@@ -1,0 +1,14 @@
+name: vManage-client feature request
+description: Suggest an idea for vManage-client.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for finding the time to propose a new feature!
+        We really appreciate that.
+
+  - type: textarea
+    attributes:
+      label: Description
+      description: A short description of your feature.

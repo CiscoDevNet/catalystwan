@@ -1,62 +1,57 @@
 name: Bug Report
-description: File a bug report
-title: "[Bug]: "
-labels: ["bug", "triage"]
-assignees:
-  - octocat
+description: Report a problem or a bug with vManage-client code.
+labels: ["needs review"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
-  - type: input
-    id: contact
+        Thank you for finding the time to report a problem!
+        We really appreciate that.
+  - type: textarea
     attributes:
-      label: Contact Details
-      description: How can we get in touch with you if we need more info?
-      placeholder: ex. email@example.com
+      label: Summary
+      description: Description of the bug, what happened and what you expected to happen
+      placeholder: >
+        Clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Logs and external information
+      description: Add logs to help diagnose the issue.
+      placeholder: >
+        TBD
     validations:
       required: false
   - type: textarea
-    id: what-happened
     attributes:
-      label: What happened?
-      description: Also tell us, what did you expect to happen?
-      placeholder: Tell us what you see!
-      value: "A bug happened!"
+      label: Reproduction script
+      description: >
+        Please provide minimal, copy-pasted script which reproduces the issue. 
+        If reproducible script is not provided, issue may be closed.
+        [How to create a Minimal, Reproducible Example](https://stackoverflow.com/help/mcve).
     validations:
       required: true
   - type: dropdown
-    id: version
     attributes:
-      label: Version
-      description: What version of our software are you running?
-      options:
-        - 1.0.2 (Default)
-        - 1.0.3 (Edge)
-    validations:
-      required: true
-  - type: dropdown
-    id: browsers
-    attributes:
-      label: What browsers are you seeing the problem on?
+      label: On what platform(s) does it occur?
       multiple: true
       options:
-        - Firefox
-        - Chrome
-        - Safari
-        - Microsoft Edge
-  - type: textarea
-    id: logs
+        - Windows
+        - Linux
+        - macOS
+        - Not Applicable
+    validations:
+      required: true
+  - type: dropdown
     attributes:
-      label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
-      render: shell
-  - type: checkboxes
-    id: terms
-    attributes:
-      label: Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com)
+      label: Issue Severity
+      description: |
+        How does it affect you as a user?
+      multiple: false
       options:
-        - label: I agree to follow this project's Code of Conduct
-          required: true
+          - "High: Blocking everything"
+          - "Medium: There is a workaround"
+          - "Low: It annoys me"
+    validations:
+        required: false
