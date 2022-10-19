@@ -1,0 +1,28 @@
+name: Check for version bump
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  analyze_code:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check changed files
+        id: files
+        uses: tj-actions/changed-files@v31
+      - name: Check if pyproject.toml was changed
+        run: |
+          file="pyproject.toml"
+          if [[ "${{ steps.files.outputs.all_changed_files }}" =~ .*"$file".* ]]
+          then
+            echo "$file changed"
+          else
+            (echo "$file not changed, bump version";exit 1)
+          fi
