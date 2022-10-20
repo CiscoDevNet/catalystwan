@@ -1,0 +1,47 @@
+name: Static code analyzer
+
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  analyze_code:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8']
+    defaults:
+      run:
+        shell: sh
+
+    steps:
+      - if: ${{ env.ACT }}
+        name: Hack container for local development
+        run: |
+            curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set Up Poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: 1.1.13
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          poetry install -v
+      - name: Checking if imports are sorted correctly
+        run: poetry run isort --check --diff -l 120 --profile black vmngclient
+      - name: Check static-typing
+        run: poetry run mypy --show-error-codes --show-error-context --pretty vmngclient
+      - name: Check code style
+        run: poetry run flake8 --max-line-length 120 vmngclient
