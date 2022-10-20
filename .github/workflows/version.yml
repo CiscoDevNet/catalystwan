@@ -1,0 +1,49 @@
+name: Bump version
+
+on:
+  push:
+    branches: main
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+      - name: Set Up Poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: 1.1.13
+      - name: Get old version
+        run: |
+          version_message=$(poetry version)
+          old_version=$(echo "${version_message##* }")
+          echo "old_version=${old_version}" >> $GITHUB_ENV
+      - name: Get bump message
+        run: |
+          stringContain() { [ -z "$1" ] || { [ -z "${2##*$1*}" ] && [ -n "$2" ];};}
+          commit_message=`echo "${{ github.event.head_commit.message }}" | head -1`
+          if stringContain ':' $commit_message;then bump=`echo "${commit_message%%:*}"`;else bump="";fi
+          echo "bump=${bump}" >> $GITHUB_ENV
+      - name: Bump version and get new version
+        run: |
+          bump_message=$(poetry version ${{ env.bump }})
+          new_version=$(echo "${bump_message##* }")
+          echo "new_version=${new_version}" >> $GITHUB_ENV
+      - name: Commit version changes in pyproject.toml
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: 'Automated version bump'
+          add: 'pyproject.toml'
+      - name: Add tag with new version
+        if: ${{ env.new_version != env.old_version }}
+        uses: rickstaa/action-create-tag@v1
+        with:
+          tag: "v${{ env.new_version }}"
