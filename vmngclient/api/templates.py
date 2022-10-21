@@ -64,13 +64,13 @@ class TemplateAPI:
 
     def tt(self):
         payload = {
-            "templateId": "dfb831c4-f0a3-4f28-b24a-0912f8c849e8",
+            "templateId": "",
             "device": {
-                "csv-status": "complete",
-                "csv-deviceId": "C8K-eb40c692-e2fd-4c91-9d0e-f577a5af5117",
-                "csv-deviceIP": "172.16.254.5",
-                "csv-host-name": "vm6",
-                "csv-templateId": "dfb831c4-f0a3-4f28-b24a-0912f8c849e8",
+                "csv-status": "",
+                "csv-deviceId": "",
+                "csv-deviceIP": "",
+                "csv-host-name": "",
+                "csv-templateId": "",
             },
         }
 
