@@ -11,6 +11,7 @@ from vmngclient.utils.certificate_status import CertificateStatus
 from vmngclient.utils.creation_tools import get_logger_name
 from vmngclient.utils.reachability import Reachability
 from vmngclient.utils.validate_status import ValidateStatus
+from os.path import basename
 
 logger = logging.getLogger(get_logger_name(__name__))
 
@@ -181,3 +182,15 @@ class DecommissionAction(DeviceActionApi):
                 return None
 
         wait_for_status()
+
+class UploadImage(DeviceActionApi):
+    """
+    API methods for uploading images to Vmanage repository 
+
+    Args:
+        DeviceActionApi (_type_): _description_
+    """
+    def upload_vmanage(self,file_path):
+        url = '/device/action/software/package'
+        files = {'file': (basename(file_path), open(file_path, 'rb'))}
+
