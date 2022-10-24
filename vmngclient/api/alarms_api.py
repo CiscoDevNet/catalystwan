@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, List, Set
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
 from vmngclient.dataclasses import AlarmData
-from vmngclient.session import Session
+from vmngclient.session.session_base import Session
 from vmngclient.utils.creation_tools import create_dataclass, flatten_dict, get_logger_name
 
 logger = logging.getLogger(get_logger_name(__name__))

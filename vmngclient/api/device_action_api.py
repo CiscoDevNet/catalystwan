@@ -6,7 +6,7 @@ from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
 from vmngclient.api.basic_api import DevicesApi, DeviceStateApi
 from vmngclient.dataclasses import DeviceInfo
-from vmngclient.session import Session
+from vmngclient.session.session_base import Session
 from vmngclient.utils.certificate_status import CertificateStatus
 from vmngclient.utils.creation_tools import get_logger_name
 from vmngclient.utils.reachability import Reachability

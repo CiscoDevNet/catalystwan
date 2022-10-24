@@ -9,7 +9,7 @@ from vmngclient.dataclasses import (
     OmpServiceData,
     OmpSummaryData,
 )
-from vmngclient.session import Session
+from vmngclient.session.session_base import Session
 from vmngclient.utils.creation_tools import create_dataclass
 
 

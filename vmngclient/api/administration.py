@@ -2,7 +2,7 @@ import logging
 from typing import List, Union, cast
 
 from vmngclient.dataclasses import CloudConnectorData, CloudServicesSettings, ServiceConfigurationData, User
-from vmngclient.session import Session
+from vmngclient.session.session_base import Session
 from vmngclient.utils.creation_tools import asdict, create_dataclass, get_logger_name
 
 logger = logging.getLogger(get_logger_name(__name__))

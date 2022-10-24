@@ -6,7 +6,7 @@ from urllib.error import HTTPError
 
 from vmngclient.api.basic_api import DeviceStateApi
 from vmngclient.dataclasses import DeviceInfo, Speedtest
-from vmngclient.session import Session
+from vmngclient.session.session_base import Session
 from vmngclient.utils.creation_tools import get_logger_name
 
 logger = logging.getLogger(get_logger_name(__name__))

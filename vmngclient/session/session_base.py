@@ -20,6 +20,10 @@ logger = logging.getLogger(get_logger_name(__name__))
 
 
 class Session:
+    """Base class for API sessions for vmanage client.
+    
+    Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
+    """
     def __init__(self, ip_address: str, port: int, username: str, password: str, timeout: int = 30) -> None:
         self.base_url = self.__create_base_url(ip_address, port)
         self.username = username
@@ -349,8 +353,22 @@ class Session:
 
         return True if _send_server_request() else False
 
+
+class ProviderSession(Session):
+    """vManage API client logged as provider (admin).
+    
+    Attributes:
+        ip_address: IP address, i.e. '10.0.1.200'
+        port: port
+        username: admin username
+        password: admin password
+    """
+    def __init__(
+        self, ip_address: str, port: int, username: str, password: str, timeout: int = 30) -> None:
+        super().__init__(ip_address, port, username, password, timeout)
+
     def __str__(self) -> str:
-        return f"{self.username}@{self.base_url}"
+        return f"{self.__class__.__name__}({self.username}@{self.base_url})"
 
 
 class ProviderAsTenantSession(Session):
@@ -419,6 +437,9 @@ class ProviderAsTenantSession(Session):
         assert vsession_id == '', 'Switch to provider expecting VSessionId to be empty'
         del self.session_headers['VSessionId']
 
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}({self.username}@{self.base_url})"
+
 
 class TenantSession(Session):
     """vManage API client logged as a tenant.
@@ -451,4 +472,4 @@ class TenantSession(Session):
         super().login()
 
     def __str__(self) -> str:
-        return f"{self.username}@{self.domain}"
+        return f"{self.__class__.__name__}({self.username}@{self.domain})"
