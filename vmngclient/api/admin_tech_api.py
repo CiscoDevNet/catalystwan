@@ -10,7 +10,7 @@ from typing import List, Optional, cast
 from urllib.error import HTTPError
 
 from vmngclient.dataclasses import AdminTech
-from vmngclient.session.session_base import Session
+from vmngclient.session import Session
 from vmngclient.utils.creation_tools import create_dataclass
 
 

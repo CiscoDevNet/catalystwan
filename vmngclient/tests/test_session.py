@@ -1,6 +1,6 @@
 import unittest
 
-from vmngclient.session.session_base import Session
+from vmngclient.session import Session
 
 
 class TestSessionConstructor(unittest.TestCase):

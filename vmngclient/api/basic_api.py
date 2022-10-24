@@ -6,7 +6,7 @@ from typing import Iterator, List, Union, cast
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
 from vmngclient.dataclasses import BfdSessionData, Connection, DeviceInfo, Reboot, WanInterface
-from vmngclient.session.session_base import Session
+from vmngclient.session import Session
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability

@@ -13,7 +13,7 @@ from typing import Iterator
 
 from vmngclient.api.basic_api import DeviceStateApi
 from vmngclient.dataclasses import DeviceInfo, PacketSetup, Status
-from vmngclient.session.session_base import Session
+from vmngclient.session import Session
 from vmngclient.utils.creation_tools import create_dataclass, get_logger_name
 
 logger = logging.getLogger(get_logger_name(__name__))

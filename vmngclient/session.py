@@ -19,11 +19,45 @@ from vmngclient.utils.creation_tools import get_logger_name
 logger = logging.getLogger(get_logger_name(__name__))
 
 
+def session_factory(
+    ip_address: str,
+    port: int,
+    username: str,
+    password: str,
+    timeout: int = 30,
+    domain: str = None,
+    subdomain: str = None,
+):
+    """Factory function that creates session object based on provided arguments."""
+    if not domain and not subdomain:
+        return Session(ip_address=ip_address, port=port, username=username, password=password, timeout=timeout)
+    elif domain and not subdomain:
+        return TenantSession(
+            ip_address=ip_address, port=port, username=username, password=password, timeout=timeout, domain=domain
+        )
+    elif subdomain and not domain:
+        return ProviderAsTenantSession(
+            ip_address=ip_address, port=port, username=username, password=password, timeout=timeout, subdomain=subdomain
+        )
+    raise TypeError(
+        "Session type could not be found based on provided arguments. "
+        "Please verify that you are not using `domain` and `subdomain` at the same time."
+    )
+
+
 class Session:
     """Base class for API sessions for vmanage client.
-    
+
     Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
+    In Session, vManage API client is logged as provider (admin).
+
+    Attributes:
+        ip_address: IP address, i.e. '10.0.1.200'
+        port: port
+        username: admin username
+        password: admin password
     """
+
     def __init__(self, ip_address: str, port: int, username: str, password: str, timeout: int = 30) -> None:
         self.base_url = self.__create_base_url(ip_address, port)
         self.username = username
@@ -353,21 +387,10 @@ class Session:
 
         return True if _send_server_request() else False
 
-
-class ProviderSession(Session):
-    """vManage API client logged as provider (admin).
-    
-    Attributes:
-        ip_address: IP address, i.e. '10.0.1.200'
-        port: port
-        username: admin username
-        password: admin password
-    """
-    def __init__(
-        self, ip_address: str, port: int, username: str, password: str, timeout: int = 30) -> None:
-        super().__init__(ip_address, port, username, password, timeout)
-
     def __str__(self) -> str:
+        return f"{self.username}@{self.base_url}"
+
+    def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.username}@{self.base_url})"
 
 
@@ -438,6 +461,9 @@ class ProviderAsTenantSession(Session):
         del self.session_headers['VSessionId']
 
     def __str__(self) -> str:
+        return f"{self.username}@{self.base_url}"
+
+    def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.username}@{self.base_url})"
 
 
@@ -447,6 +473,7 @@ class TenantSession(Session):
     Attributes:
         base_url: TODO.
         domain: Tenant domain, i.e. 'apple.fruits.com'.
+        port: port
         username: Tenant username.
         password: Tenant password.
         timeout: TODO. Defaults to 0.
@@ -472,4 +499,7 @@ class TenantSession(Session):
         super().login()
 
     def __str__(self) -> str:
-        return f"{self.__class__.__name__}({self.username}@{self.domain})"
+        return f"{self.username}@{self.domain}"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.username}@{self.base_url})"
