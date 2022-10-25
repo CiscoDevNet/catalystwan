@@ -1,51 +1,45 @@
+from vmngclient.dataclasses import DeviceInfo
+from vmngclient.session import Session
+from vmngclient.api.repository import Repository
+from vmngclient.dataclasses import DeviceInfo
+from typing import List
+
 class PartitionManager:
+
+    def __init__(self, session: Session, devices : List[DeviceInfo],
+                 vmanage_image : str = '') -> None:
+        self.vmanange_image = vmanage_image
+        self.session = session
+        self.devices = []
+        for dev in devices:
+                dev_dict = dict()
+                dev_dict['deviceIP'] = dev.local_system_ip
+                dev_dict['deviceId'] = dev.uuid
+                self.devices.append(dev_dict)
 
     def set_default_partition(self):
 
-        #move to __init__
-        #raw version of self.devs, have to write it prettier
-        self.devs = []
         for dev in self.devices:
-                dev_dict = dict()
-                dev_dict['deviceIP'] = dev.local_system_ip
-                dev_dict['version'] = self.all_versions["current"]
-                dev_dict['deviceId'] = dev.uuid
-                self.devs.append(dev_dict)
-
+            dev['version'] = self.get_all_versions["current"]
         url = '/device/action/defaultpartition'
         payload = {'action': 'defaultpartition',
-                   'devices': self.devs ,
+                   'devices': self.devices ,
                    'deviceType': 'vmanage'
                    }
         return self.session.post_data(url, payload)
     
     def remove_available_partition(self):
         
-        # u is for unicode
-        self.devs = []
+        # u is for unicode, have to checkout if it's unneccessary
         for dev in self.devices:
-                dev_dict = dict()
-                dev_dict['deviceIP'] = dev.local_system_ip
-                dev_dict['version'] = self.all_versions["default"]
-                dev_dict['deviceId'] = dev.uuid
-                self.devs.append(dev_dict)
+            dev['version'] = self.get_all_versions["current"]
 
         url = '/device/action/removepartition'
         payload = {'action': 'removepartition',
-                   'devices': self.devs,
+                   'devices': self.devices,
                    'deviceType': 'vmanage'
                    }
         return self.session.post_data(url, payload)
     
-    def get_all_versions(self):
-        url = '/system/device/controllers'
-        versions = {'deviceId' :{'availableVersions':['ver1','ver2'], 
-                                  'defaultVersions':['ver1','ver2'],
-                                  'toInstallVersion':[self.get_image_version()]} }
+
         
-    
-        """
-        3. Install software (use endpoint from software_upgrade from vmanagehttp.py), 
-           have to create dataclass InstallSpecification
-        4. Activate (many actions here)
-        """
