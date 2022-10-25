@@ -1,30 +1,56 @@
-from vmngclient.api.basic_api import DevicesApi, DeviceStateApi
-from vmngclient.dataclasses import DeviceInfo
+from vmngclient.dataclasses import DeviceInfo, InstallSpec
 from vmngclient.session import Session
+from vmngclient.api.repository import Repository
 from typing import List
 from vmngclient.utils.creation_tools import get_logger_name
-import os
+from vmngclient.api.partition_manager_api import PartitionManager
 import logging
 
 logger = logging.getLogger(get_logger_name(__name__))
 
 class VmanageUpgradeApi:
-    # TODO: add rollback option if it's api endpoint
-    # TODO: add logging
+    # TODO 1: add rollback option if it's api endpoint
+    # TODO 2: add logging
+    # TODO 3: Ask about timeouts
 
-    def __init__(self,vmanage_image : str, session: Session, devices: List[DeviceInfo]):
+    def __init__(self,vmanage_image : str, session: Session,
+                 partition_manager : PartitionManager,
+                 install_spec: InstallSpec):
+
         self.vmanage_image = vmanage_image
-        # self.version_to_set = Repository(session).get_image_version()
-        self.all_versions = get_all_versions(self)
         self.session = session
-        self.devices = devices
+        self.devices = partition_manager.devices
+        self.install_spec = install_spec
 
-    def upload_vmanage_image (self):
-
-        "have to wait for request lib case resolve"
-    
     def upgrade_vmanage (self):
-        #just upgrade here
+        
+        api = '/device/action/install'
+        payload = {
+            'action': 'install',
+            'input': {
+                'vEdgeVPN': 0,
+                'vSmartVPN': 0,
+                'data': [
+                    {
+                        'family': self.install_spec.family,
+                        'version': Repository(self.session, self.vmanage_image).get_image_version(),
+                    }
+                ],
+                'versionType': self.install_spec.version_type,
+                'reboot': self.install_spec.reboot,
+                'sync': self.install_spec.sync,
+            },
+            'devices': self.devices,
+            'deviceType': self.install_spec.device_type,
+        }
 
-        self.set_default_partition()
-        self.remove_available_partition()
+        self.session.get_data(api,payload)
+
+    def activate_vmanage(self):
+
+        api = '/device/action/changepartition'
+        payload = {'action': 'changepartition',
+                   'devices': self.devices,
+                   'deviceType': 'vmanage'
+                   }
+        self.session.post_data(api, payload)
