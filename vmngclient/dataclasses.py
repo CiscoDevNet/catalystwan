@@ -269,3 +269,12 @@ class CloudOnRampForSaasMode:
     """
 
     mode: str = field(metadata={FIELD_NAME: "mode"})
+
+class InstallSpec:
+    """Class to keep installation specification"""
+
+    family: str
+    version_type: str
+    device_type: str
+    reboot: bool
+    sync: bool
