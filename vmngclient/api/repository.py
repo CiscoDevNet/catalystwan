@@ -3,7 +3,7 @@ from vmngclient.session import Session
 
 class Repository:
 
-    def __init__(self, session: Session, vmanage_image : str):
+    def __init__(self, session: Session, vmanage_image : str = ''):
         self.session = session
         self.vmanage_image = vmanage_image
     
@@ -28,6 +28,7 @@ class Repository:
         return version
    
     def get_all_versions(self):
+        #Maybe create dataclass for that?
         url = '/dataservice/system/device/controllers'
         
         devices_versions = dict()
@@ -36,7 +37,8 @@ class Repository:
             versions_dict = dict()
             versions_dict['availableVersions'] = [dev.split('-')[0] for dev in
                                                   dev['availableVersions']]
-            versions_dict['defaultVersion'] = (dev['defaultVersion']).split('-')[0]
+            versions_dict['currentVersion'] = dev['version']
+            versions_dict['defaultVersion'] = dev['defaultVersion'].split('-')[0]
             versions_dict['UpgradeVersion'] = self.get_image_version()
             devices_versions[dev['uuid']] = versions_dict
         
