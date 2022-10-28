@@ -1,5 +1,6 @@
 import logging
 from typing import List
+from vmngclient.dataclasses import DeviceSoftwareVersions
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
