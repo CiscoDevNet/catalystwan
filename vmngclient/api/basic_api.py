@@ -8,6 +8,7 @@ from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 from vmngclient.dataclasses import BfdSessionData, Connection, DeviceInfo, Reboot, WanInterface
 from vmngclient.session import Session
 from vmngclient.utils.creation_tools import create_dataclass
+from vmngclient.utils.operation_status import OperationStatus
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
 
@@ -143,8 +144,8 @@ class DevicesApi:
             self.session.__get_logger(f"Orignial exception: {retry_state.outcome.exception()}.")
 
         def check_state(action_data):
-            list_action = [not action['status'] == 'Success' for action in action_data]
-            return all(list_action)
+            list_action = [action['status'] == OperationStatus.SUCCESS.value for action in action_data]
+            return not all(list_action)
 
         @retry(
             wait=wait_fixed(sleep_seconds),

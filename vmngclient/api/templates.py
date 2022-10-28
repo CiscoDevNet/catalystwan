@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, cast
+from typing import List, cast
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
@@ -14,7 +14,7 @@ logger = logging.getLogger(get_logger_name(__name__))
 
 
 class TemplateNotFoundError(Exception):
-    """Used when a templete item is not found."""
+    """Used when a template item is not found."""
 
     def __init__(self, template):
         self.message = f"No such template: '{template}'"
@@ -38,7 +38,7 @@ class TemplateAPI:
         """Templates.
 
         Returns:
-            List[Template]: List exist template.
+            List[Template]: List of existing templates.
         """
         endpoint = "/dataservice/template/device"
         data = self.session.get_data(endpoint)
@@ -51,7 +51,7 @@ class TemplateAPI:
             name (str): Name of template.
 
         Raises:
-            TemplateNotFoundError: If template is not exist.
+            TemplateNotFoundError: If template does not exist.
 
         Returns:
             Template: Selected template.
@@ -97,7 +97,7 @@ class TemplateAPI:
             retry=retry_if_result(check_status),
         )
         def wait_for_status():
-            return self.get_operation_status(operation_id)
+            return self.__get_operation_status(operation_id)
 
         return True if wait_for_status() else False
 
@@ -109,7 +109,7 @@ class TemplateAPI:
             device (DeviceInfo): Device to attach template.
 
         Returns:
-            bool: True if attached template is successful, otherwise - False.
+            bool: True if attaching template is successful, otherwise - False.
         """
         templateId = self.get_id(template_name)
         payload = {
@@ -146,20 +146,7 @@ class TemplateAPI:
         response = cast(dict, self.session.post_json(url=endpoint, data=payload))
         return self.wait_complete(response['id'])
 
-    def get_operation_information(self, id: str) -> List[Dict[str, str]]:
-        """Get operation information.
-
-        Args:
-            id (str): Operatrion id.
-
-        Returns:
-            List[Dict[str, str]]: List action status.
-        """
-        endpoint = f"/dataservice/device/action/status/{id}"
-        response = cast(list, self.session.get_data(endpoint))
-        return response
-
-    def get_operation_status(self, operation_id: str) -> List[OperationStatus]:
+    def __get_operation_status(self, operation_id: str) -> List[OperationStatus]:
         """Get operatrion status.
 
         Args:
@@ -168,7 +155,9 @@ class TemplateAPI:
         Returns:
             List[OperationStatus]: List of operations.
         """
-        return [OperationStatus(status['status']) for status in self.get_operation_information(operation_id)]
+        endpoint = f"/dataservice/device/action/status/{operation_id}"
+        response = cast(list, self.session.get_data(endpoint))
+        return [OperationStatus(status['status']) for status in response]
 
     def delete(self, template_name: str) -> bool:
         """Delete template.
@@ -210,8 +199,8 @@ class CreateCliTemplate:
         config = cast(dict, self.session.get_json(endpoint))
         self.config = CiscoConfParse(config['config'].splitlines())
 
-    def send_to_vmanage(self) -> str:
-        """Send CLI template to vManage.
+    def send_to_device(self) -> str:
+        """Send CLI template to device.
 
         Returns:
             str: Template id.

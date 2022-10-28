@@ -9,6 +9,7 @@ from vmngclient.dataclasses import DeviceInfo
 from vmngclient.session import Session
 from vmngclient.utils.certificate_status import CertificateStatus
 from vmngclient.utils.creation_tools import get_logger_name
+from vmngclient.utils.operation_status import OperationStatus
 from vmngclient.utils.reachability import Reachability
 from vmngclient.utils.validate_status import ValidateStatus
 
@@ -66,7 +67,7 @@ class RebootAction(DeviceActionApi):
         self,
         sleep_seconds: int = 15,
         timeout_seconds: int = 1800,
-        expected_status: str = 'Success',
+        expected_status: str = OperationStatus.SUCCESS.value,
         expected_reachability: str = Reachability.reachable.value,
     ):
         def check_status(action_data):
