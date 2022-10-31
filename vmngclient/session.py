@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import socket
 import ssl
@@ -19,25 +21,39 @@ from vmngclient.utils.creation_tools import get_logger_name
 logger = logging.getLogger(get_logger_name(__name__))
 
 
-def session_factory(
+# Alternative naming: Provision, Prepare, Yield, Establish, Supply
+def CreateSession(
     ip_address: str,
     port: int,
     username: str,
     password: str,
     timeout: int = 30,
+    # TODO: domain and subdomain are not the same, for specific tenant login it should be subdomain
     domain: str = None,
     subdomain: str = None,
-):
+) -> Session:
     """Factory function that creates session object based on provided arguments."""
     if not domain and not subdomain:
-        return Session(ip_address=ip_address, port=port, username=username, password=password, timeout=timeout)
+        return ProviderSession(
+            ip_address=ip_address, port=port, provider_username=username, provider_password=password, timeout=timeout
+        )
     elif domain and not subdomain:
         return TenantSession(
-            ip_address=ip_address, port=port, username=username, password=password, timeout=timeout, domain=domain
+            ip_address=ip_address,
+            port=port,
+            tenant_username=username,
+            tenant_password=password,
+            timeout=timeout,
+            domain=domain,
         )
     elif subdomain and not domain:
         return ProviderAsTenantSession(
-            ip_address=ip_address, port=port, username=username, password=password, timeout=timeout, subdomain=subdomain
+            ip_address=ip_address,
+            port=port,
+            provider_username=username,
+            provider_password=password,
+            timeout=timeout,
+            subdomain=subdomain,
         )
     raise TypeError(
         "Session type could not be found based on provided arguments. "
@@ -49,13 +65,12 @@ class Session:
     """Base class for API sessions for vmanage client.
 
     Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
-    In Session, vManage API client is logged as provider (admin).
 
     Attributes:
         ip_address: IP address, i.e. '10.0.1.200'
         port: port
-        username: admin username
-        password: admin password
+        username: username
+        password: password
     """
 
     def __init__(self, ip_address: str, port: int, username: str, password: str, timeout: int = 30) -> None:
@@ -394,22 +409,50 @@ class Session:
         return f"{self.__class__.__name__}({self.username}@{self.base_url})"
 
 
+class ProviderSession(Session):
+    """vManage API client logged as provider (admin).
+
+    Attributes:
+        ip_address: IP address, i.e. '10.0.1.200'
+        port: port
+        provider_username: username for provider role
+        provider_password: password
+    """
+
+    def __init__(
+        self, ip_address: str, port: int, provider_username: str, provider_password: str, timeout: int = 30
+    ) -> None:
+        super().__init__(ip_address, port, provider_username, provider_password, timeout)
+
+    def __str__(self) -> str:
+        return f"{self.username}@{self.base_url}"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.username}@{self.base_url})"
+
+
 class ProviderAsTenantSession(Session):
     """vManage API client logged in as provider acting as tenant.
 
     Attributes:
         ip_address: IP address, i.e. '10.0.1.200'
         port: port
-        username: provider username
-        password: secret
+        provider_username: provider role username
+        provider_password: secret
         subdomain: tenant subdomain, i.e. 'apple.fruits.com'
     """
 
     def __init__(
-        self, ip_address: str, port: int, username: str, password: str, subdomain: str, timeout: int = 30
+        self,
+        ip_address: str,
+        port: int,
+        provider_username: str,
+        provider_password: str,
+        subdomain: str,
+        timeout: int = 30,
     ) -> None:
         self.subdomain = subdomain
-        super().__init__(ip_address, port, username, password, timeout)
+        super().__init__(ip_address, port, provider_username, provider_password, timeout)
         # self._name = f'{self._name} vSession for {subdomain}'
 
     def login(self) -> None:
@@ -472,19 +515,26 @@ class TenantSession(Session):
 
     Attributes:
         base_url: TODO.
-        domain: Tenant domain, i.e. 'apple.fruits.com'.
         port: port
-        username: Tenant username.
-        password: Tenant password.
+        tenant_username: Tenant username.
+        tenant_password: Tenant password.
+        domain: Tenant subdomain, i.e. 'apple.fruits.com'.  # todo consider using subdomain here
         timeout: TODO. Defaults to 0.
     """
 
     def __init__(
-        self, ip_address: str, domain: str, port: int, username: str, password: str, timeout: int = 0, logger=None
+        self,
+        ip_address: str,
+        domain: str,
+        port: int,
+        tenant_username: str,
+        tenant_password: str,
+        timeout: int = 0,
+        logger=None,
     ) -> None:
         self.domain = domain
         # TODO How to remove an ip address? Do we need an ip for tenant?
-        super().__init__(ip_address, port, username, password)
+        super().__init__(ip_address, port, tenant_username, tenant_password)
         # self.base_url = "https://apple.fruits.com:10100"
 
     def login(self) -> None:
