@@ -1,3 +1,4 @@
+from distutils.debug import DEBUG
 from vmngclient.dataclasses import DeviceInfo, InstallSpec
 from vmngclient.api.device_action_api import DeviceActionApi
 from vmngclient.api.basic_api import DeviceStateApi
@@ -10,9 +11,12 @@ import logging
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
 logger = logging.getLogger(get_logger_name(__name__))
+logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s -  %(levelname)s - %(message)s')
 
 
-class VmanageUpgradeApi:
+
+class SoftwareUpgradeApi:
     # TODO 1: add rollback option if it's api endpoint
     # TODO 2: add logging
     # TODO 3: Ask about timeouts
@@ -25,27 +29,27 @@ class VmanageUpgradeApi:
         self.partition_manager = partition_manager
         self.install_spec = install_spec
 
-    def upgrade_vmanage (self):
+    # def upgrade_vmanage (self):
         
-        url = '/dataservice/device/action/install'
-        payload = {
-            'action': 'install',
-            'input': {
-                'vEdgeVPN': 0,
-                'vSmartVPN': 0,
-                'family': self.install_spec.family,
-                'version': Repository(self.session, self.partition_manager.vmanange_image).get_image_version(),
-                'versionType': self.install_spec.version_type,
-                'reboot': self.install_spec.reboot,
-                'sync': self.install_spec.sync,
-            },
-            'devices': self.partition_manager.devices,
-            'deviceType': self.install_spec.device_type,
-        }
+    #     url = '/dataservice/device/action/install'
+    #     payload = {
+    #         'action': 'install',
+    #         'input': {
+    #             'vEdgeVPN': 0,
+    #             'vSmartVPN': 0,
+    #             'family': self.install_spec.family,
+    #             'version': Repository(self.session, self.partition_manager.vmanange_image).get_image_version(),
+    #             'versionType': self.install_spec.version_type,
+    #             'reboot': self.install_spec.reboot,
+    #             'sync': self.install_spec.sync,
+    #         },
+    #         'devices': self.partition_manager.devices,
+    #         'deviceType': self.install_spec.device_type,
+    #     }
 
 
-        upgrade_id = self.session.post_json(url,payload)
-        return upgrade_id['id']
+    #     upgrade_id = self.session.post_json(url,payload)
+    #     return upgrade_id['id']
 
     def activate_vmanage(self):
 
@@ -58,7 +62,25 @@ class VmanageUpgradeApi:
 
 
         activate_id = self.session.post_json(url, payload)
-        return activate_id['id'] 
+        return activate_id['id']
+    
+    def upgrade_controller(self):
+        url = '/dataservice/device/action/install'
+        payload = {"action":"install",
+                   "input":{
+                        "vEdgeVPN":0,
+                        "vSmartVPN":0,
+                        "family":self.install_spec.family,
+                        "version":Repository(self.session, self.partition_manager.vmanange_image).get_image_version(),
+                        "versionType":self.install_spec.version_type,
+                        "reboot":self.install_spec.reboot,
+                        "sync":self.install_spec.sync},
+                    "devices":self.partition_manager.devices,
+                    "deviceType":self.install_spec.device_type}
+
+        upgrade_id = self.session.post_json(url,payload)
+        return upgrade_id['id']
+    
 
     def wait_for_completed(self, 
         sleep_seconds: int,timeout_seconds: int,
