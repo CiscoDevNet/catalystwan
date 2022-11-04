@@ -281,8 +281,7 @@ class InstallSpec:
     sync: bool
 
 @define
-class DeviceSoftwareVersions:
-    image_version: str = field(default='')
+class DeviceSoftwareRepository:
     available_versions: List[str] = field(default=None, metadata={FIELD_NAME: "availableVersions"})
     current_version: str = field(default=None, metadata={FIELD_NAME: "version"})
     default_version: str = field(default=None, metadata={FIELD_NAME: "defaultVersion"})
