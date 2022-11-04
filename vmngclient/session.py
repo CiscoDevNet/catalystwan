@@ -23,41 +23,28 @@ logger = logging.getLogger(get_logger_name(__name__))
 
 # Alternative naming: Provision, Prepare, Yield, Establish, Supply
 def CreateSession(
-    ip_address: str,
+    url: str,
     port: int,
     username: str,
     password: str,
+    admin: bool = False,
     timeout: int = 30,
-    # TODO: domain and subdomain are not the same, for specific tenant login it should be subdomain
-    domain: str = None,
-    subdomain: str = None,
 ) -> Session:
     """Factory function that creates session object based on provided arguments."""
-    if not domain and not subdomain:
-        return ProviderSession(
-            ip_address=ip_address, port=port, provider_username=username, provider_password=password, timeout=timeout
-        )
-    elif domain and not subdomain:
-        return TenantSession(
-            ip_address=ip_address,
-            port=port,
-            tenant_username=username,
-            tenant_password=password,
-            timeout=timeout,
-            domain=domain,
-        )
-    elif subdomain and not domain:
-        return ProviderAsTenantSession(
-            ip_address=ip_address,
-            port=port,
-            provider_username=username,
-            provider_password=password,
-            timeout=timeout,
-            subdomain=subdomain,
-        )
+
+    if admin:
+        provider_session = ProviderSession(url, port, username, password, timeout)
+        role = provider_session.get_json("/dataservice/admin/user/role")
+        assert role["isAdmin"] is True, "Expected provider role, got tenant role"
+        return provider_session
+    else:
+        tenant_session = TenantSession(url, port, username, password, timeout)
+        role = tenant_session.get_json("/dataservice/admin/user/role")
+        assert role["isAdmin"] is False, "Expected tenant role, got provider role"
+        return tenant_session
+
     raise TypeError(
         "Session type could not be found based on provided arguments. "
-        "Please verify that you are not using `domain` and `subdomain` at the same time."
     )
 
 
@@ -66,15 +53,16 @@ class Session:
 
     Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
 
-    Attributes:
-        ip_address: IP address, i.e. '10.0.1.200'
+    Args:
+        url: IP address or domain name, i.e. '10.0.1.200' or 'fruits.com'
         port: port
         username: username
         password: password
+        timeout: timeout
     """
 
-    def __init__(self, ip_address: str, port: int, username: str, password: str, timeout: int = 30) -> None:
-        self.base_url = self.__create_base_url(ip_address, port)
+    def __init__(self, url: str, port: int, username: str, password: str, timeout: int = 30) -> None:
+        self.base_url = self.__create_base_url(url, port)
         self.username = username
         self.password = password
         self.timeout = timeout
@@ -334,21 +322,21 @@ class Session:
         ctx.verify_mode = ssl.CERT_NONE
         return ctx
 
-    def __create_base_url(self, ip_address: str, port: int) -> str:
+    def __create_base_url(self, url: str, port: int) -> str:
         """Creates base url based on ip address and port.
 
         Args:
-            ip_address (str): Ip address of reachable vManage.
+            url: IP address or domain name, i.e. '10.0.1.200' or 'fruits.com'
             port (int): Port of reachable vManage.
 
         Returns:
             str: Base url shared for every request.
         """
         try:
-            IPv4Address(ip_address)
+            IPv4Address(url)
         except (AddressValueError, AttributeError) as error_info:
             logger.info(f"Please provide correct IPv4 address. Error info: {error_info}")
-        return f"https://{ip_address}:{port}"
+        return f"https://{url}:{port}"
 
     def __get_logger(self) -> Logger:
         """TODO: method should configure self sufficent vManage-client logger
@@ -412,68 +400,28 @@ class Session:
 class ProviderSession(Session):
     """vManage API client logged as provider (admin).
 
-    Attributes:
-        ip_address: IP address, i.e. '10.0.1.200'
+    Args:
+        url: IP address or domain name, i.e. '10.0.1.200' or 'fruits.com'
         port: port
         provider_username: username for provider role
         provider_password: password
+        timeout: timeout
     """
-
     def __init__(
-        self, ip_address: str, port: int, provider_username: str, provider_password: str, timeout: int = 30
+        self, url: str, port: int, provider_username: str, provider_password: str, timeout: int = 30
     ) -> None:
-        super().__init__(ip_address, port, provider_username, provider_password, timeout)
+        super().__init__(url, port, provider_username, provider_password, timeout)
 
-    def __str__(self) -> str:
-        return f"{self.username}@{self.base_url}"
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.username}@{self.base_url})"
-
-
-class ProviderAsTenantSession(Session):
-    """vManage API client logged in as provider acting as tenant.
-
-    Attributes:
-        ip_address: IP address, i.e. '10.0.1.200'
-        port: port
-        provider_username: provider role username
-        provider_password: secret
-        subdomain: tenant subdomain, i.e. 'apple.fruits.com'
-    """
-
-    def __init__(
-        self,
-        ip_address: str,
-        port: int,
-        provider_username: str,
-        provider_password: str,
-        subdomain: str,
-        timeout: int = 30,
-    ) -> None:
-        self.subdomain = subdomain
-        super().__init__(ip_address, port, provider_username, provider_password, timeout)
-        # self._name = f'{self._name} vSession for {subdomain}'
-
-    def login(self) -> None:
-        """Logs in to vManage API as Provider using username/password and switch to Tenant.
-
-        Returns:
-            ProviderAsTenantSession object  TODO
-        """
-        super().login()
-        self.switch_to_tenant()
-
-    def get_tenant_id(self) -> str:
+    def get_tenant_id(self, subdomain: str) -> str:
         """Gets tenant UUID for tenant subdomain.
 
         Returns:
             tenant UUID
         """
         tenants = self.get_data('/dataservice/tenant')
-        tenant_ids = [tenant.get('tenantId') for tenant in tenants if tenant['subDomain'] == self.subdomain]
-        assert len(tenant_ids) > 0, f"Tenant not found for subdomain: {self.subdomain}"
-        return tenant_ids[0]
+        tenant_id_list = [tenant.get('tenantId') for tenant in tenants if tenant['subDomain'] == subdomain]
+        assert len(tenant_id_list) > 0, f"Tenant not found for subdomain: {subdomain}"
+        return tenant_id_list[0]
 
     def create_vsession(self, tenant_id: str) -> str:
         """Creates virtual session for tenant.
@@ -486,17 +434,19 @@ class ProviderAsTenantSession(Session):
         """
         response = cast(dict, self.post_json(f'/dataservice/tenant/{tenant_id}/vsessionid'))
         assert 'VSessionId' in response, "Invalid vsessionid response"
+        print( response['VSessionId'])
         return response['VSessionId']
 
-    def switch_to_tenant(self) -> None:
+    def switch_to_tenant(self, subdomain: str) -> None:
         """As provider impersonate tenant session."""
-        tenant_id = self.get_tenant_id()
+        tenant_id = self.get_tenant_id(subdomain)
         vsession_id = self.create_vsession(tenant_id)
         assert vsession_id != '', 'Switch to tenant expecting VSessionId to not be empty'
         self.session_headers['VSessionId'] = vsession_id
 
     def switch_to_provider(self) -> None:
         """Switch back to provider session after impersonating tenant."""
+        # TODO dont we need just `del VSessionId`?
         data = cast(dict, self.server())
         assert 'providerId' in data, "Invalid vsessionid response"
         vsession_id = self.create_vsession(data['providerId'])
@@ -510,31 +460,105 @@ class ProviderAsTenantSession(Session):
         return f"{self.__class__.__name__}({self.username}@{self.base_url})"
 
 
+# class ProviderAsTenantSession(Session):
+#     """vManage API client logged in as provider acting as tenant.
+#
+#     Attributes:
+#         ip_address: IP address, i.e. '10.0.1.200'
+#         port: port
+#         provider_username: provider role username
+#         provider_password: secret
+#         subdomain: tenant subdomain, i.e. 'apple.fruits.com'
+#     """
+#
+#     def __init__(
+#         self,
+#         ip_address: str,
+#         port: int,
+#         provider_username: str,
+#         provider_password: str,
+#         subdomain: str,
+#         timeout: int = 30,
+#     ) -> None:
+#         self.subdomain = subdomain
+#         super().__init__(ip_address, port, provider_username, provider_password, timeout)
+#         # self._name = f'{self._name} vSession for {subdomain}'
+#
+#     def login(self) -> None:
+#         """Logs in to vManage API as Provider using username/password and switch to Tenant.
+#
+#         Returns:
+#             ProviderAsTenantSession object  TODO
+#         """
+#         super().login()
+#         self.switch_to_tenant()
+#
+#     def get_tenant_id(self) -> str:
+#         """Gets tenant UUID for tenant subdomain.
+#
+#         Returns:
+#             tenant UUID
+#         """
+#         tenants = self.get_data('/dataservice/tenant')
+#         tenant_ids = [tenant.get('tenantId') for tenant in tenants if tenant['subDomain'] == self.subdomain]
+#         assert len(tenant_ids) > 0, f"Tenant not found for subdomain: {self.subdomain}"
+#         return tenant_ids[0]
+#
+#     def create_vsession(self, tenant_id: str) -> str:
+#         """Creates virtual session for tenant.
+#
+#         Args:
+#             tenant_id: provider or tenant UUID
+#
+#         Returns:
+#             virtual session token
+#         """
+#         response = cast(dict, self.post_json(f'/dataservice/tenant/{tenant_id}/vsessionid'))
+#         assert 'VSessionId' in response, "Invalid vsessionid response"
+#         return response['VSessionId']
+#
+#     def switch_to_tenant(self) -> None:
+#         """As provider impersonate tenant session."""
+#         tenant_id = self.get_tenant_id()
+#         vsession_id = self.create_vsession(tenant_id)
+#         assert vsession_id != '', 'Switch to tenant expecting VSessionId to not be empty'
+#         self.session_headers['VSessionId'] = vsession_id
+#
+#     def switch_to_provider(self) -> None:
+#         """Switch back to provider session after impersonating tenant."""
+#         data = cast(dict, self.server())
+#         assert 'providerId' in data, "Invalid vsessionid response"
+#         vsession_id = self.create_vsession(data['providerId'])
+#         assert vsession_id == '', 'Switch to provider expecting VSessionId to be empty'
+#         del self.session_headers['VSessionId']
+#
+#     def __str__(self) -> str:
+#         return f"{self.username}@{self.base_url}"
+#
+#     def __repr__(self) -> str:
+#         return f"{self.__class__.__name__}({self.username}@{self.base_url})"
+
+
 class TenantSession(Session):
     """vManage API client logged as a tenant.
 
-    Attributes:
-        base_url: TODO.
+    Args:
+        url: IP address or subdomain name, i.e. '10.0.1.201' or 'apple.fruits.com'
         port: port
-        tenant_username: Tenant username.
-        tenant_password: Tenant password.
-        domain: Tenant subdomain, i.e. 'apple.fruits.com'.  # todo consider using subdomain here
-        timeout: TODO. Defaults to 0.
+        tenant_username: username for tenant role
+        tenant_password: password
+        timeout: timeout
     """
-
     def __init__(
         self,
-        ip_address: str,
-        domain: str,
+        url: str,
         port: int,
         tenant_username: str,
         tenant_password: str,
         timeout: int = 0,
-        logger=None,
     ) -> None:
-        self.domain = domain
         # TODO How to remove an ip address? Do we need an ip for tenant?
-        super().__init__(ip_address, port, tenant_username, tenant_password)
+        super().__init__(url, port, tenant_username, tenant_password, timeout)
         # self.base_url = "https://apple.fruits.com:10100"
 
     def login(self) -> None:
@@ -544,12 +568,12 @@ class TenantSession(Session):
             TenantSession object
         """
 
-        # TODO DO we need header when we use domain?
-        self.session_headers['Host'] = self.domain
+        # TODO DO we need header when we use domain? - i think we don't
+        # self.session_headers['Host'] = self.domain
         super().login()
 
     def __str__(self) -> str:
-        return f"{self.username}@{self.domain}"
+        return f"{self.username}@{self.base_url}"
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.username}@{self.base_url})"
