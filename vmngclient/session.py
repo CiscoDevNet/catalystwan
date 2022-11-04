@@ -17,6 +17,7 @@ from urllib.request import Request, urlopen
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 
 from vmngclient.utils.creation_tools import get_logger_name
+from vmngclient.utils.is_admin import IsAdmin
 
 logger = logging.getLogger(get_logger_name(__name__))
 
@@ -34,18 +35,14 @@ def CreateSession(
 
     if admin:
         provider_session = ProviderSession(url, port, username, password, timeout)
-        role = provider_session.get_json("/dataservice/admin/user/role")
+        role = cast(dict, provider_session.get_json("/dataservice/admin/user/role"))
         assert role["isAdmin"] is True, "Expected provider role, got tenant role"
         return provider_session
     else:
         tenant_session = TenantSession(url, port, username, password, timeout)
-        role = tenant_session.get_json("/dataservice/admin/user/role")
+        role = cast(dict, tenant_session.get_json("/dataservice/admin/user/role"))
         assert role["isAdmin"] is False, "Expected tenant role, got provider role"
         return tenant_session
-
-    raise TypeError(
-        "Session type could not be found based on provided arguments. "
-    )
 
 
 class Session:
@@ -434,7 +431,6 @@ class ProviderSession(Session):
         """
         response = cast(dict, self.post_json(f'/dataservice/tenant/{tenant_id}/vsessionid'))
         assert 'VSessionId' in response, "Invalid vsessionid response"
-        print( response['VSessionId'])
         return response['VSessionId']
 
     def switch_to_tenant(self, subdomain: str) -> None:
