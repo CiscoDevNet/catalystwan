@@ -17,7 +17,6 @@ from urllib.request import Request, urlopen
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 
 from vmngclient.utils.creation_tools import get_logger_name
-from vmngclient.utils.is_admin import IsAdmin
 
 logger = logging.getLogger(get_logger_name(__name__))
 
