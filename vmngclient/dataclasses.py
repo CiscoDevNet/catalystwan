@@ -4,6 +4,7 @@ from typing import List, Optional
 from attr import define, field
 
 from vmngclient.utils.creation_tools import FIELD_NAME, convert_attributes
+from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.reachability import Reachability
 
 
@@ -61,6 +62,7 @@ class DeviceInfo:
     memUsage: float = field(default=-1)
     cpuLoad: float = field(default=-1)
     serialNumber: str = field(default="NA")
+    configOperationMode: str = field(default="NA")
     configStatusMessage: str = field(default="NA")
     connected_vManages: List[str] = field(default=["NA"], metadata={FIELD_NAME: "connectedVManages"})
     model: str = field(default=None, metadata={FIELD_NAME: "device-model"})
@@ -189,9 +191,10 @@ class User:
     resource_group: str = field(default=None, metadata={FIELD_NAME: "resGroupName"})
 
 
-@define(frozen=True)
+@define
 class Template:
-    device_type: str = field(metadata={FIELD_NAME: "deviceType"})
+    device_type_str: str = field(metadata={FIELD_NAME: "deviceType"})
+    device_type: DeviceModel = field(init=False)
     last_updated_by: str = field(metadata={FIELD_NAME: "lastUpdatedBy"})
     resource_group: str = field(metadata={FIELD_NAME: "resourceGroup"})
     template_class: str = field(metadata={FIELD_NAME: "templateClass"})
@@ -204,6 +207,9 @@ class Template:
     draft_mode: str = field(metadata={FIELD_NAME: "draftMode"})
     last_updated_on: dt.datetime = field(metadata={FIELD_NAME: "lastUpdatedOn"})
     template_attached: int = field(metadata={FIELD_NAME: "templateAttached"})
+
+    def __attrs_post_init__(self):
+        self.device_type = DeviceModel(self.device_type_str)
 
 
 @define
