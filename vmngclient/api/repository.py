@@ -40,15 +40,15 @@ class Repository:
         self.controllers_versions_repository = {}
         for controller in controllers_versions_info:
             controller_obj = create_dataclass(DeviceSoftwareRepository,controller)
-            controller[controller_obj.device_id] = controller_obj
+            self.controllers_versions_repository[controller_obj.device_id] = controller_obj
         return self.controllers_versions_repository
 
     def complete_device_list(self,version_to_set_up)-> None:
         
         for dev in self.devices:
-            dev_available_versions = self.create_controllers_versions_repository()[dev['deviceId']]
-            print (dev_available_versions)
-            # for available_version in dev_available_versions:
-            #     if version_to_set_up in available_version:
-            #         dev['version'] = available_version
-            #         break
+            dev_available_versions = self.create_controllers_versions_repository()[dev['deviceId']].available_versions
+            for available_version in dev_available_versions:
+                if version_to_set_up in available_version:
+                    dev['version'] = available_version
+                    print (dev['version'])
+                    break
