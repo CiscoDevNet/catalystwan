@@ -1,7 +1,5 @@
-from distutils.debug import DEBUG
-from vmngclient.dataclasses import DeviceInfo, InstallSpec
-from vmngclient.api.device_action_api import DeviceActionApi
-from vmngclient.api.basic_api import DeviceStateApi
+
+from vmngclient.dataclasses import InstallSpec
 from vmngclient.session import Session
 from vmngclient.api.repository import Repository
 from typing import List
@@ -19,48 +17,39 @@ logging.basicConfig(format='%(asctime)s -  %(levelname)s - %(message)s')
 class SoftwareUpgradeApi:
 
     def __init__(self, session: Session,
-                 partition_manager : PartitionManager,
-                 install_spec: InstallSpec):
+                 install_spec: InstallSpec = None,
+                 repository = Repository):
 
         self.session = session
-        self.partition_manager = partition_manager
         self.install_spec = install_spec
+        self.repository = repository
 
-    def activate_vmanage(self):
 
-        self.completed_devices_list = self.partition_manager.complete_device_list('image_version')
-        url = '/dataservice/device/action/changepartition'
-        payload = {'action': 'changepartition',
-                   'devices': self.completed_devices_list,
-                   'deviceType': 'vmanage'
-                   }
+    def activate_software(self,version_to_activate: str, devices_category: str) -> str:
         
-    
-    def activate_controller(self):
-
-        self.completed_devices_list = self.partition_manager.complete_device_list('image_version')
+        self.repository.devices_category = devices_category
+        self.repository.complete_device_list(version_to_activate)
         url = '/dataservice/device/action/changepartition'
         payload = {'action': 'changepartition',
-                   'devices': self.completed_devices_list,
+                   'devices': self.repository.devices,
                    'deviceType': 'vmanage'
                    }
         activate_id = self.session.post_json(url, payload)
         return activate_id['id']
     
-    def upgrade_controller(self):
+    def upgrade_software(self, software_image: str):
         url = '/dataservice/device/action/install'
         payload = {"action":"install",
                    "input":{
                         "vEdgeVPN":0,
                         "vSmartVPN":0,
                         "family":self.install_spec.family,
-                        "version":Repository(self.session, self.partition_manager.vmanange_image).get_image_version(),
+                        "version":self.repository.get_image_version(software_image),
                         "versionType":self.install_spec.version_type,
                         "reboot":self.install_spec.reboot,
                         "sync":self.install_spec.sync},
-                    "devices":self.partition_manager.devices,
+                    "devices":self.repository.devices,
                     "deviceType":self.install_spec.device_type}
-
         upgrade_id = self.session.post_json(url,payload)
         return upgrade_id['id']
     
