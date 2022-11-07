@@ -441,12 +441,10 @@ class ProviderSession(Session):
 
     def switch_to_provider(self) -> None:
         """Switch back to provider session after impersonating tenant."""
-        # TODO don't we need just `del VSessionId`?
-        data = cast(dict, self.server())
-        assert 'providerId' in data, "Invalid vsessionid response"
-        vsession_id = self.create_vsession(data['providerId'])
-        assert vsession_id == '', 'Switch to provider expecting VSessionId to be empty'
-        del self.session_headers['VSessionId']
+        try:
+            del self.session_headers['VSessionId']
+        except KeyError:
+            logger.info("No 'VSessionId' token found, already on provider view.")
 
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"
