@@ -7,12 +7,11 @@ from typing import List
 
 class Repository:
 
-    def __init__(self, session: Session,devices : List[DeviceInfo],
-                  vmanage_image : str = ''):
+    def __init__(self, session: Session, devices : List[DeviceInfo]):
         
         self.session = session
-        self.vmanage_image = vmanage_image
         self.devices = []
+        self.devices_category = ''
  
         for dev in devices:
             dev_dict = dict()
@@ -21,11 +20,10 @@ class Repository:
             self.devices.append(dev_dict)
 
     
-    def get_image_version(self) -> str:
+    def get_image_version(self, software_image: str) -> str:
         
-        image_version = ''
         url = '/dataservice/device/action/software/images?imageType=software'
-        image_name = os.path.basename(self.vmanage_image)
+        image_name = os.path.basename(software_image)
         software_images = self.session.get_data(url)
         for img in software_images:
             if image_name in img['availableFiles']:
@@ -33,9 +31,9 @@ class Repository:
                 break
         return image_version
    
-    def create_controllers_versions_repository(self)-> dict[DeviceSoftwareRepository] : 
+    def create_devices_versions_repository(self)-> dict[DeviceSoftwareRepository] : 
 
-        url = '/dataservice/system/device/controllers'
+        url = f'/dataservice/system/device/{self.devices_category}'
         controllers_versions_info = self.session.get_data(url)
         self.controllers_versions_repository = {}
         for controller in controllers_versions_info:
@@ -46,9 +44,8 @@ class Repository:
     def complete_device_list(self,version_to_set_up)-> None:
         
         for dev in self.devices:
-            dev_available_versions = self.create_controllers_versions_repository()[dev['deviceId']].available_versions
+            dev_available_versions = self.create_devices_versions_repository()[dev['deviceId']].available_versions
             for available_version in dev_available_versions:
                 if version_to_set_up in available_version:
                     dev['version'] = available_version
-                    print (dev['version'])
                     break
