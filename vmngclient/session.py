@@ -27,7 +27,7 @@ def CreateSession(
     port: int,
     username: str,
     password: str,
-    admin: bool = False,
+    admin: bool = True,
     timeout: int = 30,
 ) -> Session:
     """Factory function that creates session object based on provided arguments."""
