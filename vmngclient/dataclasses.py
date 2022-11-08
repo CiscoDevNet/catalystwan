@@ -269,20 +269,3 @@ class CloudOnRampForSaasMode:
     """
 
     mode: str = field(metadata={FIELD_NAME: "mode"})
-
-@define
-class InstallSpec:
-    """Class to keep installation specification"""
-
-    family: str
-    version_type: str
-    device_type: str
-    reboot: bool
-    sync: bool
-
-@define
-class DeviceSoftwareRepository:
-    available_versions: List[str] = field(default=None, metadata={FIELD_NAME: "availableVersions"})
-    current_version: str = field(default=None, metadata={FIELD_NAME: "version"})
-    default_version: str = field(default=None, metadata={FIELD_NAME: "defaultVersion"})
-    device_id: str = field(default=None, metadata={FIELD_NAME: "uuid"})
