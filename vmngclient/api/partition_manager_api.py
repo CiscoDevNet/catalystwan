@@ -1,6 +1,6 @@
 from vmngclient.dataclasses import DeviceInfo
 from vmngclient.session import Session
-from vmngclient.api.repository import Repository
+from vmngclient.api.repository_api import Repository
 from vmngclient.dataclasses import DeviceInfo
 from typing import List
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
