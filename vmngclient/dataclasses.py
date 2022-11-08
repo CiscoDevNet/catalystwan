@@ -199,7 +199,7 @@ class Template:
     resource_group: str = field(metadata={FIELD_NAME: "resourceGroup"})
     template_class: str = field(metadata={FIELD_NAME: "templateClass"})
     config_type: str = field(metadata={FIELD_NAME: "configType"})
-    template_id: str = field(metadata={FIELD_NAME: "templateId"})
+    id: str = field(metadata={FIELD_NAME: "templateId"})
     factory_default: bool = field(metadata={FIELD_NAME: "factoryDefault"})
     name: str = field(metadata={FIELD_NAME: "templateName"})
     devices_attached: int = field(metadata={FIELD_NAME: "devicesAttached"})

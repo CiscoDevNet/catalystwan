@@ -77,7 +77,7 @@ class TemplateAPI:
         Returns:
             str: Template id.
         """
-        return self.get(name).template_id
+        return self.get(name).id
 
     def wait_complete(self, operation_id: str, timeout_seconds: int = 300, sleep_seconds: int = 5) -> bool:
         """Wait to complete action.
@@ -179,7 +179,7 @@ class TemplateAPI:
             bool: True if deletion is successful, otherwise - False.
         """
         template = self.get(name)
-        endpoint = f"/dataservice/template/device/{template.template_id}"
+        endpoint = f"/dataservice/template/device/{template.id}"
         if template.devices_attached == 0:
             response = self.session.delete(url=endpoint)
             return response.status == 200
