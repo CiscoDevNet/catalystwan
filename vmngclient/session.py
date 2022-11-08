@@ -191,7 +191,7 @@ class Session:
         """
         return self.relogin_request('POST', url, data)
 
-    def post_json(self, url: str, data: Union[dict, list, None] = None) -> Union[dict, list]
+    def post_json(self, url: str, data: Union[dict, list, None] = None) -> Union[dict, list]:
         """Sends HTTP POST request and return parsed JSON data.
 
         Args:
