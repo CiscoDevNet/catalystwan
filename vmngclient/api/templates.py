@@ -104,7 +104,7 @@ class TemplateAPI:
             retry=retry_if_result(check_status),
         )
         def wait_for_status():
-            return self.__get_operation_status(operation_id)
+            return self.get_operation_status(operation_id)
 
         return True if wait_for_status() else False
 
@@ -153,7 +153,7 @@ class TemplateAPI:
         response = cast(dict, self.session.post_json(url=endpoint, data=payload))
         return self.wait_complete(response['id'])
 
-    def __get_operation_status(self, operation_id: str) -> List[OperationStatus]:
+    def get_operation_status(self, operation_id: str) -> List[OperationStatus]:
         """Get operatrion status.
 
         Args:
