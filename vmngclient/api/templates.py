@@ -91,6 +91,12 @@ class TemplateAPI:
             bool: True if acction status is successful, otherwise - False.
         """
 
+        def _log_exception(retry_state):
+            logger.error(
+                f"Operatrion status not achieved in the given time, exception: {retry_state.outcome.exception()}"
+            )
+            return False
+
         def check_status(action_data):
             if action_data:
                 list_action = [action == OperationStatus.SUCCESS for action in action_data]
@@ -102,6 +108,7 @@ class TemplateAPI:
             wait=wait_fixed(sleep_seconds),
             stop=stop_after_attempt(int(timeout_seconds / sleep_seconds)),
             retry=retry_if_result(check_status),
+            retry_error_callback=_log_exception,
         )
         def wait_for_status():
             return self.get_operation_status(operation_id)
