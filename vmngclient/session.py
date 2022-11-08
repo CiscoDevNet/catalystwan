@@ -21,16 +21,28 @@ from vmngclient.utils.creation_tools import get_logger_name
 logger = logging.getLogger(get_logger_name(__name__))
 
 
-# Alternative naming: Provision, Prepare, Yield, Establish, Supply
-def CreateSession(
+def Create(
     url: str,
     port: int,
     username: str,
     password: str,
     admin: bool = True,
     timeout: int = 30,
-) -> Session:
-    """Factory function that creates session object based on provided arguments."""
+) -> Union[ProviderSession, TenantSession]:
+    """Factory function that creates session object based on provided arguments.
+    
+    Args:
+        url (str): IP address or domain name
+        port (int): port
+        username (str): username
+        password (str): password
+        admin (bool): specifies the type of session that is returned,
+            for 'True' it is 'ProviderSession', if 'False' it is 'TenantSession'
+        timeout (int): timeout
+        
+    Returns:
+        ProviderSession or TenantSession based on admin argument.
+    """
 
     if admin:
         provider_session = ProviderSession(url, port, username, password, timeout)
@@ -179,7 +191,7 @@ class Session:
         """
         return self.relogin_request('POST', url, data)
 
-    def post_json(self, url: str, data: Union[dict, list, None] = None) -> Union[dict, list]:
+    def post_json(self, url: str, data: Union[dict, list, None] = None) -> Union[dict, list]
         """Sends HTTP POST request and return parsed JSON data.
 
         Args:
