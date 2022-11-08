@@ -4,7 +4,6 @@ from vmngclient.session import Session
 from vmngclient.api.repository_api import Repository
 from typing import List
 from vmngclient.utils.creation_tools import get_logger_name
-from vmngclient.api.partition_manager_api import PartitionManager
 import logging
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 from attr import define
@@ -12,18 +11,13 @@ from enum import Enum
 from vmngclient.api.software_upgrade_api import InstallSpecification
 
 logger = logging.getLogger(get_logger_name(__name__))
-logging.basicConfig(level=logging.DEBUG)
-logging.basicConfig(format='%(asctime)s -  %(levelname)s - %(message)s')
-
 
 class SoftwareUpgradeApi:
 
     def __init__(self, session: Session,
-                 repository = Repository):
-
+                 repository = Repository) -> None:
         self.session = session
         self.repository = repository
-
 
     def activate_software(self,version_to_activate: str, devices_category: str) -> str:
         
@@ -34,11 +28,11 @@ class SoftwareUpgradeApi:
                    'devices': self.repository.devices,
                    'deviceType': 'vmanage',
                   }
-        activate_id = self.session.post_json(url, payload)
-        return activate_id['id']
+        activate = self.session.post_json(url, payload)
+        return activate['id']
     
     def upgrade_software(self, software_image: str, install_spec: InstallSpecification,
-                         reboot : bool, sync: bool = True):
+                         reboot : bool, sync: bool = True) -> str:
         self.install_spec = install_spec
 
         url = '/dataservice/device/action/install'
@@ -54,14 +48,14 @@ class SoftwareUpgradeApi:
                     "devices":self.repository.devices,
                     "deviceType":self.install_spec.device_type
                     }
-        upgrade_id = self.session.post_json(url,payload)
-        return upgrade_id['id']
+        upgrade = self.session.post_json(url,payload)
+        return upgrade['id']
     
 
     def wait_for_completed(self, 
         sleep_seconds: int,timeout_seconds: int,
         expected_status: str,
-        action_id : str):
+        action_id : str) -> None:
         
         def check_status(action_data):
             return not action_data in (expected_status,'Failure')
