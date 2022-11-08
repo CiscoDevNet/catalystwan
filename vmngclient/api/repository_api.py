@@ -40,7 +40,7 @@ class Repository:
                 break
         return image_version
    
-    def create_devices_versions_repository(self)-> dict[DeviceSoftwareRepository] : 
+    def _create_devices_versions_repository(self)-> dict[DeviceSoftwareRepository] : 
 
         url = f'/dataservice/system/device/{self.devices_category}'
         controllers_versions_info = self.session.get_data(url)
@@ -53,7 +53,7 @@ class Repository:
     def complete_device_list(self,version_to_set_up)-> None:
         
         for dev in self.devices:
-            dev_available_versions = self.create_devices_versions_repository()[dev['deviceId']].available_versions
+            dev_available_versions = self._create_devices_versions_repository()[dev['deviceId']].available_versions
             for available_version in dev_available_versions:
                 if version_to_set_up in available_version:
                     dev['version'] = available_version

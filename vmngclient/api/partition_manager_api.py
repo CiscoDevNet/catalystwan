@@ -23,8 +23,8 @@ class PartitionManager:
                    'devices': self.devices,
                    'deviceType': 'vmanage'
                   }
-        
-        return self.session.post_json(url, payload)
+        set_default = self.session.post_json(url, payload)
+        return set_default['id']
 
     def remove_partition(self):
         
@@ -34,7 +34,8 @@ class PartitionManager:
                    'deviceType': 'vmanage'
                    }
 
-        return self.session.post_json(url, payload)
+        remove_action = self.session.post_json(url, payload)
+        return remove_action['id']
     
     def wait_for_completed(self, 
         sleep_seconds: int,timeout_seconds: int,
