@@ -30,7 +30,7 @@ def Create(
     timeout: int = 30,
 ) -> Union[ProviderSession, TenantSession]:
     """Factory function that creates session object based on provided arguments.
-    
+
     Args:
         url (str): IP address or domain name
         port (int): port
@@ -39,7 +39,7 @@ def Create(
         admin (bool): specifies the type of session that is returned,
             for 'True' it is 'ProviderSession', if 'False' it is 'TenantSession'
         timeout (int): timeout
-        
+
     Returns:
         ProviderSession or TenantSession based on admin argument.
     """
