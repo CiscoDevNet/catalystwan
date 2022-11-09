@@ -461,7 +461,6 @@ class ProviderAsTenantSession(Session):
     ) -> None:
         self.subdomain = subdomain
         super().__init__(url, port, username, password, timeout)
-        # self._name = f'{self._name} vSession for {subdomain}'
 
     def login(self) -> None:
         """Logs in to vManage API as Provider using username/password and switches to Tenant."""
