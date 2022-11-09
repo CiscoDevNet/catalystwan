@@ -496,8 +496,6 @@ class ProviderAsTenantSession(Session):
         assert vsession_id != '', 'Switch to tenant expecting VSessionId to not be empty'
         self.session_headers['VSessionId'] = vsession_id
 
-    def sth(self):
-        print("ee")
 
 class TenantSession(Session):
     """vManage API client logged as a tenant.
