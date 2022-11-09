@@ -19,6 +19,12 @@ class DeviceCategory(Enum):
     CEDGE = "vedges"
     VMANAGE = "controllers"
 
+class DeviceCategory(Enum):
+    VSMART = 'controllers'
+    VBOND = 'controllers'
+    VEDGE = 'vedges'
+    CEDGE = 'vedges'
+    VMANAGE = 'controllers'
 
 @define
 class DeviceSoftwareRepository:
