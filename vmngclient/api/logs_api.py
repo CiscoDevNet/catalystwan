@@ -9,7 +9,7 @@ from vmngclient.utils.creation_tools import get_logger_name
 logger = logging.getLogger(get_logger_name(__name__))
 
 
-class LogsApi:
+class LogsAPI:
     def __init__(self, session: Session) -> None:
         self.session = session
 

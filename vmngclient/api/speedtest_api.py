@@ -12,7 +12,7 @@ from vmngclient.utils.creation_tools import get_logger_name
 logger = logging.getLogger(get_logger_name(__name__))
 
 
-class SpeedtestApi:
+class SpeedtestAPI:
     def __init__(self, session: Session):
         self.session = session
 

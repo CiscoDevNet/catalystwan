@@ -25,7 +25,7 @@ class DownloadStatus(Enum):
     FILESIZE = None
 
 
-class PacketCaptureApi:
+class PacketCaptureAPI:
     def __init__(self, session: Session, vpn: str = "0", interface: str = "ge0/1", status=None) -> None:
         self.session = session
         self.vpn = vpn
