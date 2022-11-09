@@ -43,7 +43,7 @@ class DevicesApi:
         return [
             controller
             for controller in self.devices
-            if controller.personality in [Personality.VMANAGE.value, Personality.VSMART.value]
+            if controller.personality in [Personality.VMANAGE, Personality.VSMART]
         ]
 
     @property
@@ -366,3 +366,6 @@ class FailedSend(Exception):
     """Used when a referenced item is not found"""
 
     pass
+
+
+__all__ = ['Device']
