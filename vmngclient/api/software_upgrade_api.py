@@ -6,7 +6,6 @@ import logging
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 from attr import define
 from enum import Enum
-# from vmngclient.api.software_upgrade_api import InstallSpecification
 
 logger = logging.getLogger(get_logger_name(__name__))
 
@@ -81,17 +80,19 @@ class SoftwareUpgradeApi:
                                 self.repository.device_category)
             if incorrect_devices:
                 raise ValueError(
-                f'Current version of devices {incorrect_devices} is higher than upgrade version. Acion denied!')
+                f'Current version of devices {incorrect_devices} is higher than upgrade version. Action denied!')
+        
         upgrade = self.session.post_json(url,payload)
         return upgrade['id']
     
     
     def downgrade_check(self, version_to_upgrade : str,
                  devices_category: InstallSpecification) -> Union[None,List]:
-
+        
+        incorrect_devices = []
         for dev in self.repository.devices:
-            incorrect_devices = []
-            dev_current_version = self.repository.create_devices_versions_repository()[dev['deviceId']].current_version
+            version_to_upgrade = ''
+            dev_current_version = str(self.repository.create_devices_versions_repository()[dev['deviceId']].current_version)
             version_to_upgrade = version_to_upgrade.split('.')
             for priority, label in enumerate(dev_current_version.split('.')):
                 if str(label) > str(version_to_upgrade[priority]):
