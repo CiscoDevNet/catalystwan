@@ -1,11 +1,20 @@
 import os
 from vmngclient.session import Session
-from vmngclient.utils.creation_tools import create_dataclass
+from vmngclient.utils.creation_tools import create_dataclass, get_logger_name, FIELD_NAME
 from vmngclient.dataclasses import DeviceInfo
 from typing import List
 from attr import define, field
-from vmngclient.utils.creation_tools import FIELD_NAME
+from enum import Enum
+import logging
 
+logger = logging.getLogger(get_logger_name(__name__))
+
+class DeviceCategory(Enum):
+    VSMART = 'controllers'
+    VBOND = 'controllers'
+    VEDGE = 'vedges'
+    CEDGE = 'vedges'
+    VMANAGE = 'controllers'
 
 @define
 class DeviceSoftwareRepository:
@@ -16,11 +25,11 @@ class DeviceSoftwareRepository:
 
 class Repository:
 
-    def __init__(self, session: Session, devices : List[DeviceInfo]):
+    def __init__(self, session: Session, devices : List[DeviceInfo], device_category : DeviceCategory):
         
         self.session = session
         self.devices = []
-        self.devices_category = ''
+        self.device_category = device_category
  
         for dev in devices:
             dev_dict = dict()
@@ -37,23 +46,24 @@ class Repository:
         for img in software_images:
             if image_name in img['availableFiles']:
                 image_version = img['versionName']
-                break
-        return image_version
+                return image_version
+        logger.error(f'Software image {image_name} is not in available images')
+        
    
-    def _create_devices_versions_repository(self)-> dict[DeviceSoftwareRepository] : 
+    def create_devices_versions_repository(self)-> dict[DeviceSoftwareRepository] : 
 
-        url = f'/dataservice/system/device/{self.devices_category}'
-        controllers_versions_info = self.session.get_data(url)
-        self.controllers_versions_repository = {}
-        for controller in controllers_versions_info:
-            controller_obj = create_dataclass(DeviceSoftwareRepository,controller)
-            self.controllers_versions_repository[controller_obj.device_id] = controller_obj
-        return self.controllers_versions_repository
+        url = f'/dataservice/system/device/{self.device_category}'
+        devices_versions_info = self.session.get_data(url)
+        self.devices_versions_repository = {}
+        for device in devices_versions_info:
+            controller_obj = create_dataclass(DeviceSoftwareRepository,device)
+            self.devices_versions_repository[controller_obj.device_id] = controller_obj
+        return self.devices_versions_repository
 
     def complete_device_list(self,version_to_set_up)-> None:
         
         for dev in self.devices:
-            dev_available_versions = self._create_devices_versions_repository()[dev['deviceId']].available_versions
+            dev_available_versions = self.create_devices_versions_repository()[dev['deviceId']].available_versions
             for available_version in dev_available_versions:
                 if version_to_set_up in available_version:
                     dev['version'] = available_version
