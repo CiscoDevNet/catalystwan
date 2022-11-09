@@ -15,7 +15,7 @@ from vmngclient.utils.validate_status import ValidateStatus
 logger = logging.getLogger(get_logger_name(__name__))
 
 
-class DeviceActionApi(ABC):
+class DeviceActionAPI(ABC):
     """API method to execute action on Device."""
 
     def __init__(self, session: Session, dev: DeviceInfo):
@@ -39,7 +39,7 @@ class DeviceActionApi(ABC):
         raise NotImplementedError
 
 
-class RebootAction(DeviceActionApi):
+class RebootAction(DeviceActionAPI):
     """API method to perform reboot on Device."""
 
     def execute(self):
@@ -96,7 +96,7 @@ class RebootAction(DeviceActionApi):
         wait_for_come_up()
 
 
-class ValidateAction(DeviceActionApi):
+class ValidateAction(DeviceActionAPI):
     """
     API method to perform validate Device
     """
@@ -144,7 +144,7 @@ class ValidateAction(DeviceActionApi):
         wait_for_come_up()
 
 
-class DecommissionAction(DeviceActionApi):
+class DecommissionAction(DeviceActionAPI):
     """
     API method to decommission Device
     """
