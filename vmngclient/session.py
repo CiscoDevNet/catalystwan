@@ -25,7 +25,7 @@ class SessionNotCreatedError(Exception):
     pass
 
 
-def assert_admin_role(session, expected_admin: bool):
+def assert_admin_role(session: Session, expected_admin: bool) -> None:
     role = cast(dict, session.get_json("/dataservice/admin/user/role"))
     if not role["isAdmin"] is expected_admin:
         raise SessionNotCreatedError("Got different role than expected")
@@ -54,7 +54,7 @@ def create_session(
         timeout (int): timeout
 
     Returns:
-        ProviderSession or TenantSession based on admin argument.
+        Session object
     """
 
     if admin and not subdomain:
