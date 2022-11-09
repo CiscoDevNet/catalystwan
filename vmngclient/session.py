@@ -31,7 +31,7 @@ def assert_admin_role(session, expected_admin: bool):
         raise SessionNotCreatedError("Got different role than expected")
 
 
-def Create(
+def create_session(
     url: str,
     port: int,
     username: str,
