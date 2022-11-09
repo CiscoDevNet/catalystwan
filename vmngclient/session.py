@@ -21,14 +21,25 @@ from vmngclient.utils.creation_tools import get_logger_name
 logger = logging.getLogger(get_logger_name(__name__))
 
 
+class SessionNotCreatedError(Exception):
+    pass
+
+
+def assert_admin_role(session, expected_admin: bool):
+    role = cast(dict, session.get_json("/dataservice/admin/user/role"))
+    if not role["isAdmin"] is expected_admin:
+        raise SessionNotCreatedError("Got different role than expected")
+
+
 def Create(
     url: str,
     port: int,
     username: str,
     password: str,
     admin: bool = True,
+    subdomain: str = None,
     timeout: int = 30,
-) -> Union[ProviderSession, TenantSession]:
+) -> Session:
     """Factory function that creates session object based on provided arguments.
 
     Args:
@@ -38,22 +49,28 @@ def Create(
         password (str): password
         admin (bool): specifies the type of session that is returned,
             for 'True' it is 'ProviderSession', if 'False' it is 'TenantSession'
+        subdomain: subdomain specifying to which view switch when creating provider as a tenant session,
+            if provided creates
         timeout (int): timeout
 
     Returns:
         ProviderSession or TenantSession based on admin argument.
     """
 
-    if admin:
+    if admin and not subdomain:
         provider_session = ProviderSession(url, port, username, password, timeout)
-        role = cast(dict, provider_session.get_json("/dataservice/admin/user/role"))
-        assert role["isAdmin"] is True, "Expected provider role, got tenant role"
+        assert_admin_role(provider_session, expected_admin=True)
         return provider_session
-    else:
+    if admin and subdomain:
+        provider_as_a_session = ProviderAsTenantSession(url, port, username, password, subdomain, timeout)
+        assert_admin_role(provider_as_a_session, expected_admin=True)
+        return provider_as_a_session
+    if not admin and not subdomain:
         tenant_session = TenantSession(url, port, username, password, timeout)
-        role = cast(dict, tenant_session.get_json("/dataservice/admin/user/role"))
-        assert role["isAdmin"] is False, "Expected tenant role, got provider role"
+        assert_admin_role(tenant_session, expected_admin=False)
         return tenant_session
+
+    raise SessionNotCreatedError("Session not created. Check admin and subdomain.")
 
 
 class Session:
@@ -420,23 +437,51 @@ class ProviderSession(Session):
     ) -> None:
         super().__init__(url, port, provider_username, provider_password, timeout)
 
-    def get_tenant_id(self, subdomain: str) -> str:
-        """Gets tenant UUID for tenant subdomain.
+    def __str__(self) -> str:
+        return f"{self.username}@{self.base_url}"
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.username}@{self.base_url})"
+
+
+class ProviderAsTenantSession(Session):
+    """vManage API client logged in as provider acting as tenant.
+
+    Args:
+        url: IP address or domain name, i.e. '10.0.1.200' or 'fruits.com'
+        port: port
+        username: username for provider role
+        password: password
+        subdomain: tenant subdomain, i.e. 'apple.fruits.com'
+        timeout: timeout
+    """
+
+    def __init__(
+        self, url: str, port: int, username: str, password: str, subdomain: str, timeout: int = 30
+    ) -> None:
+        self.subdomain = subdomain
+        super().__init__(url, port, username, password, timeout)
+        # self._name = f'{self._name} vSession for {subdomain}'
+
+    def login(self) -> None:
+        """Logs in to vManage API as Provider using username/password and switches to Tenant."""
+        super().login()
+        self.__switch_to_tenant()
+
+    def __get_tenant_id(self) -> str:
+        """Gets tenant UUID for tenant subdomain.
         Returns:
             tenant UUID
         """
         tenants = self.get_data('/dataservice/tenant')
-        tenant_id_list = [tenant.get('tenantId') for tenant in tenants if tenant['subDomain'] == subdomain]
-        assert len(tenant_id_list) > 0, f"Tenant not found for subdomain: {subdomain}"
-        return tenant_id_list[0]
+        tenant_ids = [tenant.get('tenantId') for tenant in tenants if tenant['subDomain'] == self.subdomain]
+        assert len(tenant_ids) > 0, f"Tenant not found for subdomain: {self.subdomain}"
+        return tenant_ids[0]
 
-    def create_vsession(self, tenant_id: str) -> str:
+    def __create_vsession(self, tenant_id: str) -> str:
         """Creates virtual session for tenant.
-
         Args:
             tenant_id: provider or tenant UUID
-
         Returns:
             virtual session token
         """
@@ -444,26 +489,15 @@ class ProviderSession(Session):
         assert 'VSessionId' in response, "Invalid vsessionid response"
         return response['VSessionId']
 
-    def switch_to_tenant(self, subdomain: str) -> None:
+    def __switch_to_tenant(self) -> None:
         """As provider impersonate tenant session."""
-        tenant_id = self.get_tenant_id(subdomain)
-        vsession_id = self.create_vsession(tenant_id)
+        tenant_id = self.__get_tenant_id()
+        vsession_id = self.__create_vsession(tenant_id)
         assert vsession_id != '', 'Switch to tenant expecting VSessionId to not be empty'
         self.session_headers['VSessionId'] = vsession_id
 
-    def switch_to_provider(self) -> None:
-        """Switch back to provider session after impersonating tenant."""
-        try:
-            del self.session_headers['VSessionId']
-        except KeyError:
-            logger.info("No 'VSessionId' token found, already on provider view.")
-
-    def __str__(self) -> str:
-        return f"{self.username}@{self.base_url}"
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.username}@{self.base_url})"
-
+    def sth(self):
+        print("ee")
 
 class TenantSession(Session):
     """vManage API client logged as a tenant.
