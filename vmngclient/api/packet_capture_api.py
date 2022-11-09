@@ -11,7 +11,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Iterator
 
-from vmngclient.api.basic_api import DeviceStateApi
+from vmngclient.api.basic_api import DeviceStateAPI
 from vmngclient.dataclasses import DeviceInfo, PacketSetup, Status
 from vmngclient.session import Session
 from vmngclient.utils.creation_tools import create_dataclass, get_logger_name
@@ -42,7 +42,7 @@ class PacketCaptureApi:
         Returns:
             Status
         """
-        with DeviceStateApi(self.session).enable_data_stream():
+        with DeviceStateAPI(self.session).enable_data_stream():
             try:
                 with self.channel(device):
                     with self.start_stop():

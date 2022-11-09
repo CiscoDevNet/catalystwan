@@ -4,7 +4,7 @@ from typing import cast
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
-from vmngclient.api.basic_api import DevicesApi, DeviceStateApi
+from vmngclient.api.basic_api import DevicesAPI, DeviceStateAPI
 from vmngclient.dataclasses import DeviceInfo
 from vmngclient.session import Session
 from vmngclient.utils.certificate_status import CertificateStatus
@@ -85,7 +85,7 @@ class RebootAction(DeviceActionApi):
                 logger.debug(f"Status of device {self.dev.hostname} reboot is: {action_data}")
             except IndexError:
                 action_data = ''
-            status = DeviceStateApi(self.session).get_system_status(self.dev.id)
+            status = DeviceStateAPI(self.session).get_system_status(self.dev.id)
             # it is necessary to wait also for Success of reboot because device can be reachable even several
             # seconds after execute reboot
             if status.reachability.value == expected_reachability:
@@ -135,7 +135,7 @@ class ValidateAction(DeviceActionApi):
             retry=retry_if_result(check_status),
         )
         def wait_for_come_up():
-            status = DeviceStateApi(self.session).get_system_status(self.dev.id)
+            status = DeviceStateAPI(self.session).get_system_status(self.dev.id)
             if status.reachability.value == expected_reachability:
                 return self.session.get_data(f'/dataservice/device?host-name={self.dev.hostname}')[0]
             else:
@@ -174,7 +174,7 @@ class DecommissionAction(DeviceActionApi):
             retry=retry_if_result(check_status),
         )
         def wait_for_status():
-            status = DevicesApi(self.session).get_device_details(self.dev.uuid)
+            status = DevicesAPI(self.session).get_device_details(self.dev.uuid)
             if status.reachability.value == expected_reachability:
                 return status
             else:

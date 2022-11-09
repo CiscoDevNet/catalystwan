@@ -12,7 +12,7 @@ from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
 
 
-class DevicesApi:
+class DevicesAPI:
     """API methods of vManage for getting devices and controllers.
 
     Attributes:
@@ -165,7 +165,7 @@ class DevicesApi:
         return True if wait_for_state() else False
 
 
-class DeviceStateApi:
+class DeviceStateAPI:
     """Basic API methods of vManage.
 
     Attributes:
@@ -249,7 +249,7 @@ class DeviceStateApi:
 
     def get_colors(self, device_id: str) -> List[str]:
         url = '/dataservice/device/bfd/state/device/tlocInterfaceMap'
-        colors_raw = DevicesApi(self.session).session.get(url + f'?deviceId={device_id}')
+        colors_raw = DevicesAPI(self.session).session.get(url + f'?deviceId={device_id}')
         json_colors = json.loads(str(colors_raw.read(), 'utf-8'))
         colors = list(json_colors["intfList"].keys())
 
