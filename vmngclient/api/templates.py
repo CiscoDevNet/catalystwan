@@ -125,7 +125,10 @@ class TemplateAPI:
         Returns:
             bool: True if attaching template is successful, otherwise - False.
         """
-        templateId = self.get_id(name)
+        try:
+            templateId = self.get_id(name)
+        except TemplateNotFoundError:
+            return False
         payload = {
             "deviceTemplateList": [
                 {
