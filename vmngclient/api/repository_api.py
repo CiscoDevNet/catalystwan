@@ -6,6 +6,7 @@ from typing import List
 from attr import define, field
 from enum import Enum
 import logging
+from typing import Union
 
 logger = logging.getLogger(get_logger_name(__name__))
 
@@ -38,7 +39,7 @@ class Repository:
             self.devices.append(dev_dict)
 
     
-    def get_image_version(self, software_image: str) -> str:
+    def get_image_version(self, software_image: str) -> Union[str,None]:
         
         url = '/dataservice/device/action/software/images?imageType=software'
         image_name = os.path.basename(software_image)
@@ -48,9 +49,9 @@ class Repository:
                 image_version = img['versionName']
                 return image_version
         logger.error(f'Software image {image_name} is not in available images')
-        
+        return None
    
-    def create_devices_versions_repository(self)-> dict[DeviceSoftwareRepository] : 
+    def create_devices_versions_repository(self)-> dict[str,DeviceSoftwareRepository] : 
 
         url = f'/dataservice/system/device/{self.device_category}'
         devices_versions_info = self.session.get_data(url)
