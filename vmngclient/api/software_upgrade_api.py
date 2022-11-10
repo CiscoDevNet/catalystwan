@@ -32,7 +32,6 @@ class DeviceType(Enum):
 
 @define
 class InstallSpecification:
-    """Class to keep installation specification"""
 
     family: Family 
     version_type: VersionType
@@ -106,15 +105,13 @@ class SoftwareUpgradeApi:
             return incorrect_devices
 
                                                                              
-    
-
     def wait_for_completed(self, 
         sleep_seconds: int,timeout_seconds: int,
-        expected_status: str,
+        exit_statuses: str,
         action_id : str) -> None:
         
         def check_status(action_data):
-            return not action_data in (expected_status,'Failure')
+            return not action_data in (exit_statuses)
 
         @retry(
             wait=wait_fixed(sleep_seconds),
