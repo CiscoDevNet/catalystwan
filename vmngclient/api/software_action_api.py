@@ -53,7 +53,7 @@ class SoftwareUpgradeApi:
                    'devices': self.repository.devices,
                    'deviceType': 'vmanage',
                   }
-        activate = self.session.post_json(url, payload)
+        activate = dict(self.session.post_json(url, payload))
         return activate['id']
     
     def upgrade_software(self, software_image: str, install_spec: InstallSpecification,
@@ -81,7 +81,7 @@ class SoftwareUpgradeApi:
                 raise ValueError(
                 f'Current version of devices {incorrect_devices} is higher than upgrade version. Action denied!')
         
-        upgrade = self.session.post_json(url,payload)
+        upgrade = dict(self.session.post_json(url,payload))
         return upgrade['id']
     
     
@@ -90,11 +90,10 @@ class SoftwareUpgradeApi:
         
         incorrect_devices = []
         for dev in self.repository.devices:
-            version_to_upgrade = ''
             dev_current_version = str(self.repository.create_devices_versions_repository()[dev['deviceId']].current_version)
-            version_to_upgrade = version_to_upgrade.split('.')
+            splited_version_to_upgrade = version_to_upgrade.split('.') 
             for priority, label in enumerate(dev_current_version.split('.')):
-                if str(label) > str(version_to_upgrade[priority]):
+                if str(label) > str(splited_version_to_upgrade[priority]):
                     if devices_category == 'vmanages' and label == 2:
                        continue
                     incorrect_devices.append(dev['deviceId'])
