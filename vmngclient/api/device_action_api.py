@@ -1,6 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import cast
+from typing import cast,Union,List
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
@@ -28,16 +28,27 @@ class DeviceActionAPI(ABC):
     def __str__(self):
         return str(self.session)
 
-    @abstractmethod
-    def execute(self):
-        raise NotImplementedError
-
-    @abstractmethod
+    
     def wait_for_completed(
-        self, sleep_seconds: int, timeout_seconds: int, expected_status: str, expected_reachability: str
+        self,
+        sleep_seconds: int = 15,
+        timeout_seconds: int = 180,
+        exit_statuses: Union(List,str) = "Success"
     ):
-        raise NotImplementedError
+        def check_status(action_data):
+            return not action_data['validity'] in exit_statuses
 
+        @retry(
+            wait=wait_fixed(sleep_seconds),
+            stop=stop_after_attempt(int(timeout_seconds / sleep_seconds)),
+            retry=retry_if_result(check_status),
+        )
+        def wait_for_come_up():
+            status = DeviceStateAPI(self.session).get_system_status(self.dev.id)
+            
+            return self.session.get_data(f'/dataservice/device?host-name={self.dev.hostname}')[0]
+
+        wait_for_come_up()
 
 class RebootAction(DeviceActionAPI):
     """API method to perform reboot on Device."""
