@@ -529,7 +529,7 @@ class TenantSession(Session):
         port: int,
         tenant_username: str,
         tenant_password: str,
-        timeout: int = 0,
+        timeout: int = 30,
     ) -> None:
         super().__init__(url, port, tenant_username, tenant_password, timeout)
 
