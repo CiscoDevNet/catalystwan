@@ -21,7 +21,7 @@ class TemplateNotFoundError(Exception):
 
 
 class TemplateExist(Exception):
-    """Used when a template item is exist."""
+    """Used when a template item exists."""
 
     def __init__(self, name):
         self.message = f"Template with that name '{name}' exists."
@@ -167,7 +167,7 @@ class TemplateAPI:
         """Get operatrion status.
 
         Args:
-            operation_id (str): Operatrion id.
+            operation_id (str): Operation id.
 
         Returns:
             List[OperationStatus]: List of operations.
@@ -289,7 +289,7 @@ class CliTemplate:
         cast(dict, self.session.put_json(url=endpoint, data=payload))
 
     def add_to_config(self, add_config: CiscoConfParse, add_before: str) -> None:
-        """Adding config to exist config before existing value.
+        """Add config to existing config before provided value.
 
         Args:
             add_config (CiscoConfParse): Config to added.
