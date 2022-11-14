@@ -57,15 +57,15 @@ class Repository:
         devices_versions_info = self.session.get_data(url)
         self.devices_versions_repository = {}
         for device in devices_versions_info:
-            controller_obj = create_dataclass(DeviceSoftwareRepository,device)
-            self.devices_versions_repository[controller_obj.device_id] = controller_obj
+            device_all_versions = create_dataclass(DeviceSoftwareRepository,device)
+            self.devices_versions_repository[device_all_versions.device_id] = device_all_versions
         return self.devices_versions_repository
 
-    def complete_device_list(self,version_to_set_up)-> None:
+    def complete_device_list(self,version_to_set_up, version_type)-> None:
         
         for dev in self.devices:
-            dev_available_versions = self.create_devices_versions_repository()[dev['deviceId']].available_versions
-            for available_version in dev_available_versions:
-                if version_to_set_up in available_version:
-                    dev['version'] = available_version
+            dev_version_type = getattr(self.create_devices_versions_repository()[dev['deviceId']],version_type)
+            for version in dev_version_type:
+                if version_to_set_up in version:
+                    dev['version'] = version
                     break
