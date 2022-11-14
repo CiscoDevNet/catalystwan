@@ -35,11 +35,12 @@ def create_dataclass(cls: Type[T], data: Dict[str, Any]) -> T:
         return dict(filter(lambda key_value: key_value[0] in available_fields, data.items()))
 
     class_fields = list(cls.__annotations__)
+    data_copy = data.copy()
     for field in fields(cls):
         json_field_name = field.metadata.get(FIELD_NAME, None)
-        if json_field_name and json_field_name in data:
-            data[field.name] = data.pop(json_field_name)
-    filtered_data = filter_fields(class_fields, data)
+        if json_field_name and json_field_name in data_copy:
+            data_copy[field.name] = data_copy.pop(json_field_name)
+    filtered_data = filter_fields(class_fields, data_copy)
     return cls(**filtered_data)
 
 
