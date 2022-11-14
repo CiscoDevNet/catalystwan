@@ -45,12 +45,25 @@ class InstallSpecification:
 
 
 class SoftwareActionAPI:
+    """
+    API methods for software actions. All methods
+    are exececutable on all device categories.
+    """
+
     def __init__(self, session: Session, repository: RepositoryAPI) -> None:
         self.session = session
         self.repository = repository
 
     def activate_software(self, version_to_activate: str) -> str:
+        """
+        Method to set choosen version as current version
 
+        Args:
+            version_to_activate (str): version to be set as current version
+
+        Returns:
+            str: action id
+        """
         self.repository.complete_device_list(version_to_activate, "current")
         url = "/dataservice/device/action/changepartition"
         payload = {
@@ -68,6 +81,22 @@ class SoftwareActionAPI:
         reboot: bool,
         sync: bool = True,
     ) -> str:
+        """
+        Method to install new software
+
+        Args:
+            software_image (str): path to software image
+            install_spec (InstallSpecification): specification of devices
+            on which the action is to be performed
+            reboot (bool): reboot device after action end
+            sync (bool, optional): Synchronize settings. Defaults to True.
+
+        Raises:
+            ValueError: Raise error if downgrade in certain cases
+
+        Returns:
+            str: action id
+        """
         self.install_spec = install_spec
 
         url = "/dataservice/device/action/install"
@@ -87,7 +116,7 @@ class SoftwareActionAPI:
         }
 
         if self.install_spec.family in (Family.VMANAGE.value, Family.CEDGE.value):
-            incorrect_devices = self.downgrade_check(payload["input"]["version"], self.repository.device_category)
+            incorrect_devices = self._downgrade_check(payload["input"]["version"], self.repository.device_category)
             if incorrect_devices:
                 raise ValueError(
                     f"Current version of devices {incorrect_devices} is higher than upgrade version. Action denied!"
@@ -96,7 +125,7 @@ class SoftwareActionAPI:
         upgrade = dict(self.session.post_json(url, payload))
         return upgrade["id"]
 
-    def downgrade_check(self, version_to_upgrade: str, devices_category: DeviceCategory) -> Union[None, List]:
+    def _downgrade_check(self, version_to_upgrade: str, devices_category: DeviceCategory) -> Union[None, List]:
 
         incorrect_devices = []
         for dev in self.repository.devices:
@@ -119,9 +148,18 @@ class SoftwareActionAPI:
         self,
         sleep_seconds: int,
         timeout_seconds: int,
-        exit_statuses: str,
+        exit_statuses: List[str],
         action_id: str,
     ) -> None:
+        """_summary_
+
+        Args:
+            sleep_seconds (int): _description_
+            timeout_seconds (int): _description_
+            exit_statuses (List[str]): _description_
+            action_id (str): _description_
+        """
+
         def check_status(action_data):
             return action_data not in (exit_statuses)
 
