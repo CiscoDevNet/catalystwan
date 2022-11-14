@@ -4,6 +4,7 @@ import logging
 import socket
 import ssl
 import time
+from copy import copy
 from http import HTTPStatus
 from http.client import HTTPException, HTTPResponse
 from ipaddress import AddressValueError, IPv4Address
@@ -17,6 +18,7 @@ from urllib.request import Request, urlopen
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 
 from vmngclient.utils.creation_tools import get_logger_name
+from vmngclient.utils.user_mode import UserMode
 
 logger = logging.getLogger(get_logger_name(__name__))
 
@@ -25,18 +27,11 @@ class SessionNotCreatedError(Exception):
     pass
 
 
-def assert_admin_role(session: Session, expected_admin: bool) -> None:
-    role = cast(dict, session.get_json("/dataservice/admin/user/role"))
-    if not role["isAdmin"] is expected_admin:
-        raise SessionNotCreatedError("Got different role than expected")
-
-
 def create_session(
     url: str,
     port: int,
     username: str,
     password: str,
-    admin: bool = True,
     subdomain: str = None,
     timeout: int = 30,
 ) -> Session:
@@ -47,30 +42,29 @@ def create_session(
         port (int): port
         username (str): username
         password (str): password
-        admin (bool): specifies the type of session that is returned,
-            for 'True' it is 'ProviderSession', if 'False' it is 'TenantSession'
         subdomain: subdomain specifying to which view switch when creating provider as a tenant session,
-            if provided creates
+            works only on provider user mode
         timeout (int): timeout
 
     Returns:
         Session object
     """
 
-    if admin and not subdomain:
-        provider_session = ProviderSession(url, port, username, password, timeout)
-        assert_admin_role(provider_session, expected_admin=True)
-        return provider_session
-    if admin and subdomain:
-        provider_as_a_session = ProviderAsTenantSession(url, port, username, password, subdomain, timeout)
-        assert_admin_role(provider_as_a_session, expected_admin=True)
-        return provider_as_a_session
-    if not admin and not subdomain:
-        tenant_session = TenantSession(url, port, username, password, timeout)
-        assert_admin_role(tenant_session, expected_admin=False)
-        return tenant_session
+    session = Session(url, port, username, password, timeout)
+    response = cast(dict, session.server())
+    user_mode = response["userMode"]
 
-    raise SessionNotCreatedError("Session not created. Check admin and subdomain.")
+    if user_mode == UserMode.tenant.value and not subdomain:
+        return TenantSession.from_session(session)
+    elif user_mode == UserMode.provider.value and not subdomain:
+        return ProviderSession.from_session(session)
+    elif user_mode == UserMode.provider.value and subdomain:
+        return ProviderAsTenantSession.from_session(session, subdomain)
+    elif user_mode == UserMode.tenant.value and subdomain:
+        raise SessionNotCreatedError("Session not created. 'subdomain' passed to tenant session, "
+                                     "cannot switch to tenant from tenant user mode.")
+    else:
+        raise SessionNotCreatedError("Session not created. Unrecognized user mode.")
 
 
 class Session:
@@ -415,6 +409,11 @@ class Session:
 
         return True if _send_server_request() else False
 
+    def __copy__(self):
+        session = super().__new__(type(self))
+        session.__dict__.update(self.__dict__)
+        return session
+
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"
 
@@ -432,6 +431,7 @@ class ProviderSession(Session):
         provider_password: password
         timeout: timeout
     """
+
     def __init__(
         self, url: str, port: int, provider_username: str, provider_password: str, timeout: int = 30
     ) -> None:
@@ -442,6 +442,13 @@ class ProviderSession(Session):
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.username}@{self.base_url})"
+
+    @classmethod
+    def from_session(cls, session: Session) -> "ProviderSession":
+        base = copy(session)
+        provider_session = super().__new__(ProviderSession)
+        provider_session.__dict__.update(base.__dict__)
+        return provider_session
 
 
 class ProviderAsTenantSession(Session):
@@ -462,18 +469,13 @@ class ProviderAsTenantSession(Session):
         self.subdomain = subdomain
         super().__init__(url, port, username, password, timeout)
 
-    def login(self) -> None:
-        """Logs in to vManage API as Provider using username/password and switches to Tenant."""
-        super().login()
-        self.__switch_to_tenant()
-
-    def __get_tenant_id(self) -> str:
+    def __get_tenant_id(self, subdomain: str) -> str:
         """Gets tenant UUID for tenant subdomain.
         Returns:
             tenant UUID
         """
         tenants = self.get_data('/dataservice/tenant')
-        tenant_ids = [tenant.get('tenantId') for tenant in tenants if tenant['subDomain'] == self.subdomain]
+        tenant_ids = [tenant.get('tenantId') for tenant in tenants if tenant['subDomain'] == subdomain]
         assert len(tenant_ids) > 0, f"Tenant not found for subdomain: {self.subdomain}"
         return tenant_ids[0]
 
@@ -488,12 +490,20 @@ class ProviderAsTenantSession(Session):
         assert 'VSessionId' in response, "Invalid vsessionid response"
         return response['VSessionId']
 
-    def __switch_to_tenant(self) -> None:
+    def __switch_to_tenant(self, subdomain: str) -> None:
         """As provider impersonate tenant session."""
-        tenant_id = self.__get_tenant_id()
+        tenant_id = self.__get_tenant_id(subdomain)
         vsession_id = self.__create_vsession(tenant_id)
         assert vsession_id != '', 'Switch to tenant expecting VSessionId to not be empty'
         self.session_headers['VSessionId'] = vsession_id
+
+    @classmethod
+    def from_session(cls, session: Session, subdomain: str) -> "ProviderAsTenantSession":
+        base = copy(session)
+        provider_as_tenant_session = super().__new__(ProviderAsTenantSession)
+        provider_as_tenant_session.__dict__.update(base.__dict__)
+        provider_as_tenant_session.__switch_to_tenant(subdomain)
+        return provider_as_tenant_session
 
 
 class TenantSession(Session):
@@ -516,17 +526,15 @@ class TenantSession(Session):
     ) -> None:
         super().__init__(url, port, tenant_username, tenant_password, timeout)
 
-    def login(self) -> None:
-        """Login to vManage API as Tenant using username/password and set the session headers.
-
-        Returns:
-            TenantSession object
-        """
-
-        super().login()
-
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.username}@{self.base_url})"
+
+    @classmethod
+    def from_session(cls, session: Session) -> "TenantSession":
+        base = copy(session)
+        tenant_session = super().__new__(TenantSession)
+        tenant_session.__dict__.update(base.__dict__)
+        return tenant_session
