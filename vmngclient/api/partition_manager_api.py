@@ -1,7 +1,9 @@
 import logging
 from typing import List
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
-import logging
+
+from vmngclient.api.repository_api import RepositoryAPI
+from vmngclient.session import Session
 from vmngclient.utils.creation_tools import get_logger_name
 
 logger = logging.getLogger(get_logger_name(__name__))
