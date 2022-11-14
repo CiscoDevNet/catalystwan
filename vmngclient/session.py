@@ -469,6 +469,11 @@ class ProviderAsTenantSession(Session):
         self.subdomain = subdomain
         super().__init__(url, port, username, password, timeout)
 
+    def login(self) -> None:
+        """Logs in to vManage API as Provider using username/password and switches to Tenant."""
+        super().login()
+        self.__switch_to_tenant()
+
     def __get_tenant_id(self) -> str:
         """Gets tenant UUID for tenant subdomain.
         Returns:
