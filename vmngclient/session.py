@@ -409,8 +409,8 @@ class Session:
 
         return True if _send_server_request() else False
 
-    def __copy__(self):
-        session = super().__new__(type(self))
+    def __copy__(self) -> "Session":
+        session = super().__new__(Session)
         session.__dict__.update(self.__dict__)
         return session
 
