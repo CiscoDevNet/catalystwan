@@ -1,7 +1,7 @@
 import logging
 import os
 from enum import Enum
-from typing import List, Union
+from typing import Dict, List, Union
 
 from attr import define, field
 
@@ -59,7 +59,7 @@ class RepositoryAPI:
         logger.error(f"Software image {image_name} is not in available images")
         return None
 
-    def create_devices_versions_repository(self) -> dict[str, DeviceSoftwareRepository]:
+    def create_devices_versions_repository(self) -> Dict[str, DeviceSoftwareRepository]:
 
         url = f"/dataservice/system/device/{self.device_category}"
         devices_versions_info = self.session.get_data(url)
