@@ -469,13 +469,13 @@ class ProviderAsTenantSession(Session):
         self.subdomain = subdomain
         super().__init__(url, port, username, password, timeout)
 
-    def __get_tenant_id(self, subdomain: str) -> str:
+    def __get_tenant_id(self) -> str:
         """Gets tenant UUID for tenant subdomain.
         Returns:
             tenant UUID
         """
         tenants = self.get_data('/dataservice/tenant')
-        tenant_ids = [tenant.get('tenantId') for tenant in tenants if tenant['subDomain'] == subdomain]
+        tenant_ids = [tenant.get('tenantId') for tenant in tenants if tenant['subDomain'] == self.subdomain]
         assert len(tenant_ids) > 0, f"Tenant not found for subdomain: {self.subdomain}"
         return tenant_ids[0]
 
@@ -490,9 +490,11 @@ class ProviderAsTenantSession(Session):
         assert 'VSessionId' in response, "Invalid vsessionid response"
         return response['VSessionId']
 
-    def __switch_to_tenant(self, subdomain: str) -> None:
+    def __switch_to_tenant(self, subdomain: str = None) -> None:
         """As provider impersonate tenant session."""
-        tenant_id = self.__get_tenant_id(subdomain)
+        if subdomain:
+            self.subdomain = subdomain
+        tenant_id = self.__get_tenant_id()
         vsession_id = self.__create_vsession(tenant_id)
         assert vsession_id != '', 'Switch to tenant expecting VSessionId to not be empty'
         self.session_headers['VSessionId'] = vsession_id
