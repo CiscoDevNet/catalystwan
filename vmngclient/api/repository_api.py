@@ -30,6 +30,10 @@ class DeviceSoftwareRepository:
 
 
 class RepositoryAPI:
+    """
+    API methods to prepare data for most of software actions
+    """
+
     def __init__(
         self,
         session: Session,
@@ -48,7 +52,15 @@ class RepositoryAPI:
             self.devices.append(dev_dict)
 
     def get_image_version(self, software_image: str) -> Union[str, None]:
+        """
+        Method to get proper software image version
 
+        Args:
+            software_image (str): path to software image
+
+        Returns:
+            Union[str, None]: image version or None
+        """
         url = "/dataservice/device/action/software/images?imageType=software"
         image_name = os.path.basename(software_image)
         software_images = self.session.get_data(url)
@@ -60,6 +72,14 @@ class RepositoryAPI:
         return None
 
     def create_devices_versions_repository(self) -> Dict[str, DeviceSoftwareRepository]:
+        """
+        Factory method for DeviceSoftwareRepository dataclass,
+        which cointains information about all possible version types for certain devices
+
+        Returns:
+            Dict[str, DeviceSoftwareRepository]: Dictionary containing all versions
+            information
+        """
 
         url = f"/dataservice/system/device/{self.device_category}"
         devices_versions_info = self.session.get_data(url)

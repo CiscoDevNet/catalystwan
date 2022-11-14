@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
@@ -10,6 +11,11 @@ logger = logging.getLogger(get_logger_name(__name__))
 
 
 class PartitionManagerAPI:
+    """
+    API methods for partitions actions. All methods
+    are exececutable on all device categories.
+    """
+
     def __init__(
         self,
         session: Session,
@@ -19,7 +25,15 @@ class PartitionManagerAPI:
         self.repository = repository
 
     def set_default_partition(self, version_to_default: str) -> str:
+        """
+        Method to set choosen software version as current version
 
+        Args:
+            version_to_default (str): software version to be set as default version
+
+        Returns:
+            str: action id
+        """
         self.repository.complete_device_list(version_to_default, "installed_versions")
         url = "/dataservice/device/action/defaultpartition"
         payload = {
@@ -31,6 +45,15 @@ class PartitionManagerAPI:
         return set_default["id"]
 
     def remove_partition(self, version_to_remove: str) -> str:
+        """
+        Method to remove choosen software version from Vmanage repository
+
+        Args:
+            version_to_remove (str): software version to be removed from repository
+
+        Returns:
+            str: action id
+        """
 
         self.repository.complete_device_list(version_to_remove, "available_versions")
         url = "/dataservice/device/action/removepartition"
@@ -47,9 +70,18 @@ class PartitionManagerAPI:
         self,
         sleep_seconds: int,
         timeout_seconds: int,
-        exit_statuses: str,
+        exit_statuses: List[str],
         action_id: str,
     ) -> None:
+        """Method to check action status
+
+        Args:
+            sleep_seconds (int): interval between action status requests
+            timeout_seconds (int): After this time, function will stop requesting action status
+            exit_statuses (List[str]): actions statuses that cause stop requesting action status
+            action_id (str): inspected action id
+        """
+
         def check_status(action_data):
             return action_data not in (exit_statuses)
 
