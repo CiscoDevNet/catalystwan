@@ -38,7 +38,7 @@ class InstallSpecification:
     device_type: DeviceType
 
 
-class SoftwareUpgradeApi:
+class SoftwareAcionAPI:
 
     def __init__(self, session: Session,
                  repository = Repository) -> None:
@@ -47,7 +47,7 @@ class SoftwareUpgradeApi:
 
     def activate_software(self,version_to_activate: str) -> str:
         
-        self.repository.complete_device_list(version_to_activate)
+        self.repository.complete_device_list(version_to_activate, 'current')
         url = '/dataservice/device/action/changepartition'
         payload = {'action': 'changepartition',
                    'devices': self.repository.devices,
