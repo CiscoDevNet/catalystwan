@@ -19,10 +19,12 @@ class DeviceCategory(Enum):
 
 @define
 class DeviceSoftwareRepository:
+    installed_versions : List[str]
     available_versions: List[str] = field(default=None, metadata={FIELD_NAME: "availableVersions"})
     current_version: str = field(default=None, metadata={FIELD_NAME: "version"})
     default_version: str = field(default=None, metadata={FIELD_NAME: "defaultVersion"})
     device_id: str = field(default=None, metadata={FIELD_NAME: "uuid"})
+
 
 class Repository:
 
@@ -58,14 +60,20 @@ class Repository:
         self.devices_versions_repository = {}
         for device in devices_versions_info:
             device_all_versions = create_dataclass(DeviceSoftwareRepository,device)
+            device_all_versions.installed_versions = device_all_versions.available_versions
+            device_all_versions.installed_versions.append(device_all_versions.current_version)
             self.devices_versions_repository[device_all_versions.device_id] = device_all_versions
         return self.devices_versions_repository
 
-    def complete_device_list(self,version_to_set_up, version_type)-> None:
+    def complete_device_list(self,version_to_set_up, version_type : str)-> None:
         
         for dev in self.devices:
-            dev_version_type = getattr(self.create_devices_versions_repository()[dev['deviceId']],version_type)
-            for version in dev_version_type:
+            dev_versions = getattr(self.create_devices_versions_repository()[dev['deviceId']],version_type)
+            for version in dev_versions:
                 if version_to_set_up in version:
                     dev['version'] = version
                     break
+                else:
+                    logger.error(f'Software version {version_to_set_up} is not included in {version_type}')
+        return None
+        
