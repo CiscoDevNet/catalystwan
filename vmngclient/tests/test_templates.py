@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
 
-from vmngclient.api.templates import TemplateAPI, TemplateAttached, TemplateExist, TemplateNotFoundError
+from vmngclient.api.templates import AttachedError, NameAlreadyExistError, NotFoundError, TemplateAPI
 from vmngclient.dataclasses import DeviceInfo, Template
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.operation_status import OperationStatus
@@ -123,7 +123,7 @@ class TestTemplateAPI(unittest.TestCase):
             return test_object.get('no_exist_name')
 
         # Assert
-        self.assertRaises(TemplateNotFoundError, answer)
+        self.assertRaises(NotFoundError, answer)
 
     @patch.object(TemplateAPI, 'templates')
     def test_get_id_success(self, mock_templates):
@@ -157,10 +157,10 @@ class TestTemplateAPI(unittest.TestCase):
             return test_object.get_id('no_exist_name')
 
         # Assert
-        self.assertRaises(TemplateNotFoundError, answer)
+        self.assertRaises(NotFoundError, answer)
 
     @patch.object(TemplateAPI, "get_operation_status")
-    def test_wait_complete_true(self, mock_operation):
+    def test_wait_for_complete_true(self, mock_operation):
 
         # Arrage
         MockOperatrion = Mock()
@@ -171,13 +171,13 @@ class TestTemplateAPI(unittest.TestCase):
         operation_id = 'operation_id'
 
         # Act
-        answer = test_object.wait_complete(operation_id)
+        answer = test_object.wait_for_complete(operation_id)
 
         # Assert
         self.assertTrue(answer)
 
     @patch.object(TemplateAPI, "get_operation_status")
-    def test_wait_complete_false(self, mock_operation):
+    def test_wait_for_complete_false(self, mock_operation):
 
         # Arrage
         MockOperatrion = Mock()
@@ -188,15 +188,15 @@ class TestTemplateAPI(unittest.TestCase):
         operation_id = 'operation_id'
 
         # Act
-        answer = test_object.wait_complete(operation_id, timeout_seconds=2, sleep_seconds=1)
+        answer = test_object.wait_for_complete(operation_id, timeout_seconds=2, sleep_seconds=1)
 
         # Assert
         self.assertFalse(answer)
 
     @patch('vmngclient.session.Session')
     @patch.object(TemplateAPI, 'templates')
-    @patch.object(TemplateAPI, "wait_complete")
-    def test_attach_exist_template(self, mock_session, mock_wait_complete, mock_templates):
+    @patch.object(TemplateAPI, "wait_for_complete")
+    def test_attach_exist_template(self, mock_session, mock_wait_for_complete, mock_templates):
 
         # Arrage
         mock_session.post_json.return_value = {"id": "operation_id"}
@@ -209,8 +209,8 @@ class TestTemplateAPI(unittest.TestCase):
 
         # mock wait complete
         MockWaitComplete = Mock()
-        mock_wait_complete.return_value = MockWaitComplete
-        test_object.wait_complete.return_value = True
+        mock_wait_for_complete.return_value = MockWaitComplete
+        test_object.wait_for_complete.return_value = True
 
         # Act
         answer = test_object.attach('template_1', self.device_info)
@@ -220,8 +220,8 @@ class TestTemplateAPI(unittest.TestCase):
 
     @patch('vmngclient.session.Session')
     @patch.object(TemplateAPI, 'templates')
-    @patch.object(TemplateAPI, "wait_complete")
-    def test_attach_no_exist_template(self, mock_session, mock_wait_complete, mock_templates):
+    @patch.object(TemplateAPI, "wait_for_complete")
+    def test_attach_no_exist_template(self, mock_session, mock_wait_for_complete, mock_templates):
 
         # Arrage
         mock_session.post_json.return_value = {"id": "operation_id"}
@@ -234,8 +234,8 @@ class TestTemplateAPI(unittest.TestCase):
 
         # mock wait complete
         MockWaitComplete = Mock()
-        mock_wait_complete.return_value = MockWaitComplete
-        test_object.wait_complete.return_value = True
+        mock_wait_for_complete.return_value = MockWaitComplete
+        test_object.wait_for_complete.return_value = True
 
         # Act
         answer = test_object.attach('no_exist_template', self.device_info)
@@ -244,8 +244,8 @@ class TestTemplateAPI(unittest.TestCase):
         self.assertFalse(answer)
 
     @patch('vmngclient.session.Session')
-    @patch.object(TemplateAPI, "wait_complete")
-    def test_device_to_cli_true(self, mock_session, mock_wait_complete):
+    @patch.object(TemplateAPI, "wait_for_complete")
+    def test_device_to_cli_true(self, mock_session, mock_wait_for_complete):
 
         # Arrage
         mock_session.post_json.return_value = {"id": "operation_id"}
@@ -253,8 +253,8 @@ class TestTemplateAPI(unittest.TestCase):
 
         # mock wait complete
         MockWaitComplete = Mock()
-        mock_wait_complete.return_value = MockWaitComplete
-        test_object.wait_complete.return_value = True
+        mock_wait_for_complete.return_value = MockWaitComplete
+        test_object.wait_for_complete.return_value = True
 
         # Act
         answer = test_object.device_to_cli(self.device_info)
@@ -360,7 +360,7 @@ class TestTemplateAPI(unittest.TestCase):
             return test_object.delete('template_2')
 
         # Assert
-        self.assertRaises(TemplateAttached, answer)
+        self.assertRaises(AttachedError, answer)
 
     @patch('vmngclient.session.Session')
     @patch.object(TemplateAPI, 'templates')
@@ -380,7 +380,4 @@ class TestTemplateAPI(unittest.TestCase):
             return test_object.create(self.device_info, 'template_1', 'new_description', config)
 
         # Assert
-        self.assertRaises(TemplateExist, answer)
-
-    def test_create_success(self):
-        pass
+        self.assertRaises(NameAlreadyExistError, answer)

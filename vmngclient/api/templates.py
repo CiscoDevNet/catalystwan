@@ -13,21 +13,21 @@ from vmngclient.utils.operation_status import OperationStatus
 logger = logging.getLogger(get_logger_name(__name__))
 
 
-class TemplateNotFoundError(Exception):
+class NotFoundError(Exception):
     """Used when a template item is not found."""
 
     def __init__(self, template):
         self.message = f"No such template: '{template}'"
 
 
-class TemplateExist(Exception):
+class NameAlreadyExistError(Exception):
     """Used when a template item exists."""
 
     def __init__(self, name):
         self.message = f"Template with that name '{name}' exists."
 
 
-class TemplateAttached(Exception):
+class AttachedError(Exception):
     """Used when delete attached template."""
 
     def __init__(self, template):
@@ -35,14 +35,12 @@ class TemplateAttached(Exception):
 
 
 class TemplateAPI:
-    """TemplateAPI."""
-
     def __init__(self, session: Session) -> None:
         self.session = session
 
     @property
     def templates(self) -> List[Template]:
-        """Templates.
+        """
 
         Returns:
             List[Template]: List of existing templates.
@@ -52,13 +50,13 @@ class TemplateAPI:
         return [create_dataclass(Template, template) for template in data]
 
     def get(self, name: str) -> Template:
-        """Get template.
+        """
 
         Args:
             name (str): Name of template.
 
         Raises:
-            TemplateNotFoundError: If template does not exist.
+            NotFoundError: If template does not exist.
 
         Returns:
             Template: Selected template.
@@ -66,10 +64,10 @@ class TemplateAPI:
         for template in self.templates:
             if name == template.name:
                 return template
-        raise TemplateNotFoundError(name)
+        raise NotFoundError(name)
 
     def get_id(self, name: str) -> str:
-        """Get id template.
+        """
 
         Args:
             name (str): Name of template to get id.
@@ -79,8 +77,8 @@ class TemplateAPI:
         """
         return self.get(name).id
 
-    def wait_complete(self, operation_id: str, timeout_seconds: int = 300, sleep_seconds: int = 5) -> bool:
-        """Wait to complete action.
+    def wait_for_complete(self, operation_id: str, timeout_seconds: int = 300, sleep_seconds: int = 5) -> bool:
+        """
 
         Args:
             operation_id (str): Id of the action waiting for completion.
@@ -116,7 +114,7 @@ class TemplateAPI:
         return True if wait_for_status() else False
 
     def attach(self, name: str, device: DeviceInfo) -> bool:
-        """Attach template to device.
+        """
 
         Args:
             name (str): Template name to attached.
@@ -126,20 +124,20 @@ class TemplateAPI:
             bool: True if attaching template is successful, otherwise - False.
         """
         try:
-            templateId = self.get_id(name)
-        except TemplateNotFoundError:
+            template_id = self.get_id(name)
+        except NotFoundError:
             return False
         payload = {
             "deviceTemplateList": [
                 {
-                    "templateId": templateId,
+                    "templateId": template_id,
                     "device": [
                         {
                             "csv-status": "complete",
                             "csv-deviceId": device.uuid,
                             "csv-deviceIP": device.id,
                             "csv-host-name": device.hostname,
-                            "csv-templateId": templateId,
+                            "csv-templateId": template_id,
                         }
                     ],
                 }
@@ -147,10 +145,10 @@ class TemplateAPI:
         }
         endpoint = "/dataservice/template/device/config/attachcli"
         response = cast(dict, self.session.post_json(url=endpoint, data=payload))
-        return self.wait_complete(response['id'])
+        return self.wait_for_complete(response['id'])
 
     def device_to_cli(self, device: DeviceInfo) -> bool:
-        """Device mode to Cli.
+        """
 
         Args:
             device (DeviceInfo): Device to chcange mode.
@@ -161,10 +159,10 @@ class TemplateAPI:
         payload = {"deviceType": device.personality, "devices": [{"deviceId": device.uuid, "deviceIP": device.id}]}
         endpoint = "/dataservice/template/config/device/mode/cli"
         response = cast(dict, self.session.post_json(url=endpoint, data=payload))
-        return self.wait_complete(response['id'])
+        return self.wait_for_complete(response['id'])
 
     def get_operation_status(self, operation_id: str) -> List[OperationStatus]:
-        """Get operatrion status.
+        """
 
         Args:
             operation_id (str): Operation id.
@@ -177,13 +175,13 @@ class TemplateAPI:
         return [OperationStatus(status['status']) for status in response]
 
     def delete(self, name: str) -> bool:
-        """Delete template.
+        """
 
         Args:
             name (str): Name template to delete.
 
         Raises:
-            TemplateAttached: If template is attached to device.
+            AttachedError: If template is attached to device.
 
         Returns:
             bool: True if deletion is successful, otherwise - False.
@@ -193,10 +191,10 @@ class TemplateAPI:
         if template.devices_attached == 0:
             response = self.session.delete(url=endpoint)
             return response.status == 200
-        raise TemplateAttached(template.name)
+        raise AttachedError(template.name)
 
     def create(self, device_model: DeviceModel, name: str, description: str, config: CiscoConfParse) -> str:
-        """Create template.
+        """
 
         Args:
             device_model (DeviceModel): Device model to create template.
@@ -209,16 +207,14 @@ class TemplateAPI:
         """
         try:
             self.get(name)
-            raise TemplateExist(name)
-        except TemplateNotFoundError:
+            raise NameAlreadyExistError(name)
+        except NotFoundError:
             cli_template = CliTemplate(self.session, device_model, name, description)
             cli_template.config = config
             return cli_template.send_to_device()
 
 
 class CliTemplate:
-    """Cli Template."""
-
     def __init__(self, session: Session, device_model: DeviceModel, name: str, description: str) -> None:
         self.session = session
         self.device_model = device_model
@@ -247,17 +243,17 @@ class CliTemplate:
         self.config = CiscoConfParse(config['config'].splitlines())
 
     def send_to_device(self) -> str:
-        """Send CLI template to device.
+        """
 
         Returns:
             str: Template id.
         """
-        config_p = "\n".join(self.config.ioscfg)
+        config_str = "\n".join(self.config.ioscfg)
         payload = {
             "templateName": self.name,
             "templateDescription": self.description,
             "deviceType": self.device_model.value,
-            "templateConfiguration": config_p,
+            "templateConfiguration": config_str,
             "factoryDefault": False,
             "configType": "file",
         }
@@ -266,7 +262,7 @@ class CliTemplate:
         return response['templateId']
 
     def update(self, id: str) -> None:
-        """Update CLI template.
+        """
 
         Args:
             id (str): Template id to update.
@@ -274,13 +270,13 @@ class CliTemplate:
         Returns:
             str: Process id.
         """
-        config_p = "\n".join(self.config.ioscfg)
+        config_str = "\n".join(self.config.ioscfg)
         payload = {
             "templateId": id,
             "templateName": self.name,
             "templateDescription": self.description,
             "deviceType": self.device_model.value,
-            "templateConfiguration": config_p,
+            "templateConfiguration": config_str,
             "factoryDefault": False,
             "configType": "file",
             "draftMode": False,
