@@ -23,7 +23,7 @@ class DeviceNotFoundError(Exception):
     pass
 
 
-class DevicesApi:
+class DevicesAPI:
     """API methods of vManage for getting devices and controllers.
 
     Attributes:
@@ -277,7 +277,7 @@ class DeviceStateApi:
 
     def get_colors(self, device_id: str) -> List[str]:
         url = '/dataservice/device/bfd/state/device/tlocInterfaceMap'
-        colors_raw = DevicesApi(self.session).session.get(url + f'?deviceId={device_id}')
+        colors_raw = DevicesAPI(self.session).session.get(url + f'?deviceId={device_id}')
         json_colors = json.loads(str(colors_raw.read(), 'utf-8'))
         colors = list(json_colors["intfList"].keys())
 
