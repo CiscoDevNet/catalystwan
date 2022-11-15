@@ -5,7 +5,7 @@ from typing import cast
 from urllib.error import HTTPError
 
 from vmngclient.api.basic_api import DeviceStateApi
-from vmngclient.dataclasses import DeviceInfo, Speedtest
+from vmngclient.dataclasses import Device, Speedtest
 from vmngclient.session import Session
 from vmngclient.utils.creation_tools import get_logger_name
 
@@ -17,7 +17,7 @@ class SpeedtestApi:
         self.session = session
 
     def speedtest(
-        self, source_device: DeviceInfo, destination_device: DeviceInfo, test_duration_seconds: int = 300
+        self, source_device: Device, destination_device: Device, test_duration_seconds: int = 300
     ) -> Speedtest:
 
         source_color = DeviceStateApi(self.session).get_colors(source_device.id)[0]
@@ -49,8 +49,8 @@ class SpeedtestApi:
 
     def perform(
         self,
-        source_device: DeviceInfo,
-        destination_device: DeviceInfo,
+        source_device: Device,
+        destination_device: Device,
         source_color: str,
         destination_color: str,
         test_duration_seconds: int = 300,
