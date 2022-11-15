@@ -22,7 +22,7 @@ class RequestTokenIdNotFound(Exception):
     pass
 
 
-class AdminTechApi:
+class AdminTechAPI:
     """Class for handling admintech logs for a device.
 
     Attributes:
