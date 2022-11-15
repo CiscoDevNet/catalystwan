@@ -143,7 +143,7 @@ class OmpAdvertisedTlocData:
 @define
 class OmpServiceData:
     name: str = field(metadata={FIELD_NAME: "service"})
-    status: str = field(default='')
+    status: Optional[str] = field(default=None)
 
 
 @define
@@ -229,7 +229,7 @@ class ServiceConfigurationData:
     vmanage_id: str = field(metadata={FIELD_NAME: "vmanageID"})
     device_ip: str = field(metadata={FIELD_NAME: "deviceIP"})  # consider using ip4 module to verify
     services: dict = field(metadata={FIELD_NAME: "services"})  # consider using nested dataclasses
-    persona: str = field(default="COMPUTE_AND_DATA")
+    persona: str = field(default="COMPUTE_AND_DATA")  # TODO Enum
     username: Optional[str] = field(default=None)
     password: Optional[str] = field(default=None)
 
