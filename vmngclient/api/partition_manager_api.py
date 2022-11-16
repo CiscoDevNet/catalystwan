@@ -24,7 +24,6 @@ class PartitionManagerAPI:
     """
 
     def __init__(self, repository: RepositoryAPI) -> None:
-
         self.repository = repository
 
     def set_default_partition(self, version_to_default: str) -> str:
