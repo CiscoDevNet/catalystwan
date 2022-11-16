@@ -16,12 +16,8 @@ class PartitionManagerAPI:
     are exececutable on all device categories.
     """
 
-    def __init__(
-        self,
-        session: Session,
-        repository: RepositoryAPI,
-    ) -> None:
-        self.session = session
+    def __init__(self, repository: RepositoryAPI) -> None:
+        
         self.repository = repository
 
     def set_default_partition(self, version_to_default: str) -> str:
@@ -41,7 +37,7 @@ class PartitionManagerAPI:
             "devices": self.repository.devices,
             "deviceType": "vmanage",
         }
-        set_default = dict(self.session.post_json(url, payload))
+        set_default = dict(self.repository.session.post_json(url, payload))
         return set_default["id"]
 
     def remove_partition(self, version_to_remove: str) -> str:
@@ -63,7 +59,7 @@ class PartitionManagerAPI:
             "deviceType": "vmanage",
         }
 
-        remove_action = dict(self.session.post_json(url, payload))
+        remove_action = dict(self.repository.session.post_json(url, payload))
         return remove_action["id"]
 
     def wait_for_completed(
@@ -93,7 +89,7 @@ class PartitionManagerAPI:
         def wait_for_end_software_action():
             url = f"/dataservice/device/action/status/{action_id}"
             try:
-                action_data = self.session.get_data(url)[0]["status"]
+                action_data = self.repository.session.get_data(url)[0]["status"]
                 logger.debug(f"Status of action {action_id} is: {action_data}")
             except IndexError:
                 action_data = ""
