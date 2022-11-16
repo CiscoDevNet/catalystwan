@@ -71,7 +71,6 @@ class SoftwareActionAPI:
             "devices": self.repository.devices,
             "deviceType": "vmanage",
         }
-
         activate = dict(self.repository.session.post_json(url, payload))
         return activate["id"]
 
