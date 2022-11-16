@@ -22,7 +22,7 @@ class DeviceCategory(Enum):
 
 @define
 class DeviceSoftwareRepository:
-    installed_versions: List[str]
+    installed_versions: List[str] = field(default=None)
     available_versions: List[str] = field(default=None, metadata={FIELD_NAME: "availableVersions"})
     current_version: str = field(default=None, metadata={FIELD_NAME: "version"})
     default_version: str = field(default=None, metadata={FIELD_NAME: "defaultVersion"})

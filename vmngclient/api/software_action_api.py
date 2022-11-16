@@ -64,13 +64,14 @@ class SoftwareActionAPI:
         Returns:
             str: action id
         """
-        self.repository.complete_device_list(version_to_activate, "current")
+        self.repository.complete_device_list(version_to_activate, "available_versions")
         url = "/dataservice/device/action/changepartition"
         payload = {
             "action": "changepartition",
             "devices": self.repository.devices,
             "deviceType": "vmanage",
         }
+        
         activate = dict(self.session.post_json(url, payload))
         return activate["id"]
 
@@ -172,7 +173,8 @@ class SoftwareActionAPI:
             url = f"/dataservice/device/action/status/{action_id}"
             try:
                 action_data = self.session.get_data(url)[0]["status"]
-                logger.debug(f"Status of action {action_id} is: {action_data}")
+                # logger.debug(f"Status of action {action_id} is: {action_data}")
+                print (f"Status of action {action_id} is: {action_data}")
             except IndexError:
                 action_data = ""
 
