@@ -50,8 +50,8 @@ class SoftwareActionAPI:
     are exececutable on all device categories.
     """
 
-    def __init__(self, session: Session, repository: RepositoryAPI) -> None:
-        self.session = session
+    def __init__(self, repository: RepositoryAPI) -> None:
+
         self.repository = repository
 
     def activate_software(self, version_to_activate: str) -> str:
@@ -72,7 +72,7 @@ class SoftwareActionAPI:
             "deviceType": "vmanage",
         }
         
-        activate = dict(self.session.post_json(url, payload))
+        activate = dict(self.repository.session.post_json(url, payload))
         return activate["id"]
 
     def upgrade_software(
@@ -123,7 +123,7 @@ class SoftwareActionAPI:
                     f"Current version of devices {incorrect_devices} is higher than upgrade version. Action denied!"
                 )
 
-        upgrade = dict(self.session.post_json(url, payload))
+        upgrade = dict(self.repository.session.post_json(url, payload))
         return upgrade["id"]
 
     def _downgrade_check(self, version_to_upgrade: str, devices_category: DeviceCategory) -> Union[None, List]:
@@ -172,7 +172,7 @@ class SoftwareActionAPI:
         def wait_for_end_software_action():
             url = f"/dataservice/device/action/status/{action_id}"
             try:
-                action_data = self.session.get_data(url)[0]["status"]
+                action_data = self.repository.session.get_data(url)[0]["status"]
                 # logger.debug(f"Status of action {action_id} is: {action_data}")
                 print (f"Status of action {action_id} is: {action_data}")
             except IndexError:
