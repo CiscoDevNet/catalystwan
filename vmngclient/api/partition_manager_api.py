@@ -68,7 +68,7 @@ class PartitionManagerAPI:
         timeout_seconds: int,
         exit_statuses: List[str],
         action_id: str,
-    ) -> None:
+    ) -> str:
         """Method to check action status
 
         Args:
@@ -96,4 +96,4 @@ class PartitionManagerAPI:
 
             return action_data
 
-        wait_for_end_software_action()
+        return wait_for_end_software_action()

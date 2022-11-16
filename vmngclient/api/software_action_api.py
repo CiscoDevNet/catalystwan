@@ -151,7 +151,7 @@ class SoftwareActionAPI:
         timeout_seconds: int,
         exit_statuses: List[str],
         action_id: str,
-    ) -> None:
+    ) -> str:
         """_summary_
 
         Args:
@@ -180,4 +180,4 @@ class SoftwareActionAPI:
 
             return action_data
 
-        wait_for_end_software_action()
+        return wait_for_end_software_action()
