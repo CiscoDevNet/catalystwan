@@ -86,19 +86,22 @@ class RepositoryAPI:
         self.devices_versions_repository = {}
         for device in devices_versions_info:
             device_all_versions = create_dataclass(DeviceSoftwareRepository, device)
-            device_all_versions.installed_versions = device_all_versions.available_versions
+            device_all_versions.installed_versions = [version for version in device_all_versions.available_versions]
             device_all_versions.installed_versions.append(device_all_versions.current_version)
             self.devices_versions_repository[device_all_versions.device_id] = device_all_versions
         return self.devices_versions_repository
 
     def complete_device_list(self, version_to_set_up, version_type: str) -> None:
 
+        all_dev_versions = self.create_devices_versions_repository()
         for dev in self.devices:
-            dev_versions = getattr(self.create_devices_versions_repository()[dev["deviceId"]], version_type)
+            dev_versions = getattr(all_dev_versions[dev["deviceId"]], version_type)
+            print(version_to_set_up)
             for version in dev_versions:
                 if version_to_set_up in version:
                     dev["version"] = version
                     break
-                else:
-                    logger.error(f"Software version {version_to_set_up} is not included in {version_type}")
+            if dev['version'] == None:
+                raise ValueError(f"Software version {version_to_set_up} is not included in {version_type}")    
+                 
         return None
