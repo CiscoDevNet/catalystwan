@@ -4,7 +4,7 @@ from typing import List, cast
 from ciscoconfparse import CiscoConfParse  # type: ignore
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
-from vmngclient.dataclasses import DeviceInfo, Template
+from vmngclient.dataclasses import Device, Template
 from vmngclient.session import Session
 from vmngclient.utils.creation_tools import create_dataclass, get_logger_name
 from vmngclient.utils.device_model import DeviceModel
@@ -113,12 +113,12 @@ class TemplateAPI:
 
         return True if wait_for_status() else False
 
-    def attach(self, name: str, device: DeviceInfo) -> bool:
+    def attach(self, name: str, device: Device) -> bool:
         """
 
         Args:
             name (str): Template name to attached.
-            device (DeviceInfo): Device to attach template.
+            device (Device): Device to attach template.
 
         Returns:
             bool: True if attaching template is successful, otherwise - False.
@@ -147,11 +147,11 @@ class TemplateAPI:
         response = cast(dict, self.session.post_json(url=endpoint, data=payload))
         return self.wait_for_complete(response['id'])
 
-    def device_to_cli(self, device: DeviceInfo) -> bool:
+    def device_to_cli(self, device: Device) -> bool:
         """
 
         Args:
-            device (DeviceInfo): Device to chcange mode.
+            device (Device): Device to chcange mode.
 
         Returns:
             bool: True if change mode to cli is successful, otherwise - False.
@@ -232,11 +232,11 @@ class CliTemplate:
         config = cast(dict, self.session.get_json(endpoint))
         self.config = CiscoConfParse(config['templateConfiguration'].splitlines())
 
-    def load_running(self, device: DeviceInfo) -> None:
+    def load_running(self, device: Device) -> None:
         """Load running config from device.
 
         Args:
-            device (DeviceInfo): The device from which load config.
+            device (Device): The device from which load config.
         """
         endpoint = f"/dataservice/template/config/running/{device.uuid}"
         config = cast(dict, self.session.get_json(endpoint))
