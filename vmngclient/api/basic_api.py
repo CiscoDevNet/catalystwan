@@ -189,9 +189,6 @@ class DevicesAPI:
             if getattr(device, field.value) == value:
                 return device
         raise DeviceNotFoundError(f"Device with `{field.value}` equals to `{value}` does not exists.")
-        # filtered_attributes = [{getattr(device, field.value): device} for device in self.devices]
-        # if value in filtered_attributes:
-        #
 
 
 class DeviceStateAPI:
