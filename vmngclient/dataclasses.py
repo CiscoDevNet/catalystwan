@@ -5,6 +5,7 @@ from attr import define, field
 
 from vmngclient.utils.creation_tools import FIELD_NAME, convert_attributes
 from vmngclient.utils.device_model import DeviceModel
+from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
 
 
@@ -47,31 +48,22 @@ class AlarmData:
 
 
 @define
-class DeviceInfo:
-    personality: str
+class Device:
     uuid: str
+    status: str
+    personality: Personality = field(converter=Personality)
     id: str = field(metadata={FIELD_NAME: "deviceId"})
-    hostname: str = field(default="NA", metadata={FIELD_NAME: "host-name"})
-    reachability: Reachability = field(default=Reachability.na, converter=Reachability)
-    local_system_ip: str = field(default="NA", metadata={FIELD_NAME: "local-system-ip"})
-    vedgeCertificateState: str = field(default="NA")
-    cpuState: str = field(default="NA")
-    chasisNumber: str = field(default="NA")
-    memState: str = field(default="NA")
-    status: str = field(default="NA")
-    memUsage: float = field(default=-1)
-    cpuLoad: float = field(default=-1)
-    serialNumber: str = field(default="NA")
-    configOperationMode: str = field(default="NA")
-    configStatusMessage: str = field(default="NA")
-    connected_vManages: List[str] = field(default=["NA"], metadata={FIELD_NAME: "connectedVManages"})
-    model: str = field(default=None, metadata={FIELD_NAME: "device-model"})
-    stateDescription: str = field(default="NA", metadata={FIELD_NAME: "state_description"})
-    board_serial: str = field(default=None, metadata={'field_name': 'board-serial'})
+    hostname: str = field(metadata={FIELD_NAME: "host-name"})
+    reachability: Reachability = field(converter=Reachability)
+    local_system_ip: str = field(metadata={FIELD_NAME: "local-system-ip"})
+    memUsage: Optional[float] = field(default=None)
+    connected_vManages: List[str] = field(factory=list, metadata={FIELD_NAME: "connectedVManages"})
+    model: Optional[str] = field(default=None, metadata={FIELD_NAME: "device-model"})
+    board_serial: Optional[str] = field(default=None, metadata={'field_name': 'board-serial'})
 
     @property
     def is_reachable(self) -> bool:
-        return self.reachability.value == Reachability.reachable.value
+        return self.reachability is Reachability.REACHABLE
 
 
 @define(field_transformer=convert_attributes)
@@ -152,7 +144,7 @@ class OmpAdvertisedTlocData:
 @define
 class OmpServiceData:
     name: str = field(metadata={FIELD_NAME: "service"})
-    status: str = field(default='')
+    status: Optional[str] = field(default=None)
 
 
 @define
@@ -186,9 +178,9 @@ class User:
     group: List[str]
     locale: str
     username: str = field(metadata={FIELD_NAME: "userName"})
-    password: Optional[str] = field(default="")
-    description: Optional[str] = field(default="")
-    resource_group: str = field(default=None, metadata={FIELD_NAME: "resGroupName"})
+    password: Optional[str] = field(default=None)
+    description: Optional[str] = field(default=None)
+    resource_group: Optional[str] = field(default=None, metadata={FIELD_NAME: "resGroupName"})
 
 
 @define
@@ -231,8 +223,8 @@ class PacketSetup:
 
 @define(frozen=True)
 class Status:
-    file_download_status: str = field(default=None, metadata={FIELD_NAME: "fileDownloadStatus"})
-    file_size: int = field(default=None, metadata={FIELD_NAME: "fileSize"})
+    file_download_status: Optional[str] = field(default=None, metadata={FIELD_NAME: "fileDownloadStatus"})
+    file_size: Optional[int] = field(default=None, metadata={FIELD_NAME: "fileSize"})
 
 
 @define(frozen=True)
@@ -242,9 +234,9 @@ class ServiceConfigurationData:
     vmanage_id: str = field(metadata={FIELD_NAME: "vmanageID"})
     device_ip: str = field(metadata={FIELD_NAME: "deviceIP"})  # consider using ip4 module to verify
     services: dict = field(metadata={FIELD_NAME: "services"})  # consider using nested dataclasses
-    persona: str = field(default="COMPUTE_AND_DATA")
-    username: str = field(default="")
-    password: str = field(default="")
+    persona: str = field(default="COMPUTE_AND_DATA")  # TODO Enum
+    username: Optional[str] = field(default=None)
+    password: Optional[str] = field(default=None)
 
 
 @define(frozen=True)
@@ -255,7 +247,7 @@ class CloudConnectorData:
     client_secret: str = field(metadata={FIELD_NAME: "clientSecret"})
     org_name: str = field(metadata={FIELD_NAME: "orgName"})
     telemetry_enabled: bool = field(metadata={FIELD_NAME: "telemetryEnabled"})
-    affinity: str = field(default="")
+    affinity: Optional[str] = field(default=None)
     cloud_enabled: bool = field(default=True, metadata={FIELD_NAME: "cloudEnabled"})
 
 
@@ -264,8 +256,8 @@ class CloudServicesSettings:
     """Administration -> Settings -> Cloud Services"""
 
     enabled: bool = field(metadata={FIELD_NAME: "enabled"})
-    otp: str = field(default='', metadata={FIELD_NAME: "otp"})
-    cloud_gateway_url: str = field(default='', metadata={FIELD_NAME: "cloudGatewayUrl"})
+    otp: Optional[str] = field(default=None, metadata={FIELD_NAME: "otp"})
+    cloud_gateway_url: Optional[str] = field(default=None, metadata={FIELD_NAME: "cloudGatewayUrl"})
 
 
 @define(frozen=True)

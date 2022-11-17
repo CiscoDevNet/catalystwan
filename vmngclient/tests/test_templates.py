@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, Mock, patch
 from ciscoconfparse import CiscoConfParse  # type: ignore
 
 from vmngclient.api.templates import AttachedError, NameAlreadyExistError, NotFoundError, TemplateAPI
-from vmngclient.dataclasses import DeviceInfo, Template
+from vmngclient.dataclasses import Device, Template
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.operation_status import OperationStatus
 from vmngclient.utils.reachability import Reachability
@@ -45,27 +45,17 @@ class TestTemplateAPI(unittest.TestCase):
             },
         ]
         self.templates = [create_dataclass(Template, template) for template in self.data_template]
-        self.device_info = DeviceInfo(
+        self.device_info = Device(
             personality='vedge',
             uuid='dummy_uuid',
             id='162.168.0.1',
             hostname='dummy_host',
-            reachability=Reachability.reachable,
+            reachability=Reachability.REACHABLE,
             local_system_ip='192.168.0.1',
-            vedgeCertificateState='NA',
-            cpuState='normal',
-            chasisNumber='NA',
-            memState='normal',
-            status='normal',
             memUsage=1.0,
-            cpuLoad=1.0,
-            serialNumber='NA',
-            configOperationMode='NA',
-            configStatusMessage='NA',
             connected_vManages=['192.168.0.1'],
             model='vedge-cloud',
-            stateDescription='All daemons up',
-            board_serial=None,
+            status='normal',
         )
 
     @patch('vmngclient.session.Session')

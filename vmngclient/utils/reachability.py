@@ -2,6 +2,5 @@ from enum import Enum
 
 
 class Reachability(Enum):
-    reachable = 'reachable'
-    unreachable = 'unreachable'
-    na = "NA"
+    REACHABLE = 'reachable'
+    UNREACHABLE = 'unreachable'
