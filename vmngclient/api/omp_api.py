@@ -13,7 +13,7 @@ from vmngclient.session import Session
 from vmngclient.utils.creation_tools import create_dataclass
 
 
-class OmpApi:
+class OmpAPI:
     """OMP API methods of vManage for get common omp data.
 
     Attributes:
