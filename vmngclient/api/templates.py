@@ -156,7 +156,10 @@ class TemplateAPI:
         Returns:
             bool: True if change mode to cli is successful, otherwise - False.
         """
-        payload = {"deviceType": device.personality, "devices": [{"deviceId": device.uuid, "deviceIP": device.id}]}
+        payload = {
+            "deviceType": device.personality.value,
+            "devices": [{"deviceId": device.uuid, "deviceIP": device.id}],
+        }
         endpoint = "/dataservice/template/config/device/mode/cli"
         response = cast(dict, self.session.post_json(url=endpoint, data=payload))
         return self.wait_for_complete(response['id'])
