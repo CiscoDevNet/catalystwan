@@ -96,12 +96,11 @@ class RepositoryAPI:
         all_dev_versions = self.create_devices_versions_repository()
         for dev in self.devices:
             dev_versions = getattr(all_dev_versions[dev["deviceId"]], version_type)
-            print(version_to_set_up)
             for version in dev_versions:
                 if version_to_set_up in version:
                     dev["version"] = version
+                    print (self.devices)
                     break
-            if dev['version'] == None:
-                raise ValueError(f"Software version {version_to_set_up} is not included in {version_type}")    
-                 
+            if 'version' not in dev:
+                raise ValueError(f"Software version {version_to_set_up} is not included in {version_type}")         
         return None
