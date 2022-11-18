@@ -7,6 +7,7 @@ from vmngclient.api.templates import AttachedError, NameAlreadyExistError, NotFo
 from vmngclient.dataclasses import Device, Template
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.operation_status import OperationStatus
+from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
 
 
@@ -46,7 +47,7 @@ class TestTemplateAPI(unittest.TestCase):
         ]
         self.templates = [create_dataclass(Template, template) for template in self.data_template]
         self.device_info = Device(
-            personality='vedge',
+            personality=Personality.EDGE,
             uuid='dummy_uuid',
             id='162.168.0.1',
             hostname='dummy_host',
