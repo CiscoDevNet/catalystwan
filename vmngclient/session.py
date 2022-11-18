@@ -72,7 +72,7 @@ def create_session(
     elif user_mode == UserMode.PROVIDER.value and view_mode == UserMode.TENANT.value:
         session.session_type = SessionType.PROVIDER_AS_TENANT
     elif user_mode == UserMode.TENANT.value and subdomain:
-        raise SessionNotCreatedError("Session not created. 'subdomain' passed to tenant session, "
+        raise SessionNotCreatedError(f"Session not created. Subdomain {subdomain} passed to tenant session, "
                                      "cannot switch to tenant from tenant user mode.")
     else:
         raise SessionNotCreatedError("Session not created. Unrecognized user mode.")
