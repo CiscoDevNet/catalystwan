@@ -22,7 +22,7 @@ class Viewed(Enum):
     no = "false"
 
 
-class AlarmsApi:
+class AlarmsAPI:
 
     URL = '/dataservice/alarms'
 
@@ -50,7 +50,7 @@ class AlarmsApi:
                 {"value": [value], "field": "acknowledged", "type": "bool", "operator": "equal"}
             )
 
-        alarms = self.session.post_data(AlarmsApi.URL, data=query)
+        alarms = self.session.post_data(AlarmsAPI.URL, data=query)
 
         logger.info("Actualas alarms collected successfuly.")
 
@@ -75,7 +75,7 @@ class AlarmsApi:
           True if all alarms are viewed
         """
 
-        self.session.post(f'{AlarmsApi.URL}/markallasviewed')
+        self.session.post(f'{AlarmsAPI.URL}/markallasviewed')
         logger.info("Alarms mark as viewed.")
 
         return not self.get_not_viewed_alarms()

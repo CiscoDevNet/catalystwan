@@ -16,7 +16,7 @@ class UserDoesNotExists(Exception):
     pass
 
 
-class UserApi:
+class UsersAPI:
     def __init__(self, session: Session) -> None:
         self.session = session
 
@@ -47,7 +47,7 @@ class UserApi:
         return True if response.status == 200 else False
 
 
-class ClusterManagementApi:
+class ClusterManagementAPI:
     """Covers clusterManagement API calls.
 
     Attributes:
@@ -79,7 +79,7 @@ class ClusterManagementApi:
         return self.session.get_data(url_path)
 
 
-class AdministrationSettingsApi:
+class AdministrationSettingsAPI:
     def __init__(self, session: Session) -> None:
         """Covers Administration Settings API calls.
 

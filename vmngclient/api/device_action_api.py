@@ -4,21 +4,22 @@ from typing import cast
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
-from vmngclient.api.basic_api import DevicesApi, DeviceStateApi
-from vmngclient.dataclasses import DeviceInfo
+from vmngclient.api.basic_api import DevicesAPI, DeviceStateAPI
+from vmngclient.dataclasses import Device
 from vmngclient.session import Session
 from vmngclient.utils.certificate_status import CertificateStatus
 from vmngclient.utils.creation_tools import get_logger_name
+from vmngclient.utils.operation_status import OperationStatus
 from vmngclient.utils.reachability import Reachability
 from vmngclient.utils.validate_status import ValidateStatus
 
 logger = logging.getLogger(get_logger_name(__name__))
 
 
-class DeviceActionApi(ABC):
+class DeviceActionAPI(ABC):
     """API method to execute action on Device."""
 
-    def __init__(self, session: Session, dev: DeviceInfo):
+    def __init__(self, session: Session, dev: Device):
         self.session = session
         self.dev = dev
         self.action_status = ''
@@ -39,7 +40,7 @@ class DeviceActionApi(ABC):
         raise NotImplementedError
 
 
-class RebootAction(DeviceActionApi):
+class RebootAction(DeviceActionAPI):
     """API method to perform reboot on Device."""
 
     def execute(self):
@@ -66,8 +67,8 @@ class RebootAction(DeviceActionApi):
         self,
         sleep_seconds: int = 15,
         timeout_seconds: int = 1800,
-        expected_status: str = 'Success',
-        expected_reachability: str = Reachability.reachable.value,
+        expected_status: str = OperationStatus.SUCCESS.value,
+        expected_reachability: str = Reachability.REACHABLE.value,
     ):
         def check_status(action_data):
             return not action_data == expected_status
@@ -85,7 +86,7 @@ class RebootAction(DeviceActionApi):
                 logger.debug(f"Status of device {self.dev.hostname} reboot is: {action_data}")
             except IndexError:
                 action_data = ''
-            status = DeviceStateApi(self.session).get_system_status(self.dev.id)
+            status = DeviceStateAPI(self.session).get_system_status(self.dev.id)
             # it is necessary to wait also for Success of reboot because device can be reachable even several
             # seconds after execute reboot
             if status.reachability.value == expected_reachability:
@@ -96,7 +97,7 @@ class RebootAction(DeviceActionApi):
         wait_for_come_up()
 
 
-class ValidateAction(DeviceActionApi):
+class ValidateAction(DeviceActionAPI):
     """
     API method to perform validate Device
     """
@@ -124,7 +125,7 @@ class ValidateAction(DeviceActionApi):
         sleep_seconds: int = 15,
         timeout_seconds: int = 180,
         expected_status: str = ValidateStatus.validate.value,
-        expected_reachability: str = Reachability.reachable.value,
+        expected_reachability: str = Reachability.REACHABLE.value,
     ):
         def check_status(action_data):
             return not action_data['validity'] == expected_status
@@ -135,7 +136,7 @@ class ValidateAction(DeviceActionApi):
             retry=retry_if_result(check_status),
         )
         def wait_for_come_up():
-            status = DeviceStateApi(self.session).get_system_status(self.dev.id)
+            status = DeviceStateAPI(self.session).get_system_status(self.dev.id)
             if status.reachability.value == expected_reachability:
                 return self.session.get_data(f'/dataservice/device?host-name={self.dev.hostname}')[0]
             else:
@@ -144,7 +145,7 @@ class ValidateAction(DeviceActionApi):
         wait_for_come_up()
 
 
-class DecommissionAction(DeviceActionApi):
+class DecommissionAction(DeviceActionAPI):
     """
     API method to decommission Device
     """
@@ -163,7 +164,7 @@ class DecommissionAction(DeviceActionApi):
         sleep_seconds: int = 15,
         timeout_seconds: int = 20,
         expected_status: str = CertificateStatus.generated.value,
-        expected_reachability=Reachability.unreachable.value,
+        expected_reachability=Reachability.UNREACHABLE.value,
     ):
         def check_status(action_data):
             return not action_data.vedgeCertificateState == expected_status
@@ -174,7 +175,7 @@ class DecommissionAction(DeviceActionApi):
             retry=retry_if_result(check_status),
         )
         def wait_for_status():
-            status = DevicesApi(self.session).get_device_details(self.dev.uuid)
+            status = DevicesAPI(self.session).get_device_details(self.dev.uuid)
             if status.reachability.value == expected_reachability:
                 return status
             else:
