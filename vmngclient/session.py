@@ -69,20 +69,25 @@ def create_session(
 
     session = Session(url, port, username, password, subdomain, timeout)
     response = cast(dict, session.server())
-    user_mode = UserMode(response.get("userMode"))
-    view_mode = ViewMode(response.get("viewMode"))
+    try:
+        user_mode = UserMode(response.get("userMode"))
+    except ValueError:
+        raise SessionNotCreatedError("Session not created. Unrecognized user mode.")
 
-    if user_mode == UserMode.TENANT and not subdomain and view_mode == ViewMode.TENANT:
+    try:
+        view_mode = ViewMode(response.get("viewMode"))
+    except ValueError:
+        raise SessionNotCreatedError("Session not created. Unrecognized view mode.")
+
+    if user_mode is UserMode.TENANT and not subdomain and view_mode is ViewMode.TENANT:
         session.session_type = SessionType.TENANT
-    elif user_mode == UserMode.PROVIDER and not subdomain and view_mode == ViewMode.PROVIDER:
+    elif user_mode is UserMode.PROVIDER and not subdomain and view_mode is ViewMode.PROVIDER:
         session.session_type = SessionType.PROVIDER
-    elif user_mode == UserMode.PROVIDER and view_mode == ViewMode.TENANT:
+    elif user_mode is UserMode.PROVIDER and view_mode is ViewMode.TENANT:
         session.session_type = SessionType.PROVIDER_AS_TENANT
-    elif user_mode == UserMode.TENANT and subdomain:
+    elif user_mode is UserMode.TENANT and subdomain:
         raise SessionNotCreatedError(f"Session not created. Subdomain {subdomain} passed to tenant session, "
                                      "cannot switch to tenant from tenant user mode.")
-    else:
-        raise SessionNotCreatedError("Session not created. Unrecognized user mode.")
 
     return session
 
