@@ -31,6 +31,13 @@ class SessionType(Enum):
 class UserMode(Enum):
     PROVIDER = "provider"
     TENANT = "tenant"
+    NOT_DEFINED = None
+
+
+class ViewMode(Enum):
+    PROVIDER = "provider"
+    TENANT = "tenant"
+    NOT_DEFINED = None
 
 
 class SessionNotCreatedError(Exception):
@@ -62,16 +69,16 @@ def create_session(
 
     session = Session(url, port, username, password, subdomain, timeout)
     response = cast(dict, session.server())
-    user_mode = response.get("userMode", UserMode.NOT_DEFINED)
-    view_mode = response.get("viewMode", ViewMode.NOT_DEFINED)
+    user_mode = UserMode(response.get("userMode"))
+    view_mode = ViewMode(response.get("viewMode"))
 
-    if user_mode == UserMode.TENANT.value and not subdomain and view_mode == UserMode.TENANT.value:
+    if user_mode == UserMode.TENANT and not subdomain and view_mode == ViewMode.TENANT:
         session.session_type = SessionType.TENANT
-    elif user_mode == UserMode.PROVIDER.value and not subdomain and view_mode == UserMode.PROVIDER.value:
+    elif user_mode == UserMode.PROVIDER and not subdomain and view_mode == ViewMode.PROVIDER:
         session.session_type = SessionType.PROVIDER
-    elif user_mode == UserMode.PROVIDER.value and view_mode == UserMode.TENANT.value:
+    elif user_mode == UserMode.PROVIDER and view_mode == ViewMode.TENANT:
         session.session_type = SessionType.PROVIDER_AS_TENANT
-    elif user_mode == UserMode.TENANT.value and subdomain:
+    elif user_mode == UserMode.TENANT and subdomain:
         raise SessionNotCreatedError(f"Session not created. Subdomain {subdomain} passed to tenant session, "
                                      "cannot switch to tenant from tenant user mode.")
     else:
