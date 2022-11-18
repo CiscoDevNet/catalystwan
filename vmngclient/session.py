@@ -62,8 +62,8 @@ def create_session(
 
     session = Session(url, port, username, password, subdomain, timeout)
     response = cast(dict, session.server())
-    user_mode = response["userMode"]
-    view_mode = response["viewMode"]
+    user_mode = response.get("userMode", UserMode.NOT_DEFINED)
+    view_mode = response.get("viewMode", ViewMode.NOT_DEFINED)
 
     if user_mode == UserMode.TENANT.value and not subdomain and view_mode == UserMode.TENANT.value:
         session.session_type = SessionType.TENANT
