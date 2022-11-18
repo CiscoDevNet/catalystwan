@@ -59,7 +59,9 @@ class Device:
     memUsage: Optional[float] = field(default=None)
     connected_vManages: List[str] = field(factory=list, metadata={FIELD_NAME: "connectedVManages"})
     model: Optional[str] = field(default=None, metadata={FIELD_NAME: "device-model"})
-    board_serial: Optional[str] = field(default=None, metadata={'field_name': 'board-serial'})
+    board_serial: Optional[str] = field(default=None, metadata={FIELD_NAME: 'board-serial'})
+    vedgeCertificateState: Optional[str] = field(default=None, metadata={FIELD_NAME: 'vedgeCertificateState'})  # TODO
+    chasis_number: Optional[str] = field(default=None, metadata={FIELD_NAME: 'chasisNumber'})
 
     @property
     def is_reachable(self) -> bool:
