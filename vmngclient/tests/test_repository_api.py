@@ -81,6 +81,15 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_repository_object.complete_device_list('ver1','available_versions')
         expected_result = [{'deviceId' : 'mock_uuid', 'deviceIP' : 'mock_ip', 'version' : 'ver1'}]
         self.assertEqual(mock_repository_object.devices, expected_result,"self.devices filled incorrectly")
+    
+    
+    @patch.object(RepositoryAPI,"create_devices_versions_repository")
+    def test_complete_device_list_raise_error(self,mock_create_devices_versions_repository):
+        mock_create_devices_versions_repository.return_value = Mock()
+        mock_session = Mock()
+        mock_repository_object = RepositoryAPI(mock_session,[self.device_info],DeviceCategory.CEDGE.value)
+        mock_repository_object.create_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
+        self.assertRaises(ValueError, mock_repository_object.complete_device_list,'ver3','available_versions')
 
 if __name__ == '__main__':
     unittest.main()
