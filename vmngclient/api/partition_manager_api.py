@@ -1,10 +1,9 @@
 import logging
 from typing import List
 
-from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
+from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed, RetryError
 
 from vmngclient.api.repository_api import RepositoryAPI
-from vmngclient.session import Session
 from vmngclient.utils.creation_tools import get_logger_name
 
 logger = logging.getLogger(get_logger_name(__name__))
@@ -110,7 +109,6 @@ class PartitionManagerAPI:
                 logger.debug(f"Status of action {action_id} is: {action_data}")
             except IndexError:
                 action_data = ""
-
             return action_data
 
         return wait_for_end_software_action()
