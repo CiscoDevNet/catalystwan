@@ -3,7 +3,6 @@ from typing import List
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
 from vmngclient.api.repository_api import RepositoryAPI
-from vmngclient.session import Session
 from vmngclient.utils.creation_tools import get_logger_name
 
 logger = logging.getLogger(get_logger_name(__name__))
@@ -46,12 +45,7 @@ class PartitionManagerAPI:
         set_default = dict(self.repository.session.post_json(url, payload))
         return set_default["id"]
 
-<<<<<<< HEAD
     def remove_partition(self, version_to_remove: str, force_remove: bool = False) -> str:
-=======
-    def remove_partition(self, version_to_remove: str,
-                         force_remove : bool = False) -> str:
->>>>>>> 429ca35 (add remove version validation in method remove_partition)
         """
         Method to remove choosen software version from Vmanage repository
 
@@ -69,7 +63,6 @@ class PartitionManagerAPI:
             "devices": self.repository.devices,
             "deviceType": "vmanage",
         }
-<<<<<<< HEAD
         if force_remove is False:
             invalid_devices = self._check_remove_partition_possibility()
             if invalid_devices:
@@ -77,14 +70,6 @@ class PartitionManagerAPI:
                     f'Current or default version of devices with ids {invalid_devices} \
                         are equal to remove version. Action denied!'
                 )
-=======
-        if force_remove == False:
-            invalid_devices = self._check_remove_partition_possibility(version_to_remove)
-            if invalid_devices:
-                raise ValueError(
-                    f'Current or default version of devices with ids {invalid_devices} \
-                        are equal to remove version. Action denied!')
->>>>>>> 429ca35 (add remove version validation in method remove_partition)
         remove_action = dict(self.repository.session.post_json(url, payload))
         return remove_action["id"]             
                 
