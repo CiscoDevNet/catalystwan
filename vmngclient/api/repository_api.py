@@ -106,7 +106,6 @@ class RepositoryAPI:
             for version in dev_versions:
                 if version_to_set_up in version:
                     dev["version"] = version
-                    print (self.devices)
                     break
             if 'version' not in dev:
                 raise ValueError(f"Software version {version_to_set_up} is not included in {version_type}")

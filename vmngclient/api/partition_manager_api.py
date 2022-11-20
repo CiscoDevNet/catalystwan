@@ -46,7 +46,12 @@ class PartitionManagerAPI:
         set_default = dict(self.repository.session.post_json(url, payload))
         return set_default["id"]
 
+<<<<<<< HEAD
     def remove_partition(self, version_to_remove: str, force_remove: bool = False) -> str:
+=======
+    def remove_partition(self, version_to_remove: str,
+                         force_remove : bool = False) -> str:
+>>>>>>> 429ca35 (add remove version validation in method remove_partition)
         """
         Method to remove choosen software version from Vmanage repository
 
@@ -64,6 +69,7 @@ class PartitionManagerAPI:
             "devices": self.repository.devices,
             "deviceType": "vmanage",
         }
+<<<<<<< HEAD
         if force_remove is False:
             invalid_devices = self._check_remove_partition_possibility()
             if invalid_devices:
@@ -71,8 +77,27 @@ class PartitionManagerAPI:
                     f'Current or default version of devices with ids {invalid_devices} \
                         are equal to remove version. Action denied!'
                 )
+=======
+        if force_remove == False:
+            invalid_devices = self._check_remove_partition_possibility(version_to_remove)
+            if invalid_devices:
+                raise ValueError(
+                    f'Current or default version of devices with ids {invalid_devices} \
+                        are equal to remove version. Action denied!')
+>>>>>>> 429ca35 (add remove version validation in method remove_partition)
         remove_action = dict(self.repository.session.post_json(url, payload))
-        return remove_action["id"]
+        return remove_action["id"]             
+                
+    def _check_remove_partition_possibility(self):
+        
+        for device in self.repository.devices:
+            invalid_devices = []
+            if device['version'] in (self.repository.devices_versions_repository[device["deviceId"]].current_version,
+                self.repository.devices_versions_repository[device["deviceId"]].default_version):
+                invalid_devices.append((device["deviceId"]))
+            if invalid_devices == []:
+                return None
+            return invalid_devices
 
     def _check_remove_partition_possibility(self):
 
