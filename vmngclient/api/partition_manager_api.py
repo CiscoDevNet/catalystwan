@@ -71,14 +71,16 @@ class PartitionManagerAPI:
                         are equal to remove version. Action denied!'
                 )
         remove_action = dict(self.repository.session.post_json(url, payload))
-        return remove_action["id"]             
-                
+        return remove_action["id"]
+
     def _check_remove_partition_possibility(self):
-        
+
         for device in self.repository.devices:
             invalid_devices = []
-            if device['version'] in (self.repository.devices_versions_repository[device["deviceId"]].current_version,
-                self.repository.devices_versions_repository[device["deviceId"]].default_version):
+            if device['version'] in (
+                self.repository.devices_versions_repository[device["deviceId"]].current_version,
+                self.repository.devices_versions_repository[device["deviceId"]].default_version,
+            ):
                 invalid_devices.append((device["deviceId"]))
             if invalid_devices == []:
                 return None
