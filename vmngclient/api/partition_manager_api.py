@@ -1,11 +1,5 @@
 import logging
 from typing import List
-from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
-
-from vmngclient.api.repository_api import RepositoryAPI
-from vmngclient.utils.creation_tools import get_logger_name
-
-logger = logging.getLogger(get_logger_name(__name__))
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
@@ -38,7 +32,7 @@ class PartitionManagerAPI:
         self.repository.complete_device_list(version_to_default, "installed_versions")
         url = "/dataservice/device/action/defaultpartition"
         payload = {
-            "action": "defaultpartition",
+            "action": 'defaultpartition',
             "devices": self.repository.devices,
             "deviceType": "vmanage",
         }
@@ -72,19 +66,6 @@ class PartitionManagerAPI:
                 )
         remove_action = dict(self.repository.session.post_json(url, payload))
         return remove_action["id"]
-
-    def _check_remove_partition_possibility(self):
-
-        for device in self.repository.devices:
-            invalid_devices = []
-            if device['version'] in (
-                self.repository.devices_versions_repository[device["deviceId"]].current_version,
-                self.repository.devices_versions_repository[device["deviceId"]].default_version,
-            ):
-                invalid_devices.append((device["deviceId"]))
-            if invalid_devices == []:
-                return None
-            return invalid_devices
 
     def _check_remove_partition_possibility(self):
 
