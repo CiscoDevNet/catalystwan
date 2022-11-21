@@ -5,12 +5,12 @@ from tenacity import RetryError
 
 from vmngclient.api.partition_manager_api import PartitionManagerAPI
 from vmngclient.api.repository_api import DeviceCategory, DeviceSoftwareRepository, RepositoryAPI
-from vmngclient.dataclasses import DeviceInfo
+from vmngclient.dataclasses import Device
 
 
 class TestPartitionManagerAPI(unittest.TestCase):
     def setUp(self):
-        self.device_info = DeviceInfo(
+        self.device_info = Device(
             personality="vedge",
             uuid="mock_uuid",
             id="mock_ip",

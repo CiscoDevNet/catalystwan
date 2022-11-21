@@ -5,7 +5,7 @@ from typing import Dict, List, Union
 
 from attr import define, field
 
-from vmngclient.dataclasses import DeviceInfo
+from vmngclient.dataclasses import Device
 from vmngclient.session import Session
 from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass, get_logger_name
 
@@ -37,7 +37,7 @@ class RepositoryAPI:
     def __init__(
         self,
         session: Session,
-        devices: List[DeviceInfo],
+        devices: List[Device],
         device_category: DeviceCategory,
     ):
 

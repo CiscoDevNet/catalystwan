@@ -5,12 +5,12 @@ from tenacity import RetryError
 
 from vmngclient.api.repository_api import DeviceCategory, DeviceSoftwareRepository, RepositoryAPI
 from vmngclient.api.software_action_api import DeviceType, Family, InstallSpecification, SoftwareActionAPI, VersionType
-from vmngclient.dataclasses import DeviceInfo
+from vmngclient.dataclasses import Device
 
 
 class TestSoftwareAcionAPI(unittest.TestCase):
     def setUp(self):
-        self.device_info = DeviceInfo(
+        self.device_info = Device(
             personality="vedge",
             uuid="mock_uuid",
             id="mock_ip",

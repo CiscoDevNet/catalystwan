@@ -5,6 +5,7 @@ from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
 from vmngclient.api.repository_api import RepositoryAPI
 from vmngclient.utils.creation_tools import get_logger_name
+from vmngclient.utils.operation_status import OperationStatus
 
 logger = logging.getLogger(get_logger_name(__name__))
 
@@ -84,7 +85,7 @@ class PartitionManagerAPI:
         self,
         sleep_seconds: int,
         timeout_seconds: int,
-        exit_statuses: List[str],
+        exit_statuses: List[OperationStatus],
         action_id: str,
     ) -> str:
         """Method to check action status

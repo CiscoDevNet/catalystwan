@@ -2,12 +2,12 @@ import unittest
 from unittest.mock import Mock, patch
 
 from vmngclient.api.repository_api import DeviceCategory, DeviceSoftwareRepository, RepositoryAPI
-from vmngclient.dataclasses import DeviceInfo
+from vmngclient.dataclasses import Device
 
 
 class TestRepositoryAPI(unittest.TestCase):
     def setUp(self):
-        self.device_info = DeviceInfo(
+        self.device_info = Device(
             personality="vedge",
             uuid="mock_uuid",
             id="mock_ip",
