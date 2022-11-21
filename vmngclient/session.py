@@ -31,13 +31,15 @@ class SessionType(Enum):
 class UserMode(Enum):
     PROVIDER = "provider"
     TENANT = "tenant"
-    NOT_DEFINED = None
+    NOT_RECOGNIZED = "not recognized"
+    NOT_FOUND = "not found"
 
 
 class ViewMode(Enum):
     PROVIDER = "provider"
     TENANT = "tenant"
-    NOT_DEFINED = None
+    NOT_RECOGNIZED = "not recognized"
+    NOT_FOUND = "not found"
 
 
 class SessionNotCreatedError(Exception):
@@ -66,18 +68,22 @@ def create_session(
     Returns:
         Session object
     """
+    unknown_user_mode = None
+    unknown_view_mode = None
 
     session = Session(url, port, username, password, subdomain, timeout)
     response = cast(dict, session.server())
     try:
-        user_mode = UserMode(response.get("userMode"))
+        user_mode = UserMode(response.get("userMode", "not found"))
     except ValueError:
-        raise SessionNotCreatedError("Session not created. Unrecognized user mode.")
+        user_mode = UserMode.NOT_RECOGNIZED
+        unknown_user_mode = response.get("userMode")
 
     try:
-        view_mode = ViewMode(response.get("viewMode"))
+        view_mode = ViewMode(response.get("viewMode", "not found"))
     except ValueError:
-        raise SessionNotCreatedError("Session not created. Unrecognized view mode.")
+        view_mode = ViewMode.NOT_RECOGNIZED
+        unknown_view_mode = response.get("viewMode")
 
     if user_mode is UserMode.TENANT and not subdomain and view_mode is ViewMode.TENANT:
         session.session_type = SessionType.TENANT
@@ -88,6 +94,14 @@ def create_session(
     elif user_mode is UserMode.TENANT and subdomain:
         raise SessionNotCreatedError(f"Session not created. Subdomain {subdomain} passed to tenant session, "
                                      "cannot switch to tenant from tenant user mode.")
+    else:
+        session.session_type = SessionType.NOT_DEFINED
+        logger.warning(f"Session created with {user_mode.value} user mode and {view_mode.value} view mode.\n"
+                       f"Session type set to not defined")
+        if unknown_user_mode:
+            logger.warning(f"Unrecognized user mode is: '{unknown_user_mode}'")
+        if unknown_view_mode:
+            logger.warning(f"Unrecognized view mode is: '{unknown_view_mode}'")
 
     return session
 
