@@ -1,12 +1,14 @@
+from __future__ import annotations
+
 import logging
 import socket
 import ssl
 import time
+from enum import Enum, auto
 from http import HTTPStatus
 from http.client import HTTPException, HTTPResponse
 from ipaddress import AddressValueError, IPv4Address
 from json import dumps, loads
-from logging import Logger
 from typing import Any, Dict, List, Optional, Union, cast
 from urllib.error import HTTPError
 from urllib.parse import urlencode
@@ -19,12 +21,113 @@ from vmngclient.utils.creation_tools import get_logger_name
 logger = logging.getLogger(get_logger_name(__name__))
 
 
+class SessionType(Enum):
+    PROVIDER = auto()
+    TENANT = auto()
+    PROVIDER_AS_TENANT = auto()
+    NOT_DEFINED = auto()
+
+
+class UserMode(Enum):
+    PROVIDER = "provider"
+    TENANT = "tenant"
+    NOT_RECOGNIZED = "not recognized"
+    NOT_FOUND = "not found"
+
+
+class ViewMode(Enum):
+    PROVIDER = "provider"
+    TENANT = "tenant"
+    NOT_RECOGNIZED = "not recognized"
+    NOT_FOUND = "not found"
+
+
+class SessionNotCreatedError(Exception):
+    pass
+
+
+def create_session(
+    url: str,
+    port: int,
+    username: str,
+    password: str,
+    subdomain: str = None,
+    timeout: int = 30,
+) -> Session:
+    """Factory function that creates session object based on provided arguments.
+
+    Args:
+        url (str): IP address or domain name
+        port (int): port
+        username (str): username
+        password (str): password
+        subdomain: subdomain specifying to which view switch when creating provider as a tenant session,
+            works only on provider user mode
+        timeout (int): timeout
+
+    Returns:
+        Session object
+    """
+    session = Session(url, port, username, password, subdomain, timeout)
+    response = cast(dict, session.server())
+
+    try:
+        user_mode = UserMode(response.get("userMode", "not found"))
+    except ValueError:
+        user_mode = UserMode.NOT_RECOGNIZED
+        logger.warning(f"Unrecognized user mode is: '{response.get('userMode')}'")
+
+    try:
+        view_mode = ViewMode(response.get("viewMode", "not found"))
+    except ValueError:
+        view_mode = ViewMode.NOT_RECOGNIZED
+        logger.warning(f"Unrecognized user mode is: '{response.get('viewMode')}'")
+
+    if user_mode is UserMode.TENANT and not subdomain and view_mode is ViewMode.TENANT:
+        session.session_type = SessionType.TENANT
+    elif user_mode is UserMode.PROVIDER and not subdomain and view_mode is ViewMode.PROVIDER:
+        session.session_type = SessionType.PROVIDER
+    elif user_mode is UserMode.PROVIDER and view_mode is ViewMode.TENANT:
+        session.session_type = SessionType.PROVIDER_AS_TENANT
+    elif user_mode is UserMode.TENANT and subdomain:
+        raise SessionNotCreatedError(f"Session not created. Subdomain {subdomain} passed to tenant session, "
+                                     "cannot switch to tenant from tenant user mode.")
+    else:
+        session.session_type = SessionType.NOT_DEFINED
+        logger.warning(f"Session created with {user_mode.value} user mode and {view_mode.value} view mode.\n"
+                       f"Session type set to not defined")
+
+    return session
+
+
 class Session:
-    def __init__(self, ip_address: str, port: int, username: str, password: str, timeout: int = 30) -> None:
-        self.base_url = self.__create_base_url(ip_address, port)
+    """Base class for API sessions for vmanage client.
+
+    Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
+
+    Args:
+        url: IP address or domain name, i.e. '10.0.1.200' or 'fruits.com'
+        port: port
+        username: username
+        password: password
+        timeout: timeout
+    """
+
+    def __init__(
+        self, url: str,
+        port: int,
+        username: str,
+        password: str,
+        subdomain: str = None,
+        timeout: int = 30
+    ):
+        self.base_url = self.__create_base_url(url, port)
         self.username = username
         self.password = password
+        self.subdomain = subdomain
         self.timeout = timeout
+
+        self.session_type = SessionType.NOT_DEFINED
 
         self.ctx = self.__get_context()
 
@@ -252,6 +355,9 @@ class Session:
             self.session_request('GET', self.get_full_url('/dataservice/client/token')).read().decode('ascii')
         )
 
+        if self.subdomain:
+            self.__switch_to_tenant()
+
     def session_request(self, method: str, full_url: str, data: Union[dict, list, None] = None) -> HTTPResponse:
         available_methods = ["GET", "POST", "PUT", "PATCH", "HEAD", "DELETE"]
         assert method in available_methods, f"{method} is not supported. Available methods: {available_methods}."
@@ -281,31 +387,21 @@ class Session:
         ctx.verify_mode = ssl.CERT_NONE
         return ctx
 
-    def __create_base_url(self, ip_address: str, port: int) -> str:
+    def __create_base_url(self, url: str, port: int) -> str:
         """Creates base url based on ip address and port.
 
         Args:
-            ip_address (str): Ip address of reachable vManage.
+            url: IP address or domain name, i.e. '10.0.1.200' or 'fruits.com'
             port (int): Port of reachable vManage.
 
         Returns:
             str: Base url shared for every request.
         """
         try:
-            IPv4Address(ip_address)
+            IPv4Address(url)
         except (AddressValueError, AttributeError) as error_info:
             logger.info(f"Please provide correct IPv4 address. Error info: {error_info}")
-        return f"https://{ip_address}:{port}"
-
-    def __get_logger(self) -> Logger:
-        """TODO: method should configure self sufficent vManage-client logger
-
-        Returns:
-            Logger: Configured logger.
-        """
-        logger = logging.getLogger(get_logger_name(__name__))
-        logger.debug("Creating vManage-client logger")
-        return logger
+        return f"https://{url}:{port}"
 
     def about(self) -> Union[List[Any], Dict[Any, Any]]:
         response = self.get_data(url="/dataservice/client/about")
@@ -349,106 +445,33 @@ class Session:
 
         return True if _send_server_request() else False
 
-    def __str__(self) -> str:
-        return f"{self.username}@{self.base_url}"
-
-
-class ProviderAsTenantSession(Session):
-    """vManage API client logged in as provider acting as tenant.
-
-    Attributes:
-        ip_address: IP address, i.e. '10.0.1.200'
-        port: port
-        username: provider username
-        password: secret
-        subdomain: tenant subdomain, i.e. 'apple.fruits.com'
-    """
-
-    def __init__(
-        self, ip_address: str, port: int, username: str, password: str, subdomain: str, timeout: int = 30
-    ) -> None:
-        self.subdomain = subdomain
-        super().__init__(ip_address, port, username, password, timeout)
-        # self._name = f'{self._name} vSession for {subdomain}'
-
-    def login(self) -> None:
-        """Logs in to vManage API as Provider using username/password and switch to Tenant.
-
-        Returns:
-            ProviderAsTenantSession object  TODO
-        """
-        super().login()
-        self.switch_to_tenant()
-
-    def get_tenant_id(self) -> str:
+    def __get_tenant_id(self) -> str:
         """Gets tenant UUID for tenant subdomain.
-
         Returns:
             tenant UUID
         """
         tenants = self.get_data('/dataservice/tenant')
         tenant_ids = [tenant.get('tenantId') for tenant in tenants if tenant['subDomain'] == self.subdomain]
-        assert len(tenant_ids) > 0, f"Tenant not found for subdomain: {self.subdomain}"
         return tenant_ids[0]
 
-    def create_vsession(self, tenant_id: str) -> str:
+    def __create_vsession(self, tenant_id: str) -> str:
         """Creates virtual session for tenant.
-
         Args:
             tenant_id: provider or tenant UUID
-
         Returns:
             virtual session token
         """
         response = cast(dict, self.post_json(f'/dataservice/tenant/{tenant_id}/vsessionid'))
-        assert 'VSessionId' in response, "Invalid vsessionid response"
         return response['VSessionId']
 
-    def switch_to_tenant(self) -> None:
+    def __switch_to_tenant(self) -> None:
         """As provider impersonate tenant session."""
-        tenant_id = self.get_tenant_id()
-        vsession_id = self.create_vsession(tenant_id)
-        assert vsession_id != '', 'Switch to tenant expecting VSessionId to not be empty'
+        tenant_id = self.__get_tenant_id()
+        vsession_id = self.__create_vsession(tenant_id)
         self.session_headers['VSessionId'] = vsession_id
 
-    def switch_to_provider(self) -> None:
-        """Switch back to provider session after impersonating tenant."""
-        data = cast(dict, self.server())
-        assert 'providerId' in data, "Invalid vsessionid response"
-        vsession_id = self.create_vsession(data['providerId'])
-        assert vsession_id == '', 'Switch to provider expecting VSessionId to be empty'
-        del self.session_headers['VSessionId']
-
-
-class TenantSession(Session):
-    """vManage API client logged as a tenant.
-
-    Attributes:
-        base_url: TODO.
-        domain: Tenant domain, i.e. 'apple.fruits.com'.
-        username: Tenant username.
-        password: Tenant password.
-        timeout: TODO. Defaults to 0.
-    """
-
-    def __init__(
-        self, ip_address: str, domain: str, port: int, username: str, password: str, timeout: int = 0, logger=None
-    ) -> None:
-        self.domain = domain
-        # TODO How to remove an ip address? Do we need an ip for tenant?
-        super().__init__(ip_address, port, username, password)
-        # self.base_url = "https://apple.fruits.com:10100"
-
-    def login(self) -> None:
-        """Login to vManage API as Tenant using username/password and set the session headers.
-
-        Returns:
-            TenantSession object
-        """
-
-        # TODO DO we need header when we use domain?
-        self.session_headers['Host'] = self.domain
-        super().login()
-
     def __str__(self) -> str:
-        return f"{self.username}@{self.domain}"
+        return f"{self.username}@{self.base_url}"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.username}@{self.base_url})"
