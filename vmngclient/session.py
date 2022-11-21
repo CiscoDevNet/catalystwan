@@ -68,22 +68,20 @@ def create_session(
     Returns:
         Session object
     """
-    unknown_user_mode = None
-    unknown_view_mode = None
-
     session = Session(url, port, username, password, subdomain, timeout)
     response = cast(dict, session.server())
+
     try:
         user_mode = UserMode(response.get("userMode", "not found"))
     except ValueError:
         user_mode = UserMode.NOT_RECOGNIZED
-        unknown_user_mode = response.get("userMode")
+        logger.warning(f"Unrecognized user mode is: '{response.get('userMode')}'")
 
     try:
         view_mode = ViewMode(response.get("viewMode", "not found"))
     except ValueError:
         view_mode = ViewMode.NOT_RECOGNIZED
-        unknown_view_mode = response.get("viewMode")
+        logger.warning(f"Unrecognized user mode is: '{response.get('viewMode')}'")
 
     if user_mode is UserMode.TENANT and not subdomain and view_mode is ViewMode.TENANT:
         session.session_type = SessionType.TENANT
@@ -98,10 +96,6 @@ def create_session(
         session.session_type = SessionType.NOT_DEFINED
         logger.warning(f"Session created with {user_mode.value} user mode and {view_mode.value} view mode.\n"
                        f"Session type set to not defined")
-        if unknown_user_mode:
-            logger.warning(f"Unrecognized user mode is: '{unknown_user_mode}'")
-        if unknown_view_mode:
-            logger.warning(f"Unrecognized view mode is: '{unknown_view_mode}'")
 
     return session
 
