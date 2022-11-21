@@ -1,21 +1,11 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from vmngclient.api.repository_api import (
-    DeviceCategory,
-    DeviceSoftwareRepository,
-    RepositoryAPI,
-)
-from vmngclient.api.software_action_api import (
-    SoftwareActionAPI,
-    InstallSpecification,
-    Family,
-    VersionType,
-    DeviceType,
-)
-
-from vmngclient.dataclasses import DeviceInfo
 from tenacity import RetryError
+
+from vmngclient.api.repository_api import DeviceCategory, DeviceSoftwareRepository, RepositoryAPI
+from vmngclient.api.software_action_api import DeviceType, Family, InstallSpecification, SoftwareActionAPI, VersionType
+from vmngclient.dataclasses import DeviceInfo
 
 
 class TestSoftwareAcionAPI(unittest.TestCase):
@@ -51,24 +41,18 @@ class TestSoftwareAcionAPI(unittest.TestCase):
             ),
         }
 
-        self.mock_devices = [
-            {"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "ver1"}
-        ]
+        self.mock_devices = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "ver1"}]
         self.install_spec = InstallSpecification(
             Family.VMANAGE.value, VersionType.VMANAGE.value, DeviceType.VMANAGE.value
         )
 
         mock_session = Mock()
-        self.mock_repository_object = RepositoryAPI(
-            mock_session, [self.device_info], DeviceCategory.VMANAGE.value
-        )
+        self.mock_repository_object = RepositoryAPI(mock_session, [self.device_info], DeviceCategory.VMANAGE.value)
         self.mock_software_action_obj = SoftwareActionAPI(self.mock_repository_object)
 
     @patch.object(SoftwareActionAPI, "_downgrade_check")
     @patch.object(RepositoryAPI, "get_image_version")
-    def test_upgrade_software_if_downgrade_check_not_none(
-        self, mock_get_image_version, mock_downgrade_check
-    ):
+    def test_upgrade_software_if_downgrade_check_not_none(self, mock_get_image_version, mock_downgrade_check):
 
         # Prepare mock data
         mock_downgrade_check.return_value = ["mock_uuid"]
@@ -85,79 +69,51 @@ class TestSoftwareAcionAPI(unittest.TestCase):
 
     @patch.object(SoftwareActionAPI, "_downgrade_check")
     @patch.object(RepositoryAPI, "get_image_version")
-    def test_upgrade_software_if_downgrade_check_is_none(
-        self, mock_get_image_version, mock_downgrade_check
-    ):
+    def test_upgrade_software_if_downgrade_check_is_none(self, mock_get_image_version, mock_downgrade_check):
 
         # Prepare mock data
         mock_downgrade_check.return_value = None
-        self.mock_repository_object.session.post_json.return_value = {
-            "id": "mock_action_id"
-        }
+        self.mock_repository_object.session.post_json.return_value = {"id": "mock_action_id"}
 
         # Assert
-        answer = self.mock_software_action_obj.upgrade_software(
-            "path", self.install_spec, True, True
-        )
+        answer = self.mock_software_action_obj.upgrade_software("path", self.install_spec, True, True)
         self.assertEqual(answer, "mock_action_id", "action ids not equal")
 
     @patch.object(RepositoryAPI, "create_devices_versions_repository")
-    def test_downgrade_check_no_incorrect_devices(
-        self, mock_create_devices_versions_repository
-    ):
+    def test_downgrade_check_no_incorrect_devices(self, mock_create_devices_versions_repository):
         # Preapre mock data
         upgrade_version = "20.9"
-        mock_create_devices_versions_repository.return_value = (
-            self.DeviceSoftwareRepository_obj
-        )
-        mock_devices = [
-            {"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": upgrade_version}
-        ]
+        mock_create_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
+        mock_devices = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": upgrade_version}]
         self.mock_repository_object.devices = mock_devices
         # Assert
-        answer = self.mock_software_action_obj._downgrade_check(
-            upgrade_version, DeviceCategory.VMANAGE.value
-        )
+        answer = self.mock_software_action_obj._downgrade_check(upgrade_version, DeviceCategory.VMANAGE.value)
         self.assertEqual(answer, None, "downgrade detected, but should not")
 
     @patch.object(RepositoryAPI, "create_devices_versions_repository")
-    def test_downgrade_check_incorrect_devices_exists(
-        self, mock_create_devices_versions_repository
-    ):
+    def test_downgrade_check_incorrect_devices_exists(self, mock_create_devices_versions_repository):
         # Preapre mock data
         upgrade_version = "20.6"
-        mock_create_devices_versions_repository.return_value = (
-            self.DeviceSoftwareRepository_obj
-        )
-        mock_devices = [
-            {"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": upgrade_version}
-        ]
+        mock_create_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
+        mock_devices = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": upgrade_version}]
         self.mock_repository_object.devices = mock_devices
         # Assert
-        answer = self.mock_software_action_obj._downgrade_check(
-            upgrade_version, DeviceCategory.VMANAGE.value
-        )
+        answer = self.mock_software_action_obj._downgrade_check(upgrade_version, DeviceCategory.VMANAGE.value)
         self.assertEqual(answer, ["mock_uuid"], "downgrade detected, but should not")
 
     def test_wait_for_completed_success(self):
 
         # Prepare mock data
-        self.mock_repository_object.session.get_data.return_value = [
-            {"status": "Success"}
-        ]
+        self.mock_repository_object.session.get_data.return_value = [{"status": "Success"}]
 
         # Assert
-        answer = self.mock_software_action_obj.wait_for_completed(
-            5, 500, ["Success", "Failure"], "mock_action_id"
-        )
+        answer = self.mock_software_action_obj.wait_for_completed(5, 500, ["Success", "Failure"], "mock_action_id")
         self.assertEqual(answer, "Success", "job status incorrect")
 
     def test_wait_for_completed_status_out_of_range(self):
 
         # Prepare mock data
-        self.mock_repository_object.session.get_data.return_value = [
-            {"status": "other_status"}
-        ]
+        self.mock_repository_object.session.get_data.return_value = [{"status": "other_status"}]
         # assert
 
         self.assertRaises(
