@@ -101,5 +101,5 @@ class RepositoryAPI:
                     dev["version"] = version
                     break
             if 'version' not in dev:
-                raise ValueError(f"Software version {version_to_set_up} is not included in {version_type}")         
+                raise ValueError(f"Software version {version_to_set_up} is not included in {version_type}")
         return None

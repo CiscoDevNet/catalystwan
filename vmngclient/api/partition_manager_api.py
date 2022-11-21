@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed, RetryError
+from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
 from vmngclient.api.repository_api import RepositoryAPI
 from vmngclient.utils.creation_tools import get_logger_name
@@ -16,7 +16,7 @@ class PartitionManagerAPI:
     """
 
     def __init__(self, repository: RepositoryAPI) -> None:
-        
+
         self.repository = repository
 
     def set_default_partition(self, version_to_default: str) -> str:
@@ -39,8 +39,7 @@ class PartitionManagerAPI:
         set_default = dict(self.repository.session.post_json(url, payload))
         return set_default["id"]
 
-    def remove_partition(self, version_to_remove: str,
-                         force_remove : bool = False) -> str:
+    def remove_partition(self, version_to_remove: str, force_remove: bool = False) -> str:
         """
         Method to remove choosen software version from Vmanage repository
 
@@ -58,21 +57,24 @@ class PartitionManagerAPI:
             "devices": self.repository.devices,
             "deviceType": "vmanage",
         }
-        if force_remove == False:
-            invalid_devices = self._check_remove_partition_possibility(version_to_remove)
+        if force_remove is False:
+            invalid_devices = self._check_remove_partition_possibility()
             if invalid_devices:
                 raise ValueError(
                     f'Current or default version of devices with ids {invalid_devices} \
-                        are equal to remove version. Action denied!')
+                        are equal to remove version. Action denied!'
+                )
         remove_action = dict(self.repository.session.post_json(url, payload))
-        return remove_action["id"]             
-                
+        return remove_action["id"]
+
     def _check_remove_partition_possibility(self):
-        
+
         for device in self.repository.devices:
             invalid_devices = []
-            if device['version'] in (self.repository.devices_versions_repository[device["deviceId"]].current_version,
-                self.repository.devices_versions_repository[device["deviceId"]].default_version):
+            if device['version'] in (
+                self.repository.devices_versions_repository[device["deviceId"]].current_version,
+                self.repository.devices_versions_repository[device["deviceId"]].default_version,
+            ):
                 invalid_devices.append((device["deviceId"]))
             if invalid_devices == []:
                 return None
