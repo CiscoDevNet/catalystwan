@@ -106,8 +106,6 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="vmngclient/vmngclient.html#vmngclient.session.TenantSession.base_url">base_url (vmngclient.session.TenantSession attribute)</a>
-</li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.BfdSessionData">BfdSessionData (class in vmngclient.dataclasses)</a>
 </li>
   </ul></td>
@@ -180,9 +178,9 @@
 </li>
       <li><a href="vmngclient/vmngclient.utils.html#vmngclient.utils.creation_tools.create_dataclass">create_dataclass() (in module vmngclient.utils.creation_tools)</a>
 </li>
-      <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.administration.UsersAPI.create_user">create_user() (vmngclient.api.administration.UsersAPI method)</a>
+      <li><a href="vmngclient/vmngclient.html#vmngclient.session.create_session">create_session() (in module vmngclient.session)</a>
 </li>
-      <li><a href="vmngclient/vmngclient.html#vmngclient.session.ProviderAsTenantSession.create_vsession">create_vsession() (vmngclient.session.ProviderAsTenantSession method)</a>
+      <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.administration.UsersAPI.create_user">create_user() (vmngclient.api.administration.UsersAPI method)</a>
 </li>
       <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.alarms_api.AlarmLevel.critical">critical (vmngclient.api.alarms_api.AlarmLevel attribute)</a>
 </li>
@@ -257,8 +255,6 @@
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.Template.devices_attached">devices_attached (vmngclient.dataclasses.Template attribute)</a>
 </li>
       <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.administration.AdministrationSettingsAPI.disable_sdavc_cloud_connector">disable_sdavc_cloud_connector() (vmngclient.api.administration.AdministrationSettingsAPI method)</a>
-</li>
-      <li><a href="vmngclient/vmngclient.html#vmngclient.session.TenantSession.domain">domain (vmngclient.session.TenantSession attribute)</a>
 </li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.OmpPeerData.domainId">domainId (vmngclient.dataclasses.OmpPeerData attribute)</a>
 </li>
@@ -398,8 +394,6 @@
 </li>
       <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.packet_capture_api.PacketCaptureAPI.get_status">get_status() (vmngclient.api.packet_capture_api.PacketCaptureAPI method)</a>
 </li>
-      <li><a href="vmngclient/vmngclient.html#vmngclient.session.ProviderAsTenantSession.get_tenant_id">get_tenant_id() (vmngclient.session.ProviderAsTenantSession method)</a>
-</li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.User.group">group (vmngclient.dataclasses.User attribute)</a>
 </li>
   </ul></td>
@@ -444,8 +438,6 @@
 </li>
       <li><a href="vmngclient/vmngclient.utils.html#vmngclient.utils.validate_status.ValidateStatus.invalidate">invalidate (vmngclient.utils.validate_status.ValidateStatus attribute)</a>
 </li>
-      <li><a href="vmngclient/vmngclient.html#vmngclient.session.ProviderAsTenantSession.ip_address">ip_address (vmngclient.session.ProviderAsTenantSession attribute)</a>
-</li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.PacketSetup.is_new_session">is_new_session (vmngclient.dataclasses.PacketSetup attribute)</a>
 </li>
       <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.basic_api.Device.is_reachable">is_reachable (vmngclient.api.basic_api.Device property)</a>
@@ -474,20 +466,14 @@
         <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.Device.local_system_ip">(vmngclient.dataclasses.Device attribute)</a>
 </li>
       </ul></li>
-      <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.User.locale">locale (vmngclient.dataclasses.User attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.User.locale">locale (vmngclient.dataclasses.User attribute)</a>
+</li>
       <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.alarms_api.AlarmVerification.logger">logger (vmngclient.api.alarms_api.AlarmVerification attribute)</a>
 </li>
-      <li><a href="vmngclient/vmngclient.html#vmngclient.session.ProviderAsTenantSession.login">login() (vmngclient.session.ProviderAsTenantSession method)</a>
-
-      <ul>
-        <li><a href="vmngclient/vmngclient.html#vmngclient.session.Session.login">(vmngclient.session.Session method)</a>
+      <li><a href="vmngclient/vmngclient.html#vmngclient.session.Session.login">login() (vmngclient.session.Session method)</a>
 </li>
-        <li><a href="vmngclient/vmngclient.html#vmngclient.session.TenantSession.login">(vmngclient.session.TenantSession method)</a>
-</li>
-      </ul></li>
       <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.logs_api.LogsAPI">LogsAPI (class in vmngclient.api.logs_api)</a>
 </li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.AlarmData.lowercase">lowercase() (vmngclient.dataclasses.AlarmData method)</a>
@@ -579,12 +565,26 @@
         <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.Template.name">(vmngclient.dataclasses.Template attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.AlarmData.new_state">new_state (vmngclient.dataclasses.AlarmData attribute)</a>
 </li>
       <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.alarms_api.Viewed.no">no (vmngclient.api.alarms_api.Viewed attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vmngclient/vmngclient.html#vmngclient.session.SessionType.NOT_DEFINED">NOT_DEFINED (vmngclient.session.SessionType attribute)</a>
+</li>
+      <li><a href="vmngclient/vmngclient.html#vmngclient.session.UserMode.NOT_FOUND">NOT_FOUND (vmngclient.session.UserMode attribute)</a>
+
+      <ul>
+        <li><a href="vmngclient/vmngclient.html#vmngclient.session.ViewMode.NOT_FOUND">(vmngclient.session.ViewMode attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vmngclient/vmngclient.html#vmngclient.session.UserMode.NOT_RECOGNIZED">NOT_RECOGNIZED (vmngclient.session.UserMode attribute)</a>
+
+      <ul>
+        <li><a href="vmngclient/vmngclient.html#vmngclient.session.ViewMode.NOT_RECOGNIZED">(vmngclient.session.ViewMode attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -634,10 +634,6 @@
       <ul>
         <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.User.password">(vmngclient.dataclasses.User attribute)</a>
 </li>
-        <li><a href="vmngclient/vmngclient.html#vmngclient.session.ProviderAsTenantSession.password">(vmngclient.session.ProviderAsTenantSession attribute)</a>
-</li>
-        <li><a href="vmngclient/vmngclient.html#vmngclient.session.TenantSession.password">(vmngclient.session.TenantSession attribute)</a>
-</li>
       </ul></li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.OmpAdvertisedRouteData.peerIp">peerIp (vmngclient.dataclasses.OmpAdvertisedRouteData attribute)</a>
 
@@ -659,16 +655,14 @@
 </li>
       <li><a href="vmngclient/vmngclient.utils.html#vmngclient.utils.personality.Personality">Personality (class in vmngclient.utils.personality)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.basic_api.Device.personality">personality (vmngclient.api.basic_api.Device attribute)</a>
 
       <ul>
         <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.Device.personality">(vmngclient.dataclasses.Device attribute)</a>
 </li>
       </ul></li>
-      <li><a href="vmngclient/vmngclient.html#vmngclient.session.ProviderAsTenantSession.port">port (vmngclient.session.ProviderAsTenantSession attribute)</a>
-</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="vmngclient/vmngclient.html#vmngclient.session.Session.post">post() (vmngclient.session.Session method)</a>
 </li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.session.Session.post_data">post_data() (vmngclient.session.Session method)</a>
@@ -685,7 +679,15 @@
         <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.OmpReceivedRouteData.protocol">(vmngclient.dataclasses.OmpReceivedRouteData attribute)</a>
 </li>
       </ul></li>
-      <li><a href="vmngclient/vmngclient.html#vmngclient.session.ProviderAsTenantSession">ProviderAsTenantSession (class in vmngclient.session)</a>
+      <li><a href="vmngclient/vmngclient.html#vmngclient.session.SessionType.PROVIDER">PROVIDER (vmngclient.session.SessionType attribute)</a>
+
+      <ul>
+        <li><a href="vmngclient/vmngclient.html#vmngclient.session.UserMode.PROVIDER">(vmngclient.session.UserMode attribute)</a>
+</li>
+        <li><a href="vmngclient/vmngclient.html#vmngclient.session.ViewMode.PROVIDER">(vmngclient.session.ViewMode attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="vmngclient/vmngclient.html#vmngclient.session.SessionType.PROVIDER_AS_TENANT">PROVIDER_AS_TENANT (vmngclient.session.SessionType attribute)</a>
 </li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.WanInterface.publicIp">publicIp (vmngclient.dataclasses.WanInterface attribute)</a>
 </li>
@@ -765,6 +767,10 @@
 </li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.session.Session.session_request">session_request() (vmngclient.session.Session method)</a>
 </li>
+      <li><a href="vmngclient/vmngclient.html#vmngclient.session.SessionNotCreatedError">SessionNotCreatedError</a>
+</li>
+      <li><a href="vmngclient/vmngclient.html#vmngclient.session.SessionType">SessionType (class in vmngclient.session)</a>
+</li>
       <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.administration.AdministrationSettingsAPI.set_cloud_services">set_cloud_services() (vmngclient.api.administration.AdministrationSettingsAPI method)</a>
 </li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.AlarmData.severity">severity (vmngclient.dataclasses.AlarmData attribute)</a>
@@ -781,14 +787,14 @@
       </ul></li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.BfdSessionData.sourceIp">sourceIp (vmngclient.dataclasses.BfdSessionData attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.BfdSessionData.sourceTlocColor">sourceTlocColor (vmngclient.dataclasses.BfdSessionData attribute)</a>
 </li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.Speedtest">Speedtest (class in vmngclient.dataclasses)</a>
 </li>
       <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.speedtest_api.SpeedtestAPI.speedtest">speedtest() (vmngclient.api.speedtest_api.SpeedtestAPI method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.speedtest_api.SpeedtestAPI">SpeedtestAPI (class in vmngclient.api.speedtest_api)</a>
 </li>
       <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.packet_capture_api.PacketCaptureAPI.start_stop">start_stop() (vmngclient.api.packet_capture_api.PacketCaptureAPI method)</a>
@@ -815,12 +821,6 @@
         <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.Speedtest.status">(vmngclient.dataclasses.Speedtest attribute)</a>
 </li>
       </ul></li>
-      <li><a href="vmngclient/vmngclient.html#vmngclient.session.ProviderAsTenantSession.subdomain">subdomain (vmngclient.session.ProviderAsTenantSession attribute)</a>
-</li>
-      <li><a href="vmngclient/vmngclient.html#vmngclient.session.ProviderAsTenantSession.switch_to_provider">switch_to_provider() (vmngclient.session.ProviderAsTenantSession method)</a>
-</li>
-      <li><a href="vmngclient/vmngclient.html#vmngclient.session.ProviderAsTenantSession.switch_to_tenant">switch_to_tenant() (vmngclient.session.ProviderAsTenantSession method)</a>
-</li>
       <li><a href="vmngclient/vmngclient.utils.html#vmngclient.utils.config_status.ConfigStatus.sync">sync (vmngclient.utils.config_status.ConfigStatus attribute)</a>
 </li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.AdminTech.system_ip">system_ip (vmngclient.dataclasses.AdminTech attribute)</a>
@@ -849,12 +849,16 @@
 </li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.EventData.tenant">tenant (vmngclient.dataclasses.EventData attribute)</a>
 </li>
-      <li><a href="vmngclient/vmngclient.html#vmngclient.session.TenantSession">TenantSession (class in vmngclient.session)</a>
+      <li><a href="vmngclient/vmngclient.html#vmngclient.session.SessionType.TENANT">TENANT (vmngclient.session.SessionType attribute)</a>
+
+      <ul>
+        <li><a href="vmngclient/vmngclient.html#vmngclient.session.UserMode.TENANT">(vmngclient.session.UserMode attribute)</a>
 </li>
+        <li><a href="vmngclient/vmngclient.html#vmngclient.session.ViewMode.TENANT">(vmngclient.session.ViewMode attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="vmngclient/vmngclient.html#vmngclient.session.TenantSession.timeout">timeout (vmngclient.session.TenantSession attribute)</a>
-</li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.OmpSummaryData.tlocs_installed">tlocs_installed (vmngclient.dataclasses.OmpSummaryData attribute)</a>
 </li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.OmpSummaryData.tlocs_received">tlocs_received (vmngclient.dataclasses.OmpSummaryData attribute)</a>
@@ -885,14 +889,12 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="vmngclient/vmngclient.html#vmngclient.session.UserMode">UserMode (class in vmngclient.session)</a>
+</li>
       <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.ServiceConfigurationData.username">username (vmngclient.dataclasses.ServiceConfigurationData attribute)</a>
 
       <ul>
         <li><a href="vmngclient/vmngclient.html#vmngclient.dataclasses.User.username">(vmngclient.dataclasses.User attribute)</a>
-</li>
-        <li><a href="vmngclient/vmngclient.html#vmngclient.session.ProviderAsTenantSession.username">(vmngclient.session.ProviderAsTenantSession attribute)</a>
-</li>
-        <li><a href="vmngclient/vmngclient.html#vmngclient.session.TenantSession.username">(vmngclient.session.TenantSession attribute)</a>
 </li>
       </ul></li>
       <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.administration.UsersAPI">UsersAPI (class in vmngclient.api.administration)</a>
@@ -936,6 +938,8 @@
       <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.alarms_api.AlarmVerification.verify">verify() (vmngclient.api.alarms_api.AlarmVerification method)</a>
 </li>
       <li><a href="vmngclient/vmngclient.api.html#vmngclient.api.alarms_api.Viewed">Viewed (class in vmngclient.api.alarms_api)</a>
+</li>
+      <li><a href="vmngclient/vmngclient.html#vmngclient.session.ViewMode">ViewMode (class in vmngclient.session)</a>
 </li>
       <li><a href="vmngclient/vmngclient.utils.html#vmngclient.utils.personality.Personality.VMANAGE">VMANAGE (vmngclient.utils.personality.Personality attribute)</a>
 </li>
