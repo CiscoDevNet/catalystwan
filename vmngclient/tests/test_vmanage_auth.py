@@ -1,7 +1,7 @@
 import unittest
 from unittest import TestCase, mock
 
-from demo import InvalidCredentialsError, vManageAuth
+from vmngclient.vmanage_auth import InvalidCredentialsError, vManageAuth
 
 
 class MockResponse:
