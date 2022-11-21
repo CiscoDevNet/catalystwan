@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 from vmngclient.api.repository_api import (DeviceCategory,
                                            DeviceSoftwareRepository,
@@ -91,5 +91,3 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_repository_object.create_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
         self.assertRaises(ValueError, mock_repository_object.complete_device_list,'ver3','available_versions')
 
-if __name__ == '__main__':
-    unittest.main()
