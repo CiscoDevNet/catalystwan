@@ -14,19 +14,10 @@ class TestRepositoryAPI(unittest.TestCase):
             hostname="mock_host",
             reachability="reachable",
             local_system_ip="mock_ip",
-            vedgeCertificateState="NA",
-            cpuState="normal",
-            chasisNumber="NA",
-            memState="normal",
             status="normal",
             memUsage=1.0,
-            cpuLoad=1.0,
-            serialNumber="NA",
-            configStatusMessage="NA",
             connected_vManages=["192.168.0.1"],
             model="vedge-cloud",
-            stateDescription="All daemons up",
-            board_serial=None,
         )
         self.DeviceSoftwareRepository_obj = {
             "mock_uuid": DeviceSoftwareRepository(
