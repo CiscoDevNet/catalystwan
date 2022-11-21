@@ -1,9 +1,7 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from vmngclient.api.repository_api import (DeviceCategory,
-                                           DeviceSoftwareRepository,
-                                           RepositoryAPI)
+from vmngclient.api.repository_api import DeviceCategory, DeviceSoftwareRepository, RepositoryAPI
 from vmngclient.dataclasses import DeviceInfo
 
 
