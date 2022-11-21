@@ -6,7 +6,6 @@ from attr import define
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
 from vmngclient.api.repository_api import DeviceCategory, RepositoryAPI
-from vmngclient.session import Session
 from vmngclient.utils.creation_tools import get_logger_name
 
 logger = logging.getLogger(get_logger_name(__name__))
@@ -71,7 +70,7 @@ class SoftwareActionAPI:
             "devices": self.repository.devices,
             "deviceType": "vmanage",
         }
-        
+
         activate = dict(self.repository.session.post_json(url, payload))
         return activate["id"]
 
@@ -174,7 +173,7 @@ class SoftwareActionAPI:
             try:
                 action_data = self.repository.session.get_data(url)[0]["status"]
                 # logger.debug(f"Status of action {action_id} is: {action_data}")
-                print (f"Status of action {action_id} is: {action_data}")
+                print(f"Status of action {action_id} is: {action_data}")
             except IndexError:
                 action_data = ""
 
