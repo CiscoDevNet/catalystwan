@@ -104,14 +104,9 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_session = Mock()
         mock_repository_object = RepositoryAPI(mock_session, [self.device_info], DeviceCategory.CEDGE.value)
         mock_repository_object.create_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
-<<<<<<< HEAD
         self.assertRaises(
             ValueError,
             mock_repository_object.complete_device_list,
             "ver3",
             "available_versions",
         )
-=======
-        self.assertRaises(ValueError, mock_repository_object.complete_device_list,'ver3','available_versions')
-
->>>>>>> ab43e0c (tests refactor)
