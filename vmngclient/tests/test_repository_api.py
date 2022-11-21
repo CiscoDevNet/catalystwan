@@ -1,11 +1,7 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from vmngclient.api.repository_api import (
-    DeviceCategory,
-    DeviceSoftwareRepository,
-    RepositoryAPI,
-)
+from vmngclient.api.repository_api import DeviceCategory, DeviceSoftwareRepository, RepositoryAPI
 from vmngclient.dataclasses import DeviceInfo
 
 
@@ -45,28 +41,24 @@ class TestRepositoryAPI(unittest.TestCase):
     @patch("vmngclient.session.Session")
     def test_get_image_version_if_image_available(self, mock_session):
 
-        versions_response = [
-            {"availableFiles": "vmanage-20.9.1-x86_64.tar.gz", "versionName": "20.9.1"}
-        ]
+        versions_response = [{"availableFiles": "vmanage-20.9.1-x86_64.tar.gz", "versionName": "20.9.1"}]
         mock_session.get_data.return_value = versions_response
-        image_version = "20.9.1"
-        answer = RepositoryAPI(
-            mock_session, [self.device_info], DeviceCategory.CEDGE.value
-        ).get_image_version("vmanage-20.9.1-x86_64.tar.gz")
+        image_version = '20.9.1'
+        answer = RepositoryAPI(mock_session, [self.device_info], DeviceCategory.CEDGE.value).get_image_version(
+            "vmanage-20.9.1-x86_64.tar.gz"
+        )
 
         self.assertEqual(answer, image_version, "not same version")
 
     @patch("vmngclient.session.Session")
     def test_get_image_version_if_image_unavailable(self, mock_session):
 
-        api_mock_response = [
-            {"availableFiles": "vmanage-20.9.2-x86_64.tar.gz", "versionName": "20.9.1"}
-        ]
+        api_mock_response = [{"availableFiles": "vmanage-20.9.2-x86_64.tar.gz", "versionName": "20.9.1"}]
         mock_session.get_data.return_value = api_mock_response
         image_version = None
-        answer = RepositoryAPI(
-            mock_session, [self.device_info], DeviceCategory.CEDGE.value
-        ).get_image_version("vmanage-20.9.1-x86_64.tar.gz")
+        answer = RepositoryAPI(mock_session, [self.device_info], DeviceCategory.CEDGE.value).get_image_version(
+            "vmanage-20.9.1-x86_64.tar.gz"
+        )
 
         self.assertEqual(answer, image_version, "not same version")
 
@@ -82,9 +74,7 @@ class TestRepositoryAPI(unittest.TestCase):
             }
         ]
         mock_session.get_data.return_value = api_mock_response
-        mock_repository_object = RepositoryAPI(
-            mock_session, [self.device_info], DeviceCategory.CEDGE.value
-        )
+        mock_repository_object = RepositoryAPI(mock_session, [self.device_info], DeviceCategory.CEDGE.value)
 
         answer = mock_repository_object.create_devices_versions_repository()
 
@@ -98,16 +88,10 @@ class TestRepositoryAPI(unittest.TestCase):
     def test_complete_device_list(self, mock_create_devices_versions_repository):
         mock_create_devices_versions_repository.return_value = Mock()
         mock_session = Mock()
-        mock_repository_object = RepositoryAPI(
-            mock_session, [self.device_info], DeviceCategory.CEDGE.value
-        )
-        mock_repository_object.create_devices_versions_repository.return_value = (
-            self.DeviceSoftwareRepository_obj
-        )
+        mock_repository_object = RepositoryAPI(mock_session, [self.device_info], DeviceCategory.CEDGE.value)
+        mock_repository_object.create_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
         mock_repository_object.complete_device_list("ver1", "available_versions")
-        expected_result = [
-            {"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "ver1"}
-        ]
+        expected_result = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "ver1"}]
         self.assertEqual(
             mock_repository_object.devices,
             expected_result,
@@ -115,17 +99,11 @@ class TestRepositoryAPI(unittest.TestCase):
         )
 
     @patch.object(RepositoryAPI, "create_devices_versions_repository")
-    def test_complete_device_list_raise_error(
-        self, mock_create_devices_versions_repository
-    ):
+    def test_complete_device_list_raise_error(self, mock_create_devices_versions_repository):
         mock_create_devices_versions_repository.return_value = Mock()
         mock_session = Mock()
-        mock_repository_object = RepositoryAPI(
-            mock_session, [self.device_info], DeviceCategory.CEDGE.value
-        )
-        mock_repository_object.create_devices_versions_repository.return_value = (
-            self.DeviceSoftwareRepository_obj
-        )
+        mock_repository_object = RepositoryAPI(mock_session, [self.device_info], DeviceCategory.CEDGE.value)
+        mock_repository_object.create_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
         self.assertRaises(
             ValueError,
             mock_repository_object.complete_device_list,
