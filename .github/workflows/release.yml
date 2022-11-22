@@ -1,4 +1,4 @@
-name: Publish to robot-dev-pypi-local
+name: Publish to PyPi
 
 on:
   push:
@@ -15,20 +15,20 @@ jobs:
       - if: ${{ env.ACT }}
         name: Hack container for local development
         run: |
-            curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-            sudo apt-get install -y nodejs
-      - uses: actions/checkout@v2
+          curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
       - name: Set Up Poetry
         uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: 1.1.13
-      - name: Configure cisco repository
+      - name: Publish vmngclient
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
-              poetry config repositories.tmp_cisco https://engci-maven-master.cisco.com/artifactory/api/pypi/robot-dev-pypi-local/
-              poetry config http-basic.tmp_cisco ${{ secrets.PYPI_API_USERNAME }} ${{ secrets.PYPI_API_PASSWORD }}
-      - name: Publish package
-        run: poetry publish --build -r tmp_cisco
+          poetry config pypi-token.pypi $PYPI_TOKEN
+          poetry publish --build
