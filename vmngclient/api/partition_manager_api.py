@@ -99,10 +99,15 @@ class PartitionManagerAPI:
         def check_status(action_data):
             return action_data not in (exit_statuses)
 
+        def _log_exception(self):
+            logger.error("Operation status not achieved in given time")
+            return None
+
         @retry(
             wait=wait_fixed(sleep_seconds),
             stop=stop_after_attempt(int(timeout_seconds / sleep_seconds)),
             retry=retry_if_result(check_status),
+            retry_error_callback=_log_exception,
         )
         def wait_for_end_software_action():
             url = f"/dataservice/device/action/status/{action_id}"

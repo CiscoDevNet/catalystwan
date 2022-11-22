@@ -1,8 +1,6 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from tenacity import RetryError
-
 from vmngclient.api.partition_manager_api import PartitionManagerAPI
 from vmngclient.api.repository_api import DeviceCategory, DeviceSoftwareRepository, RepositoryAPI
 from vmngclient.dataclasses import Device
@@ -116,12 +114,6 @@ class TestPartitionManagerAPI(unittest.TestCase):
         # Prepare mock data
         self.mock_repository_object.session.get_data.return_value = [{"status": "other_status"}]
 
-        # assert
-        self.assertRaises(
-            RetryError,
-            self.mock_partition_manager_obj.wait_for_completed,
-            1,
-            1,
-            ["Success", "Failure"],
-            "mock_action_id",
-        )
+        # Assert
+        answer = self.mock_partition_manager_obj.wait_for_completed(1, 1, ["Success", "Failure"], "mock_action_id")
+        self.assertEqual(answer, None, "job status incorrect")
