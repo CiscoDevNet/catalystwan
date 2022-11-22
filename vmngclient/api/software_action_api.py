@@ -172,8 +172,7 @@ class SoftwareActionAPI:
             url = f"/dataservice/device/action/status/{action_id}"
             try:
                 action_data = self.repository.session.get_data(url)[0]["status"]
-                # logger.debug(f"Status of action {action_id} is: {action_data}")
-                print(f"Status of action {action_id} is: {action_data}")
+                logger.debug(f"Status of action {action_id} is: {action_data}")
             except IndexError:
                 action_data = ""
 
