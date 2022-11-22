@@ -48,9 +48,9 @@ class SessionNotCreatedError(Exception):
 
 def create_session(
     url: str,
-    port: int,
     username: str,
     password: str,
+    port: int = None,
     subdomain: str = None,
     timeout: int = 30,
 ) -> Session:
@@ -397,11 +397,9 @@ class Session:
         Returns:
             str: Base url shared for every request.
         """
-        try:
-            IPv4Address(url)
-        except (AddressValueError, AttributeError) as error_info:
-            logger.info(f"Please provide correct IPv4 address. Error info: {error_info}")
-        return f"https://{url}:{port}"
+        if port:
+            return f"https://{url}:{port}"
+        return f"https://{url}"
 
     def about(self) -> Union[List[Any], Dict[Any, Any]]:
         response = self.get_data(url="/dataservice/client/about")
