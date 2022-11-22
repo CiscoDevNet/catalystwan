@@ -116,7 +116,7 @@ class Session:
         self, url: str,
         username: str,
         password: str,
-        port: int = None,
+        port: Optional[int],
         subdomain: str = None,
         timeout: int = 30
     ):
@@ -386,7 +386,7 @@ class Session:
         ctx.verify_mode = ssl.CERT_NONE
         return ctx
 
-    def __create_base_url(self, url: str, port: int = None) -> str:
+    def __create_base_url(self, url: str, port: Optional[int]) -> str:
         """Creates base url based on ip address and port.
 
         Args:
