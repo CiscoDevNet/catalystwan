@@ -7,7 +7,6 @@ import time
 from enum import Enum, auto
 from http import HTTPStatus
 from http.client import HTTPException, HTTPResponse
-from ipaddress import AddressValueError, IPv4Address
 from json import dumps, loads
 from typing import Any, Dict, List, Optional, Union, cast
 from urllib.error import HTTPError
