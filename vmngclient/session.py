@@ -68,7 +68,7 @@ def create_session(
     Returns:
         Session object
     """
-    session = Session(url, port, username, password, subdomain, timeout)
+    session = Session(url, username, password, port, subdomain, timeout)
     response = cast(dict, session.server())
 
     try:
@@ -115,9 +115,9 @@ class Session:
 
     def __init__(
         self, url: str,
-        port: int,
         username: str,
         password: str,
+        port: int = None,
         subdomain: str = None,
         timeout: int = 30
     ):
@@ -387,7 +387,7 @@ class Session:
         ctx.verify_mode = ssl.CERT_NONE
         return ctx
 
-    def __create_base_url(self, url: str, port: int) -> str:
+    def __create_base_url(self, url: str, port: int = None) -> str:
         """Creates base url based on ip address and port.
 
         Args:
