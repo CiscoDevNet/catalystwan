@@ -3,10 +3,15 @@ from typing import List, Optional
 
 from attr import define, field
 
-from vmngclient.utils.creation_tools import FIELD_NAME, convert_attributes
+from vmngclient.utils.creation_tools import FIELD_NAME, convert_attributes, asdict
 from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
+
+class BaseDataclass():
+
+    def __str__(self):
+        return f'Class name: {self.__class__.__name__}' + "\n"+ "\n".join(f'{attribute[0]}: {attribute[1]}' for attribute in asdict(self).items())
 
 
 @define(frozen=True, field_transformer=convert_attributes)
@@ -48,7 +53,7 @@ class AlarmData:
 
 
 @define
-class Device:
+class Device(BaseDataclass):
     uuid: str
     status: str
     personality: Personality = field(converter=Personality)
@@ -66,7 +71,7 @@ class Device:
     @property
     def is_reachable(self) -> bool:
         return self.reachability is Reachability.REACHABLE
-
+    
 
 @define(field_transformer=convert_attributes)
 class Reboot:
