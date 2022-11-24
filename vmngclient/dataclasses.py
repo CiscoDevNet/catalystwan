@@ -3,19 +3,23 @@ from typing import List, Optional
 
 from attr import define, field
 
-from vmngclient.utils.creation_tools import FIELD_NAME, convert_attributes, asdict
+from vmngclient.utils.creation_tools import FIELD_NAME, asdict, convert_attributes
 from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
 
-class BaseDataclass():
 
+class DataclassSettings:
     def __str__(self):
-        return f'Class name: {self.__class__.__name__}' + "\n"+ "\n".join(f'{attribute[0]}: {attribute[1]}' for attribute in asdict(self).items())
+        return (
+            f'Class name: {self.__class__.__name__}'
+            + "\n"
+            + "\n".join(f'  {attribute[0]}: {attribute[1]}' for attribute in asdict(self).items())
+        )
 
 
 @define(frozen=True, field_transformer=convert_attributes)
-class AdminTech:
+class AdminTech(DataclassSettings):
     state: str
     filename: str = field(metadata={FIELD_NAME: "fileName"})
     token_id: str = field(metadata={FIELD_NAME: "requestTokenId"})
@@ -24,7 +28,7 @@ class AdminTech:
 
 
 @define(frozen=True, field_transformer=convert_attributes)
-class AlarmData:
+class AlarmData(DataclassSettings):
     component: Optional[str] = field(default=None)
     severity: Optional[str] = field(default=None)
     active: Optional[bool] = field(default=None)
@@ -53,7 +57,7 @@ class AlarmData:
 
 
 @define
-class Device(BaseDataclass):
+class Device(DataclassSettings):
     uuid: str
     status: str
     personality: Personality = field(converter=Personality)
@@ -71,10 +75,10 @@ class Device(BaseDataclass):
     @property
     def is_reachable(self) -> bool:
         return self.reachability is Reachability.REACHABLE
-    
+
 
 @define(field_transformer=convert_attributes)
-class Reboot:
+class Reboot(DataclassSettings):
     reason: str = field(metadata={FIELD_NAME: "reboot_reason"})
     dateTime: dt.datetime = field(metadata={FIELD_NAME: "reboot_date_time"})
     vdeviceName: str = field(metadata={FIELD_NAME: "vdevice-name"})
@@ -85,7 +89,7 @@ class Reboot:
 
 
 @define
-class WanInterface:
+class WanInterface(DataclassSettings):
     color: str
     vDeviceIp: str = field(metadata={FIELD_NAME: 'vdevice-name'})
     vDeviceName: str = field(metadata={FIELD_NAME: 'vdevice-host-name'})
@@ -99,14 +103,14 @@ class WanInterface:
 
 
 @define
-class Connection:
+class Connection(DataclassSettings):
     state: str
     peerType: str = field(metadata={FIELD_NAME: 'peer-type'})
     systemIp: str = field(metadata={FIELD_NAME: 'system-ip'})
 
 
 @define
-class BfdSessionData:
+class BfdSessionData(DataclassSettings):
     state: str
     siteId: str = field(metadata={FIELD_NAME: "site-id"})
     sourceTlocColor: str = field(metadata={FIELD_NAME: "local-color"})
@@ -117,7 +121,7 @@ class BfdSessionData:
 
 
 @define
-class OmpPeerData:
+class OmpPeerData(DataclassSettings):
     type: str
     state: str
     peerIp: str = field(metadata={FIELD_NAME: "peer"})
@@ -127,35 +131,35 @@ class OmpPeerData:
 
 
 @define
-class OmpReceivedRouteData:
+class OmpReceivedRouteData(DataclassSettings):
     protocol: str
     peerIp: str = field(metadata={FIELD_NAME: "from-peer"})
 
 
 @define
-class OmpAdvertisedRouteData:
+class OmpAdvertisedRouteData(DataclassSettings):
     protocol: str
     peerIp: str = field(metadata={FIELD_NAME: "to-peer"})
 
 
 @define
-class OmpReceivedTlocData:
+class OmpReceivedTlocData(DataclassSettings):
     peerIp: str = field(metadata={FIELD_NAME: "from-peer"})
 
 
 @define
-class OmpAdvertisedTlocData:
+class OmpAdvertisedTlocData(DataclassSettings):
     peerIp: str = field(metadata={FIELD_NAME: "to-peer"})
 
 
 @define
-class OmpServiceData:
+class OmpServiceData(DataclassSettings):
     name: str = field(metadata={FIELD_NAME: "service"})
     status: Optional[str] = field(default=None)
 
 
 @define
-class OmpSummaryData:
+class OmpSummaryData(DataclassSettings):
     oper_state: str = field(metadata={FIELD_NAME: "operstate"})
     admin_state: str = field(metadata={FIELD_NAME: "adminstate"})
     routes_received: str = field(metadata={FIELD_NAME: "routes-received"})
@@ -167,7 +171,7 @@ class OmpSummaryData:
 
 
 @define
-class EventData:
+class EventData(DataclassSettings):
     system_ip: str
     vmanage_system_ip: str
     tenant: str
@@ -181,7 +185,7 @@ class EventData:
 
 
 @define(frozen=True)
-class User:
+class User(DataclassSettings):
     group: List[str]
     locale: str
     username: str = field(metadata={FIELD_NAME: "userName"})
@@ -191,7 +195,7 @@ class User:
 
 
 @define
-class Template:
+class Template(DataclassSettings):
     device_type_str: str = field(metadata={FIELD_NAME: "deviceType"})
     device_type: DeviceModel = field(init=False)
     last_updated_by: str = field(metadata={FIELD_NAME: "lastUpdatedBy"})
@@ -212,7 +216,7 @@ class Template:
 
 
 @define
-class Speedtest:
+class Speedtest(DataclassSettings):
     device_ip: str
     device_name: str
     destination_ip: str
@@ -223,19 +227,19 @@ class Speedtest:
 
 
 @define(frozen=True)
-class PacketSetup:
+class PacketSetup(DataclassSettings):
     session_id: str = field(metadata={FIELD_NAME: "sessionId"})
     is_new_session: bool = field(metadata={FIELD_NAME: "isNewSession"})
 
 
 @define(frozen=True)
-class Status:
+class Status(DataclassSettings):
     file_download_status: Optional[str] = field(default=None, metadata={FIELD_NAME: "fileDownloadStatus"})
     file_size: Optional[int] = field(default=None, metadata={FIELD_NAME: "fileSize"})
 
 
 @define(frozen=True)
-class ServiceConfigurationData:
+class ServiceConfigurationData(DataclassSettings):
     """Administration -> Service Configuration"""
 
     vmanage_id: str = field(metadata={FIELD_NAME: "vmanageID"})
@@ -247,7 +251,7 @@ class ServiceConfigurationData:
 
 
 @define(frozen=True)
-class CloudConnectorData:
+class CloudConnectorData(DataclassSettings):
     """Administration -> Settings -> SD-AVC Cloud Connector"""
 
     client_id: str = field(metadata={FIELD_NAME: "clientId"})
@@ -259,7 +263,7 @@ class CloudConnectorData:
 
 
 @define(frozen=True)
-class CloudServicesSettings:
+class CloudServicesSettings(DataclassSettings):
     """Administration -> Settings -> Cloud Services"""
 
     enabled: bool = field(metadata={FIELD_NAME: "enabled"})
@@ -268,7 +272,7 @@ class CloudServicesSettings:
 
 
 @define(frozen=True)
-class CloudOnRampForSaasMode:
+class CloudOnRampForSaasMode(DataclassSettings):
     """
     Administration -> Settings -> Cloud on Ramp for Saas
     """
