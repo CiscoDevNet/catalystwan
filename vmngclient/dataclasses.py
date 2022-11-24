@@ -12,9 +12,9 @@ from vmngclient.utils.reachability import Reachability
 class DataclassSettings:
     def __str__(self):
         return (
-            f'Class name: {self.__class__.__name__}'
-            + "\n"
-            + "\n".join(f'  {attribute[0]}: {attribute[1]}' for attribute in asdict(self).items())
+            f"{self.__class__.__name__}(\n"
+            + "\n".join(f"    {attribute[0]}: {attribute[1]}," for attribute in asdict(self).items())
+            + "\n)"
         )
 
 
