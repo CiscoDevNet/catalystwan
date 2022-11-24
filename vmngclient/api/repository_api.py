@@ -28,8 +28,7 @@ class DeviceSoftwareRepository:
     default_version: str = field(default=None, metadata={FIELD_NAME: "defaultVersion"})
     device_id: str = field(default=None, metadata={FIELD_NAME: "uuid"})
 
-
-class RepositoryAPI:
+class ApiCallData:
     """
     API methods to prepare data for most of software actions
     """
@@ -51,6 +50,17 @@ class RepositoryAPI:
             dev_dict["deviceIP"] = dev.id
             self.devices.append(dev_dict)
 
+class RepositoryAPI:
+    """
+    API methods to prepare data for most of software actions
+    """
+
+    def __init__(
+        self,
+        api_call_data: ApiCallData,
+    ):
+        self.api_call_data = api_call_data
+
     def get_image_version(self, software_image: str) -> Union[str, None]:
         """
         Method to get proper software image version
@@ -63,7 +73,7 @@ class RepositoryAPI:
         """
         url = "/dataservice/device/action/software/images?imageType=software"
         image_name = os.path.basename(software_image)
-        software_images = self.session.get_data(url)
+        software_images = self.api_call_data.session.get_data(url)
         for img in software_images:
             if image_name in img["availableFiles"]:
                 image_version = img["versionName"]
@@ -71,9 +81,9 @@ class RepositoryAPI:
         logger.error(f"Software image {image_name} is not in available images")
         return None
 
-    def create_devices_versions_repository(self) -> Dict[str, DeviceSoftwareRepository]:
+    def get_devices_versions_repository(self) -> Dict[str, DeviceSoftwareRepository]:
         """
-        Factory method for DeviceSoftwareRepository dataclass,
+        Method for create DeviceSoftwareRepository dataclass,
         which cointains information about all possible version types for certain devices
 
         Returns:
@@ -81,8 +91,8 @@ class RepositoryAPI:
             information
         """
 
-        url = f"/dataservice/system/device/{self.device_category}"
-        devices_versions_info = self.session.get_data(url)
+        url = f"/dataservice/system/device/{self.api_call_data.device_category}"
+        devices_versions_info = self.api_call_data.session.get_data(url)
         self.devices_versions_repository = {}
         for device in devices_versions_info:
             device_all_versions = create_dataclass(DeviceSoftwareRepository, device)
@@ -93,8 +103,8 @@ class RepositoryAPI:
 
     def complete_device_list(self, version_to_set_up, version_type: str) -> None:
 
-        all_dev_versions = self.create_devices_versions_repository()
-        for dev in self.devices:
+        all_dev_versions = self.get_devices_versions_repository()
+        for dev in self.api_call_data.devices:
             dev_versions = getattr(all_dev_versions[dev["deviceId"]], version_type)
             for version in dev_versions:
                 if version_to_set_up in version:
