@@ -480,10 +480,10 @@ class Session:
     def __eq__(self, other):
         if isinstance(other, Session):
             comparison_list = [self.url == other.url,
-                         self.username == other.username,
-                         self.password == other.password,
-                         self.port == other.port,
-                         str(self.subdomain) == str(other.subdomain),
-                         str(self.timeout) == str(other.timeout)]
+                               self.username == other.username,
+                               self.password == other.password,
+                               self.port == other.port,
+                               str(self.subdomain) == str(other.subdomain),
+                               str(self.timeout) == str(other.timeout)]
             return True if all(comparison_list) else False
         return False
