@@ -113,13 +113,16 @@ class Session:
     """
 
     def __init__(
-        self, url: str,
+        self,
+        url: str,
         username: str,
         password: str,
         port: Optional[int],
         subdomain: str = None,
         timeout: int = 30
     ):
+        self.url = url
+        self.port = port
         self.base_url = self.__create_base_url(url, port)
         self.username = username
         self.password = password
@@ -470,5 +473,17 @@ class Session:
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"
 
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.username}@{self.base_url})"
+    def __repr__(self):
+        return f"{self.__class__.__name__}('{self.url}', '{self.username}', '{self.password}', port={self.port}, " \
+               f"subdomain='{self.subdomain}', timeout='{self.timeout}')"
+
+    def __eq__(self, other):
+        if isinstance(other, Session):
+            bool_list = [self.url == other.url,
+                         self.username == other.username,
+                         self.password == other.password,
+                         self.port == other.port,
+                         str(self.subdomain) == str(other.subdomain),
+                         str(self.timeout) == str(other.timeout)]
+            return True if all(bool_list) else False
+        return False
