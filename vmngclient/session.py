@@ -123,7 +123,7 @@ class Session:
     ):
         self.url = url
         self.port = port
-        self.base_url = self.__create_base_url(url, port)
+        self.base_url = self.__create_base_url()
         self.username = username
         self.password = password
         self.subdomain = subdomain
@@ -389,19 +389,15 @@ class Session:
         ctx.verify_mode = ssl.CERT_NONE
         return ctx
 
-    def __create_base_url(self, url: str, port: Optional[int]) -> str:
+    def __create_base_url(self) -> str:
         """Creates base url based on ip address and port.
-
-        Args:
-            url: IP address or domain name, i.e. '10.0.1.200' or 'fruits.com'
-            port (int): Port of reachable vManage.
 
         Returns:
             str: Base url shared for every request.
         """
-        if port:
-            return f"https://{url}:{port}"
-        return f"https://{url}"
+        if self.port:
+            return f"https://{self.url}:{self.port}"
+        return f"https://{self.url}"
 
     def about(self) -> Union[List[Any], Dict[Any, Any]]:
         response = self.get_data(url="/dataservice/client/about")
