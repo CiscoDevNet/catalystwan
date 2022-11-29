@@ -37,6 +37,9 @@ jobs:
           bump_message=$(poetry version ${{ env.bump }})
           new_version=$(echo "${bump_message##* }")
           echo "new_version=${new_version}" >> $GITHUB_ENV
+        continue-on-error: true
+      - name: Set environment variable if no new version was created
+        run: if [ -z "${{env.new_version}}" ]; then echo "new_version=${old_version}" >> $GITHUB_ENV; fi
       - name: Commit version changes in pyproject.toml
         uses: EndBug/add-and-commit@v9
         with:
