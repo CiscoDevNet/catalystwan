@@ -322,6 +322,17 @@ class Session:
         """
         return self.relogin_request('DELETE', url)
 
+    def delete_json(self, url: str) -> Union[dict, list]:
+        """Sends HTTP DELETE request and return 'data' property from parsed JSON data.
+
+        Args:
+            url: API endpoint without base URL
+
+        Returns:
+            'data' property from the JSON response
+        """
+        return self.decode_json(self.delete(url))
+
     def login(self) -> None:
         """Login to vManage API using self username and password.
 
