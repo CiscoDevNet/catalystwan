@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 from vmngclient.session import Session
 
@@ -24,18 +25,21 @@ class TestSessionConstructor(unittest.TestCase):
         # Assert
         self.assertNotEqual(repr(session), session_str)
 
-    def test_session_eval_repr(self):
+    @patch("vmngclient.session.Session.__repr__")
+    def test_session_eval_repr(self, mock_repr):
         # Arrange, Act
+        mock_repr.return_value = "Session('domain.com', 'user1', '$password', port=111, subdomain='None', timeout=30)"
         session = Session("domain.com", "user1", "$password", port=111)
         # Assert
-        self.assertEqual(eval(repr(session)), session)
+        self.assertEqual(eval(mock_repr()), session)
 
-    def test_session_eval_repr_different_sessions(self):
+    @patch("vmngclient.session.Session.__repr__")
+    def test_session_eval_repr_different_sessions(self, mock_repr):
         # Arrange, Act
-        session_1 = Session("domain.com", "user1", "$password", port=111)
-        session_2 = Session("not.domain.com", "different_user", "$password", port=111)
+        mock_repr.return_value = "Session('domain.com', 'user1', '$password', port=111, subdomain='None', timeout=30)"
+        session = Session("not.domain.com", "different_user", "$password", port=111)
         # Assert
-        self.assertNotEqual(eval(repr(session_1)), session_2)
+        self.assertNotEqual(eval(mock_repr()), session)
 
     def test_session_eq(self):
         # Arrange, Act
