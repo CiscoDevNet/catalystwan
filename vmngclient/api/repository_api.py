@@ -28,27 +28,7 @@ class DeviceSoftwareRepository:
     default_version: str = field(default=None, metadata={FIELD_NAME: "defaultVersion"})
     device_id: str = field(default=None, metadata={FIELD_NAME: "uuid"})
 
-class ApiCallData:
-    """
-    API methods to prepare data for most of software actions
-    """
 
-    def __init__(
-        self,
-        session: Session,
-        devices: List[Device],
-        device_category: DeviceCategory,
-    ):
-
-        self.session = session
-        self.devices = []
-        self.device_category = device_category
-
-        for dev in devices:
-            dev_dict = dict()
-            dev_dict["deviceId"] = dev.uuid
-            dev_dict["deviceIP"] = dev.id
-            self.devices.append(dev_dict)
 
 class RepositoryAPI:
     """
@@ -57,9 +37,36 @@ class RepositoryAPI:
 
     def __init__(
         self,
-        api_call_data: ApiCallData,
+        session: Session,
     ):
-        self.api_call_data = api_call_data
+        self.session = session
+
+    def get_all_software_images (self):
+        
+        url = "/dataservice/device/action/software/images?imageType=software"
+        software_images = self.session.get_data(url)
+        return software_images
+
+
+    def get_devices_versions_repository(self,device_category) -> Dict[str, DeviceSoftwareRepository]:
+        """
+        Factory method for DeviceSoftwareRepository dataclass,
+        which cointains information about all possible version types for certain devices
+
+        Returns:
+            Dict[str, DeviceSoftwareRepository]: Dictionary containing all versions
+            information
+        """
+
+        url = f"/dataservice/system/device/{device_category}"
+        devices_versions_info = self.session.get_data(url)
+        devices_versions_repository = {}
+        for device in devices_versions_info:
+            device_all_versions = create_dataclass(DeviceSoftwareRepository, device)
+            device_all_versions.installed_versions = [version for version in device_all_versions.available_versions]
+            device_all_versions.installed_versions.append(device_all_versions.current_version)
+            devices_versions_repository[device_all_versions.device_id] = device_all_versions
+        return devices_versions_repository
 
     def get_image_version(self, software_image: str) -> Union[str, None]:
         """
@@ -71,9 +78,9 @@ class RepositoryAPI:
         Returns:
             Union[str, None]: image version or None
         """
-        url = "/dataservice/device/action/software/images?imageType=software"
+
         image_name = os.path.basename(software_image)
-        software_images = self.api_call_data.session.get_data(url)
+        software_images = self.get_all_software_images()
         for img in software_images:
             if image_name in img["availableFiles"]:
                 image_version = img["versionName"]
@@ -81,35 +88,39 @@ class RepositoryAPI:
         logger.error(f"Software image {image_name} is not in available images")
         return None
 
-    def get_devices_versions_repository(self) -> Dict[str, DeviceSoftwareRepository]:
-        """
-        Method for create DeviceSoftwareRepository dataclass,
-        which cointains information about all possible version types for certain devices
+class Payload:
+    
+    def __init__(
+        self,
+        devices: List[Device],
+        repository : RepositoryAPI
+    ):
+        self.devices = [{"deviceId" : dev.uuid, "deviceIP" : dev.id} for dev in devices]
+        self.repository = repository
+    
+    def complete_device_list_if_in_available(self, version_to_set_up : str) -> None:
 
-        Returns:
-            Dict[str, DeviceSoftwareRepository]: Dictionary containing all versions
-            information
-        """
-
-        url = f"/dataservice/system/device/{self.api_call_data.device_category}"
-        devices_versions_info = self.api_call_data.session.get_data(url)
-        self.devices_versions_repository = {}
-        for device in devices_versions_info:
-            device_all_versions = create_dataclass(DeviceSoftwareRepository, device)
-            device_all_versions.installed_versions = [version for version in device_all_versions.available_versions]
-            device_all_versions.installed_versions.append(device_all_versions.current_version)
-            self.devices_versions_repository[device_all_versions.device_id] = device_all_versions
-        return self.devices_versions_repository
-
-    def complete_device_list(self, version_to_set_up, version_type: str) -> None:
-
-        all_dev_versions = self.get_devices_versions_repository()
-        for dev in self.api_call_data.devices:
-            dev_versions = getattr(all_dev_versions[dev["deviceId"]], version_type)
-            for version in dev_versions:
+        all_dev_versions = self.repository.get_devices_versions_repository()
+        for dev in self.devices:
+            dev_available_versions = all_dev_versions[dev["deviceId"]].available_versions
+            for version in dev_available_versions:
                 if version_to_set_up in version:
                     dev["version"] = version
                     break
             if 'version' not in dev:
-                raise ValueError(f"Software version {version_to_set_up} is not included in {version_type}")
+                logger.error(f"Software version {version_to_set_up} for {dev} is not included in available_versions")
         return None
+
+    def complete_device_list_if_in_installed(self, version_to_set_up : str) -> None:
+
+        all_dev_versions = self.repository.get_devices_versions_repository()
+        for dev in self.devices:
+            dev_installed_versions = all_dev_versions[dev["deviceId"]].installed_versions
+            for version in dev_installed_versions:
+                if version_to_set_up in version:
+                    dev["version"] = version
+                    break
+            if 'version' not in dev:
+                logger.error(f"Software version {version_to_set_up} for {dev} is not included in available_versions")
+        return None
+

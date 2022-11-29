@@ -5,7 +5,8 @@ from typing import Any, Dict, List, Union
 from attr import define
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
-from vmngclient.api.repository_api import DeviceCategory, RepositoryAPI, ApiCallData
+from vmngclient.api.repository_api import DeviceCategory, RepositoryAPI, Payload
+from vmngclient.api.basic_api import Session
 from vmngclient.utils.creation_tools import get_logger_name
 from vmngclient.utils.operation_status import OperationStatus
 
@@ -50,8 +51,11 @@ class SoftwareActionAPI:
     are exececutable on all device categories.
     """
 
-    def __init__(self, repository: RepositoryAPI) -> None:
+    def __init__(self, session: Session, payload : Payload,
+    repository: RepositoryAPI) -> None:
 
+        self.session = session
+        self.payload = payload
         self.repository = repository
 
     def activate_software(self, version_to_activate: str) -> str:
@@ -64,14 +68,14 @@ class SoftwareActionAPI:
         Returns:
             str: action id
         """
-        self.repository.complete_device_list(version_to_activate, "available_versions")
+        self.payload.complete_device_list_if_in_available(version_to_activate)
         url = "/dataservice/device/action/changepartition"
         payload = {
             "action": "changepartition",
-            "devices": self.repository.api_call_data.devices,
+            "devices": self.payload.devices,
             "deviceType": "vmanage",
         }
-        activate = dict(self.repository.api_call_data.session.post_json(url, payload))
+        activate = dict(self.session.post_json(url, payload))
         return activate["id"]
 
     def upgrade_software(
@@ -111,26 +115,27 @@ class SoftwareActionAPI:
                 "reboot": reboot,
                 "sync": sync,
             },
-            "devices": self.repository.api_call_data.devices,
+            "devices": self.payload.devices,
             "deviceType": self.install_spec.device_type,
         }
 
         if self.install_spec.family in (Family.VMANAGE.value, Family.CEDGE.value):
-            incorrect_devices = self._downgrade_check(payload["input"]["version"], self.repository.device_category)
+            incorrect_devices = self._downgrade_check(payload["input"]["version"], self.payload.device_category)
             if incorrect_devices:
                 raise ValueError(
                     f"Current version of devices {incorrect_devices} is higher than upgrade version. Action denied!"
                 )
 
-        upgrade = dict(self.repository.session.post_json(url, payload))
+        upgrade = dict(self.session.post_json(url, payload))
         return upgrade["id"]
 
     def _downgrade_check(self, version_to_upgrade: str, devices_category: DeviceCategory) -> Union[None, List]:
 
         incorrect_devices = []
-        for dev in self.repository.api_call_data.devices:
+        devices_versions_repo = self.repository.get_devices_versions_repository()
+        for dev in self.payload.devices:
             dev_current_version = str(
-                self.repository.get_devices_versions_repository()[dev["deviceId"]].current_version
+                devices_versions_repo[dev["deviceId"]].current_version
             )
             splited_version_to_upgrade = version_to_upgrade.split(".")
             for priority, label in enumerate(dev_current_version.split(".")):
@@ -176,7 +181,7 @@ class SoftwareActionAPI:
         def wait_for_end_software_action():
             url = f"/dataservice/device/action/status/{action_id}"
             try:
-                action_data = self.repository.session.get_data(url)[0]["status"]
+                action_data = self.session.get_data(url)[0]["status"]
                 logger.debug(f"Status of action {action_id} is: {action_data}")
             except IndexError:
                 action_data = ""
