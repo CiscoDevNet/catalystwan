@@ -471,7 +471,7 @@ class Session:
 
     def __repr__(self):
         return f"{self.__class__.__name__}('{self.url}', '{self.username}', '{self.password}', port={self.port}, " \
-               f"subdomain='{self.subdomain}', timeout='{self.timeout}')"
+               f"subdomain='{self.subdomain}', timeout={self.timeout})"
 
     def __eq__(self, other):
         if isinstance(other, Session):
