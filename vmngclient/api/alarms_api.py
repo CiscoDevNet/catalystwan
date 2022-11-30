@@ -1,11 +1,11 @@
 import logging
 from enum import Enum
-from typing import Any, Callable, Dict, List, Set
+from typing import Any, Callable, Dict, List, Optional, Set
 
-from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
+from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.dataclasses import AlarmData
-from vmngclient.session import Session
+from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass, flatten_dict, get_logger_name
 
 logger = logging.getLogger(get_logger_name(__name__))
@@ -26,10 +26,12 @@ class AlarmsAPI:
 
     URL = '/dataservice/alarms'
 
-    def __init__(self, session: Session):
+    def __init__(self, session: vManageSession):
         self.session = session
 
-    def get_alarms(self, hours: int = None, level: str = None, viewed: bool = None) -> List[AlarmData]:
+    def get_alarms(
+        self, hours: Optional[int] = None, level: Optional[str] = None, viewed: Optional[bool] = None
+    ) -> List[AlarmData]:
         query: Dict[str, Any] = {"query": {"condition": "AND", "rules": []}}
 
         if hours:
@@ -50,22 +52,22 @@ class AlarmsAPI:
                 {"value": [value], "field": "acknowledged", "type": "bool", "operator": "equal"}
             )
 
-        alarms = self.session.post_data(AlarmsAPI.URL, data=query)
+        alarms = self.session.post(url=AlarmsAPI.URL, data=query).json()
 
         logger.info("Actualas alarms collected successfuly.")
 
         return [create_dataclass(AlarmData, flatten_dict(alarm)) for alarm in alarms]
 
-    def get_critical_alarms(self, hours: int = None, viewed: bool = None) -> List[AlarmData]:
+    def get_critical_alarms(self, hours: Optional[int] = None, viewed: Optional[bool] = None) -> List[AlarmData]:
         return self.get_alarms(hours, AlarmLevel.critical.value, viewed)
 
-    def get_major_alarms(self, hours: int = None, viewed: bool = None) -> List[AlarmData]:
+    def get_major_alarms(self, hours: Optional[int] = None, viewed: Optional[bool] = None) -> List[AlarmData]:
         return self.get_alarms(hours, AlarmLevel.major.value, viewed)
 
-    def get_minor_alarms(self, hours: int = None, viewed: bool = None) -> List[AlarmData]:
+    def get_minor_alarms(self, hours: Optional[int] = None, viewed: Optional[bool] = None) -> List[AlarmData]:
         return self.get_alarms(hours, AlarmLevel.minor.value, viewed)
 
-    def get_not_viewed_alarms(self, hours: int = None) -> List[AlarmData]:
+    def get_not_viewed_alarms(self, hours: Optional[int] = None) -> List[AlarmData]:
         return self.get_alarms(hours=hours, viewed=False)
 
     def mark_all_as_viewed(self) -> bool:

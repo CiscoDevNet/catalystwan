@@ -1,7 +1,7 @@
 import datetime as dt
 from typing import List, Optional
 
-from attr import define, field
+from attr import define, field  # type: ignore
 
 from vmngclient.utils.creation_tools import FIELD_NAME, convert_attributes
 from vmngclient.utils.device_model import DeviceModel

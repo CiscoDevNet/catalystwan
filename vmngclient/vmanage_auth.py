@@ -8,7 +8,7 @@ from requests.cookies import RequestsCookieJar
 
 
 class InvalidCredentialsError(Exception):
-    """Exception raised for invalid credentials
+    """Exception raised for invalid credentials.
 
     Attributes:
         username (str): vManage username.
@@ -112,7 +112,7 @@ class vManageAuth(AuthBase):
 
     def __call__(self, prepared_request: PreparedRequest) -> PreparedRequest:
         if self.expiration_time is None:
-            if self.token is None:
+            if self.token == "":
                 self.set_cookie = self.get_cookie()
                 self.token = self.fetch_token(self.set_cookie)
 
