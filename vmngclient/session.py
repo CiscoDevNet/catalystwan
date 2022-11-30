@@ -8,14 +8,15 @@ from urllib.error import HTTPError
 from urllib.parse import urljoin
 
 # import requests
-from requests import Response, Session
+from requests import Session
 from requests.auth import AuthBase
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
-from vmngclient.utils.creation_tools import get_logger_name
 from vmngclient.vmanage_auth import vManageAuth
 
-logger = logging.getLogger(get_logger_name(__name__))
+logger = logging.getLogger(__name__)
+
+JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
 
 
 class SessionType(Enum):
@@ -40,11 +41,11 @@ class ViewMode(Enum):
 
 
 class SessionNotCreatedError(Exception):
-    pass
+    pass  # TODO
 
 
 def create_vManageSession(
-    url: str,
+    url: str,  # TODO Support urls with or w/o schemes.
     username: str,
     password: str,
     port: Optional[int] = None,
@@ -64,12 +65,13 @@ def create_vManageSession(
     Returns:
         Session object
     """
-    a = vManageAuth("https://sandbox-sdwan-2.cisco.com/", username, password, verify=False)
-    session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain, auth=a)
-    auth = vManageAuth(session.base_url, username, password, verify=False)
-    session.auth = auth
+    session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
+    session.auth = vManageAuth(session.base_url, username, password, verify=False)
+    if subdomain:  # TODO new class
+        tenant_id = session.get_tenant_id()
+        vsession_id = session.get_virtual_session_id(tenant_id)
+        session.headers.update({'VSessionId': vsession_id})
     server_info = session.server()
-    print(server_info)
 
     try:
         user_mode = UserMode(server_info.get("userMode", "not found"))
@@ -82,13 +84,12 @@ def create_vManageSession(
     except ValueError:
         view_mode = ViewMode.NOT_RECOGNIZED
         logger.warning(f"Unrecognized user mode is: '{server_info.get('viewMode')}'")
-
     if user_mode is UserMode.TENANT and not subdomain and view_mode is ViewMode.TENANT:
         session.session_type = SessionType.TENANT
     elif user_mode is UserMode.PROVIDER and not subdomain and view_mode is ViewMode.PROVIDER:
         session.session_type = SessionType.PROVIDER
     elif user_mode is UserMode.PROVIDER and view_mode is ViewMode.TENANT:
-        # session.__switch_to_tenant()
+
         session.session_type = SessionType.PROVIDER_AS_TENANT
     elif user_mode is UserMode.TENANT and subdomain:
         raise SessionNotCreatedError(
@@ -101,7 +102,8 @@ def create_vManageSession(
             f"Session created with {user_mode.value} user mode and {view_mode.value} view mode.\n"
             f"Session type set to not defined"
         )
-
+    print(f"Logged as {username}. The session type is {session.session_type}")
+    logger.info(f"Logged as {username}. The session type is {session.session_type}")
     return session
 
 
@@ -139,7 +141,7 @@ class vManageSession(Session):
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
 
-    def request(self, method, url, *args, **kwargs) -> Response:
+    def request(self, method, url, *args, **kwargs) -> Any:
         full_url = self.get_full_url(url)
         return super(vManageSession, self).request(method, full_url, args, kwargs)
 
@@ -161,18 +163,18 @@ class vManageSession(Session):
             return f"https://{url}:{port}"
         return f"https://{url}"
 
-    def about(self) -> Union[List[Any], Dict[Any, Any]]:
-        response = self.get(url="/dataservice/client/about")
-        data = self.get_data(response)
-        return data
+    def about(self) -> Dict:
+        return self.get_data(url="/dataservice/client/about")
 
-    def server(self) -> Dict[Any, Any]:
-        response = self.get(url="/dataservice/client/server")
-        data = self.get_data(response)
-        return data
+    def server(self) -> Dict:
+        return self.get_data(url="/dataservice/client/server")
 
-    def get_data(self, response: Response):
-        return response.json()['data']
+    def get_data(self, url: str) -> Any:  # TODO
+        return self.get_json(url)['data']
+
+    def get_json(self, url: str) -> Any:  # TODO
+        response = self.get(url)
+        return response.json()
 
     def wait_for_server_reachability(self, retries: int, delay: int, initial_delay: int = 0) -> bool:
         """Checks if vManage API is reachable by sending server request.
@@ -208,37 +210,37 @@ class vManageSession(Session):
 
         return True if _send_server_request() else False
 
-    # def __get_tenant_id(self) -> str:
-    #     """Gets tenant UUID for tenant subdomain.
-    #     Returns:
-    #         tenant UUID
-    #     """
-    #     tenants = self.get_data('/dataservice/tenant')
-    #     tenant_ids = [tenant.get('tenantId') for tenant in tenants if tenant['subDomain'] == self.subdomain]
-    #     return tenant_ids[0]
+    def get_tenant_id(self) -> str:
+        """Gets tenant UUID for its subdomain.
 
-    # def __create_vsession(self, tenant_id: str) -> str:
-    #     """Creates virtual session for tenant.
-    #     Args:
-    #         tenant_id: provider or tenant UUID
-    #     Returns:
-    #         virtual session token
-    #     """
-    #     response = cast(dict, self.post_json(f'/dataservice/tenant/{tenant_id}/vsessionid'))
-    #     return response['VSessionId']
+        Returns:
+            Tenant UUID.
+        """
+        tenants = self.get_data(url='/dataservice/tenant')
+        tenant_id = [tenant.get('tenantId', None) for tenant in tenants if tenant['subDomain'] == self.subdomain][0]
+        return tenant_id
 
-    # def __switch_to_tenant(self) -> None:
-    #     """As provider impersonate tenant session."""
-    #     tenant_id = self.__get_tenant_id()
-    #     vsession_id = self.__create_vsession(tenant_id)
-    #     self.session_headers['VSessionId'] = vsession_id
+    def get_virtual_session_id(self, tenant_id: str) -> str:
+        """Get VSessionId for a specific tenant
+
+        Note: In a multitenant vManage system, this API is only available in the Provider view. # TODO
+
+        Args:
+            tenant_id: provider or tenant UUID
+        Returns:
+            Virtual session token
+        """
+        url_path = f"/dataservice/tenant/{tenant_id}/vsessionid"
+        response = self.post(url_path)
+        return response.json()['VSessionId']
 
     def __prepare_session(self, verify: bool, auth: Optional[AuthBase]) -> None:
         self.auth = auth
         self.verify = verify
+        self.headers.update({"content-type": "application/json"})
 
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # TODO
         return f"{self.__class__.__name__}({self.username}@{self.base_url})"

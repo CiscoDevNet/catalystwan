@@ -8,7 +8,7 @@ from requests.cookies import RequestsCookieJar
 
 
 class InvalidCredentialsError(Exception):
-    """Exception raised for invalid credentials
+    """Exception raised for invalid credentials.
 
     Attributes:
         username (str): vManage username.

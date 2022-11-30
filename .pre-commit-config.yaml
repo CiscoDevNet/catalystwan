@@ -42,7 +42,7 @@ repos:
         # types: [python]
         # require_serial: true
         args: ["--show-error-codes", "--show-error-context", "--pretty"]
-        additional_dependencies: ['types-requests']
+        additional_dependencies: ['types-requests', 'types-attrs']
         verbose: true
   
 
