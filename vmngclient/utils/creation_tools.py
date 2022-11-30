@@ -2,7 +2,7 @@ import datetime as dt
 import sys
 from typing import Any, ClassVar, Dict, List, Protocol, Type, TypeVar
 
-import attrs
+import attrs  # type: ignore
 from attr import Attribute, fields
 from dateutil import parser  # type: ignore
 
@@ -68,7 +68,7 @@ def convert_attributes(cls: type, fields: List[Attribute]) -> List[Attribute]:
             converter = lambda x: str(x)  # noqa: E731
         else:
             converter = None
-        results.append(field.evolve(converter=converter))
+        results.append(field.evolve(converter=converter))  # type: ignore
     return results
 
 

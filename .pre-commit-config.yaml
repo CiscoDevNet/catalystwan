@@ -41,7 +41,7 @@ repos:
         # language: system
         # types: [python]
         # require_serial: true
-        args: ["--show-error-codes", "--show-error-context", "--pretty"]
+        args: ["--show-error-codes", "--show-error-context", "--pretty", "--show-absolute-path"]
         additional_dependencies: ['types-requests', 'types-attrs']
         verbose: true
   
