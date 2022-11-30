@@ -42,6 +42,6 @@ jobs:
       - name: Checking if imports are sorted correctly
         run: poetry run isort --check --diff -l 120 --profile black vmngclient
       - name: Check static-typing
-        run: poetry run mypy --show-error-codes --show-error-context --pretty --install-types vmngclient
+        run: poetry run mypy --show-error-codes --show-error-context --pretty vmngclient
       - name: Check code style
         run: poetry run flake8 --max-line-length 120 vmngclient
