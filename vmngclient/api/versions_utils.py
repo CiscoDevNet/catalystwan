@@ -1,6 +1,6 @@
 import logging
-import os
 from enum import Enum
+from pathlib import PurePath
 from typing import Dict, List, Union
 
 from attr import define, field
@@ -29,7 +29,6 @@ class DeviceSoftwareRepository:
     device_id: str = field(default=None, metadata={FIELD_NAME: "uuid"})
 
 
-
 class RepositoryAPI:
     """
     API methods to prepare data for most of software actions
@@ -41,16 +40,21 @@ class RepositoryAPI:
     ):
         self.session = session
 
-    def get_all_software_images (self):
-        
+    def get_all_software_images(self) -> list:
+        """
+        Method to get all info about all software images stored
+        in Vmanage repository
+
+        Returns:
+            list: software images list
+        """
         url = "/dataservice/device/action/software/images?imageType=software"
-        software_images = self.session.get_data(url)
+        software_images = list(self.session.get_data(url))
         return software_images
 
-
-    def get_devices_versions_repository(self,device_category) -> Dict[str, DeviceSoftwareRepository]:
+    def get_devices_versions_repository(self, device_category) -> Dict[str, DeviceSoftwareRepository]:
         """
-        Factory method for DeviceSoftwareRepository dataclass,
+        Method for create DeviceSoftwareRepository dataclass,
         which cointains information about all possible version types for certain devices
 
         Returns:
@@ -79,7 +83,7 @@ class RepositoryAPI:
             Union[str, None]: image version or None
         """
 
-        image_name = os.path.basename(software_image)
+        image_name = PurePath(software_image).name
         software_images = self.get_all_software_images()
         for img in software_images:
             if image_name in img["availableFiles"]:
@@ -88,19 +92,26 @@ class RepositoryAPI:
         logger.error(f"Software image {image_name} is not in available images")
         return None
 
-class Payload:
-    
-    def __init__(
-        self,
-        devices: List[Device],
-        repository : RepositoryAPI
-    ):
-        self.devices = [{"deviceId" : dev.uuid, "deviceIP" : dev.id} for dev in devices]
-        self.repository = repository
-    
-    def complete_device_list_if_in_available(self, version_to_set_up : str) -> None:
 
-        all_dev_versions = self.repository.get_devices_versions_repository()
+class Payload:
+    def __init__(self, devices: List[Device], repository: RepositoryAPI, device_category: DeviceCategory):
+        self.devices = [{"deviceId": dev.uuid, "deviceIP": dev.id} for dev in devices]
+        self.repository = repository
+        self.device_category = device_category
+
+    def complete_device_list_if_in_available(self, version_to_set_up: str) -> None:
+        """
+        Create version key fir every device dict in device list, if requested version
+        is in available versions
+
+        Args:
+            version_to_set_up (str): requested version
+
+        Returns:
+            None
+        """
+
+        all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
         for dev in self.devices:
             dev_available_versions = all_dev_versions[dev["deviceId"]].available_versions
             for version in dev_available_versions:
@@ -111,9 +122,19 @@ class Payload:
                 logger.error(f"Software version {version_to_set_up} for {dev} is not included in available_versions")
         return None
 
-    def complete_device_list_if_in_installed(self, version_to_set_up : str) -> None:
+    def complete_device_list_if_in_installed(self, version_to_set_up: str) -> None:
+        """
+        Create version key fir every device dict in device list, if requested version
+        is in available versions
 
-        all_dev_versions = self.repository.get_devices_versions_repository()
+        Args:
+            version_to_set_up (str): requested version
+
+        Returns:
+            None
+        """
+
+        all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
         for dev in self.devices:
             dev_installed_versions = all_dev_versions[dev["deviceId"]].installed_versions
             for version in dev_installed_versions:
@@ -123,4 +144,3 @@ class Payload:
             if 'version' not in dev:
                 logger.error(f"Software version {version_to_set_up} for {dev} is not included in available_versions")
         return None
-

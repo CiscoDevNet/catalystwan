@@ -5,8 +5,8 @@ from typing import Any, Dict, List, Union
 from attr import define
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
-from vmngclient.api.repository_api import DeviceCategory, RepositoryAPI, Payload
 from vmngclient.api.basic_api import Session
+from vmngclient.api.versions_utils import DeviceCategory, Payload, RepositoryAPI
 from vmngclient.utils.creation_tools import get_logger_name
 from vmngclient.utils.operation_status import OperationStatus
 
@@ -14,26 +14,17 @@ logger = logging.getLogger(get_logger_name(__name__))
 
 
 class Family(Enum):
-    CEDGE = "vedge"
-    VBOND = "vedge"
     VEDGE = "vedge"
-    VSMART = "vedge"
     VMANAGE = "vmanage"
 
 
 class VersionType(Enum):
-    VSMART = "vmanage"
-    VBOND = "vmanage"
-    VEDGE = "vmanage"
-    CEDGE = "vmanage"
     VMANAGE = "vmanage"
 
 
 class DeviceType(Enum):
-    VSMART = "controller"
-    VBOND = "controller"
+    CONTROLLER = "controller"
     VEDGE = "vedge"
-    CEDGE = "vedge"
     VMANAGE = "vmanage"
 
 
@@ -45,14 +36,21 @@ class InstallSpecification:
     device_type: DeviceType
 
 
+class InstallHelper:
+    VMANAGE = InstallSpecification(Family.VMANAGE, VersionType.VMANAGE, DeviceType.VMANAGE)
+    VSMART = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)
+    VBOND = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)
+    VEDGE = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE)
+    CEDGE = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE)
+
+
 class SoftwareActionAPI:
     """
     API methods for software actions. All methods
     are exececutable on all device categories.
     """
 
-    def __init__(self, session: Session, payload : Payload,
-    repository: RepositoryAPI) -> None:
+    def __init__(self, session: Session, payload: Payload, repository: RepositoryAPI) -> None:
 
         self.session = session
         self.payload = payload
@@ -101,7 +99,6 @@ class SoftwareActionAPI:
         Returns:
             str: action id
         """
-        self.install_spec = install_spec
 
         url = "/dataservice/device/action/install"
         payload: Dict[str, Any] = {
@@ -109,17 +106,17 @@ class SoftwareActionAPI:
             "input": {
                 "vEdgeVPN": 0,
                 "vSmartVPN": 0,
-                "family": self.install_spec.family,
+                "family": install_spec.family,
                 "version": self.repository.get_image_version(software_image),
-                "versionType": self.install_spec.version_type,
+                "versionType": install_spec.version_type,
                 "reboot": reboot,
                 "sync": sync,
             },
             "devices": self.payload.devices,
-            "deviceType": self.install_spec.device_type,
+            "deviceType": install_spec.device_type,
         }
 
-        if self.install_spec.family in (Family.VMANAGE.value, Family.CEDGE.value):
+        if install_spec.family in (Family.VMANAGE.value, Family.VEDGE.value):
             incorrect_devices = self._downgrade_check(payload["input"]["version"], self.payload.device_category)
             if incorrect_devices:
                 raise ValueError(
@@ -130,13 +127,21 @@ class SoftwareActionAPI:
         return upgrade["id"]
 
     def _downgrade_check(self, version_to_upgrade: str, devices_category: DeviceCategory) -> Union[None, List]:
+        """
+        Check if upgrade operation is not actually and downgrade opeartion.
+        If so, in some cases action is being blocked.
 
+        Args:
+            version_to_upgrade (str): version to upgrade
+            devices_category (DeviceCategory): devices category
+
+        Returns:
+            Union[None, List]: [None, list of devices with no permission to downgrade]
+        """
         incorrect_devices = []
-        devices_versions_repo = self.repository.get_devices_versions_repository()
+        devices_versions_repo = self.repository.get_devices_versions_repository(self.payload.device_category)
         for dev in self.payload.devices:
-            dev_current_version = str(
-                devices_versions_repo[dev["deviceId"]].current_version
-            )
+            dev_current_version = str(devices_versions_repo[dev["deviceId"]].current_version)
             splited_version_to_upgrade = version_to_upgrade.split(".")
             for priority, label in enumerate(dev_current_version.split(".")):
                 if str(label) > str(splited_version_to_upgrade[priority]):
