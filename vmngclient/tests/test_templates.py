@@ -295,7 +295,7 @@ class TestTemplateAPI(unittest.TestCase):
 
         # Arrage
         MockResponse = MagicMock()
-        MockResponse.status = 200
+        MockResponse.status_code = 200
         mock_session.delete.return_value = MockResponse
         test_object = TemplateAPI(mock_session)
 
@@ -306,7 +306,6 @@ class TestTemplateAPI(unittest.TestCase):
 
         # Act
         answer = test_object.delete('template_1')
-
         # Assert
         self.assertTrue(answer)
 
