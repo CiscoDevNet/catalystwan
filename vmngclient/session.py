@@ -41,11 +41,11 @@ class ViewMode(Enum):
 
 
 class SessionNotCreatedError(Exception):
-    pass  # TODO
+    pass
 
 
 def create_vManageSession(
-    url: str,  # TODO Support urls with or w/o schemes.
+    url: str,
     username: str,
     password: str,
     port: Optional[int] = None,
@@ -67,7 +67,7 @@ def create_vManageSession(
     """
     session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
-    if subdomain:  # TODO new class
+    if subdomain:
         tenant_id = session.get_tenant_id()
         vsession_id = session.get_virtual_session_id(tenant_id)
         session.headers.update({'VSessionId': vsession_id})
@@ -136,7 +136,7 @@ class vManageSession(Session):
         self.port = port
         self.subdomain = subdomain
 
-        self.session_type = SessionType.NOT_DEFINED  # TODO readonly
+        self.session_type = SessionType.NOT_DEFINED
 
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
@@ -169,10 +169,10 @@ class vManageSession(Session):
     def server(self) -> Dict:
         return self.get_data(url="/dataservice/client/server")
 
-    def get_data(self, url: str) -> Any:  # TODO
+    def get_data(self, url: str) -> Any:
         return self.get_json(url)['data']
 
-    def get_json(self, url: str) -> Any:  # TODO
+    def get_json(self, url: str) -> Any:
         response = self.get(url)
         return response.json()
 
@@ -223,7 +223,7 @@ class vManageSession(Session):
     def get_virtual_session_id(self, tenant_id: str) -> str:
         """Get VSessionId for a specific tenant
 
-        Note: In a multitenant vManage system, this API is only available in the Provider view. # TODO
+        Note: In a multitenant vManage system, this API is only available in the Provider view.
 
         Args:
             tenant_id: provider or tenant UUID
@@ -242,5 +242,5 @@ class vManageSession(Session):
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"
 
-    def __repr__(self) -> str:  # TODO
+    def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.username}@{self.base_url})"
