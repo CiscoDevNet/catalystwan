@@ -1,12 +1,11 @@
 """
 Module for handling tenant backup and restore
 """
-import shutil
 from pathlib import Path
 from typing import Optional, Union
 
 from vmngclient.dataclasses import TenantBackupRestore
-from vmngclient.session import Session
+from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
 
 
@@ -18,7 +17,7 @@ class TenantBackupRestoreApi:
         session: logged in API client session
     """
 
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: vManageSession) -> None:
         self.session = session
 
     def __str__(self) -> str:
@@ -53,7 +52,10 @@ class TenantBackupRestoreApi:
         """
 
         url = f"/dataservice/tenantbackup/delete?fileName={file_name}"
-        return self.session.delete_json(url)
+        return self.session.delete(url).json()
+
+    def delete_all(self) -> Union[dict, list]:
+        return self.delete('all')
 
     def download(self, file_name: str, download_dir: Optional[Path] = None) -> Path:
         """Download tenant backup file
@@ -71,5 +73,20 @@ class TenantBackupRestoreApi:
         url = f"/dataservice/tenantbackup/download/{tenant_id}/{file_name}"
         with self.session.get(url) as payload:
             with open(download_path, "wb") as file:
-                shutil.copyfileobj(payload, file)
+                file.write(payload.content)
         return download_path
+
+    def import_backup(self, filename: Path):
+        '''
+        upload the specified file for tenant import,
+        then poll the task until success or failure.
+        Args:
+            filename: The path of the file to be upladed
+        Returns:
+        '''
+        # Upload the file
+        url = '/dataservice/tenantbackup/import'
+        response = self.session.post_file(url, filename, data={})
+        # TODO: Poll the task if it was created.
+        # processId = response.json()['processId']
+        return response
