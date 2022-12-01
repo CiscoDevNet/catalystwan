@@ -4,13 +4,14 @@ Module for handling admintech logs for a device
 import json
 import shutil
 import time
-from http.client import HTTPResponse
 from pathlib import Path
 from typing import List, Optional, cast
 from urllib.error import HTTPError
 
+from requests import Response
+
 from vmngclient.dataclasses import AdminTech
-from vmngclient.session import Session
+from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
 
 
@@ -29,7 +30,7 @@ class AdminTechAPI:
         session: logged in API client session
     """
 
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: vManageSession) -> None:
         self.session = session
 
     def __str__(self) -> str:
@@ -44,7 +45,7 @@ class AdminTechAPI:
             AdminTech object for given device
         """
         body = {'deviceIP': device_id}
-        response = self.session.post_data('/dataservice/device/tools/admintechlist', data=body)
+        response = self.session.post(url='/dataservice/device/tools/admintechlist', data=body).json()
         return create_dataclass(AdminTech, response[0])
 
     def get_all(self) -> List[AdminTech]:
@@ -71,12 +72,10 @@ class AdminTechAPI:
         """
         create_admin_tech_error_msgs = 'Admin tech creation already in progress'
         body = {'deviceIP': device_id, 'exclude-cores': True, 'exclude-tech': False, 'exclude-logs': True}
-        _session_timeout = self.session.timeout
         polling_timer = polling_timeout
         while polling_timer > 0:
             try:
-                self.session.timeout = request_timeout
-                response = self.session.post_json('/dataservice/device/tools/admintech', body)
+                response = self.session.post(url='/dataservice/device/tools/admintech', data=body)
                 return cast(dict, response)['fileName']
             except HTTPError as error:
                 error_details = error.read().decode()
@@ -86,8 +85,6 @@ class AdminTechAPI:
                     raise GenerateAdminTechLogError(f'It is not possible to generate admintech log for {device_id}')
                 time.sleep(polling_interval)
                 polling_timer -= polling_interval
-            finally:
-                self.session.timeout = _session_timeout
         raise GenerateAdminTechLogError(f'It is not possible to generate admintech log for {device_id}')
 
     def _get_token_id(self, device_id) -> str:
@@ -98,7 +95,7 @@ class AdminTechAPI:
                 return admin_tech.token_id
         raise RequestTokenIdNotFound(f'Request Id of admin tech generation request not found for device: {device_id}')
 
-    def delete(self, device_id: str) -> HTTPResponse:
+    def delete(self, device_id: str) -> Response:
         """Deletes admin tech logs for a device.
 
         Args:
@@ -123,7 +120,7 @@ class AdminTechAPI:
         if not download_dir:
             download_dir = Path.cwd()
         download_path = download_dir / admin_tech_name
-        with self.session.get(f'/dataservice/device/tools/admintech/download/{admin_tech_name}') as payload:
+        with self.session.get_data(f'/dataservice/device/tools/admintech/download/{admin_tech_name}') as payload:
             with open(download_path, 'wb') as file:
                 shutil.copyfileobj(payload, file)
         return download_path
