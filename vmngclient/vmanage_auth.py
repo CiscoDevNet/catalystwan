@@ -39,7 +39,7 @@ class vManageAuth(AuthBase):
     2. Get a cross-site request forgery prevention token, which is required for most POST operations.
 
     Attributes:
-        base_url (str): url with port f.e. https://1.1.1.1:1111
+        base_url (str): url (with port if applicable) f.e. https://1.1.1.1:1111
         username (str): vManage username
         password (str): vManage user's password
         verify (bool): Controls whether we verify the server's TLS certificate.
