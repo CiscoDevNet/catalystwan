@@ -2,12 +2,12 @@
 import json
 from contextlib import contextmanager
 from enum import Enum
-from typing import Iterator, List, Union, cast
+from typing import Iterator, List, Union
 
-from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
+from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.dataclasses import BfdSessionData, Connection, Device, Reboot, WanInterface
-from vmngclient.session import Session
+from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.operation_status import OperationStatus
 from vmngclient.utils.personality import Personality
@@ -32,7 +32,7 @@ class DevicesAPI:
         devices: List with system status for all devices
     """
 
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: vManageSession) -> None:
         self.session = session
 
     def __str__(self) -> str:
@@ -168,7 +168,7 @@ class DevicesAPI:
             status_api = f'/dataservice/device/action/status/{action_id}'
             return self.session.get_data(f'{status_api}')
 
-        response = cast(dict, self.session.post_json('/dataservice/certificate/vedge/list?action=push'))
+        response = self.session.post('/dataservice/certificate/vedge/list?action=push').json()
         if response.get('id'):
             action_id = response['id']
         else:
@@ -198,7 +198,7 @@ class DeviceStateAPI:
         session: logged in API client session
     """
 
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: vManageSession) -> None:
         self.session = session
 
     def __str__(self) -> str:
@@ -275,29 +275,29 @@ class DeviceStateAPI:
 
     def get_colors(self, device_id: str) -> List[str]:
         url = '/dataservice/device/bfd/state/device/tlocInterfaceMap'
-        colors_raw = DevicesAPI(self.session).session.get(url + f'?deviceId={device_id}')
+        colors_raw = DevicesAPI(self.session).session.get_data(url + f'?deviceId={device_id}')
         json_colors = json.loads(str(colors_raw.read(), 'utf-8'))
         colors = list(json_colors["intfList"].keys())
 
         return colors
 
     @contextmanager
-    def enable_data_stream(self) -> Iterator:
+    def enable_data_stream(self) -> Iterator:  # TODO check
         try:
             url_path = "/dataservice/settings/configuration/vmanagedatastream"
             data_stream_status = self.session.get_data(url_path)[0]
-            query = {
-                "enable": True,
+            query = {  # TODO Dict[str, obj]
+                "enable": "True",
                 "ipType": "systemIp",
                 "serverHostName": "systemIp",
-                "vpn": 0,
+                "vpn": "0",
             }
             url_path = "/dataservice/settings/configuration/vmanagedatastream"
-            self.session.post_data(url_path, query)
+            self.session.post(url=url_path, params=query)
             yield None
         finally:
             url_path = "/dataservice/settings/configuration/vmanagedatastream"
-            self.session.post_data(url_path, data_stream_status)
+            self.session.post(url=url_path, data=data_stream_status)
 
     def get_bfd_sessions(self, device_id: str) -> List[BfdSessionData]:
         items = self.session.get_data(f'/dataservice/device/bfd/sessions?deviceId={device_id}')
