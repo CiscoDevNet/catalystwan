@@ -17,7 +17,6 @@ class Family(Enum):
     VEDGE = "vedge"
     VMANAGE = "vmanage"
 
-
 class VersionType(Enum):
     VMANAGE = "vmanage"
 
@@ -37,11 +36,11 @@ class InstallSpecification:
 
 
 class InstallHelper:
-    VMANAGE = InstallSpecification(Family.VMANAGE, VersionType.VMANAGE, DeviceType.VMANAGE)
-    VSMART = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)
-    VBOND = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)
-    VEDGE = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE)
-    CEDGE = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE)
+    VMANAGE = (Family.VMANAGE, VersionType.VMANAGE, DeviceType.VMANAGE)
+    VSMART = (Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)
+    VBOND = (Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)
+    VEDGE = (Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE)
+    CEDGE = (Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE)
 
 
 class SoftwareActionAPI:
@@ -79,7 +78,8 @@ class SoftwareActionAPI:
     def upgrade_software(
         self,
         software_image: str,
-        install_spec: InstallSpecification,
+        # install_spec: InstallSpecification,
+        install_helper: InstallHelper,
         reboot: bool,
         sync: bool = True,
     ) -> str:
@@ -99,14 +99,14 @@ class SoftwareActionAPI:
         Returns:
             str: action id
         """
-
+        
         url = "/dataservice/device/action/install"
         payload: Dict[str, Any] = {
             "action": "install",
             "input": {
                 "vEdgeVPN": 0,
                 "vSmartVPN": 0,
-                "family": install_spec.family,
+                "family": install_helper.value.Family,
                 "version": self.repository.get_image_version(software_image),
                 "versionType": install_spec.version_type,
                 "reboot": reboot,

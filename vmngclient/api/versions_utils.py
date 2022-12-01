@@ -93,7 +93,9 @@ class RepositoryAPI:
         return None
 
 
-class Payload:
+class DeviceVersions:
+    """_summary_
+    """
     def __init__(self, devices: List[Device], repository: RepositoryAPI, device_category: DeviceCategory):
         self.devices = [{"deviceId": dev.uuid, "deviceIP": dev.id} for dev in devices]
         self.repository = repository
@@ -120,7 +122,7 @@ class Payload:
                     break
             if 'version' not in dev:
                 logger.error(f"Software version {version_to_set_up} for {dev} is not included in available_versions")
-        return None
+        return 
 
     def complete_device_list_if_in_installed(self, version_to_set_up: str) -> None:
         """
