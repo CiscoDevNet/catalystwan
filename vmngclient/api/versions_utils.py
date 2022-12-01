@@ -13,11 +13,8 @@ logger = logging.getLogger(get_logger_name(__name__))
 
 
 class DeviceCategory(Enum):
-    VSMART = "controllers"
-    VBOND = "controllers"
-    VEDGE = "vedges"
-    CEDGE = "vedges"
-    VMANAGE = "controllers"
+    CONTROLLERS = "controllers"
+    VEDGES = "vedges"
 
 
 @define
@@ -94,14 +91,15 @@ class RepositoryAPI:
 
 
 class DeviceVersions:
-    """_summary_
     """
-    def __init__(self, devices: List[Device], repository: RepositoryAPI, device_category: DeviceCategory):
-        self.devices = [{"deviceId": dev.uuid, "deviceIP": dev.id} for dev in devices]
+    Methods to prepare devices list for payload
+    """
+
+    def __init__(self, repository: RepositoryAPI, device_category: DeviceCategory):
         self.repository = repository
         self.device_category = device_category
 
-    def complete_device_list_if_in_available(self, version_to_set_up: str) -> None:
+    def get_device_list_if_in_available(self, version_to_set_up: str, devices: List[Device]) -> list:
         """
         Create version key fir every device dict in device list, if requested version
         is in available versions
@@ -110,21 +108,21 @@ class DeviceVersions:
             version_to_set_up (str): requested version
 
         Returns:
-            None
+            list : list of devices
         """
-
+        devs = [{"deviceId": dev.uuid, "deviceIP": dev.id, "version": None} for dev in devices]
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
-        for dev in self.devices:
-            dev_available_versions = all_dev_versions[dev["deviceId"]].available_versions
+        for dev in devs:
+            dev_available_versions = all_dev_versions[str(dev["deviceId"])].available_versions
             for version in dev_available_versions:
                 if version_to_set_up in version:
                     dev["version"] = version
                     break
-            if 'version' not in dev:
+            if not dev["version"]:
                 logger.error(f"Software version {version_to_set_up} for {dev} is not included in available_versions")
-        return 
+        return devs
 
-    def complete_device_list_if_in_installed(self, version_to_set_up: str) -> None:
+    def get_device_list_if_in_installed(self, version_to_set_up: str, devices: List[Device]) -> list:
         """
         Create version key fir every device dict in device list, if requested version
         is in available versions
@@ -135,14 +133,18 @@ class DeviceVersions:
         Returns:
             None
         """
-
+        devs = [{"deviceId": dev.uuid, "deviceIP": dev.id} for dev in devices]
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
-        for dev in self.devices:
+        for dev in devs:
             dev_installed_versions = all_dev_versions[dev["deviceId"]].installed_versions
             for version in dev_installed_versions:
                 if version_to_set_up in version:
                     dev["version"] = version
                     break
-            if 'version' not in dev:
+            if not dev["version"]:
                 logger.error(f"Software version {version_to_set_up} for {dev} is not included in available_versions")
-        return None
+        return devices
+
+    def get_device_list(self, devices: List[Device]) -> list:
+
+        return [{"deviceId": dev.uuid, "deviceIP": dev.id} for dev in devices]

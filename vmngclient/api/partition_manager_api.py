@@ -4,7 +4,8 @@ from typing import List, Union
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
 from vmngclient.api.basic_api import Session
-from vmngclient.api.versions_utils import Payload, RepositoryAPI
+from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
+from vmngclient.dataclasses import Device
 from vmngclient.utils.creation_tools import get_logger_name
 from vmngclient.utils.operation_status import OperationStatus
 
@@ -17,13 +18,13 @@ class PartitionManagerAPI:
     are exececutable on all device categories.
     """
 
-    def __init__(self, session: Session, payload: Payload, repository: RepositoryAPI) -> None:
+    def __init__(self, session: Session, device_versions: DeviceVersions, repository: RepositoryAPI) -> None:
 
         self.session = session
-        self.payload = payload
+        self.device_versions = device_versions
         self.repository = repository
 
-    def set_default_partition(self, version_to_default: str) -> str:
+    def set_default_partition(self, devices: List[Device], version: str) -> str:
         """
         Method to set choosen software version as current version
 
@@ -33,17 +34,17 @@ class PartitionManagerAPI:
         Returns:
             str: action id
         """
-        self.payload.complete_device_list_if_in_installed(version_to_default)
+
         url = "/dataservice/device/action/defaultpartition"
         payload = {
             "action": 'defaultpartition',
-            "devices": self.payload.devices,
+            "devices": self.device_versions.get_device_list_if_in_installed(version, devices),
             "deviceType": "vmanage",
         }
         set_default = dict(self.repository.session.post_json(url, payload))
         return set_default["id"]
 
-    def remove_partition(self, version: str, force: bool = False) -> str:
+    def remove_partition(self, devices: List[Device], version: str, force: bool = False) -> str:
         """
         Method to remove choosen software version from Vmanage repository
 
@@ -54,15 +55,14 @@ class PartitionManagerAPI:
             str: action id
         """
 
-        self.payload.complete_device_list_if_in_available(version)
         url = "/dataservice/device/action/removepartition"
         payload = {
             "action": "removepartition",
-            "devices": self.payload.devices,
+            "devices": self.device_versions.get_device_list_if_in_available(version, devices),
             "deviceType": "vmanage",
         }
         if force is False:
-            invalid_devices = self._check_remove_partition_possibility()
+            invalid_devices = self._check_remove_partition_possibility(payload["devices"])
             if invalid_devices:
                 raise ValueError(
                     f'Current or default version of devices with ids {invalid_devices} \
@@ -71,11 +71,13 @@ class PartitionManagerAPI:
         remove_action = dict(self.repository.session.post_json(url, payload))
         return remove_action["id"]
 
-    def _check_remove_partition_possibility(self) -> Union[List, None]:
+    def _check_remove_partition_possibility(self, devices) -> Union[List, None]:
 
-        devices_versions_repository = self.repository.get_devices_versions_repository(self.payload.device_category)
+        devices_versions_repository = self.repository.get_devices_versions_repository(
+            self.device_versions.device_category.value
+        )
         invalid_devices = []
-        for device in self.payload.devices:
+        for device in devices:
 
             if device['version'] in (
                 devices_versions_repository[device["deviceId"]].current_version,
