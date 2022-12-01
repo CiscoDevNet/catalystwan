@@ -1,20 +1,19 @@
 import logging
 from datetime import datetime as dt
 from pathlib import Path
-from typing import Optional
 from urllib.parse import quote
 
-from vmngclient.session import vManageSession
+from vmngclient.session import Session
 from vmngclient.utils.creation_tools import get_logger_name
 
 logger = logging.getLogger(get_logger_name(__name__))
 
 
 class LogsAPI:
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: Session) -> None:
         self.session = session
 
-    def get_auditlogs(self, file_path: Optional[str] = None, n_hours: int = 1) -> None:
+    def get_auditlogs(self, file_path: str = None, n_hours: int = 1) -> None:
         query = {
             "query": {
                 "condition": "AND",

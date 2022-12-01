@@ -9,7 +9,7 @@ from vmngclient.dataclasses import (
     OmpServiceData,
     OmpSummaryData,
 )
-from vmngclient.session import vManageSession
+from vmngclient.session import Session
 from vmngclient.utils.creation_tools import create_dataclass
 
 
@@ -17,10 +17,10 @@ class OmpAPI:
     """OMP API methods of vManage for get common omp data.
 
     Attributes:
-        session (vManageSession): logged in API client session
+        session (Session): logged in API client session
     """
 
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: Session) -> None:
         self.session = session
 
     def __str__(self) -> str:

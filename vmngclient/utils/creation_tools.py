@@ -2,7 +2,7 @@ import datetime as dt
 import sys
 from typing import Any, ClassVar, Dict, List, Protocol, Type, TypeVar
 
-import attrs  # type: ignore
+import attrs
 from attr import Attribute, fields
 from dateutil import parser  # type: ignore
 
@@ -63,12 +63,12 @@ def convert_attributes(cls: type, fields: List[Attribute]) -> List[Attribute]:
         if field.type in {dt.datetime, "datetime"}:
             converter = (
                 lambda d: parser.parse(d) if isinstance(d, str) else dt.datetime.fromtimestamp(d / 1000)
-            )  # type: ignore # noqa: E731
+            )  # noqa: E731
         elif field.type in {str, "str"}:
-            converter = lambda x: str(x)  # type: ignore # noqa: E731
+            converter = lambda x: str(x)  # noqa: E731
         else:
             converter = None
-        results.append(field.evolve(converter=converter))  # type: ignore
+        results.append(field.evolve(converter=converter))
     return results
 
 
