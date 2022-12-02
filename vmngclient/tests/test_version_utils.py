@@ -87,7 +87,7 @@ class TestRepositoryAPI(unittest.TestCase):
         answer = mock_device_versions.get_device_list_if_in_available("ver1",[self.device])
         expected_result = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "ver1"}]
         
-        #Assert
+        #Assertcom
         self.assertEqual(
             answer,
             expected_result,
