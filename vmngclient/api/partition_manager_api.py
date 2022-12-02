@@ -118,7 +118,7 @@ class PartitionManagerAPI:
         def wait_for_end_software_action():
             url = f"/dataservice/device/action/status/{action_id}"
             try:
-                action_data = self.repository.session.get_data(url)[0]["status"]
+                action_data = self.session.get_data(url)[0]["status"]
                 logger.debug(f"Status of action {action_id} is: {action_data}")
             except IndexError:
                 action_data = ""
