@@ -143,7 +143,7 @@ class DeviceVersions:
                     break
             if not dev["version"]:
                 logger.error(f"Software version {version_to_set_up} for {dev} is not included in available_versions")
-        return devices
+        return devs
 
     def get_device_list(self, devices: List[Device]) -> list:
 

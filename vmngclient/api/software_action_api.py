@@ -1,13 +1,13 @@
 import logging
 from enum import Enum
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 from urllib.error import HTTPError
 
 from attr import define
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
 from vmngclient.api.basic_api import Session
-from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, RepositoryAPI
+from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.utils.creation_tools import get_logger_name
 from vmngclient.utils.operation_status import OperationStatus
@@ -109,23 +109,22 @@ class SoftwareActionAPI:
             "input": {
                 "vEdgeVPN": 0,
                 "vSmartVPN": 0,
-                "family": install_spec.value.family.value,  # type: ignore
+                "family": install_spec.family.value,
                 "version": self.repository.get_image_version(software_image),
-                "versionType": install_spec.value.version_type.value,  # type: ignore
+                "versionType": install_spec.version_type.value,
                 "reboot": reboot,
                 "sync": sync,
             },
             "devices": self.device_versions.get_device_list(devices),
-            "deviceType": install_spec.value.device_type.value,  # type: ignore
+            "deviceType": install_spec.device_type.value,
         }
-
-        if install_spec.value.family.value in (Family.VMANAGE.value, Family.VEDGE.value):  # type: ignore
+        print(payload)
+        if install_spec.family.value in (Family.VMANAGE.value, Family.VEDGE.value):
             incorrect_devices = self._downgrade_check(
                 payload["devices"],
                 payload["input"]["version"],
-                self.device_versions.device_category,
-                install_spec.value.family.value,  # type: ignore
-            )  # type: ignore
+                install_spec.family.value,
+            )
             if incorrect_devices:
                 raise ValueError(
                     f"Current version of devices with id's {incorrect_devices} is \
@@ -134,11 +133,9 @@ class SoftwareActionAPI:
         upgrade = dict(self.session.post_json(url, payload))
         return upgrade["id"]
 
-    def _downgrade_check(
-        self, devices, version_to_upgrade: str, devices_category: DeviceCategory, family
-    ) -> Union[None, List]:
+    def _downgrade_check(self, devices, version_to_upgrade: str, family) -> List:
         """
-        Check if upgrade operation is not actually and downgrade opeartion.
+        Check if upgrade operation is not actually a downgrade opeartion.
         If so, in some cases action is being blocked.
 
         Args:
@@ -163,10 +160,7 @@ class SoftwareActionAPI:
                     break
                 elif str(label) < str(splited_version_to_upgrade[priority]):
                     break
-        if incorrect_devices == []:
-            return None
-        else:
-            return incorrect_devices
+        return incorrect_devices
 
     def wait_for_completed(
         self,

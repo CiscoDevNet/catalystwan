@@ -1,5 +1,5 @@
 import logging
-from typing import List, Union
+from typing import List
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
@@ -71,7 +71,7 @@ class PartitionManagerAPI:
         remove_action = dict(self.repository.session.post_json(url, payload))
         return remove_action["id"]
 
-    def _check_remove_partition_possibility(self, devices) -> Union[List, None]:
+    def _check_remove_partition_possibility(self, devices) -> List:
 
         devices_versions_repository = self.repository.get_devices_versions_repository(
             self.device_versions.device_category.value
@@ -84,8 +84,6 @@ class PartitionManagerAPI:
                 devices_versions_repository[device["deviceId"]].default_version,
             ):
                 invalid_devices.append((device["deviceId"]))
-        if invalid_devices == []:
-            return None
         return invalid_devices
 
     def wait_for_completed(
