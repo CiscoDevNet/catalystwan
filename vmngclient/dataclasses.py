@@ -73,8 +73,8 @@ class Device(DataclassBase):
     connected_vManages: List[str] = field(factory=list, metadata={FIELD_NAME: "connectedVManages"})
     model: Optional[str] = field(default=None, metadata={FIELD_NAME: "device-model"})
     board_serial: Optional[str] = field(default=None, metadata={FIELD_NAME: 'board-serial'})
-    vedgeCertificateState: Optional[str] = field(default=None, metadata={FIELD_NAME: 'vedgeCertificateState'})  # TODO
-    chasis_number: Optional[str] = field(default=None, metadata={FIELD_NAME: 'chasisNumber'})
+    vedgeCertificateState: Optional[str] = field(default=None, metadata={FIELD_NAME: 'vedgeCertificateState'})  # TODO json name is certificate-status or certificate-validity
+    chasis_number: Optional[str] = field(default=None, metadata={FIELD_NAME: 'chassis-number'})  # TODO json name is chassis-number
 
     @property
     def is_reachable(self) -> bool:
