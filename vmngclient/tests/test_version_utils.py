@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from vmngclient.api.versions_utils import DeviceCategory, DeviceSoftwareRepository, RepositoryAPI, DeviceVersions
+from vmngclient.api.versions_utils import DeviceCategory, DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 
 
@@ -35,9 +35,7 @@ class TestRepositoryAPI(unittest.TestCase):
         versions_response = [{"availableFiles": "vmanage-20.9.1-x86_64.tar.gz", "versionName": "20.9.1"}]
         mock_session.get_data.return_value = versions_response
         image_version = '20.9.1'
-        answer = RepositoryAPI(mock_session).get_image_version(
-            "vmanage-20.9.1-x86_64.tar.gz"
-        )
+        answer = RepositoryAPI(mock_session).get_image_version("vmanage-20.9.1-x86_64.tar.gz")
 
         self.assertEqual(answer, image_version, "not same version")
 
@@ -47,9 +45,7 @@ class TestRepositoryAPI(unittest.TestCase):
         api_mock_response = [{"availableFiles": "vmanage-20.9.2-x86_64.tar.gz", "versionName": "20.9.1"}]
         mock_session.get_data.return_value = api_mock_response
         image_version = None
-        answer = RepositoryAPI(mock_session).get_image_version(
-            "vmanage-20.9.1-x86_64.tar.gz"
-        )
+        answer = RepositoryAPI(mock_session).get_image_version("vmanage-20.9.1-x86_64.tar.gz")
 
         self.assertEqual(answer, image_version, "not same version")
 
@@ -74,38 +70,37 @@ class TestRepositoryAPI(unittest.TestCase):
             self.DeviceSoftwareRepository_obj["mock_uuid"],
             "DeviceSoftwareRepository object created uncorrectly",
         )
-    
-   
+
     @patch.object(RepositoryAPI, "get_devices_versions_repository")
     def test_get_device_list_if_in_available(self, mock_get_devices_versions_repository):
-        #Prepare mock data
+        # Prepare mock data
         mock_get_devices_versions_repository.return_value = Mock()
         mock_session = Mock()
         mock_repository_object = RepositoryAPI(mock_session)
-        mock_device_versions = DeviceVersions(mock_repository_object,DeviceCategory.CONTROLLERS.value)
+        mock_device_versions = DeviceVersions(mock_repository_object, DeviceCategory.CONTROLLERS.value)
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
-        answer = mock_device_versions.get_device_list_if_in_available("ver1",[self.device])
+        answer = mock_device_versions.get_device_list_if_in_available("ver1", [self.device])
         expected_result = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "ver1"}]
-        
-        #Assertcom
+
+        # Assertcom
         self.assertEqual(
             answer,
             expected_result,
             "Version add incorrectly",
         )
-    
+
     @patch.object(RepositoryAPI, "get_devices_versions_repository")
     def test_get_device_list_if_in_installed(self, mock_get_devices_versions_repository):
-        #Prepare mock data
+        # Prepare mock data
         mock_get_devices_versions_repository.return_value = Mock()
         mock_session = Mock()
         mock_repository_object = RepositoryAPI(mock_session)
-        mock_device_versions = DeviceVersions(mock_repository_object,DeviceCategory.CONTROLLERS.value)
+        mock_device_versions = DeviceVersions(mock_repository_object, DeviceCategory.CONTROLLERS.value)
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
-        answer = mock_device_versions.get_device_list_if_in_installed("ver1",[self.device])
+        answer = mock_device_versions.get_device_list_if_in_installed("ver1", [self.device])
         expected_result = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "ver1"}]
-        
-        #Assert
+
+        # Assert
         self.assertEqual(
             answer,
             expected_result,

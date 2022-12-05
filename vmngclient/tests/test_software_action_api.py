@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from vmngclient.api.versions_utils import DeviceCategory, DeviceSoftwareRepository, RepositoryAPI, DeviceVersions
-from vmngclient.api.software_action_api import InstallSpecHelper, SoftwareActionAPI, VersionType, Family
+from vmngclient.api.software_action_api import Family, InstallSpecHelper, SoftwareActionAPI
+from vmngclient.api.versions_utils import DeviceCategory, DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 
 
@@ -35,10 +35,10 @@ class TestSoftwareAcionAPI(unittest.TestCase):
 
         mock_session = Mock()
         self.mock_repository_object = RepositoryAPI(mock_session)
-        self.mock_device_versions = DeviceVersions(self.mock_repository_object,
-        DeviceCategory.CONTROLLERS)
-        self.mock_software_action_obj = SoftwareActionAPI(mock_session,self.mock_device_versions,
-        self.mock_repository_object)
+        self.mock_device_versions = DeviceVersions(self.mock_repository_object, DeviceCategory.CONTROLLERS)
+        self.mock_software_action_obj = SoftwareActionAPI(
+            mock_session, self.mock_device_versions, self.mock_repository_object
+        )
 
     @patch.object(SoftwareActionAPI, "_downgrade_check")
     @patch.object(RepositoryAPI, "get_image_version")
@@ -67,7 +67,7 @@ class TestSoftwareAcionAPI(unittest.TestCase):
         self.mock_repository_object.session.post_json.return_value = {"id": "mock_action_id"}
 
         # Assert
-        answer = self.mock_software_action_obj.upgrade_software([self.device],'path',self.install_spec, True, True)
+        answer = self.mock_software_action_obj.upgrade_software([self.device], 'path', self.install_spec, True, True)
         self.assertEqual(answer, "mock_action_id", "action ids not equal")
 
     @patch.object(RepositoryAPI, "get_devices_versions_repository")
@@ -78,7 +78,7 @@ class TestSoftwareAcionAPI(unittest.TestCase):
         mock_devices = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": upgrade_version}]
         self.mock_repository_object.devices = mock_devices
         # Assert
-        answer = self.mock_software_action_obj._downgrade_check(mock_devices,upgrade_version, Family.VMANAGE.value)
+        answer = self.mock_software_action_obj._downgrade_check(mock_devices, upgrade_version, Family.VMANAGE.value)
         self.assertEqual(answer, [], "downgrade detected, but should not")
 
     @patch.object(RepositoryAPI, "get_devices_versions_repository")
@@ -89,7 +89,7 @@ class TestSoftwareAcionAPI(unittest.TestCase):
         mock_devices = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": upgrade_version}]
         self.mock_repository_object.devices = mock_devices
         # Assert
-        answer = self.mock_software_action_obj._downgrade_check(mock_devices,upgrade_version, Family.VMANAGE.value)
+        answer = self.mock_software_action_obj._downgrade_check(mock_devices, upgrade_version, Family.VMANAGE.value)
         self.assertEqual(answer, ["mock_uuid"], "downgrade detected, but should not")
 
     def test_wait_for_completed_success(self):
