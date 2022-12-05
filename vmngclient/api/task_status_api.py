@@ -1,20 +1,18 @@
 from vmngclient.session import Session
 import logging
-from abc import ABC, abstractmethod
-from typing import cast,Union,List
+from typing import Union,List
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
-
-from vmngclient.api.basic_api import DevicesAPI, DeviceStateAPI
 from vmngclient.dataclasses import Device
 from vmngclient.session import Session
-from vmngclient.utils.certificate_status import CertificateStatus
 from vmngclient.utils.creation_tools import get_logger_name
-from vmngclient.utils.reachability import Reachability
-from vmngclient.utils.validate_status import ValidateStatus
+from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 
-class ActionAPI():
-    """API methods to execute action and verify its status """
+
+logger = logging.getLogger(get_logger_name(__name__))
+
+class TaskStatus():
+    """API methods to validate and check  """
 
     def __init__(self, session: Session, dev: Device):
         self.session = session
@@ -27,8 +25,8 @@ class ActionAPI():
     def wait_for_completed(self, 
         sleep_seconds: int,
         timeout_seconds: int,
-        exit_statuses : Union[List(str),str],
-        exit_statuses_ids : Union[List(str),str],
+        exit_statuses : Union[List(OperationStatus),str],
+        exit_statuses_ids : Union[List(OperationStatusId),str],
         action_id : str,
         activity_text : str = None,
         action_url: str = '/dataservice/device/action/status/',
@@ -43,12 +41,18 @@ class ActionAPI():
                     else:
                         return True
                 return False
+            return True
+        
+        def _log_exception(self):
+            logger.error("Operation status not achieved in given time")
+            return None
                     
 
         @retry(
             wait=wait_fixed(sleep_seconds),
             stop=stop_after_attempt(int(timeout_seconds / sleep_seconds)),
             retry=retry_if_result(check_status),
+            retry_error_callback=_log_exception,
         )
         def wait_for_action_finish():
             url = f'{action_url}{action_id}'
@@ -69,5 +73,6 @@ class ActionAPI():
                     else:
                         return False
                 return True
+            return False
 
         wait_for_action_finish()
