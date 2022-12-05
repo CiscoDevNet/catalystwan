@@ -9,11 +9,11 @@ import time
 from contextlib import contextmanager
 from enum import Enum
 from pathlib import Path
-from typing import Iterator
+from typing import Iterator, Optional
 
 from vmngclient.api.basic_api import DeviceStateAPI
-from vmngclient.dataclasses import DeviceInfo, PacketSetup, Status
-from vmngclient.session import Session
+from vmngclient.dataclasses import Device, PacketSetup, Status
+from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass, get_logger_name
 
 logger = logging.getLogger(get_logger_name(__name__))
@@ -26,17 +26,17 @@ class DownloadStatus(Enum):
 
 
 class PacketCaptureAPI:
-    def __init__(self, session: Session, vpn: str = "0", interface: str = "ge0/1", status=None) -> None:
+    def __init__(self, session: vManageSession, vpn: str = "0", interface: str = "ge0/1", status=None) -> None:
         self.session = session
         self.vpn = vpn
         self.interface = interface
         self.status = status
 
-    def get_packets(self, device: DeviceInfo, duration_time=20) -> Status:
+    def get_packets(self, device: Device, duration_time=20) -> Status:
         """Initate packet capture process.
 
         Args:
-            device (DeviceInfo): DeviceInfo class object
+            device (Device): Device class object
             duration_time (int, optional): Duration od packet capturing . Defaults to 20.
 
         Returns:
@@ -57,11 +57,11 @@ class PacketCaptureAPI:
             return self.status
 
     @contextmanager
-    def channel(self, device: DeviceInfo) -> Iterator:
+    def channel(self, device: Device) -> Iterator:
         """Creates packet capture session.
 
         Args:
-            device (DeviceInfo): DeviceInfo class object
+            device (Device): Device class object
 
         Raises:
             PermissionError: if already another packet capture session is active
@@ -78,7 +78,7 @@ class PacketCaptureAPI:
 
         try:
             url_path = r"/dataservice/stream/device/capture"
-            packet_setup = dict(self.session.post_json(url_path, query))
+            packet_setup = self.session.post(url=url_path, params=query).json()  # TODO check
             self.packet_channel = create_dataclass(PacketSetup, packet_setup)
             if self.packet_channel.is_new_session is True:
                 yield self.packet_channel
@@ -111,17 +111,17 @@ class PacketCaptureAPI:
             url_path = f"/dataservice/stream/device/capture/stop/{self.packet_channel.session_id}"
             self.session.get_json(url_path)
 
-    def get_interface_name(self, device: DeviceInfo) -> str:
+    def get_interface_name(self, device: Device) -> str:
 
         url_path = f"/dataservice/device/interface/synced?deviceId={device.local_system_ip}"
         ifname = dict(self.session.get_json(url_path))
         if_name = str(ifname["data"][0]["ifname"])
         return if_name
 
-    def download_capture_session(self, packet: PacketSetup, device: DeviceInfo, file_path: str = None) -> bool:
+    def download_capture_session(self, packet: PacketSetup, device: Device, file_path: Optional[str] = None) -> bool:
         url_path = f"/dataservice/stream/device/capture/download/{packet.session_id}"
         full_url = self.session.get_full_url(url_path)
-        download_packet = self.session.session_request("GET", full_url)
+        download_packet = self.session.get_data(url=full_url)
         if file_path is None:
             file_path = f"{Path(__file__).parents[0]}/{device.uuid}.pcap"
 

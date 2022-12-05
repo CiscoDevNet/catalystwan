@@ -1,319 +1,180 @@
+from __future__ import annotations
+
 import logging
-import socket
-import ssl
 import time
-from http import HTTPStatus
-from http.client import HTTPException, HTTPResponse
-from ipaddress import AddressValueError, IPv4Address
-from json import dumps, loads
-from logging import Logger
-from typing import Any, Dict, List, Optional, Union, cast
+from enum import Enum, auto
+from typing import Any, Dict, List, Optional, Union
 from urllib.error import HTTPError
-from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+from urllib.parse import urljoin
 
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
+# import requests
+from requests import Session
+from requests.auth import AuthBase
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
-from vmngclient.utils.creation_tools import get_logger_name
+from vmngclient.vmanage_auth import vManageAuth
 
-logger = logging.getLogger(get_logger_name(__name__))
+logger = logging.getLogger(__name__)
+
+JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
 
 
-class Session:
-    def __init__(self, ip_address: str, port: int, username: str, password: str, timeout: int = 30) -> None:
-        self.base_url = self.__create_base_url(ip_address, port)
+class SessionType(Enum):
+    PROVIDER = auto()
+    TENANT = auto()
+    PROVIDER_AS_TENANT = auto()
+    NOT_DEFINED = auto()
+
+
+class UserMode(Enum):
+    PROVIDER = "provider"
+    TENANT = "tenant"
+    NOT_RECOGNIZED = "not recognized"
+    NOT_FOUND = "not found"
+
+
+class ViewMode(Enum):
+    PROVIDER = "provider"
+    TENANT = "tenant"
+    NOT_RECOGNIZED = "not recognized"
+    NOT_FOUND = "not found"
+
+
+class SessionNotCreatedError(Exception):
+    pass
+
+
+def create_vManageSession(
+    url: str,
+    username: str,
+    password: str,
+    port: Optional[int] = None,
+    subdomain: Optional[str] = None,
+) -> vManageSession:
+    """Factory function that creates session object based on provided arguments.
+
+    Args:
+        url (str): IP address or domain name
+        port (int): port
+        username (str): username
+        password (str): password
+        subdomain: subdomain specifying to which view switch when creating provider as a tenant session,
+            works only on provider user mode
+        timeout (int): timeout
+
+    Returns:
+        Session object
+    """
+    session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
+    session.auth = vManageAuth(session.base_url, username, password, verify=False)
+    if subdomain:
+        tenant_id = session.get_tenant_id()
+        vsession_id = session.get_virtual_session_id(tenant_id)
+        session.headers.update({'VSessionId': vsession_id})
+    server_info = session.server()
+
+    try:
+        user_mode = UserMode(server_info.get("userMode", "not found"))
+    except ValueError:
+        user_mode = UserMode.NOT_RECOGNIZED
+        logger.warning(f"Unrecognized user mode is: '{server_info.get('userMode')}'")
+
+    try:
+        view_mode = ViewMode(server_info.get("viewMode", "not found"))
+    except ValueError:
+        view_mode = ViewMode.NOT_RECOGNIZED
+        logger.warning(f"Unrecognized user mode is: '{server_info.get('viewMode')}'")
+    if user_mode is UserMode.TENANT and not subdomain and view_mode is ViewMode.TENANT:
+        session.session_type = SessionType.TENANT
+    elif user_mode is UserMode.PROVIDER and not subdomain and view_mode is ViewMode.PROVIDER:
+        session.session_type = SessionType.PROVIDER
+    elif user_mode is UserMode.PROVIDER and view_mode is ViewMode.TENANT:
+
+        session.session_type = SessionType.PROVIDER_AS_TENANT
+    elif user_mode is UserMode.TENANT and subdomain:
+        raise SessionNotCreatedError(
+            f"Session not created. Subdomain {subdomain} passed to tenant session, "
+            "cannot switch to tenant from tenant user mode."
+        )
+    else:
+        session.session_type = SessionType.NOT_DEFINED
+        logger.warning(
+            f"Session created with {user_mode.value} user mode and {view_mode.value} view mode.\n"
+            f"Session type set to not defined"
+        )
+    print(f"Logged as {username}. The session type is {session.session_type}")
+    logger.info(f"Logged as {username}. The session type is {session.session_type}")
+    return session
+
+
+class vManageSession(Session):
+    """Base class for API sessions for vManage client.
+
+    Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
+
+    Args:
+        url: IP address or domain name, i.e. '10.0.1.200' or 'fruits.com'
+        port: port
+        username: username
+        password: password
+        timeout: timeout
+    """
+
+    def __init__(
+        self,
+        url: str,
+        username: str,
+        password: str,
+        verify: bool = False,
+        port: Optional[int] = None,
+        subdomain: Optional[str] = None,
+        auth: Optional[AuthBase] = None,
+    ):
+        self.base_url = self.__create_base_url(url, port)
         self.username = username
         self.password = password
-        self.timeout = timeout
+        self.port = port
+        self.subdomain = subdomain
 
-        self.ctx = self.__get_context()
+        self.session_type = SessionType.NOT_DEFINED
 
-        # TODO session headers as a function and serializable class
-        self.session_headers: Dict[str, str] = dict()
+        super(vManageSession, self).__init__()
+        self.__prepare_session(verify, auth)
 
-    def get_full_url(self, url: str) -> str:
-        """Returns base API URL plus relative URL.
-
-        Args:
-            url: relative API URL, i.e. '/dataservice/devices'
-
-        Returns:
-            str: Absolute API URL, i.e. 'https://10.0.1.200:8443/dataservice/devices'
-        """
-        return f'{self.base_url}{url}'
-
-    def relogin_request(self, method: str, url: str, data: Union[dict, list, None] = None) -> HTTPResponse:
-        """Generic method to send request to vManage API.
-
-        Args:
-            method: API method, i.e. POST, GET
-            url: API endpoint without base URL
-            data: (optional) Dictionary, list of tuples, bytes, or file-like
-              object to send in the body of the request
-
-        Returns:
-            Response object
-        """
+    def request(self, method, url, *args, **kwargs) -> Any:
         full_url = self.get_full_url(url)
-        logger.debug(f'{method} {full_url}')
-        response = self.session_request(method, full_url, data)
-        if response.status == HTTPStatus.OK and 'set-cookie' in response.headers:
-            self.session_headers = {
-                name: value
-                for name, value in self.session_headers.items()
-                if name not in ['cookie', 'x-xsrf-token', 'VSessionId', 'content-type']
-            }
-            # in this case re-login is necessary because session is expired
-            self.login()
-            response = self.session_request(method, full_url, data)
+        return super(vManageSession, self).request(method, full_url, args, kwargs)
 
-        return response
+    def get_full_url(self, url_path: str) -> str:
+        """Returns base API url plus given url path."""
+        return urljoin(self.base_url, url_path)
 
-    def get(self, url: str) -> HTTPResponse:
-        """Send HTTP GET request using session headers.
-
-        Used by methods: get_json.
-
-        Args:
-            url: API endpoint without base URL
-
-        Returns:
-            Response object
-        """
-        return self.relogin_request('GET', url)
-
-    def decode_json(self, response: HTTPResponse) -> Union[dict, list]:
-        """Try parsing API response as JSON and produce readable error message on failure.
-
-        Args:
-            response: response object
-
-        Returns:
-            Parsed data from JSON
-        """
-        response_text = response.read().decode('utf-8')
-        try:
-            json = loads(response_text)
-            return json
-        except ValueError as err:
-            logger.error(f'Response status: {response.status}')
-            logger.error(f'Invalid JSON response: {response_text}')
-            raise err
-
-    def get_json(self, url: str) -> Union[dict, list]:
-        """Sends HTTP GET request and return parsed JSON data.
-
-        Used by methods: get_data.
-
-        Args:
-            url: API endpoint without base URL
-
-        Returns:
-            JSON data parsed from response
-        """
-        return self.decode_json(self.get(url))
-
-    def get_data(self, url: str) -> Union[list, dict]:
-        """Sends HTTP GET request and return 'data' property from parsed JSON data.
-
-        Args:
-            url: API endpoint without base URL
-
-        Returns:
-            'data' property from the JSON response
-        """
-        json = cast(dict, self.get_json(url))
-        assert 'data' in json, "Expecting data property in JSON response"
-
-        return json['data']
-
-    def post(self, url: str, data: Union[dict, list, None] = None) -> HTTPResponse:
-        """Sends HTTP POST request using session headers.
-
-        Used by methods: post_json, login.
-
-        Args:
-            url: API endpoint without base URL
-            data: (optional) Dictionary, list of tuples, bytes, or file-like
-              object to send in the body of the request
-
-        Returns:
-            response object
-        """
-        return self.relogin_request('POST', url, data)
-
-    def post_json(self, url: str, data: Union[dict, list, None] = None) -> Union[dict, list]:
-        """Sends HTTP POST request and return parsed JSON data.
-
-        Args:
-            url: API endpoint without base URL
-            data: request payload
-
-        Returns:
-            JSON data parsed from response
-        """
-        return self.decode_json(self.post(url, data))
-
-    def post_data(self, url: str, data: Optional[dict] = None) -> Union[list, dict]:
-        """Sends HTTP POST request and return 'data' property from parsed JSON data.
-
-        Args:
-            url: API endpoint without base URL
-
-        Returns:
-            'data' property from the JSON response
-        """
-        json = cast(dict, self.post_json(url, data))
-        assert 'data' in json, "Expecting data property in JSON response"
-
-        return json['data']
-
-    def put(self, url: str, data: Optional[dict] = None) -> HTTPResponse:
-        """Sends HTTP PUT request using session headers.
-
-        Used by methods: put_json.
-
-        Args:
-            url: API endpoint without base URL
-            data: (optional) Dictionary, list of tuples, bytes, or file-like
-              object to send in the body of the request
-
-        Returns:
-            response object
-        """
-        return self.relogin_request('PUT', url, data)
-
-    def put_json(self, url: str, data: Optional[dict] = None) -> Union[list, dict]:
-        """Sends HTTP PUT request and return parsed JSON data.
-
-        Args:
-            url: API endpoint without base URL
-            data: request payload
-
-        Returns:
-            JSON data parsed from response
-        """
-        return self.decode_json(self.put(url, data))
-
-    def put_data(self, url: str, data: Optional[dict] = None) -> Union[list, dict]:
-        """Sends HTTP PUT request and return 'data' property from parsed JSON data.
-
-        Args:
-            url: API endpoint without base URL
-
-        Returns:
-            'data' property from the JSON response
-        """
-        json = cast(dict, self.put_json(url, data))
-        assert 'data' in json, "Expecting data property in JSON response"
-
-        return json['data']
-
-    def delete(self, url: str) -> HTTPResponse:
-        """Sends HTTP DELETE request for delete resource for example admin_tech file.
-
-        Args:
-            url: API endpoint without base URL
-
-        Returns:
-            response object
-        """
-        return self.relogin_request('DELETE', url)
-
-    def login(self) -> None:
-        """Login to vManage API using self username and password.
-
-        Returns:
-            Dictionary with Session headers.  # TODO
-        """
-        # send no session headers to login
-        response = urlopen(
-            Request(
-                self.get_full_url('/j_security_check'),
-                data=urlencode(
-                    {
-                        'j_username': self.username,
-                        'j_password': self.password,
-                    }
-                ).encode('utf-8'),
-                headers=self.session_headers,
-            ),
-            context=self.ctx,
-            timeout=self.timeout,
-        )
-
-        assert 'set-cookie' in response.headers, 'Authentication error: cookie not found'
-
-        self.session_headers['content-type'] = 'application/json'
-        self.session_headers['cookie'] = response.headers['set-cookie']
-
-        # use session_request instead of relogin_request to avoid infinite loop
-        self.session_headers['x-xsrf-token'] = (
-            self.session_request('GET', self.get_full_url('/dataservice/client/token')).read().decode('ascii')
-        )
-
-    def session_request(self, method: str, full_url: str, data: Union[dict, list, None] = None) -> HTTPResponse:
-        available_methods = ["GET", "POST", "PUT", "PATCH", "HEAD", "DELETE"]
-        assert method in available_methods, f"{method} is not supported. Available methods: {available_methods}."
-        encoded = dumps(data).encode() if data else None
-        try:
-            return urlopen(
-                Request(full_url, method=method, data=encoded, headers=self.session_headers),
-                context=self.ctx,
-                timeout=self.timeout,
-            )
-        except HTTPError as error:
-            if error.code == 503:  # Catch Service Unavailable
-                logger.warning("Server not ready to handle the request.")
-                raise error
-            logger.error(f"There was a problem with {method} method. URL: {full_url}. Error: {error}")
-            raise error
-        except socket.timeout as error:
-            logger.error("Request timeout!")
-            raise error
-        except HTTPException as error:
-            logger.error(error)
-            raise error
-
-    def __get_context(self) -> ssl.SSLContext:
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        return ctx
-
-    def __create_base_url(self, ip_address: str, port: int) -> str:
+    def __create_base_url(self, url: str, port: Optional[int]) -> str:
         """Creates base url based on ip address and port.
 
         Args:
-            ip_address (str): Ip address of reachable vManage.
+            url: IP address or domain name, i.e. '10.0.1.200' or 'fruits.com'
             port (int): Port of reachable vManage.
 
         Returns:
             str: Base url shared for every request.
         """
-        try:
-            IPv4Address(ip_address)
-        except (AddressValueError, AttributeError) as error_info:
-            logger.info(f"Please provide correct IPv4 address. Error info: {error_info}")
-        return f"https://{ip_address}:{port}"
+        if port:
+            return f"https://{url}:{port}"
+        return f"https://{url}"
 
-    def __get_logger(self) -> Logger:
-        """TODO: method should configure self sufficent vManage-client logger
+    def about(self) -> Dict:
+        return self.get_data(url="/dataservice/client/about")
 
-        Returns:
-            Logger: Configured logger.
-        """
-        logger = logging.getLogger(get_logger_name(__name__))
-        logger.debug("Creating vManage-client logger")
-        return logger
+    def server(self) -> Dict:
+        return self.get_data(url="/dataservice/client/server")
 
-    def about(self) -> Union[List[Any], Dict[Any, Any]]:
-        response = self.get_data(url="/dataservice/client/about")
-        return response
+    def get_data(self, url: str) -> Any:
+        return self.get_json(url)['data']
 
-    def server(self) -> Union[List[Any], Dict[Any, Any]]:
-        response = self.get_data(url="/dataservice/client/server")
-        return response
+    def get_json(self, url: str) -> Any:
+        response = self.get(url)
+        return response.json()
 
     def wait_for_server_reachability(self, retries: int, delay: int, initial_delay: int = 0) -> bool:
         """Checks if vManage API is reachable by sending server request.
@@ -349,106 +210,37 @@ class Session:
 
         return True if _send_server_request() else False
 
-    def __str__(self) -> str:
-        return f"{self.username}@{self.base_url}"
-
-
-class ProviderAsTenantSession(Session):
-    """vManage API client logged in as provider acting as tenant.
-
-    Attributes:
-        ip_address: IP address, i.e. '10.0.1.200'
-        port: port
-        username: provider username
-        password: secret
-        subdomain: tenant subdomain, i.e. 'apple.fruits.com'
-    """
-
-    def __init__(
-        self, ip_address: str, port: int, username: str, password: str, subdomain: str, timeout: int = 30
-    ) -> None:
-        self.subdomain = subdomain
-        super().__init__(ip_address, port, username, password, timeout)
-        # self._name = f'{self._name} vSession for {subdomain}'
-
-    def login(self) -> None:
-        """Logs in to vManage API as Provider using username/password and switch to Tenant.
-
-        Returns:
-            ProviderAsTenantSession object  TODO
-        """
-        super().login()
-        self.switch_to_tenant()
-
     def get_tenant_id(self) -> str:
-        """Gets tenant UUID for tenant subdomain.
+        """Gets tenant UUID for its subdomain.
 
         Returns:
-            tenant UUID
+            Tenant UUID.
         """
-        tenants = self.get_data('/dataservice/tenant')
-        tenant_ids = [tenant.get('tenantId') for tenant in tenants if tenant['subDomain'] == self.subdomain]
-        assert len(tenant_ids) > 0, f"Tenant not found for subdomain: {self.subdomain}"
-        return tenant_ids[0]
+        tenants = self.get_data(url='/dataservice/tenant')
+        tenant_id = [tenant.get('tenantId', None) for tenant in tenants if tenant['subDomain'] == self.subdomain][0]
+        return tenant_id
 
-    def create_vsession(self, tenant_id: str) -> str:
-        """Creates virtual session for tenant.
+    def get_virtual_session_id(self, tenant_id: str) -> str:
+        """Get VSessionId for a specific tenant
+
+        Note: In a multitenant vManage system, this API is only available in the Provider view.
 
         Args:
             tenant_id: provider or tenant UUID
-
         Returns:
-            virtual session token
+            Virtual session token
         """
-        response = cast(dict, self.post_json(f'/dataservice/tenant/{tenant_id}/vsessionid'))
-        assert 'VSessionId' in response, "Invalid vsessionid response"
-        return response['VSessionId']
+        url_path = f"/dataservice/tenant/{tenant_id}/vsessionid"
+        response = self.post(url_path)
+        return response.json()['VSessionId']
 
-    def switch_to_tenant(self) -> None:
-        """As provider impersonate tenant session."""
-        tenant_id = self.get_tenant_id()
-        vsession_id = self.create_vsession(tenant_id)
-        assert vsession_id != '', 'Switch to tenant expecting VSessionId to not be empty'
-        self.session_headers['VSessionId'] = vsession_id
-
-    def switch_to_provider(self) -> None:
-        """Switch back to provider session after impersonating tenant."""
-        data = cast(dict, self.server())
-        assert 'providerId' in data, "Invalid vsessionid response"
-        vsession_id = self.create_vsession(data['providerId'])
-        assert vsession_id == '', 'Switch to provider expecting VSessionId to be empty'
-        del self.session_headers['VSessionId']
-
-
-class TenantSession(Session):
-    """vManage API client logged as a tenant.
-
-    Attributes:
-        base_url: TODO.
-        domain: Tenant domain, i.e. 'apple.fruits.com'.
-        username: Tenant username.
-        password: Tenant password.
-        timeout: TODO. Defaults to 0.
-    """
-
-    def __init__(
-        self, ip_address: str, domain: str, port: int, username: str, password: str, timeout: int = 0, logger=None
-    ) -> None:
-        self.domain = domain
-        # TODO How to remove an ip address? Do we need an ip for tenant?
-        super().__init__(ip_address, port, username, password)
-        # self.base_url = "https://apple.fruits.com:10100"
-
-    def login(self) -> None:
-        """Login to vManage API as Tenant using username/password and set the session headers.
-
-        Returns:
-            TenantSession object
-        """
-
-        # TODO DO we need header when we use domain?
-        self.session_headers['Host'] = self.domain
-        super().login()
+    def __prepare_session(self, verify: bool, auth: Optional[AuthBase]) -> None:
+        self.auth = auth
+        self.verify = verify
+        self.headers.update({"content-type": "application/json"})
 
     def __str__(self) -> str:
-        return f"{self.username}@{self.domain}"
+        return f"{self.username}@{self.base_url}"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.username}@{self.base_url})"

@@ -2,7 +2,7 @@ import datetime as dt
 import sys
 from typing import Any, ClassVar, Dict, List, Protocol, Type, TypeVar
 
-import attrs
+import attrs  # type: ignore
 from attr import Attribute, fields
 from dateutil import parser  # type: ignore
 
@@ -35,11 +35,12 @@ def create_dataclass(cls: Type[T], data: Dict[str, Any]) -> T:
         return dict(filter(lambda key_value: key_value[0] in available_fields, data.items()))
 
     class_fields = list(cls.__annotations__)
+    data_copy = data.copy()
     for field in fields(cls):
         json_field_name = field.metadata.get(FIELD_NAME, None)
-        if json_field_name and json_field_name in data:
-            data[field.name] = data.pop(json_field_name)
-    filtered_data = filter_fields(class_fields, data)
+        if json_field_name and json_field_name in data_copy:
+            data_copy[field.name] = data_copy.pop(json_field_name)
+    filtered_data = filter_fields(class_fields, data_copy)
     return cls(**filtered_data)
 
 
@@ -62,12 +63,12 @@ def convert_attributes(cls: type, fields: List[Attribute]) -> List[Attribute]:
         if field.type in {dt.datetime, "datetime"}:
             converter = (
                 lambda d: parser.parse(d) if isinstance(d, str) else dt.datetime.fromtimestamp(d / 1000)
-            )  # noqa: E731
+            )  # type: ignore # noqa: E731
         elif field.type in {str, "str"}:
-            converter = lambda x: str(x)  # noqa: E731
+            converter = lambda x: str(x)  # type: ignore # noqa: E731
         else:
             converter = None
-        results.append(field.evolve(converter=converter))
+        results.append(field.evolve(converter=converter))  # type: ignore
     return results
 
 

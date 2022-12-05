@@ -1,15 +1,27 @@
 """Methods covering essential API endpoints and related data classes."""
 import json
 from contextlib import contextmanager
-from typing import Iterator, List, Union, cast
+from enum import Enum
+from typing import Iterator, List, Union
 
-from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
+from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
-from vmngclient.dataclasses import BfdSessionData, Connection, DeviceInfo, Reboot, WanInterface
-from vmngclient.session import Session
+from vmngclient.dataclasses import BfdSessionData, Connection, Device, Reboot, WanInterface
+from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
+from vmngclient.utils.operation_status import OperationStatus
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
+
+
+# TODO link that with dataclass
+class DeviceField(Enum):
+    HOSTNAME = 'hostname'
+    ID = 'id'
+
+
+class DeviceNotFoundError(Exception):
+    pass
 
 
 class DevicesAPI:
@@ -20,35 +32,35 @@ class DevicesAPI:
         devices: List with system status for all devices
     """
 
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: vManageSession) -> None:
         self.session = session
 
     def __str__(self) -> str:
         return str(self.session)
 
     @property
-    def controllers(self) -> List[DeviceInfo]:
+    def controllers(self) -> List[Device]:
         """List of controller devices only."""
         return [
             controller
             for controller in self.devices
-            if controller.personality in [Personality.VMANAGE.value, Personality.VSMART.value]
+            if controller.personality in [Personality.VMANAGE, Personality.VSMART]
         ]
 
     @property
-    def orchestrators(self) -> List[DeviceInfo]:
+    def orchestrators(self) -> List[Device]:
         """List of orchestrator devices only."""
-        return [orchestrator for orchestrator in self.devices if Personality.VBOND.value in orchestrator.personality]
+        return [orchestrator for orchestrator in self.devices if Personality.VBOND is orchestrator.personality]
 
     @property
-    def edges(self) -> List[DeviceInfo]:
+    def edges(self) -> List[Device]:
         """List of edge devices only."""
-        return [edge for edge in self.devices if Personality.EDGE.value in edge.personality]
+        return [edge for edge in self.devices if Personality.EDGE is edge.personality]
 
     @property
-    def vsmarts(self) -> List[DeviceInfo]:
+    def vsmarts(self) -> List[Device]:
         """List of vsmart devices only."""
-        return [vsmart for vsmart in self.devices if Personality.VSMART.value in vsmart.personality]
+        return [vsmart for vsmart in self.devices if Personality.VSMART is vsmart.personality]
 
     @property
     def system_ips(self) -> List[str]:
@@ -67,7 +79,7 @@ class DevicesAPI:
         return ''
 
     @property
-    def devices(self) -> List[DeviceInfo]:
+    def devices(self) -> List[Device]:
         """List of all devices."""
         devices_basic_info = self.session.get_data('/dataservice/device')
 
@@ -77,22 +89,22 @@ class DevicesAPI:
 
         devices_full_info = self.session.get_data(f'/dataservice/device/system/info?{devices_ids}')
 
-        return [create_dataclass(DeviceInfo, device) for device in devices_full_info]
+        return [create_dataclass(Device, device) for device in devices_full_info]
 
-    def get_device_details(self, uuid: str) -> DeviceInfo:
+    def get_device_details(self, uuid: str) -> Device:
         """Gets system information for a device.
 
         Args:
             device_id: device ID (usually system-ip)
 
         Returns:
-            DeviceInfo object
+            Device object
         """
         devices = self.session.get_data(f'/dataservice/system/device/vedges?uuid={uuid}')
 
         assert len(devices) == 1, 'Expected system info response list to have one member'
 
-        return create_dataclass(DeviceInfo, devices[0])
+        return create_dataclass(Device, devices[0])
 
     def count_devices(self, personality: Personality) -> int:
         """Gets number of devices of given personality.
@@ -143,8 +155,8 @@ class DevicesAPI:
             self.session.__get_logger(f"Orignial exception: {retry_state.outcome.exception()}.")
 
         def check_state(action_data):
-            list_action = [not action['status'] == 'Success' for action in action_data]
-            return all(list_action)
+            list_action = [action['status'] == OperationStatus.SUCCESS.value for action in action_data]
+            return not all(list_action)
 
         @retry(
             wait=wait_fixed(sleep_seconds),
@@ -156,13 +168,27 @@ class DevicesAPI:
             status_api = f'/dataservice/device/action/status/{action_id}'
             return self.session.get_data(f'{status_api}')
 
-        response = cast(dict, self.session.post_json('/dataservice/certificate/vedge/list?action=push'))
+        response = self.session.post('/dataservice/certificate/vedge/list?action=push').json()
         if response.get('id'):
             action_id = response['id']
         else:
             raise FailedSend('Failed to push edges list certificates')
 
         return True if wait_for_state() else False
+
+    def get(self, field: DeviceField, value: str) -> Device:
+        supported_fields = [
+            DeviceField.HOSTNAME,
+            DeviceField.ID,
+        ]
+
+        if field not in supported_fields:
+            raise TypeError(f"{field} is not supported. Available fields: {supported_fields}")
+
+        for device in self.devices:
+            if getattr(device, field.value) == value:
+                return device
+        raise DeviceNotFoundError(f"Device with `{field.value}` equals to `{value}` does not exists.")
 
 
 class DeviceStateAPI:
@@ -172,7 +198,7 @@ class DeviceStateAPI:
         session: logged in API client session
     """
 
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: vManageSession) -> None:
         self.session = session
 
     def __str__(self) -> str:
@@ -228,20 +254,20 @@ class DeviceStateAPI:
 
         return [create_dataclass(Reboot, item) for item in items]
 
-    def get_system_status(self, device_id: str) -> DeviceInfo:
+    def get_system_status(self, device_id: str) -> Device:
         """Get system information for a device.
 
         Args:
             device_id: device ID (usually system-ip)
 
         Returns:
-           DeviceInfo object
+           Device object
         """
         devices = self.session.get_data(f'/dataservice/device/system/info?deviceId={device_id}')
 
         assert len(devices) == 1, 'Expected system info response list to have one member'
 
-        return create_dataclass(DeviceInfo, devices[0])
+        return create_dataclass(Device, devices[0])
 
     def get_device_wan_interfaces(self, device_id: str):
         wan_interfaces = self.session.get_data(f'/dataservice/device/control/waninterface?deviceId={device_id}')
@@ -249,29 +275,29 @@ class DeviceStateAPI:
 
     def get_colors(self, device_id: str) -> List[str]:
         url = '/dataservice/device/bfd/state/device/tlocInterfaceMap'
-        colors_raw = DevicesAPI(self.session).session.get(url + f'?deviceId={device_id}')
+        colors_raw = DevicesAPI(self.session).session.get_data(url + f'?deviceId={device_id}')
         json_colors = json.loads(str(colors_raw.read(), 'utf-8'))
         colors = list(json_colors["intfList"].keys())
 
         return colors
 
     @contextmanager
-    def enable_data_stream(self) -> Iterator:
+    def enable_data_stream(self) -> Iterator:  # TODO check
         try:
             url_path = "/dataservice/settings/configuration/vmanagedatastream"
             data_stream_status = self.session.get_data(url_path)[0]
-            query = {
-                "enable": True,
+            query = {  # TODO Dict[str, obj]
+                "enable": "True",
                 "ipType": "systemIp",
                 "serverHostName": "systemIp",
-                "vpn": 0,
+                "vpn": "0",
             }
             url_path = "/dataservice/settings/configuration/vmanagedatastream"
-            self.session.post_data(url_path, query)
+            self.session.post(url=url_path, params=query)
             yield None
         finally:
             url_path = "/dataservice/settings/configuration/vmanagedatastream"
-            self.session.post_data(url_path, data_stream_status)
+            self.session.post(url=url_path, data=data_stream_status)
 
     def get_bfd_sessions(self, device_id: str) -> List[BfdSessionData]:
         items = self.session.get_data(f'/dataservice/device/bfd/sessions?deviceId={device_id}')
@@ -300,7 +326,7 @@ class DeviceStateAPI:
         device_id: str,
         sleep_seconds: int = 5,
         timeout_seconds: int = 600,
-        exp_state: Reachability = Reachability.reachable,
+        exp_state: Reachability = Reachability.REACHABLE,
     ):
         """
         Waiting for the state of the machine.
@@ -338,3 +364,6 @@ class FailedSend(Exception):
     """Used when a referenced item is not found"""
 
     pass
+
+
+__all__ = ['Device']
