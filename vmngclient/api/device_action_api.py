@@ -1,6 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import cast,Union,List
+from typing import cast
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
@@ -15,49 +15,31 @@ from vmngclient.utils.validate_status import ValidateStatus
 logger = logging.getLogger(get_logger_name(__name__))
 
 
-class ActionAPI(ABC):
-    """API methods to execute action and verify its status """
+class DeviceActionAPI(ABC):
+    """API method to execute action on Device."""
 
     def __init__(self, session: Session, dev: DeviceInfo):
         self.session = session
+        self.dev = dev
         self.action_status = ''
         self.action_id = ''
+        self.action_status_api = '/dataservice/device/action/status/'
 
     def __str__(self):
         return str(self.session)
 
-    def wait_for_completed(self, 
-        sleep_seconds: int,
-        timeout_seconds: int,
-        exit_statuses : Union[List(str),str],
-        action_id : str,
-        action_url: str = '/dataservice/device/action/status/',
-         ) -> None:
-        
-        def check_status(action_data):
-            return not action_data in exit_statuses
+    @abstractmethod
+    def execute(self):
+        raise NotImplementedError
 
-        @retry(
-            wait=wait_fixed(sleep_seconds),
-            stop=stop_after_attempt(int(timeout_seconds / sleep_seconds)),
-            retry=retry_if_result(check_status),
-        )
-        def wait_for_action_finish():
-            url = f'{action_url}{action_id}'
-            try:
-                action_data = self.session.get_data(url)[0]
-                status = action_data['status']
-                status_id = action_data['statusId']
-                activity = action_data['activity'][0]
-                logger.debug(f"Status of action {action_id} is: {action_data}")
-            except IndexError:
-                action_data = ''
+    @abstractmethod
+    def wait_for_completed(
+        self, sleep_seconds: int, timeout_seconds: int, expected_status: str, expected_reachability: str
+    ):
+        raise NotImplementedError
 
-            return action_data
 
-        wait_for_action_finish()
-
-class RebootAction(ActionAPI):
+class RebootAction(DeviceActionAPI):
     """API method to perform reboot on Device."""
 
     def execute(self):
@@ -114,7 +96,7 @@ class RebootAction(ActionAPI):
         wait_for_come_up()
 
 
-class ValidateAction(ActionAPI):
+class ValidateAction(DeviceActionAPI):
     """
     API method to perform validate Device
     """
@@ -161,7 +143,8 @@ class ValidateAction(ActionAPI):
 
         wait_for_come_up()
 
-class DecommissionAction(ActionAPI):
+
+class DecommissionAction(DeviceActionAPI):
     """
     API method to decommission Device
     """
