@@ -45,7 +45,10 @@ class ActionAPI(ABC):
         def wait_for_action_finish():
             url = f'{action_url}{action_id}'
             try:
-                action_data = self.session.get_data(url)[0]['status']
+                action_data = self.session.get_data(url)[0]
+                status = action_data['status']
+                status_id = action_data['statusId']
+                activity = action_data['activity'][0]
                 logger.debug(f"Status of action {action_id} is: {action_data}")
             except IndexError:
                 action_data = ''
