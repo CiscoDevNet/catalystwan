@@ -1,10 +1,11 @@
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
-from parameterized import parameterized  # type: ignore
+from parameterized import parameterized
+from tenacity import RetryError
 
-from vmngclient.api.basic_api import DeviceField, DevicesAPI
-from vmngclient.dataclasses import Device
+from vmngclient.api.basic_api import DeviceField, DevicesAPI, DeviceStateAPI, FailedSend
+from vmngclient.dataclasses import BfdSessionData, Connection, Device, Reboot, WanInterface
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.personality import Personality
 
@@ -289,12 +290,32 @@ class TestDevicesAPI(TestCase):
         # Assert
         self.assertRaises(AssertionError, answer)
 
-    def test_send_certificate_state_to_controllers(self):
-        pass  # TODO
+    @patch('vmngclient.session.vManageSession')
+    def test_send_certificate_state_to_controllers(self, mock_session):
+        # Arrange
+        mock_session.post().json.return_value = {'id': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'}
+
+        # Act
+        answer = DevicesAPI(mock_session).send_certificate_state_to_controllers()
+
+        # Assert
+        self.assertTrue(answer)
+
+    @patch('vmngclient.session.vManageSession')
+    def test_send_certificate_state_to_controllers_error(self, mock_session):
+        # Arrange
+        mock_session.post().json.return_value = {}
+
+        # Act
+        def answer():
+            return DevicesAPI(mock_session).send_certificate_state_to_controllers()
+
+        # Assert
+        self.assertRaises(FailedSend, answer)
 
     @parameterized.expand([["vm200", 0], ["vm129", 1], ["vm128", 2], ["vm1", 3]])
     @patch.object(DevicesAPI, 'devices')
-    def test_get(self, hostname, device_number, mock_devices):
+    def test_get_by_hostname(self, hostname, device_number, mock_devices):
         # Arrange
         MockDevices = Mock()
         mock_devices.return_value = MockDevices
@@ -306,40 +327,347 @@ class TestDevicesAPI(TestCase):
         # Assert
         self.assertEqual(answer, self.devices_dataclass[device_number])
 
+    @parameterized.expand([["1.1.1.1", 0], ["1.1.1.3", 1], ["1.1.1.2", 2], ["169.254.10.10", 3]])
+    @patch.object(DevicesAPI, 'devices')
+    def test_get_by_id(self, device_id, device_number, mock_devices):
+        # Arrange
+        MockDevices = Mock()
+        mock_devices.return_value = MockDevices
+        session = Mock()
+        test_object = DevicesAPI(session)
+        test_object.devices = self.devices_dataclass
+        # Act
+        answer = test_object.get(DeviceField.ID, device_id)
+        # Assert
+        self.assertEqual(answer, self.devices_dataclass[device_number])
+
 
 class TestDevicesStateAPI(TestCase):
     def setUp(self) -> None:
-        pass
+        self.crash_info = [
+            {
+                "core-time": "Tue Feb 15 04:14:38 UTC 2022",
+                "vdevice-dataKey": "169.254.10.12-0",
+                "vdevice-name": "169.254.10.12",
+                "index": 0,
+                "lastupdated": 1645064726542,
+                "core-filename": "vm5_htx_19219_20220215-041430-UTC.core.gz",
+                "core-time-date": 1644898478000,
+                "vdevice-host-name": "vm5",
+            },
+            {
+                "core-time": "Tue Feb 15 04:15:24 UTC 2022",
+                "vdevice-dataKey": "169.254.10.12-1",
+                "vdevice-name": "169.254.10.12",
+                "index": 1,
+                "lastupdated": 1645064726542,
+                "core-filename": "vm5_htx_19539_20220215-041515-UTC.core.gz",
+                "core-time-date": 1644898524000,
+                "vdevice-host-name": "vm5",
+            },
+        ]
+        self.connections_info = [
+            {
+                'system-ip': '1.1.1.1',
+                'peer-type': 'vsmart',
+                'state': 'up',
+            },
+            {
+                'system-ip': '1.1.1.2',
+                'peer-type': 'vedge',
+                'state': 'up',
+            },
+        ]
+        self.connections_info_dataclass = [create_dataclass(Connection, item) for item in self.connections_info]
+        self.reboot_history = [
+            {
+                "reboot_date_time-date": 1642651714000,
+                "lastupdated": 1642656685355,
+                "vdevice-dataKey": "172.16.255.11-2022-01-20T04:08:34+00:00",
+                "reboot_date_time": "2022-01-20T04:08:34+00:00",
+                "reboot_reason": "Initiated by user - Reboot issued via NETCONF",
+                "vdevice-host-name": "vm1",
+                "vdevice-name": "172.16.255.11",
+            },
+            {
+                "reboot_date_time-date": 164265171400,
+                "lastupdated": 1642656685356,
+                "vdevice-dataKey": "172.16.255.11-2022-01-20T04:08:34+00:00",
+                "reboot_date_time": "2022-01-20T04:08:34+00:00",
+                "reboot_reason": "Initiated by user - Reboot issued via NETCONF",
+                "vdevice-host-name": "vm2",
+                "vdevice-name": "172.16.255.12",
+            },
+        ]
+        self.reboot_history_dataclass = [create_dataclass(Reboot, item) for item in self.reboot_history]
+        self.device = [
+            {  # vmanage
+                "device-model": "vmanage",
+                "deviceId": "1.1.1.1",
+                "uuid": "aaaaaaaa-6169-445c-8e49-c0bdaaaaaaa",
+                "cpuLoad": 4.71,
+                "state_description": "All daemons up",
+                "status": "normal",
+                "memState": "normal",
+                "local-system-ip": "1.1.1.1",
+                "board-serial": "11122233",
+                "personality": "vmanage",
+                "memUsage": 57.0,
+                "reachability": "reachable",
+                "connectedVManages": ["1.1.1.1"],
+                "host-name": "vm200",
+                "cpuState": "normal",
+                "chassis-number": "aaaaaaaa-6aa9-445c-8e49-c0aaaaaaaaa9",
+            }
+        ]
+        self.device_dataclass = create_dataclass(Device, self.device[0])
+        self.wan_interfaces = [
+            {
+                'color': 'default',
+                'vdevice-name': '1.1.1.1',
+                'admin-state': 'up',
+                'interface': 'eth1',
+                'private-port': 12345,
+                'vdevice-host-name': 'vm1',
+                'public-ip': '1.1.1.1',
+                'operation-state': 'up',
+                'public-port': 12345,
+                'private-ip': '1.1.1.1',
+            },
+            {
+                'color': 'default',
+                'vdevice-name': '1.1.1.1',
+                'admin-state': 'up',
+                'interface': 'eth1',
+                'private-port': 11111,
+                'vdevice-host-name': 'vm2',
+                'public-ip': '1.1.1.1',
+                'operation-state': 'up',
+                'public-port': 11111,
+                'private-ip': '1.1.1.1',
+            },
+        ]
+        self.wan_interfaces_dataclass = [create_dataclass(WanInterface, item) for item in self.wan_interfaces]
+        self.bfd_session = [
+            {
+                'src-ip': '1.1.1.1',
+                'dst-ip': '1.1.1.2',
+                'color': '3g',
+                'system-ip': '1.1.1.1',
+                'site-id': 1,
+                'local-color': '3g',
+                'state': 'up',
+            },
+            {
+                'src-ip': '1.1.1.1',
+                'dst-ip': '1.1.1.3',
+                'color': '3g',
+                'system-ip': '1.1.1.1',
+                'site-id': 1,
+                'local-color': '3g',
+                'state': 'up',
+            },
+        ]
+        self.bfd_session_dataclass = [create_dataclass(BfdSessionData, item) for item in self.bfd_session]
+        self.bfd_session_down = [
+            {
+                'src-ip': '1.1.1.1',
+                'dst-ip': '1.1.1.2',
+                'color': '3g',
+                'system-ip': '1.1.1.1',
+                'site-id': 1,
+                'local-color': '3g',
+                'state': 'down',
+            }
+        ]
+        self.device_unreachable = [
+            {  # vmanage
+                "device-model": "vmanage",
+                "deviceId": "1.1.1.1",
+                "uuid": "zzzzzzzz-6169-445c-8e49-c0bdaaaaaaa",
+                "cpuLoad": 4.71,
+                "state_description": "All daemons up",
+                "status": "normal",
+                "memState": "normal",
+                "local-system-ip": "1.1.1.1",
+                "board-serial": "11122233",
+                "personality": "vmanage",
+                "memUsage": 57.0,
+                "reachability": "unreachable",
+                "connectedVManages": ["1.1.1.1"],
+                "host-name": "vm200",
+                "cpuState": "normal",
+                "chassis-number": "aaaaaaaa-6aa9-445c-8e49-c0aaaaaaaaa9",
+            }
+        ]
 
-    def test_get_device_crash_info(self):
-        pass
+    @patch('vmngclient.session.vManageSession')
+    def test_get_device_crash_info(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = self.crash_info
+        # Act
+        answer = DeviceStateAPI(mock_session).get_device_crash_info(device_id="1.1.1.1")
+        # Assert
+        self.assertEqual(answer, self.crash_info)
 
-    def test_get_device_control_connections_info(self):
-        pass
+    @patch('vmngclient.session.vManageSession')
+    def test_get_device_crash_info_empty(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = []
+        # Act
+        answer = DeviceStateAPI(mock_session).get_device_crash_info(device_id="1.1.1.1")
+        # Assert
+        self.assertEqual(answer, [])
 
-    def test_get_device_orchestrator_connections_info(self):
-        pass
+    @patch('vmngclient.session.vManageSession')
+    def test_get_device_control_connections_info(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = self.connections_info
+        # Act
+        answer = DeviceStateAPI(mock_session).get_device_control_connections_info(device_id="1.1.1.1")
+        # Assert
+        self.assertEqual(answer, self.connections_info_dataclass)
 
-    def test_get_device_reboot_history(self):
-        pass
+    @patch('vmngclient.session.vManageSession')
+    def test_get_device_control_connections_info_empty(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = []
+        # Act
+        answer = DeviceStateAPI(mock_session).get_device_control_connections_info(device_id="1.1.1.1")
+        # Assert
+        self.assertEqual(answer, [])
 
-    def test_get_system_status(self):
-        pass
+    @patch('vmngclient.session.vManageSession')
+    def test_get_device_orchestrator_connections_info(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = self.connections_info
+        # Act
+        answer = DeviceStateAPI(mock_session).get_device_orchestrator_connections_info(device_id="1.1.1.1")
+        # Assert
+        self.assertEqual(answer, self.connections_info_dataclass)
 
-    def test_get_device_wan_interfaces(self):
-        pass
+    @patch('vmngclient.session.vManageSession')
+    def test_get_device_orchestrator_connections_info_empty(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = []
+        # Act
+        answer = DeviceStateAPI(mock_session).get_device_orchestrator_connections_info(device_id="1.1.1.1")
+        # Assert
+        self.assertEqual(answer, [])
+
+    @patch('vmngclient.session.vManageSession')
+    def test_get_device_reboot_history(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = self.reboot_history
+        # Act
+        answer = DeviceStateAPI(mock_session).get_device_reboot_history(device_id="1.1.1.11")
+        # Assert
+        self.assertEqual(answer, self.reboot_history_dataclass)
+
+    @patch('vmngclient.session.vManageSession')
+    def test_get_device_reboot_history_empty(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = []
+        # Act
+        answer = DeviceStateAPI(mock_session).get_device_reboot_history(device_id="1.1.1.1")
+        # Assert
+        self.assertEqual(answer, [])
+
+    @patch('vmngclient.session.vManageSession')
+    def test_get_system_status(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = self.device
+        # Act
+        answer = DeviceStateAPI(mock_session).get_system_status(device_id="1.1.1.1")
+        # Assert
+        self.assertEqual(answer, self.device_dataclass)
+
+    @patch('vmngclient.session.vManageSession')
+    def test_get_system_status_empty(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = []
+
+        # Act
+        def answer():
+            return DeviceStateAPI(mock_session).get_system_status(device_id="1.1.1.1")
+
+        # Assert
+        self.assertRaises(AssertionError, answer)
+
+    @patch('vmngclient.session.vManageSession')
+    def test_get_device_wan_interfaces(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = self.wan_interfaces
+        # Act
+        answer = DeviceStateAPI(mock_session).get_device_wan_interfaces(device_id="1.1.1.1")
+        # Assert
+        self.assertEqual(answer, self.wan_interfaces_dataclass)
+
+    @patch('vmngclient.session.vManageSession')
+    def test_get_device_wan_interfaces_empty(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = []
+        # Act
+        answer = DeviceStateAPI(mock_session).get_device_wan_interfaces(device_id="1.1.1.1")
+        # Assert
+        self.assertEqual(answer, [])
 
     def test_get_colors(self):
-        pass
+        pass  # TODO fix method before test
 
     def test_enable_data_stream(self):
-        pass
+        pass  # TODO fix method before test
 
-    def test_get_bfd_sessions(self):
-        pass
+    @patch('vmngclient.session.vManageSession')
+    def test_get_bfd_sessions(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = self.bfd_session
+        # Act
+        answer = DeviceStateAPI(mock_session).get_bfd_sessions(device_id="1.1.1.1")
+        # Assert
+        self.assertEqual(answer, self.bfd_session_dataclass)
 
-    def test_wait_for_bfd_session_up(self):
-        pass
+    @patch('vmngclient.session.vManageSession')
+    def test_get_bfd_sessions_empty(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = []
+        # Act
+        answer = DeviceStateAPI(mock_session).get_bfd_sessions(device_id="1.1.1.1")
+        # Assert
+        self.assertEqual(answer, [])
 
-    def test_wait_for_device_state(self):
-        pass
+    @patch('vmngclient.session.vManageSession')
+    def test_wait_for_bfd_session_up(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = self.bfd_session
+        # Act
+        answer = DeviceStateAPI(mock_session).wait_for_bfd_session_up(system_ip="1.1.1.1")
+        # Assert
+        self.assertIsNone(answer)
+
+    @patch('vmngclient.session.vManageSession')
+    def test_wait_for_bfd_session_up_timeout(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = self.bfd_session_down
+
+        # Act
+        def answer():
+            return DeviceStateAPI(mock_session).wait_for_bfd_session_up(
+                system_ip="1.1.1.1", sleep_seconds=1, timeout_seconds=1
+            )
+
+        # Assert
+        self.assertRaises(RetryError, answer)
+
+    @patch('vmngclient.session.vManageSession')
+    def test_wait_for_device_state(self, mock_session):
+        # Arrange
+        mock_session.get_data.return_value = self.device
+        # Act
+        answer = DeviceStateAPI(mock_session).wait_for_device_state(device_id="1.1.1.1")
+        # Assert
+        self.assertTrue(answer)
+
+    @patch('vmngclient.session.vManageSession')
+    def test_wait_for_device_state_unreachable(self, mock_session):
+        pass  # TODO fix method before test
