@@ -9,7 +9,7 @@ from urllib.error import HTTPError
 from urllib.parse import urljoin
 
 # import requests
-from requests import Session
+from requests import Response, Session
 from requests.auth import AuthBase
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
@@ -178,7 +178,7 @@ class vManageSession(Session):
         response = self.get(url)
         return response.json()
 
-    def get_file(self, url: str, filename: Path) -> HTTPResponse:
+    def get_file(self, url: str, filename: Path) -> Response:
         """Get a file using session get.
 
         Args:
