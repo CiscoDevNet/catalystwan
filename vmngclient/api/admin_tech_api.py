@@ -120,7 +120,6 @@ class AdminTechAPI:
         if not download_dir:
             download_dir = Path.cwd()
         download_path = download_dir / admin_tech_name
-        with self.session.get_data(f'/dataservice/device/tools/admintech/download/{admin_tech_name}') as payload:
-            with open(download_path, 'wb') as file:
-                shutil.copyfileobj(payload, file)
+        url = f'/dataservice/device/tools/admintech/download/{admin_tech_name}')
+        response = self.session.get_file(url, download_path)
         return download_path
