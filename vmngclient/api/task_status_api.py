@@ -79,7 +79,7 @@ class TaskStatus:
                 f"Statuses of action {action_id} is: \
                     status: {status}, status_id: {status_id}, activity: {activity} "
             )
-            if status in exit_statuses and status_id in exit_statuses_ids:
+            if status == OperationStatus.SUCCESS.value and status_id == OperationStatusId.SUCCESS.value:
                 if activity_text:
                     if activity_text == activity:
                         return True
