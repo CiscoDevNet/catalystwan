@@ -3,12 +3,13 @@ from __future__ import annotations
 import logging
 import time
 from enum import Enum, auto
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from urllib.error import HTTPError
 from urllib.parse import urljoin
 
 # import requests
-from requests import Session
+from requests import Response, Session
 from requests.auth import AuthBase
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
@@ -64,6 +65,7 @@ def create_vManageSession(
 
     Returns:
         Session object
+
     """
     session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
@@ -175,6 +177,25 @@ class vManageSession(Session):
     def get_json(self, url: str) -> Any:
         response = self.get(url)
         return response.json()
+
+    def get_file(self, url: str, filename: Path) -> Response:
+        """Get a file using session get.
+
+        Args:
+            url: dataservice api.
+            filename: Filename to write download file to.
+
+        Returns:
+            http response.
+
+        Example usage:
+            response = self.session.get_file(url, filename)
+
+        """
+        with self.get(url) as response:
+            with open(filename, "wb") as file:
+                file.write(response.content)
+        return response
 
     def wait_for_server_reachability(self, retries: int, delay: int, initial_delay: int = 0) -> bool:
         """Checks if vManage API is reachable by sending server request.
