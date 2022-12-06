@@ -65,6 +65,7 @@ def create_vManageSession(
 
     Returns:
         Session object
+
     """
     session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
@@ -186,6 +187,10 @@ class vManageSession(Session):
 
         Returns:
             http response.
+
+        Example usage:
+            response = self.session.get_file(url, filename)
+
         """
         with self.get(url) as response:
             with open(filename, "wb") as file:
