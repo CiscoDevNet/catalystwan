@@ -177,6 +177,12 @@ class vManageSession(Session):
         response = self.get(url)
         return response.json()
 
+    def get_file(self, url: str, filename: Path) -> Any:
+        with self.get(url) as response:
+            with open(filename, "wb") as file:
+                file.write(response.content)
+        return response
+
     def post_file(self, url: str, filename: Path, data: Dict = {}) -> Any:
         headers = self.headers
         del headers['Content-Type']

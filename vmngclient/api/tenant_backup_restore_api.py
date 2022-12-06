@@ -71,9 +71,7 @@ class TenantBackupRestoreApi:
         download_path = download_dir / file_name
         tenant_id = file_name.split("_")[1]
         url = f"/dataservice/tenantbackup/download/{tenant_id}/{file_name}"
-        with self.session.get(url) as payload:
-            with open(download_path, "wb") as file:
-                file.write(payload.content)
+        response = self.session.get_file(url, download_path)
         return download_path
 
     def import_backup(self, filename: Path):
