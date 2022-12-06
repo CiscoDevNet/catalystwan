@@ -1,10 +1,7 @@
-from vmngclient.session import Session
 import logging
 from typing import Union,List
-
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
-from vmngclient.dataclasses import Device
-from vmngclient.session import Session
+from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import get_logger_name
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 
@@ -12,15 +9,10 @@ from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 logger = logging.getLogger(get_logger_name(__name__))
 
 class TaskStatus():
-    """API methods to validate and check  """
+    """API class to check task status"""
 
-    def __init__(self, session: Session, dev: Device):
+    def __init__(self, session: vManageSession):
         self.session = session
-        self.action_status = ''
-        self.action_id = ''
-
-    def __str__(self):
-        return str(self.session)
 
     def wait_for_completed(self, 
         sleep_seconds: int,
@@ -31,10 +23,22 @@ class TaskStatus():
         activity_text : str = None,
         action_url: str = '/dataservice/device/action/status/',
         
-         ) -> None:
+         ) -> bool:
         
-        def check_status(status: str, status_id: str, activity: str):
-            if status in exit_statuses and status_id in exit_statuses_ids:
+        def check_status(status: str, status_id: str, activity: str) -> bool:
+            """
+            Function checks if condition is met. If so,
+            wait_for_completed stops asking for task status
+
+            Args:
+                status (str): status of task
+                status_id (str): status id of task
+                activity (str): activity text
+
+            Returns:
+                bool: False if condition is met
+            """
+            if (status in exit_statuses) and (status_id in exit_statuses_ids):
                 if activity_text:
                     if activity_text == activity:
                         return False
@@ -43,7 +47,7 @@ class TaskStatus():
                 return False
             return True
         
-        def _log_exception(self):
+        def _log_exception(self) -> None:
             logger.error("Operation status not achieved in given time")
             return None
                     
@@ -54,18 +58,22 @@ class TaskStatus():
             retry=retry_if_result(check_status),
             retry_error_callback=_log_exception,
         )
-        def wait_for_action_finish():
+        def wait_for_action_finish() -> bool:
+            """
+            Keep asking for task status, status_id,
+            activity(optional), till check_status is True
+
+            Returns:
+                bool: True if condition is met
+            """
             url = f'{action_url}{action_id}'
-            try:
-                action_data = self.session.get_data(url)[0]
-                status = action_data['status']
-                status_id = action_data['statusId']
-                activity = action_data['activity'][0]
-                logger.debug(f"Statuses of action {action_id} is: \
-                     status: {status}, status_id: {status_id}, activity: {activity} ")
-            except IndexError:
-                action_data = ''
-            
+            action_data = self.session.get_data(url)[0]
+            status = action_data['status']
+            status_id = action_data['statusId']
+            activity = action_data['activity']
+            logger.debug(f"Statuses of action {action_id} is: \
+                    status: {status}, status_id: {status_id}, activity: {activity} ")
+
             if status in exit_statuses and status_id in exit_statuses_ids:
                 if activity_text:
                     if activity_text == activity:
@@ -75,4 +83,4 @@ class TaskStatus():
                 return True
             return False
 
-        wait_for_action_finish()
+        return wait_for_action_finish()
