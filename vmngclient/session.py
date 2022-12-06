@@ -178,6 +178,15 @@ class vManageSession(Session):
         return response.json()
 
     def get_file(self, url: str, filename: Path) -> Any:
+        """Get a file using session get.
+
+        Args:
+            url: dataservice api.
+            filename: Filename of file to dowload to.
+
+        Returns:
+            html response.
+        """
         with self.get(url) as response:
             with open(filename, "wb") as file:
                 file.write(response.content)
