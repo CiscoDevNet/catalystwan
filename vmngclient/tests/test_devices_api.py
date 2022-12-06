@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
-from parameterized import parameterized
+from parameterized import parameterized  # type: ignore
 from tenacity import RetryError
 
 from vmngclient.api.basic_api import DeviceField, DevicesAPI, DeviceStateAPI, FailedSend
