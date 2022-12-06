@@ -68,9 +68,9 @@ class TaskStatus:
             """
             url = f'{action_url}{action_id}'
             action_data = self.session.get_data(url)[0]
-            status = action_data['status']
-            status_id = action_data['statusId']
-            activity = action_data['activity']
+            status = str(action_data['status'])
+            status_id = str(action_data['statusId'])
+            activity = str(action_data['activity'])
             logger.debug(
                 f"Statuses of action {action_id} is: \
                     status: {status}, status_id: {status_id}, activity: {activity} "
