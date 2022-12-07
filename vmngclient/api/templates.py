@@ -3,8 +3,9 @@ import logging
 from typing import List, cast
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
-from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 from requests.exceptions import HTTPError
+from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
+
 from vmngclient.dataclasses import Device, Template
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass, get_logger_name
@@ -131,9 +132,7 @@ class TemplateAPI:
             return False
         except HTTPError as error:
             error_details = json.loads(error.response.text)
-            logger.error(
-                f"Bug in config: {error_details['error']['details']}"
-            )
+            logger.error(f"Bug in config: {error_details['error']['details']}")
             return False
         payload = {
             "deviceTemplateList": [
@@ -152,7 +151,7 @@ class TemplateAPI:
             ]
         }
         endpoint = "/dataservice/template/device/config/attachcli"
-        response = cast(dict, self.session.post(url=endpoint, json=payload)).json()
+        response = cast(dict, self.session.post(url=endpoint, json=payload).json())
         return self.wait_for_complete(response['id'])
 
     def device_to_cli(self, device: Device) -> bool:
@@ -169,7 +168,7 @@ class TemplateAPI:
             "devices": [{"deviceId": device.uuid, "deviceIP": device.id}],
         }
         endpoint = "/dataservice/template/config/device/mode/cli"
-        response = cast(dict, self.session.post(url=endpoint, json=payload)).json()
+        response = cast(dict, self.session.post(url=endpoint, json=payload).json())
         return self.wait_for_complete(response['id'])
 
     def get_operation_status(self, operation_id: str) -> List[OperationStatus]:
@@ -223,22 +222,22 @@ class TemplateAPI:
             cli_template = CliTemplate(self.session, device_model, name, description)
             cli_template.config = config
             return cli_template.send_to_device()
-    
-    def __validation_template(self, id:str, device: Device) -> None:
+
+    def __validation_template(self, id: str, device: Device) -> None:
         payload = {
             "templateId": id,
-            "device":{
-                "csv-status":"complete",
+            "device": {
+                "csv-status": "complete",
                 "csv-deviceId": device.uuid,
                 "csv-deviceIP": device.id,
                 "csv-host-name": device.hostname,
-                "csv-templateId": id
-                },
+                "csv-templateId": id,
+            },
             "isEdited": False,
             "isMasterEdited": False,
-            "isRFSRequired": True
-            }
-        endpoint = f"/dataservice/template/device/config/config/"
+            "isRFSRequired": True,
+        }
+        endpoint = "/dataservice/template/device/config/config/"
         self.session.post(url=endpoint, json=payload)
 
 
@@ -286,7 +285,7 @@ class CliTemplate:
             "configType": "file",
         }
         endpoint = "/dataservice/template/device/cli/"
-        response = cast(dict, self.session.post(url=endpoint, json=payload)).json()
+        response = cast(dict, self.session.post(url=endpoint, json=payload).json())
         return response['templateId']
 
     def update(self, id: str) -> None:
