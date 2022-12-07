@@ -39,12 +39,6 @@ from vmngclient.api.administration import UserAlreadyExistsError, UserApi
 from vmngclient.dataclasses import User
 from vmngclient.session import Session
 
-ip_address = "x"
-port = x
-username = "x"
-password = "x"
-
-provider_session = Session(ip_address, port, username, password)
 user_api = UserApi(provider_session)
 
 test_user = User(
@@ -56,29 +50,25 @@ test_user = User(
     resource_group="global"
 )
 
-print(test_user)
-
 try:
     user_api.create_user(test_user)
 except UserAlreadyExistsError as error:
-    print(f"User {username} already exists. Trying to recreate.")
-    user_api.delete_user(test_user.username)
-    user_api.create_user(test_user)
+    print(f"User {username} already exists.")
 
 print(user_api.get_all_users())
-
-
->>> "Logged as devnetuser. The session type is SessionType.TENANT"
->>> {'title': 'Cisco vManage', 'version': '20.4.2.1', 'applicationVersion': '20.4R-vbamboo-16-Dec-2021 19:07:17 PST', 'applicationServer': 'vmanage', 'copyright': 'Copyright (c) 2022, Cisco. All rights reserved.', 'time': '2022-12-01 13:45:44', 'timeZone': 'UTC', 'logo': '/dataservice/client/logo.png'}
 ```
 </details>
+
 
 ## Contributing, reporting issues, seeking support
 Please contact authors direcly or via Issues Github page.
 
 ## **Enviroment setup**
-1. Use python 3.8
+1. Download Python3.8 or higher.
 2. Download repository
+    ```
+    git clone https://github.com/CiscoDevNet/vManage-client.git
+    ```
 3. Install poetry v1.1.13
 
     ```
