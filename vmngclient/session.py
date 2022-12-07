@@ -156,6 +156,7 @@ class vManageSession(Session):
             if response.status_code == 403:
                 logger.info("Unauthorized")
             raise error
+        return response
 
     def get_full_url(self, url_path: str) -> str:
         """Returns base API url plus given url path."""
