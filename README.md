@@ -70,7 +70,6 @@ Please contact authors direcly or via Issues Github page.
     git clone https://github.com/CiscoDevNet/vManage-client.git
     ```
 3. Install poetry v1.1.13
-
     ```
     pip install poetry==1.1.13
     ```
