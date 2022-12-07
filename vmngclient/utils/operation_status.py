@@ -7,6 +7,7 @@ class OperationStatus(Enum):
     SUCCESS = 'Success'
     SCHEDULED = 'Scheduled'
 
+
 class OperationStatusId(Enum):
     IN_PROGRESS = 'in progress'
     FAILURE = 'failure'
