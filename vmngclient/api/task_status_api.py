@@ -15,6 +15,9 @@ class TaskStatus:
 
     def __init__(self, session: vManageSession):
         self.session = session
+        self.status: str = ''
+        self.status_id: str = ''
+        self.activity: List[str] = []
 
     def wait_for_completed(
         self,
@@ -39,17 +42,10 @@ class TaskStatus:
             Returns:
                 bool: False if condition is met
             """
-            status = str(action_data['status'])
-            status_id = str(action_data['statusId'])
-            activity = str(action_data['activity'])
 
-            if (status in exit_statuses) and (status_id in exit_statuses_ids):
-                if activity_text:
-                    if activity_text in activity:
-                        return False
-                    else:
-                        return True
-                return False
+            if (self.status in exit_statuses) and (self.status_id in exit_statuses_ids):
+                if not activity_text or activity_text in self.activity:
+                    return False
             return True
 
         def _log_exception(self) -> None:
@@ -72,31 +68,18 @@ class TaskStatus:
             """
             url = f'{action_url}{action_id}'
             action_data = self.session.get_data(url)[0]
-            status = str(action_data['status'])
-            status_id = str(action_data['statusId'])
-            activity = str(action_data['activity'])
+            self.status = action_data['status']
+            self.status_id = action_data['statusId']
+            self.activity = action_data['activity']
             logger.debug(
                 f"Statuses of action {action_id} is: "
-                f"status: {status}, status_id: {status_id}, activity: {activity} "
-            )
-            print(
-                f"Statuses of action {action_id} is: " 
-                f"status: {status}, status_id: {status_id}, activity: {activity} "
+                f"status: {self.status}, status_id: {self.status_id}, activity: {self.activity} "
             )
             return action_data
-        
-        wait_for_action = wait_for_action_finish() 
-        
-        if wait_for_action['status'] == OperationStatus.SUCCESS.value \
-        and wait_for_action['statusId'] == OperationStatusId.SUCCESS.value:
-            if activity_text:
-                if activity_text in wait_for_action['activity']:
-                    return True
-                else:
-                    return False
-            return True
-        else:
-            return False
 
-                
+        wait_for_action_finish()
 
+        if self.status == OperationStatus.SUCCESS.value and self.status_id == OperationStatusId.SUCCESS.value:
+            if not activity_text or activity_text in self.activity:
+                return True
+        return False
