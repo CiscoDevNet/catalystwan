@@ -26,7 +26,7 @@ class TaskStatus:
         activity_text: Union[str, None] = None,
         action_url: str = '/dataservice/device/action/status/',
     ) -> bool:
-        def check_status(status: str, status_id: str, activity: str) -> bool:
+        def check_status(action_data) -> bool:
             """
             Function checks if condition is met. If so,
             wait_for_completed stops asking for task status
@@ -39,6 +39,10 @@ class TaskStatus:
             Returns:
                 bool: False if condition is met
             """
+            status = str(action_data['status'])
+            status_id = str(action_data['statusId'])
+            activity = str(action_data['activity'])
+
             if (status in exit_statuses) and (status_id in exit_statuses_ids):
                 if activity_text:
                     if activity_text in activity:
@@ -72,20 +76,27 @@ class TaskStatus:
             status_id = str(action_data['statusId'])
             activity = str(action_data['activity'])
             logger.debug(
-                f"Statuses of action {action_id} is: \
-                    status: {status}, status_id: {status_id}, activity: {activity} "
+                f"Statuses of action {action_id} is: "
+                f"status: {status}, status_id: {status_id}, activity: {activity} "
             )
             print(
-                f"Statuses of action {action_id} is: \
-                    status: {status}, status_id: {status_id}, activity: {activity} "
+                f"Statuses of action {action_id} is: " 
+                f"status: {status}, status_id: {status_id}, activity: {activity} "
             )
-            if status == OperationStatus.SUCCESS.value and status_id == OperationStatusId.SUCCESS.value:
-                if activity_text:
-                    if activity_text == activity:
-                        return True
-                    else:
-                        return False
-                return True
+            return action_data
+        
+        wait_for_action = wait_for_action_finish() 
+        
+        if wait_for_action['status'] == OperationStatus.SUCCESS.value \
+        and wait_for_action['statusId'] == OperationStatusId.SUCCESS.value:
+            if activity_text:
+                if activity_text in wait_for_action['activity']:
+                    return True
+                else:
+                    return False
+            return True
+        else:
             return False
 
-        return wait_for_action_finish()
+                
+
