@@ -7,11 +7,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from urllib.parse import urljoin
 
-# import requests
 from requests import Response, Session
 from requests.auth import AuthBase
-
-# from urllib.error import HTTPError
 from requests.exceptions import HTTPError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
@@ -153,8 +150,9 @@ class vManageSession(Session):
         except HTTPError as error:
             logger.debug(error)
             if response.status_code == 403:
-                logger.info("Unauthorized")
-            raise error
+                logger.info(f"User {self.username} is unauthorized for method {method} {full_url}")
+            else:
+                raise error
         return response
 
     def get_full_url(self, url_path: str) -> str:
