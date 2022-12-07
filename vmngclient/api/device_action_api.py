@@ -1,12 +1,11 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import cast
 
-from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
+from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.api.basic_api import DevicesAPI, DeviceStateAPI
 from vmngclient.dataclasses import Device
-from vmngclient.session import Session
+from vmngclient.session import vManageSession
 from vmngclient.utils.certificate_status import CertificateStatus
 from vmngclient.utils.creation_tools import get_logger_name
 from vmngclient.utils.operation_status import OperationStatus
@@ -19,7 +18,7 @@ logger = logging.getLogger(get_logger_name(__name__))
 class DeviceActionAPI(ABC):
     """API method to execute action on Device."""
 
-    def __init__(self, session: Session, dev: Device):
+    def __init__(self, session: vManageSession, dev: Device):
         self.session = session
         self.dev = dev
         self.action_status = ''
@@ -97,7 +96,7 @@ class RebootAction(DeviceActionAPI):
         wait_for_come_up()
 
 
-class ValidateAction(DeviceActionAPI):
+class ValidateAction(DeviceActionAPI):  # TODO check
     """
     API method to perform validate Device
     """
@@ -106,15 +105,13 @@ class ValidateAction(DeviceActionAPI):
         """
         validate device
         """
-        body = [
-            {
-                "chasisNumber": self.dev.uuid,
-                "serialNumber": self.dev.board_serial,
-                "validity": "valid" if valid else "invalid",
-            }
-        ]
+        body = {
+            "chasisNumber": self.dev.uuid,
+            "serialNumber": self.dev.board_serial,
+            "validity": "valid" if valid else "invalid",
+        }
 
-        response = cast(dict, self.session.post_json('/dataservice/certificate/save/vedge/list', data=body))
+        response = self.session.post(url='/dataservice/certificate/save/vedge/list', data=body).json()
         if response.get('id'):
             self.action_id = response['id']
         else:

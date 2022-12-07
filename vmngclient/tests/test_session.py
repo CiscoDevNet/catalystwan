@@ -1,13 +1,35 @@
 import unittest
 from unittest.mock import patch
+from typing import Optional
 
-from vmngclient.session import Session
+from parameterized import parameterized  # type: ignore
+
+from vmngclient.session import vManageSession
 
 
-class TestSessionConstructor(unittest.TestCase):
+class TestSession(unittest.TestCase):
+    def setUp(self):
+        self.url = "example.com"
+        self.username = "admin"
+        self.password = "admin_password"
+
     def test_session_str(self):
         # Arrange, Act
-        session = Session("1.1.1.1", "admin", None, port=111)
+        session = vManageSession(self.url, self.username, self.password, port=111)
+
+        # Assert
+        self.assertEqual(str(session), "admin@https://example.com:111")
+
+    @parameterized.expand(
+        [
+            (123, "https://example.com:123"),
+            (None, "https://example.com"),
+        ]
+    )
+    def test_base_url(self, port: Optional[int], base_url: str):
+        # Arrange, Act
+        session = vManageSession(self.url, self.username, self.password, port=port)
+
         # Assert
         self.assertEqual(str(session), "admin@https://1.1.1.1:111")
 
@@ -54,3 +76,22 @@ class TestSessionConstructor(unittest.TestCase):
         session_2 = Session("not.domain.com", "different_user", "$password", port=111)
         # Assert
         self.assertNotEqual(session_1, session_2)
+
+    @parameterized.expand(
+        [
+            (123, "/devices", "https://example.com:123/devices"),
+            (123, "devices", "https://example.com:123/devices"),
+            (None, "/devices", "https://example.com/devices"),
+            (None, "devices", "https://example.com/devices"),
+        ]
+    )
+    def test_get_full_url(self, port: Optional[int], url: str, full_url: str):
+        # Arrange, Act
+        session = vManageSession(self.url, self.username, self.password, port=port)
+
+        # Assert
+        self.assertEqual(session.get_full_url(url), full_url)
+
+
+if __name__ == '__main__':
+    unittest.main()
