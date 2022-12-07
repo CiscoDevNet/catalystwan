@@ -1,9 +1,10 @@
+import json
 import logging
 from typing import List, cast
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
-from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
-
+from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
+from requests.exceptions import HTTPError
 from vmngclient.dataclasses import Device, Template
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass, get_logger_name
@@ -125,7 +126,14 @@ class TemplateAPI:
         """
         try:
             template_id = self.get_id(name)
+            self.__validation_template(template_id, device=device)
         except NotFoundError:
+            return False
+        except HTTPError as error:
+            error_details = json.loads(error.response.text)
+            logger.error(
+                f"Bug in config: {error_details['error']['details']}"
+            )
             return False
         payload = {
             "deviceTemplateList": [
@@ -144,7 +152,7 @@ class TemplateAPI:
             ]
         }
         endpoint = "/dataservice/template/device/config/attachcli"
-        response = self.session.post(url=endpoint, data=payload).json()
+        response = cast(dict, self.session.post(url=endpoint, json=payload)).json()
         return self.wait_for_complete(response['id'])
 
     def device_to_cli(self, device: Device) -> bool:
@@ -161,7 +169,7 @@ class TemplateAPI:
             "devices": [{"deviceId": device.uuid, "deviceIP": device.id}],
         }
         endpoint = "/dataservice/template/config/device/mode/cli"
-        response = self.session.post(url=endpoint, data=payload).json()
+        response = cast(dict, self.session.post(url=endpoint, json=payload)).json()
         return self.wait_for_complete(response['id'])
 
     def get_operation_status(self, operation_id: str) -> List[OperationStatus]:
@@ -193,7 +201,7 @@ class TemplateAPI:
         endpoint = f"/dataservice/template/device/{template.id}"
         if template.devices_attached == 0:
             response = self.session.delete(url=endpoint)
-            return response.status_code == 200
+            return response.ok
         raise AttachedError(template.name)
 
     def create(self, device_model: DeviceModel, name: str, description: str, config: CiscoConfParse) -> str:
@@ -215,6 +223,23 @@ class TemplateAPI:
             cli_template = CliTemplate(self.session, device_model, name, description)
             cli_template.config = config
             return cli_template.send_to_device()
+    
+    def __validation_template(self, id:str, device: Device) -> None:
+        payload = {
+            "templateId": id,
+            "device":{
+                "csv-status":"complete",
+                "csv-deviceId": device.uuid,
+                "csv-deviceIP": device.id,
+                "csv-host-name": device.hostname,
+                "csv-templateId": id
+                },
+            "isEdited": False,
+            "isMasterEdited": False,
+            "isRFSRequired": True
+            }
+        endpoint = f"/dataservice/template/device/config/config/"
+        self.session.post(url=endpoint, json=payload)
 
 
 class CliTemplate:
@@ -261,7 +286,7 @@ class CliTemplate:
             "configType": "file",
         }
         endpoint = "/dataservice/template/device/cli/"
-        response = self.session.post(url=endpoint, data=payload).json()
+        response = cast(dict, self.session.post(url=endpoint, json=payload)).json()
         return response['templateId']
 
     def update(self, id: str) -> None:
@@ -285,7 +310,7 @@ class CliTemplate:
             "draftMode": False,
         }
         endpoint = f"/dataservice/template/device/{id}"
-        self.session.put(url=endpoint, data=payload).json()
+        cast(dict, self.session.put(url=endpoint, json=payload))
 
     def add_to_config(self, add_config: CiscoConfParse, add_before: str) -> None:
         """Add config to existing config before provided value.
