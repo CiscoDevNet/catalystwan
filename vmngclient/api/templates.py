@@ -132,7 +132,7 @@ class TemplateAPI:
             return False
         except HTTPError as error:
             error_details = json.loads(error.response.text)
-            logger.error(f"Bug in config: {error_details['error']['details']}")
+            logger.error(f"Error in config: {error_details['error']['details']}")
             return False
         payload = {
             "deviceTemplateList": [
