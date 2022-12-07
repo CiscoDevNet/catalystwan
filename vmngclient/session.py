@@ -143,7 +143,7 @@ class vManageSession(Session):
 
     def request(self, method, url, *args, **kwargs) -> Any:
         full_url = self.get_full_url(url)
-        return super(vManageSession, self).request(method, full_url, args, kwargs)
+        return super(vManageSession, self).request(method, full_url, *args, **kwargs)
 
     def get_full_url(self, url_path: str) -> str:
         """Returns base API url plus given url path."""
