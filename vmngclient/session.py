@@ -119,7 +119,6 @@ class vManageSession(Session):
         port: port
         username: username
         password: password
-        timeout: timeout
     """
 
     def __init__(
@@ -263,15 +262,14 @@ class vManageSession(Session):
 
     def __repr__(self):
         return f"{self.__class__.__name__}('{self.url}', '{self.username}', '{self.password}', port={self.port}, " \
-               f"subdomain='{self.subdomain}', timeout={self.timeout})"
+               f"subdomain='{self.subdomain}')"
 
     def __eq__(self, other):
-        if isinstance(other, Session):
+        if isinstance(other, vManageSession):
             comparison_list = [self.url == other.url,
                                self.username == other.username,
                                self.password == other.password,
                                self.port == other.port,
-                               str(self.subdomain) == str(other.subdomain),
-                               str(self.timeout) == str(other.timeout)]
+                               str(self.subdomain) == str(other.subdomain)]
             return True if all(comparison_list) else False
         return False
