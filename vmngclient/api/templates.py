@@ -151,7 +151,7 @@ class TemplateAPI:
             ]
         }
         endpoint = "/dataservice/template/device/config/attachcli"
-        response = cast(dict, self.session.post(url=endpoint, json=payload).json())
+        response = self.session.post(url=endpoint, json=payload).json()
         return self.wait_for_complete(response['id'])
 
     def device_to_cli(self, device: Device) -> bool:
@@ -168,7 +168,7 @@ class TemplateAPI:
             "devices": [{"deviceId": device.uuid, "deviceIP": device.id}],
         }
         endpoint = "/dataservice/template/config/device/mode/cli"
-        response = cast(dict, self.session.post(url=endpoint, json=payload).json())
+        response = self.session.post(url=endpoint, json=payload).json()
         return self.wait_for_complete(response['id'])
 
     def get_operation_status(self, operation_id: str) -> List[OperationStatus]:
@@ -223,7 +223,16 @@ class TemplateAPI:
             cli_template.config = config
             return cli_template.send_to_device()
 
-    def __validation_template(self, id: str, device: Device) -> None:
+    def __validation_template(self, id: str, device: Device) -> bool:
+        """Checking the templaet of the configuration on the machine.
+
+        Args:
+            id (str): template id to check.
+            device (Device): The device on which the configuration is to be validate.
+
+        Returns:
+            bool: True if everything is correct, otherwise False.
+        """
         payload = {
             "templateId": id,
             "device": {
@@ -238,7 +247,8 @@ class TemplateAPI:
             "isRFSRequired": True,
         }
         endpoint = "/dataservice/template/device/config/config/"
-        self.session.post(url=endpoint, json=payload)
+        response = self.session.post(url=endpoint, json=payload).json()
+        return response.ok
 
 
 class CliTemplate:
@@ -256,7 +266,7 @@ class CliTemplate:
             id (str): The template id from which load config.
         """
         endpoint = f"/dataservice/template/device/object/{id}"
-        config = cast(dict, self.session.get_json(endpoint))
+        config = self.session.get_json(endpoint)
         self.config = CiscoConfParse(config['templateConfiguration'].splitlines())
 
     def load_running(self, device: Device) -> None:
@@ -266,7 +276,7 @@ class CliTemplate:
             device (Device): The device from which load config.
         """
         endpoint = f"/dataservice/template/config/running/{device.uuid}"
-        config = cast(dict, self.session.get_json(endpoint))
+        config = self.session.get_json(endpoint)
         self.config = CiscoConfParse(config['config'].splitlines())
 
     def send_to_device(self) -> str:
@@ -285,7 +295,7 @@ class CliTemplate:
             "configType": "file",
         }
         endpoint = "/dataservice/template/device/cli/"
-        response = cast(dict, self.session.post(url=endpoint, json=payload).json())
+        response = self.session.post(url=endpoint, json=payload).json()
         return response['templateId']
 
     def update(self, id: str) -> None:
@@ -309,7 +319,7 @@ class CliTemplate:
             "draftMode": False,
         }
         endpoint = f"/dataservice/template/device/{id}"
-        cast(dict, self.session.put(url=endpoint, json=payload))
+        self.session.put(url=endpoint, json=payload)
 
     def add_to_config(self, add_config: CiscoConfParse, add_before: str) -> None:
         """Add config to existing config before provided value.
