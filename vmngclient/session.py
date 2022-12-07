@@ -61,7 +61,6 @@ def create_vManageSession(
         password (str): password
         subdomain: subdomain specifying to which view switch when creating provider as a tenant session,
             works only on provider user mode
-        timeout (int): timeout
 
     Returns:
         Session object
@@ -115,7 +114,7 @@ class vManageSession(Session):
     Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
 
     Args:
-        url: IP address or domain name, i.e. '10.0.1.200' or 'fruits.com'
+        url: IP address or domain name, i.e. '10.0.1.200' or 'example.com'
         port: port
         username: username
         password: password
@@ -153,7 +152,7 @@ class vManageSession(Session):
         return urljoin(self.base_url, url_path)
 
     def __create_base_url(self) -> str:
-        """Creates base url based on ip address and port.
+        """Creates base url based on ip address or domain and port if provided.
 
         Returns:
             str: Base url shared for every request.
@@ -211,7 +210,7 @@ class vManageSession(Session):
         """
 
         def _log_exception(retry_state):
-            logger.error(f"Cannot reach server, orignial exception: {retry_state.outcome.exception()}")
+            logger.error(f"Cannot reach server, original exception: {retry_state.outcome.exception()}")
             return False
 
         if initial_delay:
