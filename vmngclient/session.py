@@ -3,12 +3,13 @@ from __future__ import annotations
 import logging
 import time
 from enum import Enum, auto
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from urllib.error import HTTPError
 from urllib.parse import urljoin
 
 # import requests
-from requests import Session
+from requests import Response, Session
 from requests.auth import AuthBase
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
@@ -64,6 +65,7 @@ def create_vManageSession(
 
     Returns:
         Session object
+
     """
     session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
@@ -117,7 +119,6 @@ class vManageSession(Session):
         port: port
         username: username
         password: password
-        timeout: timeout
     """
 
     def __init__(
@@ -130,7 +131,9 @@ class vManageSession(Session):
         subdomain: Optional[str] = None,
         auth: Optional[AuthBase] = None,
     ):
-        self.base_url = self.__create_base_url(url, port)
+        self.url = url
+        self.port = port
+        self.base_url = self.__create_base_url()
         self.username = username
         self.password = password
         self.port = port
@@ -143,25 +146,21 @@ class vManageSession(Session):
 
     def request(self, method, url, *args, **kwargs) -> Any:
         full_url = self.get_full_url(url)
-        return super(vManageSession, self).request(method, full_url, args, kwargs)
+        return super(vManageSession, self).request(method, full_url, *args, **kwargs)
 
     def get_full_url(self, url_path: str) -> str:
         """Returns base API url plus given url path."""
         return urljoin(self.base_url, url_path)
 
-    def __create_base_url(self, url: str, port: Optional[int]) -> str:
+    def __create_base_url(self) -> str:
         """Creates base url based on ip address and port.
-
-        Args:
-            url: IP address or domain name, i.e. '10.0.1.200' or 'fruits.com'
-            port (int): Port of reachable vManage.
 
         Returns:
             str: Base url shared for every request.
         """
-        if port:
-            return f"https://{url}:{port}"
-        return f"https://{url}"
+        if self.port:
+            return f"https://{self.url}:{self.port}"
+        return f"https://{self.url}"
 
     def about(self) -> Dict:
         return self.get_data(url="/dataservice/client/about")
@@ -175,6 +174,25 @@ class vManageSession(Session):
     def get_json(self, url: str) -> Any:
         response = self.get(url)
         return response.json()
+
+    def get_file(self, url: str, filename: Path) -> Response:
+        """Get a file using session get.
+
+        Args:
+            url: dataservice api.
+            filename: Filename to write download file to.
+
+        Returns:
+            http response.
+
+        Example usage:
+            response = self.session.get_file(url, filename)
+
+        """
+        with self.get(url) as response:
+            with open(filename, "wb") as file:
+                file.write(response.content)
+        return response
 
     def wait_for_server_reachability(self, retries: int, delay: int, initial_delay: int = 0) -> bool:
         """Checks if vManage API is reachable by sending server request.
@@ -242,5 +260,16 @@ class vManageSession(Session):
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"
 
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.username}@{self.base_url})"
+    def __repr__(self):
+        return f"{self.__class__.__name__}('{self.url}', '{self.username}', '{self.password}', port={self.port}, " \
+               f"subdomain='{self.subdomain}')"
+
+    def __eq__(self, other):
+        if isinstance(other, vManageSession):
+            comparison_list = [self.url == other.url,
+                               self.username == other.username,
+                               self.password == other.password,
+                               self.port == other.port,
+                               str(self.subdomain) == str(other.subdomain)]
+            return True if all(comparison_list) else False
+        return False
