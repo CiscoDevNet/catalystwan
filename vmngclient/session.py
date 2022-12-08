@@ -12,6 +12,7 @@ from requests.auth import AuthBase
 from requests.exceptions import HTTPError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
+from vmngclient.utils.response import response_debug
 from vmngclient.vmanage_auth import vManageAuth
 
 logger = logging.getLogger(__name__)
@@ -143,12 +144,8 @@ class vManageSession(Session):
 
     def request(self, method, url, *args, **kwargs) -> Any:
         full_url = self.get_full_url(url)
-        logger.debug(
-            f"{method} {full_url}\n \
-                    args={args if args else None}\n \
-                    kwargs={kwargs if kwargs else None}"
-        )
         response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
+        logger.debug(response_debug(response))
         try:
             response.raise_for_status()
         except HTTPError as error:
