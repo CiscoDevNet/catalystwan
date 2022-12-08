@@ -143,6 +143,11 @@ class vManageSession(Session):
 
     def request(self, method, url, *args, **kwargs) -> Any:
         full_url = self.get_full_url(url)
+        logger.debug(
+            f"{method} {full_url}\n \
+                    args={args if args else None}\n \
+                    kwargs={kwargs if kwargs else None}"
+        )
         response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
         try:
             response.raise_for_status()
