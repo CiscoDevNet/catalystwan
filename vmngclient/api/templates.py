@@ -2,10 +2,10 @@ import logging
 from typing import List, cast
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
-from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
+from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.dataclasses import Device, Template
-from vmngclient.session import Session
+from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass, get_logger_name
 from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.operation_status import OperationStatus
@@ -35,7 +35,7 @@ class AttachedError(Exception):
 
 
 class TemplateAPI:
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: vManageSession) -> None:
         self.session = session
 
     @property
@@ -144,7 +144,7 @@ class TemplateAPI:
             ]
         }
         endpoint = "/dataservice/template/device/config/attachcli"
-        response = cast(dict, self.session.post_json(url=endpoint, data=payload))
+        response = self.session.post(url=endpoint, data=payload).json()
         return self.wait_for_complete(response['id'])
 
     def device_to_cli(self, device: Device) -> bool:
@@ -161,7 +161,7 @@ class TemplateAPI:
             "devices": [{"deviceId": device.uuid, "deviceIP": device.id}],
         }
         endpoint = "/dataservice/template/config/device/mode/cli"
-        response = cast(dict, self.session.post_json(url=endpoint, data=payload))
+        response = self.session.post(url=endpoint, data=payload).json()
         return self.wait_for_complete(response['id'])
 
     def get_operation_status(self, operation_id: str) -> List[OperationStatus]:
@@ -193,7 +193,7 @@ class TemplateAPI:
         endpoint = f"/dataservice/template/device/{template.id}"
         if template.devices_attached == 0:
             response = self.session.delete(url=endpoint)
-            return response.status == 200
+            return response.status_code == 200
         raise AttachedError(template.name)
 
     def create(self, device_model: DeviceModel, name: str, description: str, config: CiscoConfParse) -> str:
@@ -218,7 +218,7 @@ class TemplateAPI:
 
 
 class CliTemplate:
-    def __init__(self, session: Session, device_model: DeviceModel, name: str, description: str) -> None:
+    def __init__(self, session: vManageSession, device_model: DeviceModel, name: str, description: str) -> None:
         self.session = session
         self.device_model = device_model
         self.name = name
@@ -261,7 +261,7 @@ class CliTemplate:
             "configType": "file",
         }
         endpoint = "/dataservice/template/device/cli/"
-        response = cast(dict, self.session.post_json(url=endpoint, data=payload))
+        response = self.session.post(url=endpoint, data=payload).json()
         return response['templateId']
 
     def update(self, id: str) -> None:
@@ -285,7 +285,7 @@ class CliTemplate:
             "draftMode": False,
         }
         endpoint = f"/dataservice/template/device/{id}"
-        cast(dict, self.session.put_json(url=endpoint, data=payload))
+        self.session.put(url=endpoint, data=payload).json()
 
     def add_to_config(self, add_config: CiscoConfParse, add_before: str) -> None:
         """Add config to existing config before provided value.

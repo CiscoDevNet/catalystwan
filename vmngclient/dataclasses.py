@@ -1,7 +1,7 @@
 import datetime as dt
 from typing import List, Optional
 
-from attr import define, field
+from attr import define, field  # type: ignore
 
 from vmngclient.utils.creation_tools import FIELD_NAME, asdict, convert_attributes
 from vmngclient.utils.device_model import DeviceModel
@@ -66,6 +66,10 @@ class Device(DataclassBase):
     reachability: Reachability = field(converter=Reachability)
     local_system_ip: str = field(metadata={FIELD_NAME: "local-system-ip"})
     memUsage: Optional[float] = field(default=None)
+    mem_state: Optional[str] = field(default=None, metadata={FIELD_NAME: "memState"})
+    cpu_state: Optional[str] = field(default=None, metadata={FIELD_NAME: "cpuState"})
+    cpu_load: Optional[float] = field(default=None, metadata={FIELD_NAME: "cpuLoad"})
+    state_description: Optional[str] = field(default=None)
     connected_vManages: List[str] = field(factory=list, metadata={FIELD_NAME: "connectedVManages"})
     model: Optional[str] = field(default=None, metadata={FIELD_NAME: "device-model"})
     board_serial: Optional[str] = field(default=None, metadata={FIELD_NAME: 'board-serial'})
@@ -187,8 +191,8 @@ class EventData(DataclassBase):
 @define(frozen=True)
 class User(DataclassBase):
     group: List[str]
-    locale: str
     username: str = field(metadata={FIELD_NAME: "userName"})
+    locale: Optional[str] = field(default=None)
     password: Optional[str] = field(default=None)
     description: Optional[str] = field(default=None)
     resource_group: Optional[str] = field(default=None, metadata={FIELD_NAME: "resGroupName"})

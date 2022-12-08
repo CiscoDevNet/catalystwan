@@ -2,7 +2,7 @@ import logging
 from typing import List, Union, cast
 
 from vmngclient.dataclasses import CloudConnectorData, CloudServicesSettings, ServiceConfigurationData, User
-from vmngclient.session import Session
+from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import asdict, create_dataclass, get_logger_name
 
 logger = logging.getLogger(get_logger_name(__name__))
@@ -17,7 +17,7 @@ class UserDoesNotExists(Exception):
 
 
 class UsersAPI:
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: vManageSession) -> None:
         self.session = session
 
     def get_all_users(self) -> List[User]:
@@ -35,7 +35,7 @@ class UsersAPI:
         url_path = "/dataservice/admin/user"
         data = asdict(user)  # type: ignore
 
-        response = self.session.post_json(url_path, data)
+        response = self.session.post(url=url_path, data=data)
         logger.info(response)
 
     def delete_user(self, username: str) -> bool:
@@ -44,7 +44,7 @@ class UsersAPI:
         url_path = f"/dataservice/admin/user/{username}"
         logger.debug(f"Deleting user {username}.")
         response = self.session.delete(url_path)
-        return True if response.status == 200 else False
+        return True if response.status_code == 200 else False
 
 
 class ClusterManagementAPI:
@@ -54,9 +54,8 @@ class ClusterManagementAPI:
         session: logged in API admin session
     """
 
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: vManageSession) -> None:
         self.session = session
-        self.session.login()  # consider using login in Session init
 
     def modify_cluster_setup(self, service_configuration: ServiceConfigurationData) -> bool:
         """Updates vManage cluster configuration.
@@ -67,7 +66,7 @@ class ClusterManagementAPI:
         url_path = "/dataservice/clusterManagement/setup"
         data = asdict(service_configuration)  # type: ignore
         response = self.session.put(url_path, data)
-        return True if response.status == 200 else False
+        return True if response.status_code == 200 else False
 
     def get_cluster_management_health_status(self) -> Union[dict, list]:
         """Gets Cluster Management Service Reachability health status.
@@ -80,14 +79,13 @@ class ClusterManagementAPI:
 
 
 class AdministrationSettingsAPI:
-    def __init__(self, session: Session) -> None:
+    def __init__(self, session: vManageSession) -> None:
         """Covers Administration Settings API calls.
 
         Args:
             session: logged in API admin session
         """
         self.session = session
-        self.session.login()  # consider using login in Session init
 
     def get_sdavc_cloud_connector_config(self) -> CloudConnectorData:
         """Gets SD-AVC Cloud Connector Config.
@@ -104,14 +102,14 @@ class AdministrationSettingsAPI:
         url_path = "/dataservice/sdavc/cloudconnector"
         data = asdict(cloud_connector)  # type: ignore
         response = self.session.post(url_path, data)
-        return True if response.status == 200 else False
+        return True if response.status_code == 200 else False
 
     def disable_sdavc_cloud_connector(self) -> bool:
         """Disables SD-AVC Cloud Connector on vManage."""
         url_path = "/dataservice/sdavc/cloudconnector"
         data = {"cloudEnabled": False}
         response = self.session.put(url_path, data)
-        return True if response.status == 200 else False
+        return True if response.status_code == 200 else False
 
     def get_cloud_services(self) -> CloudServicesSettings:
         url_path = "/dataservice/settings/configuration/cloudservices"
@@ -121,7 +119,7 @@ class AdministrationSettingsAPI:
     def set_cloud_services(self, config: CloudServicesSettings) -> bool:
         url_path = "/dataservice/settings/configuration/cloudservices"
         response = self.session.post(url_path, asdict(config))  # type: ignore
-        return True if response.status == 200 else False
+        return True if response.status_code == 200 else False
 
     def get_cloud_on_ramp_for_saas_mode(self):
         """Get information about Cloud on Ramp for Saas mode"""

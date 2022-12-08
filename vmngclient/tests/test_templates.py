@@ -59,7 +59,7 @@ class TestTemplateAPI(unittest.TestCase):
             status='normal',
         )
 
-    @patch('vmngclient.session.Session')
+    @patch('vmngclient.session.vManageSession')
     def test_templates_success(self, mock_session):
 
         # Arrange
@@ -71,7 +71,7 @@ class TestTemplateAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, self.templates)
 
-    @patch('vmngclient.session.Session')
+    @patch('vmngclient.session.vManageSession')
     def test_templates_no_data(self, mock_session):
 
         # Arrange
@@ -184,7 +184,7 @@ class TestTemplateAPI(unittest.TestCase):
         # Assert
         self.assertFalse(answer)
 
-    @patch('vmngclient.session.Session')
+    @patch('vmngclient.session.vManageSession')
     @patch.object(TemplateAPI, 'templates')
     @patch.object(TemplateAPI, "wait_for_complete")
     def test_attach_exist_template(self, mock_session, mock_wait_for_complete, mock_templates):
@@ -209,7 +209,7 @@ class TestTemplateAPI(unittest.TestCase):
         # Assert
         self.assertTrue(answer)
 
-    @patch('vmngclient.session.Session')
+    @patch('vmngclient.session.vManageSession')
     @patch.object(TemplateAPI, 'templates')
     @patch.object(TemplateAPI, "wait_for_complete")
     def test_attach_no_exist_template(self, mock_session, mock_wait_for_complete, mock_templates):
@@ -234,7 +234,7 @@ class TestTemplateAPI(unittest.TestCase):
         # Assert
         self.assertFalse(answer)
 
-    @patch('vmngclient.session.Session')
+    @patch('vmngclient.session.vManageSession')
     @patch.object(TemplateAPI, "wait_for_complete")
     def test_device_to_cli_true(self, mock_session, mock_wait_for_complete):
 
@@ -253,7 +253,7 @@ class TestTemplateAPI(unittest.TestCase):
         # Assert
         self.assertTrue(answer)
 
-    @patch('vmngclient.session.Session')
+    @patch('vmngclient.session.vManageSession')
     def test_get_operatrion_status_success(self, mock_session):
 
         # Arrage
@@ -275,7 +275,7 @@ class TestTemplateAPI(unittest.TestCase):
             [OperationStatus.IN_PROGRESS, OperationStatus.FAILURE, OperationStatus.SUCCESS, OperationStatus.SCHEDULED],
         )
 
-    @patch('vmngclient.session.Session')
+    @patch('vmngclient.session.vManageSession')
     def test_get_operatrion_status_no_data(self, mock_session):
 
         # Arrage
@@ -289,13 +289,13 @@ class TestTemplateAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, [])
 
-    @patch('vmngclient.session.Session')
+    @patch('vmngclient.session.vManageSession')
     @patch.object(TemplateAPI, 'templates')
     def test_delete_success(self, mock_session, mock_templates):
 
         # Arrage
         MockResponse = MagicMock()
-        MockResponse.status = 200
+        MockResponse.status_code = 200
         mock_session.delete.return_value = MockResponse
         test_object = TemplateAPI(mock_session)
 
@@ -306,11 +306,10 @@ class TestTemplateAPI(unittest.TestCase):
 
         # Act
         answer = test_object.delete('template_1')
-
         # Assert
         self.assertTrue(answer)
 
-    @patch('vmngclient.session.Session')
+    @patch('vmngclient.session.vManageSession')
     @patch.object(TemplateAPI, 'templates')
     def test_delete_wrong_status(self, mock_session, mock_templates):
 
@@ -331,7 +330,7 @@ class TestTemplateAPI(unittest.TestCase):
         # Assert
         self.assertFalse(answer)
 
-    @patch('vmngclient.session.Session')
+    @patch('vmngclient.session.vManageSession')
     @patch.object(TemplateAPI, 'templates')
     def test_delete_exception(self, mock_session, mock_templates):
 
@@ -353,7 +352,7 @@ class TestTemplateAPI(unittest.TestCase):
         # Assert
         self.assertRaises(AttachedError, answer)
 
-    @patch('vmngclient.session.Session')
+    @patch('vmngclient.session.vManageSession')
     @patch.object(TemplateAPI, 'templates')
     def test_create_exception(self, mock_session, mock_templates):
 
