@@ -1,9 +1,13 @@
-import json
 from dataclasses import dataclass
-from typing import Any, Dict, List, cast
+from pprint import pformat
+from typing import Any, Dict, List, Type, TypeVar, cast
 
 from requests import Response
 from requests.exceptions import JSONDecodeError
+
+from vmngclient.utils.creation_tools import create_dataclass
+
+T = TypeVar("T")
 
 
 class VManageResponseException(Exception):
@@ -32,7 +36,7 @@ def response_debug(response: Response, headers: bool = False) -> str:
     if headers:
         info.request.update({"headers": dict(response.request.headers.items())})
         info.response.update({"headers": dict(response.headers.items())})
-    return json.dumps(dict(info.__dict__.items()), indent=4)
+    return pformat(dict(info.__dict__.items()), width=80, indent=0)
 
 
 def get_json_data(response: Response) -> Any:
@@ -53,8 +57,23 @@ def get_json_data_as_list(response: Response) -> List:
     return cast(list, data)
 
 
-def get_json_data_as_dict(response: Response) -> Dict:
+def get_json_data_as_dict(response: Response) -> Dict[str, Any]:
     data = get_json_data(response)
     if not isinstance(data, Dict):
         raise VManageResponseException(f"{{\"data\": ...}} contains {type(data)}, expected dict", response)
     return cast(dict, data)
+
+
+def parse_as(response: Response, cls: Type[T]) -> T:
+    try:
+        return create_dataclass(cls, get_json_data_as_dict(response))
+    except TypeError as e:
+        raise VManageResponseException(f"Cannot create {cls}: {str(e)}", response)
+
+
+def parse_as_list(response: Response, cls: Type[T]) -> List[T]:
+    try:
+        items = get_json_data_as_list(response)
+        return [create_dataclass(cls, item) for item in items]
+    except TypeError as e:
+        raise VManageResponseException(f"Cannot create {cls}: {str(e)}", response)

@@ -4,7 +4,12 @@ from unittest.mock import patch
 
 from parameterized import parameterized  # type: ignore
 
-from vmngclient.response import VManageResponseException, get_json_data, get_json_data_as_dict, get_json_data_as_list
+from vmngclient.utils.response import (
+    VManageResponseException,
+    get_json_data,
+    get_json_data_as_dict,
+    get_json_data_as_list,
+)
 
 
 class TestResponse(unittest.TestCase):
