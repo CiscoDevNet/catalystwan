@@ -5,12 +5,11 @@ import time
 from enum import Enum, auto
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
-from urllib.error import HTTPError
 from urllib.parse import urljoin
 
-# import requests
 from requests import Response, Session
 from requests.auth import AuthBase
+from requests.exceptions import HTTPError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.vmanage_auth import vManageAuth
@@ -61,7 +60,6 @@ def create_vManageSession(
         password (str): password
         subdomain: subdomain specifying to which view switch when creating provider as a tenant session,
             works only on provider user mode
-        timeout (int): timeout
 
     Returns:
         Session object
@@ -115,11 +113,10 @@ class vManageSession(Session):
     Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
 
     Args:
-        url: IP address or domain name, i.e. '10.0.1.200' or 'fruits.com'
+        url: IP address or domain name, i.e. '10.0.1.200' or 'example.com'
         port: port
         username: username
         password: password
-        timeout: timeout
     """
 
     def __init__(
@@ -132,7 +129,9 @@ class vManageSession(Session):
         subdomain: Optional[str] = None,
         auth: Optional[AuthBase] = None,
     ):
-        self.base_url = self.__create_base_url(url, port)
+        self.url = url
+        self.port = port
+        self.base_url = self.__create_base_url()
         self.username = username
         self.password = password
         self.port = port
@@ -145,25 +144,30 @@ class vManageSession(Session):
 
     def request(self, method, url, *args, **kwargs) -> Any:
         full_url = self.get_full_url(url)
-        return super(vManageSession, self).request(method, full_url, args, kwargs)
+        response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
+        try:
+            response.raise_for_status()
+        except HTTPError as error:
+            logger.debug(error)
+            if response.status_code == 403:
+                logger.info(f"User {self.username} is unauthorized for method {method} {full_url}")
+            else:
+                raise error
+        return response
 
     def get_full_url(self, url_path: str) -> str:
         """Returns base API url plus given url path."""
         return urljoin(self.base_url, url_path)
 
-    def __create_base_url(self, url: str, port: Optional[int]) -> str:
-        """Creates base url based on ip address and port.
-
-        Args:
-            url: IP address or domain name, i.e. '10.0.1.200' or 'fruits.com'
-            port (int): Port of reachable vManage.
+    def __create_base_url(self) -> str:
+        """Creates base url based on ip address or domain and port if provided.
 
         Returns:
             str: Base url shared for every request.
         """
-        if port:
-            return f"https://{url}:{port}"
-        return f"https://{url}"
+        if self.port:
+            return f"https://{self.url}:{self.port}"
+        return f"https://{self.url}"
 
     def about(self) -> Dict:
         return self.get_data(url="/dataservice/client/about")
@@ -214,7 +218,7 @@ class vManageSession(Session):
         """
 
         def _log_exception(retry_state):
-            logger.error(f"Cannot reach server, orignial exception: {retry_state.outcome.exception()}")
+            logger.error(f"Cannot reach server, original exception: {retry_state.outcome.exception()}")
             return False
 
         if initial_delay:
@@ -263,5 +267,20 @@ class vManageSession(Session):
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"
 
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.username}@{self.base_url})"
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}('{self.url}', '{self.username}', '{self.password}', port={self.port}, "
+            f"subdomain='{self.subdomain}')"
+        )
+
+    def __eq__(self, other):
+        if isinstance(other, vManageSession):
+            comparison_list = [
+                self.url == other.url,
+                self.username == other.username,
+                self.password == other.password,
+                self.port == other.port,
+                str(self.subdomain) == str(other.subdomain),
+            ]
+            return True if all(comparison_list) else False
+        return False
