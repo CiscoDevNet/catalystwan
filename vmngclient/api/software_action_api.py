@@ -6,11 +6,12 @@ from urllib.error import HTTPError
 from attr import define
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
-from vmngclient.api.basic_api import Session
+from vmngclient.session import vManageSession
 from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.utils.creation_tools import get_logger_name
 from vmngclient.utils.operation_status import OperationStatus
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 logger = logging.getLogger(get_logger_name(__name__))
 
@@ -52,7 +53,7 @@ class SoftwareActionAPI:
     are exececutable on all device categories.
     """
 
-    def __init__(self, session: Session, device_versions: DeviceVersions, repository: RepositoryAPI) -> None:
+    def __init__(self, session: vManageSession , device_versions: DeviceVersions, repository: RepositoryAPI) -> None:
 
         self.session = session
         self.device_versions = device_versions
@@ -75,7 +76,7 @@ class SoftwareActionAPI:
             "devices": self.device_versions.get_device_list_if_in_available(version_to_activate, devices),
             "deviceType": "vmanage",
         }
-        activate = dict(self.session.post_json(url, payload))
+        activate = dict(self.session.post(url, json = payload).json())
         return activate["id"]
 
     def upgrade_software(
@@ -118,7 +119,6 @@ class SoftwareActionAPI:
             "devices": self.device_versions.get_device_list(devices),
             "deviceType": install_spec.device_type.value,
         }
-        print(payload)
         if install_spec.family.value in (Family.VMANAGE.value, Family.VEDGE.value):
             incorrect_devices = self._downgrade_check(
                 payload["devices"],
@@ -130,8 +130,24 @@ class SoftwareActionAPI:
                     f"Current version of devices with id's {incorrect_devices} is \
                     higher than upgrade version. Action denied!"
                 )
-        upgrade = dict(self.session.post_json(url, payload))
+        upgrade = dict(self.session.post(url, json=payload).json())
         return upgrade["id"]
+    
+    def upload_image(self,image_path: str):
+        #self.session.headers.update({"content-type": "file"})
+        
+        encoder = MultipartEncoder(
+            fields={
+            'file': ('filename', open(image_path, 'rb'), 'text/plain')})
+        self.session.headers.update({"content-type": encoder.content_type})
+        url = "/dataservice/device/action/software/package"
+        # files = {'upload_file': open(image_path,'rb')}
+        # values={'DB':'photcat' , 'OUT':'.gz' , 'SHORT':'short'}
+        # return self.session.post(url,files=files)
+        print ('asdsada')
+        print (encoder.content_type)
+        
+        return self.session.post(url, data=encoder).json()
 
     def _downgrade_check(self, devices, version_to_upgrade: str, family) -> List:
         """

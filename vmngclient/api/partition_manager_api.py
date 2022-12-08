@@ -3,7 +3,7 @@ from typing import List
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
 
-from vmngclient.api.basic_api import Session
+from vmngclient.session import vManageSession
 from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.utils.creation_tools import get_logger_name
@@ -18,7 +18,7 @@ class PartitionManagerAPI:
     are exececutable on all device categories.
     """
 
-    def __init__(self, session: Session, device_versions: DeviceVersions, repository: RepositoryAPI) -> None:
+    def __init__(self, session: vManageSession, device_versions: DeviceVersions, repository: RepositoryAPI) -> None:
 
         self.session = session
         self.device_versions = device_versions
@@ -41,7 +41,7 @@ class PartitionManagerAPI:
             "devices": self.device_versions.get_device_list_if_in_installed(version, devices),
             "deviceType": "vmanage",
         }
-        set_default = dict(self.repository.session.post_json(url, payload))
+        set_default = dict(self.repository.session.post(url, json=payload).json())
         return set_default["id"]
 
     def remove_partition(self, devices: List[Device], version: str, force: bool = False) -> str:
@@ -68,7 +68,7 @@ class PartitionManagerAPI:
                     f'Current or default version of devices with ids {invalid_devices} \
                         are equal to remove version. Action denied!'
                 )
-        remove_action = dict(self.repository.session.post_json(url, payload))
+        remove_action = dict(self.repository.session.post(url, payload).json())
         return remove_action["id"]
 
     def _check_remove_partition_possibility(self, devices) -> List:

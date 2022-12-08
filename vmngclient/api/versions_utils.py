@@ -6,7 +6,7 @@ from typing import Dict, List, Union
 from attr import define, field
 
 from vmngclient.dataclasses import Device
-from vmngclient.session import Session
+from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass, get_logger_name
 
 logger = logging.getLogger(get_logger_name(__name__))
@@ -33,7 +33,7 @@ class RepositoryAPI:
 
     def __init__(
         self,
-        session: Session,
+        session: vManageSession,
     ):
         self.session = session
 
