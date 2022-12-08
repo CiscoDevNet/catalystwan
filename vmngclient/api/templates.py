@@ -208,7 +208,7 @@ class TemplateAPI:
         endpoint = f"/dataservice/template/device/{template.id}"
         if template.devices_attached == 0:
             response = self.session.delete(url=endpoint)
-            if response.ok:
+            if response.status_code == 200:
                 logger.warning(f"Template with name: {name} - deleted.")
                 return True
             logger.warning(f"Template with name: {name} - has not been removed.")
@@ -263,7 +263,7 @@ class TemplateAPI:
         }
         endpoint = "/dataservice/template/device/config/config/"
         response = self.session.post(url=endpoint, json=payload)
-        return response.ok
+        return response.status_code == 200
 
 
 class CliTemplate:
