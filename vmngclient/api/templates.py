@@ -132,7 +132,7 @@ class TemplateAPI:
         """
         try:
             template_id = self.get_id(name)
-            self.__validation_template(template_id, device=device)
+            self.__template_validation(template_id, device=device)
         except NotFoundError:
             logger.error(f"Error, Template with name {name} not found on {device}.")
             return False
@@ -238,7 +238,7 @@ class TemplateAPI:
             logger.warning(f"Template with name: {name} - created.")
             return cli_template.send_to_device()
 
-    def __validation_template(self, id: str, device: Device) -> bool:
+    def __template_validation(self, id: str, device: Device) -> bool:
         """Checking the template of the configuration on the machine.
 
         Args:
