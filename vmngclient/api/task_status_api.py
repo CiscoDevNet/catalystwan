@@ -113,7 +113,7 @@ class TaskStatus:
             self.status = action_data['status']
             self.status_id = action_data['statusId']
             self.activity = action_data['activity']
-            print(
+            logger.debug(
                 f"Statuses of action {action_id} is: "
                 f"status: {self.status}, status_id: {self.status_id}, activity: {self.activity} "
             )
