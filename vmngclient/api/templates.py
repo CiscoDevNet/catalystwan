@@ -93,7 +93,7 @@ class TemplateAPI:
 
         def _log_exception(retry_state):
             logger.error(
-                f"Operatrion status not achieved in the given time, exception: {retry_state.outcome.exception()}"
+                f"Operatrion status not achieved in the given time, exception: {retry_state.outcome.exception()}."
             )
             return False
 
@@ -113,7 +113,12 @@ class TemplateAPI:
         def wait_for_status():
             return self.get_operation_status(operation_id)
 
-        return True if wait_for_status() else False
+        if wait_for_status():
+            logger.warning(f"The action: {operation_id} - successful")
+            return True
+        else:
+            logger.warning(f"The action: {operation_id} - failed")
+            return False
 
     def attach(self, name: str, device: Device) -> bool:
         """
@@ -129,10 +134,11 @@ class TemplateAPI:
             template_id = self.get_id(name)
             self.__validation_template(template_id, device=device)
         except NotFoundError:
+            logger.error(f"Error, Template with name {name} not found on {device}.")
             return False
         except HTTPError as error:
             error_details = json.loads(error.response.text)
-            logger.error(f"Error in config: {error_details['error']['details']}")
+            logger.error(f"Error in config: {error_details['error']['details']}.")
             return False
         payload = {
             "deviceTemplateList": [
@@ -152,6 +158,7 @@ class TemplateAPI:
         }
         endpoint = "/dataservice/template/device/config/attachcli"
         response = self.session.post(url=endpoint, json=payload).json()
+        logger.warning(f"Attaching a template: {name} to the device: {device.hostname}.")
         return self.wait_for_complete(response['id'])
 
     def device_to_cli(self, device: Device) -> bool:
@@ -169,6 +176,7 @@ class TemplateAPI:
         }
         endpoint = "/dataservice/template/config/device/mode/cli"
         response = self.session.post(url=endpoint, json=payload).json()
+        logger.warning(f"Changing mode to cli mode for {device.hostname}.")
         return self.wait_for_complete(response['id'])
 
     def get_operation_status(self, operation_id: str) -> List[OperationStatus]:
@@ -200,7 +208,12 @@ class TemplateAPI:
         endpoint = f"/dataservice/template/device/{template.id}"
         if template.devices_attached == 0:
             response = self.session.delete(url=endpoint)
-            return response.ok
+            if response.ok:
+                logger.warning(f"Template with name: {name} - deleted.")
+                return True
+            logger.warning(f"Template with name: {name} - has not been removed.")
+            return False
+        logger.warning(f"Template: {template} is attached to device - cannot be deleted.")
         raise AttachedError(template.name)
 
     def create(self, device_model: DeviceModel, name: str, description: str, config: CiscoConfParse) -> str:
@@ -217,14 +230,16 @@ class TemplateAPI:
         """
         try:
             self.get(name)
+            logger.error(f"Error, Template with name: {name} exists.")
             raise NameAlreadyExistError(name)
         except NotFoundError:
             cli_template = CliTemplate(self.session, device_model, name, description)
             cli_template.config = config
+            logger.warning(f"Template with name: {name} - created.")
             return cli_template.send_to_device()
 
     def __validation_template(self, id: str, device: Device) -> bool:
-        """Checking the templaet of the configuration on the machine.
+        """Checking the template of the configuration on the machine.
 
         Args:
             id (str): template id to check.
@@ -247,7 +262,7 @@ class TemplateAPI:
             "isRFSRequired": True,
         }
         endpoint = "/dataservice/template/device/config/config/"
-        response = self.session.post(url=endpoint, json=payload).json()
+        response = self.session.post(url=endpoint, json=payload)
         return response.ok
 
 
@@ -278,6 +293,7 @@ class CliTemplate:
         endpoint = f"/dataservice/template/config/running/{device.uuid}"
         config = self.session.get_json(endpoint)
         self.config = CiscoConfParse(config['config'].splitlines())
+        logger.warning(f"Template loaded from {device.hostname}.")
 
     def send_to_device(self) -> str:
         """
@@ -296,6 +312,7 @@ class CliTemplate:
         }
         endpoint = "/dataservice/template/device/cli/"
         response = self.session.post(url=endpoint, json=payload).json()
+        logger.warning(f"Template with name: {self.name} - sent to the device.")
         return response['templateId']
 
     def update(self, id: str) -> None:
@@ -320,6 +337,7 @@ class CliTemplate:
         }
         endpoint = f"/dataservice/template/device/{id}"
         self.session.put(url=endpoint, json=payload)
+        logger.warning(f"Template with name: {self.name} - updated.")
 
     def add_to_config(self, add_config: CiscoConfParse, add_before: str) -> None:
         """Add config to existing config before provided value.
