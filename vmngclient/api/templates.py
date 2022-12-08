@@ -297,6 +297,8 @@ class CLITemplate:
 
         Returns:
             bool: True if send template to device is successful, otherwise - False.
+
+        The payload differs depending on the type of machine - for physical machines it has two more attributes.
         """
         config_str = "\n".join(self.config.ioscfg)
         payload = {
