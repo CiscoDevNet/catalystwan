@@ -28,6 +28,12 @@ session = create_vManageSession(url=base_url, username=username, password=passwo
 ```
 </details>
 
+### Note:
+To remove `InsecureRequestWarning`, you can include in your scripts:
+```Python
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+```
 
 ## User creation example
 
