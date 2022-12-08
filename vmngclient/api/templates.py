@@ -93,7 +93,7 @@ class TemplateAPI:
 
         def _log_exception(retry_state):
             logger.error(
-                f"Operatrion status not achieved in the given time, exception: {retry_state.outcome.exception()}."
+                f"Operation status not achieved in the given time, exception: {retry_state.outcome.exception()}."
             )
             return False
 
