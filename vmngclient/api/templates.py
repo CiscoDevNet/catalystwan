@@ -207,9 +207,9 @@ class TemplateAPI:
         template = self.get(name)
         endpoint = f"/dataservice/template/device/{template.id}"
         if template.devices_attached == 0:
-            self.session.delete(url=endpoint)
+            response = self.session.delete(url=endpoint)
             logger.info(f"Template with name: {name} - deleted.")
-            return True
+            return response.ok
         logger.info(f"Template: {template} is attached to device - cannot be deleted.")
         raise AttachedError(template.name)
 
