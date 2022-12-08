@@ -235,7 +235,7 @@ class TemplateAPI:
             logger.info(f"Template with name: {name} - created.")
             return cli_template.send_to_device()
 
-    def template_validation(self, id: str, device: Device) -> bool:
+    def template_validation(self, id: str, device: Device) -> str:
         """Checking the template of the configuration on the machine.
 
         Args:
@@ -243,7 +243,7 @@ class TemplateAPI:
             device (Device): The device on which the configuration is to be validate.
 
         Returns:
-            bool: True if everything is correct, otherwise False.
+            str: Validated config.
         """
         payload = {
             "templateId": id,
@@ -260,7 +260,7 @@ class TemplateAPI:
         }
         endpoint = "/dataservice/template/device/config/config/"
         response = self.session.post(url=endpoint, json=payload)
-        return response.status_code == 200
+        return response.text
 
 
 class CLITemplate:
