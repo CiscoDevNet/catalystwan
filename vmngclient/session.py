@@ -102,7 +102,6 @@ def create_vManageSession(
             f"Session created with {user_mode.value} user mode and {view_mode.value} view mode.\n"
             f"Session type set to not defined"
         )
-    print(f"Logged as {username}. The session type is {session.session_type}")
     logger.info(f"Logged as {username}. The session type is {session.session_type}")
     return session
 
