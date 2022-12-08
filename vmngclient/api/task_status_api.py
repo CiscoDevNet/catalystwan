@@ -1,5 +1,5 @@
 import logging
-from typing import List, Union
+from typing import List, cast
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
@@ -40,13 +40,20 @@ class TaskStatus:
         self,
         sleep_seconds: int,
         timeout_seconds: int,
-        exit_statuses: Union[List[OperationStatus], str],
-        exit_statuses_ids: Union[List[OperationStatusId], str],
         action_id: str,
+        exit_statuses: List[OperationStatus] = [
+            OperationStatus.SUCCESS,
+            OperationStatus.FAILURE,
+        ],
+        exit_statuses_ids: List[OperationStatusId] = [
+            OperationStatusId.SUCCESS,
+            OperationStatusId.FAILURE,
+        ],
         activity_text: str = '',
         action_url: str = '/dataservice/device/action/status/',
     ) -> bool:
-        """_summary_
+        """
+        Method to check action status
 
         Args:
             sleep_seconds (int): interval between action status requests
@@ -59,8 +66,10 @@ class TaskStatus:
             action_url (str, optional): Action url. Defaults to '/dataservice/device/action/status/'
 
         Returns:
-            bool: _description_
+            bool: True if condition is met
         """
+        exit_statuses = [cast(OperationStatus, exit_status.value) for exit_status in exit_statuses]
+        exit_statuses_ids = [cast(OperationStatusId, exit_status_id.value) for exit_status_id in exit_statuses_ids]
 
         def check_status(action_data) -> bool:
             """
@@ -104,7 +113,7 @@ class TaskStatus:
             self.status = action_data['status']
             self.status_id = action_data['statusId']
             self.activity = action_data['activity']
-            logger.debug(
+            print(
                 f"Statuses of action {action_id} is: "
                 f"status: {self.status}, status_id: {self.status_id}, activity: {self.activity} "
             )
