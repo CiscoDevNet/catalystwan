@@ -30,7 +30,7 @@ class TaskStatus:
 
     """
 
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: vManageSession) -> None:
         self.session = session
         self.status: str = ''
         self.status_id: str = ''
@@ -51,7 +51,7 @@ class TaskStatus:
         ],
         activity_text: str = '',
         action_url: str = '/dataservice/device/action/status/',
-    ) -> bool:
+    ) -> "TaskStatus":
         """
         Method to check action status
 
@@ -120,8 +120,4 @@ class TaskStatus:
             return action_data
 
         wait_for_action_finish()
-
-        if self.status == OperationStatus.SUCCESS.value and self.status_id == OperationStatusId.SUCCESS.value:
-            if not activity_text or activity_text in self.activity:
-                return True
-        return False
+        return self
