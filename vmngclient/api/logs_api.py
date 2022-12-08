@@ -5,9 +5,8 @@ from typing import Optional
 from urllib.parse import quote
 
 from vmngclient.session import vManageSession
-from vmngclient.utils.creation_tools import get_logger_name
 
-logger = logging.getLogger(get_logger_name(__name__))
+logger = logging.getLogger(__name__)
 
 
 class LogsAPI:
