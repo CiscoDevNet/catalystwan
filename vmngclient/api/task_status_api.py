@@ -11,7 +11,24 @@ logger = logging.getLogger(get_logger_name(__name__))
 
 
 class TaskStatus:
-    """API class to check task status"""
+    """
+    API class to check task status
+        Example usage:
+
+        session = create_vManageSession(ip_address,admin_username,password,port=port)
+        devices = DevicesAPI(session).devices
+        vsmart_device = [dev for dev in devices if dev.personality == Personality.VSMART][0]
+        exit_statuses = [OperationStatus.SUCCESS.value, OperationStatus.FAILURE.value]
+        exit_statuses_ids = [OperationStatusId.SUCCESS.value, OperationStatusId.FAILURE.value]
+
+        reboot_action = RebootAction(session,devices)
+        reboot_action.execute()
+
+        # Keep asking for reboot status until it's not in exit_statuses (Failure or Success)
+        # or timeout is not achieved (3000s)
+        TaskStatus(session).wait_for_completed(5,3000,exit_statuses,exit_statuses_ids,reboot_action.action_id)
+
+    """
 
     def __init__(self, session: vManageSession):
         self.session = session
@@ -26,9 +43,25 @@ class TaskStatus:
         exit_statuses: Union[List[OperationStatus], str],
         exit_statuses_ids: Union[List[OperationStatusId], str],
         action_id: str,
-        activity_text: Union[str, None] = None,
+        activity_text: str = '',
         action_url: str = '/dataservice/device/action/status/',
     ) -> bool:
+        """_summary_
+
+        Args:
+            sleep_seconds (int): interval between action status requests
+            timeout_seconds (int): After this time, function will stop requesting action status
+            exit_statuses (Union[List[OperationStatus], str]): actions statuses that cause stop requesting action status
+            exit_statuses_ids (Union[List[OperationStatusId], str]): actions statuses ids
+             that cause stop requesting action status id
+            action_id (str): inspected action id
+            activity_text (str): activity text
+            action_url (str, optional): Action url. Defaults to '/dataservice/device/action/status/'
+
+        Returns:
+            bool: _description_
+        """
+
         def check_status(action_data) -> bool:
             """
             Function checks if condition is met. If so,
