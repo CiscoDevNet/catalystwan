@@ -1,5 +1,4 @@
 import datetime as dt
-import sys
 from typing import Any, ClassVar, Dict, List, Protocol, Type, TypeVar
 
 import attrs  # type: ignore
@@ -90,15 +89,6 @@ def asdict(dataclass: AttrsInstance) -> dict:
         if json_field_name:
             json_fields[json_field_name] = json_fields.pop(field.name)
     return {**json_fields, **json_fields_excluded}
-
-
-def get_logger_name(name: str) -> str:
-    is_vtest_env = "vtest" in sys.modules
-    if is_vtest_env is True:
-        logger_name = f"runsuite.{name}"
-    else:
-        logger_name = name
-    return logger_name
 
 
 def flatten_dict(d: Dict) -> Dict:
