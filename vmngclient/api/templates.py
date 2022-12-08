@@ -207,12 +207,9 @@ class TemplateAPI:
         template = self.get(name)
         endpoint = f"/dataservice/template/device/{template.id}"
         if template.devices_attached == 0:
-            response = self.session.delete(url=endpoint)
-            if response.status_code == 200:
-                logger.info(f"Template with name: {name} - deleted.")
-                return True
-            logger.info(f"Template with name: {name} - has not been removed.")
-            return False
+            self.session.delete(url=endpoint)
+            logger.info(f"Template with name: {name} - deleted.")
+            return True
         logger.info(f"Template: {template} is attached to device - cannot be deleted.")
         raise AttachedError(template.name)
 
@@ -233,7 +230,7 @@ class TemplateAPI:
             logger.error(f"Error, Template with name: {name} exists.")
             raise NameAlreadyExistError(name)
         except NotFoundError:
-            cli_template = CliTemplate(self.session, device_model, name, description)
+            cli_template = CLITemplate(self.session, device_model, name, description)
             cli_template.config = config
             logger.info(f"Template with name: {name} - created.")
             return cli_template.send_to_device()
@@ -266,7 +263,7 @@ class TemplateAPI:
         return response.status_code == 200
 
 
-class CliTemplate:
+class CLITemplate:
     def __init__(self, session: vManageSession, device_model: DeviceModel, name: str, description: str) -> None:
         self.session = session
         self.device_model = device_model
@@ -293,7 +290,7 @@ class CliTemplate:
         endpoint = f"/dataservice/template/config/running/{device.uuid}"
         config = self.session.get_json(endpoint)
         self.config = CiscoConfParse(config['config'].splitlines())
-        logger.info(f"Template loaded from {device.hostname}.")
+        logger.debug(f"Template loaded from {device.hostname}.")
 
     def send_to_device(self) -> bool:
         """
@@ -310,16 +307,20 @@ class CliTemplate:
             "factoryDefault": False,
             "configType": "file",
         }
+        if self.device_model not in [DeviceModel.VEDGE, DeviceModel.VSMART, DeviceModel.VMANAGE, DeviceModel.VBOND]:
+            payload["cliType"] = "device"
+            payload["draftMode"] = False
+
         endpoint = "/dataservice/template/device/cli/"
         try:
             self.session.post(url=endpoint, json=payload).json()
-            logger.info(f"Template with name: {self.name} - sent to the device.")
-            return True
         except HTTPError as error:
             response = json.loads(error.response.text)['error']
             logger.error(response['message'])
             logger.error(response['details'])
             return False
+        logger.info(f"Template with name: {self.name} - sent to the device.")
+        return True
 
     def update(self, id: str) -> bool:
         """
@@ -344,13 +345,13 @@ class CliTemplate:
         endpoint = f"/dataservice/template/device/{id}"
         try:
             self.session.put(url=endpoint, json=payload)
-            logger.info(f"Template with name: {self.name} - updated.")
-            return True
         except HTTPError as error:
             response = json.loads(error.response.text)['error']
             logger.error(response['message'])
             logger.error(response['details'])
             return False
+        logger.info(f"Template with name: {self.name} - updated.")
+        return True
 
     def add_to_config(self, add_config: CiscoConfParse, add_before: str) -> None:
         """Add config to existing config before provided value.
