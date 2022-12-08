@@ -37,9 +37,10 @@ session = create_vManageSession(url=base_url, username=username, password=passwo
 ```Python
 from vmngclient.api.administration import UserAlreadyExistsError, UserApi
 from vmngclient.dataclasses import User
-from vmngclient.session import Session
+from vmngclient.session import create_vManageSession
 
-user_api = UserApi(provider_session)
+session = create_vManageSession(url=..., username=..., password=...)
+user_api = UserApi(session)
 
 test_user = User(
     group=["basic"],
@@ -54,8 +55,6 @@ try:
     user_api.create_user(test_user)
 except UserAlreadyExistsError as error:
     print(f"User {username} already exists.")
-
-print(user_api.get_all_users())
 ```
 </details>
 

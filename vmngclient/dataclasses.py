@@ -191,8 +191,8 @@ class EventData(DataclassBase):
 @define(frozen=True)
 class User(DataclassBase):
     group: List[str]
-    locale: str
     username: str = field(metadata={FIELD_NAME: "userName"})
+    locale: Optional[str] = field(default=None)
     password: Optional[str] = field(default=None)
     description: Optional[str] = field(default=None)
     resource_group: Optional[str] = field(default=None, metadata={FIELD_NAME: "resGroupName"})
