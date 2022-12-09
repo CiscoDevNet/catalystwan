@@ -3,9 +3,9 @@ from typing import List, Union, cast
 
 from vmngclient.dataclasses import CloudConnectorData, CloudServicesSettings, ServiceConfigurationData, User
 from vmngclient.session import vManageSession
-from vmngclient.utils.creation_tools import asdict, create_dataclass, get_logger_name
+from vmngclient.utils.creation_tools import asdict, create_dataclass
 
-logger = logging.getLogger(get_logger_name(__name__))
+logger = logging.getLogger(__name__)
 
 
 class UserAlreadyExistsError(Exception):

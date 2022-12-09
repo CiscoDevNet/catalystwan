@@ -7,9 +7,8 @@ from urllib.error import HTTPError
 from vmngclient.api.basic_api import DeviceStateAPI
 from vmngclient.dataclasses import Device, Speedtest
 from vmngclient.session import vManageSession
-from vmngclient.utils.creation_tools import get_logger_name
 
-logger = logging.getLogger(get_logger_name(__name__))
+logger = logging.getLogger(__name__)
 
 
 class SpeedtestAPI:
