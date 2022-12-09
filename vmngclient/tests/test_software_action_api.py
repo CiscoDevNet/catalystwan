@@ -91,21 +91,3 @@ class TestSoftwareAcionAPI(unittest.TestCase):
         # Assert
         answer = self.mock_software_action_obj._downgrade_check(mock_devices, upgrade_version, Family.VMANAGE.value)
         self.assertEqual(answer, ["mock_uuid"], "downgrade detected, but should not")
-
-    def test_wait_for_completed_success(self):
-
-        # Prepare mock data
-        self.mock_repository_object.session.get_data.return_value = [{"status": "Success"}]
-
-        # Assert
-        answer = self.mock_software_action_obj.wait_for_completed(5, 500, ["Success", "Failure"], "mock_action_id")
-        self.assertEqual(answer, "Success", "job status incorrect")
-
-    def test_wait_for_completed_status_out_of_range(self):
-
-        # Prepare mock data
-        self.mock_repository_object.session.get_data.return_value = [{"status": "other_status"}]
-
-        # Assert
-        answer = self.mock_software_action_obj.wait_for_completed(1, 1, ["Success", "Failure"], "mock_action_id")
-        self.assertEqual(answer, None, "job status incorrect")

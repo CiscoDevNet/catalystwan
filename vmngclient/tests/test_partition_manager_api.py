@@ -106,21 +106,3 @@ class TestPartitionManagerAPI(unittest.TestCase):
         # Assert
         answer = self.mock_partition_manager_obj._check_remove_partition_possibility(mock_devices)
         self.assertEqual(answer, [], "lists are not equal")
-
-    def test_wait_for_completed_success(self):
-
-        # Prepare mock data
-        self.mock_partition_manager_obj.session.get_data.return_value = [{"status": "Success"}]
-
-        # Assert
-        answer = self.mock_partition_manager_obj.wait_for_completed(5, 500, ["Success", "Failure"], "mock_action_id")
-        self.assertEqual(answer, "Success", "job status incorrect")
-
-    def test_wait_for_completed_status_out_of_range(self):
-
-        # Prepare mock data
-        self.mock_partition_manager_obj.session.get_data.return_value = [{"status": "other_status"}]
-
-        # Assert
-        answer = self.mock_partition_manager_obj.wait_for_completed(1, 1, ["Success", "Failure"], "mock_action_id")
-        self.assertEqual(answer, None, "job status incorrect")
