@@ -74,7 +74,7 @@ class SoftwareActionAPI:
             "devices": self.device_versions.get_device_list_if_in_available(version_to_activate, devices),
             "deviceType": "vmanage",
         }
-        activate = dict(self.session.post(url, json=payload).json())
+        activate = dict(self.session.post(url, json=payload))
         return activate["id"]
 
     def upgrade_software(
@@ -128,7 +128,7 @@ class SoftwareActionAPI:
                     f"Current version of devices with id's {incorrect_devices} is \
                     higher than upgrade version. Action denied!"
                 )
-        upgrade = dict(self.session.post(url, json=payload).json())
+        upgrade = dict(self.session.post(url, json=payload))
         return upgrade["id"]
 
     def upload_image(self, image_path: str) -> int:

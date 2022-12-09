@@ -65,7 +65,7 @@ class PartitionManagerAPI:
                     f'Current or default version of devices with ids {invalid_devices} \
                         are equal to remove version. Action denied!'
                 )
-        remove_action = dict(self.repository.session.post(url, payload).json())
+        remove_action = dict(self.repository.session.post(url, payload))
         return remove_action["id"]
 
     def _check_remove_partition_possibility(self, devices) -> List:
