@@ -4,9 +4,8 @@ from typing import List
 from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.session import vManageSession
-from vmngclient.utils.creation_tools import get_logger_name
 
-logger = logging.getLogger(get_logger_name(__name__))
+logger = logging.getLogger(__name__)
 
 
 class PartitionManagerAPI:
@@ -35,7 +34,7 @@ class PartitionManagerAPI:
         url = "/dataservice/device/action/defaultpartition"
         payload = {
             "action": 'defaultpartition',
-            "devices": self.device_versions.get_device_list_if_in_installed(version, devices),
+            "devices": self.device_versions._get_device_list_in(version, devices, "installed_versions"),
             "deviceType": "vmanage",
         }
         set_default = dict(self.repository.session.post(url, json=payload).json())
@@ -55,7 +54,7 @@ class PartitionManagerAPI:
         url = "/dataservice/device/action/removepartition"
         payload = {
             "action": "removepartition",
-            "devices": self.device_versions.get_device_list_if_in_available(version, devices),
+            "devices": self.device_versions._get_device_list_in(version, devices, "available_versions"),
             "deviceType": "vmanage",
         }
         if force is False:

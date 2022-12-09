@@ -7,9 +7,9 @@ from attr import define, field
 
 from vmngclient.dataclasses import Device
 from vmngclient.session import vManageSession
-from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass, get_logger_name
+from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
 
-logger = logging.getLogger(get_logger_name(__name__))
+logger = logging.getLogger(__name__)
 
 
 class DeviceCategory(Enum):
@@ -131,12 +131,35 @@ class DeviceVersions:
             version_to_set_up (str): requested version
 
         Returns:
-            None
+            list : list of devices
         """
         devs = [{"deviceId": dev.uuid, "deviceIP": dev.id} for dev in devices]
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
         for dev in devs:
             dev_installed_versions = all_dev_versions[dev["deviceId"]].installed_versions
+            for version in dev_installed_versions:
+                if version_to_set_up in version:
+                    dev["version"] = version
+                    break
+            if not dev["version"]:
+                logger.error(f"Software version {version_to_set_up} for {dev} is not included in available_versions")
+        return devs
+    
+    def _get_device_list_in(self, version_to_set_up: str, devices: List[Device], version_type:str):
+        """
+        Create version key for every device dict in device list, if requested version
+        is in available versions
+
+        Args:
+            version_to_set_up (str): requested version
+
+        Returns:
+            list : list of devices
+        """
+        devs = [{"deviceId": dev.uuid, "deviceIP": dev.id} for dev in devices]
+        all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
+        for dev in devs:
+            dev_installed_versions = getattr(all_dev_versions[dev["deviceId"]],version_type)
             for version in dev_installed_versions:
                 if version_to_set_up in version:
                     dev["version"] = version

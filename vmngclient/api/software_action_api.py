@@ -9,9 +9,8 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder  # type: ignore
 from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.session import vManageSession
-from vmngclient.utils.creation_tools import get_logger_name
 
-logger = logging.getLogger(get_logger_name(__name__))
+logger = logging.getLogger(__name__)
 
 
 class Family(Enum):
@@ -71,7 +70,7 @@ class SoftwareActionAPI:
         url = "/dataservice/device/action/changepartition"
         payload = {
             "action": "changepartition",
-            "devices": self.device_versions.get_device_list_if_in_available(version_to_activate, devices),
+            "devices": self.device_versions._get_device_list_in(version_to_activate, devices, "available_versions"),
             "deviceType": "vmanage",
         }
         activate = dict(self.session.post(url, json=payload))
