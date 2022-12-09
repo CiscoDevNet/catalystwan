@@ -12,6 +12,7 @@ from requests.auth import AuthBase
 from requests.exceptions import HTTPError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
+from vmngclient.utils.response import response_debug
 from vmngclient.vmanage_auth import vManageAuth
 
 logger = logging.getLogger(__name__)
@@ -102,7 +103,6 @@ def create_vManageSession(
             f"Session created with {user_mode.value} user mode and {view_mode.value} view mode.\n"
             f"Session type set to not defined"
         )
-    print(f"Logged as {username}. The session type is {session.session_type}")
     logger.info(f"Logged as {username}. The session type is {session.session_type}")
     return session
 
@@ -145,6 +145,7 @@ class vManageSession(Session):
     def request(self, method, url, *args, **kwargs) -> Any:
         full_url = self.get_full_url(url)
         response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
+        logger.debug(response_debug(response))
         try:
             response.raise_for_status()
         except HTTPError as error:
