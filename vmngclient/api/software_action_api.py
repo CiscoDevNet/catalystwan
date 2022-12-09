@@ -12,6 +12,7 @@ from vmngclient.dataclasses import Device
 from vmngclient.utils.creation_tools import get_logger_name
 from vmngclient.utils.operation_status import OperationStatus
 from requests_toolbelt.multipart.encoder import MultipartEncoder
+from pathlib import PurePath
 
 logger = logging.getLogger(get_logger_name(__name__))
 
@@ -133,21 +134,27 @@ class SoftwareActionAPI:
         upgrade = dict(self.session.post(url, json=payload).json())
         return upgrade["id"]
     
-    def upload_image(self,image_path: str):
-        #self.session.headers.update({"content-type": "file"})
-        
+    def upload_image(self,image_path: str) -> str:
+        """
+        Upload software image 'tar.gz' to Vmanage
+        software repository  
+
+        Args:
+            image_path (str): path to software image
+
+        Returns:
+            str: Response status code
+        """
+        url = "/dataservice/device/action/software/package"
         encoder = MultipartEncoder(
             fields={
-            'file': ('filename', open(image_path, 'rb'), 'text/plain')})
-        self.session.headers.update({"content-type": encoder.content_type})
-        url = "/dataservice/device/action/software/package"
-        # files = {'upload_file': open(image_path,'rb')}
-        # values={'DB':'photcat' , 'OUT':'.gz' , 'SHORT':'short'}
-        # return self.session.post(url,files=files)
-        print ('asdsada')
-        print (encoder.content_type)
-        
-        return self.session.post(url, data=encoder).json()
+            'file': (PurePath(image_path).name,
+             open(image_path, 'rb'),
+             'application/x-gzip')})
+        headers = self.session.headers.copy()
+        headers.update({"content-type": encoder.content_type})
+        response = self.session.post(url, data=encoder, headers = headers)
+        return response.status_code
 
     def _downgrade_check(self, devices, version_to_upgrade: str, family) -> List:
         """
