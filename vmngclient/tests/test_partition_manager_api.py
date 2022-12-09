@@ -62,7 +62,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         mock_devices.return_value = self.mock_devices
         mock_get_device_list.return_value = self.mock_devices
         self.mock_repository_object.devices = self.mock_devices
-        self.mock_repository_object.session.post_json.return_value = {"id": "mock_action_id"}
+        self.mock_repository_object.session.post.return_value = {"id": "mock_action_id"}
 
         # Assert
         answer = self.mock_partition_manager_obj.remove_partition([self.device], "ver1", True)
@@ -79,7 +79,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         ).return_value = self.mock_devices
         mock_check_remove.return_value = []
         self.mock_repository_object.devices = self.mock_devices
-        self.mock_repository_object.session.post_json.return_value = {"id": "mock_action_id"}
+        self.mock_repository_object.session.post.return_value = {"id": "mock_action_id"}
 
         # Assert
         answer = self.mock_partition_manager_obj.remove_partition("ver1", True)
