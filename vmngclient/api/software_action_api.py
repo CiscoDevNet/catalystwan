@@ -1,18 +1,15 @@
 import logging
 from enum import Enum
+from pathlib import PurePath
 from typing import Any, Dict, List
-from urllib.error import HTTPError
 
 from attr import define
-from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
+from requests_toolbelt.multipart.encoder import MultipartEncoder  # type: ignore
 
-from vmngclient.session import vManageSession
 from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
+from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import get_logger_name
-from vmngclient.utils.operation_status import OperationStatus
-from requests_toolbelt.multipart.encoder import MultipartEncoder
-from pathlib import PurePath
 
 logger = logging.getLogger(get_logger_name(__name__))
 
@@ -54,7 +51,7 @@ class SoftwareActionAPI:
     are exececutable on all device categories.
     """
 
-    def __init__(self, session: vManageSession , device_versions: DeviceVersions, repository: RepositoryAPI) -> None:
+    def __init__(self, session: vManageSession, device_versions: DeviceVersions, repository: RepositoryAPI) -> None:
 
         self.session = session
         self.device_versions = device_versions
@@ -77,7 +74,7 @@ class SoftwareActionAPI:
             "devices": self.device_versions.get_device_list_if_in_available(version_to_activate, devices),
             "deviceType": "vmanage",
         }
-        activate = dict(self.session.post(url, json = payload).json())
+        activate = dict(self.session.post(url, json=payload).json())
         return activate["id"]
 
     def upgrade_software(
@@ -133,11 +130,11 @@ class SoftwareActionAPI:
                 )
         upgrade = dict(self.session.post(url, json=payload).json())
         return upgrade["id"]
-    
-    def upload_image(self,image_path: str) -> str:
+
+    def upload_image(self, image_path: str) -> int:
         """
         Upload software image 'tar.gz' to Vmanage
-        software repository  
+        software repository
 
         Args:
             image_path (str): path to software image
@@ -147,13 +144,11 @@ class SoftwareActionAPI:
         """
         url = "/dataservice/device/action/software/package"
         encoder = MultipartEncoder(
-            fields={
-            'file': (PurePath(image_path).name,
-             open(image_path, 'rb'),
-             'application/x-gzip')})
+            fields={'file': (PurePath(image_path).name, open(image_path, 'rb'), 'application/x-gzip')}
+        )
         headers = self.session.headers.copy()
         headers.update({"content-type": encoder.content_type})
-        response = self.session.post(url, data=encoder, headers = headers)
+        response = self.session.post(url, data=encoder, headers=headers)
         return response.status_code
 
     def _downgrade_check(self, devices, version_to_upgrade: str, family) -> List:
@@ -184,48 +179,3 @@ class SoftwareActionAPI:
                 elif str(label) < str(splited_version_to_upgrade[priority]):
                     break
         return incorrect_devices
-
-    def wait_for_completed(
-        self,
-        sleep_seconds: int,
-        timeout_seconds: int,
-        exit_statuses: List[OperationStatus],
-        action_id: str,
-    ) -> str:
-        """_summary_
-
-        Args:
-            sleep_seconds (int): _description_
-            timeout_seconds (int): _description_
-            exit_statuses (List[str]): _description_
-            action_id (str): _description_
-        """
-
-        def check_status(action_data):
-            return action_data not in (exit_statuses)
-
-        def _log_exception(self):
-            logger.error("Operation status not achieved in given time")
-            return None
-
-        @retry(
-            wait=wait_fixed(sleep_seconds),
-            stop=stop_after_attempt(int(timeout_seconds / sleep_seconds)),
-            retry=retry_if_result(check_status),
-            retry_error_callback=_log_exception,
-        )
-        def wait_for_end_software_action():
-            url = f"/dataservice/device/action/status/{action_id}"
-            try:
-                action_data = self.session.get_data(url)[0]["status"]
-                logger.debug(f"Status of action {action_id} is: {action_data}")
-                print(f"Status of action {action_id} is: {action_data}")
-            except IndexError:
-                action_data = ""
-            except HTTPError as error:
-                if error.code == 503:
-                    pass
-
-            return action_data
-
-        return wait_for_end_software_action()

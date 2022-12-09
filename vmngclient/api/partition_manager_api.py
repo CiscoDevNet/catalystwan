@@ -1,13 +1,10 @@
 import logging
 from typing import List
 
-from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
-
-from vmngclient.session import vManageSession
 from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
+from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import get_logger_name
-from vmngclient.utils.operation_status import OperationStatus
 
 logger = logging.getLogger(get_logger_name(__name__))
 
@@ -85,43 +82,3 @@ class PartitionManagerAPI:
             ):
                 invalid_devices.append((device["deviceId"]))
         return invalid_devices
-
-    def wait_for_completed(
-        self,
-        sleep_seconds: int,
-        timeout_seconds: int,
-        exit_statuses: List[OperationStatus],
-        action_id: str,
-    ) -> str:
-        """Method to check action status
-
-        Args:
-            sleep_seconds (int): interval between action status requests
-            timeout_seconds (int): After this time, function will stop requesting action status
-            exit_statuses (List[str]): actions statuses that cause stop requesting action status
-            action_id (str): inspected action id
-        """
-
-        def check_status(action_data):
-            return action_data not in (exit_statuses)
-
-        def _log_exception(self):
-            logger.error("Operation status not achieved in given time")
-            return None
-
-        @retry(
-            wait=wait_fixed(sleep_seconds),
-            stop=stop_after_attempt(int(timeout_seconds / sleep_seconds)),
-            retry=retry_if_result(check_status),
-            retry_error_callback=_log_exception,
-        )
-        def wait_for_end_software_action():
-            url = f"/dataservice/device/action/status/{action_id}"
-            try:
-                action_data = self.session.get_data(url)[0]["status"]
-                logger.debug(f"Status of action {action_id} is: {action_data}")
-            except IndexError:
-                action_data = ""
-            return action_data
-
-        return wait_for_end_software_action()
