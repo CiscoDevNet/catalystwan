@@ -6,9 +6,9 @@ from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # t
 
 from vmngclient.dataclasses import AlarmData
 from vmngclient.session import vManageSession
-from vmngclient.utils.creation_tools import create_dataclass, flatten_dict, get_logger_name
+from vmngclient.utils.creation_tools import create_dataclass, flatten_dict
 
-logger = logging.getLogger(get_logger_name(__name__))
+logger = logging.getLogger(__name__)
 
 
 class AlarmLevel(Enum):
