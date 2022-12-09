@@ -17,7 +17,7 @@ class Family(Enum):
     VEDGE = "vedge"
     VMANAGE = "vmanage"
 
-
+    
 class VersionType(Enum):
     VMANAGE = "vmanage"
 
@@ -27,6 +27,12 @@ class DeviceType(Enum):
     VEDGE = "vedge"
     VMANAGE = "vmanage"
 
+class DeviceClass(Enum):
+    VEDGE = "vedge"
+    VMANAGE = "vmanage"
+    VSMART = "vsmart"
+    VBOND = "vbond"
+    CEDGE = "cedge"
 
 @define
 class InstallSpecification:
@@ -37,11 +43,11 @@ class InstallSpecification:
 
 
 class InstallSpecHelper(Enum):
-    VMANAGE = InstallSpecification(Family.VMANAGE, VersionType.VMANAGE, DeviceType.VMANAGE)
-    VSMART = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)
-    VBOND = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)
-    VEDGE = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE)
-    CEDGE = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE)
+    VMANAGE = InstallSpecification(Family.VMANAGE, VersionType.VMANAGE, DeviceType.VMANAGE, DeviceClass.VMANAGE)
+    VSMART = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER, DeviceClass.VSMART)
+    VBOND = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER, DeviceClass.VBOND)
+    VEDGE = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE, DeviceClass.VEDGE)
+    CEDGE = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE, DeviceClass.CEDGE)
 
 
 class SoftwareActionAPI:
@@ -116,7 +122,7 @@ class SoftwareActionAPI:
             "devices": self.device_versions.get_device_list(devices),
             "deviceType": install_spec.device_type.value,
         }
-        if install_spec.family.value in (Family.VMANAGE.value, Family.VEDGE.value):
+        if install_spec.family.value in (DeviceClass.VMANAGE.value, DeviceClass.CEDGE.value):
             incorrect_devices = self._downgrade_check(
                 payload["devices"],
                 payload["input"]["version"],
