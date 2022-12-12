@@ -14,9 +14,9 @@ from typing import Iterator, Optional
 from vmngclient.api.basic_api import DeviceStateAPI
 from vmngclient.dataclasses import Device, PacketSetup, Status
 from vmngclient.session import vManageSession
-from vmngclient.utils.creation_tools import create_dataclass, get_logger_name
+from vmngclient.utils.creation_tools import create_dataclass
 
-logger = logging.getLogger(get_logger_name(__name__))
+logger = logging.getLogger(__name__)
 
 
 class DownloadStatus(Enum):
