@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import json
 import logging
 from difflib import Differ
+from enum import Enum
 from typing import List, cast
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
@@ -14,27 +17,6 @@ from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.operation_status import OperationStatus
 
 logger = logging.getLogger(__name__)
-
-
-class NotFoundError(Exception):
-    """Used when a template item is not found."""
-
-    def __init__(self, template):
-        self.message = f"No such template: '{template}'"
-
-
-class NameAlreadyExistError(Exception):
-    """Used when a template item exists."""
-
-    def __init__(self, name):
-        self.message = f"Template with that name '{name}' exists."
-
-
-class AttachedError(Exception):
-    """Used when delete attached template."""
-
-    def __init__(self, template):
-        self.message = f"Template: {template} is attached to device."
 
 
 class TemplateAPI:
@@ -223,6 +205,9 @@ class TemplateAPI:
             description (str): Description template to create.
             config (CiscoConfParse): The config to device.
 
+        Raises:
+            NameAlreadyExistError: If such template name already exists.
+
         Returns:
             bool: True if create template is successful, otherwise - False.
         """
@@ -363,16 +348,24 @@ class CLITemplate:
         self.description = description
         self.config: CiscoConfParse = CiscoConfParse([])
 
-    def load(self, id: str) -> None:
-        """Load config from template.
+    def load(self, id: str) -> CiscoConfParse:
+        """Load CLI config from template.
 
         Args:
             id (str): The template id from which load config.
+
+        Raises:
+            TemplateTypeError: wrong template type - CLI required.
+
+        Returns:
+            CiscoConfParse: Loaded template.
         """
-        # TODO add check type template!!!
         endpoint = f"/dataservice/template/device/object/{id}"
         config = self.session.get_json(endpoint)
+        if TemplateType(config['configType']) == TemplateType.FEATURE:
+            raise TemplateTypeError(config['templateName'])
         self.config = CiscoConfParse(config['templateConfiguration'].splitlines())
+        return self.config
 
     def load_running(self, device: Device) -> CiscoConfParse:
         """Load running config from device.
@@ -461,3 +454,36 @@ class CLITemplate:
         """
         for comand in add_config.ioscfg:
             self.config.ConfigObjs.insert_before(add_before, comand, atomic=True)
+
+
+class TemplateType(Enum):
+    CLI = 'file'
+    FEATURE = 'template'
+
+
+class NotFoundError(Exception):
+    """Used when a template item is not found."""
+
+    def __init__(self, template):
+        self.message = f"No such template: '{template}'"
+
+
+class NameAlreadyExistError(Exception):
+    """Used when a template item exists."""
+
+    def __init__(self, name):
+        self.message = f"Template with that name '{name}' exists."
+
+
+class AttachedError(Exception):
+    """Used when delete attached template."""
+
+    def __init__(self, template):
+        self.message = f"Template: {template} is attached to device."
+
+
+class TemplateTypeError(Exception):
+    """Used when wrong type template."""
+
+    def __init__(self, name):
+        self.message = f"Template: {name} - wrong template type."
