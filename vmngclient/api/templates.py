@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import json
 import logging
 from difflib import Differ
@@ -17,6 +15,39 @@ from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.operation_status import OperationStatus
 
 logger = logging.getLogger(__name__)
+
+
+class TemplateType(Enum):
+    CLI = 'file'
+    FEATURE = 'template'
+
+
+class NotFoundError(Exception):
+    """Used when a template item is not found."""
+
+    def __init__(self, template):
+        self.message = f"No such template: '{template}'"
+
+
+class NameAlreadyExistError(Exception):
+    """Used when a template item exists."""
+
+    def __init__(self, name):
+        self.message = f"Template with that name '{name}' exists."
+
+
+class AttachedError(Exception):
+    """Used when delete attached template."""
+
+    def __init__(self, template):
+        self.message = f"Template: {template} is attached to device."
+
+
+class TemplateTypeError(Exception):
+    """Used when wrong type template."""
+
+    def __init__(self, name):
+        self.message = f"Template: {name} - wrong template type."
 
 
 class TemplateAPI:
@@ -454,36 +485,3 @@ class CLITemplate:
         """
         for comand in add_config.ioscfg:
             self.config.ConfigObjs.insert_before(add_before, comand, atomic=True)
-
-
-class TemplateType(Enum):
-    CLI = 'file'
-    FEATURE = 'template'
-
-
-class NotFoundError(Exception):
-    """Used when a template item is not found."""
-
-    def __init__(self, template):
-        self.message = f"No such template: '{template}'"
-
-
-class NameAlreadyExistError(Exception):
-    """Used when a template item exists."""
-
-    def __init__(self, name):
-        self.message = f"Template with that name '{name}' exists."
-
-
-class AttachedError(Exception):
-    """Used when delete attached template."""
-
-    def __init__(self, template):
-        self.message = f"Template: {template} is attached to device."
-
-
-class TemplateTypeError(Exception):
-    """Used when wrong type template."""
-
-    def __init__(self, name):
-        self.message = f"Template: {name} - wrong template type."
