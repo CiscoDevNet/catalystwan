@@ -264,12 +264,13 @@ class TemplateAPI:
         return response.text
 
     @staticmethod
-    def compare_template(first: CiscoConfParse, second: CiscoConfParse, debug: bool = False) -> str:
+    def compare_template(first: CiscoConfParse, second: CiscoConfParse, full: bool = False, debug: bool = False) -> str:
         """
 
         Args:
             first: First template for comparison.
             second: Second template for comparison.
+            full: Return a full comparison if True, otherwise only the lines that differ.
             debug: Adding debug to the logger. Defaults to False.
 
         Returns:
@@ -286,7 +287,7 @@ class TemplateAPI:
         >>> b = "!\n  tacacs\n  server 192.168.1.1\n   vpn 3\n   secret-key a\n   auth-port 151\n exit".splitlines()
         >>> a_conf = CiscoConfParse(a)
         >>> b_conf = CiscoConfParse(b)
-        >>> compare = TemplateAPI.compare_template(a_conf, b_conf)
+        >>> compare = TemplateAPI.compare_template(a_conf, b_conf full=True)
         >>> print(compare)
           !
             tacacs
@@ -301,17 +302,22 @@ class TemplateAPI:
         """
         first_n = list(map(lambda x: x + "\n", first.ioscfg))
         second_n = list(map(lambda x: x + "\n", second.ioscfg))
-        compare = "".join(list(Differ().compare(first_n, second_n)))
+        compare = list(Differ().compare(first_n, second_n))
+        if not full:
+            compare = [x for x in compare if x[0] in ["?", "-", "+"]]
         if debug:
-            logger.debug(compare)
-        return compare
+            logger.debug("".join(compare))
+        return "".join(compare)
 
-    def compare_with_running(self, template: CiscoConfParse, device: Device, debug: bool = False) -> str:
+    def compare_with_running(
+        self, template: CiscoConfParse, device: Device, full: bool = False, debug: bool = False
+    ) -> str:
         """The comparison of the config with the one running on the machine.
 
         Args:
             template: The template to compare.
             device: The device on which to compare config.
+            full: Return a full comparison if True, otherwise only the lines that differ.
             debug: Adding debug to the logger. Defaults to False.
 
         Returns:
@@ -321,7 +327,7 @@ class TemplateAPI:
         >>> a = "!\n  tacacs\n  server 192.168.1.1\n   vpn 512\n   secret-key a\n   auth-port 151\n exit".splitlines()
         >>> a_conf = CiscoConfParse(a)
         >>> device = DevicesAPI(API_SESSION).get(DeviceField.HOSTNAME, device_name)
-        >>> compare = TemplateAPI.compare_template(a_conf, device)
+        >>> compare = TemplateAPI.compare_template(a_conf, device, full=True)
         >>> print(compare)
         .
         .
@@ -363,6 +369,7 @@ class CLITemplate:
         Args:
             id (str): The template id from which load config.
         """
+        # TODO add check type template!!!
         endpoint = f"/dataservice/template/device/object/{id}"
         config = self.session.get_json(endpoint)
         self.config = CiscoConfParse(config['templateConfiguration'].splitlines())
