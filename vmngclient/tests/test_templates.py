@@ -315,7 +315,7 @@ class TestTemplateAPI(unittest.TestCase):
 
         # Arrage
         MockResponse = MagicMock()
-        MockResponse.status = 404
+        MockResponse.ok = False
         mock_session.delete.return_value = MockResponse
         test_object = TemplateAPI(mock_session)
 
