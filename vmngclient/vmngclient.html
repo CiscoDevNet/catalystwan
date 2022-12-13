@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>vManage-client package &#8212; vmngclient 0.1.2 documentation</title>
+    <title>vManage-client package &#8212; vmngclient 0.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="modules.html" title="vManage-client"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">vmngclient 0.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">vmngclient 0.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">vManage-client</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">vManage-client package</a></li> 
       </ul>
@@ -72,8 +72,13 @@
 <span id="dataclasses-module"></span><h2>dataclasses module<a class="headerlink" href="#module-vmngclient.dataclasses" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="vmngclient.dataclasses.AdminTech">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.dataclasses.</span></span><span class="sig-name descname"><span class="pre">AdminTech</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_ip</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.dataclasses.AdminTech" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.dataclasses.</span></span><span class="sig-name descname"><span class="pre">AdminTech</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">creation_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tac_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.dataclasses.AdminTech" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#vmngclient.dataclasses.DataclassBase" title="vmngclient.dataclasses.DataclassBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataclassBase</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.dataclasses.AdminTech.creation_time">
+<span class="sig-name descname"><span class="pre">creation_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#vmngclient.dataclasses.AdminTech.creation_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="vmngclient.dataclasses.AdminTech.device_ip">
 <span class="sig-name descname"><span class="pre">device_ip</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#vmngclient.dataclasses.AdminTech.device_ip" title="Permalink to this definition">¶</a></dt>
@@ -85,6 +90,11 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.dataclasses.AdminTech.size">
+<span class="sig-name descname"><span class="pre">size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#vmngclient.dataclasses.AdminTech.size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="vmngclient.dataclasses.AdminTech.state">
 <span class="sig-name descname"><span class="pre">state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#vmngclient.dataclasses.AdminTech.state" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -92,6 +102,11 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="vmngclient.dataclasses.AdminTech.system_ip">
 <span class="sig-name descname"><span class="pre">system_ip</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#vmngclient.dataclasses.AdminTech.system_ip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.dataclasses.AdminTech.tac_state">
+<span class="sig-name descname"><span class="pre">tac_state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.dataclasses.AdminTech.tac_state" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -398,6 +413,37 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="vmngclient.dataclasses.Device.vedgeCertificateState">
 <span class="sig-name descname"><span class="pre">vedgeCertificateState</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.dataclasses.Device.vedgeCertificateState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.dataclasses.DeviceAdminTech">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.dataclasses.</span></span><span class="sig-name descname"><span class="pre">DeviceAdminTech</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">creation_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.dataclasses.DeviceAdminTech" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vmngclient.dataclasses.DataclassBase" title="vmngclient.dataclasses.DataclassBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataclassBase</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.dataclasses.DeviceAdminTech.creation_time">
+<span class="sig-name descname"><span class="pre">creation_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#vmngclient.dataclasses.DeviceAdminTech.creation_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.dataclasses.DeviceAdminTech.filename">
+<span class="sig-name descname"><span class="pre">filename</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#vmngclient.dataclasses.DeviceAdminTech.filename" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.dataclasses.DeviceAdminTech.size">
+<span class="sig-name descname"><span class="pre">size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#vmngclient.dataclasses.DeviceAdminTech.size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.dataclasses.DeviceAdminTech.state">
+<span class="sig-name descname"><span class="pre">state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#vmngclient.dataclasses.DeviceAdminTech.state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.dataclasses.DeviceAdminTech.token_id">
+<span class="sig-name descname"><span class="pre">token_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.dataclasses.DeviceAdminTech.token_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1234,6 +1280,7 @@ It is intended to be used as a probe, so it doesn’t raise original error from 
 <li><a class="reference internal" href="#vmngclient.dataclasses.Connection"><code class="docutils literal notranslate"><span class="pre">Connection</span></code></a></li>
 <li><a class="reference internal" href="#vmngclient.dataclasses.DataclassBase"><code class="docutils literal notranslate"><span class="pre">DataclassBase</span></code></a></li>
 <li><a class="reference internal" href="#vmngclient.dataclasses.Device"><code class="docutils literal notranslate"><span class="pre">Device</span></code></a></li>
+<li><a class="reference internal" href="#vmngclient.dataclasses.DeviceAdminTech"><code class="docutils literal notranslate"><span class="pre">DeviceAdminTech</span></code></a></li>
 <li><a class="reference internal" href="#vmngclient.dataclasses.EventData"><code class="docutils literal notranslate"><span class="pre">EventData</span></code></a></li>
 <li><a class="reference internal" href="#vmngclient.dataclasses.OmpAdvertisedRouteData"><code class="docutils literal notranslate"><span class="pre">OmpAdvertisedRouteData</span></code></a></li>
 <li><a class="reference internal" href="#vmngclient.dataclasses.OmpAdvertisedTlocData"><code class="docutils literal notranslate"><span class="pre">OmpAdvertisedTlocData</span></code></a></li>
@@ -1313,7 +1360,7 @@ It is intended to be used as a probe, so it doesn’t raise original error from 
         <li class="right" >
           <a href="modules.html" title="vManage-client"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">vmngclient 0.1.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">vmngclient 0.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >vManage-client</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">vManage-client package</a></li> 
       </ul>
