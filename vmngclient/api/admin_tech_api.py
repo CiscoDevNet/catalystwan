@@ -106,11 +106,12 @@ class AdminTechAPI:
                 response = http_error.response
             if response.status_code == 200:
                 return response.json()["fileName"]
-            if response.status_code != 400 and create_admin_tech_error_msgs not in response.json().get("error", {}).get(
+            if response.status_code == 400 and create_admin_tech_error_msgs in response.json().get("error", {}).get(
                 "details", ""
             ):
+                logger.warning(f"Admin tech creation already in progress, retrying in {polling_interval} seconds")
+            else:
                 raise GenerateAdminTechLogError(f"It is not possible to generate admintech log for {device_id}")
-            logger.warning(f"Admin tech creation already in progress, retrying in {polling_interval} seconds")
             time.sleep(polling_interval)
             polling_timer -= polling_interval
         raise GenerateAdminTechLogError(f'It is not possible to generate admintech log for {device_id}')
