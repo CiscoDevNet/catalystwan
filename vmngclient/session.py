@@ -203,10 +203,10 @@ class vManageSession(Session):
         return response
 
     def post_file(self, url: str, filename: Path, data: Dict = {}) -> Any:
-        headers = self.headers
+        headers = self.headers.copy()
         del headers['Content-Type']
         files = {'file': (filename.name, open(filename, 'rb'))}
-        response = self.post(url, data=data, files=files, headers={})
+        response = self.post(url, data=data, files=files, headers=headers)
         return response.json()
 
     def wait_for_server_reachability(self, retries: int, delay: int, initial_delay: int = 0) -> bool:
