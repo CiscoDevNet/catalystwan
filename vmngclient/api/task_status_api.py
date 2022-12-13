@@ -50,7 +50,6 @@ class TaskStatus:
             OperationStatusId.FAILURE,
         ],
         activity_text: str = '',
-        action_url: str = '/dataservice/device/action/status/',
     ) -> "TaskStatus":
         """
         Method to check action status
@@ -68,6 +67,7 @@ class TaskStatus:
         Returns:
             bool: True if condition is met
         """
+        action_url = '/dataservice/device/action/status/'
         exit_statuses = [cast(OperationStatus, exit_status.value) for exit_status in exit_statuses]
         exit_statuses_ids = [cast(OperationStatusId, exit_status_id.value) for exit_status_id in exit_statuses_ids]
 
