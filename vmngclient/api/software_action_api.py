@@ -4,7 +4,8 @@ from pathlib import PurePath
 from typing import Any, Dict, List
 
 from attr import define
-from requests_toolbelt.multipart.encoder import MultipartEncoder  # type: ignore
+from clint.textui.progress import Bar as ProgressBar
+from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
 
 from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
@@ -136,6 +137,16 @@ class SoftwareActionAPI:
                 )
         upgrade = dict(self.session.post(url, json=payload))
         return upgrade["id"]
+    
+
+    def _create_callback(self, encoder: MultipartEncoder):
+
+        bar = ProgressBar(expected_size=encoder._calculate_length(), filled_char='=')
+
+        def callback(monitor: MultipartEncoderMonitor):
+            bar.show(monitor.bytes_read)
+
+        return callback
 
     def upload_image(self, image_path: str) -> int:
         """
@@ -152,9 +163,11 @@ class SoftwareActionAPI:
         encoder = MultipartEncoder(
             fields={'file': (PurePath(image_path).name, open(image_path, 'rb'), 'application/x-gzip')}
         )
+        callback = self._create_callback(encoder)
+        monitor = MultipartEncoderMonitor(encoder, callback)
         headers = self.session.headers.copy()
-        headers.update({"content-type": encoder.content_type})
-        response = self.session.post(url, data=encoder, headers=headers)
+        headers.update({"content-type": monitor.content_type})
+        response = self.session.post(url, data=monitor, headers=headers)
         return response.status_code
 
     def _downgrade_check(self, devices, version_to_upgrade: str, family) -> List:
@@ -185,3 +198,5 @@ class SoftwareActionAPI:
                 elif str(label) < str(splited_version_to_upgrade[priority]):
                     break
         return incorrect_devices
+    
+
