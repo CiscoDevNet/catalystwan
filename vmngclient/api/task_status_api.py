@@ -1,5 +1,5 @@
 import logging
-from typing import List, Union
+from typing import List, cast
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
@@ -11,9 +11,26 @@ logger = logging.getLogger(get_logger_name(__name__))
 
 
 class TaskStatus:
-    """API class to check task status"""
+    """
+    API class to check task status
+        Example usage:
 
-    def __init__(self, session: vManageSession):
+        session = create_vManageSession(ip_address,admin_username,password,port=port)
+        devices = DevicesAPI(session).devices
+        vsmart_device = [dev for dev in devices if dev.personality == Personality.VSMART][0]
+        exit_statuses = [OperationStatus.SUCCESS.value, OperationStatus.FAILURE.value]
+        exit_statuses_ids = [OperationStatusId.SUCCESS.value, OperationStatusId.FAILURE.value]
+
+        reboot_action = RebootAction(session,devices)
+        reboot_action.execute()
+
+        # Keep asking for reboot status until it's not in exit_statuses (Failure or Success)
+        # or timeout is not achieved (3000s)
+        TaskStatus(session).wait_for_completed(5,3000,exit_statuses,exit_statuses_ids,reboot_action.action_id)
+
+    """
+
+    def __init__(self, session: vManageSession) -> None:
         self.session = session
         self.status: str = ''
         self.status_id: str = ''
@@ -22,13 +39,38 @@ class TaskStatus:
     def wait_for_completed(
         self,
         sleep_seconds: int,
-        timeout_seconds: int,
-        exit_statuses: Union[List[OperationStatus], str],
-        exit_statuses_ids: Union[List[OperationStatusId], str],
         action_id: str,
-        activity_text: Union[str, None] = None,
-        action_url: str = '/dataservice/device/action/status/',
-    ) -> bool:
+        timeout_seconds: int = 300,
+        exit_statuses: List[OperationStatus] = [
+            OperationStatus.SUCCESS,
+            OperationStatus.FAILURE,
+        ],
+        exit_statuses_ids: List[OperationStatusId] = [
+            OperationStatusId.SUCCESS,
+            OperationStatusId.FAILURE,
+        ],
+        activity_text: str = '',
+    ) -> "TaskStatus":
+        """
+        Method to check action status
+
+        Args:
+            sleep_seconds (int): interval between action status requests
+            timeout_seconds (int): After this time, function will stop requesting action status
+            exit_statuses (Union[List[OperationStatus], str]): actions statuses that cause stop requesting action status
+            exit_statuses_ids (Union[List[OperationStatusId], str]): actions statuses ids
+             that cause stop requesting action status id
+            action_id (str): inspected action id
+            activity_text (str): activity text
+            action_url (str, optional): Action url. Defaults to '/dataservice/device/action/status/'
+
+        Returns:
+            bool: True if condition is met
+        """
+        action_url = '/dataservice/device/action/status/'
+        exit_statuses = [cast(OperationStatus, exit_status.value) for exit_status in exit_statuses]
+        exit_statuses_ids = [cast(OperationStatusId, exit_status_id.value) for exit_status_id in exit_statuses_ids]
+
         def check_status(action_data) -> bool:
             """
             Function checks if condition is met. If so,
@@ -78,8 +120,4 @@ class TaskStatus:
             return action_data
 
         wait_for_action_finish()
-
-        if self.status == OperationStatus.SUCCESS.value and self.status_id == OperationStatusId.SUCCESS.value:
-            if not activity_text or activity_text in self.activity:
-                return True
-        return False
+        return self
