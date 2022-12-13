@@ -20,11 +20,23 @@ class DataclassBase:
 
 @define(frozen=True, field_transformer=convert_attributes)
 class AdminTech(DataclassBase):
-    state: str
+    creation_time: dt.datetime = field(metadata={FIELD_NAME: "creationTime"})
+    size: int
     filename: str = field(metadata={FIELD_NAME: "fileName"})
-    token_id: str = field(metadata={FIELD_NAME: "requestTokenId"})
+    state: str
+    tac_state: Optional[str]
     device_ip: str = field(metadata={FIELD_NAME: "deviceIP"})
     system_ip: str = field(metadata={FIELD_NAME: "local-system-ip"})
+    token_id: str = field(metadata={FIELD_NAME: "requestTokenId"})
+
+
+@define(frozen=True, field_transformer=convert_attributes)
+class DeviceAdminTech(DataclassBase):
+    filename: str = field(metadata={FIELD_NAME: "fileName"})
+    creation_time: dt.datetime = field(metadata={FIELD_NAME: "creationTime"})
+    size: int
+    state: str
+    token_id: Optional[str] = field(default=None, metadata={FIELD_NAME: "requestTokenId"})
 
 
 @define(frozen=True, field_transformer=convert_attributes)
