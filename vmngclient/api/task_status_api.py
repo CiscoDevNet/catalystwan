@@ -39,8 +39,8 @@ class TaskStatus:
     def wait_for_completed(
         self,
         sleep_seconds: int,
-        timeout_seconds: int,
         action_id: str,
+        timeout_seconds: int = 300,
         exit_statuses: List[OperationStatus] = [
             OperationStatus.SUCCESS,
             OperationStatus.FAILURE,
