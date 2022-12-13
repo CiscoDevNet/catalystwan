@@ -40,6 +40,7 @@ class InstallSpecification:
     family: Family
     version_type: VersionType
     device_type: DeviceType
+    device_class: DeviceClass
 
 
 class InstallSpecHelper(Enum):
