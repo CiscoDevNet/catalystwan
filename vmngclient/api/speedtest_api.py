@@ -64,7 +64,7 @@ class SpeedtestAPI:
             "port": "80",
         }
         url_path = "/dataservice/stream/device/speed"
-        setup_speedtest = self.session.post(url_path, start_query).json()
+        setup_speedtest = self.session.post(url_path, json=start_query).json()
 
         speedtest_session = setup_speedtest["sessionId"]
 
@@ -95,7 +95,7 @@ class SpeedtestAPI:
             "size": 10000,
         }
         url_path = "/dataservice/statistics/speedtest"
-        post_speedtest = self.session.post(url_path, end_query).json()
+        post_speedtest = self.session.post(url_path, json=end_query).json()
 
         try:
             self.speedtest_output.status = disable_speedtest["status"]
