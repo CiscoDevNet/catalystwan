@@ -4,7 +4,7 @@ Module for handling tenant backup and restore
 from pathlib import Path
 from typing import Optional, Union
 
-from vmngclient.api.task_status_api import TaskStatus
+#from vmngclient.api.task_status_api import TaskStatus
 from vmngclient.dataclasses import TenantBackupRestore
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
@@ -46,11 +46,11 @@ class TenantBackupRestoreApi:
             filename on vManage server of exported tenant backup file
         """
         response = self.session.get_json("/dataservice/tenantbackup/export")
-        task_status = TaskStatus(self.session)
-        result = task_status.wait_for_completed(5, 3000,
-                                       self.exit_statuses,
-                                       self.exit_statuses_ids,
-                                       response['processId'])
+        #task_status = TaskStatus(self.session)
+        #result = task_status.wait_for_completed(5, 3000,
+        #                               self.exit_statuses,
+        #                               self.exit_statuses_ids,
+        #                               response['processId'])
         return str(response)
 
     def delete(self, file_name) -> Union[dict, list]:
@@ -94,9 +94,9 @@ class TenantBackupRestoreApi:
         # Upload the file
         url = '/dataservice/tenantbackup/import'
         response = self.session.post_file(url, filename, data={})
-        task_status = TaskStatus(self.session)
-        result = task_status.wait_for_completed(5, 3000,
-                                       self.exit_statuses,
-                                       self.exit_statuses_ids,
-                                       response.json()['processId'])
+        #task_status = TaskStatus(self.session)
+        #result = task_status.wait_for_completed(5, 3000,
+        #                               self.exit_statuses,
+        #                               self.exit_statuses_ids,
+        #                               response.json()['processId'])
         return response
