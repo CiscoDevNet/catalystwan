@@ -57,7 +57,7 @@ class TestvManageAuth(TestCase):
         # Assert
         mock_post.assert_called_with(
             url="https://1.1.1.1:1111/j_security_check",
-            json=security_payload,
+            data=security_payload,
             verify=False,
             headers={'Content-Type': 'application/x-www-form-urlencoded'},
         )
@@ -78,7 +78,7 @@ class TestvManageAuth(TestCase):
         # Assert
         mock_post.assert_called_with(
             url="https://1.1.1.1:1111/j_security_check",
-            json=security_payload,
+            data=security_payload,
             verify=False,
             headers={'Content-Type': 'application/x-www-form-urlencoded'},
         )
