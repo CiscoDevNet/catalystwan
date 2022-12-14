@@ -78,7 +78,7 @@ class PacketCaptureAPI:
 
         try:
             url_path = r"/dataservice/stream/device/capture"
-            packet_setup = self.session.post(url=url_path, params=query).json()  # TODO check
+            packet_setup = self.session.post(url=url_path, json=query).json()  # TODO check
             self.packet_channel = create_dataclass(PacketSetup, packet_setup)
             if self.packet_channel.is_new_session is True:
                 yield self.packet_channel

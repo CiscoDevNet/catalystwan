@@ -293,11 +293,11 @@ class DeviceStateAPI:
                 "vpn": "0",
             }
             url_path = "/dataservice/settings/configuration/vmanagedatastream"
-            self.session.post(url=url_path, params=query)
+            self.session.post(url=url_path, json=query)
             yield None
         finally:
             url_path = "/dataservice/settings/configuration/vmanagedatastream"
-            self.session.post(url=url_path, data=data_stream_status)
+            self.session.post(url=url_path, json=data_stream_status)
 
     def get_bfd_sessions(self, device_id: str) -> List[BfdSessionData]:
         items = self.session.get_data(f'/dataservice/device/bfd/sessions?deviceId={device_id}')

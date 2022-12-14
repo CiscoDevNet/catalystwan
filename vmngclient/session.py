@@ -270,7 +270,6 @@ class vManageSession(Session):
     def __prepare_session(self, verify: bool, auth: Optional[AuthBase]) -> None:
         self.auth = auth
         self.verify = verify
-        self.headers.update({"content-type": "application/json"})
 
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"
