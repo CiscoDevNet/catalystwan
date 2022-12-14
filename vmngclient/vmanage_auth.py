@@ -17,16 +17,17 @@ class InvalidCredentialsError(Exception):
     """
 
     def __init__(
-        self, username: str, password: str, message: str = "Username and/or password is incorrect. Please try again!"
+        self,
+        username: str,
+        password: str,
+        message: str = "Username and/or password is incorrect. Please try again!",
     ):
         self.username = username
         self.password = password
         self.message = message
 
     def __str__(self):
-        return (
-            f"Trying to access vManage with the following credentials: {self.username}/{self.password}. {self.message}"
-        )
+        return f"Trying to access vManage with the following credentials: {self.username}/{self.password}. {self.message}"
 
 
 class vManageAuth(AuthBase):
@@ -50,7 +51,9 @@ class vManageAuth(AuthBase):
 
     """
 
-    def __init__(self, base_url: str, username: str, password: str, verify: bool = False):
+    def __init__(
+        self, base_url: str, username: str, password: str, verify: bool = False
+    ):
         self.base_url = base_url
         self.username = username
         self.password = password
@@ -72,17 +75,11 @@ class vManageAuth(AuthBase):
         Returns:
             RequestsCookieJar: _description_
         """
-        security_payload = {
-            'j_username': self.username,
-            'j_password': self.password,
-        }
+        security_payload = {"j_username": self.username, "j_password": self.password}
         full_url = urljoin(self.base_url, "/j_security_check")
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
         response = requests.post(
-            url=full_url,
-            data=security_payload,
-            verify=self.verify,
-            headers=headers,
+            url=full_url, data=security_payload, verify=self.verify, headers=headers
         )
         if response.text != "":
             raise InvalidCredentialsError(self.username, self.password)
@@ -101,12 +98,9 @@ class vManageAuth(AuthBase):
             str: Valid token.
         """
         full_url = urljoin(self.base_url, "/dataservice/client/token")
-        headers = {'Content-Type': 'application/json'}
+        headers = {"Content-Type": "application/json"}
         response = requests.get(
-            url=full_url,
-            cookies=cookies,
-            verify=self.verify,
-            headers=headers,
+            url=full_url, cookies=cookies, verify=self.verify, headers=headers
         )
         return response.text
 

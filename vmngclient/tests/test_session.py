@@ -21,10 +21,7 @@ class TestSession(unittest.TestCase):
         self.assertEqual(str(session), "admin@https://example.com:111")
 
     @parameterized.expand(
-        [
-            (123, "https://example.com:123"),
-            (None, "https://example.com"),
-        ]
+        [(123, "https://example.com:123"), (None, "https://example.com")]
     )
     def test_base_url(self, port: Optional[int], base_url: str):
         # Arrange, Act
@@ -59,7 +56,9 @@ class TestSession(unittest.TestCase):
     def test_session_eval_repr_different_sessions(self, mock_repr):
         # Arrange, Act
         mock_repr.return_value = "vManageSession('domain.com', 'user1', '$password', port=111, subdomain='None')"
-        session = vManageSession("not.domain.com", "different_user", "$password", port=111)
+        session = vManageSession(
+            "not.domain.com", "different_user", "$password", port=111
+        )
         # Assert
         self.assertNotEqual(eval(mock_repr()), session)
 
@@ -73,7 +72,9 @@ class TestSession(unittest.TestCase):
     def test_session_eq_different_sessions(self):
         # Arrange, Act
         session_1 = vManageSession("domain.com", "user1", "$password", port=111)
-        session_2 = vManageSession("not.domain.com", "different_user", "$password", port=111)
+        session_2 = vManageSession(
+            "not.domain.com", "different_user", "$password", port=111
+        )
         # Assert
         self.assertNotEqual(session_1, session_2)
 
@@ -93,5 +94,5 @@ class TestSession(unittest.TestCase):
         self.assertEqual(session.get_full_url(url), full_url)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

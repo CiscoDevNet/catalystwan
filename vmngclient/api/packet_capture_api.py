@@ -26,7 +26,13 @@ class DownloadStatus(Enum):
 
 
 class PacketCaptureAPI:
-    def __init__(self, session: vManageSession, vpn: str = "0", interface: str = "ge0/1", status=None) -> None:
+    def __init__(
+        self,
+        session: vManageSession,
+        vpn: str = "0",
+        interface: str = "ge0/1",
+        status=None,
+    ) -> None:
         self.session = session
         self.vpn = vpn
         self.interface = interface
@@ -78,13 +84,17 @@ class PacketCaptureAPI:
 
         try:
             url_path = r"/dataservice/stream/device/capture"
-            packet_setup = self.session.post(url=url_path, json=query).json()  # TODO check
+            packet_setup = self.session.post(
+                url=url_path, json=query
+            ).json()  # TODO check
             self.packet_channel = create_dataclass(PacketSetup, packet_setup)
             if self.packet_channel.is_new_session is True:
                 yield self.packet_channel
             else:
                 self.status = None
-                raise PermissionError("Can't start new session, another is already open")
+                raise PermissionError(
+                    "Can't start new session, another is already open"
+                )
         finally:
             for _ in range(3):
                 time.sleep(10)
@@ -113,12 +123,16 @@ class PacketCaptureAPI:
 
     def get_interface_name(self, device: Device) -> str:
 
-        url_path = f"/dataservice/device/interface/synced?deviceId={device.local_system_ip}"
+        url_path = (
+            f"/dataservice/device/interface/synced?deviceId={device.local_system_ip}"
+        )
         ifname = dict(self.session.get_json(url_path))
         if_name = str(ifname["data"][0]["ifname"])
         return if_name
 
-    def download_capture_session(self, packet: PacketSetup, device: Device, file_path: Optional[str] = None) -> bool:
+    def download_capture_session(
+        self, packet: PacketSetup, device: Device, file_path: Optional[str] = None
+    ) -> bool:
         url_path = f"/dataservice/stream/device/capture/download/{packet.session_id}"
         full_url = self.session.get_full_url(url_path)
         download_packet = self.session.get_data(url=full_url)
@@ -131,7 +145,9 @@ class PacketCaptureAPI:
         return True
 
     def get_status(self, packet_channel: PacketSetup) -> Status:
-        url_path = f"/dataservice/stream/device/capture/status/{packet_channel.session_id}"
+        url_path = (
+            f"/dataservice/stream/device/capture/status/{packet_channel.session_id}"
+        )
         self.status = dict(self.session.get_json(url_path))
         self.status = create_dataclass(Status, self.status)
         return self.status

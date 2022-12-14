@@ -16,11 +16,16 @@ class SpeedtestAPI:
         self.session = session
 
     def speedtest(
-        self, source_device: Device, destination_device: Device, test_duration_seconds: int = 300
+        self,
+        source_device: Device,
+        destination_device: Device,
+        test_duration_seconds: int = 300,
     ) -> Speedtest:
 
         source_color = DeviceStateAPI(self.session).get_colors(source_device.id)[0]
-        destination_color = DeviceStateAPI(self.session).get_colors(destination_device.id)[0]
+        destination_color = DeviceStateAPI(self.session).get_colors(
+            destination_device.id
+        )[0]
 
         self.speedtest_output = Speedtest(
             device_ip=source_device.local_system_ip,
@@ -36,12 +41,18 @@ class SpeedtestAPI:
             with DeviceStateAPI(self.session).enable_data_stream():
                 try:
                     self.perform(
-                        source_device, destination_device, source_color, destination_color, test_duration_seconds
+                        source_device,
+                        destination_device,
+                        source_color,
+                        destination_color,
+                        test_duration_seconds,
                     )
                 except HTTPError as e:
                     self.speedtest_output.status = str(e)
         else:
-            self.speedtest_output.status = f"Source is {source_device.reachability.value} and "
+            self.speedtest_output.status = (
+                f"Source is {source_device.reachability.value} and "
+            )
             f"destination device is {destination_device.reachability.value}"
 
         return self.speedtest_output
@@ -68,15 +79,22 @@ class SpeedtestAPI:
 
         speedtest_session = setup_speedtest["sessionId"]
 
-        self.session.get_json(f"/dataservice/stream/device/speed/start/{speedtest_session}")
+        self.session.get_json(
+            f"/dataservice/stream/device/speed/start/{speedtest_session}"
+        )
 
         duration = math.ceil(test_duration_seconds / 5)
         for _ in range(duration):
-            self.session.get_json(f"/dataservice/stream/device/speed/{speedtest_session}?logId=2")
+            self.session.get_json(
+                f"/dataservice/stream/device/speed/{speedtest_session}?logId=2"
+            )
             sleep(5)
 
         disable_speedtest = cast(
-            dict, self.session.get_json(f"/dataservice/stream/device/speed/disable/{speedtest_session}")
+            dict,
+            self.session.get_json(
+                f"/dataservice/stream/device/speed/disable/{speedtest_session}"
+            ),
         )
 
         end_query = {
@@ -89,7 +107,12 @@ class SpeedtestAPI:
                         "type": "string",
                         "operator": "in",
                     },
-                    {"value": ["completed"], "field": "status", "type": "string", "operator": "in"},
+                    {
+                        "value": ["completed"],
+                        "field": "status",
+                        "type": "string",
+                        "operator": "in",
+                    },
                 ],
             },
             "size": 10000,
@@ -103,7 +126,8 @@ class SpeedtestAPI:
             self.speedtest_output.down_speed = post_speedtest["data"][0]["down_speed"]
 
             logger.info(
-                f"Speedtest from {source_device.local_system_ip} " f"to {destination_device.local_system_ip} succeeded."
+                f"Speedtest from {source_device.local_system_ip} "
+                f"to {destination_device.local_system_ip} succeeded."
             )
         except IndexError:
             self.speedtest_output.status = "No speed received"

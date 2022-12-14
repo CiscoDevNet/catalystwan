@@ -29,10 +29,10 @@ def mocked_requests_method(*args, **kwargs):
         }
     }
 
-    full_url = kwargs.get('url', "")
-    data = kwargs.get('data', {})
+    full_url = kwargs.get("url", "")
+    data = kwargs.get("data", {})
     if full_url in url_response:
-        return url_response[full_url][data['j_username']]
+        return url_response[full_url][data["j_username"]]
 
     return MockResponse(404, "error")
 
@@ -42,14 +42,11 @@ class TestvManageAuth(TestCase):
         self.base_url = "https://1.1.1.1:1111"
         self.password = "admin"
 
-    @mock.patch('requests.post', side_effect=mocked_requests_method)
+    @mock.patch("requests.post", side_effect=mocked_requests_method)
     def test_get_cookie(self, mock_post):
         # Arrange
         username = "admin"
-        security_payload = {
-            'j_username': username,
-            'j_password': "admin",
-        }
+        security_payload = {"j_username": username, "j_password": "admin"}
         auth = vManageAuth(self.base_url, username, self.password)
         # Act
         auth.get_cookie()
@@ -59,17 +56,14 @@ class TestvManageAuth(TestCase):
             url="https://1.1.1.1:1111/j_security_check",
             data=security_payload,
             verify=False,
-            headers={'Content-Type': 'application/x-www-form-urlencoded'},
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
 
-    @mock.patch('requests.post', side_effect=mocked_requests_method)
+    @mock.patch("requests.post", side_effect=mocked_requests_method)
     def test_get_cookie_invalid_username(self, mock_post):
         # Arrange
         username = "invalid_username"
-        security_payload = {
-            'j_username': username,
-            'j_password': "admin",
-        }
+        security_payload = {"j_username": username, "j_password": "admin"}
         auth = vManageAuth(self.base_url, username, self.password)
         # Act
         with self.assertRaises(InvalidCredentialsError):
@@ -80,11 +74,11 @@ class TestvManageAuth(TestCase):
             url="https://1.1.1.1:1111/j_security_check",
             data=security_payload,
             verify=False,
-            headers={'Content-Type': 'application/x-www-form-urlencoded'},
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
 
-    @mock.patch('requests.cookies.RequestsCookieJar')
-    @mock.patch('requests.get', side_effect=mocked_requests_method)
+    @mock.patch("requests.cookies.RequestsCookieJar")
+    @mock.patch("requests.get", side_effect=mocked_requests_method)
     def test_fetch_token(self, mock_get, cookies):
         # Arrange
         valid_url = "https://1.1.1.1:1111/dataservice/client/token"
@@ -95,9 +89,12 @@ class TestvManageAuth(TestCase):
 
         # Assert
         mock_get.assert_called_with(
-            url=valid_url, verify=False, headers={'Content-Type': 'application/json'}, cookies=cookies
+            url=valid_url,
+            verify=False,
+            headers={"Content-Type": "application/json"},
+            cookies=cookies,
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

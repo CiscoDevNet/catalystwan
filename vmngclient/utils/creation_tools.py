@@ -30,8 +30,12 @@ def create_dataclass(cls: Type[T], data: Dict[str, Any]) -> T:
         A dataclass with implemented fields
     """
 
-    def filter_fields(available_fields: List[str], data: Dict[str, Any]) -> Dict[str, Any]:
-        return dict(filter(lambda key_value: key_value[0] in available_fields, data.items()))
+    def filter_fields(
+        available_fields: List[str], data: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        return dict(
+            filter(lambda key_value: key_value[0] in available_fields, data.items())
+        )
 
     class_fields = list(cls.__annotations__)
     data_copy = data.copy()
@@ -61,7 +65,9 @@ def convert_attributes(cls: type, fields: List[Attribute]) -> List[Attribute]:
             continue
         if field.type in {dt.datetime, "datetime"}:
             converter = (
-                lambda d: parser.parse(d) if isinstance(d, str) else dt.datetime.fromtimestamp(d / 1000)
+                lambda d: parser.parse(d)
+                if isinstance(d, str)
+                else dt.datetime.fromtimestamp(d / 1000)
             )  # type: ignore # noqa: E731
         elif field.type in {str, "str"}:
             converter = lambda x: str(x)  # type: ignore # noqa: E731
@@ -82,7 +88,9 @@ def asdict(dataclass: AttrsInstance) -> dict:
     Returns:
         dict: Serialized dict
     """
-    json_fields_excluded = attrs.asdict(dataclass, filter=lambda x, _: FIELD_NAME not in x.metadata)
+    json_fields_excluded = attrs.asdict(
+        dataclass, filter=lambda x, _: FIELD_NAME not in x.metadata
+    )
     json_fields = attrs.asdict(dataclass, filter=lambda x, _: FIELD_NAME in x.metadata)
     for field in fields(dataclass.__class__):
         json_field_name = field.metadata.get(FIELD_NAME, None)

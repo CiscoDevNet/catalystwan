@@ -10,7 +10,12 @@ from urllib.parse import urljoin
 from requests import Response, Session
 from requests.auth import AuthBase
 from requests.exceptions import HTTPError
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_fixed,
+)  # type: ignore
 
 from vmngclient.utils.response import response_debug
 from vmngclient.vmanage_auth import vManageAuth
@@ -66,12 +71,14 @@ def create_vManageSession(
         Session object
 
     """
-    session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
+    session = vManageSession(
+        url=url, username=username, password=password, port=port, subdomain=subdomain
+    )
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
     if subdomain:
         tenant_id = session.get_tenant_id()
         vsession_id = session.get_virtual_session_id(tenant_id)
-        session.headers.update({'VSessionId': vsession_id})
+        session.headers.update({"VSessionId": vsession_id})
     server_info = session.server()
 
     try:
@@ -87,7 +94,11 @@ def create_vManageSession(
         logger.warning(f"Unrecognized user mode is: '{server_info.get('viewMode')}'")
     if user_mode is UserMode.TENANT and not subdomain and view_mode is ViewMode.TENANT:
         session.session_type = SessionType.TENANT
-    elif user_mode is UserMode.PROVIDER and not subdomain and view_mode is ViewMode.PROVIDER:
+    elif (
+        user_mode is UserMode.PROVIDER
+        and not subdomain
+        and view_mode is ViewMode.PROVIDER
+    ):
         session.session_type = SessionType.PROVIDER
     elif user_mode is UserMode.PROVIDER and view_mode is ViewMode.TENANT:
 
@@ -144,14 +155,18 @@ class vManageSession(Session):
 
     def request(self, method, url, *args, **kwargs) -> Any:
         full_url = self.get_full_url(url)
-        response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
+        response = super(vManageSession, self).request(
+            method, full_url, *args, **kwargs
+        )
         logger.debug(response_debug(response))
         try:
             response.raise_for_status()
         except HTTPError as error:
             logger.debug(error)
             if response.status_code == 403:
-                logger.info(f"User {self.username} is unauthorized for method {method} {full_url}")
+                logger.info(
+                    f"User {self.username} is unauthorized for method {method} {full_url}"
+                )
             else:
                 raise error
         return response
@@ -177,7 +192,7 @@ class vManageSession(Session):
         return self.get_data(url="/dataservice/client/server")
 
     def get_data(self, url: str) -> Any:
-        return self.get_json(url)['data']
+        return self.get_json(url)["data"]
 
     def get_json(self, url: str) -> Any:
         response = self.get(url)
@@ -202,7 +217,9 @@ class vManageSession(Session):
                 file.write(response.content)
         return response
 
-    def wait_for_server_reachability(self, retries: int, delay: int, initial_delay: int = 0) -> bool:
+    def wait_for_server_reachability(
+        self, retries: int, delay: int, initial_delay: int = 0
+    ) -> bool:
         """Checks if vManage API is reachable by sending server request.
 
         Retries on HTTPError for specified number of times.
@@ -219,7 +236,9 @@ class vManageSession(Session):
         """
 
         def _log_exception(retry_state):
-            logger.error(f"Cannot reach server, original exception: {retry_state.outcome.exception()}")
+            logger.error(
+                f"Cannot reach server, original exception: {retry_state.outcome.exception()}"
+            )
             return False
 
         if initial_delay:
@@ -242,8 +261,12 @@ class vManageSession(Session):
         Returns:
             Tenant UUID.
         """
-        tenants = self.get_data(url='/dataservice/tenant')
-        tenant_id = [tenant.get('tenantId', None) for tenant in tenants if tenant['subDomain'] == self.subdomain][0]
+        tenants = self.get_data(url="/dataservice/tenant")
+        tenant_id = [
+            tenant.get("tenantId", None)
+            for tenant in tenants
+            if tenant["subDomain"] == self.subdomain
+        ][0]
         return tenant_id
 
     def get_virtual_session_id(self, tenant_id: str) -> str:
@@ -258,7 +281,7 @@ class vManageSession(Session):
         """
         url_path = f"/dataservice/tenant/{tenant_id}/vsessionid"
         response = self.post(url_path)
-        return response.json()['VSessionId']
+        return response.json()["VSessionId"]
 
     def __prepare_session(self, verify: bool, auth: Optional[AuthBase]) -> None:
         self.auth = auth

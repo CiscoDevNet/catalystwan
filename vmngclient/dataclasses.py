@@ -13,7 +13,10 @@ class DataclassBase:
     def __str__(self):
         return (
             f"{self.__class__.__name__}(\n"
-            + "\n".join(f"    {attribute[0]}: {attribute[1]}," for attribute in asdict(self).items())
+            + "\n".join(
+                f"    {attribute[0]}: {attribute[1]},"
+                for attribute in asdict(self).items()
+            )
             + "\n)"
         )
 
@@ -36,7 +39,9 @@ class DeviceAdminTech(DataclassBase):
     creation_time: dt.datetime = field(metadata={FIELD_NAME: "creationTime"})
     size: int
     state: str
-    token_id: Optional[str] = field(default=None, metadata={FIELD_NAME: "requestTokenId"})
+    token_id: Optional[str] = field(
+        default=None, metadata={FIELD_NAME: "requestTokenId"}
+    )
 
 
 @define(frozen=True, field_transformer=convert_attributes)
@@ -49,14 +54,21 @@ class AlarmData(DataclassBase):
     hostname: Optional[str] = field(default=None, metadata={FIELD_NAME: "host-name"})
     site_id: Optional[str] = field(default=None, metadata={FIELD_NAME: "site-id"})
     new_state: Optional[str] = field(default=None, metadata={FIELD_NAME: "new-state"})
-    interface_name: Optional[str] = field(default=None, metadata={FIELD_NAME: "if-name"})
+    interface_name: Optional[str] = field(
+        default=None, metadata={FIELD_NAME: "if-name"}
+    )
     vpn_id: Optional[str] = field(default=None, metadata={FIELD_NAME: "vpn-id"})
 
-    def issubset(self, other: 'AlarmData') -> bool:
-        field_keys = {field_key for field_key in self.__annotations__ if getattr(self, field_key)}
-        return all(getattr(self, field_key) == getattr(other, field_key) for field_key in field_keys)
+    def issubset(self, other: "AlarmData") -> bool:
+        field_keys = {
+            field_key for field_key in self.__annotations__ if getattr(self, field_key)
+        }
+        return all(
+            getattr(self, field_key) == getattr(other, field_key)
+            for field_key in field_keys
+        )
 
-    def lowercase(self) -> 'AlarmData':
+    def lowercase(self) -> "AlarmData":
         data = dict()
         for field_key in self.__annotations__:
             attr = getattr(self, field_key)
@@ -82,11 +94,19 @@ class Device(DataclassBase):
     cpu_state: Optional[str] = field(default=None, metadata={FIELD_NAME: "cpuState"})
     cpu_load: Optional[float] = field(default=None, metadata={FIELD_NAME: "cpuLoad"})
     state_description: Optional[str] = field(default=None)
-    connected_vManages: List[str] = field(factory=list, metadata={FIELD_NAME: "connectedVManages"})
+    connected_vManages: List[str] = field(
+        factory=list, metadata={FIELD_NAME: "connectedVManages"}
+    )
     model: Optional[str] = field(default=None, metadata={FIELD_NAME: "device-model"})
-    board_serial: Optional[str] = field(default=None, metadata={FIELD_NAME: 'board-serial'})
-    vedgeCertificateState: Optional[str] = field(default=None, metadata={FIELD_NAME: 'vedgeCertificateState'})  # TODO
-    chasis_number: Optional[str] = field(default=None, metadata={FIELD_NAME: 'chasisNumber'})
+    board_serial: Optional[str] = field(
+        default=None, metadata={FIELD_NAME: "board-serial"}
+    )
+    vedgeCertificateState: Optional[str] = field(
+        default=None, metadata={FIELD_NAME: "vedgeCertificateState"}
+    )  # TODO
+    chasis_number: Optional[str] = field(
+        default=None, metadata={FIELD_NAME: "chasisNumber"}
+    )
 
     @property
     def is_reachable(self) -> bool:
@@ -98,7 +118,9 @@ class Reboot(DataclassBase):
     reason: str = field(metadata={FIELD_NAME: "reboot_reason"})
     dateTime: dt.datetime = field(metadata={FIELD_NAME: "reboot_date_time"})
     vdeviceName: str = field(metadata={FIELD_NAME: "vdevice-name"})
-    rebootDateTimeDate: dt.datetime = field(metadata={FIELD_NAME: "reboot_date_time-date"})
+    rebootDateTimeDate: dt.datetime = field(
+        metadata={FIELD_NAME: "reboot_date_time-date"}
+    )
     vdeviceDataKey: str = field(metadata={FIELD_NAME: "vdevice-dataKey"})
     lastUpdated: dt.datetime = field(metadata={FIELD_NAME: "lastupdated"})
     vdeviceHostName: int = field(metadata={FIELD_NAME: "vdevice-host-name"})
@@ -107,22 +129,22 @@ class Reboot(DataclassBase):
 @define
 class WanInterface(DataclassBase):
     color: str
-    vDeviceIp: str = field(metadata={FIELD_NAME: 'vdevice-name'})
-    vDeviceName: str = field(metadata={FIELD_NAME: 'vdevice-host-name'})
-    adminState: str = field(metadata={FIELD_NAME: 'admin-state'})
-    interfaceName: str = field(metadata={FIELD_NAME: 'interface'})
-    privateIp: str = field(metadata={FIELD_NAME: 'private-ip'})
-    publicIp: str = field(metadata={FIELD_NAME: 'public-ip'})
-    privatePort: int = field(metadata={FIELD_NAME: 'private-port'})
-    publicPort: int = field(metadata={FIELD_NAME: 'public-port'})
-    operationalState: str = field(metadata={FIELD_NAME: 'operation-state'})
+    vDeviceIp: str = field(metadata={FIELD_NAME: "vdevice-name"})
+    vDeviceName: str = field(metadata={FIELD_NAME: "vdevice-host-name"})
+    adminState: str = field(metadata={FIELD_NAME: "admin-state"})
+    interfaceName: str = field(metadata={FIELD_NAME: "interface"})
+    privateIp: str = field(metadata={FIELD_NAME: "private-ip"})
+    publicIp: str = field(metadata={FIELD_NAME: "public-ip"})
+    privatePort: int = field(metadata={FIELD_NAME: "private-port"})
+    publicPort: int = field(metadata={FIELD_NAME: "public-port"})
+    operationalState: str = field(metadata={FIELD_NAME: "operation-state"})
 
 
 @define
 class Connection(DataclassBase):
     state: str
-    peerType: str = field(metadata={FIELD_NAME: 'peer-type'})
-    systemIp: str = field(metadata={FIELD_NAME: 'system-ip'})
+    peerType: str = field(metadata={FIELD_NAME: "peer-type"})
+    systemIp: str = field(metadata={FIELD_NAME: "system-ip"})
 
 
 @define
@@ -207,7 +229,9 @@ class User(DataclassBase):
     locale: Optional[str] = field(default=None)
     password: Optional[str] = field(default=None)
     description: Optional[str] = field(default=None)
-    resource_group: Optional[str] = field(default=None, metadata={FIELD_NAME: "resGroupName"})
+    resource_group: Optional[str] = field(
+        default=None, metadata={FIELD_NAME: "resGroupName"}
+    )
 
 
 @define
@@ -250,7 +274,9 @@ class PacketSetup(DataclassBase):
 
 @define(frozen=True)
 class Status(DataclassBase):
-    file_download_status: Optional[str] = field(default=None, metadata={FIELD_NAME: "fileDownloadStatus"})
+    file_download_status: Optional[str] = field(
+        default=None, metadata={FIELD_NAME: "fileDownloadStatus"}
+    )
     file_size: Optional[int] = field(default=None, metadata={FIELD_NAME: "fileSize"})
 
 
@@ -259,8 +285,12 @@ class ServiceConfigurationData(DataclassBase):
     """Administration -> Service Configuration"""
 
     vmanage_id: str = field(metadata={FIELD_NAME: "vmanageID"})
-    device_ip: str = field(metadata={FIELD_NAME: "deviceIP"})  # consider using ip4 module to verify
-    services: dict = field(metadata={FIELD_NAME: "services"})  # consider using nested dataclasses
+    device_ip: str = field(
+        metadata={FIELD_NAME: "deviceIP"}
+    )  # consider using ip4 module to verify
+    services: dict = field(
+        metadata={FIELD_NAME: "services"}
+    )  # consider using nested dataclasses
     persona: str = field(default="COMPUTE_AND_DATA")  # TODO Enum
     username: Optional[str] = field(default=None)
     password: Optional[str] = field(default=None)
@@ -284,7 +314,9 @@ class CloudServicesSettings(DataclassBase):
 
     enabled: bool = field(metadata={FIELD_NAME: "enabled"})
     otp: Optional[str] = field(default=None, metadata={FIELD_NAME: "otp"})
-    cloud_gateway_url: Optional[str] = field(default=None, metadata={FIELD_NAME: "cloudGatewayUrl"})
+    cloud_gateway_url: Optional[str] = field(
+        default=None, metadata={FIELD_NAME: "cloudGatewayUrl"}
+    )
 
 
 @define(frozen=True)

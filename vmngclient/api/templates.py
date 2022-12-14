@@ -6,7 +6,12 @@ from typing import List, cast
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
 from requests.exceptions import HTTPError
-from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
+from tenacity import (
+    retry,
+    retry_if_result,
+    stop_after_attempt,
+    wait_fixed,
+)  # type: ignore
 
 from vmngclient.dataclasses import Device, Template
 from vmngclient.session import vManageSession
@@ -18,8 +23,8 @@ logger = logging.getLogger(__name__)
 
 
 class TemplateType(Enum):
-    CLI = 'file'
-    FEATURE = 'template'
+    CLI = "file"
+    FEATURE = "template"
 
 
 class NotFoundError(Exception):
@@ -93,7 +98,9 @@ class TemplateAPI:
         """
         return self.get(name).id
 
-    def wait_for_complete(self, operation_id: str, timeout_seconds: int = 300, sleep_seconds: int = 5) -> bool:
+    def wait_for_complete(
+        self, operation_id: str, timeout_seconds: int = 300, sleep_seconds: int = 5
+    ) -> bool:
         """
 
         Args:
@@ -113,7 +120,9 @@ class TemplateAPI:
 
         def check_status(action_data):
             if action_data:
-                list_action = [action == OperationStatus.SUCCESS for action in action_data]
+                list_action = [
+                    action == OperationStatus.SUCCESS for action in action_data
+                ]
                 return not all(list_action)
             else:
                 return True
@@ -173,7 +182,7 @@ class TemplateAPI:
         endpoint = "/dataservice/template/device/config/attachcli"
         response = self.session.post(url=endpoint, json=payload).json()
         logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
-        return self.wait_for_complete(response['id'])
+        return self.wait_for_complete(response["id"])
 
     def device_to_cli(self, device: Device) -> bool:
         """
@@ -191,7 +200,7 @@ class TemplateAPI:
         endpoint = "/dataservice/template/config/device/mode/cli"
         response = self.session.post(url=endpoint, json=payload).json()
         logger.info(f"Changing mode to cli mode for {device.hostname}.")
-        return self.wait_for_complete(response['id'])
+        return self.wait_for_complete(response["id"])
 
     def get_operation_status(self, operation_id: str) -> List[OperationStatus]:
         """
@@ -204,7 +213,7 @@ class TemplateAPI:
         """
         endpoint = f"/dataservice/device/action/status/{operation_id}"
         response = cast(list, self.session.get_data(endpoint))
-        return [OperationStatus(status['status']) for status in response]
+        return [OperationStatus(status["status"]) for status in response]
 
     def delete(self, name: str) -> bool:
         """
@@ -227,7 +236,13 @@ class TemplateAPI:
         logger.info(f"Template: {template} is attached to device - cannot be deleted.")
         raise AttachedError(template.name)
 
-    def create(self, device_model: DeviceModel, name: str, description: str, config: CiscoConfParse) -> bool:
+    def create(
+        self,
+        device_model: DeviceModel,
+        name: str,
+        description: str,
+        config: CiscoConfParse,
+    ) -> bool:
         """
 
         Args:
@@ -280,7 +295,12 @@ class TemplateAPI:
         return response.text
 
     @staticmethod
-    def compare_template(first: CiscoConfParse, second: CiscoConfParse, full: bool = False, debug: bool = False) -> str:
+    def compare_template(
+        first: CiscoConfParse,
+        second: CiscoConfParse,
+        full: bool = False,
+        debug: bool = False,
+    ) -> str:
         """
 
         Args:
@@ -326,7 +346,11 @@ class TemplateAPI:
         return "".join(compare)
 
     def compare_with_running(
-        self, template: CiscoConfParse, device: Device, full: bool = False, debug: bool = False
+        self,
+        template: CiscoConfParse,
+        device: Device,
+        full: bool = False,
+        debug: bool = False,
     ) -> str:
         """The comparison of the config with the one running on the machine.
 
@@ -366,13 +390,19 @@ class TemplateAPI:
         .
         """
         running_config = CLITemplate(
-            self.session, DeviceModel(device.model), 'running_conf', 'running_conf'
+            self.session, DeviceModel(device.model), "running_conf", "running_conf"
         ).load_running(device)
         return self.compare_template(running_config, template, debug)
 
 
 class CLITemplate:
-    def __init__(self, session: vManageSession, device_model: DeviceModel, name: str, description: str) -> None:
+    def __init__(
+        self,
+        session: vManageSession,
+        device_model: DeviceModel,
+        name: str,
+        description: str,
+    ) -> None:
         self.session = session
         self.device_model = device_model
         self.name = name
@@ -393,9 +423,9 @@ class CLITemplate:
         """
         endpoint = f"/dataservice/template/device/object/{id}"
         config = self.session.get_json(endpoint)
-        if TemplateType(config['configType']) == TemplateType.FEATURE:
-            raise TemplateTypeError(config['templateName'])
-        self.config = CiscoConfParse(config['templateConfiguration'].splitlines())
+        if TemplateType(config["configType"]) == TemplateType.FEATURE:
+            raise TemplateTypeError(config["templateName"])
+        self.config = CiscoConfParse(config["templateConfiguration"].splitlines())
         return self.config
 
     def load_running(self, device: Device) -> CiscoConfParse:
@@ -409,7 +439,7 @@ class CLITemplate:
         """
         endpoint = f"/dataservice/template/config/running/{device.uuid}"
         config = self.session.get_json(endpoint)
-        self.config = CiscoConfParse(config['config'].splitlines())
+        self.config = CiscoConfParse(config["config"].splitlines())
         logger.debug(f"Template loaded from {device.hostname}.")
         return self.config
 
@@ -430,7 +460,12 @@ class CLITemplate:
             "factoryDefault": False,
             "configType": "file",
         }
-        if self.device_model not in [DeviceModel.VEDGE, DeviceModel.VSMART, DeviceModel.VMANAGE, DeviceModel.VBOND]:
+        if self.device_model not in [
+            DeviceModel.VEDGE,
+            DeviceModel.VSMART,
+            DeviceModel.VMANAGE,
+            DeviceModel.VBOND,
+        ]:
             payload["cliType"] = "device"
             payload["draftMode"] = False
 
@@ -438,9 +473,9 @@ class CLITemplate:
         try:
             self.session.post(url=endpoint, json=payload).json()
         except HTTPError as error:
-            response = json.loads(error.response.text)['error']
-            logger.error(response['message'])
-            logger.error(response['details'])
+            response = json.loads(error.response.text)["error"]
+            logger.error(response["message"])
+            logger.error(response["details"])
             return False
         logger.info(f"Template with name: {self.name} - sent to the device.")
         return True
@@ -469,9 +504,9 @@ class CLITemplate:
         try:
             self.session.put(url=endpoint, json=payload)
         except HTTPError as error:
-            response = json.loads(error.response.text)['error']
-            logger.error(response['message'])
-            logger.error(response['details'])
+            response = json.loads(error.response.text)["error"]
+            logger.error(response["message"])
+            logger.error(response["details"])
             return False
         logger.info(f"Template with name: {self.name} - updated.")
         return True

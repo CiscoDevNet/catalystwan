@@ -15,7 +15,7 @@ from vmngclient.utils.creation_tools import create_dataclass
 
 
 class TestOmpAPI(unittest.TestCase):
-    @patch('vmngclient.session.Session')
+    @patch("vmngclient.session.Session")
     def test_omp_peers(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.omp_peer
@@ -24,7 +24,7 @@ class TestOmpAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, self.omp_peer_dataclass)
 
-    @patch('vmngclient.session.Session')
+    @patch("vmngclient.session.Session")
     def test_omp_peers_empty(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = []
@@ -33,7 +33,7 @@ class TestOmpAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, [])
 
-    @patch('vmngclient.session.Session')
+    @patch("vmngclient.session.Session")
     def test_advertised_routes(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.advertised_routes
@@ -42,7 +42,7 @@ class TestOmpAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, self.advertised_routes_dataclass)
 
-    @patch('vmngclient.session.Session')
+    @patch("vmngclient.session.Session")
     def test_advertised_routes_empty(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = []
@@ -51,7 +51,7 @@ class TestOmpAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, [])
 
-    @patch('vmngclient.session.Session')
+    @patch("vmngclient.session.Session")
     def test_received_routes(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.received_routes
@@ -60,7 +60,7 @@ class TestOmpAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, self.received_routes_dataclass)
 
-    @patch('vmngclient.session.Session')
+    @patch("vmngclient.session.Session")
     def test_received_routes_empty(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = []
@@ -69,7 +69,7 @@ class TestOmpAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, [])
 
-    @patch('vmngclient.session.Session')
+    @patch("vmngclient.session.Session")
     def test_advertised_tlocs(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.advertised_tlocs
@@ -78,7 +78,7 @@ class TestOmpAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, self.advertised_tlocs_dataclass)
 
-    @patch('vmngclient.session.Session')
+    @patch("vmngclient.session.Session")
     def test_advertised_tlocs_empty(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = []
@@ -87,7 +87,7 @@ class TestOmpAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, [])
 
-    @patch('vmngclient.session.Session')
+    @patch("vmngclient.session.Session")
     def test_received_tlocs(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.received_tlocs
@@ -96,7 +96,7 @@ class TestOmpAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, self.received_tlocs_dataclass)
 
-    @patch('vmngclient.session.Session')
+    @patch("vmngclient.session.Session")
     def test_received_tlocs_empty(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = []
@@ -105,7 +105,7 @@ class TestOmpAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, [])
 
-    @patch('vmngclient.session.Session')
+    @patch("vmngclient.session.Session")
     def test_services(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.services
@@ -114,7 +114,7 @@ class TestOmpAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, self.services_dataclass)
 
-    @patch('vmngclient.session.Session')
+    @patch("vmngclient.session.Session")
     def test_services_empty(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = []
@@ -123,7 +123,7 @@ class TestOmpAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, [])
 
-    @patch('vmngclient.session.Session')
+    @patch("vmngclient.session.Session")
     def test_omp_summary(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.omp_summary
@@ -132,7 +132,7 @@ class TestOmpAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, self.omp_summary_dataclass)
 
-    @patch('vmngclient.session.Session')
+    @patch("vmngclient.session.Session")
     def test_omp_summary_empty(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = []
@@ -175,7 +175,9 @@ class TestOmpAPI(unittest.TestCase):
                 "state": "up",
             },
         ]
-        self.omp_peer_dataclass = [create_dataclass(OmpPeerData, item) for item in self.omp_peer]
+        self.omp_peer_dataclass = [
+            create_dataclass(OmpPeerData, item) for item in self.omp_peer
+        ]
         self.advertised_routes = [
             {
                 "overlay-id": "1",
@@ -217,7 +219,8 @@ class TestOmpAPI(unittest.TestCase):
             },
         ]
         self.advertised_routes_dataclass = [
-            create_dataclass(OmpAdvertisedRouteData, item) for item in self.advertised_routes
+            create_dataclass(OmpAdvertisedRouteData, item)
+            for item in self.advertised_routes
         ]
         self.received_routes = [
             {
@@ -263,7 +266,10 @@ class TestOmpAPI(unittest.TestCase):
                 "status": "C Red R",
             },
         ]
-        self.received_routes_dataclass = [create_dataclass(OmpReceivedRouteData, item) for item in self.received_routes]
+        self.received_routes_dataclass = [
+            create_dataclass(OmpReceivedRouteData, item)
+            for item in self.received_routes
+        ]
         self.advertised_tlocs = [
             {
                 "color": "default",
@@ -313,7 +319,8 @@ class TestOmpAPI(unittest.TestCase):
             },
         ]
         self.advertised_tlocs_dataclass = [
-            create_dataclass(OmpAdvertisedTlocData, item) for item in self.advertised_tlocs
+            create_dataclass(OmpAdvertisedTlocData, item)
+            for item in self.advertised_tlocs
         ]
         self.received_tlocs = [
             {
@@ -365,7 +372,9 @@ class TestOmpAPI(unittest.TestCase):
                 "address-family": "ipv4",
             },
         ]
-        self.received_tlocs_dataclass = [create_dataclass(OmpReceivedTlocData, item) for item in self.received_tlocs]
+        self.received_tlocs_dataclass = [
+            create_dataclass(OmpReceivedTlocData, item) for item in self.received_tlocs
+        ]
         self.services = [
             {
                 "path-id": "65",
@@ -393,7 +402,9 @@ class TestOmpAPI(unittest.TestCase):
                 "to-peer": "172.16.255.130",
             },
         ]
-        self.services_dataclass = [create_dataclass(OmpServiceData, item) for item in self.services]
+        self.services_dataclass = [
+            create_dataclass(OmpServiceData, item) for item in self.services
+        ]
         self.omp_summary = [
             {
                 "tlocs-sent": 4,
@@ -433,4 +444,6 @@ class TestOmpAPI(unittest.TestCase):
                 "adminstate": "UP",
             }
         ]
-        self.omp_summary_dataclass = [create_dataclass(OmpSummaryData, item) for item in self.omp_summary]
+        self.omp_summary_dataclass = [
+            create_dataclass(OmpSummaryData, item) for item in self.omp_summary
+        ]

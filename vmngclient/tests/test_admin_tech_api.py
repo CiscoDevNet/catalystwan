@@ -70,7 +70,8 @@ class TestAdminTechAPI(unittest.TestCase):
         admintechs = AdminTechAPI(mock_session).get(self.device_ip)
         # Assert
         mock_session.post.assert_called_once_with(
-            url="/dataservice/device/tools/admintechlist", json={"deviceIP": self.device_ip}
+            url="/dataservice/device/tools/admintechlist",
+            json={"deviceIP": self.device_ip},
         )
         self.assertIsInstance(admintechs[0], DeviceAdminTech)
 
@@ -99,7 +100,9 @@ class TestAdminTechAPI(unittest.TestCase):
         )
         print(filename)
         # Assert
-        mock_session.post.assert_called_once_with(url="/dataservice/device/tools/admintech", json=ANY, timeout=ANY)
+        mock_session.post.assert_called_once_with(
+            url="/dataservice/device/tools/admintech", json=ANY, timeout=ANY
+        )
         self.assertEqual(filename, self.admin_tech_generate_response["fileName"])
 
     @patch("vmngclient.session.vManageSession")
@@ -108,13 +111,17 @@ class TestAdminTechAPI(unittest.TestCase):
         # Arrange
         mock_session.post.return_value = mock_response
         mock_response.status_code = 400
-        mock_response.json.return_value = {"error": {"details": "Admin tech creation already in progress"}}
+        mock_response.json.return_value = {
+            "error": {"details": "Admin tech creation already in progress"}
+        }
         interval = 0.01
         count = 2
         # Act/Assert
         with self.assertRaises(GenerateAdminTechLogError):
             AdminTechAPI(mock_session).generate(
-                device_id=self.device_ip, polling_timeout=interval * count, polling_interval=interval
+                device_id=self.device_ip,
+                polling_timeout=interval * count,
+                polling_interval=interval,
             )
         self.assertEqual(mock_session.post.call_count, count)
 
@@ -130,7 +137,9 @@ class TestAdminTechAPI(unittest.TestCase):
         # Act/Assert
         with self.assertRaises(GenerateAdminTechLogError):
             AdminTechAPI(mock_session).generate(
-                device_id=self.device_ip, polling_timeout=interval * count, polling_interval=interval
+                device_id=self.device_ip,
+                polling_timeout=interval * count,
+                polling_interval=interval,
             )
         mock_session.post.assert_called_once()
 
@@ -145,7 +154,9 @@ class TestAdminTechAPI(unittest.TestCase):
         # Act
         AdminTechAPI(mock_session).delete(filename)
         # Assert
-        mock_session.delete.assert_called_once_with(f"/dataservice/device/tools/admintech/{token_id}")
+        mock_session.delete.assert_called_once_with(
+            f"/dataservice/device/tools/admintech/{token_id}"
+        )
 
     @patch("vmngclient.session.vManageSession")
     @patch("requests.Response")
@@ -182,4 +193,6 @@ class TestAdminTechAPI(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             # Act/Assert
             with self.assertRaises(DownloadAdminTechLogError):
-                AdminTechAPI(mock_session).download("fake-filename.tar.gz", Path(tmpdir))
+                AdminTechAPI(mock_session).download(
+                    "fake-filename.tar.gz", Path(tmpdir)
+                )

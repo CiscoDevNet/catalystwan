@@ -49,8 +49,10 @@ class AdminTechAPI:
         Returns:
             AdminTech object list for given device
         """
-        body = {'deviceIP': device_id}
-        response = self.session.post(url='/dataservice/device/tools/admintechlist', json=body)
+        body = {"deviceIP": device_id}
+        response = self.session.post(
+            url="/dataservice/device/tools/admintechlist", json=body
+        )
         items = response.json()["data"]
         return [create_dataclass(DeviceAdminTech, item) for item in items]
 
@@ -60,7 +62,7 @@ class AdminTechAPI:
         Returns:
             AdminTech objects list for all devices
         """
-        response = self.session.get('/dataservice/device/tools/admintechs')
+        response = self.session.get("/dataservice/device/tools/admintechs")
         items = response.json()["data"]
         return [create_dataclass(AdminTech, item) for item in items]
 
@@ -100,21 +102,31 @@ class AdminTechAPI:
             )
             try:
                 response = self.session.post(
-                    url="/dataservice/device/tools/admintech", json=body, timeout=request_timeout
+                    url="/dataservice/device/tools/admintech",
+                    json=body,
+                    timeout=request_timeout,
                 )
             except HTTPError as http_error:
                 response = http_error.response
             if response.status_code == 200:
                 return response.json()["fileName"]
-            if response.status_code == 400 and create_admin_tech_error_msgs in response.json().get("error", {}).get(
+            if response.status_code == 400 and create_admin_tech_error_msgs in response.json().get(
+                "error", {}
+            ).get(
                 "details", ""
             ):
-                logger.warning(f"Admin tech creation already in progress, retrying in {polling_interval} seconds")
+                logger.warning(
+                    f"Admin tech creation already in progress, retrying in {polling_interval} seconds"
+                )
             else:
-                raise GenerateAdminTechLogError(f"It is not possible to generate admintech log for {device_id}")
+                raise GenerateAdminTechLogError(
+                    f"It is not possible to generate admintech log for {device_id}"
+                )
             time.sleep(polling_interval)
             polling_timer -= polling_interval
-        raise GenerateAdminTechLogError(f'It is not possible to generate admintech log for {device_id}')
+        raise GenerateAdminTechLogError(
+            f"It is not possible to generate admintech log for {device_id}"
+        )
 
     def _get_token_id(self, filename: str) -> str:
         admin_techs = self.get_all()
@@ -134,7 +146,9 @@ class AdminTechAPI:
         """
 
         token_id = self._get_token_id(filename)
-        response = self.session.delete(f"/dataservice/device/tools/admintech/{token_id}")
+        response = self.session.delete(
+            f"/dataservice/device/tools/admintech/{token_id}"
+        )
         if response.status_code == 200:
             logger.info(f"Deleted AdminTech file {filename} on remote")
         return response
@@ -152,6 +166,8 @@ class AdminTechAPI:
         download_path = download_dir / filename
         url = f"/dataservice/device/tools/admintech/download/{filename}"
         if self.session.get_file(url=url, filename=download_path).status_code != 200:
-            raise DownloadAdminTechLogError(f"Cannot download admin tech file: {filename} from remote")
+            raise DownloadAdminTechLogError(
+                f"Cannot download admin tech file: {filename} from remote"
+            )
         logger.info(f"Downloaded AdminTech file to: {download_path}")
         return download_path

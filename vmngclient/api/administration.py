@@ -1,7 +1,12 @@
 import logging
 from typing import List, Union, cast
 
-from vmngclient.dataclasses import CloudConnectorData, CloudServicesSettings, ServiceConfigurationData, User
+from vmngclient.dataclasses import (
+    CloudConnectorData,
+    CloudServicesSettings,
+    ServiceConfigurationData,
+    User,
+)
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import asdict, create_dataclass
 
@@ -57,7 +62,9 @@ class ClusterManagementAPI:
     def __init__(self, session: vManageSession) -> None:
         self.session = session
 
-    def modify_cluster_setup(self, service_configuration: ServiceConfigurationData) -> bool:
+    def modify_cluster_setup(
+        self, service_configuration: ServiceConfigurationData
+    ) -> bool:
         """Updates vManage cluster configuration.
 
         Args:
