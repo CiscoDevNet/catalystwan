@@ -52,9 +52,9 @@ class AlarmsAPI:
                 {"value": [value], "field": "acknowledged", "type": "bool", "operator": "equal"}
             )
 
-        alarms = self.session.post(url=AlarmsAPI.URL, data=query).json()
+        alarms = self.session.post(url=AlarmsAPI.URL, json=query).json()
 
-        logger.info("Actualas alarms collected successfuly.")
+        logger.info("Current alarms collected successfuly.")
 
         return [create_dataclass(AlarmData, flatten_dict(alarm)) for alarm in alarms]
 
