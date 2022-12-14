@@ -93,7 +93,8 @@ class TenantBackupRestoreApi:
         '''
         # Upload the file
         url = '/dataservice/tenantbackup/import'
-        response = self.session.post_file(url, filename, data={})
+        files = {'file': (filename.name, open(filename, 'rb'))}
+        response = self.session.post(url, data=data, files=files)
         #task_status = TaskStatus(self.session)
         #result = task_status.wait_for_completed(5, 3000,
         #                               self.exit_statuses,
