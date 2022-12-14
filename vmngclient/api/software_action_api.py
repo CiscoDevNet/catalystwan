@@ -167,8 +167,8 @@ class SoftwareActionAPI:
         monitor = MultipartEncoderMonitor(encoder, callback)
         headers = self.session.headers.copy()
         headers.update({"content-type": monitor.content_type})
-        response = self.session.post(url, data=monitor, headers=headers)
-        return response.status_code
+        upload = self.session.post(url, data=monitor, headers={"content-type": monitor.content_type})
+        return upload.status_code
 
     def _downgrade_check(self, devices, version_to_upgrade: str, family) -> List:
         """
