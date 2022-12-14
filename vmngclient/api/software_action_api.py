@@ -165,8 +165,6 @@ class SoftwareActionAPI:
         )
         callback = self._create_callback(encoder)
         monitor = MultipartEncoderMonitor(encoder, callback)
-        headers = self.session.headers.copy()
-        headers.update({"content-type": monitor.content_type})
         upload = self.session.post(url, data=monitor, headers={"content-type": monitor.content_type})
         return upload.status_code
 
