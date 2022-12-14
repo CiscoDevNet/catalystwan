@@ -6,6 +6,7 @@ class OperationStatus(Enum):
     FAILURE = 'Failure'
     SUCCESS = 'Success'
     SCHEDULED = 'Scheduled'
+    DONE_SCHEDULED = 'Done - Scheduled'
 
 
 class OperationStatusId(Enum):
