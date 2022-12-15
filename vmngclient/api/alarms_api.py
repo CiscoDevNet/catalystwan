@@ -77,9 +77,9 @@ class AlarmsAPI:
                 }
             )
 
-        alarms = self.session.post(url=AlarmsAPI.URL, json=query).json()
+        alarms = self.session.post(url=AlarmsAPI.URL, json=query).json()["data"]
 
-        logger.info("Current alarms collected successfuly.")
+        logger.info("Current alarms collected successfully.")
 
         return [create_dataclass(AlarmData, flatten_dict(alarm)) for alarm in alarms]
 
@@ -179,7 +179,7 @@ class AlarmVerification:
     def verify(
         self, expected: Set[AlarmData], timeout_seconds: int, sleep_seconds: int
     ):
-        """The verifing if the expected alarms is included in the actuals alarms set.
+        """The verifying if the expected alarms is included in the actual alarms set.
 
         Args:
           expected(Set[AlarmData]): The set expected alarms.
@@ -192,7 +192,7 @@ class AlarmVerification:
 
         def _log_exception(retry_state):
             self.logger.error(f"Cannot found alarms in {timeout_seconds}.")
-            self.logger.error(f"Orignial exception: {retry_state.outcome.exception()}.")
+            self.logger.error(f"Original exception: {retry_state.outcome.exception()}.")
 
         def check(founds):
             return expected != founds
