@@ -124,17 +124,6 @@ class PacketCaptureAPI:
         return if_name
 
     def download_capture_session(self, packet: PacketSetup, device: Device, file_path: Optional[str] = None) -> bool:
-        # url_path = f"/dataservice/stream/device/capture/download/{packet.session_id}"
-        # full_url = self.session.get_full_url(url_path)
-        # download_packet = self.session.get_data(url=full_url)
-        # if file_path is None:
-        #     file_path = f"{Path(__file__).parents[0]}/{device.uuid}.pcap"
-
-        # with open(file_path, "wb") as file:
-        #     with download_packet as raw:
-        #         file.write(raw.read())
-        # return True
-
         if file_path is None:
             file_path = f"{Path(__file__).parents[0]}/{device.uuid}.pcap"
         url = f"/dataservice/stream/device/capture/download/{packet.session_id}"
