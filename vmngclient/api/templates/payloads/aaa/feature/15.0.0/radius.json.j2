@@ -2,89 +2,94 @@
     "timeout": {
         "vipObjectType": "object",
         "vipType": "constant",
-        "vipValue": 6,
+        "vipValue": {{ radius_timeout }},
         "vipVariableName": "radius_timeout"
     },
     "retransmit": {
         "vipObjectType": "object",
         "vipType": "constant",
-        "vipValue": 4,
+        "vipValue": {{ radius_retransmit }},
         "vipVariableName": "retransmit"
-    },
-    "server": {
-    "vipType": "constant",
-    "vipValue": [
-        {
-        "address": {
-            "vipObjectType": "object",
-            "vipType": "constant",
-            "vipValue": "20.20.20.20",
-            "vipVariableName": "radius_radius_address"
-        },
-        "tag": {
-            "vipObjectType": "object",
-            "vipType": "constant",
-            "vipValue": "radis2",
-            "vipVariableName": "radius_radius_tag"
-        },
-        "auth-port": {
-            "vipObjectType": "object",
-            "vipType": "constant",
-            "vipValue": 1812,
-            "vipVariableName": "radius_radius_auth_port"
-        },
-        "acct-port": {
-            "vipObjectType": "object",
-            "vipType": "constant",
-            "vipValue": 1813,
-            "vipVariableName": "radius_radius_acct_port"
-        },
-        "vpn": {
-            "vipObjectType": "object",
-            "vipType": "constant",
-            "vipValue": 0,
-            "vipVariableName": "radius_radius_vpn"
-        },
-        "source-interface": {
-            "vipObjectType": "object",
-            "vipType": "constant",
-            "vipValue": "GigabitEthernet0/",
-            "vipVariableName": "radius_radius_source_interface"
-        },
-        "key": {
-            "vipObjectType": "object",
-            "vipType": "constant",
-            "vipValue": "123456789a",
-            "vipVariableName": "radius_radius_key"
-        },
-        "secret-key": {
-            "vipObjectType": "object",
-            "vipType": "constant",
-            "vipValue": "123456789a",
-            "vipVariableName": "radius_radius_secret_key"
-        },
-        "priority": {
-            "vipObjectType": "object",
-            "vipType": "constant",
-            "vipValue": 1,
-            "vipVariableName": "radius_radius_priority"
-        },
-        "priority-order": [
-            "address",
-            "auth-port",
-            "vpn",
-            "source-interface",
-            "key",
-            "secret-key",
-            "priority",
-            "tag",
-            "acct-port"
-        ]
-        }
-    ],
-    "vipObjectType": "tree",
-    "vipPrimaryKey": [
-        "address"
-    ]
     }
+    {% if radius_servers %}
+        ,"server": {
+            "vipType": "constant",
+            "vipValue": [
+                {% for server in radius_servers %}
+                    {
+                    "address": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "{{ server.address }}",
+                        "vipVariableName": "radius_radius_address"
+                    },
+                    "tag": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "{{ server.tag }}",
+                        "vipVariableName": "radius_radius_tag"
+                    },
+                    "auth-port": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": {{ server.auth_port }},
+                        "vipVariableName": "radius_radius_auth_port"
+                    },
+                    "acct-port": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": {{ server.acct_port }},
+                        "vipVariableName": "radius_radius_acct_port"
+                    },
+                    "vpn": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": {{ server.vpn }},
+                        "vipVariableName": "radius_radius_vpn"
+                    },
+                    "source-interface": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "{{ server.source_interface }}",
+                        "vipVariableName": "radius_radius_source_interface"
+                    },
+                    "key": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "{{ server.key }}",
+                        "vipVariableName": "radius_radius_key"
+                    },
+                    "secret-key": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "{{ server.secret_key }}",
+                        "vipVariableName": "radius_radius_secret_key"
+                    },
+                    "priority": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": {{ server.priority }},
+                        "vipVariableName": "radius_radius_priority"
+                    },
+                    "priority-order": [
+                        "address",
+                        "auth-port",
+                        "vpn",
+                        "source-interface",
+                        "key",
+                        "secret-key",
+                        "priority",
+                        "tag",
+                        "acct-port"
+                    ]
+                    }
+                    {% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            "vipObjectType": "tree",
+            "vipPrimaryKey": [
+                "address"
+            ]
+        }
+    {% endif %}
 }

@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import json
 from enum import Enum
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from attr import define, field
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta
@@ -36,6 +38,22 @@ class TacacsServer:
 
 
 @define
+class RadiusServer:
+    """Default values from documentations."""
+
+    address: str
+    secret_key: str
+    source_interface: Optional[str] = field(default=None)
+    key: Optional[str] = field(default=None)
+    acct_port: int = field(default=1813)
+    auth_port: int = field(default=1812)
+    tag: Optional[str] = field(default=None)
+    timeout: int = field(default=5)
+    vpn: int = field(default=0)
+    priority: int = field(default=0)
+
+
+@define
 class AuthTask:
     name: str
     default_action: Action = field(default=Action.ACCEPT)
@@ -60,6 +78,9 @@ class aaaConfig:
     tacacs_authentication: TacacsAuthenticationMethod = field(default=TacacsAuthenticationMethod.PAP)
     tacacs_timeout: int = field(default=5)
     tacacs_servers: List[TacacsServer] = field(factory=list)
+    radius_retransmit: int = field(default=3)
+    radius_timeout: int = field(default=5)
+    radius_servers: List[RadiusServer] = field(factory=list)
 
 
 def prepare(dataclass: AttrsInstance) -> Dict[str, Any]:
@@ -108,13 +129,13 @@ ts1 = TacacsServer("1.1.1.1", 1, "1", "1", 1, 1)
 ts2 = TacacsServer("1.1.1.2", 1, "1", "1", 1, 1)
 ltss = [ts1, ts2]
 
-u1 = User(username="test", password="me1", description="default")
+rs1 = RadiusServer(address="1.1.1.1", secret_key="1")
+rs2 = RadiusServer(address="1.1.1.2", secret_key="2")
+lrss = [rs1, rs2]
 
-u2 = User(
-    username="test2",
-    password="me2",
-    description="default2",
-)
+u1 = User(group=['a'], username="test", password="me1", description="default", locale='cos')
+
+u2 = User(group=['b'], username="test2", password="me2", description="default2", locale='cos')
 
 users = [u1, u2]
 
@@ -129,6 +150,7 @@ aaa = aaaConfig(
     auth_disable_netconf_logs=False,
     auth_radius_servers=["1.1.1.1", "2.2.3.4"],
     tacacs_servers=ltss,
+    radius_servers=lrss,
 )
 
 
@@ -138,7 +160,7 @@ from vmngclient.session import create_vManageSession
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-url = "10.195.163.123"
+url = "10.29.30.199"
 
 subdomain = "apple.fruits.com"
 port = 10100
