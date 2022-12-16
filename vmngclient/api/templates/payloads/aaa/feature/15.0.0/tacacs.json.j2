@@ -1,0 +1,75 @@
+{
+    "timeout": {
+        "vipObjectType": "object",
+        "vipType": "ignore",
+        "vipValue": {{ tacacs_timeout }},
+        "vipVariableName": "tacacs_timeout"
+    },
+    "authentication": {
+        "vipObjectType": "object",
+        "vipType": "ignore",
+        "vipValue": "pap",
+        "vipVariableName": "{{ tacacs_authentication.value }}"
+    }
+    {% if tacacs_servers %}
+        ,"server": {
+            "vipType": "constant",
+            "vipValue": [
+                {% for server in tacacs_servers %}
+                    {
+                    "address": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "{{ server.address }}",
+                        "vipVariableName": "tacacs_tacacs_address"
+                    },
+                    "auth-port": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": {{ server.auth_port }},
+                        "vipVariableName": "tacacs_tacacs_auth_port"
+                    },
+                    "vpn": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": {{ server.vpn }},
+                        "vipVariableName": "tacacs_tacacs_vpn"
+                    },
+                    "source-interface": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "{{ server.source_interface }}",
+                        "vipVariableName": "tacacs_tacacs_source_interface"
+                    },
+                    "secret-key": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "{{ server.secret_key }}",
+                        "vipVariableName": "tacacs_tacacs_secret_key"
+                    },
+                    "priority": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": {{ server.priority }},
+                        "vipVariableName": "tacacs_tacacs_priority"
+                    },
+                    "priority-order": [
+                        "address",
+                        "auth-port",
+                        "vpn",
+                        "source-interface",
+                        "key",
+                        "secret-key",
+                        "priority"
+                    ]
+                    }
+                    {% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            "vipObjectType": "tree",
+            "vipPrimaryKey": [
+                "address"
+            ]
+        }
+    {% endif %}
+}

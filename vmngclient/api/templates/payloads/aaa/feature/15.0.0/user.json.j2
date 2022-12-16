@@ -1,0 +1,60 @@
+{
+    "vipType": "constant",
+    "vipValue": [
+		{% for user in local_users %}
+            {
+                "vipOptional": false,
+                "name": {
+                    "vipObjectType": "object",
+                    "vipType": "constant",
+                    "vipValue": "{{ user.description }}",
+                    "vipVariableName": "user_name_0"
+                },
+                "password": {
+                    "vipObjectType": "object",
+                    "vipType": "constant",
+                    "vipValue": "{{ user.password }}"
+                },
+                "pubkey-chain": {
+                    "vipObjectType": "tree",
+                    "vipType": "ignore",
+                    "vipValue": [],
+                    "vipVariableName": "user_pubkey_chain_0",
+                    "vipPrimaryKey": [
+                        "usertag"
+                    ]
+                },
+                "description": {
+                    "vipObjectType": "object",
+                    "vipType": "constant",
+                    "vipValue": "{{ user.description }}",
+                    "vipVariableName": "user_description"
+                },
+                "group": {
+                    "vipType": "constant",
+                    "vipValue": [
+                        {
+                            "vipType": "constant",
+                            "vipValue": "netadmin",
+                            "vipObjectType": "object"
+                        }
+                    ],
+                    "vipObjectType": "list",
+                    "vipVariableName": "user_group"
+                },
+                "priority-order": [
+                    "name",
+                    "password",
+                    "secret",
+                    "description",
+                    "group",
+                    "pubkey-chain"
+                ]
+            }{% if not loop.last %},{% endif %}
+		{% endfor %}
+    ],
+    "vipObjectType": "tree",
+    "vipPrimaryKey": [
+        "name"
+    ]
+}
