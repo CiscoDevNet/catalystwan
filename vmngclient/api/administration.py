@@ -35,7 +35,7 @@ class UsersAPI:
         url_path = "/dataservice/admin/user"
         data = asdict(user)  # type: ignore
 
-        response = self.session.post(url=url_path, data=data)
+        response = self.session.post(url=url_path, json=data)
         logger.info(response)
 
     def delete_user(self, username: str) -> bool:
@@ -101,7 +101,7 @@ class AdministrationSettingsAPI:
         """Enables SD-AVC Cloud Connector on vManage."""
         url_path = "/dataservice/sdavc/cloudconnector"
         data = asdict(cloud_connector)  # type: ignore
-        response = self.session.post(url_path, data)
+        response = self.session.post(url_path, json=data)
         return True if response.status_code == 200 else False
 
     def disable_sdavc_cloud_connector(self) -> bool:

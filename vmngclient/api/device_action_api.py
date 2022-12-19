@@ -55,7 +55,7 @@ class RebootAction(DeviceActionAPI):
             "deviceType": "controller",
             "devices": [{"deviceIP": self.dev.id, "deviceId": self.dev.uuid}],
         }
-        response = self.session.post_json('/dataservice/device/action/reboot', data=body)
+        response = self.session.post('/dataservice/device/action/reboot', json=body).json()
         if response.get('id'):
             self.action_id = response['id']
         else:
@@ -110,7 +110,7 @@ class ValidateAction(DeviceActionAPI):  # TODO check
             "validity": "valid" if valid else "invalid",
         }
 
-        response = self.session.post(url='/dataservice/certificate/save/vedge/list', data=body).json()
+        response = self.session.post(url='/dataservice/certificate/save/vedge/list', json=body).json()
         if response.get('id'):
             self.action_id = response['id']
         else:
