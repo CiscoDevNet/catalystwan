@@ -1,8 +1,6 @@
 import unittest
-from unittest.mock import patch
 from pathlib import Path
-
-from parameterized import parameterized  # type: ignore
+from unittest.mock import patch
 
 from vmngclient.api.logs_api import LogsAPI
 
@@ -10,18 +8,9 @@ from vmngclient.api.logs_api import LogsAPI
 class MyTestCase(unittest.TestCase):
     def setUp(self) -> None:
         self.logs = [
-            {
-                "logid": "12345",
-                "logmessage": "message from log 1",
-                "tenant": "tenant234",
-                "entry_time": 1671028426000
-            },
-            {
-                "logid": "67890",
-                "logmessage": "message from log 2",
-                "tenant": "tenant987",
-                "entry_time": 1671028426000
-            }]
+            {"logid": "12345", "logmessage": "message from log 1", "tenant": "tenant234", "entry_time": 1671028426000},
+            {"logid": "67890", "logmessage": "message from log 2", "tenant": "tenant987", "entry_time": 1671028426000},
+        ]
 
     @patch("vmngclient.session.vManageSession")
     def test_get_auditlogs_file_path_not_provided(self, mock_session):
