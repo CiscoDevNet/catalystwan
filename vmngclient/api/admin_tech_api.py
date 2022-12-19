@@ -49,8 +49,8 @@ class AdminTechAPI:
         Returns:
             AdminTech object list for given device
         """
-        body = {'deviceIP': device_id}
-        response = self.session.post(url='/dataservice/device/tools/admintechlist', json=body)
+        body = {"deviceIP": device_id}
+        response = self.session.post(url="/dataservice/device/tools/admintechlist", json=body)
         items = response.json()["data"]
         return [create_dataclass(DeviceAdminTech, item) for item in items]
 
@@ -60,7 +60,7 @@ class AdminTechAPI:
         Returns:
             AdminTech objects list for all devices
         """
-        response = self.session.get('/dataservice/device/tools/admintechs')
+        response = self.session.get("/dataservice/device/tools/admintechs")
         items = response.json()["data"]
         return [create_dataclass(AdminTech, item) for item in items]
 
@@ -114,7 +114,7 @@ class AdminTechAPI:
                 raise GenerateAdminTechLogError(f"It is not possible to generate admintech log for {device_id}")
             time.sleep(polling_interval)
             polling_timer -= polling_interval
-        raise GenerateAdminTechLogError(f'It is not possible to generate admintech log for {device_id}')
+        raise GenerateAdminTechLogError(f"It is not possible to generate admintech log for {device_id}")
 
     def _get_token_id(self, filename: str) -> str:
         admin_techs = self.get_all()

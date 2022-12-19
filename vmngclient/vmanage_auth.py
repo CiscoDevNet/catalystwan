@@ -73,11 +73,11 @@ class vManageAuth(AuthBase):
             RequestsCookieJar: _description_
         """
         security_payload = {
-            'j_username': self.username,
-            'j_password': self.password,
+            "j_username": self.username,
+            "j_password": self.password,
         }
         full_url = urljoin(self.base_url, "/j_security_check")
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
         response = requests.post(
             url=full_url,
             data=security_payload,
@@ -101,7 +101,7 @@ class vManageAuth(AuthBase):
             str: Valid token.
         """
         full_url = urljoin(self.base_url, "/dataservice/client/token")
-        headers = {'Content-Type': 'application/json'}
+        headers = {"Content-Type": "application/json"}
         response = requests.get(
             url=full_url,
             cookies=cookies,

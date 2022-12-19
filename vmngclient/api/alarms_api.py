@@ -24,7 +24,7 @@ class Viewed(Enum):
 
 class AlarmsAPI:
 
-    URL = '/dataservice/alarms'
+    URL = "/dataservice/alarms"
 
     def __init__(self, session: vManageSession):
         self.session = session
@@ -77,7 +77,7 @@ class AlarmsAPI:
           True if all alarms are viewed
         """
 
-        self.session.post(f'{AlarmsAPI.URL}/markallasviewed')
+        self.session.post(f"{AlarmsAPI.URL}/markallasviewed")
         logger.info("Alarms mark as viewed.")
 
         return not self.get_not_viewed_alarms()
@@ -108,7 +108,7 @@ class AlarmsAPI:
         logger.info(f"found alarms: {verification.found}")
         logger.info(f"not-found alarms: {verification.not_found}")
 
-        return {'found': verification.found, 'not-found': verification.not_found}
+        return {"found": verification.found, "not-found": verification.not_found}
 
 
 class AlarmVerification:

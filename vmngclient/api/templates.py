@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 
 
 class TemplateType(Enum):
-    CLI = 'file'
-    FEATURE = 'template'
+    CLI = "file"
+    FEATURE = "template"
 
 
 class NotFoundError(Exception):
@@ -173,7 +173,7 @@ class TemplateAPI:
         endpoint = "/dataservice/template/device/config/attachcli"
         response = self.session.post(url=endpoint, json=payload).json()
         logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
-        return self.wait_for_complete(response['id'])
+        return self.wait_for_complete(response["id"])
 
     def device_to_cli(self, device: Device) -> bool:
         """
@@ -191,7 +191,7 @@ class TemplateAPI:
         endpoint = "/dataservice/template/config/device/mode/cli"
         response = self.session.post(url=endpoint, json=payload).json()
         logger.info(f"Changing mode to cli mode for {device.hostname}.")
-        return self.wait_for_complete(response['id'])
+        return self.wait_for_complete(response["id"])
 
     def get_operation_status(self, operation_id: str) -> List[OperationStatus]:
         """
@@ -204,7 +204,7 @@ class TemplateAPI:
         """
         endpoint = f"/dataservice/device/action/status/{operation_id}"
         response = cast(list, self.session.get_data(endpoint))
-        return [OperationStatus(status['status']) for status in response]
+        return [OperationStatus(status["status"]) for status in response]
 
     def delete(self, name: str) -> bool:
         """
@@ -366,7 +366,7 @@ class TemplateAPI:
         .
         """
         running_config = CLITemplate(
-            self.session, DeviceModel(device.model), 'running_conf', 'running_conf'
+            self.session, DeviceModel(device.model), "running_conf", "running_conf"
         ).load_running(device)
         return self.compare_template(running_config, template, debug)
 
@@ -393,9 +393,9 @@ class CLITemplate:
         """
         endpoint = f"/dataservice/template/device/object/{id}"
         config = self.session.get_json(endpoint)
-        if TemplateType(config['configType']) == TemplateType.FEATURE:
-            raise TemplateTypeError(config['templateName'])
-        self.config = CiscoConfParse(config['templateConfiguration'].splitlines())
+        if TemplateType(config["configType"]) == TemplateType.FEATURE:
+            raise TemplateTypeError(config["templateName"])
+        self.config = CiscoConfParse(config["templateConfiguration"].splitlines())
         return self.config
 
     def load_running(self, device: Device) -> CiscoConfParse:
@@ -409,7 +409,7 @@ class CLITemplate:
         """
         endpoint = f"/dataservice/template/config/running/{device.uuid}"
         config = self.session.get_json(endpoint)
-        self.config = CiscoConfParse(config['config'].splitlines())
+        self.config = CiscoConfParse(config["config"].splitlines())
         logger.debug(f"Template loaded from {device.hostname}.")
         return self.config
 
@@ -438,9 +438,9 @@ class CLITemplate:
         try:
             self.session.post(url=endpoint, json=payload).json()
         except HTTPError as error:
-            response = json.loads(error.response.text)['error']
-            logger.error(response['message'])
-            logger.error(response['details'])
+            response = json.loads(error.response.text)["error"]
+            logger.error(response["message"])
+            logger.error(response["details"])
             return False
         logger.info(f"Template with name: {self.name} - sent to the device.")
         return True
@@ -469,9 +469,9 @@ class CLITemplate:
         try:
             self.session.put(url=endpoint, json=payload)
         except HTTPError as error:
-            response = json.loads(error.response.text)['error']
-            logger.error(response['message'])
-            logger.error(response['details'])
+            response = json.loads(error.response.text)["error"]
+            logger.error(response["message"])
+            logger.error(response["details"])
             return False
         logger.info(f"Template with name: {self.name} - updated.")
         return True

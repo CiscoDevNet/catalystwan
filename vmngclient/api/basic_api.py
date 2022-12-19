@@ -16,8 +16,8 @@ from vmngclient.utils.reachability import Reachability
 
 # TODO link that with dataclass
 class DeviceField(Enum):
-    HOSTNAME = 'hostname'
-    ID = 'id'
+    HOSTNAME = "hostname"
+    ID = "id"
 
 
 class DeviceNotFoundError(Exception):
@@ -76,18 +76,18 @@ class DevicesAPI:
         for dev in self.devices:
             if local_system_ip == dev.local_system_ip:
                 return dev.id
-        return ''
+        return ""
 
     @property
     def devices(self) -> List[Device]:
         """List of all devices."""
-        devices_basic_info = self.session.get_data('/dataservice/device')
+        devices_basic_info = self.session.get_data("/dataservice/device")
 
         devices_ids = ""
         for device in devices_basic_info:
             devices_ids += f"&deviceId={device['deviceId']}"
 
-        devices_full_info = self.session.get_data(f'/dataservice/device/system/info?{devices_ids}')
+        devices_full_info = self.session.get_data(f"/dataservice/device/system/info?{devices_ids}")
 
         return [create_dataclass(Device, device) for device in devices_full_info]
 
@@ -100,9 +100,9 @@ class DevicesAPI:
         Returns:
             Device object
         """
-        devices = self.session.get_data(f'/dataservice/system/device/vedges?uuid={uuid}')
+        devices = self.session.get_data(f"/dataservice/system/device/vedges?uuid={uuid}")
 
-        assert len(devices) == 1, 'Expected system info response list to have one member'
+        assert len(devices) == 1, "Expected system info response list to have one member"
 
         return create_dataclass(Device, devices[0])
 
@@ -123,7 +123,7 @@ class DevicesAPI:
         Returns:
             Tenants
         """
-        tenants = self.session.get_data('/dataservice/tenant')
+        tenants = self.session.get_data("/dataservice/tenant")
 
         return tenants
 
@@ -137,8 +137,8 @@ class DevicesAPI:
             reachable devices
         """
         unsupported_personality = [Personality.VMANAGE]
-        assert personality not in unsupported_personality, 'Unsupported personality for reachable endpoint'
-        return self.session.get_data(f'/dataservice/device/reachable?personality={personality.value}')
+        assert personality not in unsupported_personality, "Unsupported personality for reachable endpoint"
+        return self.session.get_data(f"/dataservice/device/reachable?personality={personality.value}")
 
     def send_certificate_state_to_controllers(
         self,
@@ -155,7 +155,7 @@ class DevicesAPI:
             self.session.__get_logger(f"Orignial exception: {retry_state.outcome.exception()}.")
 
         def check_state(action_data):
-            list_action = [action['status'] == OperationStatus.SUCCESS.value for action in action_data]
+            list_action = [action["status"] == OperationStatus.SUCCESS.value for action in action_data]
             return not all(list_action)
 
         @retry(
@@ -165,14 +165,14 @@ class DevicesAPI:
             retry_error_callback=_log_exception,
         )
         def wait_for_state():
-            status_api = f'/dataservice/device/action/status/{action_id}'
-            return self.session.get_data(f'{status_api}')
+            status_api = f"/dataservice/device/action/status/{action_id}"
+            return self.session.get_data(f"{status_api}")
 
-        response = self.session.post('/dataservice/certificate/vedge/list?action=push').json()
-        if response.get('id'):
-            action_id = response['id']
+        response = self.session.post("/dataservice/certificate/vedge/list?action=push").json()
+        if response.get("id"):
+            action_id = response["id"]
         else:
-            raise FailedSend('Failed to push edges list certificates')
+            raise FailedSend("Failed to push edges list certificates")
 
         return True if wait_for_state() else False
 
@@ -213,7 +213,7 @@ class DeviceStateAPI:
         Returns:
             Union[list, dict]: list of dicts (FIXME: add mapping to a NamedTuples)
         """
-        return self.session.get_data(f'/dataservice/device/crashlog?deviceId={device_id}')
+        return self.session.get_data(f"/dataservice/device/crashlog?deviceId={device_id}")
 
     def get_device_control_connections_info(self, device_id) -> List[Connection]:
         """Gets control connections for a device.
@@ -224,7 +224,7 @@ class DeviceStateAPI:
         Returns:
             list of Connection objects
         """
-        items = self.session.get_data(f'/dataservice/device/control/connections?deviceId={device_id}')
+        items = self.session.get_data(f"/dataservice/device/control/connections?deviceId={device_id}")
 
         return [create_dataclass(Connection, item) for item in items]
 
@@ -237,7 +237,7 @@ class DeviceStateAPI:
         Returns:
             list of Connection objects
         """
-        items = self.session.get_data(f'/dataservice/device/orchestrator/connections?deviceId={device_id}')
+        items = self.session.get_data(f"/dataservice/device/orchestrator/connections?deviceId={device_id}")
 
         return [create_dataclass(Connection, item) for item in items]
 
@@ -250,7 +250,7 @@ class DeviceStateAPI:
         Returns:
             list of Reboot objects
         """
-        items = self.session.get_data(f'/dataservice/device/reboothistory?deviceId={device_id}')
+        items = self.session.get_data(f"/dataservice/device/reboothistory?deviceId={device_id}")
 
         return [create_dataclass(Reboot, item) for item in items]
 
@@ -263,20 +263,20 @@ class DeviceStateAPI:
         Returns:
            Device object
         """
-        devices = self.session.get_data(f'/dataservice/device/system/info?deviceId={device_id}')
+        devices = self.session.get_data(f"/dataservice/device/system/info?deviceId={device_id}")
 
-        assert len(devices) == 1, 'Expected system info response list to have one member'
+        assert len(devices) == 1, "Expected system info response list to have one member"
 
         return create_dataclass(Device, devices[0])
 
     def get_device_wan_interfaces(self, device_id: str):
-        wan_interfaces = self.session.get_data(f'/dataservice/device/control/waninterface?deviceId={device_id}')
+        wan_interfaces = self.session.get_data(f"/dataservice/device/control/waninterface?deviceId={device_id}")
         return [create_dataclass(WanInterface, wan_ifc) for wan_ifc in wan_interfaces]
 
     def get_colors(self, device_id: str) -> List[str]:
-        url = '/dataservice/device/bfd/state/device/tlocInterfaceMap'
-        colors_raw = DevicesAPI(self.session).session.get_data(url + f'?deviceId={device_id}')
-        json_colors = json.loads(str(colors_raw.read(), 'utf-8'))
+        url = "/dataservice/device/bfd/state/device/tlocInterfaceMap"
+        colors_raw = DevicesAPI(self.session).session.get_data(url + f"?deviceId={device_id}")
+        json_colors = json.loads(str(colors_raw.read(), "utf-8"))
         colors = list(json_colors["intfList"].keys())
 
         return colors
@@ -300,12 +300,12 @@ class DeviceStateAPI:
             self.session.post(url=url_path, json=data_stream_status)
 
     def get_bfd_sessions(self, device_id: str) -> List[BfdSessionData]:
-        items = self.session.get_data(f'/dataservice/device/bfd/sessions?deviceId={device_id}')
+        items = self.session.get_data(f"/dataservice/device/bfd/sessions?deviceId={device_id}")
 
         return [create_dataclass(BfdSessionData, item) for item in items]
 
     def wait_for_bfd_session_up(
-        self, system_ip: str, sleep_seconds: int = 5, timeout_seconds: int = 60, exp_state: str = 'up'
+        self, system_ip: str, sleep_seconds: int = 5, timeout_seconds: int = 60, exp_state: str = "up"
     ):
         def check_state(bfd_sessions):
             return not all([bfd_session.state == exp_state for bfd_session in bfd_sessions])
@@ -366,4 +366,4 @@ class FailedSend(Exception):
     pass
 
 
-__all__ = ['Device']
+__all__ = ["Device"]

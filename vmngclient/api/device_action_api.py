@@ -20,9 +20,9 @@ class DeviceActionAPI(ABC):
     def __init__(self, session: vManageSession, dev: Device):
         self.session = session
         self.dev = dev
-        self.action_status = ''
-        self.action_id = ''
-        self.action_status_api = '/dataservice/device/action/status/'
+        self.action_status = ""
+        self.action_id = ""
+        self.action_status_api = "/dataservice/device/action/status/"
 
     def __str__(self):
         return str(self.session)
@@ -55,11 +55,11 @@ class RebootAction(DeviceActionAPI):
             "deviceType": "controller",
             "devices": [{"deviceIP": self.dev.id, "deviceId": self.dev.uuid}],
         }
-        response = self.session.post('/dataservice/device/action/reboot', json=body).json()
-        if response.get('id'):
-            self.action_id = response['id']
+        response = self.session.post("/dataservice/device/action/reboot", json=body).json()
+        if response.get("id"):
+            self.action_id = response["id"]
         else:
-            raise Exception(f'Problem with reboot of {self.dev.id} occurred')
+            raise Exception(f"Problem with reboot of {self.dev.id} occurred")
 
     def wait_for_completed(
         self,
@@ -77,13 +77,13 @@ class RebootAction(DeviceActionAPI):
             retry=retry_if_result(check_status),
         )
         def wait_for_come_up():
-            status_api = f'{self.action_status_api}{self.action_id}'
+            status_api = f"{self.action_status_api}{self.action_id}"
             # from my observation it is necessary to wait minimum 1 second for data related with reboot
             try:
-                action_data = self.session.get_data(f'{status_api}')[0]['status']
+                action_data = self.session.get_data(f"{status_api}")[0]["status"]
                 logger.debug(f"Status of device {self.dev.hostname} reboot is: {action_data}")
             except IndexError:
-                action_data = ''
+                action_data = ""
             status = DeviceStateAPI(self.session).get_system_status(self.dev.id)
             # it is necessary to wait also for Success of reboot because device can be reachable even several
             # seconds after execute reboot
@@ -110,11 +110,11 @@ class ValidateAction(DeviceActionAPI):  # TODO check
             "validity": "valid" if valid else "invalid",
         }
 
-        response = self.session.post(url='/dataservice/certificate/save/vedge/list', json=body).json()
-        if response.get('id'):
-            self.action_id = response['id']
+        response = self.session.post(url="/dataservice/certificate/save/vedge/list", json=body).json()
+        if response.get("id"):
+            self.action_id = response["id"]
         else:
-            raise Exception(f'Problem with validate of {self.dev.id} occurred')
+            raise Exception(f"Problem with validate of {self.dev.id} occurred")
 
     def wait_for_completed(
         self,
@@ -124,7 +124,7 @@ class ValidateAction(DeviceActionAPI):  # TODO check
         expected_reachability: str = Reachability.REACHABLE.value,
     ):
         def check_status(action_data):
-            return not action_data['validity'] == expected_status
+            return not action_data["validity"] == expected_status
 
         @retry(
             wait=wait_fixed(sleep_seconds),
@@ -134,7 +134,7 @@ class ValidateAction(DeviceActionAPI):  # TODO check
         def wait_for_come_up():
             status = DeviceStateAPI(self.session).get_system_status(self.dev.id)
             if status.reachability.value == expected_reachability:
-                return self.session.get_data(f'/dataservice/device?host-name={self.dev.hostname}')[0]
+                return self.session.get_data(f"/dataservice/device?host-name={self.dev.hostname}")[0]
             else:
                 return None
 
@@ -153,7 +153,7 @@ class DecommissionAction(DeviceActionAPI):
         url = f"/dataservice/system/device/decommission/{self.dev.uuid}"
         response = self.session.put(url)
         if response.status != 200:
-            raise Exception(f'Problem with decomission of {self.dev.id} occurred')
+            raise Exception(f"Problem with decomission of {self.dev.id} occurred")
 
     def wait_for_completed(
         self,
