@@ -2,8 +2,6 @@ import logging
 from unittest import TestCase
 from unittest.mock import patch
 
-from parameterized import parameterized  # type: ignore
-
 from vmngclient.api.alarms_api import AlarmsAPI, AlarmVerification
 from vmngclient.dataclasses import AlarmData
 from vmngclient.utils.creation_tools import create_dataclass, flatten_dict
@@ -11,104 +9,102 @@ from vmngclient.utils.creation_tools import create_dataclass, flatten_dict
 
 class TestAlarmsAPI(TestCase):
     def setUp(self) -> None:
-        self.alarms_data = {"data": [
-            {'type': 'site_up',
-             'component': 'OMP',
-             'severity': 'Critical',
-             'active': False,
-             'consumed_events': [
-                 {
-                     'eventname': 'omp-peer-state-change',
-                     'peer-new-state': 'handshake-in-gr',
-                     'eventId': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-                     'builtBy': 'EventDataCollector',
-                     'component': 'OMP',
-                     'severity-level': 'major ',
-                     'vmanage-system-ip': '1.1.1.1',
-                     'entry_time': 1671028426000,
-                     'system-ip': '1.1.1.1',
-                     'host-name': 'vm1',
-                     'peer': '1.1.1.1'
-                 }],
-             'site_id': '1',
-             'devices': [
-                 {
-                     'system-ip': '1.1.1.1'
-                 }
-             ]},
-            {'type': 'site_up',
-             'component': 'OMP',
-             'severity': 'Major',
-             'active': False,
-             'consumed_events': [
-                 {
-                     'eventname': 'omp-peer-state-change',
-                     'peer-new-state': 'handshake-in-gr',
-                     'eventId': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaab',
-                     'builtBy': 'EventDataCollector',
-                     'component': 'OMP',
-                     'severity-level': 'major ',
-                     'vmanage-system-ip': '1.1.1.2',
-                     'entry_time': 1671028426000,
-                     'system-ip': '1.1.1.2',
-                     'host-name': 'vm2',
-                     'peer': '1.1.1.2'
-                 }],
-             'site_id': '2',
-             'devices': [
-                 {
-                     'system-ip': '1.1.1.2'
-                 }
-             ]},
-            {'type': 'site_up',
-             'component': 'OMP',
-             'severity': 'Medium',
-             'active': False,
-             'consumed_events': [
-                 {
-                     'eventname': 'omp-peer-state-change',
-                     'peer-new-state': 'handshake-in-gr',
-                     'eventId': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaac',
-                     'builtBy': 'EventDataCollector',
-                     'component': 'OMP',
-                     'severity-level': 'major ',
-                     'vmanage-system-ip': '1.1.1.3',
-                     'entry_time': 1671028426000,
-                     'system-ip': '1.1.1.3',
-                     'host-name': 'vm3',
-                     'peer': '1.1.1.3'
-                 }],
-             'site_id': '3',
-             'devices': [
-                 {
-                     'system-ip': '1.1.1.3'
-                 }
-             ]},
-            {'type': 'site_up',
-             'component': 'OMP',
-             'severity': 'Minor',
-             'active': False,
-             'consumed_events': [
-                 {
-                     'eventname': 'omp-peer-state-change',
-                     'peer-new-state': 'handshake-in-gr',
-                     'eventId': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaad',
-                     'builtBy': 'EventDataCollector',
-                     'component': 'OMP',
-                     'severity-level': 'major ',
-                     'vmanage-system-ip': '1.1.1.4',
-                     'entry_time': 1671028426000,
-                     'system-ip': '1.1.1.4',
-                     'host-name': 'vm4',
-                     'peer': '1.1.1.4'
-                 }],
-             'site_id': '4',
-             'devices': [
-                 {
-                     'system-ip': '1.1.1.4'
-                 }
-             ]}
-        ]}
+        self.alarms_data = {
+            "data": [
+                {
+                    'type': 'site_up',
+                    'component': 'OMP',
+                    'severity': 'Critical',
+                    'active': False,
+                    'consumed_events': [
+                        {
+                            'eventname': 'omp-peer-state-change',
+                            'peer-new-state': 'handshake-in-gr',
+                            'eventId': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+                            'builtBy': 'EventDataCollector',
+                            'component': 'OMP',
+                            'severity-level': 'major ',
+                            'vmanage-system-ip': '1.1.1.1',
+                            'entry_time': 1671028426000,
+                            'system-ip': '1.1.1.1',
+                            'host-name': 'vm1',
+                            'peer': '1.1.1.1',
+                        }
+                    ],
+                    'site_id': '1',
+                    'devices': [{'system-ip': '1.1.1.1'}],
+                },
+                {
+                    'type': 'site_up',
+                    'component': 'OMP',
+                    'severity': 'Major',
+                    'active': False,
+                    'consumed_events': [
+                        {
+                            'eventname': 'omp-peer-state-change',
+                            'peer-new-state': 'handshake-in-gr',
+                            'eventId': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaab',
+                            'builtBy': 'EventDataCollector',
+                            'component': 'OMP',
+                            'severity-level': 'major ',
+                            'vmanage-system-ip': '1.1.1.2',
+                            'entry_time': 1671028426000,
+                            'system-ip': '1.1.1.2',
+                            'host-name': 'vm2',
+                            'peer': '1.1.1.2',
+                        }
+                    ],
+                    'site_id': '2',
+                    'devices': [{'system-ip': '1.1.1.2'}],
+                },
+                {
+                    'type': 'site_up',
+                    'component': 'OMP',
+                    'severity': 'Medium',
+                    'active': False,
+                    'consumed_events': [
+                        {
+                            'eventname': 'omp-peer-state-change',
+                            'peer-new-state': 'handshake-in-gr',
+                            'eventId': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaac',
+                            'builtBy': 'EventDataCollector',
+                            'component': 'OMP',
+                            'severity-level': 'major ',
+                            'vmanage-system-ip': '1.1.1.3',
+                            'entry_time': 1671028426000,
+                            'system-ip': '1.1.1.3',
+                            'host-name': 'vm3',
+                            'peer': '1.1.1.3',
+                        }
+                    ],
+                    'site_id': '3',
+                    'devices': [{'system-ip': '1.1.1.3'}],
+                },
+                {
+                    'type': 'site_up',
+                    'component': 'OMP',
+                    'severity': 'Minor',
+                    'active': False,
+                    'consumed_events': [
+                        {
+                            'eventname': 'omp-peer-state-change',
+                            'peer-new-state': 'handshake-in-gr',
+                            'eventId': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaad',
+                            'builtBy': 'EventDataCollector',
+                            'component': 'OMP',
+                            'severity-level': 'major ',
+                            'vmanage-system-ip': '1.1.1.4',
+                            'entry_time': 1671028426000,
+                            'system-ip': '1.1.1.4',
+                            'host-name': 'vm4',
+                            'peer': '1.1.1.4',
+                        }
+                    ],
+                    'site_id': '4',
+                    'devices': [{'system-ip': '1.1.1.4'}],
+                },
+            ]
+        }
         self.alarms = self.alarms_data["data"]
         self.critical_alarms_data = {"data": [self.alarms[0]]}
         self.major_alarms_data = {"data": [self.alarms[1]]}
