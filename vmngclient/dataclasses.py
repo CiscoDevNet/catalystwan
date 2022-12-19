@@ -190,10 +190,10 @@ class EventData(DataclassBase):
 
 @define(frozen=True)
 class User(DataclassBase):
-    group: List[str]
     username: str = field(metadata={FIELD_NAME: "userName"})
+    password: str
+    group: List[str] = field(factory=list)
     locale: Optional[str] = field(default=None)
-    password: Optional[str] = field(default=None)
     description: Optional[str] = field(default=None)
     resource_group: Optional[str] = field(default=None, metadata={FIELD_NAME: "resGroupName"})
 
