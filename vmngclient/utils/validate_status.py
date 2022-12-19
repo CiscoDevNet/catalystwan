@@ -2,5 +2,5 @@ from enum import Enum
 
 
 class ValidateStatus(Enum):
-    validate = 'valid'
+    validate = "valid"
     invalidate = "invalid"
