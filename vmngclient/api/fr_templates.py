@@ -29,12 +29,14 @@ class Action(Enum):
 # from vmngclient.third_parties
 @define
 class TacacsServer:
+    """Default values from documentations."""
+
     address: str
-    auth_port: int
-    secret_key: str
-    source_interface: str
-    vpn: int
-    priority: int
+    auth_port: int = field(default=49)
+    secret_key: Optional[str] = field(default=None)
+    source_interface: Optional[str] = field(default=None)
+    vpn: int = field(default=0)
+    priority: int = field(default=0)
 
 
 @define
@@ -42,9 +44,8 @@ class RadiusServer:
     """Default values from documentations."""
 
     address: str
-    secret_key: str
+    secret_key: Optional[str] = field(default=None)
     source_interface: Optional[str] = field(default=None)
-    key: Optional[str] = field(default=None)
     acct_port: int = field(default=1813)
     auth_port: int = field(default=1812)
     tag: Optional[str] = field(default=None)
@@ -125,8 +126,8 @@ class Template:
 
 
 # YAML
-ts1 = TacacsServer("1.1.1.1", 1, "1", "1", 1, 1)
-ts2 = TacacsServer("1.1.1.2", 1, "1", "1", 1, 1)
+ts1 = TacacsServer(address="1.1.1.1")
+ts2 = TacacsServer(address="1.1.1.2")
 ltss = [ts1, ts2]
 
 rs1 = RadiusServer(address="1.1.1.1", secret_key="1")

@@ -1,13 +1,13 @@
 {
     "timeout": {
         "vipObjectType": "object",
-        "vipType": "constant",
+        "vipType": "ignore",
         "vipValue": {{ radius_timeout }},
         "vipVariableName": "radius_timeout"
     },
     "retransmit": {
         "vipObjectType": "object",
-        "vipType": "constant",
+        "vipType": "ignore",
         "vipValue": {{ radius_retransmit }},
         "vipVariableName": "retransmit"
     }
@@ -23,51 +23,63 @@
                         "vipValue": "{{ server.address }}",
                         "vipVariableName": "radius_radius_address"
                     },
-                    "tag": {
-                        "vipObjectType": "object",
-                        "vipType": "constant",
-                        "vipValue": "{{ server.tag }}",
-                        "vipVariableName": "radius_radius_tag"
-                    },
                     "auth-port": {
                         "vipObjectType": "object",
-                        "vipType": "constant",
+                        {% if server.auth_port == 1812 %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                        {% endif %}
                         "vipValue": {{ server.auth_port }},
                         "vipVariableName": "radius_radius_auth_port"
                     },
                     "acct-port": {
                         "vipObjectType": "object",
-                        "vipType": "constant",
+                        {% if server.acct_port == 1813 %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                        {% endif %}
                         "vipValue": {{ server.acct_port }},
                         "vipVariableName": "radius_radius_acct_port"
                     },
                     "vpn": {
                         "vipObjectType": "object",
-                        "vipType": "constant",
+                        {% if server.vpn == 0 %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                        {% endif %}
                         "vipValue": {{ server.vpn }},
                         "vipVariableName": "radius_radius_vpn"
                     },
                     "source-interface": {
                         "vipObjectType": "object",
-                        "vipType": "constant",
-                        "vipValue": "{{ server.source_interface }}",
+                        {% if server.source_interface == None %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                            "vipValue": "{{ server.source_interface }}",
+                        {% endif %}
                         "vipVariableName": "radius_radius_source_interface"
-                    },
-                    "key": {
-                        "vipObjectType": "object",
-                        "vipType": "constant",
-                        "vipValue": "{{ server.key }}",
-                        "vipVariableName": "radius_radius_key"
                     },
                     "secret-key": {
                         "vipObjectType": "object",
-                        "vipType": "constant",
-                        "vipValue": "{{ server.secret_key }}",
+                        {% if server.secret_key == None %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                            "vipValue": "{{ server.secret_key }}",
+                        {% endif %}
                         "vipVariableName": "radius_radius_secret_key"
                     },
                     "priority": {
                         "vipObjectType": "object",
-                        "vipType": "constant",
+                        {% if server.priority == 0 %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                        {% endif %}
                         "vipValue": {{ server.priority }},
                         "vipVariableName": "radius_radius_priority"
                     },
