@@ -44,4 +44,4 @@ jobs:
       - name: Check static-typing
         run: poetry run mypy --show-error-codes --show-error-context --pretty --install-types --non-interactive vmngclient
       - name: Check code style
-        run: poetry run flake8 --max-line-length 120 vmngclient
+        run: poetry run flake8 --max-line-length 120 --inline-quotes double vmngclient 
