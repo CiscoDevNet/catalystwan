@@ -131,4 +131,4 @@ class AdministrationSettingsAPI:
         url_path = "/dataservice/settings/configuration/cloudx"
         data = {"mode": "on"} if not disable else {"mode": "off"}
         response = self.session.put(url_path, data)
-        return True if response.status == 200 else False
+        return True if response.status_code == 200 else False
