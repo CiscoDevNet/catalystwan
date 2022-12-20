@@ -3,9 +3,9 @@ from enum import Enum
 from pathlib import PurePath
 from typing import Any, Dict, List
 
-from attr import define
-from clint.textui.progress import Bar as ProgressBar
-from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
+from attr import define  # type: ignore
+from clint.textui.progress import Bar as ProgressBar # type: ignore
+from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor # type: ignore
 
 from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
@@ -18,7 +18,7 @@ class Family(Enum):
     VEDGE = "vedge"
     VMANAGE = "vmanage"
 
-    
+
 class VersionType(Enum):
     VMANAGE = "vmanage"
 
@@ -28,12 +28,14 @@ class DeviceType(Enum):
     VEDGE = "vedge"
     VMANAGE = "vmanage"
 
+
 class DeviceClass(Enum):
     VEDGE = "vedge"
     VMANAGE = "vmanage"
     VSMART = "vsmart"
     VBOND = "vbond"
     CEDGE = "cedge"
+
 
 @define
 class InstallSpecification:
@@ -81,7 +83,7 @@ class SoftwareActionAPI:
             "devices": self.device_versions.get_device_list_in_available(version_to_activate, devices),
             "deviceType": "vmanage",
         }
-        activate = dict(self.session.post(url, json=payload))
+        activate = dict(self.session.post(url, json=payload).json())
         return activate["id"]
 
     def upgrade_software(
@@ -135,9 +137,8 @@ class SoftwareActionAPI:
                     f"Current version of devices with id's {incorrect_devices} is \
                     higher than upgrade version. Action denied!"
                 )
-        upgrade = dict(self.session.post(url, json=payload))
+        upgrade = dict(self.session.post(url, json=payload).json())
         return upgrade["id"]
-    
 
     def _create_callback(self, encoder: MultipartEncoder):
 
@@ -196,5 +197,3 @@ class SoftwareActionAPI:
                 elif str(label) < str(splited_version_to_upgrade[priority]):
                     break
         return incorrect_devices
-    
-

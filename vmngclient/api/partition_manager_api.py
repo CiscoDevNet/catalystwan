@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import Dict, List
 
 from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
@@ -64,7 +64,7 @@ class PartitionManagerAPI:
                     f'Current or default version of devices with ids {invalid_devices} \
                         are equal to remove version. Action denied!'
                 )
-        remove_action = dict(self.repository.session.post(url, payload))
+        remove_action: Dict[str, str] = self.repository.session.post(url, json=payload).json()
         return remove_action["id"]
 
     def _check_remove_partition_possibility(self, devices) -> List:

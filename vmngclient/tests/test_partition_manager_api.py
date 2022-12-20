@@ -39,12 +39,12 @@ class TestPartitionManagerAPI(unittest.TestCase):
         )
 
     @patch.object(PartitionManagerAPI, "_check_remove_partition_possibility")
-    @patch.object(DeviceVersions, "get_device_list_if_in_available")
+    @patch.object(DeviceVersions, "get_device_list_in_available")
     def test_remove_partition_raise_error_force_false(self, mock_complete_device_list, mock_check_remove):
 
         # Prepare mock data
         mock_complete_device_list.return_value = Mock()
-        self.mock_device_versions.get_device_list_if_in_available(
+        self.mock_device_versions.get_device_list_in_available(
             "ver1", "available_versions"
         ).return_value = self.mock_devices
         mock_check_remove.return_value = ["mock_uuid"]
@@ -53,7 +53,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         # Assert
         self.assertRaises(ValueError, self.mock_partition_manager_obj.remove_partition, [self.device], "ver1", False)
 
-    @patch.object(DeviceVersions, "get_device_list_if_in_available")
+    @patch.object(DeviceVersions, "get_device_list_in_available")
     def test_remove_partition_if_force_true(self, mock_get_device_list):
 
         # Prepare mock data
@@ -69,12 +69,12 @@ class TestPartitionManagerAPI(unittest.TestCase):
         self.assertEqual(answer, "mock_action_id", "action ids not equal")
 
     @patch.object(PartitionManagerAPI, "_check_remove_partition_possibility")
-    @patch.object(DeviceVersions, "get_device_list_if_in_available")
+    @patch.object(DeviceVersions, "get_device_list_in_available")
     def test_remove_partition_not_raise_error_force_false(self, mock_get_device_list, mock_check_remove):
 
         # Prepare mock data
         mock_get_device_list.return_value = Mock()
-        self.mock_device_versions.get_device_list_if_in_available(
+        self.mock_device_versions.get_device_list_in_available(
             "ver1", "available_versions"
         ).return_value = self.mock_devices
         mock_check_remove.return_value = []

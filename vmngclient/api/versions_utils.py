@@ -3,7 +3,7 @@ from enum import Enum
 from pathlib import PurePath
 from typing import Dict, List, Union
 
-from attr import define, field
+from attr import define, field  # type: ignore
 
 from vmngclient.dataclasses import Device
 from vmngclient.session import vManageSession
@@ -99,8 +99,7 @@ class DeviceVersions:
         self.repository = repository
         self.device_category = device_category
 
-
-    def _get_device_list_in(self, version_to_set_up: str, devices: List[Device], version_type:str):
+    def _get_device_list_in(self, version_to_set_up: str, devices: List[Device], version_type: str) -> List[dict]:
         """
         Create version key for every device dict in device list, if requested version
         is in requested version type
@@ -116,7 +115,7 @@ class DeviceVersions:
         devs = [{"deviceId": dev.uuid, "deviceIP": dev.id} for dev in devices]
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
         for dev in devs:
-            dev_installed_versions = getattr(all_dev_versions[dev["deviceId"]],version_type)
+            dev_installed_versions = getattr(all_dev_versions[dev["deviceId"]], version_type)
             for version in dev_installed_versions:
                 if version_to_set_up in version:
                     dev["version"] = version
@@ -125,7 +124,7 @@ class DeviceVersions:
                 logger.error(f"Software version {version_to_set_up} for {dev} is not included in available_versions")
         return devs
 
-    def get_device_list_in_installed(self, version_to_set_up: str, devices: List[Device]):
+    def get_device_list_in_installed(self, version_to_set_up: str, devices: List[Device]) -> List[dict]:
         """
         Create version key for every device dict in device list, if requested version
         is in installed versions
@@ -137,8 +136,8 @@ class DeviceVersions:
             list : list of devices
         """
         return self._get_device_list_in(version_to_set_up, devices, "installed_versions")
-    
-    def get_device_list_in_available(self, version_to_set_up: str, devices: List[Device]):
+
+    def get_device_list_in_available(self, version_to_set_up: str, devices: List[Device]) -> List[dict]:
         """
         Create version key for every device dict in device list, if requested version
         is in available versions
@@ -150,8 +149,7 @@ class DeviceVersions:
             list : list of devices
         """
         return self._get_device_list_in(version_to_set_up, devices, "available_versions")
-    
 
-    def get_device_list(self, devices: List[Device]) -> list:
+    def get_device_list(self, devices: List[Device]) -> List[dict]:
 
         return [{"deviceId": dev.uuid, "deviceIP": dev.id} for dev in devices]
