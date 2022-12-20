@@ -287,7 +287,7 @@ class DeviceStateAPI:
             url_path = "/dataservice/settings/configuration/vmanagedatastream"
             data_stream_status = self.session.get_data(url_path)[0]
             query = {  # TODO Dict[str, obj]
-                "enable": "True",
+                "enable": True,
                 "ipType": "systemIp",
                 "serverHostName": "systemIp",
                 "vpn": "0",
