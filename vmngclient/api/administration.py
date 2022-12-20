@@ -29,7 +29,7 @@ class UsersAPI:
     def exists(self, username: str) -> bool:
         return username in [user.username for user in self.get_all_users()]
 
-    def create_user(self, user: User) -> None:
+    def create_user(self, user: User) -> bool:
         if self.exists(user.username):
             raise UserAlreadyExistsError(f"{user.username} already exists.")
         url_path = "/dataservice/admin/user"
@@ -37,6 +37,7 @@ class UsersAPI:
 
         response = self.session.post(url=url_path, json=data)
         logger.info(response)
+        return True if response.status_code == 200 else False
 
     def delete_user(self, username: str) -> bool:
         if not self.exists(username):
@@ -131,4 +132,4 @@ class AdministrationSettingsAPI:
         url_path = "/dataservice/settings/configuration/cloudx"
         data = {"mode": "on"} if not disable else {"mode": "off"}
         response = self.session.put(url_path, data)
-        return True if response.status == 200 else False
+        return True if response.status_code == 200 else False
