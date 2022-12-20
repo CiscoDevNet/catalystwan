@@ -63,11 +63,11 @@ class TestUsersAPI(unittest.TestCase):
         # Arrange
         mock_session.get_data.return_value = [self.users[1]]
         mock_session.post.return_value = mock_response
-        mock_response.status_code = 200
+        mock_response.status_code = status_code
         # Act
-        UsersAPI(mock_session).create_user(self.user_dataclass[0])
+        answer = UsersAPI(mock_session).create_user(self.user_dataclass[0])
         # Assert
-        self.assertTrue(True)
+        self.assertEqual(answer, expected_outcome)
 
     @patch('vmngclient.session.Session')
     def test_create_user_existing(self, mock_session):
