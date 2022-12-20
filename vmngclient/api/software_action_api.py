@@ -4,8 +4,8 @@ from pathlib import PurePath
 from typing import Any, Dict, List
 
 from attr import define  # type: ignore
-from clint.textui.progress import Bar as ProgressBar # type: ignore
-from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor # type: ignore
+from clint.textui.progress import Bar as ProgressBar  # type: ignore
+from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
 
 from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
