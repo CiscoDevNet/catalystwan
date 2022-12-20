@@ -78,7 +78,7 @@ class SoftwareActionAPI:
         url = "/dataservice/device/action/changepartition"
         payload = {
             "action": "changepartition",
-            "devices": self.device_versions._get_device_list_in(version_to_activate, devices, "available_versions"),
+            "devices": self.device_versions.get_device_list_in_available(version_to_activate, devices),
             "deviceType": "vmanage",
         }
         activate = dict(self.session.post(url, json=payload))

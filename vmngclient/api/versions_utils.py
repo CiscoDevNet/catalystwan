@@ -99,13 +99,16 @@ class DeviceVersions:
         self.repository = repository
         self.device_category = device_category
 
+
     def _get_device_list_in(self, version_to_set_up: str, devices: List[Device], version_type:str):
         """
         Create version key for every device dict in device list, if requested version
-        is in available versions
+        is in requested version type
 
         Args:
             version_to_set_up (str): requested version
+            devices List[Device]: list of Device dataclass instances
+            version_type: type of version (installed, available, etc.)
 
         Returns:
             list : list of devices
@@ -121,6 +124,33 @@ class DeviceVersions:
             if not dev["version"]:
                 logger.error(f"Software version {version_to_set_up} for {dev} is not included in available_versions")
         return devs
+
+    def get_device_list_in_installed(self, version_to_set_up: str, devices: List[Device]):
+        """
+        Create version key for every device dict in device list, if requested version
+        is in installed versions
+
+        Args:
+            version_to_set_up (str): requested version
+
+        Returns:
+            list : list of devices
+        """
+        return self._get_device_list_in(version_to_set_up, devices, "installed_versions")
+    
+    def get_device_list_in_available(self, version_to_set_up: str, devices: List[Device]):
+        """
+        Create version key for every device dict in device list, if requested version
+        is in available versions
+
+        Args:
+            version_to_set_up (str): requested version
+
+        Returns:
+            list : list of devices
+        """
+        return self._get_device_list_in(version_to_set_up, devices, "available_versions")
+    
 
     def get_device_list(self, devices: List[Device]) -> list:
 

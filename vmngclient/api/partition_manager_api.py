@@ -34,7 +34,7 @@ class PartitionManagerAPI:
         url = "/dataservice/device/action/defaultpartition"
         payload = {
             "action": 'defaultpartition',
-            "devices": self.device_versions._get_device_list_in(version, devices, "installed_versions"),
+            "devices": self.device_versions.get_device_list_in_installed(version, devices),
             "deviceType": "vmanage",
         }
         set_default = dict(self.repository.session.post(url, json=payload).json())
@@ -54,7 +54,7 @@ class PartitionManagerAPI:
         url = "/dataservice/device/action/removepartition"
         payload = {
             "action": "removepartition",
-            "devices": self.device_versions._get_device_list_in(version, devices, "available_versions"),
+            "devices": self.device_versions.get_device_list_in_available(version, devices),
             "deviceType": "vmanage",
         }
         if force is False:
