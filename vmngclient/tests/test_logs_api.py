@@ -2,10 +2,12 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from parameterized import parameterized  # type: ignore
+
 from vmngclient.api.logs_api import LogsAPI
 
 
-class MyTestCase(unittest.TestCase):
+class TestLogsAPI(unittest.TestCase):
     def setUp(self) -> None:
         self.logs = [
             {"logid": "12345", "logmessage": "message from log 1", "tenant": "tenant234", "entry_time": 1671028426000},
