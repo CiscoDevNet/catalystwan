@@ -29,7 +29,7 @@ class TestLogsAPI(unittest.TestCase):
         mock_session.get_data.return_value = self.logs
         file_path = Path(__file__).parents[0].joinpath("test_file.log")
         # Act
-        LogsAPI(mock_session).get_auditlogs(file_path=file_path)
+        LogsAPI(mock_session).get_auditlogs(file_path=str(file_path))
         does_file_exist = file_path.is_file()
         # Assert
         self.assertTrue(does_file_exist)
