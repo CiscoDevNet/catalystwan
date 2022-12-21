@@ -85,7 +85,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         answer = self.mock_partition_manager_obj.remove_partition("ver1", True)
         self.assertEqual(answer, "mock_action_id", "action ids not equal")
 
-    @patch.object(RepositoryAPI, 'get_devices_versions_repository')
+    @patch.object(RepositoryAPI, "get_devices_versions_repository")
     def test_check_remove_partition_possibility_if_version_incorrect(self, mock_get_devices_versions_repository):
 
         # Prepare mock data
@@ -96,7 +96,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         answer = self.mock_partition_manager_obj._check_remove_partition_possibility(mock_devices)
         self.assertEqual(answer, ["mock_uuid"], "lists are not equal")
 
-    @patch.object(RepositoryAPI, 'get_devices_versions_repository')
+    @patch.object(RepositoryAPI, "get_devices_versions_repository")
     def test_check_remove_partition_possibility_if_version_correct(self, mock_get_devices_versions_repository):
 
         # Prepare mock data

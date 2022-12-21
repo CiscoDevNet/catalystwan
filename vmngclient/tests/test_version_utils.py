@@ -34,7 +34,7 @@ class TestRepositoryAPI(unittest.TestCase):
 
         versions_response = [{"availableFiles": "vmanage-20.9.1-x86_64.tar.gz", "versionName": "20.9.1"}]
         mock_session.get_data.return_value = versions_response
-        image_version = '20.9.1'
+        image_version = "20.9.1"
         answer = RepositoryAPI(mock_session).get_image_version("vmanage-20.9.1-x86_64.tar.gz")
 
         self.assertEqual(answer, image_version, "not same version")

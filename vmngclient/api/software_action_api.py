@@ -142,7 +142,7 @@ class SoftwareActionAPI:
 
     def _create_callback(self, encoder: MultipartEncoder):
 
-        bar = ProgressBar(expected_size=encoder._calculate_length(), filled_char='=')
+        bar = ProgressBar(expected_size=encoder._calculate_length(), filled_char="=")
 
         def callback(monitor: MultipartEncoderMonitor):
             bar.show(monitor.bytes_read)
@@ -162,7 +162,7 @@ class SoftwareActionAPI:
         """
         url = "/dataservice/device/action/software/package"
         encoder = MultipartEncoder(
-            fields={'file': (PurePath(image_path).name, open(image_path, 'rb'), 'application/x-gzip')}
+            fields={"file": (PurePath(image_path).name, open(image_path, "rb"), "application/x-gzip")}
         )
         callback = self._create_callback(encoder)
         monitor = MultipartEncoderMonitor(encoder, callback)

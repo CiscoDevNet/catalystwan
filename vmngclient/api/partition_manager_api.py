@@ -33,7 +33,7 @@ class PartitionManagerAPI:
 
         url = "/dataservice/device/action/defaultpartition"
         payload = {
-            "action": 'defaultpartition',
+            "action": "defaultpartition",
             "devices": self.device_versions.get_device_list_in_installed(version, devices),
             "deviceType": "vmanage",
         }
@@ -61,8 +61,8 @@ class PartitionManagerAPI:
             invalid_devices = self._check_remove_partition_possibility(payload["devices"])
             if invalid_devices:
                 raise ValueError(
-                    f'Current or default version of devices with ids {invalid_devices} \
-                        are equal to remove version. Action denied!'
+                    f"Current or default version of devices with ids {invalid_devices} \
+                        are equal to remove version. Action denied!"
                 )
         remove_action: Dict[str, str] = self.repository.session.post(url, json=payload).json()
         return remove_action["id"]
@@ -75,7 +75,7 @@ class PartitionManagerAPI:
         invalid_devices = []
         for device in devices:
 
-            if device['version'] in (
+            if device["version"] in (
                 devices_versions_repository[device["deviceId"]].current_version,
                 devices_versions_repository[device["deviceId"]].default_version,
             ):
