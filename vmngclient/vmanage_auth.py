@@ -17,7 +17,10 @@ class InvalidCredentialsError(Exception):
     """
 
     def __init__(
-        self, username: str, password: str, message: str = "Username and/or password is incorrect. Please try again!"
+        self,
+        username: str,
+        password: str,
+        message: str = "Username and/or password is incorrect. Please try again!",
     ):
         self.username = username
         self.password = password

@@ -17,7 +17,14 @@ class LogsAPI:
         query = {
             "query": {
                 "condition": "AND",
-                "rules": [{"field": "entry_time", "type": "date", "value": [f"{n_hours}"], "operator": "last_n_hours"}],
+                "rules": [
+                    {
+                        "field": "entry_time",
+                        "type": "date",
+                        "value": [f"{n_hours}"],
+                        "operator": "last_n_hours",
+                    }
+                ],
             }
         }
         addon_to_url = quote(str(query), safe="").replace("%27", "%22")

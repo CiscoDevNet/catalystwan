@@ -305,7 +305,11 @@ class DeviceStateAPI:
         return [create_dataclass(BfdSessionData, item) for item in items]
 
     def wait_for_bfd_session_up(
-        self, system_ip: str, sleep_seconds: int = 5, timeout_seconds: int = 60, exp_state: str = "up"
+        self,
+        system_ip: str,
+        sleep_seconds: int = 5,
+        timeout_seconds: int = 60,
+        exp_state: str = "up",
     ):
         def check_state(bfd_sessions):
             return not all([bfd_session.state == exp_state for bfd_session in bfd_sessions])

@@ -227,7 +227,13 @@ class TemplateAPI:
         logger.info(f"Template: {template} is attached to device - cannot be deleted.")
         raise AttachedError(template.name)
 
-    def create(self, device_model: DeviceModel, name: str, description: str, config: CiscoConfParse) -> bool:
+    def create(
+        self,
+        device_model: DeviceModel,
+        name: str,
+        description: str,
+        config: CiscoConfParse,
+    ) -> bool:
         """
 
         Args:
@@ -280,7 +286,12 @@ class TemplateAPI:
         return response.text
 
     @staticmethod
-    def compare_template(first: CiscoConfParse, second: CiscoConfParse, full: bool = False, debug: bool = False) -> str:
+    def compare_template(
+        first: CiscoConfParse,
+        second: CiscoConfParse,
+        full: bool = False,
+        debug: bool = False,
+    ) -> str:
         """
 
         Args:
@@ -326,7 +337,11 @@ class TemplateAPI:
         return "".join(compare)
 
     def compare_with_running(
-        self, template: CiscoConfParse, device: Device, full: bool = False, debug: bool = False
+        self,
+        template: CiscoConfParse,
+        device: Device,
+        full: bool = False,
+        debug: bool = False,
     ) -> str:
         """The comparison of the config with the one running on the machine.
 
@@ -372,7 +387,13 @@ class TemplateAPI:
 
 
 class CLITemplate:
-    def __init__(self, session: vManageSession, device_model: DeviceModel, name: str, description: str) -> None:
+    def __init__(
+        self,
+        session: vManageSession,
+        device_model: DeviceModel,
+        name: str,
+        description: str,
+    ) -> None:
         self.session = session
         self.device_model = device_model
         self.name = name
@@ -430,7 +451,12 @@ class CLITemplate:
             "factoryDefault": False,
             "configType": "file",
         }
-        if self.device_model not in [DeviceModel.VEDGE, DeviceModel.VSMART, DeviceModel.VMANAGE, DeviceModel.VBOND]:
+        if self.device_model not in [
+            DeviceModel.VEDGE,
+            DeviceModel.VSMART,
+            DeviceModel.VMANAGE,
+            DeviceModel.VBOND,
+        ]:
             payload["cliType"] = "device"
             payload["draftMode"] = False
 

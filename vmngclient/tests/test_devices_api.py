@@ -102,7 +102,10 @@ class TestDevicesAPI(TestCase):
                 "vBondAddress": "1.1.1.1",
                 "oldIdpMetadata": "",
                 "configDBClusterServiceName": "",
-                "vSmarts": ["aaaaaaaa-aaac-42f4-b2c7-1aaaaaaaaaaaa", "bbbbbbbb-9d8a-453c-841f-4bbbbbbbbbbb"],
+                "vSmarts": [
+                    "aaaaaaaa-aaac-42f4-b2c7-1aaaaaaaaaaaa",
+                    "bbbbbbbb-9d8a-453c-841f-4bbbbbbbbbbb",
+                ],
                 "mode": "off",
                 "idpMetadata": "",
                 "createdAt": 1111111111111,
@@ -123,7 +126,10 @@ class TestDevicesAPI(TestCase):
                 "vBondAddress": "1.1.1.2",
                 "oldIdpMetadata": "",
                 "configDBClusterServiceName": "",
-                "vSmarts": ["ccccccccccccccc-42f4-b2c7-1cccccccccc", "ddddddddd-9d8a-453c-841f-4dddddddddd"],
+                "vSmarts": [
+                    "ccccccccccccccc-42f4-b2c7-1cccccccccc",
+                    "ddddddddd-9d8a-453c-841f-4dddddddddd",
+                ],
                 "mode": "off",
                 "idpMetadata": "",
                 "createdAt": 2222222222222,

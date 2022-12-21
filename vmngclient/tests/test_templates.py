@@ -158,7 +158,10 @@ class TestTemplateAPI(unittest.TestCase):
         mock_operation.return_value = MockOperatrion
         session = Mock()
         test_object = TemplateAPI(session)
-        test_object.get_operation_status.return_value = [OperationStatus.SUCCESS, OperationStatus.SUCCESS]
+        test_object.get_operation_status.return_value = [
+            OperationStatus.SUCCESS,
+            OperationStatus.SUCCESS,
+        ]
         operation_id = "operation_id"
 
         # Act
@@ -175,7 +178,10 @@ class TestTemplateAPI(unittest.TestCase):
         mock_operation.return_value = MockOperatrion
         session = Mock()
         test_object = TemplateAPI(session)
-        test_object.get_operation_status.return_value = [OperationStatus.IN_PROGRESS, OperationStatus.SUCCESS]
+        test_object.get_operation_status.return_value = [
+            OperationStatus.IN_PROGRESS,
+            OperationStatus.SUCCESS,
+        ]
         operation_id = "operation_id"
 
         # Act
@@ -272,7 +278,12 @@ class TestTemplateAPI(unittest.TestCase):
         # Assert
         self.assertEqual(
             answer,
-            [OperationStatus.IN_PROGRESS, OperationStatus.FAILURE, OperationStatus.SUCCESS, OperationStatus.SCHEDULED],
+            [
+                OperationStatus.IN_PROGRESS,
+                OperationStatus.FAILURE,
+                OperationStatus.SUCCESS,
+                OperationStatus.SCHEDULED,
+            ],
         )
 
     @patch("vmngclient.session.vManageSession")

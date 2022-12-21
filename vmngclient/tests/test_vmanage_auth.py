@@ -95,7 +95,10 @@ class TestvManageAuth(TestCase):
 
         # Assert
         mock_get.assert_called_with(
-            url=valid_url, verify=False, headers={"Content-Type": "application/json"}, cookies=cookies
+            url=valid_url,
+            verify=False,
+            headers={"Content-Type": "application/json"},
+            cookies=cookies,
         )
 
 

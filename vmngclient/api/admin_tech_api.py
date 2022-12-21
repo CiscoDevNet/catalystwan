@@ -100,7 +100,9 @@ class AdminTechAPI:
             )
             try:
                 response = self.session.post(
-                    url="/dataservice/device/tools/admintech", json=body, timeout=request_timeout
+                    url="/dataservice/device/tools/admintech",
+                    json=body,
+                    timeout=request_timeout,
                 )
             except HTTPError as http_error:
                 response = http_error.response

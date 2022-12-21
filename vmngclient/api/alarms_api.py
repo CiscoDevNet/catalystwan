@@ -31,17 +31,32 @@ class AlarmsAPI:
         self.session = session
 
     def get_alarms(
-        self, hours: Optional[int] = None, level: Optional[str] = None, viewed: Optional[bool] = None
+        self,
+        hours: Optional[int] = None,
+        level: Optional[str] = None,
+        viewed: Optional[bool] = None,
     ) -> List[AlarmData]:
         query: Dict[str, Any] = {"query": {"condition": "AND", "rules": []}}
 
         if hours:
             query["query"]["rules"].append(
-                {"value": [str(hours)], "field": "entry_time", "type": "date", "operator": "last_n_hours"}
+                {
+                    "value": [str(hours)],
+                    "field": "entry_time",
+                    "type": "date",
+                    "operator": "last_n_hours",
+                }
             )
 
         if level:
-            query["query"]["rules"].append({"value": [level], "field": "severity", "type": "string", "operator": "in"})
+            query["query"]["rules"].append(
+                {
+                    "value": [level],
+                    "field": "severity",
+                    "type": "string",
+                    "operator": "in",
+                }
+            )
 
         if viewed is not None:
             if viewed:
@@ -50,7 +65,12 @@ class AlarmsAPI:
                 value = Viewed.no.value
 
             query["query"]["rules"].append(
-                {"value": [value], "field": "acknowledged", "type": "bool", "operator": "equal"}
+                {
+                    "value": [value],
+                    "field": "acknowledged",
+                    "type": "bool",
+                    "operator": "equal",
+                }
             )
 
         alarms = self.session.post(url=AlarmsAPI.URL, json=query).json()["data"]
@@ -87,7 +107,10 @@ class AlarmsAPI:
         return not self.get_not_viewed_alarms()
 
     def check_alarms(
-        self, expected: List[Dict[str, str]], timeout_seconds: int = 240, sleep_seconds: int = 5
+        self,
+        expected: List[Dict[str, str]],
+        timeout_seconds: int = 240,
+        sleep_seconds: int = 5,
     ) -> Dict[str, set]:
         """Checks if alarms have occurred.
 

@@ -33,7 +33,11 @@ class DeviceActionAPI(ABC):
 
     @abstractmethod
     def wait_for_completed(
-        self, sleep_seconds: int, timeout_seconds: int, expected_status: str, expected_reachability: str
+        self,
+        sleep_seconds: int,
+        timeout_seconds: int,
+        expected_status: str,
+        expected_reachability: str,
     ):
         raise NotImplementedError
 
