@@ -2,8 +2,6 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from parameterized import parameterized  # type: ignore
-
 from vmngclient.api.logs_api import LogsAPI
 
 
