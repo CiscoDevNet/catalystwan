@@ -28,7 +28,7 @@ repos:
     rev: 22.8.0
     hooks:
       - id: black
-        args: ["-l", "120", "-S"]
+        args: ["-l", "120"]
 
   # Code analysis (only checks staged files)
 
