@@ -35,7 +35,7 @@ class OmpAPI:
         Returns:
             List[OmpPeerData]: OmpPeerData object
         """
-        items = self.session.get_data(f'/dataservice/device/omp/peers?deviceId={device_id}')
+        items = self.session.get_data(f"/dataservice/device/omp/peers?deviceId={device_id}")
         return [create_dataclass(OmpPeerData, item) for item in items]
 
     def get_advertised_routes(self, device_id: str) -> List[OmpAdvertisedRouteData]:
@@ -47,7 +47,7 @@ class OmpAPI:
         Returns:
             List[OmpAdvertisedRouteData]: OmpAdvertisedRouteData objects
         """
-        items = self.session.get_data(f'/dataservice/device/omp/routes/advertised?deviceId={device_id}')
+        items = self.session.get_data(f"/dataservice/device/omp/routes/advertised?deviceId={device_id}")
         return [create_dataclass(OmpAdvertisedRouteData, item) for item in items]
 
     def get_received_routes(self, device_id: str) -> List[OmpReceivedRouteData]:
@@ -59,7 +59,7 @@ class OmpAPI:
         Returns:
             List[OmpReceivedRouteData]: OmpReceivedRouteData objects
         """
-        items = self.session.get_data(f'/dataservice/device/omp/routes/received?deviceId={device_id}')
+        items = self.session.get_data(f"/dataservice/device/omp/routes/received?deviceId={device_id}")
         return [create_dataclass(OmpReceivedRouteData, item) for item in items]
 
     def get_advertised_tlocs(self, device_id: str) -> List[OmpAdvertisedTlocData]:
@@ -71,7 +71,7 @@ class OmpAPI:
         Returns:
             List[OmpAdvertisedTlocData]: OmpAdvertisedTlocData objects
         """
-        items = self.session.get_data(f'/dataservice/device/omp/tlocs/advertised?deviceId={device_id}')
+        items = self.session.get_data(f"/dataservice/device/omp/tlocs/advertised?deviceId={device_id}")
         return [create_dataclass(OmpAdvertisedTlocData, item) for item in items]
 
     def get_received_tlocs(self, device_id: str) -> List[OmpReceivedTlocData]:
@@ -83,7 +83,7 @@ class OmpAPI:
         Returns:
             List[OmpReceivedTlocData]: OmpReceivedTlocData objects
         """
-        items = self.session.get_data(f'/dataservice/device/omp/tlocs/received?deviceId={device_id}')
+        items = self.session.get_data(f"/dataservice/device/omp/tlocs/received?deviceId={device_id}")
         return [create_dataclass(OmpReceivedTlocData, item) for item in items]
 
     def get_services(self, device_id: str) -> List[OmpServiceData]:
@@ -95,7 +95,7 @@ class OmpAPI:
         Returns:
             List[OmpServiceData]: OmpServiceData objects
         """
-        items = self.session.get_data(f'/dataservice/device/omp/services?deviceId={device_id}')
+        items = self.session.get_data(f"/dataservice/device/omp/services?deviceId={device_id}")
         return [create_dataclass(OmpServiceData, item) for item in items]
 
     def get_omp_summary(self, device_id: str) -> List[OmpSummaryData]:
@@ -107,5 +107,5 @@ class OmpAPI:
         Returns:
             List[OmpSummaryData]: OmpSummaryData objects
         """
-        items = self.session.get_data(f'/dataservice/device/omp/summary?deviceId={device_id}')
+        items = self.session.get_data(f"/dataservice/device/omp/summary?deviceId={device_id}")
         return [create_dataclass(OmpSummaryData, item) for item in items]

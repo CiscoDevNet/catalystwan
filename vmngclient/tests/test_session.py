@@ -93,5 +93,5 @@ class TestSession(unittest.TestCase):
         self.assertEqual(session.get_full_url(url), full_url)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
