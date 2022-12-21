@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 class AlarmLevel(Enum):
     minor = "Minor"
+    medium = "Medium"
     major = "Major"
     critical = "Critical"
 
@@ -24,23 +25,38 @@ class Viewed(Enum):
 
 class AlarmsAPI:
 
-    URL = '/dataservice/alarms'
+    URL = "/dataservice/alarms"
 
     def __init__(self, session: vManageSession):
         self.session = session
 
     def get_alarms(
-        self, hours: Optional[int] = None, level: Optional[str] = None, viewed: Optional[bool] = None
+        self,
+        hours: Optional[int] = None,
+        level: Optional[str] = None,
+        viewed: Optional[bool] = None,
     ) -> List[AlarmData]:
         query: Dict[str, Any] = {"query": {"condition": "AND", "rules": []}}
 
         if hours:
             query["query"]["rules"].append(
-                {"value": [str(hours)], "field": "entry_time", "type": "date", "operator": "last_n_hours"}
+                {
+                    "value": [str(hours)],
+                    "field": "entry_time",
+                    "type": "date",
+                    "operator": "last_n_hours",
+                }
             )
 
         if level:
-            query["query"]["rules"].append({"value": [level], "field": "severity", "type": "string", "operator": "in"})
+            query["query"]["rules"].append(
+                {
+                    "value": [level],
+                    "field": "severity",
+                    "type": "string",
+                    "operator": "in",
+                }
+            )
 
         if viewed is not None:
             if viewed:
@@ -49,12 +65,17 @@ class AlarmsAPI:
                 value = Viewed.no.value
 
             query["query"]["rules"].append(
-                {"value": [value], "field": "acknowledged", "type": "bool", "operator": "equal"}
+                {
+                    "value": [value],
+                    "field": "acknowledged",
+                    "type": "bool",
+                    "operator": "equal",
+                }
             )
 
-        alarms = self.session.post(url=AlarmsAPI.URL, data=query).json()
+        alarms = self.session.post(url=AlarmsAPI.URL, json=query).json()["data"]
 
-        logger.info("Actualas alarms collected successfuly.")
+        logger.info("Current alarms collected successfully.")
 
         return [create_dataclass(AlarmData, flatten_dict(alarm)) for alarm in alarms]
 
@@ -63,6 +84,9 @@ class AlarmsAPI:
 
     def get_major_alarms(self, hours: Optional[int] = None, viewed: Optional[bool] = None) -> List[AlarmData]:
         return self.get_alarms(hours, AlarmLevel.major.value, viewed)
+
+    def get_medium_alarms(self, hours: Optional[int] = None, viewed: Optional[bool] = None) -> List[AlarmData]:
+        return self.get_alarms(hours, AlarmLevel.medium.value, viewed)
 
     def get_minor_alarms(self, hours: Optional[int] = None, viewed: Optional[bool] = None) -> List[AlarmData]:
         return self.get_alarms(hours, AlarmLevel.minor.value, viewed)
@@ -77,13 +101,16 @@ class AlarmsAPI:
           True if all alarms are viewed
         """
 
-        self.session.post(f'{AlarmsAPI.URL}/markallasviewed')
+        self.session.post(f"{AlarmsAPI.URL}/markallasviewed")
         logger.info("Alarms mark as viewed.")
 
         return not self.get_not_viewed_alarms()
 
     def check_alarms(
-        self, expected: List[Dict[str, str]], timeout_seconds: int = 240, sleep_seconds: int = 5
+        self,
+        expected: List[Dict[str, str]],
+        timeout_seconds: int = 240,
+        sleep_seconds: int = 5,
     ) -> Dict[str, set]:
         """Checks if alarms have occurred.
 
@@ -100,7 +127,7 @@ class AlarmsAPI:
           The dictionary with alarms that occurred (key 'found') and did not (key 'no-found')
         """
 
-        alarms_expected = {create_dataclass(AlarmData, expected_alarm) for expected_alarm in expected}
+        alarms_expected = {create_dataclass(AlarmData, flatten_dict(expected_alarm)) for expected_alarm in expected}
 
         verification = AlarmVerification(logger, self.get_not_viewed_alarms)
         verification.verify(alarms_expected, timeout_seconds, sleep_seconds)
@@ -108,7 +135,7 @@ class AlarmsAPI:
         logger.info(f"found alarms: {verification.found}")
         logger.info(f"not-found alarms: {verification.not_found}")
 
-        return {'found': verification.found, 'not-found': verification.not_found}
+        return {"found": verification.found, "not-found": verification.not_found}
 
 
 class AlarmVerification:
@@ -136,7 +163,7 @@ class AlarmVerification:
         return any(checked)
 
     def verify(self, expected: Set[AlarmData], timeout_seconds: int, sleep_seconds: int):
-        """The verifing if the expected alarms is included in the actuals alarms set.
+        """The verifying if the expected alarms is included in the actual alarms set.
 
         Args:
           expected(Set[AlarmData]): The set expected alarms.
@@ -149,7 +176,7 @@ class AlarmVerification:
 
         def _log_exception(retry_state):
             self.logger.error(f"Cannot found alarms in {timeout_seconds}.")
-            self.logger.error(f"Orignial exception: {retry_state.outcome.exception()}.")
+            self.logger.error(f"Original exception: {retry_state.outcome.exception()}.")
 
         def check(founds):
             return expected != founds

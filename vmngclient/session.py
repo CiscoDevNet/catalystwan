@@ -71,7 +71,7 @@ def create_vManageSession(
     if subdomain:
         tenant_id = session.get_tenant_id()
         vsession_id = session.get_virtual_session_id(tenant_id)
-        session.headers.update({'VSessionId': vsession_id})
+        session.headers.update({"VSessionId": vsession_id})
     server_info = session.server()
 
     try:
@@ -177,7 +177,7 @@ class vManageSession(Session):
         return self.get_data(url="/dataservice/client/server")
 
     def get_data(self, url: str) -> Any:
-        return self.get_json(url)['data']
+        return self.get_json(url)["data"]
 
     def get_json(self, url: str) -> Any:
         response = self.get(url)
@@ -242,8 +242,8 @@ class vManageSession(Session):
         Returns:
             Tenant UUID.
         """
-        tenants = self.get_data(url='/dataservice/tenant')
-        tenant_id = [tenant.get('tenantId', None) for tenant in tenants if tenant['subDomain'] == self.subdomain][0]
+        tenants = self.get_data(url="/dataservice/tenant")
+        tenant_id = [tenant.get("tenantId", None) for tenant in tenants if tenant["subDomain"] == self.subdomain][0]
         return tenant_id
 
     def get_virtual_session_id(self, tenant_id: str) -> str:
@@ -258,12 +258,11 @@ class vManageSession(Session):
         """
         url_path = f"/dataservice/tenant/{tenant_id}/vsessionid"
         response = self.post(url_path)
-        return response.json()['VSessionId']
+        return response.json()["VSessionId"]
 
     def __prepare_session(self, verify: bool, auth: Optional[AuthBase]) -> None:
         self.auth = auth
         self.verify = verify
-        self.headers.update({"content-type": "application/json"})
 
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"

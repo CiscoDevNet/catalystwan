@@ -17,7 +17,14 @@ class LogsAPI:
         query = {
             "query": {
                 "condition": "AND",
-                "rules": [{"field": "entry_time", "type": "date", "value": [f"{n_hours}"], "operator": "last_n_hours"}],
+                "rules": [
+                    {
+                        "field": "entry_time",
+                        "type": "date",
+                        "value": [f"{n_hours}"],
+                        "operator": "last_n_hours",
+                    }
+                ],
             }
         }
         addon_to_url = quote(str(query), safe="").replace("%27", "%22")
@@ -26,12 +33,12 @@ class LogsAPI:
         logs = self.session.get_data(url_path)
 
         if file_path is None:
-            file_path = str(Path(__file__).parents[0] / 'audit.log')
+            file_path = str(Path(__file__).parents[0] / "audit.log")
 
         with open(file_path, "w") as file:
             for log in logs:
-                time = dt.utcfromtimestamp(log['entry_time'] / 1000)
-                time_readable = time.strftime('%Y-%m-%d %H:%M:%S')
+                time = dt.utcfromtimestamp(log["entry_time"] / 1000)
+                time_readable = time.strftime("%Y-%m-%d %H:%M:%S")
                 file.write(
                     f"Entry time: {time_readable} - LogId: {log['logid']} - "
                     f"Log message: {log['logmessage']} - TenantId: {log['tenant']}\n"

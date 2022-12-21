@@ -30,9 +30,17 @@ def response_debug(response: Response, headers: bool = False) -> str:
     if isinstance(request_body, bytes):
         request_body = str(request_body, encoding="utf-8")
     info = VManageResponseDebugInfo(
-        request={"method": response.request.method, "url": response.request.url, "body": request_body},
-        response={"status": response.status_code, "reason": response.reason, "text": response.text},
+        request={
+            "method": response.request.method,
+            "url": response.request.url,
+            "body": request_body,
+        },
+        response={"status": response.status_code, "reason": response.reason},
     )
+    if len(response.text) <= 1024:
+        info.response.update({"text": response.text})
+    else:
+        info.response.update({"text(trimmed)": response.text[:128]})
     if headers:
         info.request.update({"headers": dict(response.request.headers.items())})
         info.response.update({"headers": dict(response.headers.items())})
@@ -47,20 +55,20 @@ def get_json_data(response: Response) -> Any:
     if isinstance(response_json, dict) and "data" in response_json.keys():
         return response_json.get("data")
     else:
-        raise VManageResponseException("{\"data\": ... } field not found in Response", response)
+        raise VManageResponseException("{'data': ... } field not found in Response", response)
 
 
 def get_json_data_as_list(response: Response) -> List:
     data = get_json_data(response)
     if not isinstance(data, list):
-        raise VManageResponseException(f"{{\"data\": ...}} contains {type(data)}, expected list", response)
+        raise VManageResponseException(f"{{'data'\"': ...}} contains {type(data)}, expected list", response)
     return cast(list, data)
 
 
 def get_json_data_as_dict(response: Response) -> Dict[str, Any]:
     data = get_json_data(response)
     if not isinstance(data, Dict):
-        raise VManageResponseException(f"{{\"data\": ...}} contains {type(data)}, expected dict", response)
+        raise VManageResponseException(f"{{'data': ...}} contains {type(data)}, expected dict", response)
     return cast(dict, data)
 
 

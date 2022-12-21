@@ -64,6 +64,26 @@ except UserAlreadyExistsError as error:
 ```
 </details>
 
+## API usage examples
+
+### AdminTechAPI
+
+<details>
+    <summary>Python (click to expand)</summary>
+
+```Python
+from vmngclient.session import create_vManageSession
+from vmngclient.api.admin_tech_api import AdminTechAPI
+
+session = create_vManageSession(url=..., username=..., password=...)
+admintech = AdminTechAPI(session)
+filename = admintech.generate("172.16.255.11")
+admintech.download(filename)
+admintech.delete(filename)
+```
+
+</details>
+
 
 ## Contributing, reporting issues, seeking support
 Please contact authors direcly or via Issues Github page.
