@@ -70,7 +70,8 @@ class TestAdminTechAPI(unittest.TestCase):
         admintechs = AdminTechAPI(mock_session).get(self.device_ip)
         # Assert
         mock_session.post.assert_called_once_with(
-            url="/dataservice/device/tools/admintechlist", json={"deviceIP": self.device_ip}
+            url="/dataservice/device/tools/admintechlist",
+            json={"deviceIP": self.device_ip},
         )
         self.assertIsInstance(admintechs[0], DeviceAdminTech)
 
@@ -114,7 +115,9 @@ class TestAdminTechAPI(unittest.TestCase):
         # Act/Assert
         with self.assertRaises(GenerateAdminTechLogError):
             AdminTechAPI(mock_session).generate(
-                device_id=self.device_ip, polling_timeout=interval * count, polling_interval=interval
+                device_id=self.device_ip,
+                polling_timeout=interval * count,
+                polling_interval=interval,
             )
         self.assertEqual(mock_session.post.call_count, count)
 
@@ -130,7 +133,9 @@ class TestAdminTechAPI(unittest.TestCase):
         # Act/Assert
         with self.assertRaises(GenerateAdminTechLogError):
             AdminTechAPI(mock_session).generate(
-                device_id=self.device_ip, polling_timeout=interval * count, polling_interval=interval
+                device_id=self.device_ip,
+                polling_timeout=interval * count,
+                polling_interval=interval,
             )
         mock_session.post.assert_called_once()
 

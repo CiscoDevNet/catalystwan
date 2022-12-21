@@ -16,7 +16,10 @@ class SpeedtestAPI:
         self.session = session
 
     def speedtest(
-        self, source_device: Device, destination_device: Device, test_duration_seconds: int = 300
+        self,
+        source_device: Device,
+        destination_device: Device,
+        test_duration_seconds: int = 300,
     ) -> Speedtest:
 
         source_color = DeviceStateAPI(self.session).get_colors(source_device.id)[0]
@@ -36,7 +39,11 @@ class SpeedtestAPI:
             with DeviceStateAPI(self.session).enable_data_stream():
                 try:
                     self.perform(
-                        source_device, destination_device, source_color, destination_color, test_duration_seconds
+                        source_device,
+                        destination_device,
+                        source_color,
+                        destination_color,
+                        test_duration_seconds,
                     )
                 except HTTPError as e:
                     self.speedtest_output.status = str(e)
@@ -76,7 +83,8 @@ class SpeedtestAPI:
             sleep(5)
 
         disable_speedtest = cast(
-            dict, self.session.get_json(f"/dataservice/stream/device/speed/disable/{speedtest_session}")
+            dict,
+            self.session.get_json(f"/dataservice/stream/device/speed/disable/{speedtest_session}"),
         )
 
         end_query = {
@@ -89,7 +97,12 @@ class SpeedtestAPI:
                         "type": "string",
                         "operator": "in",
                     },
-                    {"value": ["completed"], "field": "status", "type": "string", "operator": "in"},
+                    {
+                        "value": ["completed"],
+                        "field": "status",
+                        "type": "string",
+                        "operator": "in",
+                    },
                 ],
             },
             "size": 10000,
