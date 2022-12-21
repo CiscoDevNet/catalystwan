@@ -58,13 +58,18 @@ class TestSoftwareAcionAPI(unittest.TestCase):
             True,
         )
 
+    @patch("vmngclient.session.vManageSession")
     @patch.object(SoftwareActionAPI, "_downgrade_check")
     @patch.object(RepositoryAPI, "get_image_version")
-    def test_upgrade_software_if_downgrade_check_is_none(self, mock_get_image_version, mock_downgrade_check):
+    def test_upgrade_software_if_downgrade_check_is_none(
+        self, mock_get_image_version, mock_downgrade_check, mock_session
+    ):
 
         # Prepare mock data
         mock_downgrade_check.return_value = False
-        self.mock_repository_object.session.post.return_value = {"id": "mock_action_id"}
+        self.mock_repository_object.session.post.return_value.json.return_value = {"id": "mock_action_id"}
+        mock_session.post.return_value = {"id": "mock_action_id"}
+        # self.mock_software_action_obj.session.post.json.return_value = {"id": "mock_action_id"}
 
         # Assert
         answer = self.mock_software_action_obj.upgrade_software([self.device], 'path', self.install_spec, True, True)
