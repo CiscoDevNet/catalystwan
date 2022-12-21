@@ -30,7 +30,11 @@ def response_debug(response: Response, headers: bool = False) -> str:
     if isinstance(request_body, bytes):
         request_body = str(request_body, encoding="utf-8")
     info = VManageResponseDebugInfo(
-        request={"method": response.request.method, "url": response.request.url, "body": request_body},
+        request={
+            "method": response.request.method,
+            "url": response.request.url,
+            "body": request_body,
+        },
         response={"status": response.status_code, "reason": response.reason},
     )
     if len(response.text) <= 1024:

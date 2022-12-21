@@ -26,7 +26,13 @@ class DownloadStatus(Enum):
 
 
 class PacketCaptureAPI:
-    def __init__(self, session: vManageSession, vpn: str = "0", interface: str = "ge0/1", status=None) -> None:
+    def __init__(
+        self,
+        session: vManageSession,
+        vpn: str = "0",
+        interface: str = "ge0/1",
+        status=None,
+    ) -> None:
         self.session = session
         self.vpn = vpn
         self.interface = interface
@@ -79,7 +85,7 @@ class PacketCaptureAPI:
         try:
             url_path = r"/dataservice/stream/device/capture"
             packet_setup = self.session.post(url=url_path, json=query).json()
-            logger.debug(f'Packet capture session for device {device.uuid} has been opened')
+            logger.debug(f"Packet capture session for device {device.uuid} has been opened")
             self.packet_channel = create_dataclass(PacketSetup, packet_setup)
             if self.packet_channel.is_new_session is True:
                 yield self.packet_channel
@@ -92,10 +98,10 @@ class PacketCaptureAPI:
                 self.status = self.get_status(self.packet_channel)
                 if self.status.file_download_status == DownloadStatus.COMPLETED.value:
                     self.download_capture_session(self.packet_channel, device)
-                    logger.debug(f'Packet downloading for device {device.uuid} has been finished')
+                    logger.debug(f"Packet downloading for device {device.uuid} has been finished")
                     url_path = f"/dataservice/stream/device/capture/disable/{self.packet_channel.session_id}"
                     self.session.get_json(url_path)
-                    logger.debug(f'Packet capture session for device {device.uuid} has been disabled')
+                    logger.debug(f"Packet capture session for device {device.uuid} has been disabled")
                     break
 
     @contextmanager
@@ -108,13 +114,13 @@ class PacketCaptureAPI:
         try:
             url_path = f"/dataservice/stream/device/capture/start/{self.packet_channel.session_id}"
             self.session.get_json(url_path)
-            logger.debug(f'Packet capturing for device {device.uuid} has been started')
+            logger.debug(f"Packet capturing for device {device.uuid} has been started")
             yield None
 
         finally:
             url_path = f"/dataservice/stream/device/capture/stop/{self.packet_channel.session_id}"
             self.session.get_json(url_path)
-            logger.debug(f'Packet capturing for device {device.uuid} has been stoped')
+            logger.debug(f"Packet capturing for device {device.uuid} has been stoped")
 
     def get_interface_name(self, device: Device) -> str:
 
