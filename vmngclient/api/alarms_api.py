@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 class AlarmLevel(Enum):
     minor = "Minor"
+    medium = "Medium"
     major = "Major"
     critical = "Critical"
 
@@ -64,6 +65,9 @@ class AlarmsAPI:
     def get_major_alarms(self, hours: Optional[int] = None, viewed: Optional[bool] = None) -> List[AlarmData]:
         return self.get_alarms(hours, AlarmLevel.major.value, viewed)
 
+    def get_medium_alarms(self, hours: Optional[int] = None, viewed: Optional[bool] = None) -> List[AlarmData]:
+        return self.get_alarms(hours, AlarmLevel.medium.value, viewed)
+
     def get_minor_alarms(self, hours: Optional[int] = None, viewed: Optional[bool] = None) -> List[AlarmData]:
         return self.get_alarms(hours, AlarmLevel.minor.value, viewed)
 
@@ -100,7 +104,7 @@ class AlarmsAPI:
           The dictionary with alarms that occurred (key 'found') and did not (key 'no-found')
         """
 
-        alarms_expected = {create_dataclass(AlarmData, expected_alarm) for expected_alarm in expected}
+        alarms_expected = {create_dataclass(AlarmData, flatten_dict(expected_alarm)) for expected_alarm in expected}
 
         verification = AlarmVerification(logger, self.get_not_viewed_alarms)
         verification.verify(alarms_expected, timeout_seconds, sleep_seconds)
