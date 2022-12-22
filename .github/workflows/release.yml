@@ -25,7 +25,7 @@ jobs:
       - name: Set Up Poetry
         uses: abatilo/actions-poetry@v2.0.0
         with:
-          poetry-version: 1.1.13
+          poetry-version: 1.3.1
       - name: Publish vmngclient
         run: |
           poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
