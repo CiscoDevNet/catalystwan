@@ -1,15 +1,14 @@
 from enum import Enum
 
 
-class OperationStatus(Enum):
-    IN_PROGRESS = 'In progress'
-    FAILURE = 'Failure'
-    SUCCESS = 'Success'
-    SCHEDULED = 'Scheduled'
+    IN_PROGRESS = "In progress"
+    FAILURE = "Failure"
+    SUCCESS = "Success"
+    SCHEDULED = "Scheduled"
 
 
 class OperationStatusId(Enum):
-    IN_PROGRESS = 'in progress'
-    FAILURE = 'failure'
-    SUCCESS = 'success'
-    SCHEDULED = 'scheduled'
+    IN_PROGRESS = "in progress"
+    FAILURE = "failure"
+    SUCCESS = "success"
+    SCHEDULED = "scheduled"

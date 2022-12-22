@@ -29,7 +29,7 @@ class TestResponse(unittest.TestCase):
             (False, {"data": [{"key1": "string"}, {"key2": {}, "key3": None}, "data"]}),
         ]
     )
-    @patch('requests.Response')
+    @patch("requests.Response")
     def test_get_json_data(self, raises: bool, json: Any, mock_response):
         mock_response.json.return_value = json
         if not raises:
@@ -54,7 +54,7 @@ class TestResponse(unittest.TestCase):
             (False, {"data": [{"key1": "string"}, {"key2": {}, "key3": None}, "data"]}),
         ]
     )
-    @patch('requests.Response')
+    @patch("requests.Response")
     def test_get_json_data_as_list(self, raises: bool, json: Any, mock_response):
         mock_response.json.return_value = json
         if not raises:
@@ -79,7 +79,7 @@ class TestResponse(unittest.TestCase):
             (True, {"data": [{"key1": "string"}, {"key2": {}, "key3": None}, "data"]}),
         ]
     )
-    @patch('requests.Response')
+    @patch("requests.Response")
     def test_get_json_data_as_dict(self, raises: bool, json: Any, mock_response):
         mock_response.json.return_value = json
         if not raises:
