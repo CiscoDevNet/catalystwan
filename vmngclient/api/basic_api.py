@@ -1,5 +1,4 @@
 """Methods covering essential API endpoints and related data classes."""
-import json
 from contextlib import contextmanager
 from enum import Enum
 from typing import Iterator, List, Union
