@@ -4,11 +4,12 @@ Module for handling tenant backup and restore
 from pathlib import Path
 from typing import Optional, Union
 
-#from vmngclient.api.task_status_api import TaskStatus
+# from vmngclient.api.task_status_api import TaskStatus
 from vmngclient.dataclasses import TenantBackupRestore
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
+
 
 class TenantBackupRestoreApi:
     """
@@ -17,6 +18,7 @@ class TenantBackupRestoreApi:
     Attributes:
         session: logged in API client session
     """
+
     exit_statuses = [OperationStatus.SUCCESS.value,
                      OperationStatus.FAILURE.value]
     exit_statuses_ids = [OperationStatusId.SUCCESS.value,
@@ -46,8 +48,8 @@ class TenantBackupRestoreApi:
             filename on vManage server of exported tenant backup file
         """
         response = self.session.get_json("/dataservice/tenantbackup/export")
-        #task_status = TaskStatus(self.session)
-        #result = task_status.wait_for_completed(5, 3000,
+        # task_status = TaskStatus(self.session)
+        # result = task_status.wait_for_completed(5, 3000,
         #                               self.exit_statuses,
         #                               self.exit_statuses_ids,
         #                               response['processId'])
@@ -64,7 +66,7 @@ class TenantBackupRestoreApi:
         return self.session.delete(url).json()
 
     def delete_all(self) -> Union[dict, list]:
-        return self.delete('all')
+        return self.delete("all")
 
     def download(self, file_name: str, download_dir: Optional[Path] = None) -> Path:
         """Download tenant backup file
@@ -84,19 +86,19 @@ class TenantBackupRestoreApi:
         return download_path
 
     def import_backup(self, filename: Path):
-        '''
+        """
         upload the specified file for tenant import,
         then poll the task until success or failure.
         Args:
             filename: The path of the file to be upladed
         Returns:
-        '''
+        """
         # Upload the file
-        url = '/dataservice/tenantbackup/import'
-        files = {'file': (filename.name, open(filename, 'rb'))}
+        url = "/dataservice/tenantbackup/import"
+        files = {"file": (filename.name, open(filename, "rb"))}
         response = self.session.post(url, data=data, files=files)
-        #task_status = TaskStatus(self.session)
-        #result = task_status.wait_for_completed(5, 3000,
+        # task_status = TaskStatus(self.session)
+        # result = task_status.wait_for_completed(5, 3000,
         #                               self.exit_statuses,
         #                               self.exit_statuses_ids,
         #                               response.json()['processId'])
