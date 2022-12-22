@@ -1,5 +1,4 @@
 """Methods covering essential API endpoints and related data classes."""
-import json
 from contextlib import contextmanager
 from enum import Enum
 from typing import Iterator, List, Union
@@ -275,9 +274,8 @@ class DeviceStateAPI:
 
     def get_colors(self, device_id: str) -> List[str]:
         url = "/dataservice/device/bfd/state/device/tlocInterfaceMap"
-        colors_raw = DevicesAPI(self.session).session.get_data(url + f"?deviceId={device_id}")
-        json_colors = json.loads(str(colors_raw.read(), "utf-8"))
-        colors = list(json_colors["intfList"].keys())
+        colors_raw = DevicesAPI(self.session).session.get_json(url + f"?deviceId={device_id}")
+        colors = list(colors_raw["intfList"].keys())
 
         return colors
 
