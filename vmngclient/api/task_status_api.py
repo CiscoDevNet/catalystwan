@@ -65,7 +65,7 @@ class TaskStatus:
             action_url (str, optional): Action url. Defaults to '/dataservice/device/action/status/'
 
         Returns:
-            bool: True if condition is met
+            bool: True if c
         """
         action_url = '/dataservice/device/action/status/'
         exit_statuses = [cast(OperationStatus, exit_status.value) for exit_status in exit_statuses]
@@ -105,7 +105,7 @@ class TaskStatus:
             activity(optional), utill check_status is True
 
             Returns:
-                bool: True if condition is met
+                TaskStatus: TaskStatus instance
             """
             url = f'{action_url}{action_id}'
             action_data = self.session.get_data(url)[0]
