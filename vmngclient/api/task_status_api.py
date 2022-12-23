@@ -92,7 +92,6 @@ class TaskStatus:
 
         def _log_exception(self) -> None:
             logger.error("Operation status not achieved in given time")
-            return None
 
         @retry(
             wait=wait_fixed(sleep_seconds),
