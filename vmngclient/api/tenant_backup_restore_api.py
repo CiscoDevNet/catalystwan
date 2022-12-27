@@ -1,14 +1,17 @@
 """
 Module for handling tenant backup and restore
 """
+import logging
 from pathlib import Path
 from typing import Optional, Union
 
-# from vmngclient.api.task_status_api import TaskStatus
+from vmngclient.api.task_status_api import TaskStatus
 from vmngclient.dataclasses import TenantBackupRestore
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
+
+logger = logging.getLogger(__name__)
 
 
 class TenantBackupRestoreApi:
@@ -49,10 +52,11 @@ class TenantBackupRestoreApi:
         """
         response = self.session.get_json("/dataservice/tenantbackup/export")
         # task_status = TaskStatus(self.session)
-        # result = task_status.wait_for_completed(5, 3000,
-        #                               self.exit_statuses,
-        #                               self.exit_statuses_ids,
-        #                               response['processId'])
+        # result = task_status.wait_for_completed(
+        #     5, 3000,
+        #     self.exit_statuses,
+        #     self.exit_statuses_ids,
+        #     response['processId'])
         return str(response)
 
     def delete(self, file_name) -> Union[dict, list]:
@@ -98,8 +102,9 @@ class TenantBackupRestoreApi:
         files = {"file": (filename.name, open(str(filename), "rb"))}
         response = self.session.post(url, data={}, files=files)
         # task_status = TaskStatus(self.session)
-        # result = task_status.wait_for_completed(5, 3000,
-        #                               self.exit_statuses,
-        #                               self.exit_statuses_ids,
-        #                               response.json()['processId'])
+        # result = task_status.wait_for_completed(
+        #     5, 3000,
+        #     self.exit_statuses,
+        #     self.exit_statuses_ids,
+        #     response.json()['processId'])
         return response
