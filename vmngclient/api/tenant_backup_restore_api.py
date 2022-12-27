@@ -11,6 +11,7 @@ from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 
 
+
 class TenantBackupRestoreApi:
     """
     Class for handling tenant backup and restore
@@ -95,8 +96,8 @@ class TenantBackupRestoreApi:
         """
         # Upload the file
         url = "/dataservice/tenantbackup/import"
-        files = {"file": (filename.name, open(filename, "rb"))}
-        response = self.session.post(url, data=data, files=files)
+        files = {"file": (filename.name, open(str(filename), "rb"))}
+        response = self.session.post(url, data={}, files=files)
         # task_status = TaskStatus(self.session)
         # result = task_status.wait_for_completed(5, 3000,
         #                               self.exit_statuses,

@@ -28,7 +28,8 @@ class VManageResponseDebugInfo:
 def response_debug(response: Response, headers: bool = False) -> str:
     request_body = response.request.body
     if isinstance(request_body, bytes):
-        request_body = str(request_body, encoding="utf-8")
+        if 'multipart/form-data' not in response.request.headers['Content-Type']:
+            request_body = str(request_body, encoding="utf-8")
     info = VManageResponseDebugInfo(
         request={
             "method": response.request.method,
