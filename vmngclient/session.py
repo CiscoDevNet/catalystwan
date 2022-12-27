@@ -9,11 +9,14 @@ from urllib.parse import urljoin
 
 from requests import Response, Session
 from requests.auth import AuthBase
-from requests.exceptions import HTTPError
+from requests.exceptions import HTTPError, ConnectTimeout
+from urllib3.exceptions import MaxRetryError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.utils.response import response_debug
 from vmngclient.vmanage_auth import vManageAuth
+
+from pythonping import ping
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +69,10 @@ def create_vManageSession(
         Session object
 
     """
+    try:
+        ping(url, verbose=False)
+    except (TimeoutError, MaxRetryError, ConnectTimeout):
+        print("asdawsdsad")
     session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
     if subdomain:
