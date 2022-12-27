@@ -5,7 +5,7 @@ import logging
 from pathlib import Path
 from typing import Optional, Union
 
-from vmngclient.api.task_status_api import TaskStatus
+# from vmngclient.api.task_status_api import TaskStatus
 from vmngclient.dataclasses import TenantBackupRestore
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
@@ -22,10 +22,8 @@ class TenantBackupRestoreApi:
         session: logged in API client session
     """
 
-    exit_statuses = [OperationStatus.SUCCESS.value,
-                     OperationStatus.FAILURE.value]
-    exit_statuses_ids = [OperationStatusId.SUCCESS.value,
-                         OperationStatusId.FAILURE.value]
+    exit_statuses = [OperationStatus.SUCCESS.value, OperationStatus.FAILURE.value]
+    exit_statuses_ids = [OperationStatusId.SUCCESS.value, OperationStatusId.FAILURE.value]
 
     def __init__(self, session: vManageSession) -> None:
         self.session = session
@@ -86,7 +84,7 @@ class TenantBackupRestoreApi:
         download_path = download_dir / file_name
         tenant_id = file_name.split("_")[1]
         url = f"/dataservice/tenantbackup/download/{tenant_id}/{file_name}"
-        response = self.session.get_file(url, download_path)
+        self.session.get_file(url, download_path)
         return download_path
 
     def import_backup(self, filename: Path):

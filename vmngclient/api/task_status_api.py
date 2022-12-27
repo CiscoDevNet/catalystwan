@@ -29,8 +29,8 @@ class TaskStatus:
 
     def __init__(self, session: vManageSession) -> None:
         self.session = session
-        self.status: str = ''
-        self.status_id: str = ''
+        self.status: str = ""
+        self.status_id: str = ""
         self.activity: List[str] = []
 
     def wait_for_completed(
@@ -46,7 +46,7 @@ class TaskStatus:
             OperationStatusId.SUCCESS,
             OperationStatusId.FAILURE,
         ],
-        activity_text: str = '',
+        activity_text: str = "",
     ) -> "TaskStatus":
         """
         Method to check action status
@@ -59,12 +59,12 @@ class TaskStatus:
              that cause stop requesting action status id
             action_id (str): inspected action id
             activity_text (str): activity text
-            action_url (str, optional): Action url. Defaults to '/dataservice/device/action/status/'
+            action_url (str, optional): Action url. Defaults to "/dataservice/device/action/status/"
 
         Returns:
             bool: True if c
         """
-        action_url = '/dataservice/device/action/status/'
+        action_url = "/dataservice/device/action/status/"
         exit_statuses = [cast(OperationStatus, exit_status.value) for exit_status in exit_statuses]
         exit_statuses_ids = [cast(OperationStatusId, exit_status_id.value) for exit_status_id in exit_statuses_ids]
 
@@ -104,11 +104,11 @@ class TaskStatus:
             Returns:
                 TaskStatus: TaskStatus instance
             """
-            url = f'{action_url}{action_id}'
+            url = f"{action_url}{action_id}"
             action_data = self.session.get_data(url)[0]
-            self.status = action_data['status']
-            self.status_id = action_data['statusId']
-            self.activity = action_data['activity']
+            self.status = action_data["status"]
+            self.status_id = action_data["statusId"]
+            self.activity = action_data["activity"]
             logger.debug(
                 f"Statuses of action {action_id} is: "
                 f"status: {self.status}, status_id: {self.status_id}, activity: {self.activity} "
