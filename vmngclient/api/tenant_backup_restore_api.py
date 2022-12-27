@@ -11,7 +11,6 @@ from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 
 
-
 class TenantBackupRestoreApi:
     """
     Class for handling tenant backup and restore
