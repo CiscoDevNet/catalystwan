@@ -7,16 +7,14 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from urllib.parse import urljoin
 
+from pythonping import ping
 from requests import Response, Session
 from requests.auth import AuthBase
-from requests.exceptions import HTTPError, ConnectTimeout
-from urllib3.exceptions import MaxRetryError
+from requests.exceptions import HTTPError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.utils.response import response_debug
 from vmngclient.vmanage_auth import vManageAuth
-
-from pythonping import ping
 
 logger = logging.getLogger(__name__)
 
@@ -69,12 +67,13 @@ def create_vManageSession(
         Session object
 
     """
-    try:
-        ping(url, verbose=False)
-    except (TimeoutError, MaxRetryError, ConnectTimeout):
-        print("asdawsdsad")
-    session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
-    session.auth = vManageAuth(session.base_url, username, password, verify=False)
+    connection = ping(url, verbose=True)
+    if connection.stats_packets_returned == 0:
+        raise ConnectionError("Server is not available")
+    else:
+        session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
+        session.auth = vManageAuth(session.base_url, username, password, verify=False)
+
     if subdomain:
         tenant_id = session.get_tenant_id()
         vsession_id = session.get_virtual_session_id(tenant_id)
