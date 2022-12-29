@@ -10,7 +10,6 @@ from vmngclient.api.task_status_api import TaskStatus
 from vmngclient.dataclasses import TenantBackupRestore
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
-from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +47,7 @@ class TenantBackupRestoreApi:
         """
         response = self.session.get_json("/dataservice/tenantbackup/export")
         task_status = TaskStatus(self.session)
-        result = task_status.wait_for_completed(response['processId'], timeout, 5)
+        result = task_status.wait_for_completed(response["processId"], timeout, 5)
         string = re.search("""file location: (.*)""", result.activity[-1])
         assert string, "File locationa not found."
         return string.group(1)
@@ -98,5 +97,5 @@ class TenantBackupRestoreApi:
         response = self.session.post(url, data={}, files=files)
 
         task_status = TaskStatus(self.session)
-        result = task_status.wait_for_completed(response.json()['processId'], timeout, 5)
+        result = task_status.wait_for_completed(response.json()['processId"], timeout, 5)
         return result
