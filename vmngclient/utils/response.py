@@ -27,7 +27,6 @@ class VManageResponseDebugInfo:
 
 def response_debug(response: Response, headers: bool = False) -> str:
     request_body = response.request.body
-    x=False
     if isinstance(request_body, bytes) and request_body.isascii():
         request_body = str(request_body, encoding="utf-8")
     info = VManageResponseDebugInfo(
