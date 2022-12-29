@@ -4,7 +4,7 @@ Module for tenant backup and restore API
 import logging
 import re
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from vmngclient.api.task_status_api import TaskStatus
 from vmngclient.dataclasses import TenantBackupRestore
@@ -92,7 +92,7 @@ class TenantBackupRestoreApi:
             message = ProviderBackupRestore.delete(fileName)
         """
         url = f"/dataservice/tenantbackup/delete?fileName={file}"
-        return self.session.delete(url).json()['Deleted']
+        return self.session.delete(url).json()["Deleted"]
 
     def delete_all(self) -> List[str]:
         """Delete all tenant backup file
@@ -107,7 +107,7 @@ class TenantBackupRestoreApi:
 
     def download(self, file: str, download_dir: Optional[Path] = None) -> Path:
         """Download tenant backup file
- 
+
         Args:
             file: full path or base name of tenant backup file
             download_dir: download directory (defaul: current working directory)
