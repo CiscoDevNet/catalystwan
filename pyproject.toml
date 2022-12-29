@@ -17,7 +17,6 @@ tenacity = "^8.1.0"
 parameterized = "^0.8.1"
 Jinja2 = "^3.1.2"
 flake8-quotes = "^3.3.1"
-pythonping = "^1.1.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
