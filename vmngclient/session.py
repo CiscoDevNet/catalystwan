@@ -67,12 +67,10 @@ def create_vManageSession(
         Session object
 
     """
-    connection = ping(url, verbose=True)
-    if connection.stats_packets_returned == 0:
-        raise ConnectionError("Server is not available")
-    else:
-        session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
-        session.auth = vManageAuth(session.base_url, username, password, verify=False)
+
+    check_vmanage_server_connection()
+    session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
+    session.auth = vManageAuth(session.base_url, username, password, verify=False)
 
     if subdomain:
         tenant_id = session.get_tenant_id()
@@ -111,6 +109,11 @@ def create_vManageSession(
         )
     logger.info(f"Logged as {username}. The session type is {session.session_type}")
     return session
+
+def check_vmanage_server_connection(url):
+    connection = ping(url)
+    if connection.stats_packets_returned == 0:
+        raise ConnectionError("Server is not available")
 
 
 class vManageSession(Session):
