@@ -94,7 +94,7 @@ class TenantBackupRestoreApi:
         url = f"/dataservice/tenantbackup/delete?fileName={file}"
         return self.session.delete(url).json()['Deleted']
 
-    def delete_all(self) -> Union[dict, list]:
+    def delete_all(self) -> List[str]:
         """Delete all tenant backup file
 
         Returns:
