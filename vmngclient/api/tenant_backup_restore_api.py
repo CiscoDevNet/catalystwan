@@ -19,7 +19,7 @@ class TenantBackupRestoreApi:
     Class for tenant backup and restore
 
     Scope:
-        Provider as tenant, tenant.
+        Provider as tenant or tenant
 
     Attributes:
         session (vManageSession): logged in API client session
@@ -49,7 +49,7 @@ class TenantBackupRestoreApi:
         self.session = session
 
     def list(self) -> TenantBackupRestore:
-        """Return a list of backup files stored on vManage.
+        """Return a list of backup files stored on vManage
 
         Returns:
             list of filenames
@@ -61,13 +61,13 @@ class TenantBackupRestoreApi:
         return create_dataclass(TenantBackupRestore, response)
 
     def export(self, timeout: int = 300) -> str:
-        """Export tenant backup file from DB to vManage storage.
+        """Export tenant backup file from DB to vManage storage
 
         Args:
-            timeout: Max polling time for task (default: 300 seconds).
+            timeout: Max polling time for task (default: 300 seconds)
 
         Returns:
-            str: filename of exported tenant backup file stored on vManage.
+            str: filename of exported tenant backup file stored on vManage
 
         Example usage:
             fileName = ProviderBackupRestore.export()
@@ -95,7 +95,7 @@ class TenantBackupRestoreApi:
         return self.session.delete(url).json()["Deleted"]
 
     def delete_all(self) -> List[str]:
-        """Delete all tenant backup file
+        """Delete all tenant backup files
 
         Returns:
             http response for delete operation
@@ -128,18 +128,18 @@ class TenantBackupRestoreApi:
         self.session.get_file(file, download)
         return download
 
-    def import_db(self, file: Path, timeout: int = 300) -> TaskStatus:
-        """Upload the file for tenant import to the DB and poll for Success.
+    def import_file(self, file: Path, timeout: int = 300) -> TaskStatus:
+        """Upload the file for tenant import to the DB and poll for Success
 
         Args:
             file: The path of the file to be upladed
-            timeout: Max polling time for task (default: 300 seconds).
+            timeout: Max polling time for task (default: 300 seconds)
 
         Returns:
-            TaskStatus object with Success and Activity messages.
+            TaskStatus object with Success and Activity messages
 
         Example usage:
-             status = ProviderBackupRestore.import_db(file)
+             status = ProviderBackupRestore.import_file(file)
         """
 
         url = "/dataservice/tenantbackup/import"
