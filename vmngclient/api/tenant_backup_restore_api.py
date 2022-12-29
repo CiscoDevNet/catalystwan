@@ -84,7 +84,7 @@ class TenantBackupRestoreApi:
         self.session.get_file(file, download)
         return download
 
-    def import_backup(self, file: Path, timeout: int = 300) -> str:
+    def import_backup(self, file: Path, timeout: int = 300) -> TaskStatus:
         """
         upload the specified file for tenant import,
         then poll the task until success or failure.
