@@ -68,7 +68,7 @@ def create_vManageSession(
 
     """
 
-    check_vmanage_server_connection()
+    check_vmanage_server_connection(url)
     session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
 
