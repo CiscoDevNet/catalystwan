@@ -7,10 +7,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from urllib.parse import urljoin
 
-from pythonping import ping
-from requests import Response, Session
+from requests import Response, Session, head
 from requests.auth import AuthBase
-from requests.exceptions import HTTPError
+from requests.exceptions import ConnectionError, HTTPError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.utils.response import response_debug
@@ -110,10 +109,13 @@ def create_vManageSession(
     logger.info(f"Logged as {username}. The session type is {session.session_type}")
     return session
 
+
 def check_vmanage_server_connection(url):
-    connection = ping(url)
-    if connection.stats_packets_returned == 0:
-        raise ConnectionError("Server is not available")
+    url = f"http://{url}"
+    try:
+        head(url, timeout=2)
+    except ConnectionError:
+        logger.error("vManage server is not available")
 
 
 class vManageSession(Session):
