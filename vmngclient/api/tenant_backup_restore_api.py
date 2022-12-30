@@ -37,7 +37,7 @@ class TenantBackupRestoreApi:
         fileName = TenantBackupRestore.export()
         fileList = ProviderBackupRestore.list()
         file = TenantBackupRestore.download(fileName)
-        status = ProviderBackupRestore.import_db(file)
+        status = ProviderBackupRestore.import_file(file)
         deletedList = TenantBackupRestore.delete(fileName)
         deletedList = ProviderBackupRestore.delete_all()
     """
