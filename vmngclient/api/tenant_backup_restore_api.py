@@ -45,7 +45,7 @@ class TenantBackupRestoreApi:
     def __init__(self, session: vManageSession) -> None:
         self.session = session
 
-    def list(self) -> List(str):
+    def list(self) -> list:
         """Return a list of backup files stored on vManage
 
         Returns:
@@ -54,7 +54,7 @@ class TenantBackupRestoreApi:
         Example usage:
             fileList = ProviderBackupRestore.list()
         """
-        return = self.session.get_json("/dataservice/tenantbackup/list")
+        return self.session.get_json("/dataservice/tenantbackup/list")
 
     def export(self, timeout: int = 300) -> str:
         """Export tenant backup file from DB to vManage storage
