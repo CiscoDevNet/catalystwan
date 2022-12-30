@@ -8,7 +8,6 @@ from typing import List, Optional
 
 from vmngclient.api.task_status_api import TaskStatus
 from vmngclient.session import vManageSession
-from vmngclient.utils.creation_tools import create_dataclass
 
 logger = logging.getLogger(__name__)
 
