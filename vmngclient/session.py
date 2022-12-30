@@ -67,7 +67,6 @@ def create_vManageSession(
 
     """
 
-    check_vmanage_server_connection(url)
     session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
 
@@ -110,14 +109,6 @@ def create_vManageSession(
     return session
 
 
-def check_vmanage_server_connection(url):
-    url = f"http://{url}"
-    try:
-        head(url, timeout=2)
-    except ConnectionError:
-        logger.error("vManage server is not available")
-
-
 class vManageSession(Session):
     """Base class for API sessions for vManage client.
 
@@ -149,6 +140,8 @@ class vManageSession(Session):
         self.subdomain = subdomain
 
         self.session_type = SessionType.NOT_DEFINED
+
+        self.check_vmanage_server_connection()
 
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
@@ -295,3 +288,12 @@ class vManageSession(Session):
             ]
             return True if all(comparison_list) else False
         return False
+
+    def check_vmanage_server_connection(self) -> None:
+        try:
+            url = str(self.base_url).replace("https", "http")
+            if self.port:
+                url = url.replace(str(f":{self.port}"), "")
+            head(url, timeout=2)
+        except ConnectionError:
+            logger.error("vManage server is not available")
