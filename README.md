@@ -94,15 +94,19 @@ Please contact authors direcly or via Issues Github page.
     ```
     git clone https://github.com/CiscoDevNet/vManage-client.git
     ```
-3. Install poetry v1.1.13
+3. Install poetry v1.3.1
     ```
-    pip install poetry==1.1.13
+    pip install poetry==1.3.1
     ```
-4. Install dependecies 
+4. Configure poetry to use virtual environments in project folder (can ease IDE integration)
+    ```
+    poetry config virtualenvs.in-project true
+    ```
+5. Install dependecies 
     ```
     poetry install
     ```
-5. Activate `pre-commit`
+6. Activate `pre-commit`
     ```
     pre-commit install
     ```
