@@ -294,12 +294,3 @@ class CloudOnRampForSaasMode(DataclassBase):
     """
 
     mode: str = field(metadata={FIELD_NAME: "mode"})
-
-
-@define(frozen=True)
-class TenantBackupRestore:
-    """
-    There currently is no UI on vManage for this feature
-    apidocs/#/Tenant Backup Restore
-    """
-    backup_files: list

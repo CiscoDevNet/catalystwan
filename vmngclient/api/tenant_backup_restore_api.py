@@ -1,5 +1,5 @@
 """
-Module for tenant backup and restore API
+Module for apidocs/#/Tenant Backup Restore
 """
 import logging
 import re
@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import List, Optional
 
 from vmngclient.api.task_status_api import TaskStatus
-from vmngclient.dataclasses import TenantBackupRestore
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
 
@@ -19,7 +18,7 @@ class TenantBackupRestoreApi:
     Class for tenant backup and restore
 
     Scope:
-        Provider as tenant or tenant
+        Provider-as-tenant or tenant
 
     Attributes:
         session (vManageSession): logged in API client session
@@ -42,13 +41,12 @@ class TenantBackupRestoreApi:
         status = ProviderBackupRestore.import_db(file)
         deletedList = TenantBackupRestore.delete(fileName)
         deletedList = ProviderBackupRestore.delete_all()
-
     """
 
     def __init__(self, session: vManageSession) -> None:
         self.session = session
 
-    def list(self) -> TenantBackupRestore:
+    def list(self) -> List(str):
         """Return a list of backup files stored on vManage
 
         Returns:
@@ -57,8 +55,7 @@ class TenantBackupRestoreApi:
         Example usage:
             fileList = ProviderBackupRestore.list()
         """
-        response = self.session.get_json("/dataservice/tenantbackup/list")
-        return create_dataclass(TenantBackupRestore, response)
+        return = self.session.get_json("/dataservice/tenantbackup/list")
 
     def export(self, timeout: int = 300) -> str:
         """Export tenant backup file from DB to vManage storage
@@ -76,7 +73,7 @@ class TenantBackupRestoreApi:
         task_status = TaskStatus(self.session)
         result = task_status.wait_for_completed(response["processId"], timeout, 5)
         string = re.search("""file location: (.*)""", result.activity[-1])
-        assert string, "File locationa not found."
+        assert string, "File location not found."
         return string.group(1)
 
     def delete(self, file: str) -> List[str]:
