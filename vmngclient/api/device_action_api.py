@@ -55,10 +55,9 @@ class RebootAction(DeviceActionAPI):
         Raises:
             Exception when reboot was not successful.
         """
-        if self.dev.personality == Personality.VBOND or self.dev.personality == Personality.VSMART:
-            device_type = "controller"
-        else:
-            device_type = self.dev.personality.value
+        controllers = (Personality.VBOND, Personality.VSMART)
+        device_type = "controller" if self.dev.personality in controllers else self.dev.personality.value
+
         body = {
             "action": "reboot",
             "deviceType": device_type,
