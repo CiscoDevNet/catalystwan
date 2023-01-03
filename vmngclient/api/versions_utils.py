@@ -28,7 +28,7 @@ class DeviceSoftwareRepository:
 
 class RepositoryAPI:
     """
-    API methods to prepare data for most of software actions
+    API methods to get information about images and devices versions
     """
 
     def __init__(
