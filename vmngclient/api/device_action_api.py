@@ -8,6 +8,7 @@ from vmngclient.dataclasses import Device
 from vmngclient.session import vManageSession
 from vmngclient.utils.certificate_status import CertificateStatus
 from vmngclient.utils.operation_status import OperationStatus
+from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
 from vmngclient.utils.validate_status import ValidateStatus
 
@@ -54,9 +55,12 @@ class RebootAction(DeviceActionAPI):
         Raises:
             Exception when reboot was not successful.
         """
+        controllers = (Personality.VBOND, Personality.VSMART)
+        device_type = "controller" if self.dev.personality in controllers else self.dev.personality.value
+
         body = {
             "action": "reboot",
-            "deviceType": "controller",
+            "deviceType": device_type,
             "devices": [{"deviceIP": self.dev.id, "deviceId": self.dev.uuid}],
         }
         response = self.session.post("/dataservice/device/action/reboot", json=body).json()
