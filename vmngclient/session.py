@@ -141,7 +141,8 @@ class vManageSession(Session):
 
         self.session_type = SessionType.NOT_DEFINED
 
-        self.check_vmanage_server_connection()
+        if not self.check_vmanage_server_connection():
+            raise ConnectionError("Vmanage server is not available")
 
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
@@ -289,11 +290,13 @@ class vManageSession(Session):
             return True if all(comparison_list) else False
         return False
 
-    def check_vmanage_server_connection(self) -> None:
+    def check_vmanage_server_connection(self) -> bool:
         try:
             url = str(self.base_url).replace("https", "http")
             if self.port:
                 url = url.replace(str(f":{self.port}"), "")
             head(url, timeout=2)
         except ConnectionError:
-            logger.error("vManage server is not available")
+            return False
+        else:
+            return True
