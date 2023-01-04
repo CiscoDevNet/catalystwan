@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vmngclient"
-version = "0.2.0"
+version = "0.2.2"
 description = "Universal vManage API"
 authors = ["kagorski <kagorski@cisco.com>"]
 readme = "README.md"
@@ -31,5 +31,6 @@ flake8 = "^5.0.4"
 Sphinx = "^5.2.3"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=1.4.0"]
 build-backend = "poetry.core.masonry.api"
+

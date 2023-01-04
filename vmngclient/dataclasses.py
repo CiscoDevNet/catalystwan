@@ -24,10 +24,10 @@ class AdminTech(DataclassBase):
     size: int
     filename: str = field(metadata={FIELD_NAME: "fileName"})
     state: str
-    tac_state: Optional[str]
     device_ip: str = field(metadata={FIELD_NAME: "deviceIP"})
     system_ip: str = field(metadata={FIELD_NAME: "local-system-ip"})
     token_id: str = field(metadata={FIELD_NAME: "requestTokenId"})
+    tac_state: Optional[str] = field(default=None)
 
 
 @define(frozen=True, field_transformer=convert_attributes)
