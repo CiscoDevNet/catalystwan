@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 from typing import List, Optional
 
-from vmngclient.api.task_status_api import TaskStatus
+from vmngclient.api.task_status_api import TaskStatus, wait_for_completed
 from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
@@ -69,8 +69,7 @@ class TenantBackupRestoreApi:
             fileName = ProviderBackupRestore.export()
         """
         response = self.session.get_json("/dataservice/tenantbackup/export")
-        task_status = TaskStatus(self.session)
-        result = task_status.wait_for_completed(response["processId"], timeout, 5)
+        result = wait_for_completed(self.session, response["processId"])
         string = re.search("""file location: (.*)""", result.activity[-1])
         assert string, "File location not found."
         return string.group(1)
@@ -141,7 +140,5 @@ class TenantBackupRestoreApi:
         url = "/dataservice/tenantbackup/import"
         files = {"file": (file.name, open(str(file), "rb"))}
         response = self.session.post(url, data={}, files=files)
-
-        task_status = TaskStatus(self.session)
-        result = task_status.wait_for_completed(response.json()["processId"], timeout, 5)
+        result = wait_for_completed(self.session, response.json()["processId"])
         return result
