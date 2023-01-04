@@ -4,18 +4,17 @@ from typing import List, cast
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.session import vManageSession
-from vmngclient.utils.creation_tools import get_logger_name
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 from attr import define, field
 from vmngclient.utils.creation_tools import FIELD_NAME
 from vmngclient.utils.creation_tools import create_dataclass
 
-logger = logging.getLogger(get_logger_name(__name__))
+logger = logging.getLogger(__name__)
 
 @define
 class TaskStatus:
     status: str
-    status_id: str = field(metadata={FIELD_NAME: "statusId"})
+    status_id: str= field(metadata={FIELD_NAME: "statusId"})
     activity: List[str]
 
 def wait_for_completed(
@@ -23,35 +22,35 @@ def wait_for_completed(
     action_id: str,
     timeout_seconds: int = 300,
     sleep_seconds: int = 5,
-    exit_statuses: List[OperationStatus] = [
+    exit_statuses: List[OperationStatus]= [
         OperationStatus.SUCCESS,
         OperationStatus.FAILURE,
     ],
-    exit_statuses_ids: List[OperationStatusId] = [
+    exit_statuses_ids: List[OperationStatusId]= [
         OperationStatusId.SUCCESS,
         OperationStatusId.FAILURE,
     ],
-    activity_text: str = '',
-) -> list:
+    activity_text: str= '',
+) -> TaskStatus:
     """
     Method to check action status
 
     Args:
-        sleep_seconds (int): interval between action status requests
+        session (vManageSession): session
+        action_id (str): inspected action id
         timeout_seconds (int): After this time, function will stop requesting action status
+        sleep_seconds (int): interval between action status requests
         exit_statuses (Union[List[OperationStatus], str]): actions statuses that cause stop requesting action status
         exit_statuses_ids (Union[List[OperationStatusId], str]): actions statuses ids
             that cause stop requesting action status id
-        action_id (str): inspected action id
         activity_text (str): activity text
-        action_url (str, optional): Action url. Defaults to '/dataservice/device/action/status/'
 
     Returns:
         "TaskStatus": 
     """
-    action_url = '/dataservice/device/action/status/'
-    exit_statuses = [cast(OperationStatus, exit_status.value) for exit_status in exit_statuses]
-    exit_statuses_ids = [cast(OperationStatusId, exit_status_id.value) for exit_status_id in exit_statuses_ids]
+    action_url= '/dataservice/device/action/status/'
+    exit_statuses= [cast(OperationStatus, exit_status.value) for exit_status in exit_statuses]
+    exit_statuses_ids= [cast(OperationStatusId, exit_status_id.value) for exit_status_id in exit_statuses_ids]
 
     def check_status(task: TaskStatus) -> bool:
         """
@@ -72,14 +71,14 @@ def wait_for_completed(
                 return False
         return True
 
-    def _log_exception() -> None:
+    def log_exception() -> None:
         logger.error("Operation status not achieved in given time")
 
     @retry(
-        wait=wait_fixed(sleep_seconds),
-        stop=stop_after_attempt(int(timeout_seconds / sleep_seconds)),
-        retry=retry_if_result(check_status),
-        retry_error_callback=_log_exception,
+        wait= wait_fixed(sleep_seconds),
+        stop= stop_after_attempt(int(timeout_seconds / sleep_seconds)),
+        retry= retry_if_result(check_status),
+        retry_error_callback= log_exception,
     )
     def wait_for_action_finish() -> list:
         """
@@ -89,17 +88,13 @@ def wait_for_completed(
         Returns:
             TaskStatus: TaskStatus instance
         """
-        url = f'{action_url}{action_id}'
-        action_data = session.get_data(url)[0]
-        # status = action_data['status']
-        # status_id = action_data['statusId']
-        # activity = action_data['activity']
-        task = create_dataclass(TaskStatus, action_data)
+        url= f'{action_url}{action_id}'
+        action_data= session.get_data(url)[0]
+        task= create_dataclass(TaskStatus, action_data)
         logger.debug(
             f"Statuses of action {action_id} is: "
-            f"status: {task.status}, status_id: {task.status_id}, activity: {task.activity} "
+            f"status: {task.status}, status_id: {task.status_id}, activity: {task.activity}."
         )
         return task
 
     return wait_for_action_finish()
-    
