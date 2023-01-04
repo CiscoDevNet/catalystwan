@@ -65,7 +65,7 @@ class TaskStatus:
             action_url (str, optional): Action url. Defaults to '/dataservice/device/action/status/'
 
         Returns:
-            bool: True if c
+            "TaskStatus": 
         """
         action_url = '/dataservice/device/action/status/'
         exit_statuses = [cast(OperationStatus, exit_status.value) for exit_status in exit_statuses]
@@ -99,7 +99,7 @@ class TaskStatus:
             retry=retry_if_result(check_status),
             retry_error_callback=_log_exception,
         )
-        def wait_for_action_finish() -> bool:
+        def wait_for_action_finish() -> list:
             """
             Keep asking for task status, status_id,
             activity(optional), utill check_status is True
