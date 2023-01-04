@@ -7,9 +7,8 @@ from urllib.error import HTTPError
 from vmngclient.api.basic_api import DeviceStateAPI
 from vmngclient.dataclasses import Device, Speedtest
 from vmngclient.session import vManageSession
-from vmngclient.utils.creation_tools import get_logger_name
 
-logger = logging.getLogger(get_logger_name(__name__))
+logger = logging.getLogger(__name__)
 
 
 class SpeedtestAPI:
@@ -17,7 +16,10 @@ class SpeedtestAPI:
         self.session = session
 
     def speedtest(
-        self, source_device: Device, destination_device: Device, test_duration_seconds: int = 300
+        self,
+        source_device: Device,
+        destination_device: Device,
+        test_duration_seconds: int = 300,
     ) -> Speedtest:
 
         source_color = DeviceStateAPI(self.session).get_colors(source_device.id)[0]
@@ -37,7 +39,11 @@ class SpeedtestAPI:
             with DeviceStateAPI(self.session).enable_data_stream():
                 try:
                     self.perform(
-                        source_device, destination_device, source_color, destination_color, test_duration_seconds
+                        source_device,
+                        destination_device,
+                        source_color,
+                        destination_color,
+                        test_duration_seconds,
                     )
                 except HTTPError as e:
                     self.speedtest_output.status = str(e)
@@ -65,7 +71,7 @@ class SpeedtestAPI:
             "port": "80",
         }
         url_path = "/dataservice/stream/device/speed"
-        setup_speedtest = self.session.post(url_path, start_query).json()
+        setup_speedtest = self.session.post(url_path, json=start_query).json()
 
         speedtest_session = setup_speedtest["sessionId"]
 
@@ -77,7 +83,8 @@ class SpeedtestAPI:
             sleep(5)
 
         disable_speedtest = cast(
-            dict, self.session.get_json(f"/dataservice/stream/device/speed/disable/{speedtest_session}")
+            dict,
+            self.session.get_json(f"/dataservice/stream/device/speed/disable/{speedtest_session}"),
         )
 
         end_query = {
@@ -90,13 +97,18 @@ class SpeedtestAPI:
                         "type": "string",
                         "operator": "in",
                     },
-                    {"value": ["completed"], "field": "status", "type": "string", "operator": "in"},
+                    {
+                        "value": ["completed"],
+                        "field": "status",
+                        "type": "string",
+                        "operator": "in",
+                    },
                 ],
             },
             "size": 10000,
         }
         url_path = "/dataservice/statistics/speedtest"
-        post_speedtest = self.session.post(url_path, end_query).json()
+        post_speedtest = self.session.post(url_path, json=end_query).json()
 
         try:
             self.speedtest_output.status = disable_speedtest["status"]

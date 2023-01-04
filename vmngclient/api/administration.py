@@ -3,9 +3,9 @@ from typing import List, Union, cast
 
 from vmngclient.dataclasses import CloudConnectorData, CloudServicesSettings, ServiceConfigurationData, User
 from vmngclient.session import vManageSession
-from vmngclient.utils.creation_tools import asdict, create_dataclass, get_logger_name
+from vmngclient.utils.creation_tools import asdict, create_dataclass
 
-logger = logging.getLogger(get_logger_name(__name__))
+logger = logging.getLogger(__name__)
 
 
 class UserAlreadyExistsError(Exception):
@@ -29,14 +29,15 @@ class UsersAPI:
     def exists(self, username: str) -> bool:
         return username in [user.username for user in self.get_all_users()]
 
-    def create_user(self, user: User) -> None:
+    def create_user(self, user: User) -> bool:
         if self.exists(user.username):
             raise UserAlreadyExistsError(f"{user.username} already exists.")
         url_path = "/dataservice/admin/user"
         data = asdict(user)  # type: ignore
 
-        response = self.session.post(url=url_path, data=data)
+        response = self.session.post(url=url_path, json=data)
         logger.info(response)
+        return True if response.status_code == 200 else False
 
     def delete_user(self, username: str) -> bool:
         if not self.exists(username):
@@ -101,7 +102,7 @@ class AdministrationSettingsAPI:
         """Enables SD-AVC Cloud Connector on vManage."""
         url_path = "/dataservice/sdavc/cloudconnector"
         data = asdict(cloud_connector)  # type: ignore
-        response = self.session.post(url_path, data)
+        response = self.session.post(url_path, json=data)
         return True if response.status_code == 200 else False
 
     def disable_sdavc_cloud_connector(self) -> bool:
@@ -131,4 +132,4 @@ class AdministrationSettingsAPI:
         url_path = "/dataservice/settings/configuration/cloudx"
         data = {"mode": "on"} if not disable else {"mode": "off"}
         response = self.session.put(url_path, data)
-        return True if response.status == 200 else False
+        return True if response.status_code == 200 else False

@@ -20,11 +20,23 @@ class DataclassBase:
 
 @define(frozen=True, field_transformer=convert_attributes)
 class AdminTech(DataclassBase):
-    state: str
+    creation_time: dt.datetime = field(metadata={FIELD_NAME: "creationTime"})
+    size: int
     filename: str = field(metadata={FIELD_NAME: "fileName"})
-    token_id: str = field(metadata={FIELD_NAME: "requestTokenId"})
+    state: str
     device_ip: str = field(metadata={FIELD_NAME: "deviceIP"})
     system_ip: str = field(metadata={FIELD_NAME: "local-system-ip"})
+    token_id: str = field(metadata={FIELD_NAME: "requestTokenId"})
+    tac_state: Optional[str] = field(default=None)
+
+
+@define(frozen=True, field_transformer=convert_attributes)
+class DeviceAdminTech(DataclassBase):
+    filename: str = field(metadata={FIELD_NAME: "fileName"})
+    creation_time: dt.datetime = field(metadata={FIELD_NAME: "creationTime"})
+    size: int
+    state: str
+    token_id: Optional[str] = field(default=None, metadata={FIELD_NAME: "requestTokenId"})
 
 
 @define(frozen=True, field_transformer=convert_attributes)
@@ -40,11 +52,11 @@ class AlarmData(DataclassBase):
     interface_name: Optional[str] = field(default=None, metadata={FIELD_NAME: "if-name"})
     vpn_id: Optional[str] = field(default=None, metadata={FIELD_NAME: "vpn-id"})
 
-    def issubset(self, other: 'AlarmData') -> bool:
+    def issubset(self, other: "AlarmData") -> bool:
         field_keys = {field_key for field_key in self.__annotations__ if getattr(self, field_key)}
         return all(getattr(self, field_key) == getattr(other, field_key) for field_key in field_keys)
 
-    def lowercase(self) -> 'AlarmData':
+    def lowercase(self) -> "AlarmData":
         data = dict()
         for field_key in self.__annotations__:
             attr = getattr(self, field_key)
@@ -72,9 +84,9 @@ class Device(DataclassBase):
     state_description: Optional[str] = field(default=None)
     connected_vManages: List[str] = field(factory=list, metadata={FIELD_NAME: "connectedVManages"})
     model: Optional[str] = field(default=None, metadata={FIELD_NAME: "device-model"})
-    board_serial: Optional[str] = field(default=None, metadata={FIELD_NAME: 'board-serial'})
-    vedgeCertificateState: Optional[str] = field(default=None, metadata={FIELD_NAME: 'vedgeCertificateState'})  # TODO
-    chasis_number: Optional[str] = field(default=None, metadata={FIELD_NAME: 'chasisNumber'})
+    board_serial: Optional[str] = field(default=None, metadata={FIELD_NAME: "board-serial"})
+    vedgeCertificateState: Optional[str] = field(default=None, metadata={FIELD_NAME: "vedgeCertificateState"})  # TODO
+    chasis_number: Optional[str] = field(default=None, metadata={FIELD_NAME: "chasisNumber"})
 
     @property
     def is_reachable(self) -> bool:
@@ -95,22 +107,22 @@ class Reboot(DataclassBase):
 @define
 class WanInterface(DataclassBase):
     color: str
-    vDeviceIp: str = field(metadata={FIELD_NAME: 'vdevice-name'})
-    vDeviceName: str = field(metadata={FIELD_NAME: 'vdevice-host-name'})
-    adminState: str = field(metadata={FIELD_NAME: 'admin-state'})
-    interfaceName: str = field(metadata={FIELD_NAME: 'interface'})
-    privateIp: str = field(metadata={FIELD_NAME: 'private-ip'})
-    publicIp: str = field(metadata={FIELD_NAME: 'public-ip'})
-    privatePort: int = field(metadata={FIELD_NAME: 'private-port'})
-    publicPort: int = field(metadata={FIELD_NAME: 'public-port'})
-    operationalState: str = field(metadata={FIELD_NAME: 'operation-state'})
+    vDeviceIp: str = field(metadata={FIELD_NAME: "vdevice-name"})
+    vDeviceName: str = field(metadata={FIELD_NAME: "vdevice-host-name"})
+    adminState: str = field(metadata={FIELD_NAME: "admin-state"})
+    interfaceName: str = field(metadata={FIELD_NAME: "interface"})
+    privateIp: str = field(metadata={FIELD_NAME: "private-ip"})
+    publicIp: str = field(metadata={FIELD_NAME: "public-ip"})
+    privatePort: int = field(metadata={FIELD_NAME: "private-port"})
+    publicPort: int = field(metadata={FIELD_NAME: "public-port"})
+    operationalState: str = field(metadata={FIELD_NAME: "operation-state"})
 
 
 @define
 class Connection(DataclassBase):
     state: str
-    peerType: str = field(metadata={FIELD_NAME: 'peer-type'})
-    systemIp: str = field(metadata={FIELD_NAME: 'system-ip'})
+    peerType: str = field(metadata={FIELD_NAME: "peer-type"})
+    systemIp: str = field(metadata={FIELD_NAME: "system-ip"})
 
 
 @define
@@ -191,8 +203,8 @@ class EventData(DataclassBase):
 @define(frozen=True)
 class User(DataclassBase):
     group: List[str]
-    locale: str
     username: str = field(metadata={FIELD_NAME: "userName"})
+    locale: Optional[str] = field(default=None)
     password: Optional[str] = field(default=None)
     description: Optional[str] = field(default=None)
     resource_group: Optional[str] = field(default=None, metadata={FIELD_NAME: "resGroupName"})
