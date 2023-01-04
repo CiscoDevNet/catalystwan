@@ -72,7 +72,7 @@ def wait_for_completed(
                 return False
         return True
 
-    def log_exception() -> None:
+    def log_exception(self) -> None:
         logger.error("Operation status not achieved in given time")
 
     @retry(
