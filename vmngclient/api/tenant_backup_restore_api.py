@@ -69,8 +69,8 @@ class TenantBackupRestoreApi:
             fileName = ProviderBackupRestore.export()
         """
         response = self.session.get_json("/dataservice/tenantbackup/export")
-        result = wait_for_completed(self.session, response["processId"])
-        string = re.search("""file location: (.*)""", result.activity[-1])
+        status = wait_for_completed(self.session, response["processId"])
+        string = re.search("""file location: (.*)""", status.activity[-1])
         assert string, "File location not found."
         return string.group(1)
 
@@ -140,5 +140,4 @@ class TenantBackupRestoreApi:
         url = "/dataservice/tenantbackup/import"
         files = {"file": (file.name, open(str(file), "rb"))}
         response = self.session.post(url, data={}, files=files)
-        result = wait_for_completed(self.session, response.json()["processId"])
-        return result
+        return wait_for_completed(self.session, response.json()["processId"])
