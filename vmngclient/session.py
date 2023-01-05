@@ -269,6 +269,17 @@ class vManageSession(Session):
         self.auth = auth
         self.verify = verify
 
+    def check_vmanage_server_connection(self) -> bool:
+        try:
+            url = str(self.base_url).replace("https", "http")
+            if self.port:
+                url = url.replace(str(f":{self.port}"), "")
+            head(url, timeout=2)
+        except ConnectionError:
+            return False
+        else:
+            return True
+
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"
 
@@ -289,14 +300,3 @@ class vManageSession(Session):
             ]
             return True if all(comparison_list) else False
         return False
-
-    def check_vmanage_server_connection(self) -> bool:
-        try:
-            url = str(self.base_url).replace("https", "http")
-            if self.port:
-                url = url.replace(str(f":{self.port}"), "")
-            head(url, timeout=2)
-        except ConnectionError:
-            return False
-        else:
-            return True

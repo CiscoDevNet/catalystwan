@@ -55,9 +55,11 @@ class TestSession(unittest.TestCase):
         # Assert
         self.assertEqual(eval(mock_repr()), session)
 
+    @patch("vmngclient.session.vManageSession.check_vmanage_server_connection")
     @patch("vmngclient.session.Session.__repr__")
-    def test_session_eval_repr_different_sessions(self, mock_repr):
+    def test_session_eval_repr_different_sessions(self, mock_repr, mock_check_connection):
         # Arrange, Act
+        mock_check_connection.return_value = True
         mock_repr.return_value = "vManageSession('domain.com', 'user1', '$password', port=111, subdomain='None')"
         session = vManageSession("not.domain.com", "different_user", "$password", port=111)
         # Assert
@@ -70,8 +72,10 @@ class TestSession(unittest.TestCase):
         # Assert
         self.assertEqual(session_1, session_2)
 
-    def test_session_eq_different_sessions(self):
+    @patch("vmngclient.session.vManageSession.check_vmanage_server_connection")
+    def test_session_eq_different_sessions(self, mock_check_connection):
         # Arrange, Act
+        mock_check_connection.return_value = True
         session_1 = vManageSession("domain.com", "user1", "$password", port=111)
         session_2 = vManageSession("not.domain.com", "different_user", "$password", port=111)
         # Assert
