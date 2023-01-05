@@ -47,7 +47,7 @@ def wait_for_completed(
         activity_text (str): activity text
 
     Returns:
-        "TaskStatus":
+        task (TaskStatus):
     """
     action_url = "/dataservice/device/action/status/"
     exit_statuses = [cast(OperationStatus, exit_status.value) for exit_status in exit_statuses]
