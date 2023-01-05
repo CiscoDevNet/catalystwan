@@ -36,6 +36,22 @@ def wait_for_completed(
     """
     Method to check action status
 
+    Example:
+        session = create_vManageSession(ip_address,admin_username,password,port=port)
+        devices = DevicesAPI(session).devices
+        vsmart_device = [dev for dev in devices if dev.personality == Personality.VSMART][0]
+
+        reboot_action = RebootAction(session,devices)
+        reboot_action.execute()
+
+        # Keep asking for reboot status until it's not in exit_statuses (Failure or Success)
+          or timeout is not achieved (3000s)
+        task = wait_for_completed(session,reboot_action.action_id,3000)
+        if task.status == OperationStatus.SUCCESS.value:
+            #do something
+        else:
+            #do something else
+
     Args:
         session (vManageSession): session
         action_id (str): inspected action id
