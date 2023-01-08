@@ -12,7 +12,7 @@ from vmngclient.session import vManageSession
 logger = logging.getLogger(__name__)
 
 
-class TenantBackupRestoreApi:
+class TenantBackupRestoreAPI:
     """
     Class for tenant backup and restore
 
@@ -23,23 +23,24 @@ class TenantBackupRestoreApi:
         session (vManageSession): logged in API client session
 
     Example usage:
-        from vmngclient.api.tenant_backup_restore_api import TenantBackupRestoreApi
+        from vmngclient.api.tenant_backup_restore_api import TenantBackupRestoreAPI
         from vmngclient.session import create_vManageSession
 
-        ProviderAsTenantSession = create_vManageSession(
-            domain, admin, password, port, subdomain=tenantDomain)
-        TenantSession = create_vManageSession(
-             tenantDomain, tenantadmin, password, port)
 
-        TenantBackupRestore = TenantBackupRestoreApi(TenantSession)
-        ProviderBackupRestore = TenantBackupRestoreApi(ProviderAsTenantSession)
+        tenant_session = create_vManageSession(
+             tenant_domain, tenantadmin, password, port)
+        provider_tenant_session = create_vManageSession(
+            domain, admin, password, port, subdomain=tenant_domain)
 
-        fileName = TenantBackupRestore.export()
-        fileList = ProviderBackupRestore.list()
-        file = TenantBackupRestore.download(fileName)
-        status = ProviderBackupRestore.import_file(file)
-        deletedList = TenantBackupRestore.delete(fileName)
-        deletedList = ProviderBackupRestore.delete_all()
+        tenant_backup_restore = Tenant_backup_restoreAPI(tenant_session)
+        provider_backup_restore = Tenant_backup_restoreAPI(provider_tenant_session)
+
+        file_name = tenant_backup_restore.export()
+        file_list = provider_backup_restore.list()
+        file = tenant_backup_restore.download(file_name)
+        status = provider_backup_restore.import_file(file)
+        deleted_list = tenant_backup_restore.delete(file_name)
+        deleted_list = provider_backup_restore.delete_all()
     """
 
     def __init__(self, session: vManageSession) -> None:
@@ -69,7 +70,7 @@ class TenantBackupRestoreApi:
             fileName = ProviderBackupRestore.export()
         """
         response = self.session.get_json("/dataservice/tenantbackup/export")
-        status = wait_for_completed(self.session, response["processId"])
+        status = wait_for_completed(self.session, response["processId"], timeout)
         string = re.search("""file location: (.*)""", status.activity[-1])
         assert string, "File location not found."
         return string.group(1)
@@ -140,4 +141,4 @@ class TenantBackupRestoreApi:
         url = "/dataservice/tenantbackup/import"
         files = {"file": (file.name, open(str(file), "rb"))}
         response = self.session.post(url, data={}, files=files)
-        return wait_for_completed(self.session, response.json()["processId"])
+        return wait_for_completed(self.session, response.json()["processId"], timeout)
