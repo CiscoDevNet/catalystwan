@@ -1,8 +1,7 @@
-import io
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import ANY, patch
+from unittest.mock import patch
 
 from vmngclient.api.tenant_backup_restore_api import TenantBackupRestoreAPI
 
