@@ -28,7 +28,7 @@ class InvalidCredentialsError(Exception):
 
     def __str__(self):
         return (
-            f"Trying to access vManage with the following credentials: {self.username}/{self.password}. {self.message}"
+            f"Trying to access vManage with the following credentials: {self.username}/****. {self.message}"
         )
 
 
