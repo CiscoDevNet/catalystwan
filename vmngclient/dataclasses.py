@@ -282,3 +282,11 @@ class CloudOnRampForSaasMode(DataclassBase):
     """
 
     mode: str = field(metadata={FIELD_NAME: "mode"})
+
+
+@define(frozen=True)
+class TenantInfo(DataclassBase):
+    """Endpoint(s): /dataservice/tenant"""
+
+    name: str
+    organization_name: str = field(metadata={FIELD_NAME: "orgName"})
