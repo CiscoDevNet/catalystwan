@@ -92,8 +92,8 @@ def wait_for_completed(
         return True
 
     def get_all_tasks():
-        url = "dataservice/device/status/tasks"
-        tasks = session.get_data(url)
+        url = "dataservice/device/action/status/tasks"
+        tasks = session.get_json(url)
         return [process['processId'] for process in tasks['runningTasks']]
 
     def log_exception(self) -> None:
@@ -116,13 +116,13 @@ def wait_for_completed(
         url = f"{action_url}{action_id}"
         try:
             action_data = session.get_data(url)[0]
-        except KeyError:
+        except IndexError:
             tasks_ids = get_all_tasks()
             if action_id in tasks_ids:
                 sleep(delay_seconds)
                 try:
                     action_data = session.get_data(url)[0]
-                except KeyError:
+                except IndexError:
                     raise ValueError(f'task id {action_id} is not registered by vManage.')
             raise ValueError(f'task id {action_id} is not registered by vManage.')
 
