@@ -31,6 +31,7 @@ class VpnType(Enum):
     VPN_SERVICE = auto()
     VPN_MANAGMENT = 512
 
+
 # from vmngclient.third_parties
 @define
 class TacacsServer:
@@ -93,7 +94,7 @@ class aaaConfig:
 class vpnConfig:
     template_name: str
     template_description: str
-    
+
     vpn_id: int
     tenant_name: str = field(init=False)
     tenant_vpn: int = field(init=False)
@@ -112,7 +113,8 @@ class vpnConfig:
 
     def __get_org_name(self):
         return self.tenant_name
-    
+
+
 def prepare(dataclass: AttrsInstance) -> Dict[str, Any]:
     d = asdict(dataclass)
     for key, value in d.items():
