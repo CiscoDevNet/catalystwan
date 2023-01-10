@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from enum import Enum
+from enum import Enum, auto
 from typing import Any, Dict, List, Optional
 
 from attr import define, field
@@ -24,6 +24,12 @@ class TacacsAuthenticationMethod(Enum):
 class Action(Enum):
     ACCEPT = "accept"
     DENY = "deny"
+
+
+class VpnType(Enum):
+    VPN_TRANSPORT = 0
+    VPN_SERVICE = auto()
+    VPN_MANAGMENT = 512
 
 
 # from vmngclient.third_parties
@@ -84,6 +90,31 @@ class aaaConfig:
     radius_servers: List[RadiusServer] = field(factory=list)
 
 
+@define
+class vpnConfig:
+    template_name: str
+    template_description: str
+
+    vpn_id: int
+    tenant_name: str = field(init=False)
+    tenant_vpn: int = field(init=False)
+    org_name: str = field(init=False)
+
+    def __attrs_post_init__(self):
+        try:
+            VpnType(self.vpn_id)
+        except ValueError:
+            self.tenant_vpn = self.vpn_id
+            self.vpn_id = self.__get_vpn_id()
+            self.org_name = self.__get_org_name()
+
+    def __get_vpn_id(self):
+        return self.vpn_id
+
+    def __get_org_name(self):
+        return self.tenant_name
+
+
 def prepare(dataclass: AttrsInstance) -> Dict[str, Any]:
     d = asdict(dataclass)
     for key, value in d.items():
@@ -97,6 +128,7 @@ from enum import Enum
 
 class FeatureTemplateType(Enum):
     aaa = aaaConfig
+    vpn = vpnConfig
 
 
 def create_feature_template(type: FeatureTemplateType, session, **kwargs) -> bool:
