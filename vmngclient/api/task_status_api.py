@@ -7,6 +7,7 @@ from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # t
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
+from time import sleep
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +23,8 @@ def wait_for_completed(
     session: vManageSession,
     action_id: str,
     timeout_seconds: int = 300,
-    sleep_seconds: int = 5,
+    interval_seconds: int = 5,
+    delay_seconds: int = 10,
     exit_statuses: List[OperationStatus] = [
         OperationStatus.SUCCESS,
         OperationStatus.FAILURE,
@@ -56,7 +58,8 @@ def wait_for_completed(
         session (vManageSession): session
         action_id (str): inspected action id
         timeout_seconds (int): After this time, function will stop requesting action status
-        sleep_seconds (int): interval between action status requests
+        interval_seconds (int): interval between action status requests
+        delay_seconds (int): if Vmanage return empty list, after this time api call would be repeated
         exit_statuses (Union[List[OperationStatus], str]): actions statuses that cause stop requesting action status
         exit_statuses_ids (Union[List[OperationStatusId], str]): actions statuses ids
             that cause stop requesting action status id
@@ -88,12 +91,17 @@ def wait_for_completed(
                 return False
         return True
 
+    def get_all_tasks():
+        url = "dataservice/device/status/tasks"
+        tasks = session.get_data(url)
+        return [process['processId'] for process in tasks['runningTasks']]
+
     def log_exception(self) -> None:
         logger.error("Operation status not achieved in given time")
 
     @retry(
-        wait=wait_fixed(sleep_seconds),
-        stop=stop_after_attempt(int(timeout_seconds / sleep_seconds)),
+        wait=wait_fixed(interval_seconds),
+        stop=stop_after_attempt(int(timeout_seconds / interval_seconds)),
         retry=retry_if_result(check_status),
         retry_error_callback=log_exception,
     )
@@ -106,7 +114,18 @@ def wait_for_completed(
             TaskStatus: TaskStatus instance
         """
         url = f"{action_url}{action_id}"
-        action_data = session.get_data(url)[0]
+        try:
+            action_data = session.get_data(url)[0]
+        except KeyError:
+            tasks_ids = get_all_tasks()
+            if action_id in tasks_ids:
+                sleep(delay_seconds)
+                try:
+                    action_data = session.get_data(url)[0]
+                except KeyError:
+                    raise ValueError(f'task id {action_id} is not registered by vManage.')
+            raise ValueError(f'task id {action_id} is not registered by vManage.')
+
         task = create_dataclass(TaskStatus, action_data)
         logger.debug(
             f"Statuses of action {action_id} is: "
