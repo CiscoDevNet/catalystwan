@@ -15,6 +15,9 @@ aiohttp = "^3.8.1"
 ciscoconfparse = "^1.6.40"
 tenacity = "^8.1.0"
 parameterized = "^0.8.1"
+cattrs = "^22.2.0"
+pydantic = "^1.10.4"
+Jinja2 = "^3.1.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
