@@ -1,9 +1,11 @@
+import json
 import logging
-from typing import List, cast
+from typing import Dict, List, cast
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
+from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.dataclasses import Device, Template
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
@@ -11,6 +13,8 @@ from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.operation_status import OperationStatus
 
 logger = logging.getLogger(__name__)
+
+available_feature_templates: Dict[str, Dict[DeviceModel, FeatureTemplate]] = {}
 
 
 class NotFoundError(Exception):
@@ -34,7 +38,7 @@ class AttachedError(Exception):
         self.message = f"Template: {template} is attached to device."
 
 
-class TemplateAPI:
+class TemplatesAPI:
     def __init__(self, session: vManageSession) -> None:
         self.session = session
 
@@ -215,6 +219,10 @@ class TemplateAPI:
             cli_template = CliTemplate(self.session, device_model, name, description)
             cli_template.config = config
             return cli_template.send_to_device()
+
+    def create_feature_template(self, template: FeatureTemplate) -> None:
+        payload = template.generate_payload()
+        self.session.post("/dataservice/template/feature", json=json.loads(payload))
 
 
 class CliTemplate:
