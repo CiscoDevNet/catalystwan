@@ -59,7 +59,7 @@ def wait_for_completed(
         action_id (str): inspected action id
         timeout_seconds (int): After this time, function will stop requesting action status
         interval_seconds (int): interval between action status requests
-        delay_seconds (int): if Vmanage return empty list, after this time api call would be repeated
+        delay_seconds (int): if Vmanage didn't report task status, after this time api call would be repeated
         exit_statuses (Union[List[OperationStatus], str]): actions statuses that cause stop requesting action status
         exit_statuses_ids (Union[List[OperationStatusId], str]): actions statuses ids
             that cause stop requesting action status id
