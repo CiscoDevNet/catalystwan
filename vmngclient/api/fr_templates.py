@@ -185,13 +185,22 @@ aaa = aaaConfig(
     radius_servers=lrss,
 )
 
-
-vpn_transport = vpnConfig(
-    template_name="vpn_transport_test", template_description="vpn_transport_test", vpn_id=VpnType.VPN_TRANSPORT
+dns1 = Dns(
+    primary="192.168.1.1",
+    secondary="192.168.1.2",
+    primaryv6="2001:db8:bad:cab1:e001::41",
+    secondaryv6="2001:db8:bad:cab1:e001::42",
 )
 
-vpn_managment = vpnConfig(
-    template_name="vpn_managent_test", template_description="vpn_managent_test", vpn_id=VpnType.VPN_MANAGMENT
+mapping1 = Mapping("test_map1", ips=["192.168.2.1"])
+mapping2 = Mapping("test_map2", ips=["192.168.2.2"])
+map = [mapping1, mapping2]
+vpn_transport = vpnConfig(
+    template_name="vpn_transport_test",
+    template_description="vpn_transport_test",
+    vpn_id=VpnType.VPN_TRANSPORT,
+    dns=dns1,
+    mapping=map,
 )
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -207,7 +216,5 @@ session = create_vManageSession(url, username, password, port=port)
 
 # print(prepare(aaa))
 # print(prepare(vpn_transport))
-print(prepare(vpn_managment))
 # print(create_feature_template(FeatureTemplateType.aaa, session, **prepare(aaa)))
 print(create_feature_template(FeatureTemplateType.vpn, session, **prepare(vpn_transport)))
-print(create_feature_template(FeatureTemplateType.vpn, session, **prepare(vpn_managment)))

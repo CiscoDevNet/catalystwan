@@ -10,7 +10,9 @@
         "vipObjectType": "list",
         "vipType": "constant",
         "vipValue": [
-            {{ host.ips }}
+            {% for ip in host.ips%}
+                "{{ ip }}"{% if not loop.last %},{% endif %}
+            {% endfor %}
         ],
         "vipVariableName": "vpn_host_ip"
         },
@@ -18,5 +20,5 @@
         "hostname",
         "ip"
         ]
-    }
+    }{% if not loop.last %},{% endif %}
 {% endfor %}

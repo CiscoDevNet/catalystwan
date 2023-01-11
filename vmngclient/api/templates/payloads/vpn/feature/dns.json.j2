@@ -16,8 +16,9 @@
         "dns-addr",
         "role"
       ]
-    },
+    }
     {% if dns.secondary %}
+      ,
       {
         "role": {
           "vipType": "constant",
@@ -33,9 +34,10 @@
           "dns-addr",
           "role"
         ]
-      },
+      }
     {% endif %}
     {% if dns.primaryv6 %}
+      ,
       {
         "role": {
           "vipType": "constant",
@@ -45,7 +47,7 @@
         },
         "dns-addr": {
           "vipType": "constant",
-          "vipValue": {{ dns.primaryv6 }}",
+          "vipValue": "{{ dns.primaryv6 }}",
           "vipObjectType": "object",
           "ipType": "ipv6"
         },
@@ -53,9 +55,10 @@
           "dns-addr",
           "role"
         ]
-      },
+      }
     {% endif %}
     {% if dns.secondaryv6 %}
+      ,
       {
         "role": {
           "vipType": "constant",
