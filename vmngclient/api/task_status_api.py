@@ -1,4 +1,5 @@
 import logging
+from time import sleep
 from typing import List, cast
 
 from attr import define, field  # type: ignore
@@ -7,7 +8,6 @@ from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # t
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
-from time import sleep
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +94,7 @@ def wait_for_completed(
     def get_all_tasks():
         url = "dataservice/device/action/status/tasks"
         tasks = session.get_json(url)
-        return [process['processId'] for process in tasks['runningTasks']]
+        return [process["processId"] for process in tasks["runningTasks"]]
 
     def log_exception(self) -> None:
         logger.error("Operation status not achieved in given time")
@@ -123,8 +123,8 @@ def wait_for_completed(
                 try:
                     action_data = session.get_data(url)[0]
                 except IndexError:
-                    raise ValueError(f'task id {action_id} is not registered by vManage.')
-            raise ValueError(f'task id {action_id} is not registered by vManage.')
+                    raise ValueError(f"task id {action_id} is not registered by vManage.")
+            raise ValueError(f"task id {action_id} is not registered by vManage.")
 
         task = create_dataclass(TaskStatus, action_data)
         logger.debug(
