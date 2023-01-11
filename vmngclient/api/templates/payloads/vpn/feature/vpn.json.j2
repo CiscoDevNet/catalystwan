@@ -148,10 +148,17 @@
       ]
     },
     "host": {
-      "vipType": "ignore",
-      "vipValue": [
+      {% if mapping %}
+        "vipType": "constant",
+        "vipValue": [
+        {% include 'mapping.json.j2' %}
+        ],
+      {% else %}
+        "vipType": "ignore",
+        "vipValue": [
         
-      ],
+        ],
+      {% endif %}
       "vipObjectType": "tree",
       "vipPrimaryKey": [
         "hostname"
@@ -181,6 +188,9 @@
     "ipv6": {
       
     },
+    {% if dns %}
+      "dns": {% include 'dns.json.j2' %},
+    {% endif %}
     "omp": {
       "advertise": {
         "vipType": "ignore",

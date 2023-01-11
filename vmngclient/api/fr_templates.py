@@ -99,6 +99,22 @@ class vpnConfig:
     vpn_id: VpnType
     tenant_vpn: Optional[int] = field(default=None)
     org_name: Optional[str] = field(default=None)
+    dns: Optional[Dns] = field(default=None)
+    mapping: List[Mapping] = field(factory=list)
+
+
+@define
+class Dns:
+    primary: str
+    secondary: Optional[str] = field(default=None)
+    primaryv6: Optional[str] = field(default=None)
+    secondaryv6: Optional[str] = field(default=None)
+
+
+@define
+class Mapping:
+    name: str
+    ips: List[str] = field(factory=list)
 
 
 def prepare(dataclass: AttrsInstance) -> Dict[str, Any]:
@@ -180,7 +196,7 @@ vpn_managment = vpnConfig(
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-url = "10.29.30.43"
+url = "10.29.30.199"
 
 subdomain = "apple.fruits.com"
 port = 10100
