@@ -9,11 +9,9 @@ templates in vManage.
 
 # Basic FeatureTemplate class
 from vmngclient.api.templates.feature_template import FeatureTemplate
+from vmngclient.api.templates.payloads.aaa.aaa_model import AAAModel
 
 # CEdge Templates
 from vmngclient.api.templates.payloads.tenant.tenant_model import TenantModel
 
-__all__ = [
-    "FeatureTemplate",
-    "TenantModel",
-]
+__all__ = ["FeatureTemplate", "TenantModel", "AAAModel"]
