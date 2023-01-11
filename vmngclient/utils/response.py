@@ -25,7 +25,7 @@ class VManageResponseDebugInfo:
     response: Dict[str, Any]
 
 
-def response_debug(response: Response, headers: bool = False) -> str:
+def response_debug(response: Response, headers: bool = True) -> str:
     request_body = response.request.body
     if isinstance(request_body, bytes) and request_body.isascii():
         request_body = str(request_body, encoding="utf-8")

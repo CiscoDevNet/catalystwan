@@ -3,8 +3,9 @@ from __future__ import annotations
 import logging
 import time
 from enum import Enum, auto
+import pathlib
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Callable
 from urllib.parse import urljoin
 
 from requests import Response, Session
@@ -15,7 +16,9 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fi
 from vmngclient.utils.response import response_debug
 from vmngclient.vmanage_auth import vManageAuth
 
-logger = logging.getLogger(__name__)
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
 
@@ -61,6 +64,7 @@ def create_vManageSession(
         password (str): password
         subdomain: subdomain specifying to which view switch when creating provider as a tenant session,
             works only on provider user mode
+        path (str): file to save logs
 
     Returns:
         Session object
@@ -73,12 +77,13 @@ def create_vManageSession(
         vsession_id = session.get_virtual_session_id(tenant_id)
         session.headers.update({"VSessionId": vsession_id})
     server_info = session.server()
+    session.server_name = server_info.get('server')
 
     try:
         user_mode = UserMode(server_info.get("userMode", "not found"))
     except ValueError:
         user_mode = UserMode.NOT_RECOGNIZED
-        logger.warning(f"Unrecognized user mode is: '{server_info.get('userMode')}'")
+        session.logger.warning(f"Unrecognized user mode is: '{server_info.get('userMode')}'")
 
     try:
         view_mode = ViewMode(server_info.get("viewMode", "not found"))
@@ -90,7 +95,6 @@ def create_vManageSession(
     elif user_mode is UserMode.PROVIDER and not subdomain and view_mode is ViewMode.PROVIDER:
         session.session_type = SessionType.PROVIDER
     elif user_mode is UserMode.PROVIDER and view_mode is ViewMode.TENANT:
-
         session.session_type = SessionType.PROVIDER_AS_TENANT
     elif user_mode is UserMode.TENANT and subdomain:
         raise SessionNotCreatedError(
@@ -99,11 +103,13 @@ def create_vManageSession(
         )
     else:
         session.session_type = SessionType.NOT_DEFINED
-        logger.warning(
+        session.logger.warning(
             f"Session created with {user_mode.value} user mode and {view_mode.value} view mode.\n"
             f"Session type set to not defined"
         )
-    logger.info(f"Logged as {username}. The session type is {session.session_type}")
+    session.logging_hook()
+
+    session.logger.info(f"Logged as {username}. The session type is {session.session_type}")
     return session
 
 
@@ -118,6 +124,7 @@ class vManageSession(Session):
         username: username
         password: password
     """
+    logging_hook: Callable[[vManageSession], Any] = lambda *args: None
 
     def __init__(
         self,
@@ -138,6 +145,8 @@ class vManageSession(Session):
         self.subdomain = subdomain
 
         self.session_type = SessionType.NOT_DEFINED
+        self.server_name = None
+        self.logger = logging.getLogger(__name__)
 
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
@@ -145,13 +154,13 @@ class vManageSession(Session):
     def request(self, method, url, *args, **kwargs) -> Any:
         full_url = self.get_full_url(url)
         response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
-        logger.debug(response_debug(response))
+        self.logger.debug(response_debug(response))
         try:
             response.raise_for_status()
         except HTTPError as error:
-            logger.debug(error)
+            self.logger.debug(error)
             if response.status_code == 403:
-                logger.info(f"User {self.username} is unauthorized for method {method} {full_url}")
+                self.logger.info(f"User {self.username} is unauthorized for method {method} {full_url}")
             else:
                 raise error
         return response
@@ -219,7 +228,7 @@ class vManageSession(Session):
         """
 
         def _log_exception(retry_state):
-            logger.error(f"Cannot reach server, original exception: {retry_state.outcome.exception()}")
+            self.logger.error(f"Cannot reach server, original exception: {retry_state.outcome.exception()}")
             return False
 
         if initial_delay:
