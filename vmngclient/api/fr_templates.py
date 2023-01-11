@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import json
-from enum import Enum, auto
+from enum import Enum
 from typing import Any, Dict, List, Optional
 
+import urllib3
 from attr import define, field
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta
 
 from vmngclient.dataclasses import User
+from vmngclient.session import create_vManageSession
 from vmngclient.utils.creation_tools import AttrsInstance, asdict
 
 
@@ -28,7 +30,6 @@ class Action(Enum):
 
 class VpnType(Enum):
     VPN_TRANSPORT = 0
-    VPN_SERVICE = auto()
     VPN_MANAGMENT = 512
 
 
@@ -95,24 +96,9 @@ class vpnConfig:
     template_name: str
     template_description: str
 
-    vpn_id: int
-    tenant_name: str = field(init=False)
-    tenant_vpn: int = field(init=False)
-    org_name: str = field(init=False)
-
-    def __attrs_post_init__(self):
-        try:
-            VpnType(self.vpn_id)
-        except ValueError:
-            self.tenant_vpn = self.vpn_id
-            self.vpn_id = self.__get_vpn_id()
-            self.org_name = self.__get_org_name()
-
-    def __get_vpn_id(self):
-        return self.vpn_id
-
-    def __get_org_name(self):
-        return self.tenant_name
+    vpn_id: VpnType
+    tenant_vpn: Optional[int] = field(default=None)
+    org_name: Optional[str] = field(default=None)
 
 
 def prepare(dataclass: AttrsInstance) -> Dict[str, Any]:
@@ -123,9 +109,6 @@ def prepare(dataclass: AttrsInstance) -> Dict[str, Any]:
     return d
 
 
-from enum import Enum
-
-
 class FeatureTemplateType(Enum):
     aaa = aaaConfig
     vpn = vpnConfig
@@ -133,13 +116,13 @@ class FeatureTemplateType(Enum):
 
 def create_feature_template(type: FeatureTemplateType, session, **kwargs) -> bool:
     env = Environment(
-        loader=FileSystemLoader("vmngclient\\api\\templates\\payloads\\aaa\\feature\\15.0.0"),
+        loader=FileSystemLoader(f"vmngclient\\api\\templates\\payloads\\{type.name}\\feature"),
         trim_blocks=True,
         lstrip_blocks=True,
         undefined=DebugUndefined,
     )
     env.filters['jsonify'] = json.dumps
-    template = env.get_template('aaa.json.j2')
+    template = env.get_template(f'{type.name}.json.j2')
     output = template.render(kwargs)
 
     ast = env.parse(output)
@@ -187,13 +170,17 @@ aaa = aaaConfig(
 )
 
 
-import urllib3
+vpn_transport = vpnConfig(
+    template_name="vpn_transport_test", template_description="vpn_transport_test", vpn_id=VpnType.VPN_TRANSPORT
+)
 
-from vmngclient.session import create_vManageSession
+vpn_managment = vpnConfig(
+    template_name="vpn_managent_test", template_description="vpn_managent_test", vpn_id=VpnType.VPN_MANAGMENT
+)
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-url = "10.29.30.199"
+url = "10.29.30.43"
 
 subdomain = "apple.fruits.com"
 port = 10100
@@ -202,5 +189,9 @@ password = "Cisco#123@Viptela"
 
 session = create_vManageSession(url, username, password, port=port)
 
-print(prepare(aaa))
-print(create_feature_template(FeatureTemplateType.aaa, session, **prepare(aaa)))
+# print(prepare(aaa))
+# print(prepare(vpn_transport))
+print(prepare(vpn_managment))
+# print(create_feature_template(FeatureTemplateType.aaa, session, **prepare(aaa)))
+print(create_feature_template(FeatureTemplateType.vpn, session, **prepare(vpn_transport)))
+print(create_feature_template(FeatureTemplateType.vpn, session, **prepare(vpn_managment)))
