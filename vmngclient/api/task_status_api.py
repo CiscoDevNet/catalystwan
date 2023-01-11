@@ -123,7 +123,10 @@ def wait_for_completed(
                 try:
                     action_data = session.get_data(url)[0]
                 except IndexError:
-                    raise IndexError(f"task id {action_id} registered by vManage in all tasks list, but response about its status didn't contain any information.")
+                    raise IndexError(
+                        f"task id {action_id} registered by vManage in all tasks list"
+                        f"but response about its status didn't contain any information."
+                    )
             raise ValueError(f"task id {action_id} is not registered by vManage.")
 
         task = create_dataclass(TaskStatus, action_data)
