@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from enum import Enum
+from pathlib import Path
 from typing import List, Optional
 
 from attr import define, field  # type: ignore
 
+from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.dataclasses import User
 
 
@@ -62,25 +64,28 @@ class AuthTask:
     default_action: Action = field(default=Action.ACCEPT)
 
 
-@define
-class AAAModel:
-    template_name: str
-    template_description: str
+class AAAModel(FeatureTemplate):
+    payload_path: Path = Path(__file__).parent / "feature" / "aaa.json.j2"
+    # template_name: str
+    # template_description: str
 
     auth_order: List[AuthenticationOrder]
     auth_fallback: bool
     auth_disable_audit_logs: bool
     auth_admin_order: bool
     auth_disable_netconf_logs: bool
-    auth_radius_servers: List[str] = field(factory=list)
+    auth_radius_servers: List[str] = []
 
-    local_users: List[User] = field(factory=list)
+    local_users: List[User] = []
 
-    accounting: bool = field(default=True)
+    accounting: bool = True
 
-    tacacs_authentication: TacacsAuthenticationMethod = field(default=TacacsAuthenticationMethod.PAP)
-    tacacs_timeout: int = field(default=5)
-    tacacs_servers: List[TacacsServer] = field(factory=list)
-    radius_retransmit: int = field(default=3)
-    radius_timeout: int = field(default=5)
-    radius_servers: List[RadiusServer] = field(factory=list)
+    tacacs_authentication: TacacsAuthenticationMethod = TacacsAuthenticationMethod.PAP
+    tacacs_timeout: int = 5
+    tacacs_servers: List[TacacsServer] = []
+    radius_retransmit: int = 3
+    radius_timeout: int = 5
+    radius_servers: List[RadiusServer] = []
+
+    class Config:
+        arbitrary_types_allowed = True
