@@ -1,6 +1,6 @@
 {
-  "templateName": "{{ template_name }}",
-  "templateDescription": "{{ template_description }}",
+  "templateName": "{{ name }}",
+  "templateDescription": "{{ description }}",
   "templateType": "aaa",
   "deviceType": [
     "vedge-cloud"
@@ -33,26 +33,26 @@
       "auth-fallback": {
         "vipObjectType": "object",
         "vipType": "constant",
-        "vipValue": "{{ auth_fallback }}",
+        "vipValue": "{{ auth_fallback | tojson}}",
         "vipVariableName": "auth_fallback"
       },
       "admin-auth-order": {
         "vipObjectType": "object",
         "vipType": "constant",
-        "vipValue": "{{ auth_admin_order }}",
+        "vipValue": "{{ auth_admin_order | tojson}}",
         "vipVariableName": "admin_auth_order"
       },
       "logs": {
         "audit-disable": {
           "vipObjectType": "object",
           "vipType": "constant",
-          "vipValue": "{{ auth_disable_audit_logs }}",
+          "vipValue": "{{ auth_disable_audit_logs | tojson}}",
           "vipVariableName": "disable_audit_logs"
         },
         "netconf-disable": {
           "vipObjectType": "object",
           "vipType": "constant",
-          "vipValue": "{{ auth_disable_netconf_logs }}",
+          "vipValue": "{{ auth_disable_netconf_logs | tojson}}",
           "vipVariableName": "disable_netconf_logs"
         }
       },
