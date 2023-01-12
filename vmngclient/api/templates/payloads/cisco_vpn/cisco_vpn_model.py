@@ -23,8 +23,8 @@ class DNS:
     secondaryv6: Optional[str] = None
 
 
-class VPNModel(FeatureTemplate):
-    payload_path: Path = Path(__file__).parent / "feature/vpn.json.j2"
+class CiscoVPNModel(FeatureTemplate):
+    payload_path: Path = Path(__file__).parent / "feature/cisco_vpn.json.j2"
     id: int
     tenant_vpn: Optional[int] = None
     tenant_org_name: Optional[str] = None

@@ -13,10 +13,10 @@ from vmngclient.api.templates.feature_template import FeatureTemplate
 # AAA Templates
 from vmngclient.api.templates.payloads.aaa.aaa_model import AAAModel
 
+# Cisco VPN Templates
+from vmngclient.api.templates.payloads.cisco_vpn.cisco_vpn_model import DNS, CiscoVPNModel, Mapping
+
 # CEdge Templates
 from vmngclient.api.templates.payloads.tenant.tenant_model import TenantModel
 
-# VPN Templates
-from vmngclient.api.templates.payloads.vpn.vpn_model import DNS, Mapping, VPNModel
-
-__all__ = ["FeatureTemplate", "TenantModel", "AAAModel", "VPNModel", "DNS", "Mapping"]
+__all__ = ["FeatureTemplate", "TenantModel", "AAAModel", "CiscoVPNModel", "DNS", "Mapping"]

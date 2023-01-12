@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional
 import urllib3
 from attr import define, field
 
-from vmngclient.api.templates import DNS, Mapping, VPNModel
+from vmngclient.api.templates import DNS, CiscoVPNModel, Mapping
 from vmngclient.dataclasses import User
 from vmngclient.session import create_vManageSession
 from vmngclient.utils.creation_tools import AttrsInstance, asdict
@@ -91,32 +91,6 @@ class aaaConfig:
     radius_servers: List[RadiusServer] = field(factory=list)
 
 
-# @define
-# class vpnConfig:
-#     template_name: str
-#     template_description: str
-
-#     vpn_id: VpnType
-#     tenant_vpn: Optional[int] = field(default=None)
-#     org_name: Optional[str] = field(default=None)
-#     dns: Optional[Dns] = field(default=None)
-#     mapping: List[Mapping] = field(factory=list)
-
-
-# @define
-# class Dns:
-#     primary: str
-#     secondary: Optional[str] = field(default=None)
-#     primaryv6: Optional[str] = field(default=None)
-#     secondaryv6: Optional[str] = field(default=None)
-
-
-# @define
-# class Mapping:
-#     name: str
-#     ips: List[str] = field(factory=list)
-
-
 def prepare(dataclass: AttrsInstance) -> Dict[str, Any]:
     d = asdict(dataclass)
     for key, value in d.items():
@@ -127,7 +101,7 @@ def prepare(dataclass: AttrsInstance) -> Dict[str, Any]:
 
 class FeatureTemplateType(Enum):
     aaa = aaaConfig
-    vpn = VPNModel
+    vpn = CiscoVPNModel
 
 
 def create_feature_template(output, session, **kwargs) -> bool:
@@ -181,7 +155,7 @@ dns1 = DNS(
 mapping1 = Mapping("test_map1", ips=["192.168.2.1"])
 mapping2 = Mapping("test_map2", ips=["192.168.2.2"])
 map = [mapping1, mapping2]
-vpn_transport = VPNModel(name="vpn_transport_test", description="vpn_transport_test", id=0, dns=dns1, mapping=map)
+vpn_transport = CiscoVPNModel(name="vpn_transport_test", description="vpn_transport_test", id=0, dns=dns1, mapping=map)
 print(vpn_transport)
 payload = vpn_transport.generate_payload()
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
