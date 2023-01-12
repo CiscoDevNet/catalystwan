@@ -4,7 +4,7 @@ import logging
 import time
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union, ClassVar
 from urllib.parse import urljoin
 
 from requests import Response, Session
@@ -120,7 +120,7 @@ class vManageSession(Session):
         password: password
     """
 
-    on_session_create_hook: Callable[[vManageSession], Any] = lambda *args: None
+    on_session_create_hook: ClassVar[Callable[[vManageSession], Any]] = lambda *args: None
 
     def __init__(
         self,
