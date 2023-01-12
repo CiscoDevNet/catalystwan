@@ -1,6 +1,6 @@
 {
-  "templateName": "{{ template_name }}",
-  "templateDescription": "{{ template_description }}",
+  "templateName": "{{ name }}",
+  "templateDescription": "{{ description }}",
   "templateType": "cisco_vpn",
   "deviceType": [
     "vedge-C8000V"
@@ -10,7 +10,7 @@
     "vpn-id": {
       "vipObjectType": "object",
       "vipType": "constant",
-      "vipValue": {{ vpn_id.value }}
+      "vipValue": {{ id }}
     },
     "name": {
       "vipObjectType": "object",
@@ -46,16 +46,16 @@
         }
       }
     },
-    {% if vpn_id.value != 0 and vpn_id.value != 512 %}
+    {% if id != 0 and id != 512 %}
       "tenant-vpn-id": {
         "vipObjectType": "object",
         "vipType": "constant",
-        "vipValue": {{tenant_vpn}}
+        "vipValue": {{ tenant_vpn }}
       },
       "org-name": {
         "vipObjectType": "object",
         "vipType": "constant",
-        "vipValue": {{org_name}}
+        "vipValue": {{ tenant_org_name }}
       },
     {% endif %}
     "omp-admin-distance-ipv4": {

@@ -6,8 +6,8 @@ from typing import Any, Dict, List, Optional
 
 import urllib3
 from attr import define, field
-from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta
 
+from vmngclient.api.templates import DNS, Mapping, VPNModel
 from vmngclient.dataclasses import User
 from vmngclient.session import create_vManageSession
 from vmngclient.utils.creation_tools import AttrsInstance, asdict
@@ -91,30 +91,30 @@ class aaaConfig:
     radius_servers: List[RadiusServer] = field(factory=list)
 
 
-@define
-class vpnConfig:
-    template_name: str
-    template_description: str
+# @define
+# class vpnConfig:
+#     template_name: str
+#     template_description: str
 
-    vpn_id: VpnType
-    tenant_vpn: Optional[int] = field(default=None)
-    org_name: Optional[str] = field(default=None)
-    dns: Optional[Dns] = field(default=None)
-    mapping: List[Mapping] = field(factory=list)
-
-
-@define
-class Dns:
-    primary: str
-    secondary: Optional[str] = field(default=None)
-    primaryv6: Optional[str] = field(default=None)
-    secondaryv6: Optional[str] = field(default=None)
+#     vpn_id: VpnType
+#     tenant_vpn: Optional[int] = field(default=None)
+#     org_name: Optional[str] = field(default=None)
+#     dns: Optional[Dns] = field(default=None)
+#     mapping: List[Mapping] = field(factory=list)
 
 
-@define
-class Mapping:
-    name: str
-    ips: List[str] = field(factory=list)
+# @define
+# class Dns:
+#     primary: str
+#     secondary: Optional[str] = field(default=None)
+#     primaryv6: Optional[str] = field(default=None)
+#     secondaryv6: Optional[str] = field(default=None)
+
+
+# @define
+# class Mapping:
+#     name: str
+#     ips: List[str] = field(factory=list)
 
 
 def prepare(dataclass: AttrsInstance) -> Dict[str, Any]:
@@ -127,25 +127,11 @@ def prepare(dataclass: AttrsInstance) -> Dict[str, Any]:
 
 class FeatureTemplateType(Enum):
     aaa = aaaConfig
-    vpn = vpnConfig
+    vpn = VPNModel
 
 
-def create_feature_template(type: FeatureTemplateType, session, **kwargs) -> bool:
-    env = Environment(
-        loader=FileSystemLoader(f"vmngclient\\api\\templates\\payloads\\{type.name}\\feature"),
-        trim_blocks=True,
-        lstrip_blocks=True,
-        undefined=DebugUndefined,
-    )
-    env.filters['jsonify'] = json.dumps
-    template = env.get_template(f'{type.name}.json.j2')
-    output = template.render(kwargs)
+def create_feature_template(output, session, **kwargs) -> bool:
 
-    ast = env.parse(output)
-    if meta.find_undeclared_variables(ast):
-        print(meta.find_undeclared_variables(ast))
-        raise Exception
-    # print(output)
     config = json.loads(output)
     r = session.post("/dataservice/template/feature", json=config)
     return r.content
@@ -185,7 +171,7 @@ aaa = aaaConfig(
     radius_servers=lrss,
 )
 
-dns1 = Dns(
+dns1 = DNS(
     primary="192.168.1.1",
     secondary="192.168.1.2",
     primaryv6="2001:db8:bad:cab1:e001::41",
@@ -195,14 +181,9 @@ dns1 = Dns(
 mapping1 = Mapping("test_map1", ips=["192.168.2.1"])
 mapping2 = Mapping("test_map2", ips=["192.168.2.2"])
 map = [mapping1, mapping2]
-vpn_transport = vpnConfig(
-    template_name="vpn_transport_test",
-    template_description="vpn_transport_test",
-    vpn_id=VpnType.VPN_TRANSPORT,
-    dns=dns1,
-    mapping=map,
-)
-
+vpn_transport = VPNModel(name="vpn_transport_test", description="vpn_transport_test", id=0, dns=dns1, mapping=map)
+print(vpn_transport)
+payload = vpn_transport.generate_payload()
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 url = "10.29.30.199"
@@ -217,4 +198,5 @@ session = create_vManageSession(url, username, password, port=port)
 # print(prepare(aaa))
 # print(prepare(vpn_transport))
 # print(create_feature_template(FeatureTemplateType.aaa, session, **prepare(aaa)))
-print(create_feature_template(FeatureTemplateType.vpn, session, **prepare(vpn_transport)))
+print()
+print(create_feature_template(payload, session))
