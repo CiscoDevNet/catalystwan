@@ -1,0 +1,37 @@
+{
+    "templateName": "{{ name }}",
+    "templateDescription": "{{ description }}",
+    "templateType": "tenant",
+    "deviceType": [
+        "vedge-C8000V"
+    ],
+    "templateMinVersion": "15.0.0",
+    "templateDefinition": {
+        "tenant": {
+            "vipType": {% if tenants %}"constant"{% else %}"ignore"{% endif %},
+            "vipValue": [
+                {% for tenant in tenants %}{
+                            "org-name": {
+                                "vipObjectType": "object",
+                                "vipType": "constant",
+                                "vipValue": "{{ tenant.organization_name }}",
+                                "vipVariableName": "tenantOrgName_login"
+                            },
+                            "tier": {
+                                "tier-name": {
+                                    "vipObjectType": "object",
+                                    "vipType": "constant",
+                                    "vipValue": "{{ tenant.name }}"
+                                }
+                            }
+                        }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            "vipObjectType": "tree",
+            "vipPrimaryKey": [
+                "org-name"
+            ]
+        }
+    },
+    "factoryDefault": false
+}
