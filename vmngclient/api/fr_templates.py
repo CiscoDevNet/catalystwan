@@ -155,9 +155,9 @@ dns1 = DNS(
 mapping1 = Mapping("test_map1", ips=["192.168.2.1"])
 mapping2 = Mapping("test_map2", ips=["192.168.2.2"])
 map = [mapping1, mapping2]
-vpn_transport = CiscoVPNModel(name="vpn_transport_test", description="vpn_transport_test", id=0, dns=dns1, mapping=map)
-print(vpn_transport)
-payload = vpn_transport.generate_payload()
+# vpn_transport = CiscoVPNModel(name="vpn_transport_test", description="vpn_transport_test", vpn_id=1, dns=dns1, mapping=map, tenant_org_name='d')
+# print(vpn_transport)
+# payload = vpn_transport.generate_payload()
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 url = "10.29.30.199"
@@ -172,5 +172,16 @@ session = create_vManageSession(url, username, password, port=port)
 # print(prepare(aaa))
 # print(prepare(vpn_transport))
 # print(create_feature_template(FeatureTemplateType.aaa, session, **prepare(aaa)))
-print()
+# print(create_feature_template(payload, session))
+
+org_name = "vIPtela Inc Regression-Apple Inc"
+vpn_transport = CiscoVPNModel(
+    name="vpn_transport_test",
+    description="vpn_transport_test",
+    vpn_id=0,
+    dns=dns1,
+    mapping=map,
+    tenant_org_name=org_name,
+)
+payload = vpn_transport.generate_payload()
 print(create_feature_template(payload, session))

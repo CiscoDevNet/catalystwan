@@ -10,7 +10,7 @@
     "vpn-id": {
       "vipObjectType": "object",
       "vipType": "constant",
-      "vipValue": {{ id }}
+      "vipValue": {{ vpn_id }}
     },
     "name": {
       "vipObjectType": "object",
@@ -46,7 +46,7 @@
         }
       }
     },
-    {% if id != 0 and id != 512 %}
+    {% if vpn_id != 0 and vpn_id != 512 %}
       "tenant-vpn-id": {
         "vipObjectType": "object",
         "vipType": "constant",
@@ -55,7 +55,7 @@
       "org-name": {
         "vipObjectType": "object",
         "vipType": "constant",
-        "vipValue": {{ tenant_org_name }}
+        "vipValue": "{{ tenant_org_name }}"
       },
     {% endif %}
     "omp-admin-distance-ipv4": {
