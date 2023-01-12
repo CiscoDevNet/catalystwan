@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 import time
 from enum import Enum, auto
-import pathlib
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, Callable
 from urllib.parse import urljoin
@@ -61,7 +60,6 @@ def create_vManageSession(
         password (str): password
         subdomain: subdomain specifying to which view switch when creating provider as a tenant session,
             works only on provider user mode
-        path (str): file to save logs
 
     Returns:
         Session object
@@ -69,7 +67,6 @@ def create_vManageSession(
     """
     session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
-    session.on_session_create_hook()
 
     if subdomain:
         tenant_id = session.get_tenant_id()
@@ -77,6 +74,7 @@ def create_vManageSession(
         session.headers.update({"VSessionId": vsession_id})
     server_info = session.server()
     session.server_name = server_info.get('server')
+    session.on_session_create_hook()
 
     try:
         user_mode = UserMode(server_info.get("userMode", "not found"))
