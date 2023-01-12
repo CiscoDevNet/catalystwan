@@ -26,7 +26,6 @@ class TestPacketCaptureApi(unittest.TestCase):
 
     @patch("vmngclient.session.vManageSession")
     def test_get_status(self, mock_session):
-
         # Arrange
         mock_session.get_json.return_value = self.status_response
         # Act
@@ -36,7 +35,6 @@ class TestPacketCaptureApi(unittest.TestCase):
 
     @patch("vmngclient.session.vManageSession")
     def test_download_capture_session(self, mock_session):
-
         # Act
         answer = PacketCaptureAPI(mock_session).download_capture_session(self.packet_setup, self.device)
         # Assert
@@ -44,7 +42,6 @@ class TestPacketCaptureApi(unittest.TestCase):
 
     @patch("vmngclient.session.vManageSession")
     def test_get_interface_name(self, mock_session):
-
         # Arrange
         interface_response = {"data": [{"ifname": "GE01"}]}
         mock_session.get_json.return_value = interface_response
@@ -55,7 +52,6 @@ class TestPacketCaptureApi(unittest.TestCase):
 
     @patch("vmngclient.session.vManageSession")
     def test_start_stop(self, mock_session):
-
         # Arrange
         mock_session.get_json.return_value = None
         packet_capture = PacketCaptureAPI(mock_session)
@@ -70,7 +66,6 @@ class TestPacketCaptureApi(unittest.TestCase):
     @patch.object(PacketCaptureAPI, "get_status")
     @patch("vmngclient.session.vManageSession")
     def test_channel(self, mock_session, mock_get_status, mock_download):
-
         # Arrange
         device_capture_response = {"sessionId": "id", "isNewSession": True}
         mock_session.post.return_value.json.return_value = device_capture_response
@@ -83,7 +78,6 @@ class TestPacketCaptureApi(unittest.TestCase):
 
     @patch("vmngclient.session.vManageSession")
     def test_channel_raise_error(self, mock_session):
-
         # Arrange
         device_capture_response = {"sessionId": "id", "isNewSession": False}
         mock_session.post.return_value.json.return_value = device_capture_response
@@ -99,7 +93,6 @@ class TestPacketCaptureApi(unittest.TestCase):
     @patch.object(DeviceStateAPI, "enable_data_stream")
     @patch("vmngclient.session.vManageSession")
     def test_get_packets(self, mock_session, mock_enable, mock_channel, mock_start_stop):
-
         # Arrange
         mock_enable.return_value.__enter__.return_value = None
         mock_channel.return_value.__enter__.return_value = None
@@ -116,7 +109,6 @@ class TestPacketCaptureApi(unittest.TestCase):
     @patch.object(DeviceStateAPI, "enable_data_stream")
     @patch("vmngclient.session.vManageSession")
     def test_get_packets_handle_permission_error(self, mock_session, mock_enable, mock_channel, mock_start_stop):
-
         # Arrange
         mock_enable.return_value.__enter__.return_value = None
         mock_channel.return_value.__enter__.side_effect = PermissionError()
