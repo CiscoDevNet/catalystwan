@@ -3,10 +3,10 @@ from unittest.mock import MagicMock, Mock, patch
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
 
+from vmngclient.api.task_status_api import TaskStatus
 from vmngclient.api.templates import AttachedError, NameAlreadyExistError, NotFoundError, TemplateAPI
 from vmngclient.dataclasses import Device, Template
 from vmngclient.utils.creation_tools import create_dataclass
-from vmngclient.utils.operation_status import OperationStatus
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
 
@@ -58,6 +58,7 @@ class TestTemplateAPI(unittest.TestCase):
             model="vedge-cloud",
             status="normal",
         )
+        self.task = TaskStatus("Success", "success", [])
 
     @patch("vmngclient.session.vManageSession")
     def test_templates_success(self, mock_session):
@@ -150,50 +151,10 @@ class TestTemplateAPI(unittest.TestCase):
         # Assert
         self.assertRaises(NotFoundError, answer)
 
-    @patch.object(TemplateAPI, "get_operation_status")
-    def test_wait_for_complete_true(self, mock_operation):
-
-        # Arrage
-        MockOperatrion = Mock()
-        mock_operation.return_value = MockOperatrion
-        session = Mock()
-        test_object = TemplateAPI(session)
-        test_object.get_operation_status.return_value = [
-            OperationStatus.SUCCESS,
-            OperationStatus.SUCCESS,
-        ]
-        operation_id = "operation_id"
-
-        # Act
-        answer = test_object.wait_for_complete(operation_id)
-
-        # Assert
-        self.assertTrue(answer)
-
-    @patch.object(TemplateAPI, "get_operation_status")
-    def test_wait_for_complete_false(self, mock_operation):
-
-        # Arrage
-        MockOperatrion = Mock()
-        mock_operation.return_value = MockOperatrion
-        session = Mock()
-        test_object = TemplateAPI(session)
-        test_object.get_operation_status.return_value = [
-            OperationStatus.IN_PROGRESS,
-            OperationStatus.SUCCESS,
-        ]
-        operation_id = "operation_id"
-
-        # Act
-        answer = test_object.wait_for_complete(operation_id, timeout_seconds=2, sleep_seconds=1)
-
-        # Assert
-        self.assertFalse(answer)
-
-    @patch("vmngclient.session.vManageSession")
     @patch.object(TemplateAPI, "templates")
-    @patch.object(TemplateAPI, "wait_for_complete")
-    def test_attach_exist_template(self, mock_session, mock_wait_for_complete, mock_templates):
+    @patch("vmngclient.api.templates.wait_for_completed")
+    @patch("vmngclient.session.vManageSession")
+    def test_attach_exist_template(self, mock_session, mock_wait_for_completed, mock_templates):
 
         # Arrage
         mock_session.post_json.return_value = {"id": "operation_id"}
@@ -205,9 +166,7 @@ class TestTemplateAPI(unittest.TestCase):
         test_object.templates = self.templates
 
         # mock wait complete
-        MockWaitComplete = Mock()
-        mock_wait_for_complete.return_value = MockWaitComplete
-        test_object.wait_for_complete.return_value = True
+        mock_wait_for_completed.return_value = self.task
 
         # Act
         answer = test_object.attach("template_1", self.device_info)
@@ -215,10 +174,10 @@ class TestTemplateAPI(unittest.TestCase):
         # Assert
         self.assertTrue(answer)
 
-    @patch("vmngclient.session.vManageSession")
     @patch.object(TemplateAPI, "templates")
-    @patch.object(TemplateAPI, "wait_for_complete")
-    def test_attach_no_exist_template(self, mock_session, mock_wait_for_complete, mock_templates):
+    @patch("vmngclient.api.templates.wait_for_completed")
+    @patch("vmngclient.session.vManageSession")
+    def test_attach_no_exist_template(self, mock_session, mock_wait_for_completed, mock_templates):
 
         # Arrage
         mock_session.post_json.return_value = {"id": "operation_id"}
@@ -230,9 +189,7 @@ class TestTemplateAPI(unittest.TestCase):
         test_object.templates = self.templates
 
         # mock wait complete
-        MockWaitComplete = Mock()
-        mock_wait_for_complete.return_value = MockWaitComplete
-        test_object.wait_for_complete.return_value = True
+        mock_wait_for_completed.return_value = self.task
 
         # Act
         answer = test_object.attach("no_exist_template", self.device_info)
@@ -240,18 +197,16 @@ class TestTemplateAPI(unittest.TestCase):
         # Assert
         self.assertFalse(answer)
 
+    @patch("vmngclient.api.templates.wait_for_completed")
     @patch("vmngclient.session.vManageSession")
-    @patch.object(TemplateAPI, "wait_for_complete")
-    def test_device_to_cli_true(self, mock_session, mock_wait_for_complete):
+    def test_device_to_cli_true(self, mock_session, mock_wait_for_completed):
 
         # Arrage
         mock_session.post_json.return_value = {"id": "operation_id"}
         test_object = TemplateAPI(mock_session)
 
         # mock wait complete
-        MockWaitComplete = Mock()
-        mock_wait_for_complete.return_value = MockWaitComplete
-        test_object.wait_for_complete.return_value = True
+        mock_wait_for_completed.return_value = self.task
 
         # Act
         answer = test_object.device_to_cli(self.device_info)
@@ -259,49 +214,8 @@ class TestTemplateAPI(unittest.TestCase):
         # Assert
         self.assertTrue(answer)
 
-    @patch("vmngclient.session.vManageSession")
-    def test_get_operatrion_status_success(self, mock_session):
-
-        # Arrage
-        mock_session.get_data.return_value = [
-            {"status": "In progress"},
-            {"status": "Failure"},
-            {"status": "Success"},
-            {"status": "Scheduled"},
-        ]
-        test_object = TemplateAPI(mock_session)
-        operation_id = "dummy_id"
-
-        # Act
-        answer = test_object.get_operation_status(operation_id)
-
-        # Assert
-        self.assertEqual(
-            answer,
-            [
-                OperationStatus.IN_PROGRESS,
-                OperationStatus.FAILURE,
-                OperationStatus.SUCCESS,
-                OperationStatus.SCHEDULED,
-            ],
-        )
-
-    @patch("vmngclient.session.vManageSession")
-    def test_get_operatrion_status_no_data(self, mock_session):
-
-        # Arrage
-        mock_session.get_data.return_value = []
-        test_object = TemplateAPI(mock_session)
-        operation_id = "dummy_id"
-
-        # Act
-        answer = test_object.get_operation_status(operation_id)
-
-        # Assert
-        self.assertEqual(answer, [])
-
-    @patch("vmngclient.session.vManageSession")
     @patch.object(TemplateAPI, "templates")
+    @patch("vmngclient.session.vManageSession")
     def test_delete_success(self, mock_session, mock_templates):
 
         # Arrage
@@ -320,8 +234,8 @@ class TestTemplateAPI(unittest.TestCase):
         # Assert
         self.assertTrue(answer)
 
-    @patch("vmngclient.session.vManageSession")
     @patch.object(TemplateAPI, "templates")
+    @patch("vmngclient.session.vManageSession")
     def test_delete_wrong_status(self, mock_session, mock_templates):
 
         # Arrage
@@ -341,8 +255,8 @@ class TestTemplateAPI(unittest.TestCase):
         # Assert
         self.assertFalse(answer)
 
-    @patch("vmngclient.session.vManageSession")
     @patch.object(TemplateAPI, "templates")
+    @patch("vmngclient.session.vManageSession")
     def test_delete_exception(self, mock_session, mock_templates):
 
         # Arrage
@@ -363,8 +277,8 @@ class TestTemplateAPI(unittest.TestCase):
         # Assert
         self.assertRaises(AttachedError, answer)
 
-    @patch("vmngclient.session.vManageSession")
     @patch.object(TemplateAPI, "templates")
+    @patch("vmngclient.session.vManageSession")
     def test_create_exception(self, mock_session, mock_templates):
 
         # Arrage
