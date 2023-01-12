@@ -4,7 +4,7 @@ import logging
 import time
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Union, ClassVar
+from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
 from urllib.parse import urljoin
 
 from requests import Response, Session
