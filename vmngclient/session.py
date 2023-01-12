@@ -16,9 +16,6 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fi
 from vmngclient.utils.response import response_debug
 from vmngclient.vmanage_auth import vManageAuth
 
-import urllib3
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
 
@@ -72,6 +69,8 @@ def create_vManageSession(
     """
     session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
+    session.on_session_create_hook()
+
     if subdomain:
         tenant_id = session.get_tenant_id()
         vsession_id = session.get_virtual_session_id(tenant_id)
@@ -89,7 +88,7 @@ def create_vManageSession(
         view_mode = ViewMode(server_info.get("viewMode", "not found"))
     except ValueError:
         view_mode = ViewMode.NOT_RECOGNIZED
-        logger.warning(f"Unrecognized user mode is: '{server_info.get('viewMode')}'")
+        session.logger.warning(f"Unrecognized user mode is: '{server_info.get('viewMode')}'")
     if user_mode is UserMode.TENANT and not subdomain and view_mode is ViewMode.TENANT:
         session.session_type = SessionType.TENANT
     elif user_mode is UserMode.PROVIDER and not subdomain and view_mode is ViewMode.PROVIDER:
@@ -107,7 +106,6 @@ def create_vManageSession(
             f"Session created with {user_mode.value} user mode and {view_mode.value} view mode.\n"
             f"Session type set to not defined"
         )
-    session.logging_hook()
 
     session.logger.info(f"Logged as {username}. The session type is {session.session_type}")
     return session
@@ -124,7 +122,7 @@ class vManageSession(Session):
         username: username
         password: password
     """
-    logging_hook: Callable[[vManageSession], Any] = lambda *args: None
+    on_session_create_hook: Callable[[vManageSession], Any] = lambda *args: None
 
     def __init__(
         self,
