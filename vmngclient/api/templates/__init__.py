@@ -14,9 +14,26 @@ from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.api.templates.payloads.aaa.aaa_model import AAAModel
 
 # Cisco VPN Templates
-from vmngclient.api.templates.payloads.cisco_vpn.cisco_vpn_model import DNS, CiscoVPNModel, Mapping
+from vmngclient.api.templates.payloads.cisco_vpn.cisco_vpn_model import (
+    DNS,
+    CiscoVPNModel,
+    GatewayType,
+    IPv4Route,
+    Mapping,
+    NextHop,
+)
 
 # CEdge Templates
 from vmngclient.api.templates.payloads.tenant.tenant_model import TenantModel
 
-__all__ = ["FeatureTemplate", "TenantModel", "AAAModel", "CiscoVPNModel", "DNS", "Mapping"]
+__all__ = [
+    "FeatureTemplate",
+    "TenantModel",
+    "AAAModel",
+    "CiscoVPNModel",
+    "DNS",
+    "Mapping",
+    "IPv4Route",
+    "GatewayType",
+    "NextHop",
+]

@@ -181,9 +181,13 @@
       "ipsec-route": {
         
       },
+      {% if ipv4route %}
+        "route": {% include 'ipv4route.json.j2' %},
+      {% endif %}
       "service-route": {
         
       }
+      
     },
     "ipv6": {
       

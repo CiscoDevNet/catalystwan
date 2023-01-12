@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional
 import urllib3
 from attr import define, field
 
-from vmngclient.api.templates import DNS, CiscoVPNModel, Mapping
+from vmngclient.api.templates import DNS, CiscoVPNModel, GatewayType, IPv4Route, Mapping, NextHop
 from vmngclient.dataclasses import User
 from vmngclient.session import create_vManageSession
 from vmngclient.utils.creation_tools import AttrsInstance, asdict
@@ -174,14 +174,35 @@ session = create_vManageSession(url, username, password, port=port)
 # print(create_feature_template(FeatureTemplateType.aaa, session, **prepare(aaa)))
 # print(create_feature_template(payload, session))
 
+### EXAMPLTE ###
+
+
+hop = NextHop(address="172.16.15.1")
+
+route = IPv4Route(prefix="192.168.15.0/25", gateway=GatewayType.NEXT_HOP, next_hop=[hop])
+
+dns1 = DNS(
+    primary="192.168.1.1",
+    secondary="192.168.1.2",
+    primaryv6="2001:db8:bad:cab1:e001::41",
+    secondaryv6="2001:db8:bad:cab1:e001::42",
+)
+
+mapping1 = Mapping("test_map1", ips=["192.168.2.1"])
+mapping2 = Mapping("test_map2", ips=["192.168.2.2"])
+map = [mapping1, mapping2]
+
 org_name = "vIPtela Inc Regression-Apple Inc"
+
 vpn_transport = CiscoVPNModel(
     name="vpn_transport_test",
     description="vpn_transport_test",
-    vpn_id=0,
-    dns=dns1,
-    mapping=map,
+    vpn_id=1,
     tenant_org_name=org_name,
+    mapping=map,
+    ipv4route=[route],
+    dns=dns1,
 )
-payload = vpn_transport.generate_payload()
-print(create_feature_template(payload, session))
+
+payload = vpn_transport.generate_payload(session)
+create_feature_template(payload, session)

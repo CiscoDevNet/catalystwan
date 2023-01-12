@@ -1,6 +1,7 @@
 # vipType: ignore
 from __future__ import annotations
 
+from enum import Enum
 from pathlib import Path
 from typing import List, Optional
 
@@ -9,6 +10,13 @@ from pydantic import validator
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.session import vManageSession
+
+
+class GatewayType(Enum):
+    NEXT_HOP = "next-hop"
+    NULL_0 = "null0"
+    VPN = "vpn"
+    DHCP = "dhcp"
 
 
 @define
@@ -25,6 +33,20 @@ class DNS:
     secondaryv6: Optional[str] = None
 
 
+@define
+class NextHop:
+    address: str
+    distance: int = 1
+    en_distance: bool = False
+
+
+@define
+class IPv4Route:
+    prefix: str
+    next_hop: list[NextHop]
+    gateway: GatewayType = field(default=GatewayType.NEXT_HOP)
+
+
 class CiscoVPNModel(FeatureTemplate):
     payload_path: Path = Path(__file__).parent / "feature/cisco_vpn.json.j2"
     tenant_vpn: Optional[int]
@@ -32,6 +54,7 @@ class CiscoVPNModel(FeatureTemplate):
     vpn_id: int
     dns: Optional[DNS] = None
     mapping: List[Mapping] = []
+    ipv4route: List[IPv4Route] = None
 
     @validator('vpn_id')
     def check_id(cls, v, values):
