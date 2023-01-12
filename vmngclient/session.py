@@ -4,7 +4,7 @@ import logging
 import time
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, Callable
+from typing import Any, Callable, Dict, List, Optional, Union
 from urllib.parse import urljoin
 
 from requests import Response, Session
@@ -14,7 +14,6 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fi
 
 from vmngclient.utils.response import response_debug
 from vmngclient.vmanage_auth import vManageAuth
-
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
 
@@ -73,7 +72,7 @@ def create_vManageSession(
         vsession_id = session.get_virtual_session_id(tenant_id)
         session.headers.update({"VSessionId": vsession_id})
     server_info = session.server()
-    session.server_name = server_info.get('server')
+    session.server_name = server_info.get("server")
     session.on_session_create_hook()
 
     try:
@@ -120,6 +119,7 @@ class vManageSession(Session):
         username: username
         password: password
     """
+
     on_session_create_hook: Callable[[vManageSession], Any] = lambda *args: None
 
     def __init__(
