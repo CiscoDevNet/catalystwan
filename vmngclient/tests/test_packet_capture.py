@@ -62,10 +62,11 @@ class TestPacketCaptureApi(unittest.TestCase):
         # Assert
         self.assertEqual(answer, None)
 
+    @patch("vmngclient.api.packet_capture_api.time.sleep")
     @patch.object(PacketCaptureAPI, "download_capture_session")
     @patch.object(PacketCaptureAPI, "get_status")
     @patch("vmngclient.session.vManageSession")
-    def test_channel(self, mock_session, mock_get_status, mock_download):
+    def test_channel(self, mock_session, mock_get_status, mock_download, mock_sleep):
         # Arrange
         device_capture_response = {"sessionId": "id", "isNewSession": True}
         mock_session.post.return_value.json.return_value = device_capture_response
@@ -76,8 +77,9 @@ class TestPacketCaptureApi(unittest.TestCase):
         # Assert
         self.assertEqual(answer, self.packet_setup)
 
+    @patch("vmngclient.api.packet_capture_api.time.sleep")
     @patch("vmngclient.session.vManageSession")
-    def test_channel_raise_error(self, mock_session):
+    def test_channel_raise_error(self, mock_session, mock_sleep):
         # Arrange
         device_capture_response = {"sessionId": "id", "isNewSession": False}
         mock_session.post.return_value.json.return_value = device_capture_response
