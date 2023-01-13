@@ -48,8 +48,10 @@ class SpeedtestAPI:
                 except HTTPError as e:
                     self.speedtest_output.status = str(e)
         else:
-            self.speedtest_output.status = f"Source is {source_device.reachability.value} and "
-            f"destination device is {destination_device.reachability.value}"
+            self.speedtest_output.status = (
+                f"Source is {source_device.reachability.value} and "
+                f"destination device is {destination_device.reachability.value}"
+            )
 
         return self.speedtest_output
 
