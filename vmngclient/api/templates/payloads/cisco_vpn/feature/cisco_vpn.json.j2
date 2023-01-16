@@ -190,7 +190,9 @@
       
     },
     "ipv6": {
-      
+      {% if ipv6route %}
+        "route": {% include 'ipv6route.json.j2' %}
+      {% endif %}
     },
     {% if dns %}
       "dns": {% include 'dns.json.j2' %},

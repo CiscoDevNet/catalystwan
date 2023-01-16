@@ -47,6 +47,13 @@ class IPv4Route:
     gateway: GatewayType = field(default=GatewayType.NEXT_HOP)
 
 
+@define
+class IPv6Route:
+    prefixv6: str
+    next_hopv6: list[NextHop]
+    gatewayv6: GatewayType = field(default=GatewayType.NEXT_HOP)
+
+
 class CiscoVPNModel(FeatureTemplate):
     payload_path: Path = Path(__file__).parent / "feature/cisco_vpn.json.j2"
     tenant_vpn: Optional[int]
@@ -55,6 +62,7 @@ class CiscoVPNModel(FeatureTemplate):
     dns: Optional[DNS] = None
     mapping: List[Mapping] = []
     ipv4route: List[IPv4Route] = None
+    ipv6route: List[IPv6Route] = None
 
     @validator('vpn_id')
     def check_id(cls, v, values):

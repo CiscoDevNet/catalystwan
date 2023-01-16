@@ -272,15 +272,17 @@ class CliTemplate:
         response = self.session.post(url=endpoint, data=payload).json()
         return response['templateId']
 
-    def update(self, id: str) -> None:
+    def update(self, id: str, config: CiscoConfParse) -> None:
         """
 
         Args:
             id (str): Template id to update.
+            config (CiscoConfParse): Updated config
 
         Returns:
             str: Process id.
         """
+        self.config = config
         config_str = "\n".join(self.config.ioscfg)
         payload = {
             "templateId": id,

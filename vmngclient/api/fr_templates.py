@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional
 import urllib3
 from attr import define, field
 
-from vmngclient.api.templates import DNS, CiscoVPNModel, GatewayType, IPv4Route, Mapping, NextHop
+from vmngclient.api.templates import DNS, CiscoVPNModel, GatewayType, IPv4Route, IPv6Route, Mapping, NextHop
 from vmngclient.dataclasses import User
 from vmngclient.session import create_vManageSession
 from vmngclient.utils.creation_tools import AttrsInstance, asdict
@@ -179,7 +179,10 @@ session = create_vManageSession(url, username, password, port=port)
 
 hop = NextHop(address="172.16.15.1")
 
-route = IPv4Route(prefix="192.168.15.0/25", gateway=GatewayType.NEXT_HOP, next_hop=[hop])
+routeipv4 = IPv4Route(prefix="192.168.15.0/25", gateway=GatewayType.NEXT_HOP, next_hop=[hop])
+
+hopv6 = NextHop(address="3002:0bd6:0000:0000:0000:ee00:0033:6124")
+routeipv6 = IPv6Route(prefixv6="3002:bd6::ee00:33:6778/12", gatewayv6=GatewayType.NEXT_HOP, next_hopv6=[hopv6])
 
 dns1 = DNS(
     primary="192.168.1.1",
@@ -199,9 +202,10 @@ vpn_transport = CiscoVPNModel(
     description="vpn_transport_test",
     vpn_id=1,
     tenant_org_name=org_name,
-    mapping=map,
-    ipv4route=[route],
     dns=dns1,
+    mapping=map,
+    ipv4route=[routeipv4],
+    ipv6route=[routeipv6],
 )
 
 payload = vpn_transport.generate_payload(session)

@@ -19,6 +19,7 @@ from vmngclient.api.templates.payloads.cisco_vpn.cisco_vpn_model import (
     CiscoVPNModel,
     GatewayType,
     IPv4Route,
+    IPv6Route,
     Mapping,
     NextHop,
 )
@@ -34,6 +35,7 @@ __all__ = [
     "DNS",
     "Mapping",
     "IPv4Route",
+    "IPv6Route",
     "GatewayType",
     "NextHop",
 ]
