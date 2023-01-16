@@ -472,7 +472,7 @@ class CLITemplate:
         return True
 
     def update(self, id: str, config: CiscoConfParse) -> bool:
-        """Updating an existing cli template.
+        """Update an existing cli template.
 
         Args:
             id (str): Template id to update.
@@ -480,6 +480,7 @@ class CLITemplate:
 
         Returns:
             bool: True if update template is successful, otherwise - False.
+
         """
         self.config = config
         config_str = "\n".join(self.config.ioscfg)
