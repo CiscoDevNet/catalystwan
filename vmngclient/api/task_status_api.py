@@ -127,7 +127,7 @@ def wait_for_completed(
                         f"Task id {action_id} registered by vManage in all tasks list, "
                         f"but response about it's status didn't contain any information."
                     )
-            raise ValueError(f"task id {action_id} is not registered by vManage.")
+            raise ValueError(f"Task id {action_id} is not registered by vManage.")
 
         task = create_dataclass(TaskStatus, action_data)
         logger.debug(
