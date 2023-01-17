@@ -3,10 +3,10 @@ from __future__ import annotations
 
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional
+from typing import ClassVar, List, Optional
 
-from attr import define, field
-from pydantic import validator
+from attr import define, field  # type: ignore
+from pydantic import validator  # type: ignore
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.session import vManageSession
@@ -55,14 +55,14 @@ class IPv6Route:
 
 
 class CiscoVPNModel(FeatureTemplate):
-    payload_path: Path = Path(__file__).parent / "feature/cisco_vpn.json.j2"
+    payload_path: ClassVar[Path] = Path(__file__).parent / "feature/cisco_vpn.json.j2"
     tenant_vpn: Optional[int]
     tenant_org_name: Optional[str]
     vpn_id: int
     dns: Optional[DNS] = None
     mapping: List[Mapping] = []
-    ipv4route: List[IPv4Route] = None
-    ipv6route: List[IPv6Route] = None
+    ipv4route: List[IPv4Route] = []
+    ipv6route: List[IPv6Route] = []
 
     @validator('vpn_id')
     def check_id(cls, v, values):

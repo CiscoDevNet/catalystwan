@@ -1,13 +1,13 @@
+from abc import ABC, abstractmethod
 from pathlib import Path
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
 from pydantic import BaseModel  # type: ignore
 
 
-class FeatureTemplate(BaseModel):
+class FeatureTemplate(BaseModel, ABC):
     name: str
     description: str
-    payload_path: Path
 
     def generate_payload(self) -> str:
         env = Environment(
@@ -16,7 +16,6 @@ class FeatureTemplate(BaseModel):
             lstrip_blocks=True,
             undefined=DebugUndefined,
         )
-        # print(env.loader.list_templates())
         template = env.get_template(self.payload_path.name)
         output = template.render(self.dict())
 
@@ -27,4 +26,9 @@ class FeatureTemplate(BaseModel):
         return output
 
     def generate_cli(self) -> str:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def payload_path(self) -> Path:
         raise NotImplementedError()
