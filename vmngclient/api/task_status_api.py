@@ -19,6 +19,11 @@ class TaskStatus:
     activity: List[str]
 
 
+def get_all_tasks(session: vManageSession):
+    url = "dataservice/device/action/status/tasks"
+    tasks = session.get_json(url)
+    return [process["processId"] for process in tasks["runningTasks"]]
+
 def wait_for_completed(
     session: vManageSession,
     action_id: str,
@@ -91,11 +96,6 @@ def wait_for_completed(
                 return False
         return True
 
-    def get_all_tasks():
-        url = "dataservice/device/action/status/tasks"
-        tasks = session.get_json(url)
-        return [process["processId"] for process in tasks["runningTasks"]]
-
     def log_exception(self) -> None:
         logger.error("Operation status not achieved in given time")
 
@@ -117,7 +117,7 @@ def wait_for_completed(
         try:
             action_data = session.get_data(url)[0]
         except IndexError:
-            tasks_ids = get_all_tasks()
+            tasks_ids = get_all_tasks(session)
             if action_id in tasks_ids:
                 sleep(delay_seconds)
                 try:
@@ -136,5 +136,6 @@ def wait_for_completed(
             f"status: {task.status}, status_id: {task.status_id}, activity: {task.activity}."
         )
         return task
+    
 
     return wait_for_action_finish()
