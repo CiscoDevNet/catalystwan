@@ -4,12 +4,14 @@ from pathlib import Path
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
 from pydantic import BaseModel  # type: ignore
 
+from vmngclient.session import vManageSession
+
 
 class FeatureTemplate(BaseModel, ABC):
     name: str
     description: str
 
-    def generate_payload(self) -> str:
+    def generate_payload(self, session: vManageSession) -> str:
         env = Environment(
             loader=FileSystemLoader(self.payload_path.parent),
             trim_blocks=True,

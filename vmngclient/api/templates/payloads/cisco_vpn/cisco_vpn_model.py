@@ -78,12 +78,10 @@ class CiscoVPNModel(FeatureTemplate):
         response = session.put(url=url, json=payload).json()
         self.vpn_id = response['deviceVpn']
 
-    def generate_payload(self, session: Optional[vManageSession] = None) -> str:
+    def generate_payload(self, session: vManageSession) -> str:
         if self.vpn_id not in [0, 512]:
-            if not session:
-                raise ValueError('Must enter session.')
             self.generate_vpn_id(session=session)
-        return super().generate_payload()
+        return super().generate_payload(session)
 
     class Config:
         arbitrary_types_allowed = True

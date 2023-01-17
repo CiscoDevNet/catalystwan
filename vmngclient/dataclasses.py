@@ -290,3 +290,18 @@ class TenantInfo(DataclassBase):
 
     name: str
     organization_name: str = field(metadata={FIELD_NAME: "orgName"})
+
+
+@define(frozen=True)
+class Tlock:
+    color: str
+    encapsulation: str
+
+
+@define(frozen=True)
+class TierInfo(DataclassBase):
+    """Endpoint: /dataservice/tier"""
+
+    tlocs: List[Tlock]
+    name: str = field(metadata={FIELD_NAME: "tierName"})
+    rid: str = field(metadata={FIELD_NAME: "@rid"})
