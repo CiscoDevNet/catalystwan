@@ -19,10 +19,20 @@ class TaskStatus:
     activity: List[str]
 
 
-def get_all_tasks(session: vManageSession):
+def get_all_tasks(session: vManageSession) -> List[str]:
+    """
+    Get list of active tasks id's in vmanage
+
+    Args:
+        session (vManageSession): session
+
+    Returns:
+       List[str]: active tasks id's
+    """
     url = "dataservice/device/action/status/tasks"
     tasks = session.get_json(url)
     return [process["processId"] for process in tasks["runningTasks"]]
+
 
 def wait_for_completed(
     session: vManageSession,
@@ -136,6 +146,5 @@ def wait_for_completed(
             f"status: {task.status}, status_id: {task.status_id}, activity: {task.activity}."
         )
         return task
-    
 
     return wait_for_action_finish()
