@@ -19,6 +19,21 @@ class TaskStatus:
     activity: List[str]
 
 
+def get_all_tasks(session: vManageSession) -> List[str]:
+    """
+    Get list of active tasks id's in vmanage
+
+    Args:
+        session (vManageSession): session
+
+    Returns:
+       List[str]: active tasks id's
+    """
+    url = "dataservice/device/action/status/tasks"
+    tasks = session.get_json(url)
+    return [process["processId"] for process in tasks["runningTasks"]]
+
+
 def wait_for_completed(
     session: vManageSession,
     action_id: str,
@@ -91,11 +106,6 @@ def wait_for_completed(
                 return False
         return True
 
-    def get_all_tasks():
-        url = "dataservice/device/action/status/tasks"
-        tasks = session.get_json(url)
-        return [process["processId"] for process in tasks["runningTasks"]]
-
     def log_exception(self) -> None:
         logger.error("Operation status not achieved in given time")
 
@@ -117,7 +127,7 @@ def wait_for_completed(
         try:
             action_data = session.get_data(url)[0]
         except IndexError:
-            tasks_ids = get_all_tasks()
+            tasks_ids = get_all_tasks(session)
             if action_id in tasks_ids:
                 sleep(delay_seconds)
                 try:
@@ -127,7 +137,8 @@ def wait_for_completed(
                         f"Task id {action_id} registered by vManage in all tasks list, "
                         f"but response about it's status didn't contain any information."
                     )
-            raise ValueError(f"Task id {action_id} is not registered by vManage.")
+            else:
+                raise ValueError(f"Task id {action_id} is not registered by vManage.")
 
         task = create_dataclass(TaskStatus, action_data)
         logger.debug(
