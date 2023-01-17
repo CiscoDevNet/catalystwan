@@ -2,12 +2,12 @@ import json
 import logging
 from difflib import Differ
 from enum import Enum
-from typing import List, cast
+from typing import List
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
 from requests.exceptions import HTTPError
-from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
+from vmngclient.api.task_status_api import wait_for_completed
 from vmngclient.dataclasses import Device, Template
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
@@ -93,47 +93,6 @@ class TemplateAPI:
         """
         return self.get(name).id
 
-    def wait_for_complete(self, operation_id: str, timeout_seconds: int = 300, sleep_seconds: int = 5) -> bool:
-        """
-
-        Args:
-            operation_id (str): Id of the action waiting for completion.
-            timeout_seconds (int, optional): Time for completion. Defaults to 300.
-            sleep_seconds (int, optional): Sleep time between repetitions. Defaults to 5.
-
-        Returns:
-            bool: True if acction status is successful, otherwise - False.
-        """
-
-        def _log_exception(retry_state):
-            logger.error(
-                f"Operation status not achieved in the given time, exception: {retry_state.outcome.exception()}."
-            )
-            return False
-
-        def check_status(action_data):
-            if action_data:
-                list_action = [action == OperationStatus.SUCCESS for action in action_data]
-                return not all(list_action)
-            else:
-                return True
-
-        @retry(
-            wait=wait_fixed(sleep_seconds),
-            stop=stop_after_attempt(int(timeout_seconds / sleep_seconds)),
-            retry=retry_if_result(check_status),
-            retry_error_callback=_log_exception,
-        )
-        def wait_for_status():
-            return self.get_operation_status(operation_id)
-
-        if wait_for_status():
-            logger.info(f"The action: {operation_id} - successful")
-            return True
-        else:
-            logger.info(f"The action: {operation_id} - failed")
-            return False
-
     def attach(self, name: str, device: Device) -> bool:
         """
 
@@ -171,15 +130,20 @@ class TemplateAPI:
             ]
         }
         endpoint = "/dataservice/template/device/config/attachcli"
-        response = self.session.post(url=endpoint, json=payload).json()
         logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
-        return self.wait_for_complete(response["id"])
+        response = self.session.post(url=endpoint, json=payload).json()
+        task = wait_for_completed(session=self.session, action_id=response["id"])
+        if task.status == OperationStatus.SUCCESS.value:
+            return True
+        logger.warning(f"Failed to attach tempate: {name} to the device: {device.hostname}.")
+        logger.warning(f"Task activity information: {task.activity}")
+        return False
 
     def device_to_cli(self, device: Device) -> bool:
         """
 
         Args:
-            device (Device): Device to chcange mode.
+            device (Device): Device to change mode.
 
         Returns:
             bool: True if change mode to cli is successful, otherwise - False.
@@ -189,22 +153,14 @@ class TemplateAPI:
             "devices": [{"deviceId": device.uuid, "deviceIP": device.id}],
         }
         endpoint = "/dataservice/template/config/device/mode/cli"
-        response = self.session.post(url=endpoint, json=payload).json()
         logger.info(f"Changing mode to cli mode for {device.hostname}.")
-        return self.wait_for_complete(response["id"])
-
-    def get_operation_status(self, operation_id: str) -> List[OperationStatus]:
-        """
-
-        Args:
-            operation_id (str): Operation id.
-
-        Returns:
-            List[OperationStatus]: List of operations.
-        """
-        endpoint = f"/dataservice/device/action/status/{operation_id}"
-        response = cast(list, self.session.get_data(endpoint))
-        return [OperationStatus(status["status"]) for status in response]
+        response = self.session.post(url=endpoint, json=payload).json()
+        task = wait_for_completed(session=self.session, action_id=response["id"])
+        if task.status == OperationStatus.SUCCESS.value:
+            return True
+        logger.warning(f"Failed to change to cli mode for device: {device.hostname}.")
+        logger.warning(f"Task activity information: {task.activity}")
+        return False
 
     def delete(self, name: str) -> bool:
         """
@@ -224,7 +180,7 @@ class TemplateAPI:
             response = self.session.delete(url=endpoint)
             logger.info(f"Template with name: {name} - deleted.")
             return response.ok
-        logger.info(f"Template: {template} is attached to device - cannot be deleted.")
+        logger.warning(f"Template: {template} is attached to device - cannot be deleted.")
         raise AttachedError(template.name)
 
     def create(
@@ -465,8 +421,8 @@ class CLITemplate:
             self.session.post(url=endpoint, json=payload).json()
         except HTTPError as error:
             response = json.loads(error.response.text)["error"]
-            logger.error(response["message"])
-            logger.error(response["details"])
+            logger.error(f'Response message: {response["message"]}')
+            logger.error(f'Response details: {response["details"]}')
             return False
         logger.info(f"Template with name: {self.name} - sent to the device.")
         return True
@@ -499,8 +455,8 @@ class CLITemplate:
             self.session.put(url=endpoint, json=payload)
         except HTTPError as error:
             response = json.loads(error.response.text)["error"]
-            logger.error(response["message"])
-            logger.error(response["details"])
+            logger.error(f'Response message: {response["message"]}')
+            logger.error(f'Response details: {response["details"]}')
             return False
         logger.info(f"Template with name: {self.name} - updated.")
         return True
