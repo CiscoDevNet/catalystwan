@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional
+from typing import ClassVar, List, Optional
 
 from attr import define, field  # type: ignore
 
@@ -65,9 +65,10 @@ class AuthTask:
 
 
 class AAAModel(FeatureTemplate):
-    payload_path: Path = Path(__file__).parent / "feature" / "aaa.json.j2"
-    # template_name: str
-    # template_description: str
+    class Config:
+        arbitrary_types_allowed = True
+
+    payload_path: ClassVar[Path] = Path(__file__).parent / "feature" / "aaa.json.j2"
 
     auth_order: List[AuthenticationOrder]
     auth_fallback: bool
@@ -86,6 +87,3 @@ class AAAModel(FeatureTemplate):
     radius_retransmit: int = 3
     radius_timeout: int = 5
     radius_servers: List[RadiusServer] = []
-
-    class Config:
-        arbitrary_types_allowed = True
