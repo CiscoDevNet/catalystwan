@@ -221,7 +221,7 @@ class TemplatesAPI:
             return cli_template.send_to_device()
 
     def create_feature_template(self, template: FeatureTemplate) -> None:
-        payload = template.generate_payload()
+        payload = template.generate_payload(self.session)
         self.session.post("/dataservice/template/feature", json=json.loads(payload))
 
 

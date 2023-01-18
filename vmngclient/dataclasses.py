@@ -290,10 +290,13 @@ class TenantInfo(DataclassBase):
 
     name: str
     organization_name: str = field(metadata={FIELD_NAME: "orgName"})
+    sub_domain: str = field(metadata={FIELD_NAME: "subDomain"})
+    id: str = field(metadata={FIELD_NAME: "tenantId"})
+    flake_id: int = field(metadata={FIELD_NAME: "flakeId"})
 
 
 @define(frozen=True)
-class Tlock:
+class TLOC:
     color: str
     encapsulation: str
 
@@ -302,6 +305,13 @@ class Tlock:
 class TierInfo(DataclassBase):
     """Endpoint: /dataservice/tier"""
 
-    tlocs: List[Tlock]
     name: str = field(metadata={FIELD_NAME: "tierName"})
-    rid: str = field(metadata={FIELD_NAME: "@rid"})
+    vpn: int
+    rid: int = field(metadata={FIELD_NAME: "@rid"})
+    ipv4_route_limit_type: Optional[str] = field(default=None, metadata={FIELD_NAME: "ipv4RouteLimitType"})
+    ipv4_route_limit_threshold: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv4RouteLimitThreshold"})
+    ipv4_route_limit: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv4RouteLimit"})
+    ipv6_route_limit_type: Optional[str] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimitType"})
+    ipv6_route_limit_threshold: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimitThreshold"})
+    ipv6_route_limit: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimit"})
+    tlocs: List[TLOC] = field(factory=list)
