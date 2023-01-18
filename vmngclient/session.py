@@ -4,18 +4,16 @@ import logging
 import time
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
 from urllib.parse import urljoin
 
-from requests import Response, Session
+from requests import Response, Session, head
 from requests.auth import AuthBase
-from requests.exceptions import HTTPError
+from requests.exceptions import ConnectionError, HTTPError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.utils.response import response_debug
 from vmngclient.vmanage_auth import vManageAuth
-
-logger = logging.getLogger(__name__)
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
 
@@ -66,31 +64,34 @@ def create_vManageSession(
         Session object
 
     """
+
     session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
+
     if subdomain:
         tenant_id = session.get_tenant_id()
         vsession_id = session.get_virtual_session_id(tenant_id)
-        session.headers.update({'VSessionId': vsession_id})
+        session.headers.update({"VSessionId": vsession_id})
     server_info = session.server()
+    session.server_name = server_info.get("server")
+    session.on_session_create_hook()
 
     try:
         user_mode = UserMode(server_info.get("userMode", "not found"))
     except ValueError:
         user_mode = UserMode.NOT_RECOGNIZED
-        logger.warning(f"Unrecognized user mode is: '{server_info.get('userMode')}'")
+        session.logger.warning(f"Unrecognized user mode is: '{server_info.get('userMode')}'")
 
     try:
         view_mode = ViewMode(server_info.get("viewMode", "not found"))
     except ValueError:
         view_mode = ViewMode.NOT_RECOGNIZED
-        logger.warning(f"Unrecognized user mode is: '{server_info.get('viewMode')}'")
+        session.logger.warning(f"Unrecognized user mode is: '{server_info.get('viewMode')}'")
     if user_mode is UserMode.TENANT and not subdomain and view_mode is ViewMode.TENANT:
         session.session_type = SessionType.TENANT
     elif user_mode is UserMode.PROVIDER and not subdomain and view_mode is ViewMode.PROVIDER:
         session.session_type = SessionType.PROVIDER
     elif user_mode is UserMode.PROVIDER and view_mode is ViewMode.TENANT:
-
         session.session_type = SessionType.PROVIDER_AS_TENANT
     elif user_mode is UserMode.TENANT and subdomain:
         raise SessionNotCreatedError(
@@ -99,11 +100,12 @@ def create_vManageSession(
         )
     else:
         session.session_type = SessionType.NOT_DEFINED
-        logger.warning(
+        session.logger.warning(
             f"Session created with {user_mode.value} user mode and {view_mode.value} view mode.\n"
             f"Session type set to not defined"
         )
-    logger.info(f"Logged as {username}. The session type is {session.session_type}")
+
+    session.logger.info(f"Logged as {username}. The session type is {session.session_type}")
     return session
 
 
@@ -118,6 +120,8 @@ class vManageSession(Session):
         username: username
         password: password
     """
+
+    on_session_create_hook: ClassVar[Callable[[vManageSession], Any]] = lambda *args: None
 
     def __init__(
         self,
@@ -138,6 +142,11 @@ class vManageSession(Session):
         self.subdomain = subdomain
 
         self.session_type = SessionType.NOT_DEFINED
+        self.server_name = None
+        self.logger = logging.getLogger(__name__)
+
+        if not self.check_vmanage_server_connection():
+            raise ConnectionError("Vmanage server is not available")
 
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
@@ -145,13 +154,13 @@ class vManageSession(Session):
     def request(self, method, url, *args, **kwargs) -> Any:
         full_url = self.get_full_url(url)
         response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
-        logger.debug(response_debug(response))
+        self.logger.debug(response_debug(response))
         try:
             response.raise_for_status()
         except HTTPError as error:
-            logger.debug(error)
+            self.logger.debug(error)
             if response.status_code == 403:
-                logger.info(f"User {self.username} is unauthorized for method {method} {full_url}")
+                self.logger.info(f"User {self.username} is unauthorized for method {method} {full_url}")
             else:
                 raise error
         return response
@@ -177,7 +186,7 @@ class vManageSession(Session):
         return self.get_data(url="/dataservice/client/server")
 
     def get_data(self, url: str) -> Any:
-        return self.get_json(url)['data']
+        return self.get_json(url)["data"]
 
     def get_json(self, url: str) -> Any:
         response = self.get(url)
@@ -219,7 +228,7 @@ class vManageSession(Session):
         """
 
         def _log_exception(retry_state):
-            logger.error(f"Cannot reach server, original exception: {retry_state.outcome.exception()}")
+            self.logger.error(f"Cannot reach server, original exception: {retry_state.outcome.exception()}")
             return False
 
         if initial_delay:
@@ -242,8 +251,8 @@ class vManageSession(Session):
         Returns:
             Tenant UUID.
         """
-        tenants = self.get_data(url='/dataservice/tenant')
-        tenant_id = [tenant.get('tenantId', None) for tenant in tenants if tenant['subDomain'] == self.subdomain][0]
+        tenants = self.get_data(url="/dataservice/tenant")
+        tenant_id = [tenant.get("tenantId", None) for tenant in tenants if tenant["subDomain"] == self.subdomain][0]
         return tenant_id
 
     def get_virtual_session_id(self, tenant_id: str) -> str:
@@ -258,12 +267,22 @@ class vManageSession(Session):
         """
         url_path = f"/dataservice/tenant/{tenant_id}/vsessionid"
         response = self.post(url_path)
-        return response.json()['VSessionId']
+        return response.json()["VSessionId"]
 
     def __prepare_session(self, verify: bool, auth: Optional[AuthBase]) -> None:
         self.auth = auth
         self.verify = verify
-        self.headers.update({"content-type": "application/json"})
+
+    def check_vmanage_server_connection(self) -> bool:
+        try:
+            url = str(self.base_url).replace("https", "http")
+            if self.port:
+                url = url.replace(str(f":{self.port}"), "")
+            head(url, timeout=2)
+        except ConnectionError:
+            return False
+        else:
+            return True
 
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"
