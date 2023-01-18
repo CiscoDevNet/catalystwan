@@ -422,6 +422,16 @@ class CLITemplate:
         ]:
             payload["cliType"] = "device"
             payload["draftMode"] = False
+
+        endpoint = "/dataservice/template/device/cli/"
+        try:
+            self.session.post(url=endpoint, json=payload).json()
+        except HTTPError as error:
+            response = json.loads(error.response.text)["error"]
+            logger.error(f'Response message: {response["message"]}')
+            logger.error(f'Response details: {response["details"]}')
+            return False
+        logger.info(f"Template with name: {self.name} - sent to the device.")
         return True
 
     def update(self, id: str, config: CiscoConfParse) -> bool:
