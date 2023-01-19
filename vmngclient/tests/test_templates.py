@@ -175,8 +175,8 @@ class TestTemplatesAPI(unittest.TestCase):
         self.assertTrue(answer)
 
     @patch.object(TemplatesAPI, "templates")
-    @patch("vmngclient.session.vManageSession")
     @patch("vmngclient.api.template_api.wait_for_completed")
+    @patch("vmngclient.session.vManageSession")
     def test_attach_no_exist_template(self, mock_session, mock_wait_for_completed, mock_templates):
 
         # Arrage
