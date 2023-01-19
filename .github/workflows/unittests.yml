@@ -36,5 +36,5 @@ jobs:
         run: poetry install --sync -v
       - name: Run Tests
         run: poetry run coverage run -m pytest vmngclient/tests && poetry run coverage report -m
-      - name: Shoa total
-        run: echo $TOTAL
+      - name: Generate coverage bagde 
+        run: coverage-badge -o coverage.svg
