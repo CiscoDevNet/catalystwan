@@ -35,4 +35,4 @@ jobs:
       - name: Install dependencies
         run: poetry install --sync -v
       - name: Run Tests
-        run: poetry run coverage run -m pytest vmngclient/tests
+        run: poetry run coverage run -m pytest vmngclient/tests && poetry run coverage report -m
