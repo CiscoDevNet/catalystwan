@@ -197,8 +197,8 @@ class TestTemplatesAPI(unittest.TestCase):
         # Assert
         self.assertFalse(answer)
 
-    @patch("vmngclient.session.vManageSession")
     @patch("vmngclient.api.template_api.wait_for_completed")
+    @patch("vmngclient.session.vManageSession")
     def test_device_to_cli_true(self, mock_session, mock_wait_for_completed):
 
         # Arrage
@@ -206,7 +206,7 @@ class TestTemplatesAPI(unittest.TestCase):
         test_object = TemplatesAPI(mock_session)
 
         # mock wait complete
-        mock_wait_for_completed.wait_for_completed.return_value = self.task
+        mock_wait_for_completed.return_value = self.task
 
         # Act
         answer = test_object.device_to_cli(self.device_info)
