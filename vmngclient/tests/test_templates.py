@@ -7,7 +7,6 @@ from vmngclient.api.task_status_api import TaskStatus
 from vmngclient.api.template_api import AttachedError, NameAlreadyExistError, NotFoundError, TemplatesAPI
 from vmngclient.dataclasses import Device, Template
 from vmngclient.utils.creation_tools import create_dataclass
-from vmngclient.utils.operation_status import OperationStatus
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
 
@@ -152,43 +151,9 @@ class TestTemplatesAPI(unittest.TestCase):
         # Assert
         self.assertRaises(NotFoundError, answer)
 
-    @patch.object(TemplatesAPI, "get_operation_status")
-    def test_wait_for_complete_true(self, mock_operation):
-
-        # Arrage
-        MockOperatrion = Mock()
-        mock_operation.return_value = MockOperatrion
-        session = Mock()
-        test_object = TemplatesAPI(session)
-        test_object.get_operation_status.return_value = [OperationStatus.SUCCESS, OperationStatus.SUCCESS]
-        operation_id = "operation_id"
-
-        # Act
-        answer = test_object.wait_for_complete(operation_id)
-
-        # Assert
-        self.assertTrue(answer)
-
-    @patch.object(TemplatesAPI, "get_operation_status")
-    def test_wait_for_complete_false(self, mock_operation):
-
-        # Arrage
-        MockOperatrion = Mock()
-        mock_operation.return_value = MockOperatrion
-        session = Mock()
-        test_object = TemplatesAPI(session)
-        test_object.get_operation_status.return_value = [OperationStatus.IN_PROGRESS, OperationStatus.SUCCESS]
-        operation_id = "operation_id"
-
-        # Act
-        answer = test_object.wait_for_complete(operation_id, timeout_seconds=2, sleep_seconds=1)
-
-        # Assert
-        self.assertFalse(answer)
-
     @patch("vmngclient.session.vManageSession")
+    @patch("vmngclient.api.template_api.wait_for_completed")
     @patch.object(TemplatesAPI, "templates")
-    @patch.object(TemplatesAPI, "wait_for_complete")
     def test_attach_exist_template(self, mock_session, mock_wait_for_completed, mock_templates):
 
         # Arrage
@@ -210,8 +175,8 @@ class TestTemplatesAPI(unittest.TestCase):
         self.assertTrue(answer)
 
     @patch("vmngclient.session.vManageSession")
+    @patch("vmngclient.api.template_api.wait_for_completed")
     @patch.object(TemplatesAPI, "templates")
-    @patch.object(TemplatesAPI, "wait_for_complete")
     def test_attach_no_exist_template(self, mock_session, mock_wait_for_completed, mock_templates):
 
         # Arrage
@@ -233,7 +198,7 @@ class TestTemplatesAPI(unittest.TestCase):
         self.assertFalse(answer)
 
     @patch("vmngclient.session.vManageSession")
-    @patch.object(TemplatesAPI, "wait_for_complete")
+    @patch("vmngclient.api.template_api.wait_for_completed")
     def test_device_to_cli_true(self, mock_session, mock_wait_for_completed):
 
         # Arrage
@@ -241,49 +206,13 @@ class TestTemplatesAPI(unittest.TestCase):
         test_object = TemplatesAPI(mock_session)
 
         # mock wait complete
-        mock_wait_for_completed.return_value = self.task
+        mock_wait_for_completed.wait_for_completed.return_value = self.task
 
         # Act
         answer = test_object.device_to_cli(self.device_info)
 
         # Assert
         self.assertTrue(answer)
-
-    @patch("vmngclient.session.vManageSession")
-    def test_get_operatrion_status_success(self, mock_session):
-
-        # Arrage
-        mock_session.get_data.return_value = [
-            {"status": "In progress"},
-            {"status": "Failure"},
-            {"status": "Success"},
-            {"status": "Scheduled"},
-        ]
-        test_object = TemplatesAPI(mock_session)
-        operation_id = "dummy_id"
-
-        # Act
-        answer = test_object.get_operation_status(operation_id)
-
-        # Assert
-        self.assertEqual(
-            answer,
-            [OperationStatus.IN_PROGRESS, OperationStatus.FAILURE, OperationStatus.SUCCESS, OperationStatus.SCHEDULED],
-        )
-
-    @patch("vmngclient.session.vManageSession")
-    def test_get_operatrion_status_no_data(self, mock_session):
-
-        # Arrage
-        mock_session.get_data.return_value = []
-        test_object = TemplatesAPI(mock_session)
-        operation_id = "dummy_id"
-
-        # Act
-        answer = test_object.get_operation_status(operation_id)
-
-        # Assert
-        self.assertEqual(answer, [])
 
     @patch("vmngclient.session.vManageSession")
     @patch.object(TemplatesAPI, "templates")

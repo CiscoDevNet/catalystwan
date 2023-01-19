@@ -203,7 +203,7 @@ class EventData(DataclassBase):
 @define(frozen=True)
 class User(DataclassBase):
     username: str = field(metadata={FIELD_NAME: "userName"})
-    password: str
+    password: Optional[str] = field(default=None)
     group: List[str] = field(factory=list)
     locale: Optional[str] = field(default=None)
     description: Optional[str] = field(default=None)
