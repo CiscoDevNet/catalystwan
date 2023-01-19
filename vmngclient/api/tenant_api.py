@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from vmngclient.api.basic_api import Device
 from vmngclient.dataclasses import TenantInfo, TierInfo
+from vmngclient.exceptions import InvalidOperationError
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
 
@@ -12,14 +13,6 @@ class TierNameNotFoundError(Exception):
 
 class TenantNameNotFoundError(Exception):
     pass
-
-
-class InvalidOperationError(Exception):
-    """The exception that is thrown when a method call is invalid for the object's current state."""
-
-    def __init__(self, message: str = "The input sequence contains more than one element."):
-        self.message = message
-        super().__init__()
 
 
 # TODO tests
@@ -66,7 +59,7 @@ class TenantsAPI:
             raise TenantNameNotFoundError
 
         if len(tenants) > 1:
-            raise InvalidOperationError
+            raise InvalidOperationError("The input sequence contains more than one element.")
 
         return tenants[0]
 
@@ -103,6 +96,6 @@ class TenantsAPI:
             raise TierNameNotFoundError
 
         if len(tiers) > 1:
-            raise InvalidOperationError
+            raise InvalidOperationError("The input sequence contains more than one element.")
 
         return tiers[0]

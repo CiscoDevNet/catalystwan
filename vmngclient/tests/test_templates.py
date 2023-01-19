@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, Mock, patch
 from ciscoconfparse import CiscoConfParse  # type: ignore
 
 from vmngclient.api.task_status_api import TaskStatus
-from vmngclient.api.template_api import AttachedError, NameAlreadyExistError, NotFoundError, TemplatesAPI
+from vmngclient.api.template_api import AttachedError, TemplateAlreadyExistsError, TemplateNotFoundError, TemplatesAPI
 from vmngclient.dataclasses import Device, Template
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.personality import Personality
@@ -115,7 +115,7 @@ class TestTemplatesAPI(unittest.TestCase):
             return test_object.get("no_exist_name")
 
         # Assert
-        self.assertRaises(NotFoundError, answer)
+        self.assertRaises(TemplateNotFoundError, answer)
 
     @patch.object(TemplatesAPI, "templates")
     def test_get_id_success(self, mock_templates):
@@ -149,7 +149,7 @@ class TestTemplatesAPI(unittest.TestCase):
             return test_object.get_id("no_exist_name")
 
         # Assert
-        self.assertRaises(NotFoundError, answer)
+        self.assertRaises(TemplateNotFoundError, answer)
 
     @patch.object(TemplatesAPI, "templates")
     @patch("vmngclient.api.template_api.wait_for_completed")
@@ -295,4 +295,4 @@ class TestTemplatesAPI(unittest.TestCase):
             return test_object.create(self.device_info, "template_1", "new_description", config)
 
         # Assert
-        self.assertRaises(NameAlreadyExistError, answer)
+        self.assertRaises(TemplateAlreadyExistsError, answer)

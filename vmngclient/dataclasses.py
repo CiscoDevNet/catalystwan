@@ -327,3 +327,24 @@ class TierInfo(DataclassBase):
     ipv6_route_limit_threshold: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimitThreshold"})
     ipv6_route_limit: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimit"})
     tlocs: List[TLOC] = field(factory=list)
+
+
+@define(frozen=True)
+class FeatureTemplateInformation(DataclassBase):
+    """Endpoint: /dataservice/template/feature"""
+
+    id: str = field(metadata={FIELD_NAME: "templateId"})
+    name: str = field(metadata={FIELD_NAME: "templateName"})
+    description: str = field(metadata={FIELD_NAME: "templateDescription"})
+    type: str = field(metadata={FIELD_NAME: "templateType"})  # TODO Enum
+    device_types: List[str] = field(metadata={FIELD_NAME: "deviceType"})  # TODO Enum
+    last_updated_by: str = field(metadata={FIELD_NAME: "lastUpdatedBy"})
+    last_updated_on: dt.datetime = field(metadata={FIELD_NAME: "lastUpdatedOn"})
+    factory_default: bool = field(metadata={FIELD_NAME: "factoryDefault"})
+    devices_attached: int = field(metadata={FIELD_NAME: "devicesAttached"})
+    attached_masters: int = field(metadata={FIELD_NAME: "attachedMastersCount"})
+    version: str = field(metadata={FIELD_NAME: "templateMinVersion"})
+    config_type: str = field(metadata={FIELD_NAME: "configType"})
+    created_by: str = field(metadata={FIELD_NAME: "createdBy"})
+    created_on: dt.datetime = field(metadata={FIELD_NAME: "createdOn"})
+    resource_group: str = field(metadata={FIELD_NAME: "resourceGroup"})

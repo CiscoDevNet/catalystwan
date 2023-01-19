@@ -2,14 +2,15 @@ import json
 import logging
 from difflib import Differ
 from enum import Enum
-from typing import Dict, List
+from typing import List, Optional, Union
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
 from requests.exceptions import HTTPError
 
 from vmngclient.api.task_status_api import wait_for_completed
 from vmngclient.api.templates.feature_template import FeatureTemplate
-from vmngclient.dataclasses import Device, Template
+from vmngclient.dataclasses import Device, FeatureTemplateInformation, Template
+from vmngclient.exceptions import InvalidOperationError
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.device_model import DeviceModel
@@ -17,22 +18,20 @@ from vmngclient.utils.operation_status import OperationStatus
 
 logger = logging.getLogger(__name__)
 
-available_feature_templates: Dict[str, Dict[DeviceModel, FeatureTemplate]] = {}
-
 
 class TemplateType(Enum):
     CLI = "file"
     FEATURE = "template"
 
 
-class NotFoundError(Exception):
+class TemplateNotFoundError(Exception):
     """Used when a template item is not found."""
 
     def __init__(self, template):
         self.message = f"No such template: '{template}'"
 
 
-class NameAlreadyExistError(Exception):
+class TemplateAlreadyExistsError(Exception):
     """Used when a template item exists."""
 
     def __init__(self, name):
@@ -75,7 +74,7 @@ class TemplatesAPI:
             name (str): Name of template.
 
         Raises:
-            NotFoundError: If template does not exist.
+            TemplateNotFoundError: If template does not exist.
 
         Returns:
             Template: Selected template.
@@ -83,7 +82,7 @@ class TemplatesAPI:
         for template in self.templates:
             if name == template.name:
                 return template
-        raise NotFoundError(name)
+        raise TemplateNotFoundError(name)
 
     def get_id(self, name: str) -> str:
         """
@@ -109,7 +108,7 @@ class TemplatesAPI:
         try:
             template_id = self.get_id(name)
             self.template_validation(template_id, device=device)
-        except NotFoundError:
+        except TemplateNotFoundError:
             logger.error(f"Error, Template with name {name} not found on {device}.")
             return False
         except HTTPError as error:
@@ -202,7 +201,7 @@ class TemplatesAPI:
             config (CiscoConfParse): The config to device.
 
         Raises:
-            NameAlreadyExistError: If such template name already exists.
+            TemplateAlreadyExistsError: If such template name already exists.
 
         Returns:
             bool: True if create template is successful, otherwise - False.
@@ -210,16 +209,47 @@ class TemplatesAPI:
         try:
             self.get(name)
             logger.error(f"Error, Template with name: {name} exists.")
-            raise NameAlreadyExistError(name)
-        except NotFoundError:
+            raise TemplateAlreadyExistsError(name)
+        except TemplateNotFoundError:
             cli_template = CLITemplate(self.session, device_model, name, description)
             cli_template.config = config
             logger.info(f"Template with name: {name} - created.")
             return cli_template.send_to_device()
 
-    def create_feature_template(self, template: FeatureTemplate) -> None:
-        payload = template.generate_payload(self.session)
-        self.session.post("/dataservice/template/feature", json=json.loads(payload))
+    def create_feature_template(self, template: FeatureTemplate) -> Union[str, None]:
+        try:
+            self.get_single_feature_template(name=template.name)
+        except TemplateNotFoundError:
+            payload = template.generate_payload(self.session)
+            self.session.post("/dataservice/template/feature", json=json.loads(payload))
+        raise TemplateAlreadyExistsError(template.name)
+
+    def get_feature_templates(self, name: Optional[str] = None) -> List[FeatureTemplateInformation]:
+        """Get feature template list.
+
+        Note: In a multitenant vManage system, this API is only available in the Provider view.
+        """
+        payload = {"summary": "true"}
+        response = self.session.get("/dataservice/template/feature", params=payload)
+        parsed_response = response.json()["data"]
+        fr_templates = [
+            create_dataclass(FeatureTemplateInformation, feature_template) for feature_template in parsed_response
+        ]
+
+        if name is None:
+            return fr_templates
+        return list(filter(lambda template: template.name == name, fr_templates))
+
+    def get_single_feature_template(self, name: str) -> FeatureTemplateInformation:
+        fr_templates = self.get_feature_templates(name=name)
+
+        if not fr_templates:
+            raise TemplateNotFoundError(name)
+
+        if len(fr_templates) > 1:
+            raise InvalidOperationError("The input sequence contains more than one element.")
+
+        return fr_templates[0]
 
     def template_validation(self, id: str, device: Device) -> str:
         """Checking the template of the configuration on the machine.
