@@ -36,5 +36,7 @@ jobs:
         run: poetry install --sync -v
       - name: Install coverage
         run: pip install coverage
+      - name: Install coverage
+        run: pip install pytest
       - name: Run Tests
         run: coverage run -m pytest vmngclient/tests
