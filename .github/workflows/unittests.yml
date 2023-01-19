@@ -34,5 +34,7 @@ jobs:
           poetry-version: 1.3.1
       - name: Install dependencies
         run: poetry install --sync -v
+      - name: Install coverage
+        run: pip install coverage
       - name: Run Tests
         run: coverage run -m pytest vmngclient/tests
