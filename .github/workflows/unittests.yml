@@ -37,4 +37,4 @@ jobs:
       - name: Run Tests
         run: poetry run coverage run -m pytest vmngclient/tests && poetry run coverage report -m
       - name: Generate coverage bagde 
-        run: coverage-badge -o coverage.svg
+        run: poetry run coverage-badge -o coverage.svg
