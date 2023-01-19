@@ -2,7 +2,7 @@ import json
 import logging
 from difflib import Differ
 from enum import Enum
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
 from requests.exceptions import HTTPError
@@ -216,12 +216,15 @@ class TemplatesAPI:
             logger.info(f"Template with name: {name} - created.")
             return cli_template.send_to_device()
 
-    def create_feature_template(self, template: FeatureTemplate) -> Union[str, None]:
+    def create_feature_template(self, template: FeatureTemplate) -> str:
         try:
             self.get_single_feature_template(name=template.name)
         except TemplateNotFoundError:
             payload = template.generate_payload(self.session)
-            self.session.post("/dataservice/template/feature", json=json.loads(payload))
+            response = self.session.post("/dataservice/template/feature", json=json.loads(payload))
+            template_id = response.json()["templateId"]
+            logger.info(f"Template {template.name} was created successfully ({template_id}).")
+            return template_id
         raise TemplateAlreadyExistsError(template.name)
 
     def get_feature_templates(self, name: Optional[str] = None) -> List[FeatureTemplateInformation]:
