@@ -19,6 +19,7 @@ Jinja2 = "^3.1.2"
 flake8-quotes = "^3.3.1"
 clint = "^0.5.1"
 requests-toolbelt = "^0.10.1"
+coverage = "^7.0.5"
 
 
 [tool.poetry.dev-dependencies]
