@@ -151,9 +151,9 @@ class TestTemplatesAPI(unittest.TestCase):
         # Assert
         self.assertRaises(NotFoundError, answer)
 
-    @patch("vmngclient.session.vManageSession")
-    @patch("vmngclient.api.template_api.wait_for_completed")
     @patch.object(TemplatesAPI, "templates")
+    @patch("vmngclient.api.template_api.wait_for_completed")
+    @patch("vmngclient.session.vManageSession")
     def test_attach_exist_template(self, mock_session, mock_wait_for_completed, mock_templates):
 
         # Arrage
@@ -174,9 +174,9 @@ class TestTemplatesAPI(unittest.TestCase):
         # Assert
         self.assertTrue(answer)
 
+    @patch.object(TemplatesAPI, "templates")
     @patch("vmngclient.session.vManageSession")
     @patch("vmngclient.api.template_api.wait_for_completed")
-    @patch.object(TemplatesAPI, "templates")
     def test_attach_no_exist_template(self, mock_session, mock_wait_for_completed, mock_templates):
 
         # Arrage
@@ -214,8 +214,8 @@ class TestTemplatesAPI(unittest.TestCase):
         # Assert
         self.assertTrue(answer)
 
-    @patch("vmngclient.session.vManageSession")
     @patch.object(TemplatesAPI, "templates")
+    @patch("vmngclient.session.vManageSession")
     def test_delete_success(self, mock_session, mock_templates):
 
         # Arrage
@@ -234,8 +234,8 @@ class TestTemplatesAPI(unittest.TestCase):
         # Assert
         self.assertTrue(answer)
 
-    @patch("vmngclient.session.vManageSession")
     @patch.object(TemplatesAPI, "templates")
+    @patch("vmngclient.session.vManageSession")
     def test_delete_wrong_status(self, mock_session, mock_templates):
 
         # Arrage
@@ -255,8 +255,8 @@ class TestTemplatesAPI(unittest.TestCase):
         # Assert
         self.assertFalse(answer)
 
-    @patch("vmngclient.session.vManageSession")
     @patch.object(TemplatesAPI, "templates")
+    @patch("vmngclient.session.vManageSession")
     def test_delete_exception(self, mock_session, mock_templates):
 
         # Arrage
@@ -277,8 +277,8 @@ class TestTemplatesAPI(unittest.TestCase):
         # Assert
         self.assertRaises(AttachedError, answer)
 
-    @patch("vmngclient.session.vManageSession")
     @patch.object(TemplatesAPI, "templates")
+    @patch("vmngclient.session.vManageSession")
     def test_create_exception(self, mock_session, mock_templates):
 
         # Arrage
