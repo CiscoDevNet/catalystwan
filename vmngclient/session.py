@@ -138,7 +138,6 @@ class vManageSession(Session):
         self.base_url = self.__create_base_url()
         self.username = username
         self.password = password
-        self.port = port
         self.subdomain = subdomain
 
         self.session_type = SessionType.NOT_DEFINED
@@ -275,10 +274,7 @@ class vManageSession(Session):
 
     def check_vmanage_server_connection(self) -> bool:
         try:
-            url = str(self.base_url).replace("https", "http")
-            if self.port:
-                url = url.replace(str(f":{self.port}"), "")
-            head(url, timeout=2)
+            head(self.base_url, timeout=15, verify=False)
         except ConnectionError:
             return False
         else:
