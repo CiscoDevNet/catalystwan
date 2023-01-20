@@ -144,9 +144,6 @@ class vManageSession(Session):
         self.server_name = None
         self.logger = logging.getLogger(__name__)
 
-        if not self.check_vmanage_server_connection():
-            raise ConnectionError("Vmanage server is not available")
-
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
 
