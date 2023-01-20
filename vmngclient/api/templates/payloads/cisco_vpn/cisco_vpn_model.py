@@ -9,6 +9,7 @@ from attr import define, field  # type: ignore
 from pydantic import validator  # type: ignore
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
+from vmngclient.api.templates.payloads.aaa.aaa_model import VpnType
 from vmngclient.session import vManageSession
 
 
@@ -66,7 +67,7 @@ class CiscoVPNModel(FeatureTemplate):
 
     @validator("vpn_id")
     def check_id(cls, v, values):
-        if v not in [0, 512]:
+        if v not in [VpnType.VPN_TRANSPORT.value, VpnType.VPN_MANAGMENT.value]:
             if "tenant_org_name" not in values:
                 raise ValueError("Must enter the name of the organization.")
         return v
