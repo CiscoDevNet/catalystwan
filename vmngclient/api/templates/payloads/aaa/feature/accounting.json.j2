@@ -1,0 +1,40 @@
+{
+    "key": "accounting",
+    "description": "Enable/disable user accounting",
+    "details": "Enable/disable user accounting",
+    "optionType": [
+        {
+            "value": "constant",
+            "display": "Global",
+            "iconClass": "language",
+            "iconColor": "icon-global"
+        },
+        {
+            "value": "variable",
+            "display": "Device Specific",
+            "iconClass": "router",
+            "iconColor": "icon-variable"
+        },
+        {
+            "value": "ignore",
+            "display": "Default",
+            "iconClass": "check_circle",
+            "iconColor": "icon-default"
+        }
+    ],
+    "originalDefaultOption": "ignore",
+    "defaultOption": "ignore",
+    "dataType": {
+        "type": "boolean",
+        "default": "false"
+    },
+    "dataPath": [
+        "aaa"
+    ],
+    "vipObjectType": "object",
+    "objectType": "object",
+    "deleteFlag": false,
+    "vipValue": "{{ accounting | tojson}}",
+    "vipType": "constant",
+    "vipVariableName": "aaa_accounting"
+}

@@ -202,10 +202,10 @@ class EventData(DataclassBase):
 
 @define(frozen=True)
 class User(DataclassBase):
-    group: List[str]
     username: str = field(metadata={FIELD_NAME: "userName"})
-    locale: Optional[str] = field(default=None)
     password: Optional[str] = field(default=None)
+    group: List[str] = field(factory=list)
+    locale: Optional[str] = field(default=None)
     description: Optional[str] = field(default=None)
     resource_group: Optional[str] = field(default=None, metadata={FIELD_NAME: "resGroupName"})
 
@@ -294,3 +294,57 @@ class CloudOnRampForSaasMode(DataclassBase):
     """
 
     mode: str = field(metadata={FIELD_NAME: "mode"})
+
+
+@define(frozen=True)
+class TenantInfo(DataclassBase):
+    """Endpoint(s): /dataservice/tenant"""
+
+    name: str
+    organization_name: str = field(metadata={FIELD_NAME: "orgName"})
+    sub_domain: str = field(metadata={FIELD_NAME: "subDomain"})
+    id: str = field(metadata={FIELD_NAME: "tenantId"})
+    flake_id: int = field(metadata={FIELD_NAME: "flakeId"})
+
+
+@define(frozen=True)
+class TLOC:
+    color: str
+    encapsulation: str
+
+
+@define(frozen=True)
+class TierInfo(DataclassBase):
+    """Endpoint: /dataservice/tier"""
+
+    name: str = field(metadata={FIELD_NAME: "tierName"})
+    vpn: int
+    rid: int = field(metadata={FIELD_NAME: "@rid"})
+    ipv4_route_limit_type: Optional[str] = field(default=None, metadata={FIELD_NAME: "ipv4RouteLimitType"})
+    ipv4_route_limit_threshold: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv4RouteLimitThreshold"})
+    ipv4_route_limit: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv4RouteLimit"})
+    ipv6_route_limit_type: Optional[str] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimitType"})
+    ipv6_route_limit_threshold: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimitThreshold"})
+    ipv6_route_limit: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimit"})
+    tlocs: List[TLOC] = field(factory=list)
+
+
+@define(frozen=True)
+class FeatureTemplateInformation(DataclassBase):
+    """Endpoint: /dataservice/template/feature"""
+
+    id: str = field(metadata={FIELD_NAME: "templateId"})
+    name: str = field(metadata={FIELD_NAME: "templateName"})
+    description: str = field(metadata={FIELD_NAME: "templateDescription"})
+    type: str = field(metadata={FIELD_NAME: "templateType"})  # TODO Enum
+    device_types: List[str] = field(metadata={FIELD_NAME: "deviceType"})  # TODO Enum
+    last_updated_by: str = field(metadata={FIELD_NAME: "lastUpdatedBy"})
+    last_updated_on: dt.datetime = field(metadata={FIELD_NAME: "lastUpdatedOn"})
+    factory_default: bool = field(metadata={FIELD_NAME: "factoryDefault"})
+    devices_attached: int = field(metadata={FIELD_NAME: "devicesAttached"})
+    attached_masters: int = field(metadata={FIELD_NAME: "attachedMastersCount"})
+    version: str = field(metadata={FIELD_NAME: "templateMinVersion"})
+    config_type: str = field(metadata={FIELD_NAME: "configType"})
+    created_by: str = field(metadata={FIELD_NAME: "createdBy"})
+    created_on: dt.datetime = field(metadata={FIELD_NAME: "createdOn"})
+    resource_group: str = field(metadata={FIELD_NAME: "resourceGroup"})

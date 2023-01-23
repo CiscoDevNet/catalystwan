@@ -1,0 +1,127 @@
+{
+    "templateName": "{{ name }}",
+    "templateDescription": "{{ description }}",
+    "templateType": "tenant",
+    "deviceType": [
+        "vedge-C8000V"
+    ],
+    "templateMinVersion": "15.0.0",
+    "templateDefinition": {
+        "tenant": {
+            "vipType": {% if tenants %}"constant"{% else %}"ignore"{% endif %},
+            "vipValue": [
+                {% for tenant in tenants %}{
+							"global-tenant-id": {
+								"vipObjectType": "object",
+								"vipType": "constant",
+								"vipValue": {{ tenant["info"].flake_id }} 
+							},
+                            "org-name": {
+                                "vipObjectType": "object",
+                                "vipType": "constant",
+                                "vipValue": "{{ tenant.organization_name }}",
+                                "vipVariableName": "tenantOrgName_login"
+                            },
+                            "priority-order": [
+                                "org-name",
+                                "universal-unique-id",
+                                "global-tenant-id",
+                                "tenant-tloc",
+                                "tier"
+                            ],
+                            "tier": {
+                                "max": {
+                                    "routes": {
+                                        "address-family": {
+                                            "ipv4": {
+                                                "unicast-route-limit": {
+                                                    "route-limit": {
+                                                        "vipObjectType": "object",
+                                                        "vipType": "constant",
+                                                        "vipValue": {{ tenant["tier"].ipv4_route_limit }}
+                                                    },
+                                                    "warning-only": {
+                                                        "vipObjectType": "node-only",
+                                                        "vipType": "ignore",
+                                                        "vipValue": false
+                                                    },
+                                                    "warning-threshold": {
+                                                        "vipObjectType": "object",
+                                                        "vipType": "constant",
+                                                        "vipValue": {{ tenant["tier"].ipv4_route_limit_threshold }}
+                                                    }
+                                                }
+                                            },
+                                            "ipv6": {
+                                                "unicast-route-limit": {
+                                                    "route-limit": {
+                                                        "vipObjectType": "object",
+                                                        "vipType": "constant",
+                                                        "vipValue": {{ tenant["tier"].ipv6_route_limit }}
+                                                    },
+                                                    "warning-only": {
+                                                        "vipObjectType": "node-only",
+                                                        "vipType": "ignore",
+                                                        "vipValue": false
+                                                    },
+                                                    "warning-threshold": {
+                                                        "vipObjectType": "object",
+                                                        "vipType": "constant",
+                                                        "vipValue": {{ tenant["tier"].ipv6_route_limit_threshold }}
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "max-vpn": {
+                                    "vipObjectType": "object",
+                                    "vipType": "constant",
+                                    "vipValue": {{ tenant["tier"].vpn }}
+                                },
+                                "tier-name": {
+                                    "vipObjectType": "object",
+                                    "vipType": "constant",
+                                    "vipValue": "{{ tenant.tier_name }}"
+                                }
+                            },
+                            "tenant-tloc": {
+                                "vipObjectType": "tree",
+                                "vipPrimaryKey": [
+                                    "color", "encap"
+                                ],
+                                "vipType": "constant",
+                                "vipValue": [
+                                    {% for tloc in tenant['tier'].tlocs %}{
+                                        "color": {
+                                            "vipObjectType": "object",
+                                            "vipType": "constant",
+                                            "vipValue": "{{ tloc.color }}"
+                                        },
+                                        "encap": {
+                                            "vipObjectType": "object",
+                                            "vipType": "constant",
+                                            "vipValue": "{{ tloc.color }}"
+                                        },
+                                        "priority-order": ["color", "encap"]
+                                    }
+                                    {% if not loop.last %},{% endif %}
+                                    {% endfor %}
+                                ]
+                            },
+                            "universal-unique-id": {
+                                "vipObjectType": "object",
+                                "vipType": "constant",
+                                "vipValue": "{{ tenant["info"].id }}"
+                            }
+                        }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            "vipObjectType": "tree",
+            "vipPrimaryKey": [
+                "org-name"
+            ]
+        }
+    },
+    "factoryDefault": false
+}
