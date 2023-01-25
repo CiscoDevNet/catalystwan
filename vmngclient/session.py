@@ -12,6 +12,7 @@ from requests.auth import AuthBase
 from requests.exceptions import ConnectionError, HTTPError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
+from vmngclient.exceptions import InvalidOperationError
 from vmngclient.utils.response import response_debug
 from vmngclient.vmanage_auth import vManageAuth
 
@@ -72,7 +73,12 @@ def create_vManageSession(
         tenant_id = session.get_tenant_id()
         vsession_id = session.get_virtual_session_id(tenant_id)
         session.headers.update({"VSessionId": vsession_id})
-    server_info = session.server()
+
+    try:
+        server_info = session.server()
+    except InvalidOperationError:
+        server_info = {}
+
     session.server_name = server_info.get("server")
     session.on_session_create_hook()
 
@@ -100,10 +106,7 @@ def create_vManageSession(
         )
     else:
         session.session_type = SessionType.NOT_DEFINED
-        session.logger.warning(
-            f"Session created with {user_mode.value} user mode and {view_mode.value} view mode.\n"
-            f"Session type set to not defined"
-        )
+        session.logger.warning(f"Session created with {user_mode} and {view_mode}.")
 
     session.logger.info(f"Logged as {username}. The session type is {session.session_type}")
     return session
@@ -151,6 +154,10 @@ class vManageSession(Session):
         full_url = self.get_full_url(url)
         response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
         self.logger.debug(response_debug(response))
+
+        if response.request.url and "passwordReset.html" in response.request.url:
+            raise InvalidOperationError("Password must be changed to use this session.")
+
         try:
             response.raise_for_status()
         except HTTPError as error:
