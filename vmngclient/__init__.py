@@ -1,5 +1,6 @@
 import logging
 import logging.config
+from importlib import metadata
 from pathlib import Path
 from typing import Final
 
@@ -9,3 +10,7 @@ vmngclient_logger = logging.getLogger(__name__)
 
 if not vmngclient_logger.handlers:
     logging.config.fileConfig(LOGGING_CONF_DIR, disable_existing_loggers=False)
+
+__version__ = metadata.version(__package__)
+
+vmngclient_logger.debug(f"vmngclient {__version__}")
