@@ -157,6 +157,8 @@ class vManageSession(Session):
             self.logger.debug(self.response_trace(response, None))
         except RequestException as exception:
             self.logger.debug(self.response_trace(exception.response, exception.request))
+            self.logger.error(exception)
+            raise
 
         if response.request.url and "passwordReset.html" in response.request.url:
             raise InvalidOperationError("Password must be changed to use this session.")
