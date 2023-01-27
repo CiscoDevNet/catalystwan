@@ -146,7 +146,9 @@ class vManageSession(Session):
         self.session_type = SessionType.NOT_DEFINED
         self.server_name = None
         self.logger = logging.getLogger(__name__)
-        self.response_trace: Callable[[Response, Union[Request, PreparedRequest, None]], str] = response_history_debug
+        self.response_trace: Callable[
+            [Optional[Response], Union[Request, PreparedRequest, None]], str
+        ] = response_history_debug
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
 

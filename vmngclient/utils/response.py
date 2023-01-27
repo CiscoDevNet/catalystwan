@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from pprint import pformat
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union, cast
 
@@ -19,12 +18,6 @@ class VManageResponseException(Exception):
         return f"{self.message}\n{response_debug(self.response)}"
 
 
-@dataclass
-class VManageResponseDebugInfo:
-    request: Optional[Dict[str, Any]] = None
-    response: Optional[Dict[str, Any]] = None
-
-
 def response_debug(response: Optional[Response], request: Union[Request, PreparedRequest, None]) -> str:
     """Returns human readable string containing Request-Response contents (helpful for debugging).
 
@@ -35,23 +28,24 @@ def response_debug(response: Optional[Response], request: Union[Request, Prepare
     Returns:
         str
     """
-    if request is None and response is None:
-        return ""
-    if request is None and response is not None:
-        request = response.request
-        request_body = request.body
+    if request is None:
+        if response is None:
+            return ""
+        else:
+            _request: Union[Request, PreparedRequest] = response.request
     else:
-        request_body = None
-    info = VManageResponseDebugInfo()
-    if request is not None:
-        info.request = {
-            "method": request.method,
-            "url": request.url,
-            "body": request_body,
-            "headers": dict(request.headers.items()),
-        }
+        _request = request
+    debug_dict = {}
+    request_debug = {
+        "method": _request.method,
+        "url": _request.url,
+        "headers": dict(_request.headers.items()),
+        "body": getattr(_request, "body", None),
+        "json": getattr(_request, "json", None),
+    }
+    debug_dict["request"] = {k: v for k, v in request_debug.items() if v is not None}
     if response is not None:
-        info.response = {
+        response_debug = {
             "status": response.status_code,
             "reason": response.reason,
             "headers": dict(response.headers.items()),
@@ -59,13 +53,14 @@ def response_debug(response: Optional[Response], request: Union[Request, Prepare
         try:
             json = response.json()
             json.pop("header", None)
-            info.response.update({"json": json})
+            response_debug.update({"json": json})
         except JSONDecodeError:
             if len(response.text) <= 1024:
-                info.response.update({"text": response.text})
+                response_debug.update({"text": response.text})
             else:
-                info.response.update({"text(trimmed)": response.text[:128]})
-    return pformat(dict(info.__dict__.items()), width=80, sort_dicts=False)
+                response_debug.update({"text(trimmed)": response.text[:128]})
+        debug_dict["response"] = response_debug
+    return pformat(debug_dict, width=80, sort_dicts=False)
 
 
 def response_history_debug(response: Optional[Response], request: Union[Request, PreparedRequest, None]) -> str:
