@@ -1,8 +1,7 @@
-from dataclasses import dataclass
 from pprint import pformat
-from typing import Any, Dict, List, Type, TypeVar, cast
+from typing import Any, Dict, List, Optional, Type, TypeVar, Union, cast
 
-from requests import Response
+from requests import PreparedRequest, Request, Response
 from requests.exceptions import JSONDecodeError
 
 from vmngclient.utils.creation_tools import create_dataclass
@@ -19,32 +18,66 @@ class VManageResponseException(Exception):
         return f"{self.message}\n{response_debug(self.response)}"
 
 
-@dataclass
-class VManageResponseDebugInfo:
-    request: Dict[str, Any]
-    response: Dict[str, Any]
+def response_debug(response: Optional[Response], request: Union[Request, PreparedRequest, None]) -> str:
+    """Returns human readable string containing Request-Response contents (helpful for debugging).
 
+    Args:
+        response: Response object to be debugged (note it contains an PreparedRequest object already)
+        request: optional Request object to be debugged
 
-def response_debug(response: Response, headers: bool = True) -> str:
-    request_body = response.request.body
-    if isinstance(request_body, bytes) and request_body.isascii():
-        request_body = str(request_body, encoding="utf-8")
-    info = VManageResponseDebugInfo(
-        request={
-            "method": response.request.method,
-            "url": response.request.url,
-            "body": request_body,
-        },
-        response={"status": response.status_code, "reason": response.reason},
-    )
-    if len(response.text) <= 1024:
-        info.response.update({"text": response.text})
+    Returns:
+        str
+    """
+    if request is None:
+        if response is None:
+            return ""
+        else:
+            _request: Union[Request, PreparedRequest] = response.request
     else:
-        info.response.update({"text(trimmed)": response.text[:128]})
-    if headers:
-        info.request.update({"headers": dict(response.request.headers.items())})
-        info.response.update({"headers": dict(response.headers.items())})
-    return pformat(dict(info.__dict__.items()), width=80, indent=0)
+        _request = request
+    debug_dict = {}
+    request_debug = {
+        "method": _request.method,
+        "url": _request.url,
+        "headers": dict(_request.headers.items()),
+        "body": getattr(_request, "body", None),
+        "json": getattr(_request, "json", None),
+    }
+    debug_dict["request"] = {k: v for k, v in request_debug.items() if v is not None}
+    if response is not None:
+        response_debug = {
+            "status": response.status_code,
+            "reason": response.reason,
+            "headers": dict(response.headers.items()),
+        }
+        try:
+            json = response.json()
+            json.pop("header", None)
+            response_debug.update({"json": json})
+        except JSONDecodeError:
+            if len(response.text) <= 1024:
+                response_debug.update({"text": response.text})
+            else:
+                response_debug.update({"text(trimmed)": response.text[:128]})
+        debug_dict["response"] = response_debug
+    return pformat(debug_dict, width=80, sort_dicts=False)
+
+
+def response_history_debug(response: Optional[Response], request: Union[Request, PreparedRequest, None]) -> str:
+    """Returns human readable string containing Request-Response history contents for given response.
+
+    Args:
+        response: Response object to be debugged (note it contains an PreparedRequest object already)
+        request: optional Request object to be debugged (considered to be latest request)
+
+    Returns:
+        str
+    """
+    if response is None:
+        return response_debug(response, request)
+    response_debugs = [response_debug(resp, None) for resp in response.history]
+    response_debugs += [response_debug(response, request)]
+    return "\n".join(response_debugs)
 
 
 def get_json_data(response: Response) -> Any:
