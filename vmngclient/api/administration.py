@@ -1,7 +1,10 @@
+import json
 import logging
+from enum import Enum
 from typing import List, Union, cast
 
 from vmngclient.dataclasses import CloudConnectorData, CloudServicesSettings, ServiceConfigurationData, User
+from vmngclient.exceptions import RetrieveIntervalOutOfRange
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import asdict, create_dataclass
 
@@ -14,6 +17,11 @@ class UserAlreadyExistsError(Exception):
 
 class UserDoesNotExists(Exception):
     pass
+
+
+class ValidityPeriod(Enum):
+    ONE_YEAR = "1Y"
+    TWO_YEARS = "2Y"
 
 
 class UsersAPI:
@@ -133,3 +141,38 @@ class AdministrationSettingsAPI:
         data = {"mode": "on"} if not disable else {"mode": "off"}
         response = self.session.put(url_path, data)
         return True if response.status_code == 200 else False
+
+    def get_organization_name(self) -> List[str]:
+        endpoint = "/dataservice/settings/configuration/organization"
+
+        return [organizations_info.get("org") for organizations_info in self.session.get_data(endpoint)]
+
+    def update_vbond_address(self, vbond_address: str, vbond_port: int) -> None:
+        endpoint = "/dataservice/settings/configuration/device"
+        payload = {"domainIp": vbond_address, "port": vbond_port}
+
+        self.session.post(endpoint, data=json.dumps(payload))
+        logger.debug(f"vBond address set to {vbond_address}, and port set to {vbond_port}")
+
+    def update_controller_certificate(
+        self,
+        controller_certificate: str = "cisco",
+        first_name: str = "",
+        last_name: str = "",
+        email: str = "",
+        validity_period: ValidityPeriod = ValidityPeriod.ONE_YEAR,
+        retrieve_interval: int = 60,
+    ) -> None:
+        if retrieve_interval < 1 or retrieve_interval > 60:
+            raise RetrieveIntervalOutOfRange("Retrieve interval must be value between 1 and 60 minutes")
+
+        endpoint = "/dataservice/settings/configuration/certificate"
+        payload = {
+            "certificateSigning": controller_certificate,
+            "firstName": first_name,
+            "lastName": last_name,
+            "email": email,
+            "validityPeriod": validity_period.value,
+            "retrieveInterval": str(retrieve_interval),
+        }
+        self.session.put(endpoint, data=json.dumps(payload))
