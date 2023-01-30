@@ -1,13 +1,13 @@
 import logging
 from enum import Enum
 from pathlib import PurePath
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from attr import define  # type: ignore
 from clint.textui.progress import Bar as ProgressBar  # type: ignore
 from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
 
-from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
+from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI,DeviceCategory
 from vmngclient.dataclasses import Device
 from vmngclient.session import vManageSession
 
@@ -60,11 +60,12 @@ class SoftwareActionAPI:
     are exececutable on all device categories.
     """
 
-    def __init__(self, session: vManageSession, device_versions: DeviceVersions, repository: RepositoryAPI) -> None:
+    def __init__(self, session: vManageSession, device_category: DeviceCategory) -> None:
 
         self.session = session
-        self.device_versions = device_versions
-        self.repository = repository
+        self.repository = RepositoryAPI(self.session)
+        self.device_versions = DeviceVersions(self.repository,device_category)
+        
 
     def activate_software(self, version_to_activate: str, devices: List[Device]) -> str:
         """
@@ -89,17 +90,18 @@ class SoftwareActionAPI:
     def upgrade_software(
         self,
         devices: List[Device],
-        software_image: str,
         install_spec: InstallSpecification,
         reboot: bool,
         sync: bool = True,
+        software_image: PurePath = None,
+        image_version: str = None,
     ) -> str:
         """
         Method to install new software
 
         Args:
-            software_image (str): path to software image
-            install_spec (InstallSpecification): specification of devices
+            software_image (str): path to software image #TODO:give info about optionality
+            install_spec (InstallSpecification): specification of devices 
             on which the action is to be performed
             reboot (bool): reboot device after action end
             sync (bool, optional): Synchronize settings. Defaults to True.
@@ -110,7 +112,12 @@ class SoftwareActionAPI:
         Returns:
             str: action id
         """
-
+        if software_image and not image_version:
+            version = self.repository.get_image_version(software_image)
+        elif image_version and not software_image: 
+            version = software_image
+        else:
+            raise ValueError ("You can not provide software_image and image version at the same time")
         url = "/dataservice/device/action/install"
         payload: Dict[str, Any] = {
             "action": "install",
@@ -118,7 +125,7 @@ class SoftwareActionAPI:
                 "vEdgeVPN": 0,
                 "vSmartVPN": 0,
                 "family": install_spec.family.value,
-                "version": self.repository.get_image_version(software_image),
+                "version": version,
                 "versionType": install_spec.version_type.value,
                 "reboot": reboot,
                 "sync": sync,

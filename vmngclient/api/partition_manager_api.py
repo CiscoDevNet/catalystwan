@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, List
 
-from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
+from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI, DeviceCategory
 from vmngclient.dataclasses import Device
 from vmngclient.session import vManageSession
 
@@ -14,11 +14,11 @@ class PartitionManagerAPI:
     are exececutable on all device categories.
     """
 
-    def __init__(self, session: vManageSession, device_versions: DeviceVersions, repository: RepositoryAPI) -> None:
+    def __init__(self, session: vManageSession, device_category: DeviceCategory) -> None:
 
         self.session = session
-        self.device_versions = device_versions
-        self.repository = repository
+        self.repository = RepositoryAPI(self.session)
+        self.device_versions = DeviceVersions(self.repository,device_category)
 
     def set_default_partition(self, devices: List[Device], version: str) -> str:
         """
