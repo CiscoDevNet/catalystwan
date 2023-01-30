@@ -176,3 +176,13 @@ class AdministrationSettingsAPI:
             "retrieveInterval": str(retrieve_interval),
         }
         self.session.put(endpoint, data=json.dumps(payload))
+
+    def change_password(self, old_password: str, new_password: str) -> None:
+        logger.debug("Changing password.")
+        endpoint = "/dataservice/admin/user/profile/password"
+        payload = {
+            "oldpassword": old_password,
+            "newpassword": new_password
+        }
+        self.session.put(endpoint, data=json.dumps(payload))
+        logger.info("Password changed.")
