@@ -150,6 +150,7 @@ class AdministrationSettingsAPI:
     def add_organization_name(self, organization_name: str, domain_id: int = 1):
         endpoint = "/dataservice/settings/configuration/organization"
         payload = {"domain-id": domain_id, "org": organization_name}
+
         self.session.put(endpoint, data=json.dumps(payload))
 
     def update_vbond_address(self, vbond_address: str, vbond_port: int) -> None:
@@ -161,7 +162,7 @@ class AdministrationSettingsAPI:
 
     def update_controller_certificate(
         self,
-        controller_certificate: str = "cisco",
+        controller_certificate: str = "",
         first_name: str = "",
         last_name: str = "",
         email: str = "",
