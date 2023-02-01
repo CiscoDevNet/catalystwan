@@ -147,6 +147,11 @@ class AdministrationSettingsAPI:
 
         return [organizations_info.get("org") for organizations_info in self.session.get_data(endpoint)]
 
+    def add_organization_name(self, organization_name: str, domain_id: int = 1):
+        endpoint = "/dataservice/settings/configuration/organization"
+        payload = {"domain-id": domain_id, "org": organization_name}
+        self.session.put(endpoint, data=json.dumps(payload))
+
     def update_vbond_address(self, vbond_address: str, vbond_port: int) -> None:
         endpoint = "/dataservice/settings/configuration/device"
         payload = {"domainIp": vbond_address, "port": vbond_port}
@@ -180,9 +185,6 @@ class AdministrationSettingsAPI:
     def change_password(self, old_password: str, new_password: str) -> None:
         logger.debug("Changing password.")
         endpoint = "/dataservice/admin/user/profile/password"
-        payload = {
-            "oldpassword": old_password,
-            "newpassword": new_password
-        }
+        payload = {"oldpassword": old_password, "newpassword": new_password}
         self.session.put(endpoint, data=json.dumps(payload))
         logger.info("Password changed.")
