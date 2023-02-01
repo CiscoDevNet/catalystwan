@@ -147,7 +147,7 @@ class AdministrationSettingsAPI:
 
         return [organizations_info.get("org") for organizations_info in self.session.get_data(endpoint)]
 
-    def add_organization_name(self, organization_name: str, domain_id: int = 1):
+    def update_organization_name(self, organization_name: str, domain_id: int = 1):
         endpoint = "/dataservice/settings/configuration/organization"
         payload = {"domain-id": domain_id, "org": organization_name}
 
