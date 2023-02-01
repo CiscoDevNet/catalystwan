@@ -158,12 +158,13 @@ class AdministrationSettingsAPI:
             error = json.loads(e.response.text).get("error")
             logger.error(f"{error.get('message')} - {error.get('details')}")
 
-    def update_vbond_address(self, vbond_address: str, vbond_port: int) -> None:
+    def update_vbond_address(self, vbond_address: str, vbond_port: int) -> bool:
         endpoint = "/dataservice/settings/configuration/device"
         payload = {"domainIp": vbond_address, "port": vbond_port}
 
-        self.session.post(endpoint, json=payload)
+        response = self.session.post(endpoint, json=payload)
         logger.debug(f"vBond address set to {vbond_address}, and port set to {vbond_port}")
+        return True if response.status_code == 200 else False
 
     def update_controller_certificate(
         self,
@@ -173,7 +174,7 @@ class AdministrationSettingsAPI:
         email: str = "",
         validity_period: ValidityPeriod = ValidityPeriod.ONE_YEAR,
         retrieve_interval: int = 60,
-    ) -> None:
+    ) -> bool:
         if retrieve_interval < 1 or retrieve_interval > 60:
             raise RetrieveIntervalOutOfRange("Retrieve interval must be value between 1 and 60 minutes")
 
@@ -186,12 +187,14 @@ class AdministrationSettingsAPI:
             "validityPeriod": validity_period.value,
             "retrieveInterval": str(retrieve_interval),
         }
-        self.session.put(endpoint, json=payload)
+        response = self.session.put(endpoint, json=payload)
+        return True if response.status_code == 200 else False
 
-    def change_password(self, old_password: str, new_password: str) -> None:
+    def change_password(self, old_password: str, new_password: str) -> bool:
         logger.debug("Changing password.")
         endpoint = "/dataservice/admin/user/profile/password"
         payload = {"oldpassword": old_password, "newpassword": new_password}
 
-        self.session.put(endpoint, json=payload)
+        response = self.session.put(endpoint, json=payload)
         logger.info("Password changed.")
+        return True if response.status_code == 200 else False

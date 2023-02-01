@@ -59,7 +59,7 @@ class TestUsersAPI(unittest.TestCase):
     @parameterized.expand([[200, True], [400, False]])
     @patch("vmngclient.session.Session")
     @patch("requests.Response")
-    def test_create_user(self, status_code, expected_outcome, mock_session, mock_response):
+    def test_create_user(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
         mock_session.get_data.return_value = [self.users[1]]
         mock_session.post.return_value = mock_response
@@ -84,7 +84,7 @@ class TestUsersAPI(unittest.TestCase):
     @parameterized.expand([[200, True], [400, False]])
     @patch("vmngclient.session.Session")
     @patch("requests.Response")
-    def test_delete_user(self, status_code, expected_outcome, mock_session, mock_response):
+    def test_delete_user(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.users
         mock_session.delete.return_value = mock_response
@@ -129,7 +129,7 @@ class TestClusterManagementAPI(unittest.TestCase):
     @parameterized.expand([[200, True], [400, False]])
     @patch("vmngclient.session.Session")
     @patch("requests.Response")
-    def test_modify_cluster_setup(self, status_code, expected_outcome, mock_session, mock_response):
+    def test_modify_cluster_setup(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
         mock_session.put.return_value = mock_response
         mock_response.status_code = status_code
@@ -173,7 +173,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
     @parameterized.expand([[200, True], [400, False]])
     @patch("vmngclient.session.Session")
     @patch("requests.Response")
-    def test_enable_sdavc_cloud_connector(self, status_code, expected_outcome, mock_session, mock_response):
+    def test_enable_sdavc_cloud_connector(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
         mock_session.post.return_value = mock_response
         mock_response.status_code = status_code
@@ -187,7 +187,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
     @parameterized.expand([[200, True], [400, False]])
     @patch("vmngclient.session.Session")
     @patch("requests.Response")
-    def test_disable_sdavc_cloud_connector(self, status_code, expected_outcome, mock_session, mock_response):
+    def test_disable_sdavc_cloud_connector(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
         mock_session.put.return_value = mock_response
         mock_response.status_code = status_code
@@ -208,7 +208,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
     @parameterized.expand([[200, True], [400, False]])
     @patch("vmngclient.session.Session")
     @patch("requests.Response")
-    def test_set_cloud_services(self, status_code, expected_outcome, mock_session, mock_response):
+    def test_set_cloud_services(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
         mock_session.post.return_value = mock_response
         mock_response.status_code = status_code
@@ -229,7 +229,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
     @parameterized.expand([[200, True], [400, False]])
     @patch("vmngclient.session.Session")
     @patch("requests.Response")
-    def test_enable_cloud_on_ramp_for_saas_mode(self, status_code, expected_outcome, mock_session, mock_response):
+    def test_enable_cloud_on_ramp_for_saas_mode(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
         mock_session.put.return_value = mock_response
         mock_response.status_code = status_code
@@ -237,3 +237,50 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         answer = AdministrationSettingsAPI(mock_session).enable_cloud_on_ramp_for_saas_mode(True)
         # Assert
         self.assertEqual(answer, expected_outcome)
+
+    @patch("vmngclient.session.Session")
+    def test_get_organization_name(self, mock_session):
+        # Arrange
+        organization_name = "My org name"
+        organization_data = [{"domain-id": "1", "org": organization_name, "controlConnectionUp": "true"}]
+        mock_session.get_data.return_value = organization_data
+        # Act
+        answer = AdministrationSettingsAPI(mock_session).get_organization_name()
+        # Assert
+        self.assertEqual(answer, [organization_name])
+
+    def test_update_organization_name(self):
+        pass
+
+    @patch("vmngclient.session.Session")
+    @patch("requests.Response")
+    def test_update_vbond_address(self, mock_response, mock_session):
+        # Arrange
+        mock_session.post.return_value = mock_response
+        mock_response.status_code = 200
+        # Act
+        answer = AdministrationSettingsAPI(mock_session).update_vbond_address("123", 1)
+        # Assert
+        self.assertTrue(answer)
+
+    @patch("vmngclient.session.Session")
+    @patch("requests.Response")
+    def test_update_controller_certificate(self, mock_response, mock_session):
+        # Arrange
+        mock_session.put.return_value = mock_response
+        mock_response.status_code = 200
+        # Act
+        answer = AdministrationSettingsAPI(mock_session).update_controller_certificate()
+        # Assert
+        self.assertTrue(answer)
+
+    @patch("vmngclient.session.Session")
+    @patch("requests.Response")
+    def test_change_password(self, mock_response, mock_session):
+        # Arrange
+        mock_session.put.return_value = mock_response
+        mock_response.status_code = 200
+        # Act
+        answer = AdministrationSettingsAPI(mock_session).change_password("old_password", "new_password")
+        # Assert
+        self.assertTrue(answer)
