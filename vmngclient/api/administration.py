@@ -192,5 +192,6 @@ class AdministrationSettingsAPI:
         logger.debug("Changing password.")
         endpoint = "/dataservice/admin/user/profile/password"
         payload = {"oldpassword": old_password, "newpassword": new_password}
+
         self.session.put(endpoint, json=payload)
         logger.info("Password changed.")
