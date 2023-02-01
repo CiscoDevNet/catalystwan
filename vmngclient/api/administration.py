@@ -3,6 +3,8 @@ import logging
 from enum import Enum
 from typing import List, Union, cast
 
+from requests import HTTPError
+
 from vmngclient.dataclasses import CloudConnectorData, CloudServicesSettings, ServiceConfigurationData, User
 from vmngclient.exceptions import RetrieveIntervalOutOfRange
 from vmngclient.session import vManageSession
@@ -150,14 +152,17 @@ class AdministrationSettingsAPI:
     def update_organization_name(self, organization_name: str, domain_id: int = 1):
         endpoint = "/dataservice/settings/configuration/organization"
         payload = {"domain-id": domain_id, "org": organization_name}
-
-        self.session.put(endpoint, data=json.dumps(payload))
+        try:
+            self.session.put(endpoint, json=payload)
+        except HTTPError as e:
+            error = json.loads(e.response.text).get("error")
+            logger.error(f"{error.get('message')} - {error.get('details')}")
 
     def update_vbond_address(self, vbond_address: str, vbond_port: int) -> None:
         endpoint = "/dataservice/settings/configuration/device"
         payload = {"domainIp": vbond_address, "port": vbond_port}
 
-        self.session.post(endpoint, data=json.dumps(payload))
+        self.session.post(endpoint, json=payload)
         logger.debug(f"vBond address set to {vbond_address}, and port set to {vbond_port}")
 
     def update_controller_certificate(
@@ -181,11 +186,11 @@ class AdministrationSettingsAPI:
             "validityPeriod": validity_period.value,
             "retrieveInterval": str(retrieve_interval),
         }
-        self.session.put(endpoint, data=json.dumps(payload))
+        self.session.put(endpoint, json=payload)
 
     def change_password(self, old_password: str, new_password: str) -> None:
         logger.debug("Changing password.")
         endpoint = "/dataservice/admin/user/profile/password"
         payload = {"oldpassword": old_password, "newpassword": new_password}
-        self.session.put(endpoint, data=json.dumps(payload))
+        self.session.put(endpoint, json=payload)
         logger.info("Password changed.")
