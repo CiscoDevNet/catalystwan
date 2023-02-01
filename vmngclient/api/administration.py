@@ -149,14 +149,15 @@ class AdministrationSettingsAPI:
 
         return [organizations_info.get("org") for organizations_info in self.session.get_data(endpoint)]
 
-    def update_organization_name(self, organization_name: str, domain_id: int = 1):
+    def update_organization_name(self, organization_name: str, domain_id: int = 1) -> bool:
         endpoint = "/dataservice/settings/configuration/organization"
         payload = {"domain-id": domain_id, "org": organization_name}
         try:
-            self.session.put(endpoint, json=payload)
+            response = self.session.put(endpoint, json=payload)
         except HTTPError as e:
             error = json.loads(e.response.text).get("error")
             logger.error(f"{error.get('message')} - {error.get('details')}")
+        return True if response.status_code == 200 else False
 
     def update_vbond_address(self, vbond_address: str, vbond_port: int) -> bool:
         endpoint = "/dataservice/settings/configuration/device"

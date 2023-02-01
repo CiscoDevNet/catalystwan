@@ -249,8 +249,16 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, [organization_name])
 
-    def test_update_organization_name(self):
-        pass
+    @patch("vmngclient.session.Session")
+    @patch("requests.Response")
+    def test_update_organization_name(self, mock_response, mock_session):
+        # Arrange
+        mock_session.put.return_value = mock_response
+        mock_response.status_code = 200
+        # Act
+        answer = AdministrationSettingsAPI(mock_session).update_organization_name("My org name", 1)
+        # Assert
+        self.assertTrue(answer)
 
     @patch("vmngclient.session.Session")
     @patch("requests.Response")
