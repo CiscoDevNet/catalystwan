@@ -1,6 +1,7 @@
 import json
 import logging
 from enum import Enum
+from http import HTTPStatus
 from typing import List, Union, cast
 
 from requests import HTTPError
@@ -24,6 +25,10 @@ class UserDoesNotExists(Exception):
 class ValidityPeriod(Enum):
     ONE_YEAR = "1Y"
     TWO_YEARS = "2Y"
+
+
+RETRIEVE_INTERVAL_MIN_VALUE = 1
+RETRIEVE_INTERVAL_MAX_VALUE = 60
 
 
 class UsersAPI:
@@ -157,7 +162,7 @@ class AdministrationSettingsAPI:
         except HTTPError as e:
             error = json.loads(e.response.text).get("error")
             logger.error(f"{error.get('message')} - {error.get('details')}")
-        return True if response.status_code == 200 else False
+        return True if response.status_code == HTTPStatus.OK else False
 
     def update_vbond_address(self, vbond_address: str, vbond_port: int) -> bool:
         endpoint = "/dataservice/settings/configuration/device"
@@ -165,7 +170,7 @@ class AdministrationSettingsAPI:
 
         response = self.session.post(endpoint, json=payload)
         logger.debug(f"vBond address set to {vbond_address}, and port set to {vbond_port}")
-        return True if response.status_code == 200 else False
+        return True if response.status_code == HTTPStatus.OK else False
 
     def update_controller_certificate(
         self,
@@ -176,7 +181,7 @@ class AdministrationSettingsAPI:
         validity_period: ValidityPeriod = ValidityPeriod.ONE_YEAR,
         retrieve_interval: int = 60,
     ) -> bool:
-        if retrieve_interval < 1 or retrieve_interval > 60:
+        if retrieve_interval < RETRIEVE_INTERVAL_MIN_VALUE or retrieve_interval > RETRIEVE_INTERVAL_MAX_VALUE:
             raise RetrieveIntervalOutOfRange("Retrieve interval must be value between 1 and 60 minutes")
 
         endpoint = "/dataservice/settings/configuration/certificate"
@@ -189,7 +194,7 @@ class AdministrationSettingsAPI:
             "retrieveInterval": str(retrieve_interval),
         }
         response = self.session.put(endpoint, json=payload)
-        return True if response.status_code == 200 else False
+        return True if response.status_code == HTTPStatus.OK else False
 
     def change_password(self, old_password: str, new_password: str) -> bool:
         logger.debug("Changing password.")
@@ -198,4 +203,4 @@ class AdministrationSettingsAPI:
 
         response = self.session.put(endpoint, json=payload)
         logger.info("Password changed.")
-        return True if response.status_code == 200 else False
+        return True if response.status_code == HTTPStatus.OK else False
