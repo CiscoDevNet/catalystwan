@@ -112,7 +112,7 @@ class DeviceVersions:
         Returns:
             list : list of devices
         """
-        devs = [{"deviceId": dev.uuid, "deviceIP": dev.id} for dev in devices]
+        devs = self.get_device_list(devices)
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
         for dev in devs:
             dev_installed_versions = getattr(all_dev_versions[dev["deviceId"]], version_type)
@@ -149,6 +149,23 @@ class DeviceVersions:
             list : list of devices
         """
         return self._get_device_list_in(version_to_set_up, devices, "available_versions")
+
+    def get_devices_current_version(self, devices: List[Device]) -> List[dict]:
+        """
+        Create version key for every device dict in device list, if requested version
+        is in available versions
+
+        Args:
+            version_to_set_up (str): requested version
+
+        Returns:
+            list : list of devices
+        """
+        devices = self.get_device_list(devices)
+        all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
+        for device in devices:
+            device["version"] = getattr(all_dev_versions[device["deviceId"]], "current_version")
+        return devices
 
     def get_device_list(self, devices: List[Device]) -> List[dict]:
 

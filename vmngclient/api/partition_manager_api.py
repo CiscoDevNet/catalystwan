@@ -20,7 +20,7 @@ class PartitionManagerAPI:
         self.repository = RepositoryAPI(self.session)
         self.device_versions = DeviceVersions(self.repository,device_category)
 
-    def set_default_partition(self, devices: List[Device], version: str) -> str:
+    def _set_default_partition(self,payload_devices) -> str:
         """
         Method to set choosen software version as current version
 
@@ -34,11 +34,36 @@ class PartitionManagerAPI:
         url = "/dataservice/device/action/defaultpartition"
         payload = {
             "action": "defaultpartition",
-            "devices": self.device_versions.get_device_list_in_installed(version, devices),
+            "devices": payload_devices,
             "deviceType": "vmanage",
         }
         set_default = dict(self.repository.session.post(url, json=payload).json())
         return set_default["id"]
+    
+    def set_current_partition_as_default(self, devices: List[Device]) -> str:
+        """_summary_
+
+        Args:
+            devices (List[Device]): _description_
+
+        Returns:
+            str: _description_
+        """
+        devices = self.device_versions.get_devices_current_version(devices)
+        return self._set_default_partition(devices)
+    
+    def set_default_partition_by_version(self, devices: List[Device], version):
+        """_summary_
+
+        Args:
+            devices (List[Device]): _description_
+            version (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        devices = self.device_versions.get_device_list_in_installed(version, devices)
+        return self._set_default_partition(devices)  
 
     def remove_partition(self, devices: List[Device], version: str, force: bool = False) -> str:
         """

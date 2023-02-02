@@ -7,7 +7,7 @@ from attr import define  # type: ignore
 from clint.textui.progress import Bar as ProgressBar  # type: ignore
 from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
 
-from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI,DeviceCategory
+from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI, DeviceCategory
 from vmngclient.dataclasses import Device
 from vmngclient.session import vManageSession
 
@@ -67,7 +67,7 @@ class SoftwareActionAPI:
         self.device_versions = DeviceVersions(self.repository,device_category)
         
 
-    def activate_software(self, version_to_activate: str, devices: List[Device]) -> str:
+    def activate_software(self,  devices: List[Device], version_to_activate: str, software_image: PurePath = None) -> str:
         """
         Method to set choosen version as current version
 
@@ -77,11 +77,17 @@ class SoftwareActionAPI:
         Returns:
             str: action id
         """
-
+        if software_image and not version_to_activate:
+            version = self.repository.get_image_version(software_image)
+        elif version_to_activate and not software_image: 
+            version = software_image
+        else:
+            raise ValueError ("You can not provide software_image and image version at the same time")
+        url = "/dataservice/device/action/install"
         url = "/dataservice/device/action/changepartition"
         payload = {
             "action": "changepartition",
-            "devices": self.device_versions.get_device_list_in_available(version_to_activate, devices),
+            "devices": self.device_versions.get_device_list_in_available(version, devices),
             "deviceType": "vmanage",
         }
         activate = dict(self.session.post(url, json=payload).json())
