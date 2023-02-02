@@ -10,7 +10,13 @@ from vmngclient.api.administration import (
     UserDoesNotExists,
     UsersAPI,
 )
-from vmngclient.dataclasses import CloudConnectorData, CloudServicesSettings, ServiceConfigurationData, User
+from vmngclient.dataclasses import (
+    CloudConnectorData,
+    CloudServicesSettings,
+    Organization,
+    ServiceConfigurationData,
+    User,
+)
 from vmngclient.utils.creation_tools import create_dataclass
 
 
@@ -239,15 +245,15 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         self.assertEqual(answer, expected_outcome)
 
     @patch("vmngclient.session.Session")
-    def test_get_organization_name(self, mock_session):
+    def test_get_organization(self, mock_session):
         # Arrange
-        organization_name = "My org name"
-        organization_data = [{"domain-id": "1", "org": organization_name, "controlConnectionUp": "true"}]
-        mock_session.get_data.return_value = organization_data
+        organization = [{"domain-id": "1", "org": "My org name", "controlConnectionUp": "true"}]
+        organization_dataclass = create_dataclass(Organization, organization[0])
+        mock_session.get_data.return_value = organization
         # Act
-        answer = AdministrationSettingsAPI(mock_session).get_organization_name()
+        answer = AdministrationSettingsAPI(mock_session).get_organization()
         # Assert
-        self.assertEqual(answer, [organization_name])
+        self.assertEqual(answer, organization_dataclass)
 
     @patch("vmngclient.session.Session")
     @patch("requests.Response")

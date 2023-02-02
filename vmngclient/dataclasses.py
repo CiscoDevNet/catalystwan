@@ -348,3 +348,10 @@ class FeatureTemplateInformation(DataclassBase):
     created_by: str = field(metadata={FIELD_NAME: "createdBy"})
     created_on: dt.datetime = field(metadata={FIELD_NAME: "createdOn"})
     resource_group: str = field(metadata={FIELD_NAME: "resourceGroup"})
+
+
+@define
+class Organization(DataclassBase):
+    name: str = field(metadata={FIELD_NAME: "org"})
+    domain_id: int = field(metadata={FIELD_NAME: "domain-id"})
+    control_connection_up: bool = field(metadata={FIELD_NAME: "controlConnectionUp"})

@@ -6,7 +6,13 @@ from typing import List, Union, cast
 
 from requests import HTTPError
 
-from vmngclient.dataclasses import CloudConnectorData, CloudServicesSettings, ServiceConfigurationData, User
+from vmngclient.dataclasses import (
+    CloudConnectorData,
+    CloudServicesSettings,
+    Organization,
+    ServiceConfigurationData,
+    User,
+)
 from vmngclient.exceptions import RetrieveIntervalOutOfRange
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import asdict, create_dataclass
@@ -149,10 +155,10 @@ class AdministrationSettingsAPI:
         response = self.session.put(url_path, data)
         return True if response.status_code == 200 else False
 
-    def get_organization_name(self) -> List[str]:
+    def get_organization(self) -> Organization:
         endpoint = "/dataservice/settings/configuration/organization"
 
-        return [organizations_info.get("org") for organizations_info in self.session.get_data(endpoint)]
+        return create_dataclass(Organization, self.session.get_data(endpoint)[0])
 
     def update_organization_name(self, organization_name: str, domain_id: int = 1) -> bool:
         endpoint = "/dataservice/settings/configuration/organization"
