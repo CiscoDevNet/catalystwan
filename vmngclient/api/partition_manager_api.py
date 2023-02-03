@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, List
 
-from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI, DeviceCategory
+from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.session import vManageSession
 
@@ -18,19 +18,9 @@ class PartitionManagerAPI:
 
         self.session = session
         self.repository = RepositoryAPI(self.session)
-        self.device_versions = DeviceVersions(self.repository,device_category)
+        self.device_versions = DeviceVersions(self.repository, device_category)
 
-    def _set_default_partition(self,payload_devices) -> str:
-        """
-        Method to set choosen software version as current version
-
-        Args:
-            version_to_default (str): software version to be set as default version
-
-        Returns:
-            str: action id
-        """
-
+    def _set_default_partition(self, payload_devices) -> str:
         url = "/dataservice/device/action/defaultpartition"
         payload = {
             "action": "defaultpartition",
@@ -39,31 +29,35 @@ class PartitionManagerAPI:
         }
         set_default = dict(self.repository.session.post(url, json=payload).json())
         return set_default["id"]
-    
+
     def set_current_partition_as_default(self, devices: List[Device]) -> str:
-        """_summary_
+        """
+        Method to set current software version as default version
 
         Args:
-            devices (List[Device]): _description_
+            devices (List[Device]): For those devices default partition
+            going to be set
 
         Returns:
-            str: _description_
+            str: action id
         """
-        devices = self.device_versions.get_devices_current_version(devices)
-        return self._set_default_partition(devices)
-    
-    def set_default_partition_by_version(self, devices: List[Device], version):
-        """_summary_
+        devs = self.device_versions.get_devices_current_version(devices)
+        return self._set_default_partition(devs)
+
+    def set_default_partition_by_version(self, devices: List[Device], version) -> str:
+        """
+        Method to set choosen software version as current version
 
         Args:
-            devices (List[Device]): _description_
-            version (_type_): _description_
+            devices (List[Device]): For those devices default partition
+            going to be set
+            version (_type_): version to be set as default version
 
         Returns:
-            _type_: _description_
+            str: action id
         """
-        devices = self.device_versions.get_device_list_in_installed(version, devices)
-        return self._set_default_partition(devices)  
+        devs = self.device_versions.get_device_list_in_installed(version, devices)
+        return self._set_default_partition(devs)
 
     def remove_partition(self, devices: List[Device], version: str, force: bool = False) -> str:
         """

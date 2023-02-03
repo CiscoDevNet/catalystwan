@@ -131,6 +131,7 @@ class DeviceVersions:
 
         Args:
             version_to_set_up (str): requested version
+            devices (List[Device]): devices on which action going to be performed
 
         Returns:
             list : list of devices
@@ -144,6 +145,7 @@ class DeviceVersions:
 
         Args:
             version_to_set_up (str): requested version
+            devices (List[Device]): devices on which action going to be performed
 
         Returns:
             list : list of devices
@@ -152,20 +154,20 @@ class DeviceVersions:
 
     def get_devices_current_version(self, devices: List[Device]) -> List[dict]:
         """
-        Create version key for every device dict in device list, if requested version
-        is in available versions
+        Create version key with current software version for every device dict in device list
 
         Args:
             version_to_set_up (str): requested version
+            devices (List[Device]): devices on which action going to be performed
 
         Returns:
             list : list of devices
         """
-        devices = self.get_device_list(devices)
+        devs = self.get_device_list(devices)
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
-        for device in devices:
+        for device in devs:
             device["version"] = getattr(all_dev_versions[device["deviceId"]], "current_version")
-        return devices
+        return devs
 
     def get_device_list(self, devices: List[Device]) -> List[dict]:
 
