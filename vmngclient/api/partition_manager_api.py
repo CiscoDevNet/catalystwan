@@ -12,6 +12,29 @@ class PartitionManagerAPI:
     """
     API methods for partitions actions. All methods
     are exececutable on all device categories.
+
+    Usage example:
+        #Create session
+        ip_address = "10.195.172.68"
+        port = 10100
+        admin_username = 'admin_username'
+        tenant_username = 'tenant_username'
+        password = "password"
+        subdomain = "subdomain"
+        provider_session = create_vManageSession(ip_address,admin_username,password,port)
+        provider_session_as_tenant_session = create_vManageSession(ip_address,admin_username,password,port, subdomain)
+
+        #Prepare devices list
+        cedges = [dev for dev in DevicesAPI(provider_session_as_tenant_session).devices
+                    if dev.hostname in ["vm5", "vm6"]]
+
+        #Set default partition
+        partition_manager = PartitionManagerAPI(provider_session_as_tenant_session,DeviceCategory.VEDGES.value)
+        set_partition_id = partition_manager.set_default_partition(cedges, version="9.17.06.03a.0.56")
+
+        #Check action status
+        wait_for_completed(provider_session,set_partition_id,3000)
+
     """
 
     def __init__(self, session: vManageSession, device_category: DeviceCategory) -> None:
@@ -20,7 +43,7 @@ class PartitionManagerAPI:
         self.repository = RepositoryAPI(self.session)
         self.device_versions = DeviceVersions(self.repository, device_category)
 
-    def _set_default_partition(self, payload_devices) -> str:
+    def _set_default_partition(self, payload_devices: List[dict]) -> str:
         url = "/dataservice/device/action/defaultpartition"
         payload = {
             "action": "defaultpartition",

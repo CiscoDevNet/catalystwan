@@ -1,13 +1,13 @@
 import logging
 from enum import Enum
 from pathlib import PurePath
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, cast
 
 from attr import define  # type: ignore
 from clint.textui.progress import Bar as ProgressBar  # type: ignore
 from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
 
-from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI, DeviceCategory
+from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.session import vManageSession
 
@@ -47,6 +47,7 @@ class InstallSpecification:
 
 
 class InstallSpecHelper(Enum):
+
     VMANAGE = InstallSpecification(Family.VMANAGE, VersionType.VMANAGE, DeviceType.VMANAGE, DeviceClass.VMANAGE)
     VSMART = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER, DeviceClass.VSMART)
     VBOND = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER, DeviceClass.VBOND)
@@ -58,16 +59,39 @@ class SoftwareActionAPI:
     """
     API methods for software actions. All methods
     are exececutable on all device categories.
+
+    Usage example:
+    #Create session
+    ip_address = "10.195.172.68"
+    port = 10100
+    admin_username = 'admin_username'
+    tenant_username = 'tenant_username'
+    password = "password"
+    subdomain = "subdomain"
+    provider_session = create_vManageSession(ip_address,admin_username,password,port)
+    provider_session_as_tenant_session = create_vManageSession(ip_address,admin_username,password,port, subdomain)
+
+    #Prepare devices list
+    devices = [dev for dev in DevicesAPI(provider_session_as_tenant_session).devices if dev.hostname in ["vm5", "vm6"]]
+    software_image = PurePath("c8000v-universalk9.17.06.03a.0.56.SPA.bin")
+
+    #Upgrade
+    software_action = SoftwareActionAPI(provider_session_as_tenant_session,DeviceCategory.VEDGES.value)
+    software_action_id = software_action.upgrade_software(devices,
+    InstallSpecHelper.CEDGE.value, reboot = False, sync = True, software_image=software_image)
+
+    #Check action status
+    wait_for_completed(provider_session,software_action_id,3000)
+
     """
 
     def __init__(self, session: vManageSession, device_category: DeviceCategory) -> None:
 
         self.session = session
         self.repository = RepositoryAPI(self.session)
-        self.device_versions = DeviceVersions(self.repository,device_category)
-        
+        self.device_versions = DeviceVersions(self.repository, device_category)
 
-    def activate_software(self,  devices: List[Device], version_to_activate: str, software_image: PurePath = None) -> str:
+    def activate_software(self, devices: List[Device], version_to_activate: str = "", software_image: str = "") -> str:
         """
         Method to set choosen version as current version
 
@@ -78,11 +102,11 @@ class SoftwareActionAPI:
             str: action id
         """
         if software_image and not version_to_activate:
-            version = self.repository.get_image_version(software_image)
-        elif version_to_activate and not software_image: 
+            version = cast(str, self.repository.get_image_version(software_image))
+        elif version_to_activate and not software_image:
             version = software_image
         else:
-            raise ValueError ("You can not provide software_image and image version at the same time")
+            raise ValueError("You can not provide software_image and image version at the same time")
         url = "/dataservice/device/action/install"
         url = "/dataservice/device/action/changepartition"
         payload = {
@@ -99,15 +123,15 @@ class SoftwareActionAPI:
         install_spec: InstallSpecification,
         reboot: bool,
         sync: bool = True,
-        software_image: PurePath = None,
-        image_version: str = None,
+        software_image: str = "",
+        image_version: str = "",
     ) -> str:
         """
         Method to install new software
 
         Args:
             software_image (str): path to software image #TODO:give info about optionality
-            install_spec (InstallSpecification): specification of devices 
+            install_spec (InstallSpecification): specification of devices
             on which the action is to be performed
             reboot (bool): reboot device after action end
             sync (bool, optional): Synchronize settings. Defaults to True.
@@ -119,11 +143,11 @@ class SoftwareActionAPI:
             str: action id
         """
         if software_image and not image_version:
-            version = self.repository.get_image_version(software_image)
-        elif image_version and not software_image: 
+            version = cast(str, self.repository.get_image_version(software_image))
+        elif image_version and not software_image:
             version = software_image
         else:
-            raise ValueError ("You can not provide software_image and image version at the same time")
+            raise ValueError("You can not provide software_image and image version at the same time")
         url = "/dataservice/device/action/install"
         payload: Dict[str, Any] = {
             "action": "install",
