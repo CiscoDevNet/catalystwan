@@ -15,7 +15,7 @@ class PartitionManagerAPI:
 
     Usage example:
         #Create session
-        ip_address = ""
+        ip_address = "ip_address"
         port = 10100
         admin_username = 'admin_username'
         tenant_username = 'tenant_username'
