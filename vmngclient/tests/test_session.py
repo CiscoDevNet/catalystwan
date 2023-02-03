@@ -3,7 +3,6 @@ from typing import Optional
 from unittest.mock import patch
 
 from parameterized import parameterized  # type: ignore
-from requests.exceptions import ConnectionError
 
 from vmngclient.session import vManageSession
 
@@ -30,7 +29,6 @@ class TestSession(unittest.TestCase):
     def test_base_url(self, port: Optional[int], base_url: str):
         # Arrange, Act
         session = vManageSession(self.url, self.username, self.password, port=port)
-
         # Assert
         self.assertEqual(session.base_url, base_url)
 
@@ -98,9 +96,9 @@ class TestSession(unittest.TestCase):
         self.assertEqual(session.get_full_url(url), full_url)
 
     @patch("vmngclient.session.head")
-    def test_check_vmanage_server_with_port(self, mock_requests):
+    def test_check_vmanage_server_with_port(self, mock_head):
         # Arrange, Act
-        mock_requests.return_value = None
+        mock_head.return_value = None
         session = vManageSession("domain.com", "user1", "$password", port=111)
         answer = session.check_vmanage_server_connection()
         # Assert
@@ -114,13 +112,6 @@ class TestSession(unittest.TestCase):
         answer = session.check_vmanage_server_connection()
         # Assert
         self.assertEqual(answer, True)
-
-    @patch("vmngclient.session.head")
-    def test_check_vmanage_server_connection_error(self, mock_requests):
-        # Arrange
-        mock_requests.side_effect = ConnectionError()
-        # Assert
-        self.assertRaises(ConnectionError, vManageSession, "domain.com", "user1", "$password")
 
 
 if __name__ == "__main__":

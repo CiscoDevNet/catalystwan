@@ -7,12 +7,13 @@ from pathlib import Path
 from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
 from urllib.parse import urljoin
 
-from requests import Response, Session, head
+from requests import PreparedRequest, Request, Response, Session, head
 from requests.auth import AuthBase
-from requests.exceptions import ConnectionError, HTTPError
+from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
-from vmngclient.utils.response import response_debug
+from vmngclient.exceptions import InvalidOperationError
+from vmngclient.utils.response import response_history_debug
 from vmngclient.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
@@ -72,7 +73,12 @@ def create_vManageSession(
         tenant_id = session.get_tenant_id()
         vsession_id = session.get_virtual_session_id(tenant_id)
         session.headers.update({"VSessionId": vsession_id})
-    server_info = session.server()
+
+    try:
+        server_info = session.server()
+    except InvalidOperationError:
+        server_info = {}
+
     session.server_name = server_info.get("server")
     session.on_session_create_hook()
 
@@ -100,10 +106,7 @@ def create_vManageSession(
         )
     else:
         session.session_type = SessionType.NOT_DEFINED
-        session.logger.warning(
-            f"Session created with {user_mode.value} user mode and {view_mode.value} view mode.\n"
-            f"Session type set to not defined"
-        )
+        session.logger.warning(f"Session created with {user_mode} and {view_mode}.")
 
     session.logger.info(f"Logged as {username}. The session type is {session.session_type}")
     return session
@@ -138,23 +141,30 @@ class vManageSession(Session):
         self.base_url = self.__create_base_url()
         self.username = username
         self.password = password
-        self.port = port
         self.subdomain = subdomain
 
         self.session_type = SessionType.NOT_DEFINED
         self.server_name = None
         self.logger = logging.getLogger(__name__)
-
-        if not self.check_vmanage_server_connection():
-            raise ConnectionError("Vmanage server is not available")
-
+        self.response_trace: Callable[
+            [Optional[Response], Union[Request, PreparedRequest, None]], str
+        ] = response_history_debug
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
 
     def request(self, method, url, *args, **kwargs) -> Any:
         full_url = self.get_full_url(url)
-        response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
-        self.logger.debug(response_debug(response))
+        try:
+            response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
+            self.logger.debug(self.response_trace(response, None))
+        except RequestException as exception:
+            self.logger.debug(self.response_trace(exception.response, exception.request))
+            self.logger.error(exception)
+            raise
+
+        if response.request.url and "passwordReset.html" in response.request.url:
+            raise InvalidOperationError("Password must be changed to use this session.")
+
         try:
             response.raise_for_status()
         except HTTPError as error:
@@ -275,10 +285,7 @@ class vManageSession(Session):
 
     def check_vmanage_server_connection(self) -> bool:
         try:
-            url = str(self.base_url).replace("https", "http")
-            if self.port:
-                url = url.replace(str(f":{self.port}"), "")
-            head(url, timeout=2)
+            head(self.base_url, timeout=15, verify=False)
         except ConnectionError:
             return False
         else:

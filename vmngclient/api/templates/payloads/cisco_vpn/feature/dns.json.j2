@@ -1,0 +1,86 @@
+{
+  "vipType": "constant",
+  "vipValue": [
+    {
+      "role": {
+        "vipType": "constant",
+        "vipValue": "primary",
+        "vipObjectType": "object"
+      },
+      "dns-addr": {
+        "vipType": "constant",
+        "vipValue": "{{ dns.primary }}",
+        "vipObjectType": "object"
+      },
+      "priority-order": [
+        "dns-addr",
+        "role"
+      ]
+    }
+    {% if dns.secondary %}
+      ,
+      {
+        "role": {
+          "vipType": "constant",
+          "vipValue": "secondary",
+          "vipObjectType": "object"
+        },
+        "dns-addr": {
+          "vipType": "constant",
+          "vipValue": "{{ dns.secondary }}",
+          "vipObjectType": "object"
+        },
+        "priority-order": [
+          "dns-addr",
+          "role"
+        ]
+      }
+    {% endif %}
+    {% if dns.primaryv6 %}
+      ,
+      {
+        "role": {
+          "vipType": "constant",
+          "vipValue": "primaryv6",
+          "vipObjectType": "object",
+          "ipType": "ipv6"
+        },
+        "dns-addr": {
+          "vipType": "constant",
+          "vipValue": "{{ dns.primaryv6 }}",
+          "vipObjectType": "object",
+          "ipType": "ipv6"
+        },
+        "priority-order": [
+          "dns-addr",
+          "role"
+        ]
+      }
+    {% endif %}
+    {% if dns.secondaryv6 %}
+      ,
+      {
+        "role": {
+          "vipType": "constant",
+          "vipValue": "secondaryv6",
+          "vipObjectType": "object",
+          "ipType": "ipv6"
+        },
+        "dns-addr": {
+          "vipType": "constant",
+          "vipValue": "{{ dns.secondaryv6 }}",
+          "vipObjectType": "object",
+          "ipType": "ipv6"
+        },
+        "priority-order": [
+          "dns-addr",
+          "role"
+        ]
+      }
+    {% endif %}
+  ],
+  "vipObjectType": "tree",
+  "vipPrimaryKey": [
+    "dns-addr"
+  ]
+}

@@ -1,0 +1,107 @@
+{
+    "timeout": {
+        "vipObjectType": "object",
+        "vipType": "ignore",
+        "vipValue": {{ radius_timeout }},
+        "vipVariableName": "radius_timeout"
+    },
+    "retransmit": {
+        "vipObjectType": "object",
+        "vipType": "ignore",
+        "vipValue": {{ radius_retransmit }},
+        "vipVariableName": "retransmit"
+    }
+    {% if radius_servers %}
+        ,"server": {
+            "vipType": "constant",
+            "vipValue": [
+                {% for server in radius_servers %}
+                    {
+                    "address": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "{{ server.address }}",
+                        "vipVariableName": "radius_radius_address"
+                    },
+                    "auth-port": {
+                        "vipObjectType": "object",
+                        {% if server.auth_port == 1812 %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                        {% endif %}
+                        "vipValue": {{ server.auth_port }},
+                        "vipVariableName": "radius_radius_auth_port"
+                    },
+                    "acct-port": {
+                        "vipObjectType": "object",
+                        {% if server.acct_port == 1813 %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                        {% endif %}
+                        "vipValue": {{ server.acct_port }},
+                        "vipVariableName": "radius_radius_acct_port"
+                    },
+                    "vpn": {
+                        "vipObjectType": "object",
+                        {% if server.vpn == 0 %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                        {% endif %}
+                        "vipValue": {{ server.vpn }},
+                        "vipVariableName": "radius_radius_vpn"
+                    },
+                    "source-interface": {
+                        "vipObjectType": "object",
+                        {% if server.source_interface == None %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                            "vipValue": "{{ server.source_interface }}",
+                        {% endif %}
+                        "vipVariableName": "radius_radius_source_interface"
+                    },
+                    "secret-key": {
+                        "vipObjectType": "object",
+                        {% if server.secret_key == None %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                            "vipValue": "{{ server.secret_key }}",
+                        {% endif %}
+                        "vipVariableName": "radius_radius_secret_key"
+                    },
+                    "priority": {
+                        "vipObjectType": "object",
+                        {% if server.priority == 0 %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                        {% endif %}
+                        "vipValue": {{ server.priority }},
+                        "vipVariableName": "radius_radius_priority"
+                    },
+                    "priority-order": [
+                        "address",
+                        "auth-port",
+                        "vpn",
+                        "source-interface",
+                        "key",
+                        "secret-key",
+                        "priority",
+                        "tag",
+                        "acct-port"
+                    ]
+                    }
+                    {% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            "vipObjectType": "tree",
+            "vipPrimaryKey": [
+                "address"
+            ]
+        }
+    {% endif %}
+}

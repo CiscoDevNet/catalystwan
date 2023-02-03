@@ -1,0 +1,95 @@
+{
+    "timeout": {
+        "vipObjectType": "object",
+        "vipType": "ignore",
+        "vipValue": {{ tacacs_timeout }},
+        "vipVariableName": "tacacs_timeout"
+    },
+    "authentication": {
+        "vipObjectType": "object",
+        "vipType": "ignore",
+        "vipValue": "pap",
+        "vipVariableName": "{{ tacacs_authentication.value }}"
+    }
+    {% if tacacs_servers %}
+        ,"server": {
+            "vipType": "constant",
+            "vipValue": [
+                {% for server in tacacs_servers %}
+                    {
+                    "address": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "{{ server.address }}",
+                        "vipVariableName": "tacacs_tacacs_address"
+                    },
+                    "auth-port": {
+                        "vipObjectType": "object",
+                        {% if server.auth_port == 49 %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                        {% endif %}
+                        "vipValue": {{ server.auth_port }},
+                        "vipVariableName": "tacacs_tacacs_auth_port"
+                    },
+                    "vpn": {
+                        "vipObjectType": "object",
+                        {% if server.vpn == 0 %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                        {% endif %}
+                        "vipValue": {{ server.vpn }},
+                        "vipVariableName": "tacacs_tacacs_vpn"
+                    },
+                    "source-interface": {
+                        "vipObjectType": "object",
+                        {% if server.source_interface == None %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                            vipValue": "{{ server.source_interface }}",
+                        {% endif %}
+                        "vipVariableName": "tacacs_tacacs_source_interface"
+                    },
+                    "secret-key": {
+                        "vipObjectType": "object",
+                        {% if server.secret_key == None %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                            "vipValue": "{{ server.secret_key }}",
+                        {% endif %}
+                        "vipVariableName": "tacacs_tacacs_secret_key"
+                    },
+                    "priority": {
+                        "vipObjectType": "object",
+                        {% if server.priority == 0 %}
+                            "vipType": "ignore",
+                        {% else %}
+                            "vipType": "constant",
+                        {% endif %}
+                        "vipValue": {{ server.priority }},
+                        "vipVariableName": "tacacs_tacacs_priority"
+                    },
+                    "priority-order": [
+                        "address",
+                        "auth-port",
+                        "vpn",
+                        "source-interface",
+                        "key",
+                        "secret-key",
+                        "priority"
+                    ]
+                    }
+                    {% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            "vipObjectType": "tree",
+            "vipPrimaryKey": [
+                "address"
+            ]
+        }
+    {% endif %}
+}
