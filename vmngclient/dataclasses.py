@@ -348,3 +348,67 @@ class FeatureTemplateInformation(DataclassBase):
     created_by: str = field(metadata={FIELD_NAME: "createdBy"})
     created_on: dt.datetime = field(metadata={FIELD_NAME: "createdOn"})
     resource_group: str = field(metadata={FIELD_NAME: "resourceGroup"})
+
+
+@define
+class TenantAAA(DataclassBase):
+    """
+    Provider-Tenant -> Tenant -> Administration -> Manage users -> Remote AAA
+    """
+
+    accounting: bool = field(metadata={FIELD_NAME: "accounting"})
+    admin_auth_order: bool = field(metadata={FIELD_NAME: "adminAuthOrder"})
+    audit_disable: bool = field(metadata={FIELD_NAME: "auditDisable"})
+    auth_fallback: bool = field(metadata={FIELD_NAME: "authFallback"})
+    auth_order: List[str] = field(metadata={FIELD_NAME: "authOrder"})
+    radius_servers: str = field(metadata={FIELD_NAME: "radiusServers"})
+
+
+@define
+class RadiusServer(DataclassBase):
+    """
+    Provider-Tenant -> Tenant -> Administration -> Manage users -> Remote AAA -> RADIUS
+    """
+    address: str = field(metadata={FIELD_NAME: "address"})
+    auth_port: int = field(metadata={FIELD_NAME: "authPort"})
+    acct_port: int = field(metadata={FIELD_NAME: "acctPort"})
+    tag: str = field(metadata={FIELD_NAME: "tag"})
+    vpn: int = field(metadata={FIELD_NAME: "vpn"})
+    vpn_ip_subnet: str = field(metadata={FIELD_NAME: "vpnIpSubnet"})
+    key: str = field(metadata={FIELD_NAME: "key"})
+    secret_key: str = field(metadata={FIELD_NAME: "secretKey"})
+    priority: int = field(metadata={FIELD_NAME: "priority"})
+
+
+@define
+class TenantRadiusServer(DataclassBase):
+    """
+    Provider-Tenant -> Tenant -> Administration -> Manage users -> Remote AAA -> RADIUS
+    """
+    timeout: int = field(default=3, metadata={FIELD_NAME: "timeout"})
+    retransmit: int = field(default=3, metadata={FIELD_NAME: "retransmit"})
+    server: List[RadiusServer] = field(metadata={FIELD_NAME: "server"})
+
+
+@define
+class TacacsServer(DataclassBase):
+    """
+    Provider-Tenant -> Tenant -> Administration -> Manage users -> Remote AAA -> TACACS server
+    """
+    address: str = field(metadata={FIELD_NAME: "address"})
+    auth_port: int = field(metadata={FIELD_NAME: "authPort"})
+    vpn: int = field(metadata={FIELD_NAME: "vpn"})
+    vpn_ip_subnet: str = field(metadata={FIELD_NAME: "vpnIpSubnet"})
+    key: str = field(metadata={FIELD_NAME: "key"})
+    secret_key: str = field(metadata={FIELD_NAME: "secretKey"})
+    priority: int = field(metadata={FIELD_NAME: "priority"})
+
+
+@define
+class TenantTacacsServer(DataclassBase):
+    """
+    Provider-Tenant -> Tenant -> Administration -> Manage users -> Remote AAA -> TACACS server
+    """
+    timeout: int = field(default=3, metadata={FIELD_NAME: "timeout"})
+    authentication: str = field(default="PAP", metadata={FIELD_NAME: "authentication"})
+    server: List[TacacsServer] = field(metadata={FIELD_NAME: "server"})
