@@ -14,26 +14,19 @@ class PartitionManagerAPI:
     are exececutable on all device categories.
 
     Usage example:
-        #Create session
-        ip_address = "ip_address"
-        port = 10100
-        admin_username = 'admin_username'
-        tenant_username = 'tenant_username'
-        password = "password"
-        subdomain = "subdomain"
-        provider_session = create_vManageSession(ip_address,admin_username,password,port)
-        provider_session_as_tenant_session = create_vManageSession(ip_address,admin_username,password,port, subdomain)
+        # Create session
+        session = create_vManageSession(...)
 
-        #Prepare devices list
-        cedges = [dev for dev in DevicesAPI(provider_session_as_tenant_session).devices
+        # Prepare devices list
+        cedges = [dev for dev in DevicesAPI(session).devices
                     if dev.hostname in ["vm5", "vm6"]]
 
-        #Set default partition
-        partition_manager = PartitionManagerAPI(provider_session_as_tenant_session,DeviceCategory.VEDGES.value)
+        # Set default partition
+        partition_manager = PartitionManagerAPI(provider_session_as_tenant_session,DeviceCategory.VEDGES)
         set_partition_id = partition_manager.set_default_partition(cedges, version="9.17.06.03a.0.56")
 
-        #Check action status
-        wait_for_completed(provider_session,set_partition_id,3000)
+        # Check action status
+        wait_for_completed(session, set_partition_id, 3000)
 
     """
 
@@ -67,14 +60,14 @@ class PartitionManagerAPI:
         devs = self.device_versions.get_devices_current_version(devices)
         return self._set_default_partition(devs)
 
-    def set_default_partition_by_version(self, devices: List[Device], version) -> str:
+    def set_default_partition(self, devices: List[Device], version: str) -> str:
         """
         Method to set choosen software version as current version
 
         Args:
             devices (List[Device]): For those devices default partition
             going to be set
-            version (_type_): version to be set as default version
+            version (str): version to be set as default version
 
         Returns:
             str: action id
@@ -87,7 +80,9 @@ class PartitionManagerAPI:
         Method to remove choosen software version from Vmanage repository
 
         Args:
+            devices (List[Device]): remove partition for those devices
             version (str): software version to be removed from repository
+            force (bool): bypass version checks
 
         Returns:
             str: action id
@@ -112,7 +107,7 @@ class PartitionManagerAPI:
     def _check_remove_partition_possibility(self, devices) -> List:
 
         devices_versions_repository = self.repository.get_devices_versions_repository(
-            self.device_versions.device_category.value
+            self.device_versions.device_category
         )
         invalid_devices = []
         for device in devices:

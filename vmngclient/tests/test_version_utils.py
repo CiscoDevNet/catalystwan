@@ -63,7 +63,7 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_session.get_data.return_value = api_mock_response
         mock_repository_object = RepositoryAPI(mock_session)
 
-        answer = mock_repository_object.get_devices_versions_repository(DeviceCategory.CONTROLLERS.value)
+        answer = mock_repository_object.get_devices_versions_repository(DeviceCategory.CONTROLLERS)
 
         self.assertEqual(
             answer["mock_uuid"],

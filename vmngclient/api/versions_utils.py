@@ -49,7 +49,7 @@ class RepositoryAPI:
         software_images = list(self.session.get_data(url))
         return software_images
 
-    def get_devices_versions_repository(self, device_category) -> Dict[str, DeviceSoftwareRepository]:
+    def get_devices_versions_repository(self, device_category: DeviceCategory) -> Dict[str, DeviceSoftwareRepository]:
         """
         Method for create DeviceSoftwareRepository dataclass,
         which cointains information about all possible version types for certain devices
@@ -59,7 +59,7 @@ class RepositoryAPI:
             information
         """
 
-        url = f"/dataservice/system/device/{device_category}"
+        url = f"/dataservice/system/device/{device_category.value}"
         devices_versions_info = self.session.get_data(url)
         devices_versions_repository = {}
         for device in devices_versions_info:

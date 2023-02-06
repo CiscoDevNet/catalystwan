@@ -35,7 +35,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         self.mock_repository_object = RepositoryAPI(mock_session)
         self.mock_device_versions = DeviceVersions(self.mock_repository_object, DeviceCategory.CONTROLLERS)
         self.mock_partition_manager_obj = PartitionManagerAPI(
-            mock_session, self.mock_device_versions, self.mock_repository_object
+            mock_session, DeviceCategory.CONTROLLERS
         )
 
     @patch.object(PartitionManagerAPI, "_check_remove_partition_possibility")
