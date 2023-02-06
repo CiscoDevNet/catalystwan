@@ -106,3 +106,17 @@ class TestRepositoryAPI(unittest.TestCase):
             expected_result,
             "Version add incorrectly",
         )
+
+    @patch.object(RepositoryAPI, "get_devices_versions_repository")
+    def test_get_devices_current_version(self, mock_get_devices_versions_repository):
+        # Arrange
+        mock_session = Mock()
+        mock_get_devices_versions_repository.return_value = Mock()
+        mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
+        mock_repository_object = RepositoryAPI(mock_session)
+        mock_device_versions = DeviceVersions(mock_repository_object, DeviceCategory.CONTROLLERS)
+        # Act
+        answer = mock_device_versions.get_devices_current_version([self.device])
+        # Answer
+        proper_answer = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "curr_ver"}]
+        self.assertEqual(answer, proper_answer)
