@@ -31,6 +31,21 @@ class GeneralTemplate(BaseModel):
 
 
 class DeviceTemplate(BaseModel):
+    """
+    ## Example:
+
+    >>> templates = [
+            "default_system", # Cisco System
+            "default_logging", # Cisco Logging
+            "default_banner", # Banner
+        ]
+    >>> DeviceTemplate(
+            name="python",
+            description="python",
+            general_templates=templates
+        ).create(session)
+    """
+
     class Config:
         arbitrary_types_allowed = True
 
@@ -67,7 +82,7 @@ class DeviceTemplate(BaseModel):
     def _validate_names(self, fr_templates: List[FeatureTemplateInformation]) -> bool:
         templates = set(template.name for template in fr_templates)
         templates_exist = True
-        for template in self.feature_templates:
+        for template in self.general_templates:
             if template not in set(templates):
                 logger.error(f"{template} does not exists.")
                 templates_exist = False
