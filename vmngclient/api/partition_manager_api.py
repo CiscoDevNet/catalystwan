@@ -43,7 +43,7 @@ class PartitionManagerAPI:
             "devices": payload_devices,
             "deviceType": "vmanage",
         }
-        set_default = dict(self.repository.session.post(url, json=payload).json())
+        set_default = dict(self.session.post(url, json=payload).json())
         return set_default["id"]
 
     def set_current_partition_as_default(self, devices: List[Device]) -> str:

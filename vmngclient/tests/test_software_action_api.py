@@ -69,7 +69,6 @@ class TestSoftwareAcionAPI(unittest.TestCase):
         mock_downgrade_check.return_value = False
         self.mock_repository_object.session.post.return_value.json.return_value = {"id": "mock_action_id"}
         mock_session.post.return_value = {"id": "mock_action_id"}
-        # self.mock_software_action_obj.session.post.json.return_value = {"id": "mock_action_id"}
 
         # Assert
         answer = self.mock_software_action_obj.upgrade_software([self.device], self.install_spec, True, True, "path")
