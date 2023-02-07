@@ -82,9 +82,26 @@ class AaaAPI:
         logger.info(response)
         return True if response.status_code == 200 else False
 
-    def put_radius(self, radius_server: TenantRadiusServer) -> TenantRadiusServer:
+    def put_radius(self, radius_server: TenantRadiusServer) -> bool:
         """
         edit radius server
         :param radius_server:
         :return:
         """
+        url_path = "/dataservice/admin/radius"
+        data = asdict(radius_server)  # type: ignore
+        response = self.session.put(url_path, data)
+        return True if response.status_code == 200 else False
+
+    def delete_radius(self, radius_server: TenantRadiusServer) -> bool:
+        """
+        edit radius server
+        :param radius_server:
+        :return:
+        """
+        url_path = "/dataservice/admin/radius"
+        data = asdict(radius_server)  # type: ignore
+        response = self.session.put(url_path, data)
+        return True if response.status_code == 200 else False
+
+
