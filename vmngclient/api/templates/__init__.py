@@ -8,11 +8,11 @@ templates in vManage.
 """
 
 # Device Template
+from vmngclient.api.templates.device_template.device_template import DeviceTemplate, GeneralTemplate
 
 # Basic FeatureTemplate class
 
-# AA
-# A Templates
+# AAA Templates
 from vmngclient.api.templates.payloads.aaa.aaa_model import AAAModel
 
 # Cisco VPN Templates
