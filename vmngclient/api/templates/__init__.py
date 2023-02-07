@@ -9,7 +9,10 @@ templates in vManage.
 
 # Device Template
 
-# AAA Templates
+# Basic FeatureTemplate class
+
+# AA
+# A Templates
 from vmngclient.api.templates.payloads.aaa.aaa_model import AAAModel
 from vmngclient.api.templates.payloads.cisco_system.cisco_system_model import CiscoSystemModel
 
