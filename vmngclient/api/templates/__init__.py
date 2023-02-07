@@ -7,10 +7,12 @@ In addition, they are used to convert CLI config into separate feature
 templates in vManage.
 """
 
-# Basic FeatureTemplate class
-from vmngclient.api.templates.feature_template import FeatureTemplate
+# Device Template
 
-# AAA Templates
+# Basic FeatureTemplate class
+
+# AA
+# A Templates
 from vmngclient.api.templates.payloads.aaa.aaa_model import AAAModel
 
 # Cisco VPN Templates
@@ -28,7 +30,7 @@ from vmngclient.api.templates.payloads.cisco_vpn.cisco_vpn_model import (
 from vmngclient.api.templates.payloads.tenant.tenant_model import TenantModel
 
 __all__ = [
-    "FeatureTemplate",
+    "DeviceTemplate" "FeatureTemplate",
     "TenantModel",
     "AAAModel",
     "CiscoVPNModel",
