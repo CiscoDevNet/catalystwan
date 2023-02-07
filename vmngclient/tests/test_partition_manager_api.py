@@ -34,9 +34,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         mock_session = Mock()
         self.mock_repository_object = RepositoryAPI(mock_session)
         self.mock_device_versions = DeviceVersions(self.mock_repository_object, DeviceCategory.CONTROLLERS)
-        self.mock_partition_manager_obj = PartitionManagerAPI(
-            mock_session, DeviceCategory.CONTROLLERS
-        )
+        self.mock_partition_manager_obj = PartitionManagerAPI(mock_session, DeviceCategory.CONTROLLERS)
 
     @patch.object(PartitionManagerAPI, "_check_remove_partition_possibility")
     @patch.object(DeviceVersions, "get_device_list_in_available")
@@ -102,14 +100,13 @@ class TestPartitionManagerAPI(unittest.TestCase):
         answer = self.mock_partition_manager_obj._check_remove_partition_possibility(mock_devices)
         self.assertEqual(answer, [], "lists are not equal")
 
-    @patch('vmngclient.session.vManageSession')
-    def test_set_default_partition(self,mock_session):    
+    @patch("vmngclient.session.vManageSession")
+    def test_set_default_partition(self, mock_session):
         # Arrange
         mock_partition_manager = PartitionManagerAPI(mock_session, DeviceCategory.CONTROLLERS)
-        mock_partition_manager.session.post.return_value.json.return_value = {"id":"id_1"}
+        mock_partition_manager.session.post.return_value.json.return_value = {"id": "id_1"}
         # Act
         answer = mock_partition_manager._set_default_partition([self.device])
-        
+
         # Assert
         self.assertEqual(answer, "id_1")
-    
