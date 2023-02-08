@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import Any, ClassVar, Dict, List, Protocol, Type, TypeVar
+from typing import Any, ClassVar, Dict, Iterable, List, Protocol, Set, Type, TypeVar
 
 import attrs  # type: ignore
 from attr import Attribute, fields
@@ -30,16 +30,18 @@ def create_dataclass(cls: Type[T], data: Dict[str, Any]) -> T:
         A dataclass with implemented fields
     """
 
-    def filter_fields(available_fields: List[str], data: Dict[str, Any]) -> Dict[str, Any]:
+    def filter_fields(available_fields: Iterable[str], data: Dict[str, Any]) -> Dict[str, Any]:
         return dict(filter(lambda key_value: key_value[0] in available_fields, data.items()))
 
-    class_fields = list(cls.__annotations__)
+    def get_class_fields(cls: Type[T]) -> Set[str]:
+        return {key for _cls in cls.mro() if hasattr(_cls, "__annotations__") for key in _cls.__annotations__}
+
     data_copy = data.copy()
     for field in fields(cls):
         json_field_name = field.metadata.get(FIELD_NAME, None)
         if json_field_name and json_field_name in data_copy:
             data_copy[field.name] = data_copy.pop(json_field_name)
-    filtered_data = filter_fields(class_fields, data_copy)
+    filtered_data = filter_fields(get_class_fields(cls), data_copy)
     return cls(**filtered_data)
 
 
