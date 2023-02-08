@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from attr import define, field  # type: ignore
 
+from vmngclient.utils.certificate_status import ValidityPeriod
 from vmngclient.utils.creation_tools import FIELD_NAME, asdict, convert_attributes
 from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.personality import Personality
@@ -354,4 +355,32 @@ class FeatureTemplateInformation(DataclassBase):
 class Organization(DataclassBase):
     name: str = field(metadata={FIELD_NAME: "org"})
     domain_id: int = field(metadata={FIELD_NAME: "domain-id"})
-    control_connection_up: bool = field(metadata={FIELD_NAME: "controlConnectionUp"})
+    control_connection_up: Optional[bool] = field(default=None, metadata={FIELD_NAME: "controlConnectionUp"})
+
+
+@define
+class Password(DataclassBase):
+    old_password: str = field(metadata={FIELD_NAME: "oldpassword"})
+    new_password: str = field(metadata={FIELD_NAME: "newpassword"})
+
+
+@define
+class Certificate(DataclassBase):
+    controller_certificate: str = field(metadata={FIELD_NAME: "certificateSigning"})
+    first_name: str = field(metadata={FIELD_NAME: "firstName"})
+    last_name: str = field(metadata={FIELD_NAME: "lastName"})
+    email: str = field(metadata={FIELD_NAME: "email"})
+    validity_period: ValidityPeriod = field(metadata={FIELD_NAME: "validityPeriod"})
+    retrieve_interval: int = field(metadata={FIELD_NAME: "retrieveInterval"})
+
+    @property
+    def retrieve_interval_is_valid(self):
+        RETRIEVE_INTERVAL_MAX = 60
+        RETRIEVE_INTERVAL_MIN = 1
+        return True if RETRIEVE_INTERVAL_MIN <= int(self.retrieve_interval) <= RETRIEVE_INTERVAL_MAX else False
+
+
+@define
+class Vbond(DataclassBase):
+    vbond_address: str = field(metadata={FIELD_NAME: "domainIp"})
+    vbond_port: int = field(metadata={FIELD_NAME: "port"})

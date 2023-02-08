@@ -2,18 +2,19 @@ import json
 import logging
 from enum import Enum
 from http import HTTPStatus
-from typing import List, Union, cast
+from typing import List, Union, cast, overload
+from multipledispatch import dispatch
 
-from requests import HTTPError
+from requests import HTTPError, Response
 
 from vmngclient.dataclasses import (
     CloudConnectorData,
     CloudServicesSettings,
     Organization,
     ServiceConfigurationData,
-    User,
+    User, Certificate, Password, Vbond,
 )
-from vmngclient.exceptions import RetrieveIntervalOutOfRange
+from vmngclient.exceptions import RetrieveIntervalOutOfRange, InvalidOperationError
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import asdict, create_dataclass
 
@@ -26,15 +27,6 @@ class UserAlreadyExistsError(Exception):
 
 class UserDoesNotExists(Exception):
     pass
-
-
-class ValidityPeriod(Enum):
-    ONE_YEAR = "1Y"
-    TWO_YEARS = "2Y"
-
-
-RETRIEVE_INTERVAL_MIN_VALUE = 1
-RETRIEVE_INTERVAL_MAX_VALUE = 60
 
 
 class UsersAPI:
@@ -160,53 +152,53 @@ class AdministrationSettingsAPI:
 
         return create_dataclass(Organization, self.session.get_data(endpoint)[0])
 
-    def update_organization_name(self, organization_name: str, domain_id: int = 1) -> bool:
-        endpoint = "/dataservice/settings/configuration/organization"
-        payload = {"domain-id": domain_id, "org": organization_name}
-        try:
-            response = self.session.put(endpoint, json=payload)
-        except HTTPError as e:
-            error = json.loads(e.response.text).get("error")
-            logger.error(f"{error.get('message')} - {error.get('details')}")
-        return True if response.status_code == HTTPStatus.OK else False
+    @overload
+    def update(self, payload: Password) -> bool: ...
 
-    def update_vbond_address(self, vbond_address: str, vbond_port: int) -> bool:
-        endpoint = "/dataservice/settings/configuration/device"
-        payload = {"domainIp": vbond_address, "port": vbond_port}
-
-        response = self.session.post(endpoint, json=payload)
-        logger.debug(f"vBond address set to {vbond_address}, and port set to {vbond_port}")
-        return True if response.status_code == HTTPStatus.OK else False
-
-    def update_controller_certificate(
-        self,
-        controller_certificate: str = "",
-        first_name: str = "",
-        last_name: str = "",
-        email: str = "",
-        validity_period: ValidityPeriod = ValidityPeriod.ONE_YEAR,
-        retrieve_interval: int = 60,
-    ) -> bool:
-        if retrieve_interval < RETRIEVE_INTERVAL_MIN_VALUE or retrieve_interval > RETRIEVE_INTERVAL_MAX_VALUE:
-            raise RetrieveIntervalOutOfRange("Retrieve interval must be value between 1 and 60 minutes")
-
-        endpoint = "/dataservice/settings/configuration/certificate"
-        payload = {
-            "certificateSigning": controller_certificate,
-            "firstName": first_name,
-            "lastName": last_name,
-            "email": email,
-            "validityPeriod": validity_period.value,
-            "retrieveInterval": str(retrieve_interval),
-        }
-        response = self.session.put(endpoint, json=payload)
-        return True if response.status_code == HTTPStatus.OK else False
-
-    def change_password(self, old_password: str, new_password: str) -> bool:
-        logger.debug("Changing password.")
+    def __update_password(self, payload: dict) -> Response:
         endpoint = "/dataservice/admin/user/profile/password"
-        payload = {"oldpassword": old_password, "newpassword": new_password}
-
         response = self.session.put(endpoint, json=payload)
         logger.info("Password changed.")
+        return response
+
+    @overload
+    def update(self, payload: Certificate) -> bool: ...
+
+    def __update_certificate(self, payload: Certificate) -> Response:
+        if not payload.retrieve_interval_is_valid:
+            raise RetrieveIntervalOutOfRange("Retrieve interval must be value between 1 and 60 minutes")
+        payload.retrieve_interval = str(payload.retrieve_interval)
+        payload.validity_period = payload.validity_period.value
+        json_payload = asdict(payload)
+        endpoint = "/dataservice/settings/configuration/certificate"
+        return self.session.put(endpoint, json=json_payload)
+
+    @overload
+    def update(self, payload: Vbond) -> bool: ...
+
+    def __update_vbond(self, payload: dict) -> Response:
+        endpoint = "/dataservice/settings/configuration/device"
+        return self.session.post(endpoint, json=payload)
+
+    @overload
+    def update(self, payload: Organization) -> bool: ...
+
+    def __update_organization(self, payload: dict) -> Response:
+        endpoint = "/dataservice/settings/configuration/organization"
+        del payload["controlConnectionUp"]
+        return self.session.put(endpoint, json=payload)
+
+    def update(self, payload: Union[Organization, Certificate, Password, Vbond]) -> bool:
+        json_payload = asdict(payload)
+        if isinstance(payload, Organization):
+            response = self.__update_organization(json_payload)
+        elif isinstance(payload, Certificate):
+            response = self.__update_certificate(payload)
+        elif isinstance(payload, Password):
+            response = self.__update_password(json_payload)
+        elif isinstance(payload, Vbond):
+            response = self.__update_vbond(json_payload)
+        else:
+            raise InvalidOperationError(f"Not supported payload type: {type(payload).__name__}")
+
         return True if response.status_code == HTTPStatus.OK else False
