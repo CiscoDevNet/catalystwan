@@ -371,7 +371,7 @@ class Certificate(DataclassBase):
     last_name: str = field(metadata={FIELD_NAME: "lastName"})
     email: str = field(metadata={FIELD_NAME: "email"})
     validity_period: ValidityPeriod = field(metadata={FIELD_NAME: "validityPeriod"})
-    retrieve_interval: int = field(metadata={FIELD_NAME: "retrieveInterval"})
+    retrieve_interval: str = field(metadata={FIELD_NAME: "retrieveInterval"})
 
     @property
     def retrieve_interval_is_valid(self):

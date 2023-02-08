@@ -6,6 +6,6 @@ class CertificateStatus(Enum):
     installed = "certinstalled"
 
 
-class ValidityPeriod(Enum):
+class ValidityPeriod(str, Enum):
     ONE_YEAR = "1Y"
     TWO_YEARS = "2Y"

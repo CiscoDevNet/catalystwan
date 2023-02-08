@@ -1,3 +1,4 @@
+import json
 import logging
 from http import HTTPStatus
 from typing import List, Union, cast, overload
@@ -156,44 +157,20 @@ class AdministrationSettingsAPI:
     def update(self, payload: Password) -> bool:
         ...
 
-    def __update_password(self, payload: dict) -> Response:
-        endpoint = "/dataservice/admin/user/profile/password"
-        response = self.session.put(endpoint, json=payload)
-        logger.info("Password changed.")
-        return response
-
     @overload
     def update(self, payload: Certificate) -> bool:
         ...
-
-    def __update_certificate(self, payload: Certificate) -> Response:
-        if not payload.retrieve_interval_is_valid:
-            raise RetrieveIntervalOutOfRange("Retrieve interval must be value between 1 and 60 minutes")
-        payload.retrieve_interval = str(payload.retrieve_interval)
-        payload.validity_period = payload.validity_period.value
-        json_payload = asdict(payload)
-        endpoint = "/dataservice/settings/configuration/certificate"
-        return self.session.put(endpoint, json=json_payload)
 
     @overload
     def update(self, payload: Vbond) -> bool:
         ...
 
-    def __update_vbond(self, payload: dict) -> Response:
-        endpoint = "/dataservice/settings/configuration/device"
-        return self.session.post(endpoint, json=payload)
-
     @overload
     def update(self, payload: Organization) -> bool:
         ...
 
-    def __update_organization(self, payload: dict) -> Response:
-        endpoint = "/dataservice/settings/configuration/organization"
-        del payload["controlConnectionUp"]
-        return self.session.put(endpoint, json=payload)
-
     def update(self, payload: Union[Organization, Certificate, Password, Vbond]) -> bool:
-        json_payload = asdict(payload)
+        json_payload = asdict(payload)  # type: ignore
         if isinstance(payload, Organization):
             response = self.__update_organization(json_payload)
         elif isinstance(payload, Certificate):
@@ -206,3 +183,25 @@ class AdministrationSettingsAPI:
             raise InvalidOperationError(f"Not supported payload type: {type(payload).__name__}")
 
         return True if response.status_code == HTTPStatus.OK else False
+
+    def __update_password(self, payload: dict) -> Response:
+        endpoint = "/dataservice/admin/user/profile/password"
+        response = self.session.put(endpoint, json=payload)
+        logger.info("Password changed.")
+        return response
+
+    def __update_certificate(self, payload: Certificate) -> Response:
+        if not payload.retrieve_interval_is_valid:
+            raise RetrieveIntervalOutOfRange("Retrieve interval must be value between 1 and 60 minutes")
+        json_payload = json.dumps(asdict(payload))  # type: ignore
+        endpoint = "/dataservice/settings/configuration/certificate"
+        return self.session.put(endpoint, data=json_payload)
+
+    def __update_vbond(self, payload: dict) -> Response:
+        endpoint = "/dataservice/settings/configuration/device"
+        return self.session.post(endpoint, json=payload)
+
+    def __update_organization(self, payload: dict) -> Response:
+        endpoint = "/dataservice/settings/configuration/organization"
+        del payload["controlConnectionUp"]
+        return self.session.put(endpoint, json=payload)
