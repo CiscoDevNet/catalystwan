@@ -1,20 +1,20 @@
-import json
 import logging
-from enum import Enum
 from http import HTTPStatus
 from typing import List, Union, cast, overload
-from multipledispatch import dispatch
 
-from requests import HTTPError, Response
+from requests import Response
 
 from vmngclient.dataclasses import (
+    Certificate,
     CloudConnectorData,
     CloudServicesSettings,
     Organization,
+    Password,
     ServiceConfigurationData,
-    User, Certificate, Password, Vbond,
+    User,
+    Vbond,
 )
-from vmngclient.exceptions import RetrieveIntervalOutOfRange, InvalidOperationError
+from vmngclient.exceptions import InvalidOperationError, RetrieveIntervalOutOfRange
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import asdict, create_dataclass
 
@@ -153,7 +153,8 @@ class AdministrationSettingsAPI:
         return create_dataclass(Organization, self.session.get_data(endpoint)[0])
 
     @overload
-    def update(self, payload: Password) -> bool: ...
+    def update(self, payload: Password) -> bool:
+        ...
 
     def __update_password(self, payload: dict) -> Response:
         endpoint = "/dataservice/admin/user/profile/password"
@@ -162,7 +163,8 @@ class AdministrationSettingsAPI:
         return response
 
     @overload
-    def update(self, payload: Certificate) -> bool: ...
+    def update(self, payload: Certificate) -> bool:
+        ...
 
     def __update_certificate(self, payload: Certificate) -> Response:
         if not payload.retrieve_interval_is_valid:
@@ -174,14 +176,16 @@ class AdministrationSettingsAPI:
         return self.session.put(endpoint, json=json_payload)
 
     @overload
-    def update(self, payload: Vbond) -> bool: ...
+    def update(self, payload: Vbond) -> bool:
+        ...
 
     def __update_vbond(self, payload: dict) -> Response:
         endpoint = "/dataservice/settings/configuration/device"
         return self.session.post(endpoint, json=payload)
 
     @overload
-    def update(self, payload: Organization) -> bool: ...
+    def update(self, payload: Organization) -> bool:
+        ...
 
     def __update_organization(self, payload: dict) -> Response:
         endpoint = "/dataservice/settings/configuration/organization"
