@@ -1,4 +1,6 @@
-from typing import Generic, Iterable, MutableSequence, TypeVar, overload
+from __future__ import annotations
+
+from typing import Any, Generic, Iterable, MutableSequence, TypeVar, overload
 
 T = TypeVar("T")
 D = TypeVar("D")
@@ -13,6 +15,9 @@ class TypedList(MutableSequence[T], Generic[T]):
 
     If no argument is given, the constructor creates a new empty list.
     The argument must be an iterable if specified.
+
+    An implementation is based of pythonic list, instead of creating a new
+    Linked List from scratch.
     """
 
     @overload
@@ -36,98 +41,84 @@ class TypedList(MutableSequence[T], Generic[T]):
     def __repr__(self) -> str:
         return f"TypedList({self._type.__name__}, {repr(self.data)})"
 
-    # def __contains__(self, item):
-    #     return item in self.data
+    def __contains__(self, item: Any) -> bool:
+        return item in self.data
 
-    # def __len__(self):
-    #     return len(self.data)
+    def __len__(self) -> int:
+        return len(self.data)
 
-    # def __getitem__(self, i):
-    #     if isinstance(i, slice):
-    #         return self.__class__(self.data[i])
-    #     else:
-    #         return self.data[i]
+    @overload
+    def __getitem__(self, i: int) -> T:
+        ...
 
-    # def __setitem__(self, i, item):
-    #     self.data[i] = item
+    @overload
+    def __getitem__(self, i: slice) -> TypedList[T]:
+        ...
 
-    # def __delitem__(self, i):
-    #     del self.data[i]
+    def __getitem__(self, i):
+        if isinstance(i, slice):
+            return self.__class__(self._type, self.data[i])
+        else:
+            return self.data[i]
 
-    # def __add__(self, other):
-    #     if isinstance(other, UserList):
-    #         return self.__class__(self.data + other.data)
-    #     elif isinstance(other, type(self.data)):
-    #         return self.__class__(self.data + other)
-    #     return self.__class__(self.data + list(other))
+    @overload
+    def __setitem__(self, i: int, item: T, /) -> None:
+        ...
 
-    # def __radd__(self, other):
-    #     if isinstance(other, UserList):
-    #         return self.__class__(other.data + self.data)
-    #     elif isinstance(other, type(self.data)):
-    #         return self.__class__(other + self.data)
-    #     return self.__class__(list(other) + self.data)
+    @overload
+    def __setitem__(self, i: slice, item: Iterable[T], /) -> None:
+        ...
 
-    # def __iadd__(self, other):
-    #     if isinstance(other, UserList):
-    #         self.data += other.data
-    #     elif isinstance(other, type(self.data)):
-    #         self.data += other
-    #     else:
-    #         self.data += list(other)
-    #     return self
+    def __setitem__(self, i, item):
+        if not isinstance(item, self._type):
+            raise TypeError(f"Expected {self._type.__name__} item type, " f"got {type(item).__name__}.")
+        self.data[i] = item
 
-    # def __mul__(self, n):
-    #     return self.__class__(self.data * n)
+    @overload
+    def __delitem__(self, i: int, /) -> None:
+        ...
 
-    # __rmul__ = __mul__
+    @overload
+    def __delitem__(self, i: slice, /) -> None:
+        ...
 
-    # def __imul__(self, n):
-    #     self.data *= n
-    #     return self
+    def __delitem__(self, i):
+        del self.data[i]
 
-    # def __copy__(self):
-    #     inst = self.__class__.__new__(self.__class__)
-    #     inst.__dict__.update(self.__dict__)
-    #     # Create a copy and avoid triggering descriptors
-    #     inst.__dict__["data"] = self.__dict__["data"][:]
-    #     return inst
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, TypedList):
+            if len(self) != len(__o):
+                return False
+            return all([self.data[i] == __o.data[i] for i in range(len(self))])
+        return False
 
-    # def append(self, item):
-    #     self.data.append(item)
+    def append(self, item: T) -> None:
+        if not isinstance(item, self._type):
+            raise TypeError(f"Expected {self._type.__name__} item type, " f"got {type(item).__name__}.")
+        self.data.append(item)
 
-    # def insert(self, i, item):
-    #     self.data.insert(i, item)
+    def insert(self, i: int, item: T) -> None:
+        if not isinstance(item, self._type):
+            raise TypeError(f"Expected {self._type.__name__} item type, " f"got {type(item).__name__}.")
+        self.data.insert(i, item)
 
-    # def pop(self, i=-1):
-    #     return self.data.pop(i)
+    def pop(self, i=-1):
+        return self.data.pop(i)
 
-    # def remove(self, item):
-    #     self.data.remove(item)
+    def remove(self, item):
+        self.data.remove(item)
 
-    # def clear(self):
-    #     self.data.clear()
+    def clear(self):
+        self.data.clear()
 
-    # def copy(self):
-    #     return self.__class__(self)
+    def count(self, item):
+        return self.data.count(item)
 
-    # def count(self, item):
-    #     return self.data.count(item)
+    def index(self, item, *args):
+        return self.data.index(item, *args)
 
-    # def index(self, item, *args):
-    #     return self.data.index(item, *args)
-
-    # def reverse(self):
-    #     self.data.reverse()
-
-    # def sort(self, /, *args, **kwds):
-    #     self.data.sort(*args, **kwds)
-
-    # def extend(self, other):
-    #     if isinstance(other, UserList):
-    #         self.data.extend(other.data)
-    #     else:
-    #         self.data.extend(other)
+    def reverse(self):
+        self.data.reverse()
 
     # def single_or_default(self, default: D = None) -> Union[T, D]:  # _type
     #     """
