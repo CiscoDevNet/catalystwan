@@ -1,8 +1,8 @@
-import typing
+# type: ignore
 import unittest
 from unittest import TestCase
 
-from parameterized import parameterized  # type: ignore
+from parameterized import parameterized
 
 from vmngclient.dataclasses import User
 from vmngclient.typed_list import TypedList
@@ -17,7 +17,7 @@ class TestTypedList(TestCase):
         self.users = [u1, u2, u3]
         self.typed_list = TypedList(User, self.users)
 
-    @parameterized.expand([(str, []), (int, [1, 2, 3]), (User, [User("User1")])])  # type: ignore
+    @parameterized.expand([(str, []), (int, [1, 2, 3]), (User, [User("User1")])])
     def test_init(self, _type, iterable):
         # Arrange, Act
         TypedList(_type, iterable)
@@ -61,7 +61,6 @@ class TestTypedList(TestCase):
         # Assert
         self.assertEqual(representation, output)
 
-    @typing.no_type_check
     @parameterized.expand(
         [
             (str, ["1"], 1),
@@ -78,7 +77,6 @@ class TestTypedList(TestCase):
         # Assert
         self.assertEqual(output_length, length)
 
-    @typing.no_type_check
     @parameterized.expand(
         [
             (str, ["1"], "1"),
@@ -94,7 +92,6 @@ class TestTypedList(TestCase):
         # Assert
         self.assertTrue(other in typed_list)
 
-    @typing.no_type_check
     @parameterized.expand(
         [
             (str, ["1"], "2"),
@@ -110,7 +107,6 @@ class TestTypedList(TestCase):
         # Assert
         self.assertFalse(other in typed_list)
 
-    @typing.no_type_check
     @parameterized.expand(
         [
             (1, User(username="User2")),
@@ -120,7 +116,6 @@ class TestTypedList(TestCase):
     def test_get_item(self, index, output):
         self.assertEqual(self.typed_list[index], output)
 
-    @typing.no_type_check
     @parameterized.expand([(User(username="User1"),), (TypedList(User, [User("User3")]),)])
     def test_eq_negative(self, other):
         self.assertFalse(self.users == other)
