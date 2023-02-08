@@ -211,7 +211,7 @@ class SoftwareActionAPI:
         upload = self.session.post(url, data=monitor, headers={"content-type": monitor.content_type})
         return upload.status_code
 
-    def _downgrade_check(self, devices, version_to_upgrade: str, family) -> List:
+    def _downgrade_check(self, devices, version_to_upgrade: str, family) -> List[str]:
         """
         Check if upgrade operation is not actually a downgrade opeartion.
         If so, in some cases action is being blocked.
@@ -221,7 +221,7 @@ class SoftwareActionAPI:
             devices_category (DeviceCategory): devices category
 
         Returns:
-            Union[None, List]: [None, list of devices with no permission to downgrade]
+            Union[None, List[str]]: [None, list of devices with no permission to downgrade]
         """
         incorrect_devices = []
         devices_versions_repo = self.repository.get_devices_versions_repository(self.device_versions.device_category)

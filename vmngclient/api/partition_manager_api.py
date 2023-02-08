@@ -104,7 +104,7 @@ class PartitionManagerAPI:
         remove_action: Dict[str, str] = self.repository.session.post(url, json=payload).json()
         return remove_action["id"]
 
-    def _check_remove_partition_possibility(self, devices) -> List:
+    def _check_remove_partition_possibility(self, devices) -> List["str"]:
 
         devices_versions_repository = self.repository.get_devices_versions_repository(
             self.device_versions.device_category
