@@ -77,7 +77,6 @@ class AaaAPI:
         """
         url_path = "/dataservice/admin/radius"
         data = asdict(radius_server)  # type: ignore
-
         response = self.session.post(url=url_path, json=data)
         logger.info(response)
         return True if response.status_code == 200 else False
@@ -91,17 +90,29 @@ class AaaAPI:
         url_path = "/dataservice/admin/radius"
         data = asdict(radius_server)  # type: ignore
         response = self.session.put(url_path, data)
+        logger.info(response)
         return True if response.status_code == 200 else False
 
     def delete_radius(self, radius_server: TenantRadiusServer) -> bool:
         """
         edit radius server
         :param radius_server:
-        :return:
+        :return: True|False
         """
         url_path = "/dataservice/admin/radius"
         data = asdict(radius_server)  # type: ignore
         response = self.session.put(url_path, data)
-        return True if response.status_code == 200 else False
+        logger.info(response)
+        return True if response.status_code == 204 else False
+
+    def get_radius(self) -> TenantRadiusServer:
+        """
+
+        :return:
+        """
+        url_path = "/dataservice/admin/radius"
+        data = self.session.get_data(url_path)[0]
+        return create_dataclass(TenantRadiusServer, data)
+
 
 
