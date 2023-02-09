@@ -118,3 +118,15 @@ def flatten_dict(d: Dict) -> Dict:
             yield key, value
 
     return dict(recurse(None, d))
+
+
+def certificate_field_transformer(cls, fields):
+    results = []
+    for field in fields:
+        if field.name == "retrieve_interval":
+            results.append(field)
+        elif isinstance(Enum, type(field)):
+            results.append(field.value)
+        else:
+            results.append(field)
+    return results
