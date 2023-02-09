@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from typing import Any, Generic, Iterable, MutableSequence, TypeVar, overload
 
+from vmngclient.exceptions import InvalidOperationError
+from vmngclient.utils.creation_tools import AttrsInstance
+
 T = TypeVar("T")
 D = TypeVar("D")
 
@@ -13,7 +16,7 @@ class TypedList(MutableSequence[T], Generic[T]):
     as all elements can be assumed to have the same properties and behaviors.
     Built-in mutable sequence.
 
-    If no argument is given, the constructor creates a new empty list.
+    If no argument is provided, the constructor creates a new empty list.
     The argument must be an iterable if specified.
 
     An implementation is based of pythonic list, instead of creating a new
@@ -102,41 +105,105 @@ class TypedList(MutableSequence[T], Generic[T]):
             raise TypeError(f"Expected {self._type.__name__} item type, " f"got {type(item).__name__}.")
         self.data.insert(i, item)
 
-    def pop(self, i=-1):
+    def pop(self, i: int = -1) -> T:
         return self.data.pop(i)
 
-    def remove(self, item):
+    def remove(self, item: T) -> None:
         self.data.remove(item)
 
-    def clear(self):
+    def clear(self) -> None:
         self.data.clear()
 
-    def count(self, item):
+    def count(self, item: T) -> int:
         return self.data.count(item)
 
-    def index(self, item, *args):
-        return self.data.index(item, *args)
-
-    def reverse(self):
+    def reverse(self) -> None:
         self.data.reverse()
 
-    # def single_or_default(self, default: D = None) -> Union[T, D]:  # _type
-    #     """
 
-    #     Returns the only element of a sequence, or a default value
-    #     if the sequence is empty; this method throws an exception
-    #     if there is more than one element in the sequence.
-    #     """
-    #     if not self.data:
-    #         return default
+class DataSequence(TypedList[AttrsInstance]):
+    """
+    ## Example:
 
-    #     if len(self.data) > 1:
-    #         raise InvalidOperationError("The input sequence contains more than one element.")
+    >>> DataSequence(User, [User(username="User1")])
+        DataSequence(User, [
+            User(username='User1', password=None, group=[], locale=None, description=None, resource_group=None)
+    ])
+    """
 
-    #     return self.data[0]
+    @overload
+    def __init__(self, _type: AttrsInstance) -> None:
+        ...
 
-    # def filter(self, **kwargs) -> "TypedList":
-    #     annotations = set(kwargs.keys()) & set(self._type.__annotations__.keys())
-    #     # annotations = set(kwargs.keys())
+    @overload
+    def __init__(self, _type: AttrsInstance, _iterable: Iterable[AttrsInstance], /) -> None:
+        ...
 
-    #     return TypedList(list(filter(lambda x: all(getattr(x, a) == kwargs[a] for a in annotations), self.data)))
+    def __init__(self, _type, _iterable=None, /):
+        if not isinstance(_type, AttrsInstance):
+            raise TypeError(f"Expected {AttrsInstance.__name__} item type, got {_type.__name__}.")
+
+        super().__init__(_type, _iterable)
+
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, DataSequence):
+            if len(self) != len(__o):
+                return False
+            return all([self.data[i] == __o.data[i] for i in range(len(self))])
+        return False
+
+    def __repr__(self) -> str:
+        return f"DataSequence({self._type.__name__}, {repr(self.data)})"
+
+    @overload
+    def single_or_default(self) -> AttrsInstance:
+        ...
+
+    @overload
+    def single_or_default(self, default: D) -> D:
+        ...
+
+    def single_or_default(self, default=None):
+        """Returns the only element of a sequence, or a default value if the sequence is empty.
+
+        ## Example:
+        >>> seq = DataSequence(User, [User(username="User1"), User(username="User2")])
+        >>> seq.single_or_default()
+        User(username='User1', password=None, group=[], locale=None, description=None, resource_group=None)
+        >>> seq.filter(username="User1").single_or_default()
+        User(username='User1', password=None, group=[], locale=None, description=None, resource_group=None)
+
+        Args:
+            default : The default value to return if the sequence is empty. Defaults to None.
+
+        Raises:
+            InvalidOperationError: Raises when there is more than one element in the sequence.
+
+        Returns:
+            Union[D, T]: The single element of the input sequence, or default.
+        """
+        if not self.data:
+            return default
+
+        if len(self.data) > 1:
+            raise InvalidOperationError("The input sequence contains more than one element.")
+
+        return self.data[0]
+
+    def filter(self, **kwargs) -> DataSequence:
+        """Filters a sequence of values based on attributes.
+
+        >>> seq = DataSequence(User, [User(username="User1"), User(username="User2")])
+        >>> seq.filter(username="User1")
+        DataSequence(User, [
+            User(username='User1', password=None, group=[], locale=None, description=None, resource_group=None)
+        ])
+
+        Returns:
+            DataSequence: Filtered DataSequence.
+        """
+        annotations = set(kwargs.keys())
+
+        return DataSequence(
+            self._type, filter(lambda x: all(getattr(x, a) == kwargs[a] for a in annotations), self.data)
+        )

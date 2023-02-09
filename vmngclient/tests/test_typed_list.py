@@ -1,11 +1,13 @@
 # type: ignore
+import copy
 import unittest
 from unittest import TestCase
 
 from parameterized import parameterized
 
-from vmngclient.dataclasses import User
-from vmngclient.typed_list import TypedList
+from vmngclient.dataclasses import Device, User
+from vmngclient.exceptions import InvalidOperationError
+from vmngclient.typed_list import DataSequence, TypedList
 
 
 class TestTypedList(TestCase):
@@ -178,6 +180,103 @@ class TestTypedList(TestCase):
         self.assertNotEqual(users[1], u2)
         with self.assertRaises(TypeError):
             users.insert(1, "2")
+
+
+class TestDataSequence(TestCase):
+    def setUp(self):
+        self.u = User(username="User1")
+        u1 = User(username="User1")
+        u2 = User(username="User2")
+        u3 = User(username="User3")
+        self.users = [u1, u2, u3]
+        self.data_sequence = DataSequence(User, self.users)
+
+    @parameterized.expand(
+        [
+            (User, [], []),
+            (User, None, []),
+            (User, [User(username="User1")], [User(username="User1")]),
+            (Device, [], []),
+        ]
+    )
+    def test_init(self, _type, items, data):
+        # Arrange, Act
+        data_seq = DataSequence(_type, items)
+
+        # Assert
+        self.assertEqual(data_seq.data, data)
+
+    def test_init_exception(self):
+        # Arrage, Act, Assert
+        with self.assertRaises(TypeError):
+            DataSequence(str, ["1, 2"])
+
+    def test_single_or_default(self):
+        # Arrange, Act
+        output = DataSequence(User, [self.u]).single_or_default(default="x")
+
+        # Assert
+        self.assertEqual(output, self.u)
+
+    @parameterized.expand(
+        [
+            (User, [], None),
+            (User, [], "Test"),
+        ]
+    )
+    def test_single_or_default_empty(self, _type, items, default_value):
+        # Arrange
+        data_seq = DataSequence(_type, items)
+
+        # Act
+        output = data_seq.single_or_default(default=default_value)
+
+        # Assert
+        self.assertEqual(output, default_value)
+
+    def test_single_or_default_big_array(self):
+        # Arrange
+        data_seq = DataSequence(User, self.users)
+
+        # Act, Assert
+        with self.assertRaises(InvalidOperationError):
+            data_seq.single_or_default()
+
+    @parameterized.expand(
+        [
+            (None, []),
+            ("DoesNotExists", []),
+            ("User1", [User("User1")]),
+        ]
+    )
+    def test_filter_single_attribute(self, attribute, users):
+        # Arrange
+        correct_seq = DataSequence(User, users)
+
+        # Act
+        output = self.data_sequence.filter(username=attribute)
+
+        # Assert
+        self.assertEqual(output, correct_seq)
+        self.assertTrue(isinstance(output, DataSequence))
+
+    def test_filter_two_attributes(self):
+        # Arrange
+        additional_user = User(username="User1", description="ThisOne")
+        users = copy.deepcopy(self.data_sequence)
+        users.append(additional_user)
+        correct_output = DataSequence(User, [additional_user])
+
+        # Act
+        output = users.filter(username="User1", description="ThisOne")
+
+        # Assert
+        self.assertEqual(output, correct_output)
+
+    def test_filter_exception(self):
+        # Arrange, Act, Assert
+        with self.assertRaises(AttributeError):
+            self.data_sequence.filter(does_not="exists")
 
 
 if __name__ == "__main__":
