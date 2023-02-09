@@ -1,9 +1,9 @@
 import datetime as dt
 from enum import Enum
-from typing import Any, ClassVar, Dict, List, Protocol, Type, TypeVar
+from typing import Any, ClassVar, Dict, Iterable, List, Protocol, Type, TypeVar
 
 import attrs  # type: ignore
-from attr import Attribute, fields
+from attr import Attribute, fields, fields_dict
 from dateutil import parser  # type: ignore
 
 T = TypeVar("T")
@@ -31,16 +31,15 @@ def create_dataclass(cls: Type[T], data: Dict[str, Any]) -> T:
         A dataclass with implemented fields
     """
 
-    def filter_fields(available_fields: List[str], data: Dict[str, Any]) -> Dict[str, Any]:
+    def filter_fields(available_fields: Iterable[str], data: Dict[str, Any]) -> Dict[str, Any]:
         return dict(filter(lambda key_value: key_value[0] in available_fields, data.items()))
 
-    class_fields = list(cls.__annotations__)
     data_copy = data.copy()
     for field in fields(cls):
         json_field_name = field.metadata.get(FIELD_NAME, None)
         if json_field_name and json_field_name in data_copy:
             data_copy[field.name] = data_copy.pop(json_field_name)
-    filtered_data = filter_fields(class_fields, data_copy)
+    filtered_data = filter_fields(fields_dict(cls).keys(), data_copy)
     return cls(**filtered_data)
 
 
@@ -119,15 +118,3 @@ def flatten_dict(d: Dict) -> Dict:
             yield key, value
 
     return dict(recurse(None, d))
-
-
-def certificate_field_transformer(cls, fields):
-    results = []
-    for field in fields:
-        if field.name == "retrieve_interval":
-            results.append(field)
-        elif isinstance(Enum, type(field)):
-            results.append(field.value)
-        else:
-            results.append(field)
-    return results
