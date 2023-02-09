@@ -159,6 +159,10 @@ class DevicesAPI:
         >>> devices = DevicesAPI(session).get_devices()
         >>> vManages = devices.filter(personality=Personality.VMANAGE)
         """
+        if rediscover:
+            logger.info("Rediscovering devices...")
+            api = "/dataservice/device/action/rediscoverall"
+            self.session.post(url=api)
         devices_basic_info = self.session.get_data("/dataservice/device")
 
         parameters = {"deviceId": [device["deviceId"] for device in devices_basic_info]}
@@ -166,10 +170,7 @@ class DevicesAPI:
 
         devices = DataSequence(Device, [create_dataclass(Device, device) for device in devices_full_info])
 
-        if rediscover:
-            payload = {"action": "rediscover", "devices": [{"deviceId": d.uuid, "deviceIP": d.id} for d in devices]}
-            api = "/dataservice/device/action/rediscover"
-            self.session.post(url=api, json=json.dumps(payload))
+
 
         return devices
 
