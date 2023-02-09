@@ -97,13 +97,13 @@ Please contact authors direcly or via Issues Github page.
 3. Install and configure poetry (v1.3.1 or higher)
     https://python-poetry.org/docs/#installation
 
-    On linux/mac this usually
+    On linux/mac this usually means:
     ```
     curl -sSL https://install.python-poetry.org | python3 -
     poetry config virtualenvs.in-project true
     ```
     Depending on your IDE you might at this point think about proper integration
-    
+
     https://www.jetbrains.com/help/pycharm/poetry.html
 
     https://code.visualstudio.com/docs/python/environments
