@@ -1,4 +1,3 @@
-import json
 import logging
 from http import HTTPStatus
 from typing import List, Union, cast, overload
@@ -15,7 +14,7 @@ from vmngclient.dataclasses import (
     User,
     Vbond,
 )
-from vmngclient.exceptions import InvalidOperationError, RetrieveIntervalOutOfRange
+from vmngclient.exceptions import InvalidOperationError
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import asdict, create_dataclass
 
@@ -191,11 +190,9 @@ class AdministrationSettingsAPI:
         return response
 
     def __update_certificate(self, payload: Certificate) -> Response:
-        if not payload.retrieve_interval_is_valid:
-            raise RetrieveIntervalOutOfRange("Retrieve interval must be value between 1 and 60 minutes")
-        json_payload = json.dumps(asdict(payload))  # type: ignore
+        json_payload = asdict(payload)  # type: ignore
         endpoint = "/dataservice/settings/configuration/certificate"
-        return self.session.put(endpoint, data=json_payload)
+        return self.session.put(endpoint, json=json_payload)
 
     def __update_vbond(self, payload: dict) -> Response:
         endpoint = "/dataservice/settings/configuration/device"
