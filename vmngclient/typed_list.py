@@ -121,7 +121,7 @@ class TypedList(MutableSequence[T], Generic[T]):
         self.data.reverse()
 
 
-class DataSequence(TypedList[AttrsInstance]):
+class DataSequence(Generic[T], TypedList[AttrsInstance]):
     """
     ## Example:
 

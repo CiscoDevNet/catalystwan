@@ -1,22 +1,20 @@
 """Methods covering essential API endpoints and related data classes."""
+import json
+import logging
 from contextlib import contextmanager
-from enum import Enum
 from typing import Iterator, List, Union
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.dataclasses import BfdSessionData, Connection, Device, Reboot, WanInterface
 from vmngclient.session import vManageSession
+from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.operation_status import OperationStatus
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
 
-
-# TODO link that with dataclass
-class DeviceField(Enum):
-    HOSTNAME = "hostname"
-    ID = "id"
+logger = logging.getLogger(__name__)
 
 
 class DeviceNotFoundError(Exception):
@@ -38,30 +36,6 @@ class DevicesAPI:
         return str(self.session)
 
     @property
-    def controllers(self) -> List[Device]:
-        """List of controller devices only."""
-        return [
-            controller
-            for controller in self.devices
-            if controller.personality in [Personality.VMANAGE, Personality.VSMART]
-        ]
-
-    @property
-    def orchestrators(self) -> List[Device]:
-        """List of orchestrator devices only."""
-        return [orchestrator for orchestrator in self.devices if Personality.VBOND is orchestrator.personality]
-
-    @property
-    def edges(self) -> List[Device]:
-        """List of edge devices only."""
-        return [edge for edge in self.devices if Personality.EDGE is edge.personality]
-
-    @property
-    def vsmarts(self) -> List[Device]:
-        """List of vsmart devices only."""
-        return [vsmart for vsmart in self.devices if Personality.VSMART is vsmart.personality]
-
-    @property
     def system_ips(self) -> List[str]:
         """List of device system IP addresses."""
         return [device.local_system_ip for device in self.devices]
@@ -80,6 +54,7 @@ class DevicesAPI:
     @property
     def devices(self) -> List[Device]:
         """List of all devices."""
+        logger.warning("Devices property is deprecated. Please use get_devices() method.")
         devices_basic_info = self.session.get_data("/dataservice/device")
 
         devices_ids = ""
@@ -175,19 +150,28 @@ class DevicesAPI:
 
         return True if wait_for_state() else False
 
-    def get(self, field: DeviceField, value: str) -> Device:
-        supported_fields = [
-            DeviceField.HOSTNAME,
-            DeviceField.ID,
-        ]
+    def get_devices(self, rediscover: bool = False) -> DataSequence[Device]:
+        """Data sequence of all devices.
 
-        if field not in supported_fields:
-            raise TypeError(f"{field} is not supported. Available fields: {supported_fields}")
+        ## Examples:
 
-        for device in self.devices:
-            if getattr(device, field.value) == value:
-                return device
-        raise DeviceNotFoundError(f"Device with `{field.value}` equals to `{value}` does not exists.")
+        Get all vManages:
+        >>> devices = DevicesAPI(session).get_devices()
+        >>> vManages = devices.filter(personality=Personality.VMANAGE)
+        """
+        devices_basic_info = self.session.get_data("/dataservice/device")
+
+        parameters = {"deviceId": [device["deviceId"] for device in devices_basic_info]}
+        devices_full_info = self.session.get(url="/dataservice/device/system/info", params=parameters).json()["data"]
+
+        devices = DataSequence(Device, [create_dataclass(Device, device) for device in devices_full_info])
+
+        if rediscover:
+            payload = {"action": "rediscover", "devices": [{"deviceId": d.uuid, "deviceIP": d.id} for d in devices]}
+            api = "/dataservice/device/action/rediscover"
+            self.session.post(url=api, json=json.dumps(payload))
+
+        return devices
 
 
 class DeviceStateAPI:
