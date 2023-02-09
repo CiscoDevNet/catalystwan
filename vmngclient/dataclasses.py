@@ -5,7 +5,7 @@ from attr import define, field  # type: ignore
 
 from vmngclient.exceptions import RetrieveIntervalOutOfRange
 from vmngclient.utils.certificate_status import ValidityPeriod
-from vmngclient.utils.creation_tools import FIELD_NAME, asdict, certificate_field_transformer, convert_attributes
+from vmngclient.utils.creation_tools import FIELD_NAME, asdict, convert_attributes
 from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
@@ -365,7 +365,7 @@ class Password(DataclassBase):
     new_password: str = field(metadata={FIELD_NAME: "newpassword"})
 
 
-@define(frozen=True, field_transformer=certificate_field_transformer)
+@define
 class Certificate(DataclassBase):
     controller_certificate: str = field(metadata={FIELD_NAME: "certificateSigning"})
     first_name: str = field(metadata={FIELD_NAME: "firstName"})
