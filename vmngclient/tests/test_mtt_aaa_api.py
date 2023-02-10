@@ -2,9 +2,10 @@ import unittest
 from unittest.mock import patch
 
 from parameterized import parameterized  # type: ignore
-from vmngclient.utils.creation_tools import create_dataclass
+
 from vmngclient.api.mtt_aaa_api import TenantAaaAPI, TenantRadiusAPI, TenantTacacsAPI
 from vmngclient.dataclasses import TenantAAA, TenantRadiusServer, TenantTacacsServer
+from vmngclient.utils.creation_tools import create_dataclass
 
 
 class TestAaaAPI(unittest.TestCase):
@@ -15,7 +16,7 @@ class TestAaaAPI(unittest.TestCase):
             "adminAuthOrder": True,
             "auditDisable": False,
             "accounting": False,
-            "radiusServers": "server1"
+            "radiusServers": "server1",
         }
         self.p_aaa = {
             "authOrder": ["radius", "local"],
@@ -23,7 +24,7 @@ class TestAaaAPI(unittest.TestCase):
             "adminAuthOrder": True,
             "auditDisable": True,
             "accounting": True,
-            "radiusServers": "serverX"
+            "radiusServers": "serverX",
         }
         self.aaa_dataclass = create_dataclass(TenantAAA, self.aaa)
         self.p_aaa_dataclass = create_dataclass(TenantAAA, self.p_aaa)
@@ -88,7 +89,7 @@ class TestRadiusAPI(unittest.TestCase):
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
                 "secretKey": "cisco123",
-                "priority": 1
+                "priority": 1,
             },
             {
                 "address": "10.0.5.144",
@@ -99,7 +100,7 @@ class TestRadiusAPI(unittest.TestCase):
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
                 "secretKey": "cisco123",
-                "priority": 1
+                "priority": 1,
             },
             {
                 "address": "10.0.5.145",
@@ -110,8 +111,8 @@ class TestRadiusAPI(unittest.TestCase):
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
                 "secretKey": "cisco123",
-                "priority": 1
-            }
+                "priority": 1,
+            },
         ]
 
         self.p_radius_server_list = [
@@ -124,7 +125,7 @@ class TestRadiusAPI(unittest.TestCase):
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
                 "secretKey": "cisco123",
-                "priority": 1
+                "priority": 1,
             },
             {
                 "address": "10.0.5.144",
@@ -135,19 +136,11 @@ class TestRadiusAPI(unittest.TestCase):
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
                 "secretKey": "cisco123",
-                "priority": 1
-            }
+                "priority": 1,
+            },
         ]
-        self.radius_server = {
-            "timeout": 5,
-            "retransmit": 3,
-            "server": self.radius_server_list
-        }
-        self.p_radius_server = {
-            "timeout": 5,
-            "retransmit": 3,
-            "server": self.p_radius_server_list
-        }
+        self.radius_server = {"timeout": 5, "retransmit": 3, "server": self.radius_server_list}
+        self.p_radius_server = {"timeout": 5, "retransmit": 3, "server": self.p_radius_server_list}
         self.radius_server_dataclass = create_dataclass(TenantRadiusServer, self.radius_server)
         self.p_radius_server_dataclass = create_dataclass(TenantRadiusServer, self.p_radius_server)
 
@@ -198,6 +191,7 @@ class TestRadiusAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, expected_outcome)
 
+
 class TestTacacsAPI(unittest.TestCase):
     def setUp(self) -> None:
         self.tacacs_server_list = [
@@ -208,7 +202,7 @@ class TestTacacsAPI(unittest.TestCase):
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
                 "secretKey": "cisco123",
-                "priority": 1
+                "priority": 1,
             },
             {
                 "address": "10.0.5.142",
@@ -217,7 +211,7 @@ class TestTacacsAPI(unittest.TestCase):
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
                 "secretKey": "cisco123",
-                "priority": 2
+                "priority": 2,
             },
             {
                 "address": "10.0.5.151",
@@ -226,8 +220,8 @@ class TestTacacsAPI(unittest.TestCase):
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
                 "secretKey": "cisco123",
-                "priority": 3
-            }
+                "priority": 3,
+            },
         ]
 
         self.p_tacacs_server_list = [
@@ -238,7 +232,7 @@ class TestTacacsAPI(unittest.TestCase):
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
                 "secretKey": "cisco123",
-                "priority": 1
+                "priority": 1,
             },
             {
                 "address": "10.0.5.142",
@@ -247,19 +241,11 @@ class TestTacacsAPI(unittest.TestCase):
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
                 "secretKey": "cisco123",
-                "priority": 2
-            }
+                "priority": 2,
+            },
         ]
-        self.tacacs_server = {
-            "timeout": 5,
-            "authentication": "PAP",
-            "server": self.tacacs_server_list
-        }
-        self.p_tacacs_server = {
-            "timeout": 5,
-            "retransmit": "ASCII",
-            "server": self.p_tacacs_server_list
-        }
+        self.tacacs_server = {"timeout": 5, "authentication": "PAP", "server": self.tacacs_server_list}
+        self.p_tacacs_server = {"timeout": 5, "retransmit": "ASCII", "server": self.p_tacacs_server_list}
         self.tacacs_server_dataclass = create_dataclass(TenantTacacsServer, self.tacacs_server)
         self.p_tacacs_server_dataclass = create_dataclass(TenantTacacsServer, self.p_tacacs_server)
 
