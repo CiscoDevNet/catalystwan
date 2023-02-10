@@ -20,6 +20,13 @@ class DataclassBase:
         )
 
 
+@define(frozen=True)
+class vManageResponseErrorData(DataclassBase):
+    message: str
+    details: str
+    code: str
+
+
 @define(frozen=True, field_transformer=convert_attributes)
 class AdminTech(DataclassBase):
     creation_time: dt.datetime = field(metadata={FIELD_NAME: "creationTime"})
