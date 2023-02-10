@@ -1,8 +1,7 @@
 import logging
-from typing import List, Union, cast
 
-from vmngclient.session import vManageSession
 from vmngclient.dataclasses import TenantAAA, TenantRadiusServer, TenantTacacsServer
+from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import asdict, create_dataclass
 
 logger = logging.getLogger(__name__)
@@ -24,7 +23,7 @@ class TenantAaaAPI:
         return str(self.session)
 
     def add_aaa(self, tenant_aaa: TenantAAA) -> bool:
-        """"
+        """ "
         TenantAAA:
             "authOrder": [ "local", "radius", "tacacs"],
             "authFallback": true,
@@ -80,6 +79,7 @@ class TenantRadiusAPI:
     """
     Used to configure  mtt tenant remote aaa radius servers
     """
+
     def __init__(self, session: vManageSession) -> None:
         self.session = session
 
@@ -135,6 +135,7 @@ class TenantTacacsAPI:
     """
     Used to configure mtt tenant remote aaa TACACS servers
     """
+
     def __init__(self, session: vManageSession) -> None:
         self.session = session
 
