@@ -8,7 +8,11 @@ from vmngclient.utils.creation_tools import asdict, create_dataclass
 logger = logging.getLogger(__name__)
 
 
-class AaaAPI:
+class AAAConfigNotPresent(Exception):
+    pass
+
+
+class TenantAaaAPI:
     """
     Used to configure  mtt tenant management users remote servers
     """
@@ -57,6 +61,7 @@ class AaaAPI:
         url_path = "/dataservice/admin/aaa"
         logger.debug(f"Deleting AAA on {self.session.get_tenant_id()}.")
         response = self.session.delete(url_path)
+        logger.info(response)
         return True if response.status_code == 200 else False
 
     def put_aaa(self, tenant_AAA: TenantAAA) -> bool:
@@ -66,8 +71,20 @@ class AaaAPI:
         """
         url_path = "/dataservice/admin/aaa"
         data = asdict(tenant_AAA)  # type: ignore
-        response = self.session.put(url_path, data)
+        response = self.session.put(url=url_path, json=data)
+        logger.info(response)
         return True if response.status_code == 200 else False
+
+
+class TenantRadiusAPI:
+    """
+    Used to configure  mtt tenant remote aaa radius servers
+    """
+    def __init__(self, session: vManageSession) -> None:
+        self.session = session
+
+    def __str__(self) -> str:
+        return str(self.session)
 
     def add_radius(self, radius_server: TenantRadiusServer) -> bool:
         """
@@ -89,30 +106,81 @@ class AaaAPI:
         """
         url_path = "/dataservice/admin/radius"
         data = asdict(radius_server)  # type: ignore
-        response = self.session.put(url_path, data)
+        response = self.session.put(url=url_path, json=data)
         logger.info(response)
         return True if response.status_code == 200 else False
 
-    def delete_radius(self, radius_server: TenantRadiusServer) -> bool:
+    def delete_radius(self) -> bool:
         """
         edit radius server
         :param radius_server:
         :return: True|False
         """
         url_path = "/dataservice/admin/radius"
-        data = asdict(radius_server)  # type: ignore
-        response = self.session.put(url_path, data)
+        response = self.session.delete(url_path)
         logger.info(response)
         return True if response.status_code == 204 else False
 
     def get_radius(self) -> TenantRadiusServer:
         """
-
-        :return:
+        Retrieve Radius server
+        :return: TenantRadiusServer
         """
         url_path = "/dataservice/admin/radius"
-        data = self.session.get_data(url_path)[0]
+        data = self.session.get_data(url_path)
         return create_dataclass(TenantRadiusServer, data)
 
 
+class TenantTacacsAPI:
+    """
+    Used to configure mtt tenant remote aaa TACACS servers
+    """
+    def __init__(self, session: vManageSession) -> None:
+        self.session = session
 
+    def __str__(self) -> str:
+        return str(self.session)
+
+    def add_tacacs(self, tacacs_server: TenantTacacsServer) -> bool:
+        """
+        Create TACACS for tenant
+        :param tacacs_server:
+        :return:
+        """
+        url_path = "/dataservice/admin/tacacs"
+        data = asdict(tacacs_server)  # type: ignore
+        response = self.session.post(url=url_path, json=data)
+        logger.info(response)
+        return True if response.status_code == 200 else False
+
+    def put_tacacs(self, tacacs_server: TenantTacacsServer) -> bool:
+        """
+        Update tacacs server
+        :param tacacs_server:
+        :return:
+        """
+        url_path = "/dataservice/admin/tacacs"
+        data = asdict(tacacs_server)  # type: ignore
+        response = self.session.put(url=url_path, json=data)
+        logger.info(response)
+        return True if response.status_code == 200 else False
+
+    def delete_tacacs(self) -> bool:
+        """
+        Deletes tacacs server
+        :param tacacs_server:
+        :return: True|False
+        """
+        url_path = "/dataservice/admin/tacacs"
+        response = self.session.delete(url_path)
+        logger.info(response)
+        return True if response.status_code == 204 else False
+
+    def get_tacacs(self) -> TenantTacacsServer:
+        """
+        Retrieves Tacacs server
+        :return: TenantTacacsServer
+        """
+        url_path = "/dataservice/admin/tacacs"
+        data = self.session.get_data(url_path)
+        return create_dataclass(TenantTacacsServer, data)
