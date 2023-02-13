@@ -112,17 +112,21 @@ class DeviceVersions:
         Returns:
             list : list of devices
         """
-        devs = self.get_device_list(devices)
+        devices_payload = []
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
-        for dev in devs:
-            dev_installed_versions = getattr(all_dev_versions[dev["deviceId"]], version_type)
-            for version in dev_installed_versions:
-                if version_to_set_up in version:
-                    dev["version"] = version
-                    break
-            if not dev["version"]:
-                logger.error(f"Software version {version_to_set_up} for {dev} is not included in available_versions")
-        return devs
+        for device in devices:
+            device_versions = getattr(all_dev_versions[device.uuid], version_type)
+            try:
+                for version in device_versions:
+                    if version_to_set_up in version:
+                        devices_payload.append(
+                            {"deviceId": device.uuid, "deviceIP": device.id, "version" : [version]}
+                            )
+                        break
+            except IndexError:
+                logger.error(f"Software version {version_to_set_up} for {device.hostname} is not included in {version_type}."
+                "Action for that device is not going to proceed.")
+        return devices_payload
 
     def get_device_list_in_installed(self, version_to_set_up: str, devices: List[Device]) -> List[dict]:
         """
@@ -163,11 +167,13 @@ class DeviceVersions:
         Returns:
             list : list of devices
         """
-        devs = self.get_device_list(devices)
+        devices_payload = []
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
-        for device in devs:
-            device["version"] = getattr(all_dev_versions[device["deviceId"]], "current_version")
-        return devs
+        for device in devices:
+            devices_payload.append(
+                            {"deviceId": device.uuid, "deviceIP": device.id, "version" : getattr(all_dev_versions[device.id], "current_version")}
+                            )
+        return devices_payload
 
     def get_device_list(self, devices: List[Device]) -> List[dict]:
 

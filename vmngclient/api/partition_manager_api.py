@@ -57,8 +57,8 @@ class PartitionManagerAPI:
         Returns:
             str: action id
         """
-        devs = self.device_versions.get_devices_current_version(devices)
-        return self._set_default_partition(devs)
+        devices_current_versions = self.device_versions.get_devices_current_version(devices)
+        return self._set_default_partition(devices_current_versions)
 
     def set_default_partition(self, devices: List[Device], version: str) -> str:
         """
@@ -72,8 +72,8 @@ class PartitionManagerAPI:
         Returns:
             str: action id
         """
-        devs = self.device_versions.get_device_list_in_installed(version, devices)
-        return self._set_default_partition(devs)
+        devices_choosen_version = self.device_versions.get_device_list_in_installed(version, devices)
+        return self._set_default_partition(devices_choosen_version)
 
     def remove_partition(self, devices: List[Device], version: str, force: bool = False) -> str:
         """
@@ -104,13 +104,13 @@ class PartitionManagerAPI:
         remove_action: Dict[str, str] = self.repository.session.post(url, json=payload).json()
         return remove_action["id"]
 
-    def _check_remove_partition_possibility(self, devices) -> List["str"]:
+    def _check_remove_partition_possibility(self, payload_devices: List[dict]) -> List["str"]:
 
         devices_versions_repository = self.repository.get_devices_versions_repository(
             self.device_versions.device_category
         )
         invalid_devices = []
-        for device in devices:
+        for device in payload_devices:
 
             if device["version"] in (
                 devices_versions_repository[device["deviceId"]].current_version,
