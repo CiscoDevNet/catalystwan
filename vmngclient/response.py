@@ -7,9 +7,9 @@ from requests.exceptions import JSONDecodeError
 
 from vmngclient.dataclasses import vManageResponseErrorData
 from vmngclient.typed_list import DataSequence
-from vmngclient.utils.creation_tools import create_dataclass
+from vmngclient.utils.creation_tools import AttrsInstance, create_dataclass
 
-T = TypeVar("T")
+T = TypeVar("T", bound=AttrsInstance)
 
 
 def response_debug(response: Optional[Response], request: Union[Request, PreparedRequest, None]) -> str:
@@ -91,7 +91,7 @@ class JsonPayload:
 
 
 class vManageResponse(Response):
-    """Extension of Response with methods specific to vManage"""
+    """Extends Response object with methods specific to vManage"""
 
     def __init__(self, response: Response):
         self.__dict__.update(response.__dict__)
