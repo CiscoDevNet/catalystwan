@@ -22,6 +22,13 @@ class TenantAaaAPI:
     def __str__(self) -> str:
         return str(self.session)
 
+    def aaa_exists(self) -> bool:
+        url_path = "/dataservice/admin/aaa"
+        if not self.session.get_data(url_path):
+            return False
+        else:
+            return True
+
     def add_aaa(self, tenant_aaa: TenantAAA) -> bool:
         """ "
         TenantAAA:
@@ -58,6 +65,8 @@ class TenantAaaAPI:
         url_path = "/dataservice/admin/aaa"
         logger.debug(f"Deleting AAA on {self.session.get_tenant_id()}.")
         response = self.session.delete(url_path)
+        if not self.aaa_exists():
+            raise AAAConfigNotPresent("No Aaa config present for Tenant")
         return True if response.status_code == 200 else False
 
     def put_aaa(self, tenant_AAA: TenantAAA) -> bool:
