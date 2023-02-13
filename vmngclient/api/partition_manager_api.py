@@ -101,7 +101,17 @@ class PartitionManagerAPI:
                     f"Current or default version of devices with ids {invalid_devices} \
                         are equal to remove version. Action denied!"
                 )
-        remove_action: Dict[str, str] = self.repository.session.post(url, json=payload).json()
+        remove_action: Dict[str, str] = self.session.post(url, json=payload).json()
+        return remove_action["id"]
+    
+    def remove_available_partitions(self,devices: List[Device]):
+        url = "/dataservice/device/action/removepartition"
+        payload = {
+            "action": "removepartition",
+            "devices": self.device_versions.get_devices_available_versions(devices),
+            "deviceType": "vmanage",
+        }
+        remove_action: Dict[str,str] = self.session.post(url, json=payload).json()
         return remove_action["id"]
 
     def _check_remove_partition_possibility(self, payload_devices: List[dict]) -> List["str"]:

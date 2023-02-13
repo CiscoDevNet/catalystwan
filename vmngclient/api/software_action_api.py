@@ -114,6 +114,7 @@ class SoftwareActionAPI:
             "devices": self.device_versions.get_device_list_in_available(version, devices),
             "deviceType": "vmanage",
         }
+        print(payload)
         activate = dict(self.session.post(url, json=payload).json())
         return activate["id"]
 

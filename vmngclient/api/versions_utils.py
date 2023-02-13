@@ -155,8 +155,8 @@ class DeviceVersions:
             list : list of devices
         """
         return self._get_device_list_in(version_to_set_up, devices, "available_versions")
-
-    def get_devices_current_version(self, devices: List[Device]) -> List[dict]:
+    
+    def _get_devices_choosen_version(self, devices: List[Device], version_type: str):
         """
         Create version key with current software version for every device dict in device list
 
@@ -171,9 +171,38 @@ class DeviceVersions:
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
         for device in devices:
             devices_payload.append(
-                            {"deviceId": device.uuid, "deviceIP": device.id, "version" : getattr(all_dev_versions[device.id], "current_version")}
+                            {"deviceId": device.uuid, "deviceIP": device.id, "version" : getattr(all_dev_versions[device.uuid], version_type)}
                             )
         return devices_payload
+
+    def get_devices_current_version(self, devices: List[Device]) -> List[dict]:
+        """
+        Create version key with current software version for every device dict in device list
+
+        Args:
+            version_to_set_up (str): requested version
+            devices (List[Device]): devices on which action going to be performed
+
+        Returns:
+            list : list of devices
+        """
+
+        return self._get_devices_choosen_version(devices,"current_version")
+    
+    def get_devices_available_versions(self, devices: List[Device]) -> List[dict]:
+        """
+        Create version key with current software version for every device dict in device list
+
+        Args:
+            version_to_set_up (str): requested version
+            devices (List[Device]): devices on which action going to be performed
+
+        Returns:
+            list : list of devices
+        """
+
+        return self._get_devices_choosen_version(devices,"available_versions")
+
 
     def get_device_list(self, devices: List[Device]) -> List[dict]:
 
