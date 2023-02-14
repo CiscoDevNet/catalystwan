@@ -24,10 +24,7 @@ class TenantAaaAPI:
 
     def aaa_exists(self) -> bool:
         url_path = "/dataservice/admin/aaa"
-        if not self.session.get_data(url_path):
-            return False
-        else:
-            return True
+        return True if self.session.get_data(url_path) else False
 
     def add_aaa(self, tenant_aaa: TenantAAA) -> bool:
         """ "
@@ -44,7 +41,7 @@ class TenantAaaAPI:
         url_path = "/dataservice/admin/aaa"
         data = asdict(tenant_aaa)  # type: ignore
         response = self.session.post(url=url_path, json=data)
-        return True if response.status_code == HTTPStatus.OK else False
+        return True if response.status_code == 200 else False
 
     def get_aaa(self) -> TenantAAA:
         """
