@@ -18,13 +18,13 @@ class TenantAaaAPI:
 
     def __init__(self, session: vManageSession) -> None:
         self.session = session
+        self.url_path = "/dataservice/admin/aaa"
 
     def __str__(self) -> str:
         return str(self.session)
 
     def aaa_exists(self) -> bool:
-        url_path = "/dataservice/admin/aaa"
-        return True if self.session.get_data(url_path) else False
+        return True if self.session.get_data(self.url_path) else False
 
     def add_aaa(self, tenant_aaa: TenantAAA) -> bool:
         """ "
@@ -38,9 +38,8 @@ class TenantAaaAPI:
 
         returns bool depending on the api post call
         """
-        url_path = "/dataservice/admin/aaa"
         data = asdict(tenant_aaa)  # type: ignore
-        response = self.session.post(url=url_path, json=data)
+        response = self.session.post(url=self.url_path, json=data)
         return True if response.status_code == 200 else False
 
     def get_aaa(self) -> TenantAAA:
@@ -49,8 +48,7 @@ class TenantAaaAPI:
         :param aaa:
         :return:
         """
-        url_path = "/dataservice/admin/aaa"
-        tenant_aaa = self.session.get_data(url_path)
+        tenant_aaa = self.session.get_data(self.url_path)
         logger.debug(f"Tenant AAA: {tenant_aaa}")
         return create_dataclass(TenantAAA, tenant_aaa)
 
@@ -59,10 +57,9 @@ class TenantAaaAPI:
         Delete aaa works only for tenants
         :return:
         """
-        url_path = "/dataservice/admin/aaa"
         id = self.session.get_tenant_id()
         logger.debug(f"Deleting AAA on {id}.")
-        response = self.session.delete(url_path)
+        response = self.session.delete(self.url_path)
         if not self.aaa_exists():
             raise AAAConfigNotPresent(f"No AAA config present for Tenant id={id}")
         return True if response.status_code == 200 else False
@@ -72,9 +69,8 @@ class TenantAaaAPI:
         Updated the AAA for tenant
         :return:
         """
-        url_path = "/dataservice/admin/aaa"
         data = asdict(tenant_AAA)  # type: ignore
-        response = self.session.put(url=url_path, json=data)
+        response = self.session.put(url=self.url_path, json=data)
         return True if response.status_code == 200 else False
 
 
@@ -85,6 +81,7 @@ class TenantRadiusAPI:
 
     def __init__(self, session: vManageSession) -> None:
         self.session = session
+        self.url_path = "/dataservice/admin/radius"
 
     def __str__(self) -> str:
         return str(self.session)
@@ -95,9 +92,8 @@ class TenantRadiusAPI:
         :param radius_server:
         :return:
         """
-        url_path = "/dataservice/admin/radius"
         data = asdict(radius_server)  # type: ignore
-        response = self.session.post(url=url_path, json=data)
+        response = self.session.post(url=self.url_path, json=data)
         return True if response.status_code == 200 else False
 
     def put_radius(self, radius_server: TenantRadiusServer) -> bool:
@@ -106,9 +102,8 @@ class TenantRadiusAPI:
         :param radius_server:
         :return:
         """
-        url_path = "/dataservice/admin/radius"
         data = asdict(radius_server)  # type: ignore
-        response = self.session.put(url=url_path, json=data)
+        response = self.session.put(url=self.url_path, json=data)
         return True if response.status_code == 200 else False
 
     def delete_radius(self) -> bool:
@@ -117,8 +112,7 @@ class TenantRadiusAPI:
         :param radius_server:
         :return: True|False
         """
-        url_path = "/dataservice/admin/radius"
-        response = self.session.delete(url_path)
+        response = self.session.delete(self.url_path)
         return True if response.status_code == 204 else False
 
     def get_radius(self) -> TenantRadiusServer:
@@ -126,8 +120,7 @@ class TenantRadiusAPI:
         Retrieve Radius server
         :return: TenantRadiusServer
         """
-        url_path = "/dataservice/admin/radius"
-        data = self.session.get_data(url_path)
+        data = self.session.get_data(self.url_path)
         return create_dataclass(TenantRadiusServer, data)
 
 
@@ -138,6 +131,7 @@ class TenantTacacsAPI:
 
     def __init__(self, session: vManageSession) -> None:
         self.session = session
+        self.url_path = "/dataservice/admin/tacacs"
 
     def __str__(self) -> str:
         return str(self.session)
@@ -148,9 +142,8 @@ class TenantTacacsAPI:
         :param tacacs_server:
         :return:
         """
-        url_path = "/dataservice/admin/tacacs"
         data = asdict(tacacs_server)  # type: ignore
-        response = self.session.post(url=url_path, json=data)
+        response = self.session.post(url=self.url_path, json=data)
         return True if response.status_code == 200 else False
 
     def put_tacacs(self, tacacs_server: TenantTacacsServer) -> bool:
@@ -159,9 +152,8 @@ class TenantTacacsAPI:
         :param tacacs_server:
         :return:
         """
-        url_path = "/dataservice/admin/tacacs"
         data = asdict(tacacs_server)  # type: ignore
-        response = self.session.put(url=url_path, json=data)
+        response = self.session.put(url=self.url_path, json=data)
         return True if response.status_code == 200 else False
 
     def delete_tacacs(self) -> bool:
@@ -170,8 +162,7 @@ class TenantTacacsAPI:
         :param tacacs_server:
         :return: True|False
         """
-        url_path = "/dataservice/admin/tacacs"
-        response = self.session.delete(url_path)
+        response = self.session.delete(self.url_path)
         return True if response.status_code == 204 else False
 
     def get_tacacs(self) -> TenantTacacsServer:
@@ -179,6 +170,5 @@ class TenantTacacsAPI:
         Retrieves Tacacs server
         :return: TenantTacacsServer
         """
-        url_path = "/dataservice/admin/tacacs"
-        data = self.session.get_data(url_path)
+        data = self.session.get_data(self.url_path)
         return create_dataclass(TenantTacacsServer, data)
