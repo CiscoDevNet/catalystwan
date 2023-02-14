@@ -240,6 +240,6 @@ class SoftwareActionAPI:
                         continue
                     incorrect_devices.append(device["deviceId"])
                     break
-                elif label < splited_version_to_upgrade[priority]:
+                elif label < version: # type: ignore
                     break
         return incorrect_devices
