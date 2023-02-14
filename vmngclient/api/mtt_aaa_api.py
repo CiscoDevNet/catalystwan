@@ -67,7 +67,7 @@ class TenantAaaAPI:
         logger.debug(f"Deleting AAA on {id}.")
         response = self.session.delete(url_path)
         if not self.aaa_exists():
-            raise AAAConfigNotPresent("No Aaa config present for Tenant")
+            raise AAAConfigNotPresent(f"No AAA config present for Tenant id={id}")
         return True if response.status_code == 200 else False
 
     def put_aaa(self, tenant_AAA: TenantAAA) -> bool:
