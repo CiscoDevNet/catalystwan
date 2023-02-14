@@ -99,7 +99,9 @@ class DeviceVersions:
         self.repository = repository
         self.device_category = device_category
 
-    def _get_device_list_in(self, version_to_set_up: str, devices: List[Device], version_type: str) -> List[dict]:
+    def _get_device_list_in(
+        self, version_to_set_up: str, devices: List[Device], version_type: str, convert_version_to_list=False
+    ) -> List[dict]:
         """
         Create version key for every device dict in device list, if requested version
         is in requested version type
@@ -119,13 +121,15 @@ class DeviceVersions:
             try:
                 for version in device_versions:
                     if version_to_set_up in version:
-                        devices_payload.append(
-                            {"deviceId": device.uuid, "deviceIP": device.id, "version" : [version]}
-                            )
+                        if convert_version_to_list:
+                            version = [version]
+                        devices_payload.append({"deviceId": device.uuid, "deviceIP": device.id, "version": version})
                         break
             except IndexError:
-                logger.error(f"Software version {version_to_set_up} for {device.hostname} is not included in {version_type}."
-                "Action for that device is not going to proceed.")
+                logger.error(
+                    f"Software version {version_to_set_up} for {device.hostname} is not included in {version_type}."
+                    "Action for that device is not going to proceed."
+                )
         return devices_payload
 
     def get_device_list_in_installed(self, version_to_set_up: str, devices: List[Device]) -> List[dict]:
@@ -142,7 +146,9 @@ class DeviceVersions:
         """
         return self._get_device_list_in(version_to_set_up, devices, "installed_versions")
 
-    def get_device_list_in_available(self, version_to_set_up: str, devices: List[Device]) -> List[dict]:
+    def get_device_list_in_available(
+        self, version_to_set_up: str, devices: List[Device], convert_version_to_list=False
+    ) -> List[dict]:
         """
         Create version key for every device dict in device list, if requested version
         is in available versions
@@ -154,8 +160,8 @@ class DeviceVersions:
         Returns:
             list : list of devices
         """
-        return self._get_device_list_in(version_to_set_up, devices, "available_versions")
-    
+        return self._get_device_list_in(version_to_set_up, devices, "available_versions", convert_version_to_list)
+
     def _get_devices_choosen_version(self, devices: List[Device], version_type: str):
         """
         Create version key with current software version for every device dict in device list
@@ -171,8 +177,12 @@ class DeviceVersions:
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
         for device in devices:
             devices_payload.append(
-                            {"deviceId": device.uuid, "deviceIP": device.id, "version" : getattr(all_dev_versions[device.uuid], version_type)}
-                            )
+                {
+                    "deviceId": device.uuid,
+                    "deviceIP": device.id,
+                    "version": getattr(all_dev_versions[device.uuid], version_type),
+                }
+            )
         return devices_payload
 
     def get_devices_current_version(self, devices: List[Device]) -> List[dict]:
@@ -187,8 +197,8 @@ class DeviceVersions:
             list : list of devices
         """
 
-        return self._get_devices_choosen_version(devices,"current_version")
-    
+        return self._get_devices_choosen_version(devices, "current_version")
+
     def get_devices_available_versions(self, devices: List[Device]) -> List[dict]:
         """
         Create version key with current software version for every device dict in device list
@@ -201,8 +211,7 @@ class DeviceVersions:
             list : list of devices
         """
 
-        return self._get_devices_choosen_version(devices,"available_versions")
-
+        return self._get_devices_choosen_version(devices, "available_versions")
 
     def get_device_list(self, devices: List[Device]) -> List[dict]:
 

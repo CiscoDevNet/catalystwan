@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List
+from typing import Dict, List, cast
 
 from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
@@ -91,11 +91,11 @@ class PartitionManagerAPI:
         url = "/dataservice/device/action/removepartition"
         payload = {
             "action": "removepartition",
-            "devices": self.device_versions.get_device_list_in_available(version, devices),
+            "devices": self.device_versions.get_device_list_in_available(version, devices, True),
             "deviceType": "vmanage",
         }
         if force is False:
-            invalid_devices = self._check_remove_partition_possibility(payload["devices"])
+            invalid_devices = self._check_remove_partition_possibility(cast(list, payload["devices"]))
             if invalid_devices:
                 raise ValueError(
                     f"Current or default version of devices with ids {invalid_devices} \
@@ -103,15 +103,15 @@ class PartitionManagerAPI:
                 )
         remove_action: Dict[str, str] = self.session.post(url, json=payload).json()
         return remove_action["id"]
-    
-    def remove_available_partitions(self,devices: List[Device]):
+
+    def remove_available_partitions(self, devices: List[Device]) -> str:
         url = "/dataservice/device/action/removepartition"
         payload = {
             "action": "removepartition",
             "devices": self.device_versions.get_devices_available_versions(devices),
             "deviceType": "vmanage",
         }
-        remove_action: Dict[str,str] = self.session.post(url, json=payload).json()
+        remove_action: Dict[str, str] = self.session.post(url, json=payload).json()
         return remove_action["id"]
 
     def _check_remove_partition_possibility(self, payload_devices: List[dict]) -> List["str"]:
