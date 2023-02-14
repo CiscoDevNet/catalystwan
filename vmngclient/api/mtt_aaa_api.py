@@ -44,7 +44,7 @@ class TenantAaaAPI:
         url_path = "/dataservice/admin/aaa"
         data = asdict(tenant_aaa)  # type: ignore
         response = self.session.post(url=url_path, json=data)
-        return True if response.status_code == 200 else False
+        return True if response.status_code == HTTPStatus.OK else False
 
     def get_aaa(self) -> TenantAAA:
         """
