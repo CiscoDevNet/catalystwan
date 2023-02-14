@@ -98,6 +98,11 @@ class AdministrationSettingsAPI:
 
         Args:
             session: logged in API admin session
+
+        Example usage:
+            - to update e.g. password:
+                password = Password(old_password="qwer1234", new_password="asdf9876")
+                AdministrationSettingsAPI(session).update(password)
         """
         self.session = session
 
