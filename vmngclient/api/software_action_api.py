@@ -89,7 +89,7 @@ class SoftwareActionAPI:
         self, devices: List[Device], version_to_activate: Optional[str] = "", software_image: Optional[str] = ""
     ) -> str:
         """
-        Method to set choosen version as current version
+        Set choosen version as current version
 
         Args:
             devices (List[Device]): For those devices software will be activated
@@ -100,21 +100,20 @@ class SoftwareActionAPI:
             software_image)
 
         Returns:
-            str: action id
+            str: Activate software action id
         """
         if software_image and not version_to_activate:
             version = cast(str, self.repository.get_image_version(software_image))
         elif version_to_activate and not software_image:
             version = cast(str, version_to_activate)
         else:
-            raise VersionDeclarationError("You can not provide software_image and image version at the same time")
+            raise VersionDeclarationError("You can not provide software_image and image version at the same time!")
         url = "/dataservice/device/action/changepartition"
         payload = {
             "action": "changepartition",
             "devices": self.device_versions.get_device_list_in_available(version, devices),
             "deviceType": "vmanage",
         }
-        print(payload)
         activate = dict(self.session.post(url, json=payload).json())
         return activate["id"]
 
@@ -212,7 +211,7 @@ class SoftwareActionAPI:
         upload = self.session.post(url, data=monitor, headers={"content-type": monitor.content_type})
         return upload.status_code
 
-    def _downgrade_check(self, payload_devices: List[str], version_to_upgrade: str, family: str) -> List[str]:
+    def _downgrade_check(self, payload_devices: List[dict], version_to_upgrade: str, family: str) -> List[str]:
         """
         Check if upgrade operation is not actually a downgrade opeartion.
         If so, in some cases action is being blocked.
@@ -226,14 +225,14 @@ class SoftwareActionAPI:
         """
         incorrect_devices = []
         devices_versions_repo = self.repository.get_devices_versions_repository(self.device_versions.device_category)
-        for dev in payload_devices:
-            dev_current_version = str(devices_versions_repo[dev["deviceId"]].current_version)
+        for device in payload_devices:
+            dev_current_version = str(devices_versions_repo[device["deviceId"]].current_version)
             splited_version_to_upgrade = version_to_upgrade.split(".")
             for priority, label in enumerate(dev_current_version.split("-")[0].split(".")):
                 if str(label) > str(splited_version_to_upgrade[priority]):
                     if family == "vmanage" and label == 2:
                         continue
-                    incorrect_devices.append(dev["deviceId"])
+                    incorrect_devices.append(device["deviceId"])
                     break
                 elif str(label) < str(splited_version_to_upgrade[priority]):
                     break
