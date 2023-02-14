@@ -16,6 +16,7 @@ from vmngclient.dataclasses import (
     CloudConnectorData,
     CloudServicesSettings,
     Organization,
+    Password,
     ServiceConfigurationData,
     User,
     Vbond,
@@ -24,7 +25,7 @@ from vmngclient.exceptions import InvalidOperationError
 from vmngclient.utils.certificate_status import ValidityPeriod
 from vmngclient.utils.creation_tools import create_dataclass
 
-password_dataclass = Organization("old_password_123", "new_password_123")
+password_dataclass = Password("old_password_123", "new_password_123")
 certificate_dataclass = Certificate("cert", "Name", "Surname", "name@sur.name", ValidityPeriod.ONE_YEAR, 10)
 vbond_dataclass = Vbond("1.1.1.1", 1234)
 organization_dataclass = Organization("My org name", 1)
