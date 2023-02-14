@@ -229,11 +229,17 @@ class SoftwareActionAPI:
             dev_current_version = str(devices_versions_repo[device["deviceId"]].current_version)
             splited_version_to_upgrade = version_to_upgrade.split(".")
             for priority, label in enumerate(dev_current_version.split("-")[0].split(".")):
-                if str(label) > str(splited_version_to_upgrade[priority]):
+                try:
+                    label = int(label)  # type: ignore
+                    version = int(splited_version_to_upgrade[priority])
+                except ValueError:
+                    pass
+
+                if label > version:  # type: ignore
                     if family == "vmanage" and label == 2:
                         continue
                     incorrect_devices.append(device["deviceId"])
                     break
-                elif str(label) < str(splited_version_to_upgrade[priority]):
+                elif label < splited_version_to_upgrade[priority]:
                     break
         return incorrect_devices

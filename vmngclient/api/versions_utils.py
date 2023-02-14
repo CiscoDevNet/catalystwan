@@ -39,7 +39,7 @@ class RepositoryAPI:
 
     def get_all_software_images(self) -> list:
         """
-        Method to get all info about all software images stored
+        Get all info about all software images stored
         in Vmanage repository
 
         Returns:
@@ -51,7 +51,7 @@ class RepositoryAPI:
 
     def get_devices_versions_repository(self, device_category: DeviceCategory) -> Dict[str, DeviceSoftwareRepository]:
         """
-        Method for create DeviceSoftwareRepository dataclass,
+        Create DeviceSoftwareRepository dataclass,
         which cointains information about all possible version types for certain devices
 
         Returns:
@@ -71,7 +71,7 @@ class RepositoryAPI:
 
     def get_image_version(self, software_image: str) -> Union[str, None]:
         """
-        Method to get proper software image version
+        Get proper software image version
 
         Args:
             software_image (str): path to software image
@@ -100,16 +100,17 @@ class DeviceVersions:
         self.device_category = device_category
 
     def _get_device_list_in(
-        self, version_to_set_up: str, devices: List[Device], version_type: str, convert_version_to_list=False
+        self, version_to_set_up: str, devices: List[Device], version_type: str, convert_version_to_list: bool = False
     ) -> List[dict]:
         """
-        Create version key for every device dict in device list, if requested version
-        is in requested version type
+        Create devices payload list included requested version, if requested version
+        is in specified version type
 
         Args:
             version_to_set_up (str): requested version
             devices List[Device]: list of Device dataclass instances
             version_type: type of version (installed, available, etc.)
+            convert_version_to_list: bool = True: put version inside list
 
         Returns:
             list : list of devices
@@ -134,7 +135,7 @@ class DeviceVersions:
 
     def get_device_list_in_installed(self, version_to_set_up: str, devices: List[Device]) -> List[dict]:
         """
-        Create version key for every device dict in device list, if requested version
+        Create devices payload list included requested version, if requested version
         is in installed versions
 
         Args:
@@ -147,24 +148,26 @@ class DeviceVersions:
         return self._get_device_list_in(version_to_set_up, devices, "installed_versions")
 
     def get_device_list_in_available(
-        self, version_to_set_up: str, devices: List[Device], convert_version_to_list=False
+        self, version_to_set_up: str, devices: List[Device], convert_version_to_list: bool = False
     ) -> List[dict]:
         """
-        Create version key for every device dict in device list, if requested version
+        Create devices payload list included requested, if requested version
         is in available versions
 
         Args:
             version_to_set_up (str): requested version
             devices (List[Device]): devices on which action going to be performed
 
+
         Returns:
             list : list of devices
         """
         return self._get_device_list_in(version_to_set_up, devices, "available_versions", convert_version_to_list)
 
-    def _get_devices_choosen_version(self, devices: List[Device], version_type: str):
+    def _get_devices_choosen_version(self, devices: List[Device], version_type: str) -> List[dict]:
         """
-        Create version key with current software version for every device dict in device list
+        Create devices payload list included software version key
+        for every device in devices list
 
         Args:
             version_to_set_up (str): requested version
@@ -187,7 +190,8 @@ class DeviceVersions:
 
     def get_devices_current_version(self, devices: List[Device]) -> List[dict]:
         """
-        Create version key with current software version for every device dict in device list
+        Create devices payload list included current software version key
+        for every device in devices list
 
         Args:
             version_to_set_up (str): requested version
@@ -201,10 +205,10 @@ class DeviceVersions:
 
     def get_devices_available_versions(self, devices: List[Device]) -> List[dict]:
         """
-        Create version key with current software version for every device dict in device list
+        Create devices payload list included available software versions key
+        for every device in devices list
 
         Args:
-            version_to_set_up (str): requested version
             devices (List[Device]): devices on which action going to be performed
 
         Returns:
