@@ -63,7 +63,8 @@ class TenantAaaAPI:
         :return:
         """
         url_path = "/dataservice/admin/aaa"
-        logger.debug(f"Deleting AAA on {self.session.get_tenant_id()}.")
+        id = self.session.get_tenant_id()
+        logger.debug(f"Deleting AAA on {id}.")
         response = self.session.delete(url_path)
         if not self.aaa_exists():
             raise AAAConfigNotPresent("No Aaa config present for Tenant")
