@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import Any, ClassVar, Dict, Iterable, List, Protocol, Type, TypeVar
+from typing import Any, ClassVar, Dict, Iterable, List, Protocol, Type, TypeVar, runtime_checkable
 
 import attrs  # type: ignore
 from attr import Attribute, fields, fields_dict
@@ -9,6 +9,7 @@ T = TypeVar("T")
 FIELD_NAME = "__field_name"
 
 
+@runtime_checkable
 class AttrsInstance(Protocol):
     __attrs_attrs__: ClassVar[Any]
 

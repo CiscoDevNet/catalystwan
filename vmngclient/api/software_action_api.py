@@ -1,14 +1,15 @@
 import logging
 from enum import Enum
 from pathlib import PurePath
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, cast
 
 from attr import define  # type: ignore
 from clint.textui.progress import Bar as ProgressBar  # type: ignore
 from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
 
-from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
+from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
+from vmngclient.exceptions import VersionDeclarationError  # type: ignore
 from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
@@ -47,6 +48,7 @@ class InstallSpecification:
 
 
 class InstallSpecHelper(Enum):
+
     VMANAGE = InstallSpecification(Family.VMANAGE, VersionType.VMANAGE, DeviceType.VMANAGE, DeviceClass.VMANAGE)
     VSMART = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER, DeviceClass.VSMART)
     VBOND = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER, DeviceClass.VBOND)
@@ -58,29 +60,58 @@ class SoftwareActionAPI:
     """
     API methods for software actions. All methods
     are exececutable on all device categories.
+
+    Usage example:
+    # Create session
+    session = create_vManageSession(...)
+
+    # Prepare devices list
+    devices = [dev for dev in DevicesAPI(session).devices if dev.hostname in ["vm5", "vm6"]]
+    software_image = PurePath("c8000v-universalk9.17.06.03a.0.56.SPA.bin")
+
+    # Upgrade
+    software_action = SoftwareActionAPI(session,DeviceCategory.VEDGES.value)
+    software_action_id = software_action.upgrade_software(devices,
+        InstallSpecHelper.CEDGE.value, reboot = False, sync = True, software_image=software_image)
+
+    # Check action status
+    wait_for_completed(session, software_action_id, 3000)
+
     """
 
-    def __init__(self, session: vManageSession, device_versions: DeviceVersions, repository: RepositoryAPI) -> None:
+    def __init__(self, session: vManageSession, device_category: DeviceCategory) -> None:
 
         self.session = session
-        self.device_versions = device_versions
-        self.repository = repository
+        self.repository = RepositoryAPI(self.session)
+        self.device_versions = DeviceVersions(self.repository, device_category)
 
-    def activate_software(self, version_to_activate: str, devices: List[Device]) -> str:
+    def activate_software(
+        self, devices: List[Device], version_to_activate: Optional[str] = "", software_image: Optional[str] = ""
+    ) -> str:
         """
         Method to set choosen version as current version
 
         Args:
-            version_to_activate (str): version to be set as current version
+            devices (List[Device]): For those devices software will be activated
+            version_to_activate (Optional[str]): version to be set as current version
+            software_image (Optional[str]): path to software image
+
+            Notice: Have to pass one of those arguments (version_to_activate,
+            software_image)
 
         Returns:
             str: action id
         """
-
+        if software_image and not version_to_activate:
+            version = cast(str, self.repository.get_image_version(software_image))
+        elif version_to_activate and not software_image:
+            version = cast(str, version_to_activate)
+        else:
+            raise VersionDeclarationError("You can not provide software_image and image version at the same time")
         url = "/dataservice/device/action/changepartition"
         payload = {
             "action": "changepartition",
-            "devices": self.device_versions.get_device_list_in_available(version_to_activate, devices),
+            "devices": self.device_versions.get_device_list_in_available(version, devices),
             "deviceType": "vmanage",
         }
         activate = dict(self.session.post(url, json=payload).json())
@@ -89,20 +120,26 @@ class SoftwareActionAPI:
     def upgrade_software(
         self,
         devices: List[Device],
-        software_image: str,
         install_spec: InstallSpecification,
         reboot: bool,
         sync: bool = True,
+        software_image: Optional[str] = "",
+        image_version: Optional[str] = "",
     ) -> str:
         """
         Method to install new software
 
         Args:
-            software_image (str): path to software image
+            devices (List[Device]): For those devices software will be activated
             install_spec (InstallSpecification): specification of devices
             on which the action is to be performed
             reboot (bool): reboot device after action end
             sync (bool, optional): Synchronize settings. Defaults to True.
+            software_image (Optional[str]): path to software image
+            image_version (Optional[str]): version of software image
+
+            Notice: Have to pass one of those arguments (version_to_activate,
+            software_image)
 
         Raises:
             ValueError: Raise error if downgrade in certain cases
@@ -110,7 +147,12 @@ class SoftwareActionAPI:
         Returns:
             str: action id
         """
-
+        if software_image and not image_version:
+            version = cast(str, self.repository.get_image_version(software_image))
+        elif image_version and not software_image:
+            version = cast(str, image_version)
+        else:
+            raise VersionDeclarationError("You can not provide software_image and image version at the same time")
         url = "/dataservice/device/action/install"
         payload: Dict[str, Any] = {
             "action": "install",
@@ -118,7 +160,7 @@ class SoftwareActionAPI:
                 "vEdgeVPN": 0,
                 "vSmartVPN": 0,
                 "family": install_spec.family.value,
-                "version": self.repository.get_image_version(software_image),
+                "version": version,
                 "versionType": install_spec.version_type.value,
                 "reboot": reboot,
                 "sync": sync,
@@ -169,7 +211,7 @@ class SoftwareActionAPI:
         upload = self.session.post(url, data=monitor, headers={"content-type": monitor.content_type})
         return upload.status_code
 
-    def _downgrade_check(self, devices, version_to_upgrade: str, family) -> List:
+    def _downgrade_check(self, devices, version_to_upgrade: str, family) -> List[str]:
         """
         Check if upgrade operation is not actually a downgrade opeartion.
         If so, in some cases action is being blocked.
@@ -179,12 +221,10 @@ class SoftwareActionAPI:
             devices_category (DeviceCategory): devices category
 
         Returns:
-            Union[None, List]: [None, list of devices with no permission to downgrade]
+            Union[None, List[str]]: [None, list of devices with no permission to downgrade]
         """
         incorrect_devices = []
-        devices_versions_repo = self.repository.get_devices_versions_repository(
-            self.device_versions.device_category.value
-        )
+        devices_versions_repo = self.repository.get_devices_versions_repository(self.device_versions.device_category)
         for dev in devices:
             dev_current_version = str(devices_versions_repo[dev["deviceId"]].current_version)
             splited_version_to_upgrade = version_to_upgrade.split(".")

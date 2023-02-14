@@ -94,19 +94,24 @@ Please contact authors direcly or via Issues Github page.
     ```
     git clone https://github.com/CiscoDevNet/vManage-client.git
     ```
-3. Install poetry v1.3.1
+3. Install and configure poetry (v1.3.1 or higher)
+    https://python-poetry.org/docs/#installation
+
+    On linux/mac this usually means:
     ```
-    pip install poetry==1.3.1
-    ```
-4. Configure poetry to use virtual environments in project folder (can ease IDE integration)
-    ```
+    curl -sSL https://install.python-poetry.org | python3 -
     poetry config virtualenvs.in-project true
     ```
-5. Install dependecies 
+    Depending on your IDE you might at this point think about proper integration
+
+    https://www.jetbrains.com/help/pycharm/poetry.html
+
+    https://code.visualstudio.com/docs/python/environments
+4. Install dependecies 
     ```
     poetry install
     ```
-6. Activate `pre-commit`
+5. Activate `pre-commit`
     ```
     pre-commit install
     ```
