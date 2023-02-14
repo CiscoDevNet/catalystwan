@@ -48,21 +48,21 @@ class PartitionManagerAPI:
 
     def set_current_partition_as_default(self, devices: List[Device]) -> str:
         """
-        Method to set current software version as default version
+        Set current software version as default version
 
         Args:
-            devices (List[Device]): For those devices default partition
-            going to be set
+            devices (List[Device]): For those devices default partition is
+                going to be set
 
         Returns:
-            str: action id
+            str: set default partition action id
         """
         devices_current_versions = self.device_versions.get_devices_current_version(devices)
         return self._set_default_partition(devices_current_versions)
 
     def set_default_partition(self, devices: List[Device], version: str) -> str:
         """
-        Method to set choosen software version as current version
+        Set choosen software version as default version
 
         Args:
             devices (List[Device]): For those devices default partition
@@ -77,7 +77,7 @@ class PartitionManagerAPI:
 
     def remove_partition(self, devices: List[Device], version: str, force: bool = False) -> str:
         """
-        Method to remove choosen software version from Vmanage repository
+        Remove choosen software version from Vmanage repository
 
         Args:
             devices (List[Device]): remove partition for those devices
@@ -105,6 +105,15 @@ class PartitionManagerAPI:
         return remove_action["id"]
 
     def remove_available_partitions(self, devices: List[Device]) -> str:
+        """
+        Remove all available partitions for devices in devices list.
+
+        Args:
+            devices (List[Device]): _description_
+
+        Returns:
+            str: remove action id
+        """
         url = "/dataservice/device/action/removepartition"
         payload = {
             "action": "removepartition",
