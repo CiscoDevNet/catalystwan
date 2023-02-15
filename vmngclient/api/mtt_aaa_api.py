@@ -35,7 +35,7 @@ class TenantAaaAPI:
         return True if self.session.get_data(self.url_path) else False
 
     @status_ok
-    def add_aaa(self, tenant_aaa: TenantAAA) -> bool:
+    def add_aaa(self, tenant_aaa: TenantAAA):
         """ "
         TenantAAA:
             "authOrder": [ "local", "radius", "tacacs"],
@@ -60,7 +60,7 @@ class TenantAaaAPI:
         return create_dataclass(TenantAAA, tenant_aaa)
 
     @status_ok
-    def del_aaa(self) -> bool:
+    def del_aaa(self):
         """
         Delete aaa works only for tenants
         :return:
@@ -72,7 +72,7 @@ class TenantAaaAPI:
         return self.session.delete(self.url_path)
 
     @status_ok
-    def put_aaa(self, tenant_AAA: TenantAAA) -> bool:
+    def put_aaa(self, tenant_AAA: TenantAAA):
         """
         Updated the AAA for tenant
         :return:
@@ -94,7 +94,7 @@ class TenantRadiusAPI:
         return str(self.session)
 
     @status_ok
-    def add_radius(self, radius_server: TenantRadiusServer) -> bool:
+    def add_radius(self, radius_server: TenantRadiusServer):
         """
         Create RADIUS for tenant
         :param radius_server:
@@ -104,7 +104,7 @@ class TenantRadiusAPI:
         return self.session.post(url=self.url_path, json=data)
 
     @status_ok
-    def put_radius(self, radius_server: TenantRadiusServer) -> bool:
+    def put_radius(self, radius_server: TenantRadiusServer):
         """
         edit radius server
         :param radius_server:
@@ -114,7 +114,7 @@ class TenantRadiusAPI:
         return self.session.put(url=self.url_path, json=data)
 
     @status_ok
-    def delete_radius(self) -> bool:
+    def delete_radius(self):
         """
         edit radius server
         :param radius_server:
@@ -144,7 +144,7 @@ class TenantTacacsAPI:
         return str(self.session)
 
     @status_ok
-    def add_tacacs(self, tacacs_server: TenantTacacsServer) -> bool:
+    def add_tacacs(self, tacacs_server: TenantTacacsServer):
         """
         Create TACACS for tenant
         :param tacacs_server:
@@ -154,7 +154,7 @@ class TenantTacacsAPI:
         return self.session.post(url=self.url_path, json=data)
 
     @status_ok
-    def put_tacacs(self, tacacs_server: TenantTacacsServer) -> bool:
+    def put_tacacs(self, tacacs_server: TenantTacacsServer):
         """
         Update tacacs server
         :param tacacs_server:
@@ -164,7 +164,7 @@ class TenantTacacsAPI:
         return self.session.put(url=self.url_path, json=data)
 
     @status_ok
-    def delete_tacacs(self) -> bool:
+    def delete_tacacs(self):
         """
         Deletes tacacs server
         :param tacacs_server:
