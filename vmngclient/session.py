@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import operator
 import time
 from enum import Enum, auto
 from pathlib import Path
@@ -94,21 +95,21 @@ def create_vManageSession(
         session.logger.warning(f"Unrecognized user mode is: '{server_info.get('viewMode')}'")
 
     if user_mode is UserMode.TENANT and not subdomain and view_mode is ViewMode.TENANT:
-        session._vManageSession__session_type = SessionType.TENANT
+        session._session_type = SessionType.TENANT
     elif user_mode is UserMode.PROVIDER and not subdomain and view_mode is ViewMode.PROVIDER:
-        session._vManageSession__session_type = SessionType.PROVIDER
+        session._session_type = SessionType.PROVIDER
     elif user_mode is UserMode.PROVIDER and view_mode is ViewMode.TENANT:
-        session._vManageSession__session_type = SessionType.PROVIDER_AS_TENANT
+        session._session_type = SessionType.PROVIDER_AS_TENANT
     elif user_mode is UserMode.TENANT and subdomain:
         raise SessionNotCreatedError(
             f"Session not created. Subdomain {subdomain} passed to tenant session, "
             "cannot switch to tenant from tenant user mode."
         )
     else:
-        session._vManageSession__session_type = SessionType.NOT_DEFINED
+        session._session_type = SessionType.NOT_DEFINED
         session.logger.warning(f"Session created with {user_mode} and {view_mode}.")
 
-    session.logger.info(f"Logged as {username}. The session type is {session.session_type}")
+    session.logger.info(f"Logged as {username}. The session type is {session._session_type}")
     return session
 
 
@@ -143,7 +144,7 @@ class vManageSession(Session):
         self.password = password
         self.subdomain = subdomain
 
-        self.__session_type = SessionType.NOT_DEFINED
+        self._session_type = SessionType.NOT_DEFINED
         self.server_name = None
         self.logger = logging.getLogger(__name__)
         self.response_trace: Callable[
@@ -291,10 +292,6 @@ class vManageSession(Session):
         else:
             return True
 
-    @property
-    def session_type(self):
-        return self.__session_type
-
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"
 
@@ -315,3 +312,7 @@ class vManageSession(Session):
             ]
             return True if all(comparison_list) else False
         return False
+
+    @property
+    def session_type(self):
+        return self._session_type
