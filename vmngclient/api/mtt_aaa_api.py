@@ -14,7 +14,7 @@ class AAAConfigNotPresent(Exception):
 def status_ok(func):
     def wrapper(*args, **kwargs):
         response = func(*args, **kwargs)
-        return True if response.status_code == 200 else False
+        return True if response.status_code in [200, 204] else False
 
     return wrapper
 
