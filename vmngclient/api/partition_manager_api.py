@@ -1,9 +1,10 @@
 import logging
 from typing import Dict, List, cast
 
-from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, RepositoryAPI
+from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, RepositoryAPI,DeviceVersionPayload
 from vmngclient.dataclasses import Device
 from vmngclient.session import vManageSession
+from vmngclient.utils.creation_tools import asdict
 
 logger = logging.getLogger(__name__)
 
@@ -36,11 +37,11 @@ class PartitionManagerAPI:
         self.repository = RepositoryAPI(self.session)
         self.device_versions = DeviceVersions(self.repository, device_category)
 
-    def _set_default_partition(self, payload_devices: List[dict]) -> str:
+    def _set_default_partition(self, payload_devices: List[DeviceVersionPayload]) -> str:
         url = "/dataservice/device/action/defaultpartition"
         payload = {
             "action": "defaultpartition",
-            "devices": payload_devices,
+            "devices": [asdict(device) for device in payload_devices],
             "deviceType": "vmanage",
         }
         set_default = dict(self.session.post(url, json=payload).json())
@@ -62,7 +63,7 @@ class PartitionManagerAPI:
 
     def set_default_partition(self, devices: List[Device], version: str) -> str:
         """
-        Set choosen software version as default version
+        Set chosen software version as default version
 
         Args:
             devices (List[Device]): For those devices default partition
@@ -72,12 +73,13 @@ class PartitionManagerAPI:
         Returns:
             str: action id
         """
-        devices_choosen_version = self.device_versions.get_device_list_in_installed(version, devices)
-        return self._set_default_partition(devices_choosen_version)
+        
+        devices_chosen_version = self.device_versions.get_device_list_in_installed(version, devices)
+        return self._set_default_partition(devices_chosen_version)
 
     def remove_partition(self, devices: List[Device], version: str, force: bool = False) -> str:
         """
-        Remove choosen software version from Vmanage repository
+        Remove chosen software version from Vmanage repository
 
         Args:
             devices (List[Device]): remove partition for those devices
@@ -91,7 +93,7 @@ class PartitionManagerAPI:
         url = "/dataservice/device/action/removepartition"
         payload = {
             "action": "removepartition",
-            "devices": self.device_versions.get_device_list_in_available(version, devices, True),
+            "devices": [asdict(device) for device in self.device_versions.get_device_list_in_available(version, devices, True)],
             "deviceType": "vmanage",
         }
         if force is False:
@@ -117,7 +119,7 @@ class PartitionManagerAPI:
         url = "/dataservice/device/action/removepartition"
         payload = {
             "action": "removepartition",
-            "devices": self.device_versions.get_devices_available_versions(devices),
+            "devices": [asdict(device) for device in self.device_versions.get_devices_available_versions(devices)],
             "deviceType": "vmanage",
         }
         remove_action: Dict[str, str] = self.session.post(url, json=payload).json()

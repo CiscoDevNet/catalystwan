@@ -25,6 +25,12 @@ class DeviceSoftwareRepository:
     default_version: str = field(default=None, metadata={FIELD_NAME: "defaultVersion"})
     device_id: str = field(default=None, metadata={FIELD_NAME: "uuid"})
 
+@define(frozen=False)
+class DeviceVersionPayload:
+    deviceId: str
+    deviceIP: str
+    version: str = ""
+
 
 class RepositoryAPI:
     """
@@ -101,7 +107,7 @@ class DeviceVersions:
 
     def _get_device_list_in(
         self, version_to_set_up: str, devices: List[Device], version_type: str, convert_version_to_list: bool = False
-    ) -> List[dict]:
+    ) -> List[DeviceVersionPayload]:
         """
         Create devices payload list included requested version, if requested version
         is in specified version type
@@ -115,25 +121,25 @@ class DeviceVersions:
         Returns:
             list : list of devices
         """
-        devices_payload = []
+        devices_payload = [DeviceVersionPayload(device.uuid, device.id) for device in devices]
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
-        for device in devices:
-            device_versions = getattr(all_dev_versions[device.uuid], version_type)
+        for device in devices_payload:
+            device_versions = getattr(all_dev_versions[device.deviceId], version_type)
             try:
                 for version in device_versions:
                     if version_to_set_up in version:
                         if convert_version_to_list:
                             version = [version]
-                        devices_payload.append({"deviceId": device.uuid, "deviceIP": device.id, "version": version})
+                        device.version = version
                         break
             except IndexError:
                 logger.error(
-                    f"Software version {version_to_set_up} for {device.hostname} is not included in {version_type}."
+                    f"Software version {version_to_set_up} for {device} is not included in {version_type}."
                     "Action for that device is not going to proceed."
                 )
         return devices_payload
 
-    def get_device_list_in_installed(self, version_to_set_up: str, devices: List[Device]) -> List[dict]:
+    def get_device_list_in_installed(self, version_to_set_up: str, devices: List[Device]) -> List[DeviceVersionPayload]:
         """
         Create devices payload list included requested version, if requested version
         is in installed versions
@@ -149,7 +155,7 @@ class DeviceVersions:
 
     def get_device_list_in_available(
         self, version_to_set_up: str, devices: List[Device], convert_version_to_list: bool = False
-    ) -> List[dict]:
+    ) -> List[DeviceVersionPayload]:
         """
         Create devices payload list included requested, if requested version
         is in available versions
@@ -164,7 +170,8 @@ class DeviceVersions:
         """
         return self._get_device_list_in(version_to_set_up, devices, "available_versions", convert_version_to_list)
 
-    def _get_devices_choosen_version(self, devices: List[Device], version_type: str) -> List[dict]:
+    def _get_devices_chosen_version(self, devices: List[Device],
+         version_type: str) -> List[DeviceVersionPayload]:
         """
         Create devices payload list included software version key
         for every device in devices list
@@ -176,19 +183,13 @@ class DeviceVersions:
         Returns:
             list : list of devices
         """
-        devices_payload = []
+        devices_payload = [DeviceVersionPayload(device.uuid, device.id) for device in devices]
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
-        for device in devices:
-            devices_payload.append(
-                {
-                    "deviceId": device.uuid,
-                    "deviceIP": device.id,
-                    "version": getattr(all_dev_versions[device.uuid], version_type),
-                }
-            )
+        for device in devices_payload:
+            device.version = getattr(all_dev_versions[device.deviceId], version_type)
         return devices_payload
 
-    def get_devices_current_version(self, devices: List[Device]) -> List[dict]:
+    def get_devices_current_version(self, devices: List[Device]) -> List[DeviceVersionPayload]:
         """
         Create devices payload list included current software version key
         for every device in devices list
@@ -201,9 +202,9 @@ class DeviceVersions:
             list : list of devices
         """
 
-        return self._get_devices_choosen_version(devices, "current_version")
+        return self._get_devices_chosen_version(devices, "current_version")
 
-    def get_devices_available_versions(self, devices: List[Device]) -> List[dict]:
+    def get_devices_available_versions(self, devices: List[Device]) -> List[DeviceVersionPayload]:
         """
         Create devices payload list included available software versions key
         for every device in devices list
@@ -215,8 +216,8 @@ class DeviceVersions:
             list : list of devices
         """
 
-        return self._get_devices_choosen_version(devices, "available_versions")
+        return self._get_devices_chosen_version(devices, "available_versions")
 
     def get_device_list(self, devices: List[Device]) -> List[dict]:
 
-        return [{"deviceId": dev.uuid, "deviceIP": dev.id} for dev in devices]
+        return [DeviceVersionPayload(device.uuid, device.id) for device in devices]

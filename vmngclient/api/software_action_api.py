@@ -89,7 +89,7 @@ class SoftwareActionAPI:
         self, devices: List[Device], version_to_activate: Optional[str] = "", software_image: Optional[str] = ""
     ) -> str:
         """
-        Set choosen version as current version
+        Set chosen version as current version
 
         Args:
             devices (List[Device]): For those devices software will be activated
