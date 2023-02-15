@@ -11,6 +11,14 @@ class AAAConfigNotPresent(Exception):
     pass
 
 
+def status_ok(func):
+    def wrapper(*args, **kwargs):
+        response = func(*args, **kwargs)
+        return True if response.status_code == 200 else False
+
+    return wrapper
+
+
 class TenantAaaAPI:
     """
     Used to configure  mtt tenant management users remote servers
@@ -26,6 +34,7 @@ class TenantAaaAPI:
     def aaa_exists(self) -> bool:
         return True if self.session.get_data(self.url_path) else False
 
+    @status_ok
     def add_aaa(self, tenant_aaa: TenantAAA) -> bool:
         """ "
         TenantAAA:
@@ -35,12 +44,10 @@ class TenantAaaAPI:
             "auditDisable": false,
             "accounting": false,
             "radiusServers": "server1"
-
         returns bool depending on the api post call
         """
         data = asdict(tenant_aaa)  # type: ignore
-        response = self.session.post(url=self.url_path, json=data)
-        return True if response.status_code == 200 else False
+        return self.session.post(url=self.url_path, json=data)
 
     def get_aaa(self) -> TenantAAA:
         """
@@ -52,6 +59,7 @@ class TenantAaaAPI:
         logger.debug(f"Tenant AAA: {tenant_aaa}")
         return create_dataclass(TenantAAA, tenant_aaa)
 
+    @status_ok
     def del_aaa(self) -> bool:
         """
         Delete aaa works only for tenants
@@ -59,19 +67,18 @@ class TenantAaaAPI:
         """
         id = self.session.get_tenant_id()
         logger.debug(f"Deleting AAA on {id}.")
-        response = self.session.delete(self.url_path)
         if not self.aaa_exists():
             raise AAAConfigNotPresent(f"No AAA config present for Tenant id={id}")
-        return True if response.status_code == 200 else False
+        return self.session.delete(self.url_path)
 
+    @status_ok
     def put_aaa(self, tenant_AAA: TenantAAA) -> bool:
         """
         Updated the AAA for tenant
         :return:
         """
         data = asdict(tenant_AAA)  # type: ignore
-        response = self.session.put(url=self.url_path, json=data)
-        return True if response.status_code == 200 else False
+        return self.session.put(url=self.url_path, json=data)
 
 
 class TenantRadiusAPI:
@@ -86,6 +93,7 @@ class TenantRadiusAPI:
     def __str__(self) -> str:
         return str(self.session)
 
+    @status_ok
     def add_radius(self, radius_server: TenantRadiusServer) -> bool:
         """
         Create RADIUS for tenant
@@ -93,9 +101,9 @@ class TenantRadiusAPI:
         :return:
         """
         data = asdict(radius_server)  # type: ignore
-        response = self.session.post(url=self.url_path, json=data)
-        return True if response.status_code == 200 else False
+        return self.session.post(url=self.url_path, json=data)
 
+    @status_ok
     def put_radius(self, radius_server: TenantRadiusServer) -> bool:
         """
         edit radius server
@@ -103,17 +111,16 @@ class TenantRadiusAPI:
         :return:
         """
         data = asdict(radius_server)  # type: ignore
-        response = self.session.put(url=self.url_path, json=data)
-        return True if response.status_code == 200 else False
+        return self.session.put(url=self.url_path, json=data)
 
+    @status_ok
     def delete_radius(self) -> bool:
         """
         edit radius server
         :param radius_server:
         :return: True|False
         """
-        response = self.session.delete(self.url_path)
-        return True if response.status_code == 204 else False
+        return self.session.delete(self.url_path)
 
     def get_radius(self) -> TenantRadiusServer:
         """
@@ -136,6 +143,7 @@ class TenantTacacsAPI:
     def __str__(self) -> str:
         return str(self.session)
 
+    @status_ok
     def add_tacacs(self, tacacs_server: TenantTacacsServer) -> bool:
         """
         Create TACACS for tenant
@@ -143,9 +151,9 @@ class TenantTacacsAPI:
         :return:
         """
         data = asdict(tacacs_server)  # type: ignore
-        response = self.session.post(url=self.url_path, json=data)
-        return True if response.status_code == 200 else False
+        return self.session.post(url=self.url_path, json=data)
 
+    @status_ok
     def put_tacacs(self, tacacs_server: TenantTacacsServer) -> bool:
         """
         Update tacacs server
@@ -153,17 +161,16 @@ class TenantTacacsAPI:
         :return:
         """
         data = asdict(tacacs_server)  # type: ignore
-        response = self.session.put(url=self.url_path, json=data)
-        return True if response.status_code == 200 else False
+        return self.session.put(url=self.url_path, json=data)
 
+    @status_ok
     def delete_tacacs(self) -> bool:
         """
         Deletes tacacs server
         :param tacacs_server:
         :return: True|False
         """
-        response = self.session.delete(self.url_path)
-        return True if response.status_code == 204 else False
+        return self.session.delete(self.url_path)
 
     def get_tacacs(self) -> TenantTacacsServer:
         """

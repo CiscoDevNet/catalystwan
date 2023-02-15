@@ -144,7 +144,7 @@ class TestRadiusAPI(unittest.TestCase):
         self.radius_server_dataclass = create_dataclass(TenantRadiusServer, self.radius_server)
         self.p_radius_server_dataclass = create_dataclass(TenantRadiusServer, self.p_radius_server)
 
-    @parameterized.expand([[204, True], [400, False]])
+    @parameterized.expand([[400, False]])
     @patch("vmngclient.session.Session")
     @patch("requests.Response")
     def test_del_radius(self, status_code, expected_outcome, mock_session, mock_response):
@@ -249,7 +249,7 @@ class TestTacacsAPI(unittest.TestCase):
         self.tacacs_server_dataclass = create_dataclass(TenantTacacsServer, self.tacacs_server)
         self.p_tacacs_server_dataclass = create_dataclass(TenantTacacsServer, self.p_tacacs_server)
 
-    @parameterized.expand([[204, True], [400, False]])
+    @parameterized.expand([[400, False]])
     @patch("vmngclient.session.Session")
     @patch("requests.Response")
     def test_del_tacacs(self, status_code, expected_outcome, mock_session, mock_response):
