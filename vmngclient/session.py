@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import operator
 import time
 from enum import Enum, auto
 from pathlib import Path
@@ -312,7 +311,3 @@ class vManageSession(Session):
             ]
             return True if all(comparison_list) else False
         return False
-
-    @property
-    def session_type(self):
-        return self._session_type
