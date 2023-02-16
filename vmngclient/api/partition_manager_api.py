@@ -1,7 +1,13 @@
 import logging
 from typing import Dict, List, cast
 
-from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, RepositoryAPI,DeviceVersionPayload
+from vmngclient.api.versions_utils import (
+    DeviceCategory,
+    DeviceVersionPayload,
+    DeviceVersions,
+    PayloadRemovePartition,
+    RepositoryAPI,
+)
 from vmngclient.dataclasses import Device
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import asdict
@@ -41,7 +47,7 @@ class PartitionManagerAPI:
         url = "/dataservice/device/action/defaultpartition"
         payload = {
             "action": "defaultpartition",
-            "devices": [asdict(device) for device in payload_devices],
+            "devices": [asdict(device) for device in payload_devices],  # type: ignore
             "deviceType": "vmanage",
         }
         set_default = dict(self.session.post(url, json=payload).json())
@@ -73,7 +79,7 @@ class PartitionManagerAPI:
         Returns:
             str: action id
         """
-        
+
         devices_chosen_version = self.device_versions.get_device_list_in_installed(version, devices)
         return self._set_default_partition(devices_chosen_version)
 
@@ -91,9 +97,13 @@ class PartitionManagerAPI:
         """
 
         url = "/dataservice/device/action/removepartition"
+        devices_payload = [
+            PayloadRemovePartition(device.deviceId, device.deviceIP, [device.version])
+            for device in self.device_versions.get_device_list_in_available(version, devices, True)
+        ]
         payload = {
             "action": "removepartition",
-            "devices": [asdict(device) for device in self.device_versions.get_device_list_in_available(version, devices, True)],
+            "devices": [asdict(device) for device in devices_payload],  # type: ignore
             "deviceType": "vmanage",
         }
         if force is False:
@@ -119,14 +129,15 @@ class PartitionManagerAPI:
         url = "/dataservice/device/action/removepartition"
         payload = {
             "action": "removepartition",
-            "devices": [asdict(device) for device in self.device_versions.get_devices_available_versions(devices)],
+            "devices": [
+                asdict(device) for device in self.device_versions.get_devices_available_versions(devices)
+            ],  # type: ignore
             "deviceType": "vmanage",
         }
         remove_action: Dict[str, str] = self.session.post(url, json=payload).json()
         return remove_action["id"]
 
     def _check_remove_partition_possibility(self, payload_devices: List[dict]) -> List["str"]:
-
         devices_versions_repository = self.repository.get_devices_versions_repository(
             self.device_versions.device_category
         )
