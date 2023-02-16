@@ -242,7 +242,7 @@ class TemplatesAPI:
             payload = template.generate_payload(self.session)
             response = self.session.post("/dataservice/template/feature", json=json.loads(payload))
             template_id = response.json()["templateId"]
-            logger.info(f"Template {template.name} was created successfully ({template_id}).")
+            
             return template_id
         raise TemplateAlreadyExistsError(template.name)
 
@@ -287,12 +287,20 @@ class TemplatesAPI:
     def create_v2(self, template: DeviceTemplate) -> str:
         ...
     
-    def create_v2(self, template):
+    def create_v2(self, template) -> str:
+        template_id: Optional[str] = None
+        
         if isinstance(template, FeatureTemplate):
-            return self._create_feature_template(template)
+            template_id = self._create_feature_template(template)
 
         if isinstance(template, DeviceTemplate):
-            return self._create_device_template(template)
+            template_id = self._create_device_template(template)
+
+        if not template_id:
+            raise NotImplementedError()
+
+        logger.info(f"Template {template.name} was created successfully ({template_id}).")
+        return template_id
 
     def get_feature_templates(self, name: Optional[str] = None) -> List[FeatureTemplateInformation]:
         """Get feature template list.
