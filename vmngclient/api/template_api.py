@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 import json
 import logging
 from difflib import Differ
@@ -24,6 +23,16 @@ from vmngclient.exceptions import AlreadyExistsError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.operation_status import OperationStatus
+from typing import List, Final
+from enum import Enum
+from pydantic import BaseModel
+# from vmngclient.api.templates import FeatureTemplate
+from vmngclient.session import vManageSession
+from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
+from pathlib import Path
+import json
+from pydantic import parse_obj_as
+from vmngclient.typed_list import DataSequence
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -56,6 +65,13 @@ class TemplateTypeError(Exception):
     def __init__(self, name):
         self.message = f"Template: {name} - wrong template type."
 
+class GeneralTemplate(BaseModel):
+    templateId: str
+    templateType: str
+    subTemplates: List[GeneralTemplate] = []
+
+    class Config:
+        arbitrary_types_allowed = True
 
 class DeviceTemplateFeature(Enum):
     LAWFUL_INTERCEPTION = "lawful-interception"
@@ -658,7 +674,7 @@ class TemplatesAPI:
         ).load_running(device)
         return self.compare_template(running_config, template, debug)
 
-
+ 
 class CLITemplate:
     def __init__(
         self,
