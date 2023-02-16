@@ -1,7 +1,20 @@
 import logging
-from typing import List, Union, cast
+from http import HTTPStatus
+from typing import List, Union, cast, overload
 
-from vmngclient.dataclasses import CloudConnectorData, CloudServicesSettings, ServiceConfigurationData, User
+from requests import Response
+
+from vmngclient.dataclasses import (
+    Certificate,
+    CloudConnectorData,
+    CloudServicesSettings,
+    Organization,
+    Password,
+    ServiceConfigurationData,
+    User,
+    Vbond,
+)
+from vmngclient.exceptions import InvalidOperationError
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import asdict, create_dataclass
 
@@ -85,6 +98,11 @@ class AdministrationSettingsAPI:
 
         Args:
             session: logged in API admin session
+
+        Example usage:
+            - to update e.g. password:
+                password = Password(old_password="qwer1234", new_password="asdf9876")
+                AdministrationSettingsAPI(session).update(password)
         """
         self.session = session
 
@@ -133,3 +151,59 @@ class AdministrationSettingsAPI:
         data = {"mode": "on"} if not disable else {"mode": "off"}
         response = self.session.put(url_path, data)
         return True if response.status_code == 200 else False
+
+    def get_organization(self) -> Organization:
+        endpoint = "/dataservice/settings/configuration/organization"
+
+        return create_dataclass(Organization, self.session.get_data(endpoint)[0])
+
+    @overload
+    def update(self, payload: Password) -> bool:
+        ...
+
+    @overload
+    def update(self, payload: Certificate) -> bool:
+        ...
+
+    @overload
+    def update(self, payload: Vbond) -> bool:
+        ...
+
+    @overload
+    def update(self, payload: Organization) -> bool:
+        ...
+
+    def update(self, payload: Union[Organization, Certificate, Password, Vbond]) -> bool:
+        json_payload = asdict(payload)  # type: ignore
+        if isinstance(payload, Organization):
+            response = self.__update_organization(json_payload)
+        elif isinstance(payload, Certificate):
+            response = self.__update_certificate(payload)
+        elif isinstance(payload, Password):
+            response = self.__update_password(json_payload)
+        elif isinstance(payload, Vbond):
+            response = self.__update_vbond(json_payload)
+        else:
+            raise InvalidOperationError(f"Not supported payload type: {type(payload).__name__}")
+
+        return True if response.status_code == HTTPStatus.OK else False
+
+    def __update_password(self, payload: dict) -> Response:
+        endpoint = "/dataservice/admin/user/profile/password"
+        response = self.session.put(endpoint, json=payload)
+        logger.info("Password changed.")
+        return response
+
+    def __update_certificate(self, payload: Certificate) -> Response:
+        json_payload = asdict(payload)  # type: ignore
+        endpoint = "/dataservice/settings/configuration/certificate"
+        return self.session.put(endpoint, json=json_payload)
+
+    def __update_vbond(self, payload: dict) -> Response:
+        endpoint = "/dataservice/settings/configuration/device"
+        return self.session.post(endpoint, json=payload)
+
+    def __update_organization(self, payload: dict) -> Response:
+        endpoint = "/dataservice/settings/configuration/organization"
+        del payload["controlConnectionUp"]
+        return self.session.put(endpoint, json=payload)

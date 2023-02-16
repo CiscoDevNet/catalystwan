@@ -49,7 +49,7 @@ class RepositoryAPI:
         software_images = list(self.session.get_data(url))
         return software_images
 
-    def get_devices_versions_repository(self, device_category) -> Dict[str, DeviceSoftwareRepository]:
+    def get_devices_versions_repository(self, device_category: DeviceCategory) -> Dict[str, DeviceSoftwareRepository]:
         """
         Method for create DeviceSoftwareRepository dataclass,
         which cointains information about all possible version types for certain devices
@@ -59,7 +59,7 @@ class RepositoryAPI:
             information
         """
 
-        url = f"/dataservice/system/device/{device_category}"
+        url = f"/dataservice/system/device/{device_category.value}"
         devices_versions_info = self.session.get_data(url)
         devices_versions_repository = {}
         for device in devices_versions_info:
@@ -112,7 +112,7 @@ class DeviceVersions:
         Returns:
             list : list of devices
         """
-        devs = [{"deviceId": dev.uuid, "deviceIP": dev.id} for dev in devices]
+        devs = self.get_device_list(devices)
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
         for dev in devs:
             dev_installed_versions = getattr(all_dev_versions[dev["deviceId"]], version_type)
@@ -131,6 +131,7 @@ class DeviceVersions:
 
         Args:
             version_to_set_up (str): requested version
+            devices (List[Device]): devices on which action going to be performed
 
         Returns:
             list : list of devices
@@ -144,11 +145,29 @@ class DeviceVersions:
 
         Args:
             version_to_set_up (str): requested version
+            devices (List[Device]): devices on which action going to be performed
 
         Returns:
             list : list of devices
         """
         return self._get_device_list_in(version_to_set_up, devices, "available_versions")
+
+    def get_devices_current_version(self, devices: List[Device]) -> List[dict]:
+        """
+        Create version key with current software version for every device dict in device list
+
+        Args:
+            version_to_set_up (str): requested version
+            devices (List[Device]): devices on which action going to be performed
+
+        Returns:
+            list : list of devices
+        """
+        devs = self.get_device_list(devices)
+        all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
+        for device in devs:
+            device["version"] = getattr(all_dev_versions[device["deviceId"]], "current_version")
+        return devs
 
     def get_device_list(self, devices: List[Device]) -> List[dict]:
 

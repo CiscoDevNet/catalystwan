@@ -7,13 +7,13 @@ from pathlib import Path
 from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
 from urllib.parse import urljoin
 
-from requests import Response, Session, head
+from requests import PreparedRequest, Request, Response, Session, head
 from requests.auth import AuthBase
-from requests.exceptions import ConnectionError, HTTPError
+from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.exceptions import InvalidOperationError
-from vmngclient.utils.response import response_debug
+from vmngclient.utils.response import response_history_debug
 from vmngclient.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
@@ -146,14 +146,21 @@ class vManageSession(Session):
         self.session_type = SessionType.NOT_DEFINED
         self.server_name = None
         self.logger = logging.getLogger(__name__)
-
+        self.response_trace: Callable[
+            [Optional[Response], Union[Request, PreparedRequest, None]], str
+        ] = response_history_debug
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
 
     def request(self, method, url, *args, **kwargs) -> Any:
         full_url = self.get_full_url(url)
-        response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
-        self.logger.debug(response_debug(response))
+        try:
+            response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
+            self.logger.debug(self.response_trace(response, None))
+        except RequestException as exception:
+            self.logger.debug(self.response_trace(exception.response, exception.request))
+            self.logger.error(exception)
+            raise
 
         if response.request.url and "passwordReset.html" in response.request.url:
             raise InvalidOperationError("Password must be changed to use this session.")
