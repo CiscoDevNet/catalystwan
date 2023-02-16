@@ -1,11 +1,11 @@
 import logging
 from enum import Enum
 from pathlib import PurePath
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 from attr import define, field  # type: ignore
 
-from vmngclient.dataclasses import Device
+from vmngclient.dataclasses import DataclassBase, Device
 from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
 
@@ -18,18 +18,26 @@ class DeviceCategory(Enum):
 
 
 @define
-class DeviceSoftwareRepository:
+class DeviceSoftwareRepository(DataclassBase):
     installed_versions: List[str] = field(default=None)
     available_versions: List[str] = field(default=None, metadata={FIELD_NAME: "availableVersions"})
     current_version: str = field(default=None, metadata={FIELD_NAME: "version"})
     default_version: str = field(default=None, metadata={FIELD_NAME: "defaultVersion"})
     device_id: str = field(default=None, metadata={FIELD_NAME: "uuid"})
 
+
 @define(frozen=False)
-class DeviceVersionPayload:
+class DeviceVersionPayload(DataclassBase):
     deviceId: str
     deviceIP: str
-    version: str = ""
+    version: Optional[str] = ""
+
+
+@define(frozen=False)
+class PayloadRemovePartition(DataclassBase):
+    deviceId: str
+    deviceIP: str
+    version: Optional[List[str]] = [""]
 
 
 class RepositoryAPI:
@@ -106,7 +114,7 @@ class DeviceVersions:
         self.device_category = device_category
 
     def _get_device_list_in(
-        self, version_to_set_up: str, devices: List[Device], version_type: str, convert_version_to_list: bool = False
+        self, version_to_set_up: str, devices: List[Device], version_type: str
     ) -> List[DeviceVersionPayload]:
         """
         Create devices payload list included requested version, if requested version
@@ -116,7 +124,6 @@ class DeviceVersions:
             version_to_set_up (str): requested version
             devices List[Device]: list of Device dataclass instances
             version_type: type of version (installed, available, etc.)
-            convert_version_to_list: bool = True: put version inside list
 
         Returns:
             list : list of devices
@@ -128,8 +135,6 @@ class DeviceVersions:
             try:
                 for version in device_versions:
                     if version_to_set_up in version:
-                        if convert_version_to_list:
-                            version = [version]
                         device.version = version
                         break
             except IndexError:
@@ -153,9 +158,7 @@ class DeviceVersions:
         """
         return self._get_device_list_in(version_to_set_up, devices, "installed_versions")
 
-    def get_device_list_in_available(
-        self, version_to_set_up: str, devices: List[Device], convert_version_to_list: bool = False
-    ) -> List[DeviceVersionPayload]:
+    def get_device_list_in_available(self, version_to_set_up: str, devices: List[Device]) -> List[DeviceVersionPayload]:
         """
         Create devices payload list included requested, if requested version
         is in available versions
@@ -168,10 +171,9 @@ class DeviceVersions:
         Returns:
             list : list of devices
         """
-        return self._get_device_list_in(version_to_set_up, devices, "available_versions", convert_version_to_list)
+        return self._get_device_list_in(version_to_set_up, devices, "available_versions")
 
-    def _get_devices_chosen_version(self, devices: List[Device],
-         version_type: str) -> List[DeviceVersionPayload]:
+    def _get_devices_chosen_version(self, devices: List[Device], version_type: str) -> List[DeviceVersionPayload]:
         """
         Create devices payload list included software version key
         for every device in devices list
@@ -218,6 +220,6 @@ class DeviceVersions:
 
         return self._get_devices_chosen_version(devices, "available_versions")
 
-    def get_device_list(self, devices: List[Device]) -> List[dict]:
+    def get_device_list(self, devices: List[Device]) -> List[DeviceVersionPayload]:
 
         return [DeviceVersionPayload(device.uuid, device.id) for device in devices]
