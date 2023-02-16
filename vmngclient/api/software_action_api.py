@@ -11,6 +11,7 @@ from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, Reposi
 from vmngclient.dataclasses import Device
 from vmngclient.exceptions import VersionDeclarationError  # type: ignore
 from vmngclient.session import vManageSession
+from vmngclient.utils.creation_tools import asdict
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +112,8 @@ class SoftwareActionAPI:
         url = "/dataservice/device/action/changepartition"
         payload = {
             "action": "changepartition",
-            "devices": self.device_versions.get_device_list_in_available(version, devices),
+            "devices": [asdict(device) for device in
+                         self.device_versions.get_device_list_in_available(version, devices)],  # type: ignore
             "deviceType": "vmanage",
         }
         activate = dict(self.session.post(url, json=payload).json())
@@ -165,7 +167,7 @@ class SoftwareActionAPI:
                 "reboot": reboot,
                 "sync": sync,
             },
-            "devices": self.device_versions.get_device_list(devices),
+            "devices": [asdict(device) for device in self.device_versions.get_device_list(devices)],  # type: ignore
             "deviceType": install_spec.device_type.value,
         }
         if install_spec.family.value in (DeviceClass.VMANAGE.value, DeviceClass.CEDGE.value):
