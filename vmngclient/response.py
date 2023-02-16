@@ -8,7 +8,9 @@ from requests.exceptions import JSONDecodeError
 
 from vmngclient.dataclasses import DataclassBase
 from vmngclient.typed_list import DataSequence
-from vmngclient.utils.creation_tools import AttrsInstance, create_dataclass
+from vmngclient.utils.creation_tools import create_dataclass
+
+T = TypeVar("T")
 
 
 @define(frozen=True)
@@ -96,9 +98,6 @@ class JsonPayload:
             self.headers = json.get("headers", None)
 
 
-T = TypeVar("T", bound=AttrsInstance)
-
-
 class vManageResponse(Response):
     """Extends Response object with methods specific to vManage"""
 
@@ -127,7 +126,7 @@ class vManageResponse(Response):
             cls: Dataclass subtype (eg. Devices)
 
         Returns:
-            DataSequence of given type
+            DataSequence of given type,
             in case JSON payload was containing a single Object - sequence with one element is returned
         """
         data = self.payload.data

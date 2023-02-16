@@ -6,7 +6,7 @@ from attr import define, field  # type: ignore
 from parameterized import parameterized  # type: ignore
 
 from vmngclient.dataclasses import DataclassBase
-from vmngclient.response import vManageResponse, ErrorInfo
+from vmngclient.response import ErrorInfo, vManageResponse
 from vmngclient.typed_list import DataSequence
 
 
@@ -46,7 +46,6 @@ class TestResponse(unittest.TestCase):
         else:
             with self.assertRaises(Exception):
                 vmng_response.dataseq(ParsedDataType)
-
 
     @parameterized.expand(
         [

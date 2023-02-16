@@ -121,10 +121,7 @@ class TypedList(MutableSequence[T], Generic[T]):
         self.data.reverse()
 
 
-A = TypeVar("A", bound=AttrsInstance)
-
-
-class DataSequence(TypedList[A], Generic[A]):
+class DataSequence(TypedList[T], Generic[T]):
     """
     ## Example:
 
@@ -135,11 +132,11 @@ class DataSequence(TypedList[A], Generic[A]):
     """
 
     @overload
-    def __init__(self, _type: Type[A]) -> None:
+    def __init__(self, _type: Type[T]) -> None:
         ...
 
     @overload
-    def __init__(self, _type: Type[A], _iterable: Iterable[A], /) -> None:
+    def __init__(self, _type: Type[T], _iterable: Iterable[T], /) -> None:
         ...
 
     def __init__(self, _type, _iterable=None, /):
