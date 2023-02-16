@@ -1,15 +1,21 @@
 from functools import wraps
 from pprint import pformat
-from typing import Any, Callable, Dict, List, Optional, Type, TypeVar, Union, cast
+from typing import Any, Callable, Optional, Sequence, Type, TypeVar, Union, cast
 
+from attr import define  # type: ignore
 from requests import PreparedRequest, Request, Response
 from requests.exceptions import JSONDecodeError
 
-from vmngclient.dataclasses import vManageResponseErrorData
+from vmngclient.dataclasses import DataclassBase
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import AttrsInstance, create_dataclass
 
-T = TypeVar("T", bound=AttrsInstance)
+
+@define(frozen=True)
+class ErrorInfo(DataclassBase):
+    message: str
+    details: str
+    code: str
 
 
 def response_debug(response: Optional[Response], request: Union[Request, PreparedRequest, None]) -> str:
@@ -90,6 +96,9 @@ class JsonPayload:
             self.headers = json.get("headers", None)
 
 
+T = TypeVar("T", bound=AttrsInstance)
+
+
 class vManageResponse(Response):
     """Extends Response object with methods specific to vManage"""
 
@@ -101,47 +110,36 @@ class vManageResponse(Response):
             self.payload = JsonPayload()
 
     def info(self, history: bool = False) -> str:
-        """Returns human readable string containing Request-Response contents"""
+        """Returns human readable string containing Request-Response contents
+        Args:
+            history: include response history (eg. redirects)
+
+        Returns:
+            str
+        """
         if history:
             return response_history_debug(self, None)
         return response_debug(self, None)
 
-    def parse(self, cls: Type[T]) -> T:
-        try:
-            return create_dataclass(cls, self.__get_json_data_as_dict())
-        except TypeError as e:
-            raise vManageResponseException(f"Cannot parse {cls}: {str(e)}", self)
+    def dataseq(self, cls: Type[T]) -> DataSequence[T]:
+        """Returns data contents from JSON payload deserialized to Sequence of Dataclass instances
+        Args:
+            cls: Dataclass subtype (eg. Devices)
 
-    def parse_list(self, cls: Type[T]) -> DataSequence[T]:
-        try:
-            items = self.__get_json_data_as_list()
-            return DataSequence(cls, [create_dataclass(cls, item) for item in items])
-        except TypeError as e:
-            raise vManageResponseException(f"Cannot parse {cls}: {str(e)}", self)
-
-    def get_error(self) -> vManageResponseErrorData:
-        try:
-            return create_dataclass(vManageResponseErrorData, self.__get_error_dict())
-        except TypeError as e:
-            raise vManageResponseException(f"Cannot parse {vManageResponseErrorData}: {str(e)}", self)
-
-    def __get_json_data_as_list(self) -> List:
+        Returns:
+            DataSequence of given type
+            in case JSON payload was containing a single Object - sequence with one element is returned
+        """
         data = self.payload.data
-        if not isinstance(data, list):
-            raise vManageResponseException(f"{{'data'\"': ...}} contains {type(data)}, expected list", self)
-        return cast(list, data)
+        if isinstance(data, Sequence):
+            sequence = data
+        else:
+            sequence = [cast(dict, data)]
+        return DataSequence(cls, [create_dataclass(cls, item) for item in sequence])
 
-    def __get_json_data_as_dict(self) -> Dict[str, Any]:
-        data = self.payload.data
-        if not isinstance(data, Dict):
-            raise vManageResponseException(f"{{'data': ...}} contains {type(data)}, expected dict", self)
-        return cast(dict, data)
-
-    def __get_error_dict(self) -> Dict[str, str]:
-        error = self.payload.error
-        if not isinstance(error, Dict):
-            raise vManageResponseException(f"{{'error': ...}} contains {type(error)}, expected dict", self)
-        return cast(dict, error)
+    def get_error_info(self) -> ErrorInfo:
+        """Returns error information from JSON payload"""
+        return create_dataclass(ErrorInfo, cast(dict, self.payload.error))
 
 
 def with_vmanage_response(method: Callable[[Any], Response]) -> Callable[[Any], vManageResponse]:
@@ -150,12 +148,3 @@ def with_vmanage_response(method: Callable[[Any], Response]) -> Callable[[Any], 
         return vManageResponse(method(*args, **kwargs))
 
     return wrapper
-
-
-class vManageResponseException(Exception):
-    def __init__(self, message: str, response: vManageResponse):
-        self.message = message
-        self.response = response
-
-    def __str__(self):
-        return f"{self.message}\n{self.response}"

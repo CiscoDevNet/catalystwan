@@ -20,13 +20,6 @@ class DataclassBase:
         )
 
 
-@define(frozen=True)
-class vManageResponseErrorData(DataclassBase):
-    message: str
-    details: str
-    code: str
-
-
 @define(frozen=True, field_transformer=convert_attributes)
 class AdminTech(DataclassBase):
     creation_time: dt.datetime = field(metadata={FIELD_NAME: "creationTime"})
@@ -400,6 +393,7 @@ class TenantAAA(DataclassBase):
     """
     Provider-Tenant -> Tenant -> Administration -> Manage users -> Remote AAA
     """
+
     accounting: bool = field(metadata={FIELD_NAME: "accounting"})
     admin_auth_order: bool = field(metadata={FIELD_NAME: "adminAuthOrder"})
     audit_disable: bool = field(metadata={FIELD_NAME: "auditDisable"})
@@ -413,6 +407,7 @@ class RadiusServer(DataclassBase):
     """
     Provider-Tenant -> Tenant -> Administration -> Manage users -> Remote AAA -> RADIUS
     """
+
     address: str = field(metadata={FIELD_NAME: "address"})
     auth_port: int = field(metadata={FIELD_NAME: "authPort"})
     acct_port: int = field(metadata={FIELD_NAME: "acctPort"})
@@ -429,6 +424,7 @@ class TenantRadiusServer(DataclassBase):
     """
     Provider-Tenant -> Tenant -> Administration -> Manage users -> Remote AAA -> RADIUS
     """
+
     timeout: int = field(default=3, metadata={FIELD_NAME: "timeout"})
     retransmit: int = field(default=5, metadata={FIELD_NAME: "retransmit"})
     server: List[RadiusServer] = field(factory=list, metadata={FIELD_NAME: "server"})
@@ -439,6 +435,7 @@ class TacacsServer(DataclassBase):
     """
     Provider-Tenant -> Tenant -> Administration -> Manage users -> Remote AAA -> TACACS server
     """
+
     address: str = field(metadata={FIELD_NAME: "address"})
     auth_port: int = field(metadata={FIELD_NAME: "authPort"})
     vpn: int = field(metadata={FIELD_NAME: "vpn"})
@@ -453,6 +450,7 @@ class TenantTacacsServer(DataclassBase):
     """
     Provider-Tenant -> Tenant -> Administration -> Manage users -> Remote AAA -> TACACS server
     """
+
     timeout: int = field(default=3, metadata={FIELD_NAME: "timeout"})
     authentication: str = field(default="PAP", metadata={FIELD_NAME: "authentication"})
     server: List[TacacsServer] = field(factory=list, metadata={FIELD_NAME: "server"})
