@@ -289,17 +289,20 @@ class TemplatesAPI:
     
     def create_v2(self, template) -> str:
         template_id: Optional[str] = None
+        template_type = None
         
         if isinstance(template, FeatureTemplate):
             template_id = self._create_feature_template(template)
+            template_type = FeatureTemplate.__name__
 
         if isinstance(template, DeviceTemplate):
             template_id = self._create_device_template(template)
+            template_type = DeviceTemplate.__name__
 
         if not template_id:
             raise NotImplementedError()
 
-        logger.info(f"Template {template.name} was created successfully ({template_id}).")
+        logger.info(f"Template {template.name} ({template_type}) was created successfully ({template_id}).")
         return template_id
 
     def get_feature_templates(self, name: Optional[str] = None) -> List[FeatureTemplateInformation]:

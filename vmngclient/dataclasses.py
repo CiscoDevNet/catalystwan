@@ -322,12 +322,12 @@ class TierInfo(DataclassBase):
     name: str = field(metadata={FIELD_NAME: "tierName"})
     vpn: int
     rid: int = field(metadata={FIELD_NAME: "@rid"})
-    ipv4_route_limit_type: Optional[str] = field(default=None, metadata={FIELD_NAME: "ipv4RouteLimitType"})
-    ipv4_route_limit_threshold: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv4RouteLimitThreshold"})
-    ipv4_route_limit: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv4RouteLimit"})
-    ipv6_route_limit_type: Optional[str] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimitType"})
-    ipv6_route_limit_threshold: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimitThreshold"})
-    ipv6_route_limit: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimit"})
+    ipv4_route_limit_type: str = field(default="", metadata={FIELD_NAME: "ipv4RouteLimitType"})
+    ipv4_route_limit_threshold: str = field(default="", metadata={FIELD_NAME: "ipv4RouteLimitThreshold"})
+    ipv4_route_limit: str = field(default="", metadata={FIELD_NAME: "ipv4RouteLimit"})
+    ipv6_route_limit_type: str = field(default="", metadata={FIELD_NAME: "ipv6RouteLimitType"})
+    ipv6_route_limit_threshold: str = field(default="", metadata={FIELD_NAME: "ipv6RouteLimitThreshold"})
+    ipv6_route_limit: str = field(default="", metadata={FIELD_NAME: "ipv6RouteLimit"})
     tlocs: List[TLOC] = field(factory=list)
 
 

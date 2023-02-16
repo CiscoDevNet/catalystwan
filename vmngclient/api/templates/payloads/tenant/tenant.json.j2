@@ -37,8 +37,8 @@
                                                 "unicast-route-limit": {
                                                     "route-limit": {
                                                         "vipObjectType": "object",
-                                                        "vipType": "constant",
-                                                        "vipValue": {{ tenant["tier"].ipv4_route_limit }}
+                                                        "vipType": {% if tenant["tier"].ipv4_route_limit %}"constant"{% else %}"ignore"{% endif %},
+                                                        "vipValue": {{ tenant["tier"].ipv4_route_limit | tojson }}
                                                     },
                                                     "warning-only": {
                                                         "vipObjectType": "node-only",
@@ -47,8 +47,8 @@
                                                     },
                                                     "warning-threshold": {
                                                         "vipObjectType": "object",
-                                                        "vipType": "constant",
-                                                        "vipValue": {{ tenant["tier"].ipv4_route_limit_threshold }}
+                                                        "vipType": {% if tenant["tier"].ipv4_route_limit_threshold %}"constant"{% else %}"ignore"{% endif %},
+                                                        "vipValue": {{ tenant["tier"].ipv4_route_limit_threshold | tojson}}
                                                     }
                                                 }
                                             },
@@ -56,8 +56,8 @@
                                                 "unicast-route-limit": {
                                                     "route-limit": {
                                                         "vipObjectType": "object",
-                                                        "vipType": "constant",
-                                                        "vipValue": {{ tenant["tier"].ipv6_route_limit }}
+                                                        "vipType": {% if tenant["tier"].ipv6_route_limit %}"constant"{% else %}"ignore"{% endif %},
+                                                        "vipValue": {{ tenant["tier"].ipv6_route_limit | tojson}}
                                                     },
                                                     "warning-only": {
                                                         "vipObjectType": "node-only",
@@ -66,8 +66,8 @@
                                                     },
                                                     "warning-threshold": {
                                                         "vipObjectType": "object",
-                                                        "vipType": "constant",
-                                                        "vipValue": {{ tenant["tier"].ipv6_route_limit_threshold }}
+                                                        "vipType": {% if tenant["tier"].ipv6_route_limit_threshold %}"constant"{% else %}"ignore"{% endif %},
+                                                        "vipValue": {{ tenant["tier"].ipv6_route_limit_threshold | tojson}}
                                                     }
                                                 }
                                             }
