@@ -102,11 +102,6 @@ Please contact authors direcly or via Issues Github page.
     curl -sSL https://install.python-poetry.org | python3 -
     poetry config virtualenvs.in-project true
     ```
-    Depending on your IDE you might at this point think about proper integration
-
-    https://www.jetbrains.com/help/pycharm/poetry.html
-
-    https://code.visualstudio.com/docs/python/environments
 4. Install dependecies 
     ```
     poetry install
@@ -115,6 +110,8 @@ Please contact authors direcly or via Issues Github page.
     ```
     pre-commit install
     ```
+### **Environmet Variables**
+- **`VMNGCLIENT_DEVEL`** when set: loggers will be configured according to `./logging.conf` and `urllib3.exceptions.InsecureRequestWarning` will be suppressed
 
 ## **Add new feature**
 To add new feature create new branch and implement it. Before making a pull request make sure that `pre-commit` passes.
