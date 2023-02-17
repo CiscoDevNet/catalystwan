@@ -108,7 +108,7 @@ def create_vManageSession(
         session._session_type = SessionType.NOT_DEFINED
         session.logger.warning(f"Session created with {user_mode} and {view_mode}.")
 
-    session.logger.info(f"Logged as {username}. The session type is {session._session_type}")
+    session.logger.info(f"Logged as {username}. The session type is {session.session_type}")
     return session
 
 
@@ -290,6 +290,10 @@ class vManageSession(Session):
             return False
         else:
             return True
+
+    @property
+    def session_type(self) -> SessionType:
+        return self._session_type
 
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"
