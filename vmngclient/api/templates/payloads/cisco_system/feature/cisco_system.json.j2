@@ -42,7 +42,7 @@
           "mobile-number": {
             "vipType": "ignore",
             "vipValue": [
-
+            
             ]
           }
         }
@@ -99,7 +99,7 @@
     },
     "site-id": {
       "vipObjectType": "object",
-      "vipType": "variableName",
+      "vipType": "constant",
       "vipValue": "{{ site_id }}",
       "vipVariableName": "system_site_id"
     },
@@ -111,13 +111,13 @@
     },
     "system-ip": {
       "vipObjectType": "object",
-      "vipType": "variableName",
+      "vipType": "constant",
       "vipValue": "{{ system_ip }}",
       "vipVariableName": "system_system_ip"
     },
     "host-name": {
       "vipObjectType": "object",
-      "vipType": "variableName",
+      "vipType": "constant",
       "vipValue": "{{ host_name }}",
       "vipVariableName": "system_host_name"
     },
@@ -151,8 +151,13 @@
     },
     "multi-tenant": {
       "vipObjectType": "node-only",
-      "vipType": "notIgnore",
-      "vipValue": "{{ multi_tenant }}",
+      {% if multi_tenant %}
+          "vipType": "constant",
+          "vipValue": "true",
+      {% else %}
+          "vipType": "notIgnore",
+          "vipValue": "false",
+      {% endif %}
       "vipVariableName": "system_multi-tenant"
     },
     "on-demand": {
