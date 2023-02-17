@@ -27,6 +27,9 @@ from vmngclient.api.templates.payloads.cisco_vpn.cisco_vpn_model import (
 # CEdge Templates
 from vmngclient.api.templates.payloads.tenant.tenant_model import TenantModel
 
+# Cisco VPN Interface Ethernet Templates
+
+
 __all__ = [
     "FeatureTemplate",
     "TenantModel",

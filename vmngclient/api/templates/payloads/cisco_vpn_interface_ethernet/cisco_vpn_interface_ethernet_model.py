@@ -2,9 +2,8 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Optional
-
-from attr import field  # type: ignore
+from pathlib import Path
+from typing import ClassVar, Optional
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 
@@ -32,7 +31,11 @@ class TypeAddress(Enum):
 
 
 class CiscoVpnInterfaceEthernetModel(FeatureTemplate):
+    payload_path: ClassVar[Path] = Path(__file__).parent / "feature/cisco_vpn_interface_ethernet.json.j2"
     interface_name: InterfaceType
-    shutdownd: Optional[bool] = field(default=None)
-    type_address: TypeAddress = field(default=TypeAddress.STATIC)
-    ip: Optional[str] = field(default=None)
+    shutdown: Optional[bool]
+    type_address: TypeAddress = TypeAddress.STATIC
+    ip: Optional[str]
+
+    class Config:
+        arbitrary_types_allowed = True
