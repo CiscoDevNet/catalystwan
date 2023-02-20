@@ -28,7 +28,9 @@ from vmngclient.api.templates.payloads.cisco_vpn.cisco_vpn_model import (
 # Cisco VPN Interface Ethernet Templates
 from vmngclient.api.templates.payloads.cisco_vpn_interface_ethernet.cisco_vpn_interface_ethernet_model import (
     CiscoVpnInterfaceEthernetModel,
+    ColorType,
     InterfaceType,
+    Tunnel,
     TypeAddress,
 )
 
@@ -50,4 +52,6 @@ __all__ = [
     "CiscoVpnInterfaceEthernetModel",
     "InterfaceType",
     "TypeAddress",
+    "ColorType",
+    "Tunnel",
 ]
