@@ -292,7 +292,7 @@
     },
     "shutdown": {
       "vipObjectType": "object",
-      {% if shutdown is defined %}
+      {% if shutdown is not none %}
           "vipType": "constant",
           "vipValue": "{{ shutdown | tojson}}",
       {% else %}
@@ -301,6 +301,9 @@
       {% endif %} 
       "vipVariableName": "vpn_if_shutdown"
     },
+    {% if tunnel is not none %}
+      "tunnel-interface": {% include 'tunnel.json.j2' %},
+    {% endif %} 
     "ipv6-vrrp": {
       "vipType": "ignore",
       "vipValue": [

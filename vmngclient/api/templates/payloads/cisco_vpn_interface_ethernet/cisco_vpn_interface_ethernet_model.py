@@ -5,6 +5,8 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, Optional
 
+from attr import define  # type: ignore
+
 from vmngclient.api.templates.feature_template import FeatureTemplate
 
 
@@ -30,12 +32,55 @@ class TypeAddress(Enum):
     DYNAMIC = "dynamic"
 
 
+class ColorType(Enum):
+    G3 = "3g"
+    BIZ_INTERNET = "biz-internet"
+    BLUE = "blue"
+    BRONZE = "bronze"
+    CUSTOM_1 = "custom1"
+    CUSTOM_2 = "custom2"
+    CUSTOM_3 = "custom3"
+    DEFAULT = "default"
+    GOLD = "gold"
+    GREEN = "green"
+    LTE = "lte"
+    METRO_ETHERNET = "metro-ethernet"
+    MPLS = "mpls"
+    PRIVATE_1 = "provate1"
+    PRIVATE_2 = "provate2"
+    PRIVATE_3 = "provate3"
+    PRIVATE_4 = "provate4"
+    PRIVATE_5 = "provate5"
+    PRIVATE_6 = "provate6"
+    PUBLIC_INTERNET = "public-internet"
+    RED = "red"
+    SILVER = "silver"
+
+
+@define
+class Tunnel:
+    color: Optional[ColorType] = None
+    all: Optional[bool] = None
+    bgp: Optional[bool] = None
+    dhcp: Optional[bool] = None
+    dns: Optional[bool] = None
+    icmp: Optional[bool] = None
+    netconf: Optional[bool] = None
+    ntp: Optional[bool] = None
+    ospf: Optional[bool] = None
+    ssh: Optional[bool] = None
+    stun: Optional[bool] = None
+    https: Optional[bool] = None
+    snmp: Optional[bool] = None
+
+
 class CiscoVpnInterfaceEthernetModel(FeatureTemplate):
     payload_path: ClassVar[Path] = Path(__file__).parent / "feature/cisco_vpn_interface_ethernet.json.j2"
     interface_name: InterfaceType
     shutdown: Optional[bool]
     type_address: TypeAddress = TypeAddress.STATIC
     ip: Optional[str]
+    tunnel: Optional[Tunnel]
 
     class Config:
         arbitrary_types_allowed = True
