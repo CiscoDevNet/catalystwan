@@ -98,7 +98,7 @@ class PartitionManagerAPI:
 
         url = "/dataservice/device/action/removepartition"
         devices_payload = [
-            PayloadRemovePartition(device.deviceId, device.deviceIP, [device.version])
+            PayloadRemovePartition(device.deviceId, device.deviceIP, [cast(str, device.version)])
             for device in self.device_versions.get_device_list_in_available(version, devices)
         ]
         payload = {
