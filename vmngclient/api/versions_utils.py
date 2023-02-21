@@ -158,7 +158,7 @@ class DeviceVersions:
         """
         return self._get_device_list_in(version_to_set_up, devices, "installed_versions")
 
-    def get_device_list_in_available(self, version_to_set_up: str, devices: List[Device]) -> List[DeviceVersionPayload]:
+    def get_device_available(self, version_to_set_up: str, devices: List[Device]) -> List[DeviceVersionPayload]:
         """
         Create devices payload list included requested, if requested version
         is in available versions

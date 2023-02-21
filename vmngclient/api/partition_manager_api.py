@@ -80,8 +80,8 @@ class PartitionManagerAPI:
             str: action id
         """
 
-        devices_chosen_version = self.device_versions.get_device_list_in_installed(version, devices)
-        return self._set_default_partition(devices_chosen_version)
+        devices_version = self.device_versions.get_device_list_in_installed(version, devices)
+        return self._set_default_partition(devices_version)
 
     def remove_partition(self, devices: List[Device], version: str, force: bool = False) -> str:
         """
@@ -99,7 +99,7 @@ class PartitionManagerAPI:
         url = "/dataservice/device/action/removepartition"
         devices_payload = [
             PayloadRemovePartition(device.deviceId, device.deviceIP, [cast(str, device.version)])
-            for device in self.device_versions.get_device_list_in_available(version, devices)
+            for device in self.device_versions.get_device_available(version, devices)
         ]
         payload = {
             "action": "removepartition",

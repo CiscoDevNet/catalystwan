@@ -114,7 +114,7 @@ class SoftwareActionAPI:
             "action": "changepartition",
             "devices": [
                 asdict(device)  # type: ignore
-                for device in self.device_versions.get_device_list_in_available(version, devices)
+                for device in self.device_versions.get_device_available(version, devices)
             ],
             "deviceType": "vmanage",
         }

@@ -78,14 +78,14 @@ class TestRepositoryAPI(unittest.TestCase):
         )
 
     @patch.object(RepositoryAPI, "get_devices_versions_repository")
-    def test_get_device_list_in_available(self, mock_get_devices_versions_repository):
+    def test_get_device_available(self, mock_get_devices_versions_repository):
         # Prepare mock data
         mock_get_devices_versions_repository.return_value = Mock()
         mock_session = Mock()
         mock_repository_object = RepositoryAPI(mock_session)
         mock_device_versions = DeviceVersions(mock_repository_object, DeviceCategory.CONTROLLERS.value)
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
-        answer = mock_device_versions.get_device_list_in_available("ver1", [self.device])
+        answer = mock_device_versions.get_device_available("ver1", [self.device])
         expected_result = [DeviceVersionPayload("mock_uuid", "mock_ip", "ver1")]
 
         # Assert
