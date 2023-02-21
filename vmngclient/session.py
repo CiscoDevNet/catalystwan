@@ -65,7 +65,6 @@ def create_vManageSession(
         Session object
 
     """
-
     session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
 
@@ -93,19 +92,20 @@ def create_vManageSession(
     except ValueError:
         view_mode = ViewMode.NOT_RECOGNIZED
         session.logger.warning(f"Unrecognized user mode is: '{server_info.get('viewMode')}'")
+
     if user_mode is UserMode.TENANT and not subdomain and view_mode is ViewMode.TENANT:
-        session.session_type = SessionType.TENANT
+        session._session_type = SessionType.TENANT
     elif user_mode is UserMode.PROVIDER and not subdomain and view_mode is ViewMode.PROVIDER:
-        session.session_type = SessionType.PROVIDER
+        session._session_type = SessionType.PROVIDER
     elif user_mode is UserMode.PROVIDER and view_mode is ViewMode.TENANT:
-        session.session_type = SessionType.PROVIDER_AS_TENANT
+        session._session_type = SessionType.PROVIDER_AS_TENANT
     elif user_mode is UserMode.TENANT and subdomain:
         raise SessionNotCreatedError(
             f"Session not created. Subdomain {subdomain} passed to tenant session, "
             "cannot switch to tenant from tenant user mode."
         )
     else:
-        session.session_type = SessionType.NOT_DEFINED
+        session._session_type = SessionType.NOT_DEFINED
         session.logger.warning(f"Session created with {user_mode} and {view_mode}.")
 
     session.logger.info(f"Logged as {username}. The session type is {session.session_type}")
@@ -143,7 +143,7 @@ class vManageSession(Session):
         self.password = password
         self.subdomain = subdomain
 
-        self.session_type = SessionType.NOT_DEFINED
+        self._session_type = SessionType.NOT_DEFINED
         self.server_name = None
         self.logger = logging.getLogger(__name__)
         self.response_trace: Callable[
@@ -290,6 +290,10 @@ class vManageSession(Session):
             return False
         else:
             return True
+
+    @property
+    def session_type(self) -> SessionType:
+        return self._session_type
 
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"
