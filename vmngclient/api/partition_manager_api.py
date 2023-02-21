@@ -99,7 +99,7 @@ class PartitionManagerAPI:
         url = "/dataservice/device/action/removepartition"
         devices_payload = [
             PayloadRemovePartition(device.deviceId, device.deviceIP, [device.version])
-            for device in self.device_versions.get_device_list_in_available(version, devices, True)
+            for device in self.device_versions.get_device_list_in_available(version, devices)
         ]
         payload = {
             "action": "removepartition",
@@ -130,8 +130,9 @@ class PartitionManagerAPI:
         payload = {
             "action": "removepartition",
             "devices": [
-                asdict(device) for device in self.device_versions.get_devices_available_versions(devices)
-            ],  # type: ignore
+                asdict(device)  # type: ignore
+                for device in self.device_versions.get_devices_available_versions(devices)
+            ],
             "deviceType": "vmanage",
         }
         remove_action: Dict[str, str] = self.session.post(url, json=payload).json()
