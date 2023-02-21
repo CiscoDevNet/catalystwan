@@ -2,7 +2,13 @@ import unittest
 from unittest.mock import Mock, patch
 
 from vmngclient.api.partition_manager_api import PartitionManagerAPI
-from vmngclient.api.versions_utils import DeviceCategory, DeviceSoftwareRepository, DeviceVersions, RepositoryAPI, DeviceVersionPayload
+from vmngclient.api.versions_utils import (
+    DeviceCategory,
+    DeviceSoftwareRepository,
+    DeviceVersionPayload,
+    DeviceVersions,
+    RepositoryAPI,
+)
 from vmngclient.dataclasses import Device
 
 
@@ -31,7 +37,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         }
 
         self.mock_devices = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "ver1"}]
-        self.mock_device_version_payload = [DeviceVersionPayload("mock_uuid","mock_ip", "ver1")]
+        self.mock_device_version_payload = [DeviceVersionPayload("mock_uuid", "mock_ip", "ver1")]
         mock_session = Mock()
         self.mock_repository_object = RepositoryAPI(mock_session)
         self.mock_device_versions = DeviceVersions(self.mock_repository_object, DeviceCategory.CONTROLLERS)
