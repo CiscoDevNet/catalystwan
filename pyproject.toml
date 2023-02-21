@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vmngclient"
-version = "0.5.4"
+version = "0.6.0"
 description = "Universal vManage API"
 authors = ["kagorski <kagorski@cisco.com>"]
 readme = "README.md"
@@ -28,7 +28,7 @@ pytest = "^7.1.2"
 pytest-mock = "^3.7.0"
 isort = "^5.10.1"
 pre-commit = "^2.19.0"
-mypy = "0.991"
+mypy = "^1.0.0"
 flake8 = "^5.0.4"
 Sphinx = "^5.2.3"
 

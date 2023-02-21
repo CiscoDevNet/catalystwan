@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch
 
+from attr.exceptions import NotAnAttrsClassError
 from parameterized import parameterized  # type: ignore
 
 from vmngclient.api.administration import (
@@ -10,8 +11,24 @@ from vmngclient.api.administration import (
     UserDoesNotExists,
     UsersAPI,
 )
-from vmngclient.dataclasses import CloudConnectorData, CloudServicesSettings, ServiceConfigurationData, User
+from vmngclient.dataclasses import (
+    Certificate,
+    CloudConnectorData,
+    CloudServicesSettings,
+    Organization,
+    Password,
+    ServiceConfigurationData,
+    User,
+    Vbond,
+)
+from vmngclient.exceptions import InvalidOperationError
+from vmngclient.utils.certificate_status import ValidityPeriod
 from vmngclient.utils.creation_tools import create_dataclass
+
+password_dataclass = Password("old_password_123", "new_password_123")
+certificate_dataclass = Certificate("cert", "Name", "Surname", "name@sur.name", ValidityPeriod.ONE_YEAR, 10)
+vbond_dataclass = Vbond("1.1.1.1", 1234)
+organization_dataclass = Organization("My org name", 1)
 
 
 class TestUsersAPI(unittest.TestCase):
@@ -29,7 +46,7 @@ class TestUsersAPI(unittest.TestCase):
         ]
         self.user_dataclass = [create_dataclass(User, user) for user in self.users]
 
-    @patch("vmngclient.session.Session")
+    @patch("vmngclient.session.vManageSession")
     def test_get_all_users(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.users
@@ -38,7 +55,7 @@ class TestUsersAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, self.user_dataclass)
 
-    @patch("vmngclient.session.Session")
+    @patch("vmngclient.session.vManageSession")
     def test_exists_true(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.users
@@ -47,7 +64,7 @@ class TestUsersAPI(unittest.TestCase):
         # Assert
         self.assertTrue(answer)
 
-    @patch("vmngclient.session.Session")
+    @patch("vmngclient.session.vManageSession")
     def test_exists_false(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.users
@@ -57,9 +74,9 @@ class TestUsersAPI(unittest.TestCase):
         self.assertFalse(answer)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.Session")
+    @patch("vmngclient.session.vManageSession")
     @patch("requests.Response")
-    def test_create_user(self, status_code, expected_outcome, mock_session, mock_response):
+    def test_create_user(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
         mock_session.get_data.return_value = [self.users[1]]
         mock_session.post.return_value = mock_response
@@ -69,7 +86,7 @@ class TestUsersAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, expected_outcome)
 
-    @patch("vmngclient.session.Session")
+    @patch("vmngclient.session.vManageSession")
     def test_create_user_existing(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.users
@@ -82,9 +99,9 @@ class TestUsersAPI(unittest.TestCase):
         self.assertRaises(UserAlreadyExistsError, answer)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.Session")
+    @patch("vmngclient.session.vManageSession")
     @patch("requests.Response")
-    def test_delete_user(self, status_code, expected_outcome, mock_session, mock_response):
+    def test_delete_user(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.users
         mock_session.delete.return_value = mock_response
@@ -94,7 +111,7 @@ class TestUsersAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, expected_outcome)
 
-    @patch("vmngclient.session.Session")
+    @patch("vmngclient.session.vManageSession")
     def test_delete_user_not_existing(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = [self.users[1]]
@@ -127,9 +144,9 @@ class TestClusterManagementAPI(unittest.TestCase):
         ]
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.Session")
+    @patch("vmngclient.session.vManageSession")
     @patch("requests.Response")
-    def test_modify_cluster_setup(self, status_code, expected_outcome, mock_session, mock_response):
+    def test_modify_cluster_setup(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
         mock_session.put.return_value = mock_response
         mock_response.status_code = status_code
@@ -138,7 +155,7 @@ class TestClusterManagementAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, expected_outcome)
 
-    @patch("vmngclient.session.Session")
+    @patch("vmngclient.session.vManageSession")
     def test_get_cluster_management_health_status(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.cluster_management_health_status
@@ -161,7 +178,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         self.cloud_services_settings_dataclass = create_dataclass(CloudServicesSettings, self.cloud_services_settings)
         self.cloud_on_ramp = [{"": ""}]
 
-    @patch("vmngclient.session.Session")
+    @patch("vmngclient.session.vManageSession")
     def test_get_sdavc_cloud_connector_config(self, mock_session):
         # Arrange
         mock_session.get_json.return_value = self.cloud_connector_data
@@ -171,9 +188,9 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         self.assertEqual(answer, self.cloud_connector_data_dataclass)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.Session")
+    @patch("vmngclient.session.vManageSession")
     @patch("requests.Response")
-    def test_enable_sdavc_cloud_connector(self, status_code, expected_outcome, mock_session, mock_response):
+    def test_enable_sdavc_cloud_connector(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
         mock_session.post.return_value = mock_response
         mock_response.status_code = status_code
@@ -185,9 +202,9 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         self.assertEqual(answer, expected_outcome)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.Session")
+    @patch("vmngclient.session.vManageSession")
     @patch("requests.Response")
-    def test_disable_sdavc_cloud_connector(self, status_code, expected_outcome, mock_session, mock_response):
+    def test_disable_sdavc_cloud_connector(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
         mock_session.put.return_value = mock_response
         mock_response.status_code = status_code
@@ -196,7 +213,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, expected_outcome)
 
-    @patch("vmngclient.session.Session")
+    @patch("vmngclient.session.vManageSession")
     def test_get_cloud_services(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = [self.cloud_services_settings]
@@ -206,9 +223,9 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         self.assertEqual(answer, self.cloud_services_settings_dataclass)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.Session")
+    @patch("vmngclient.session.vManageSession")
     @patch("requests.Response")
-    def test_set_cloud_services(self, status_code, expected_outcome, mock_session, mock_response):
+    def test_set_cloud_services(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
         mock_session.post.return_value = mock_response
         mock_response.status_code = status_code
@@ -217,7 +234,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, expected_outcome)
 
-    @patch("vmngclient.session.Session")
+    @patch("vmngclient.session.vManageSession")
     def test_get_cloud_on_ramp_for_saas_mode(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.cloud_on_ramp
@@ -227,9 +244,9 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         self.assertEqual(answer, self.cloud_on_ramp)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.Session")
+    @patch("vmngclient.session.vManageSession")
     @patch("requests.Response")
-    def test_enable_cloud_on_ramp_for_saas_mode(self, status_code, expected_outcome, mock_session, mock_response):
+    def test_enable_cloud_on_ramp_for_saas_mode(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
         mock_session.put.return_value = mock_response
         mock_response.status_code = status_code
@@ -237,3 +254,66 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         answer = AdministrationSettingsAPI(mock_session).enable_cloud_on_ramp_for_saas_mode(True)
         # Assert
         self.assertEqual(answer, expected_outcome)
+
+    @patch("vmngclient.session.vManageSession")
+    def test_get_organization(self, mock_session):
+        # Arrange
+        organization = [{"domain-id": "1", "org": "My org name", "controlConnectionUp": "true"}]
+        organization_data = create_dataclass(Organization, organization[0])
+        mock_session.get_data.return_value = organization
+        # Act
+        answer = AdministrationSettingsAPI(mock_session).get_organization()
+        # Assert
+        self.assertEqual(answer, organization_data)
+
+    @parameterized.expand([[password_dataclass], [certificate_dataclass], [organization_dataclass]])
+    @patch("vmngclient.session.vManageSession")
+    @patch("requests.Response")
+    def test_update(self, payload, mock_response, mock_session):
+        # Arrange
+        mock_session.put.return_value = mock_response
+        mock_response.status_code = 200
+        # Act
+        answer = AdministrationSettingsAPI(mock_session).update(payload)
+        # Assert
+        self.assertEqual(answer, True)
+
+    @patch("vmngclient.session.vManageSession")
+    @patch("requests.Response")
+    def test_update_vbond(self, mock_response, mock_session):
+        # Arrange
+        mock_session.post.return_value = mock_response
+        mock_response.status_code = 200
+        # Act
+        answer = AdministrationSettingsAPI(mock_session).update(vbond_dataclass)
+        # Assert
+        self.assertEqual(answer, True)
+
+    @patch("vmngclient.session.vManageSession")
+    @patch("requests.Response")
+    def test_update_error_with_dataclass(self, mock_response, mock_session):
+        # Arrange
+        mock_session.post.return_value = mock_response
+        mock_response.status_code = 200
+        random_dataclass = User("name", ["group_1"])
+
+        # Act
+        def answer():
+            AdministrationSettingsAPI(mock_session).update(random_dataclass)
+
+        # Assert
+        self.assertRaises(InvalidOperationError, answer)
+
+    @patch("vmngclient.session.vManageSession")
+    @patch("requests.Response")
+    def test_update_error_without_dataclass(self, mock_response, mock_session):
+        # Arrange
+        mock_session.post.return_value = mock_response
+        mock_response.status_code = 200
+
+        # Act
+        def answer():
+            AdministrationSettingsAPI(mock_session).update("random_dataclass")
+
+        # Assert
+        self.assertRaises(NotAnAttrsClassError, answer)
