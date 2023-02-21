@@ -64,8 +64,8 @@ class PartitionManagerAPI:
         Returns:
             str: set default partition action id
         """
-        devices_current_versions = self.device_versions.get_devices_current_version(devices)
-        return self._set_default_partition(devices_current_versions)
+        devices_versions = self.device_versions.get_devices_current_version(devices)
+        return self._set_default_partition(devices_versions)
 
     def set_default_partition(self, devices: List[Device], version: str) -> str:
         """
