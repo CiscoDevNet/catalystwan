@@ -5,7 +5,6 @@ from vmngclient.api.versions_utils import (
     DeviceCategory,
     DeviceVersionPayload,
     DeviceVersions,
-    PayloadRemovePartition,
     RepositoryAPI,
 )
 from vmngclient.dataclasses import Device
@@ -98,7 +97,7 @@ class PartitionManagerAPI:
 
         url = "/dataservice/device/action/removepartition"
         devices_payload = [
-            PayloadRemovePartition(device.deviceId, device.deviceIP, [cast(str, device.version)])
+            DeviceVersionPayload(device.deviceId, device.deviceIP, [device.version])
             for device in self.device_versions.get_device_available(version, devices)
         ]
         payload = {

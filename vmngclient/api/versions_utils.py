@@ -30,15 +30,7 @@ class DeviceSoftwareRepository(DataclassBase):
 class DeviceVersionPayload(DataclassBase):
     deviceId: str
     deviceIP: str
-    version: Optional[str] = ""
-
-
-@define(frozen=False)
-class PayloadRemovePartition(DataclassBase):
-    deviceId: str
-    deviceIP: str
-    version: Optional[List[str]] = [""]
-
+    version: Optional[Union[str,List[str]]] = ""
 
 class RepositoryAPI:
     """
