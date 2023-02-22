@@ -84,7 +84,7 @@ class SoftwareActionAPI:
 
         self.session = session
         self.repository = RepositoryAPI(self.session)
-        self.device_versions = DeviceVersions(self.repository, device_category)
+        self.device_versions = DeviceVersions(self.session, device_category)
 
     def activate_software(
         self, devices: List[Device], version_to_activate: Optional[str] = "", software_image: Optional[str] = ""
@@ -113,8 +113,7 @@ class SoftwareActionAPI:
         payload = {
             "action": "changepartition",
             "devices": [
-                asdict(device)  # type: ignore
-                for device in self.device_versions.get_device_available(version, devices)
+                asdict(device) for device in self.device_versions.get_device_available(version, devices)  # type: ignore
             ],
             "deviceType": "vmanage",
         }
@@ -173,16 +172,7 @@ class SoftwareActionAPI:
             "deviceType": install_spec.device_type.value,
         }
         if install_spec.family.value in (DeviceClass.VMANAGE.value, DeviceClass.CEDGE.value):
-            incorrect_devices = self._downgrade_check(
-                payload["devices"],
-                payload["input"]["version"],
-                install_spec.family.value,
-            )
-            if incorrect_devices:
-                raise ValueError(
-                    f"Current version of devices with id's {incorrect_devices} is \
-                    higher than upgrade version. Action denied!"
-                )
+            self._downgrade_check(payload["devices"], payload["input"]["version"], install_spec.family.value)
         upgrade = dict(self.session.post(url, json=payload).json())
         return upgrade["id"]
 
@@ -215,7 +205,7 @@ class SoftwareActionAPI:
         upload = self.session.post(url, data=monitor, headers={"content-type": monitor.content_type})
         return upload.status_code
 
-    def _downgrade_check(self, payload_devices: List[dict], version_to_upgrade: str, family: str) -> List[str]:
+    def _downgrade_check(self, payload_devices: List[dict], version_to_upgrade: str, family: str) -> None:
         """
         Check if upgrade operation is not actually a downgrade opeartion.
         If so, in some cases action is being blocked.
@@ -246,4 +236,8 @@ class SoftwareActionAPI:
                     break
                 elif label < version:  # type: ignore
                     break
-        return incorrect_devices
+        if incorrect_devices:
+            raise ValueError(
+                f"Current version of devices with id's {incorrect_devices} is \
+                higher than upgrade version. Action denied!"
+            )
