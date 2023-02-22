@@ -30,7 +30,15 @@ class DeviceSoftwareRepository(DataclassBase):
 class DeviceVersionPayload(DataclassBase):
     deviceId: str
     deviceIP: str
-    version: Optional[Union[str,List[str]]] = ""
+    version: Optional[Union[str, List[str]]] = ""
+
+
+@define(frozen=False)
+class RemovePartitionPayload(DataclassBase):
+    deviceId: str
+    deviceIP: str
+    version: Union[str, List[str]] = field(converter=(lambda x: [x] if isinstance(x, str) else x))
+
 
 class RepositoryAPI:
     """
@@ -101,8 +109,8 @@ class DeviceVersions:
     Methods to prepare devices list for payload
     """
 
-    def __init__(self, repository: RepositoryAPI, device_category: DeviceCategory):
-        self.repository = repository
+    def __init__(self, session: vManageSession, device_category: DeviceCategory):
+        self.repository = RepositoryAPI(session)
         self.device_category = device_category
 
     def _get_device_list_in(
