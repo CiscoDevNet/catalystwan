@@ -168,7 +168,8 @@ class SoftwareActionAPI:
                 "reboot": reboot,
                 "sync": sync,
             },
-            "devices": [asdict(device) for device in self.device_versions.get_device_list(devices)],  # type: ignore
+            "devices": [{"deviceId":device.deviceId, "deviceIP": device.deviceIP}
+                         for device in self.device_versions.get_device_list(devices)],  # type: ignore
             "deviceType": install_spec.device_type.value,
         }
         if install_spec.family.value in (DeviceClass.VMANAGE.value, DeviceClass.CEDGE.value):
