@@ -110,7 +110,7 @@ Please contact authors direcly or via Issues Github page.
     ```
     pre-commit install
     ```
-### **Environmet Variables**
+### **Environment Variables**
 - **`VMNGCLIENT_DEVEL`** when set: loggers will be configured according to `./logging.conf` and `urllib3.exceptions.InsecureRequestWarning` will be suppressed
 
 ## **Add new feature**
