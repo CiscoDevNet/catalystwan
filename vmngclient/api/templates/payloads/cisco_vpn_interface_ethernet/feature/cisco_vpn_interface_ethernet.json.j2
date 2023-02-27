@@ -74,8 +74,13 @@
     },
     "mtu": {
       "vipObjectType": "object",
-      "vipType": "ignore",
-      "vipValue": 1500,
+      {% if mtu is not none %}
+          "vipType": "constant",
+          "vipValue": {{ mtu }},
+      {% else %}
+          "vipType": "ignore",
+          "vipValue": 1500,
+      {% endif %}  
       "vipVariableName": "vpn_if_ip_mtu"
     },
     "static-ingress-qos": {
@@ -112,7 +117,13 @@
     },
     "autonegotiate": {
       "vipObjectType": "object",
-      "vipType": "ignore",
+      {% if autonegotiate is not none %}
+        "vipType": "constant",
+        "vipValue": "{{ autonegotiate | tojson}}",
+      {% else %}
+        "vipType": "ignore",
+        "vipValue": "true",
+      {% endif %}
       "vipVariableName": "vpn_if_autonegotiate"
     },
     "shaping-rate": {
