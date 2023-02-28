@@ -12,6 +12,7 @@ from requests.auth import AuthBase
 from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
+from vmngclient.api.api_containter import APIContainter
 from vmngclient.exceptions import InvalidOperationError
 from vmngclient.utils.response import response_history_debug
 from vmngclient.vmanage_auth import vManageAuth
@@ -151,6 +152,8 @@ class vManageSession(Session):
         ] = response_history_debug
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
+
+        self.api = APIContainter(session=self)
 
     def request(self, method, url, *args, **kwargs) -> Any:
         full_url = self.get_full_url(url)
