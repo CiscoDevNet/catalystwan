@@ -1432,8 +1432,296 @@
 </dd></dl>
 
 </section>
-<section id="session-module">
-<h2>session module<a class="headerlink" href="#session-module" title="Permalink to this heading">¶</a></h2>
+<section id="module-vmngclient.session">
+<span id="session-module"></span><h2>session module<a class="headerlink" href="#module-vmngclient.session" title="Permalink to this heading">¶</a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="vmngclient.session.SessionNotCreatedError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.session.</span></span><span class="sig-name descname"><span class="pre">SessionNotCreatedError</span></span><a class="headerlink" href="#vmngclient.session.SessionNotCreatedError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.session.SessionType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.session.</span></span><span class="sig-name descname"><span class="pre">SessionType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.session.SessionType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.session.SessionType.NOT_DEFINED">
+<span class="sig-name descname"><span class="pre">NOT_DEFINED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#vmngclient.session.SessionType.NOT_DEFINED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.session.SessionType.PROVIDER">
+<span class="sig-name descname"><span class="pre">PROVIDER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#vmngclient.session.SessionType.PROVIDER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.session.SessionType.PROVIDER_AS_TENANT">
+<span class="sig-name descname"><span class="pre">PROVIDER_AS_TENANT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#vmngclient.session.SessionType.PROVIDER_AS_TENANT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.session.SessionType.TENANT">
+<span class="sig-name descname"><span class="pre">TENANT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#vmngclient.session.SessionType.TENANT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.session.UserMode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.session.</span></span><span class="sig-name descname"><span class="pre">UserMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.session.UserMode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.session.UserMode.NOT_FOUND">
+<span class="sig-name descname"><span class="pre">NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'not</span> <span class="pre">found'</span></em><a class="headerlink" href="#vmngclient.session.UserMode.NOT_FOUND" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.session.UserMode.NOT_RECOGNIZED">
+<span class="sig-name descname"><span class="pre">NOT_RECOGNIZED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'not</span> <span class="pre">recognized'</span></em><a class="headerlink" href="#vmngclient.session.UserMode.NOT_RECOGNIZED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.session.UserMode.PROVIDER">
+<span class="sig-name descname"><span class="pre">PROVIDER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'provider'</span></em><a class="headerlink" href="#vmngclient.session.UserMode.PROVIDER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.session.UserMode.TENANT">
+<span class="sig-name descname"><span class="pre">TENANT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'tenant'</span></em><a class="headerlink" href="#vmngclient.session.UserMode.TENANT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.session.ViewMode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.session.</span></span><span class="sig-name descname"><span class="pre">ViewMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.session.ViewMode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.session.ViewMode.NOT_FOUND">
+<span class="sig-name descname"><span class="pre">NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'not</span> <span class="pre">found'</span></em><a class="headerlink" href="#vmngclient.session.ViewMode.NOT_FOUND" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.session.ViewMode.NOT_RECOGNIZED">
+<span class="sig-name descname"><span class="pre">NOT_RECOGNIZED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'not</span> <span class="pre">recognized'</span></em><a class="headerlink" href="#vmngclient.session.ViewMode.NOT_RECOGNIZED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.session.ViewMode.PROVIDER">
+<span class="sig-name descname"><span class="pre">PROVIDER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'provider'</span></em><a class="headerlink" href="#vmngclient.session.ViewMode.PROVIDER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.session.ViewMode.TENANT">
+<span class="sig-name descname"><span class="pre">TENANT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'tenant'</span></em><a class="headerlink" href="#vmngclient.session.ViewMode.TENANT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="vmngclient.session.create_vManageSession">
+<span class="sig-prename descclassname"><span class="pre">vmngclient.session.</span></span><span class="sig-name descname"><span class="pre">create_vManageSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subdomain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></span><a class="headerlink" href="#vmngclient.session.create_vManageSession" title="Permalink to this definition">¶</a></dt>
+<dd><p>Factory function that creates session object based on provided arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>str</em>) – IP address or domain name</p></li>
+<li><p><strong>port</strong> (<em>int</em>) – port</p></li>
+<li><p><strong>username</strong> (<em>str</em>) – username</p></li>
+<li><p><strong>password</strong> (<em>str</em>) – password</p></li>
+<li><p><strong>subdomain</strong> – subdomain specifying to which view switch when creating provider as a tenant session,
+works only on provider user mode</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Session object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.session.vManageSession">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.session.</span></span><span class="sig-name descname"><span class="pre">vManageSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subdomain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">AuthBase</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.session.vManageSession" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></p>
+<p>Base class for API sessions for vManage client.</p>
+<p>Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> – IP address or domain name, i.e. ‘10.0.1.200’ or ‘example.com’</p></li>
+<li><p><strong>port</strong> – port</p></li>
+<li><p><strong>username</strong> – username</p></li>
+<li><p><strong>password</strong> – password</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.session.vManageSession.about">
+<span class="sig-name descname"><span class="pre">about</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="headerlink" href="#vmngclient.session.vManageSession.about" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.session.vManageSession.check_vmanage_server_connection">
+<span class="sig-name descname"><span class="pre">check_vmanage_server_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.session.vManageSession.check_vmanage_server_connection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.session.vManageSession.get_data">
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#vmngclient.session.vManageSession.get_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.session.vManageSession.get_file">
+<span class="sig-name descname"><span class="pre">get_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Response</span></span></span><a class="headerlink" href="#vmngclient.session.vManageSession.get_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a file using session get.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> – dataservice api.</p></li>
+<li><p><strong>filename</strong> – Filename to write download file to.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>http response.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Example usage:</dt><dd><p>response = self.session.get_file(url, filename)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.session.vManageSession.get_full_url">
+<span class="sig-name descname"><span class="pre">get_full_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#vmngclient.session.vManageSession.get_full_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns base API url plus given url path.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.session.vManageSession.get_json">
+<span class="sig-name descname"><span class="pre">get_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#vmngclient.session.vManageSession.get_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.session.vManageSession.get_tenant_id">
+<span class="sig-name descname"><span class="pre">get_tenant_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#vmngclient.session.vManageSession.get_tenant_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets tenant UUID for its subdomain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tenant UUID.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.session.vManageSession.get_virtual_session_id">
+<span class="sig-name descname"><span class="pre">get_virtual_session_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tenant_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#vmngclient.session.vManageSession.get_virtual_session_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get VSessionId for a specific tenant</p>
+<p>Note: In a multitenant vManage system, this API is only available in the Provider view.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tenant_id</strong> – provider or tenant UUID</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Virtual session token</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.session.vManageSession.on_session_create_hook">
+<span class="sig-name descname"><span class="pre">on_session_create_hook</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.session.vManageSession.on_session_create_hook" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.session.vManageSession.request">
+<span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#vmngclient.session.vManageSession.request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs a <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>, prepares it and sends it.
+Returns <code class="xref py py-class docutils literal notranslate"><span class="pre">Response</span></code> object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> – method for the new <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code> object.</p></li>
+<li><p><strong>url</strong> – URL for the new <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code> object.</p></li>
+<li><p><strong>params</strong> – (optional) Dictionary or bytes to be sent in the query
+string for the <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>.</p></li>
+<li><p><strong>data</strong> – (optional) Dictionary, list of tuples, bytes, or file-like
+object to send in the body of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>.</p></li>
+<li><p><strong>json</strong> – (optional) json to send in the body of the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>.</p></li>
+<li><p><strong>headers</strong> – (optional) Dictionary of HTTP Headers to send with the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>.</p></li>
+<li><p><strong>cookies</strong> – (optional) Dict or CookieJar object to send with the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>.</p></li>
+<li><p><strong>files</strong> – (optional) Dictionary of <code class="docutils literal notranslate"><span class="pre">'filename':</span> <span class="pre">file-like-objects</span></code>
+for multipart encoding upload.</p></li>
+<li><p><strong>auth</strong> – (optional) Auth tuple or callable to enable
+Basic/Digest/Custom HTTP Auth.</p></li>
+<li><p><strong>timeout</strong> (<em>float</em><em> or </em><em>tuple</em>) – (optional) How long to wait for the server to send
+data before giving up, as a float, or a <span class="xref std std-ref">(connect timeout,
+read timeout)</span> tuple.</p></li>
+<li><p><strong>allow_redirects</strong> (<em>bool</em>) – (optional) Set to True by default.</p></li>
+<li><p><strong>proxies</strong> – (optional) Dictionary mapping protocol or protocol and
+hostname to the URL of the proxy.</p></li>
+<li><p><strong>stream</strong> – (optional) whether to immediately download the response
+content. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>verify</strong> – (optional) Either a boolean, in which case it controls whether we verify
+the server’s TLS certificate, or a string, in which case it must be a path
+to a CA bundle to use. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>. When set to
+<code class="docutils literal notranslate"><span class="pre">False</span></code>, requests will accept any TLS certificate presented by
+the server, and will ignore hostname mismatches and/or expired
+certificates, which will make your application vulnerable to
+man-in-the-middle (MitM) attacks. Setting verify to <code class="docutils literal notranslate"><span class="pre">False</span></code>
+may be useful during local development or testing.</p></li>
+<li><p><strong>cert</strong> – (optional) if String, path to ssl client cert file (.pem).
+If Tuple, (‘cert’, ‘key’) pair.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>requests.Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.session.vManageSession.server">
+<span class="sig-name descname"><span class="pre">server</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="headerlink" href="#vmngclient.session.vManageSession.server" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="vmngclient.session.vManageSession.session_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">session_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#vmngclient.session.SessionType" title="vmngclient.session.SessionType"><span class="pre">SessionType</span></a></em><a class="headerlink" href="#vmngclient.session.vManageSession.session_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.session.vManageSession.wait_for_server_reachability">
+<span class="sig-name descname"><span class="pre">wait_for_server_reachability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">retries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.session.vManageSession.wait_for_server_reachability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if vManage API is reachable by sending server request.</p>
+<p>Retries on HTTPError for specified number of times.
+Delays between each request are configurable,
+It is intended to be used as a probe, so it doesn’t raise original error from exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>retries</strong> – total number of retires</p></li>
+<li><p><strong>delay</strong> – time to wait between each retry</p></li>
+<li><p><strong>initial_delay</strong> – time before sending first request</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if device is reachable, False if not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-vmngclient">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-vmngclient" title="Permalink to this heading">¶</a></h2>
@@ -1495,7 +1783,15 @@
 <li><a class="reference internal" href="#vmngclient.dataclasses.WanInterface"><code class="docutils literal notranslate"><span class="pre">WanInterface</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#session-module">session module</a></li>
+<li><a class="reference internal" href="#module-vmngclient.session">session module</a><ul>
+<li><a class="reference internal" href="#vmngclient.session.SessionNotCreatedError"><code class="docutils literal notranslate"><span class="pre">SessionNotCreatedError</span></code></a></li>
+<li><a class="reference internal" href="#vmngclient.session.SessionType"><code class="docutils literal notranslate"><span class="pre">SessionType</span></code></a></li>
+<li><a class="reference internal" href="#vmngclient.session.UserMode"><code class="docutils literal notranslate"><span class="pre">UserMode</span></code></a></li>
+<li><a class="reference internal" href="#vmngclient.session.ViewMode"><code class="docutils literal notranslate"><span class="pre">ViewMode</span></code></a></li>
+<li><a class="reference internal" href="#vmngclient.session.create_vManageSession"><code class="docutils literal notranslate"><span class="pre">create_vManageSession()</span></code></a></li>
+<li><a class="reference internal" href="#vmngclient.session.vManageSession"><code class="docutils literal notranslate"><span class="pre">vManageSession</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-vmngclient">Module contents</a></li>
 </ul>
 </li>

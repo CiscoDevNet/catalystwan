@@ -53,32 +53,872 @@
 <h1>vmngclient.api package<a class="headerlink" href="#vmngclient-api-package" title="Permalink to this heading">¶</a></h1>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
-<section id="admin-tech-api-module">
-<h3>admin_tech_api module<a class="headerlink" href="#admin-tech-api-module" title="Permalink to this heading">¶</a></h3>
+<section id="module-vmngclient.api.admin_tech_api">
+<span id="admin-tech-api-module"></span><h3>admin_tech_api module<a class="headerlink" href="#module-vmngclient.api.admin_tech_api" title="Permalink to this heading">¶</a></h3>
+<p>Module for handling admintech logs for a device</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.admin_tech_api.AdminTechAPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.admin_tech_api.</span></span><span class="sig-name descname"><span class="pre">AdminTechAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.admin_tech_api.AdminTechAPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for handling admintech logs for a device.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.admin_tech_api.AdminTechAPI.session">
+<span class="sig-name descname"><span class="pre">session</span></span><a class="headerlink" href="#vmngclient.api.admin_tech_api.AdminTechAPI.session" title="Permalink to this definition">¶</a></dt>
+<dd><p>logged in API client session</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.admin_tech_api.AdminTechAPI.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Response</span></span></span><a class="headerlink" href="#vmngclient.api.admin_tech_api.AdminTechAPI.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes admin tech logs for a device.
+:param filename: name of admin_tech file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>http response for delete operation</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.admin_tech_api.AdminTechAPI.download">
+<span class="sig-name descname"><span class="pre">download</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="headerlink" href="#vmngclient.api.admin_tech_api.AdminTechAPI.download" title="Permalink to this definition">¶</a></dt>
+<dd><p>Downloads admintech log for a device.
+:param filename: name of admin_tech file
+:param download_dir: download directory (defaults to current working directory)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>path to downloaded admin_tech file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.admin_tech_api.AdminTechAPI.generate">
+<span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_cores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_tech</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_logs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request_timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polling_timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polling_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#vmngclient.api.admin_tech_api.AdminTechAPI.generate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates admintech log for a device.
+:param device_id: device ID (usually system-ip)
+:param exclude_cores: exclude core in generated admintech log file
+:param exclude_tech: exclude tech in generated admintech log file
+:param exclude_logs: exclude logs in generated admintech log file
+:param request_timeout: wait time in seconds to generate admintech after request
+:param polling_timeout: retry period in seconds for successfull request
+:param polling_interval: polling interval in seconds between request attempts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>filename of generated admintech log</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.admin_tech_api.AdminTechAPI.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.DeviceAdminTech" title="vmngclient.dataclasses.DeviceAdminTech"><span class="pre">DeviceAdminTech</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.admin_tech_api.AdminTechAPI.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets admintech log information for a device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>device_id</strong> – device ID (usually system-ip)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>AdminTech object list for given device</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.admin_tech_api.AdminTechAPI.get_all">
+<span class="sig-name descname"><span class="pre">get_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AdminTech" title="vmngclient.dataclasses.AdminTech"><span class="pre">AdminTech</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.admin_tech_api.AdminTechAPI.get_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets admintech log information for all devices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AdminTech objects list for all devices</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="vmngclient.api.admin_tech_api.DownloadAdminTechLogError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.admin_tech_api.</span></span><span class="sig-name descname"><span class="pre">DownloadAdminTechLogError</span></span><a class="headerlink" href="#vmngclient.api.admin_tech_api.DownloadAdminTechLogError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="vmngclient.api.admin_tech_api.GenerateAdminTechLogError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.admin_tech_api.</span></span><span class="sig-name descname"><span class="pre">GenerateAdminTechLogError</span></span><a class="headerlink" href="#vmngclient.api.admin_tech_api.GenerateAdminTechLogError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="vmngclient.api.admin_tech_api.RequestTokenIdNotFound">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.admin_tech_api.</span></span><span class="sig-name descname"><span class="pre">RequestTokenIdNotFound</span></span><a class="headerlink" href="#vmngclient.api.admin_tech_api.RequestTokenIdNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
 </section>
-<section id="administration-module">
-<h3>administration module<a class="headerlink" href="#administration-module" title="Permalink to this heading">¶</a></h3>
+<section id="module-vmngclient.api.administration">
+<span id="administration-module"></span><h3>administration module<a class="headerlink" href="#module-vmngclient.api.administration" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.administration.AdministrationSettingsAPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.administration.</span></span><span class="sig-name descname"><span class="pre">AdministrationSettingsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.AdministrationSettingsAPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.AdministrationSettingsAPI.disable_sdavc_cloud_connector">
+<span class="sig-name descname"><span class="pre">disable_sdavc_cloud_connector</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.administration.AdministrationSettingsAPI.disable_sdavc_cloud_connector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disables SD-AVC Cloud Connector on vManage.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.AdministrationSettingsAPI.enable_cloud_on_ramp_for_saas_mode">
+<span class="sig-name descname"><span class="pre">enable_cloud_on_ramp_for_saas_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">disable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.AdministrationSettingsAPI.enable_cloud_on_ramp_for_saas_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable or disable COR for SaaS</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.AdministrationSettingsAPI.enable_sdavc_cloud_connector">
+<span class="sig-name descname"><span class="pre">enable_sdavc_cloud_connector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cloud_connector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.CloudConnectorData" title="vmngclient.dataclasses.CloudConnectorData"><span class="pre">CloudConnectorData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.administration.AdministrationSettingsAPI.enable_sdavc_cloud_connector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables SD-AVC Cloud Connector on vManage.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.AdministrationSettingsAPI.get_cloud_on_ramp_for_saas_mode">
+<span class="sig-name descname"><span class="pre">get_cloud_on_ramp_for_saas_mode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.AdministrationSettingsAPI.get_cloud_on_ramp_for_saas_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get information about Cloud on Ramp for Saas mode</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.AdministrationSettingsAPI.get_cloud_services">
+<span class="sig-name descname"><span class="pre">get_cloud_services</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.CloudServicesSettings" title="vmngclient.dataclasses.CloudServicesSettings"><span class="pre">CloudServicesSettings</span></a></span></span><a class="headerlink" href="#vmngclient.api.administration.AdministrationSettingsAPI.get_cloud_services" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.AdministrationSettingsAPI.get_organization">
+<span class="sig-name descname"><span class="pre">get_organization</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Organization" title="vmngclient.dataclasses.Organization"><span class="pre">Organization</span></a></span></span><a class="headerlink" href="#vmngclient.api.administration.AdministrationSettingsAPI.get_organization" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.AdministrationSettingsAPI.get_sdavc_cloud_connector_config">
+<span class="sig-name descname"><span class="pre">get_sdavc_cloud_connector_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.CloudConnectorData" title="vmngclient.dataclasses.CloudConnectorData"><span class="pre">CloudConnectorData</span></a></span></span><a class="headerlink" href="#vmngclient.api.administration.AdministrationSettingsAPI.get_sdavc_cloud_connector_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets SD-AVC Cloud Connector Config.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>CloudConnector dataclass config</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.AdministrationSettingsAPI.set_cloud_services">
+<span class="sig-name descname"><span class="pre">set_cloud_services</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.CloudServicesSettings" title="vmngclient.dataclasses.CloudServicesSettings"><span class="pre">CloudServicesSettings</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.administration.AdministrationSettingsAPI.set_cloud_services" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.AdministrationSettingsAPI.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Password" title="vmngclient.dataclasses.Password"><span class="pre">Password</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.administration.AdministrationSettingsAPI.update" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Certificate" title="vmngclient.dataclasses.Certificate"><span class="pre">Certificate</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Vbond" title="vmngclient.dataclasses.Vbond"><span class="pre">Vbond</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Organization" title="vmngclient.dataclasses.Organization"><span class="pre">Organization</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.administration.ClusterManagementAPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.administration.</span></span><span class="sig-name descname"><span class="pre">ClusterManagementAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.ClusterManagementAPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Covers clusterManagement API calls.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.administration.ClusterManagementAPI.session">
+<span class="sig-name descname"><span class="pre">session</span></span><a class="headerlink" href="#vmngclient.api.administration.ClusterManagementAPI.session" title="Permalink to this definition">¶</a></dt>
+<dd><p>logged in API admin session</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.ClusterManagementAPI.get_cluster_management_health_status">
+<span class="sig-name descname"><span class="pre">get_cluster_management_health_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.administration.ClusterManagementAPI.get_cluster_management_health_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets Cluster Management Service Reachability health status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>TODO return health status dataclass</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.ClusterManagementAPI.modify_cluster_setup">
+<span class="sig-name descname"><span class="pre">modify_cluster_setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.ServiceConfigurationData" title="vmngclient.dataclasses.ServiceConfigurationData"><span class="pre">ServiceConfigurationData</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.administration.ClusterManagementAPI.modify_cluster_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates vManage cluster configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>service_configuration</strong> – vManage cluster config</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UserAlreadyExistsError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.administration.</span></span><span class="sig-name descname"><span class="pre">UserAlreadyExistsError</span></span><a class="headerlink" href="#vmngclient.api.administration.UserAlreadyExistsError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UserDoesNotExists">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.administration.</span></span><span class="sig-name descname"><span class="pre">UserDoesNotExists</span></span><a class="headerlink" href="#vmngclient.api.administration.UserDoesNotExists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.administration.</span></span><span class="sig-name descname"><span class="pre">UsersAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.create_user">
+<span class="sig-name descname"><span class="pre">create_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.User" title="vmngclient.dataclasses.User"><span class="pre">User</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.create_user" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.delete_user">
+<span class="sig-name descname"><span class="pre">delete_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.delete_user" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.exists">
+<span class="sig-name descname"><span class="pre">exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.exists" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.get_all_users">
+<span class="sig-name descname"><span class="pre">get_all_users</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.User" title="vmngclient.dataclasses.User"><span class="pre">User</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.get_all_users" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="alarms-api-module">
-<h3>alarms_api module<a class="headerlink" href="#alarms-api-module" title="Permalink to this heading">¶</a></h3>
+<section id="module-vmngclient.api.alarms_api">
+<span id="alarms-api-module"></span><h3>alarms_api module<a class="headerlink" href="#module-vmngclient.api.alarms_api" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmLevel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.alarms_api.</span></span><span class="sig-name descname"><span class="pre">AlarmLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmLevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmLevel.critical">
+<span class="sig-name descname"><span class="pre">critical</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Critical'</span></em><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmLevel.critical" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmLevel.major">
+<span class="sig-name descname"><span class="pre">major</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Major'</span></em><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmLevel.major" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmLevel.medium">
+<span class="sig-name descname"><span class="pre">medium</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Medium'</span></em><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmLevel.medium" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmLevel.minor">
+<span class="sig-name descname"><span class="pre">minor</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Minor'</span></em><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmLevel.minor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmVerification">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.alarms_api.</span></span><span class="sig-name descname"><span class="pre">AlarmVerification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alarms_getter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmVerification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The Alarms verification class</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmVerification.alarms_getter">
+<span class="sig-name descname"><span class="pre">alarms_getter</span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmVerification.alarms_getter" title="Permalink to this definition">¶</a></dt>
+<dd><p>The function that returns a set of current alarms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmVerification.logger">
+<span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmVerification.logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logger.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Logger</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmVerification.verify">
+<span class="sig-name descname"><span class="pre">verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleep_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmVerification.verify" title="Permalink to this definition">¶</a></dt>
+<dd><p>The verifying if the expected alarms is included in the actual alarms set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>expected</strong> (<em>Set</em><em>[</em><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><em>AlarmData</em></a><em>]</em>) – The set expected alarms.</p></li>
+<li><p><strong>timeout_seconds</strong> (<em>int</em>) – Failure timeout.</p></li>
+<li><p><strong>sleep_seconds</strong> (<em>int</em>) – Sleep time.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.alarms_api.</span></span><span class="sig-name descname"><span class="pre">AlarmsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.URL">
+<span class="sig-name descname"><span class="pre">URL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/dataservice/alarms'</span></em><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.URL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.check_alarms">
+<span class="sig-name descname"><span class="pre">check_alarms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">240</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleep_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.check_alarms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if alarms have occurred.</p>
+<p>For a specified period of time, the method queries the API about unread alarms and
+checks if they occur in the expected ones. If all alarms occur before the time expires,
+it will not poll any further.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>expected</strong> (<em>list</em>) – The list of expected alarms.</p></li>
+<li><p><strong>timeout_seconds</strong> (<em>int</em>) – Failure timeout.</p></li>
+<li><p><strong>sleep_seconds</strong> (<em>int</em>) – Sleep time.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The dictionary with alarms that occurred (key ‘found’) and did not (key ‘no-found’)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.get_alarms">
+<span class="sig-name descname"><span class="pre">get_alarms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.get_alarms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.get_critical_alarms">
+<span class="sig-name descname"><span class="pre">get_critical_alarms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.get_critical_alarms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.get_major_alarms">
+<span class="sig-name descname"><span class="pre">get_major_alarms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.get_major_alarms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.get_medium_alarms">
+<span class="sig-name descname"><span class="pre">get_medium_alarms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.get_medium_alarms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.get_minor_alarms">
+<span class="sig-name descname"><span class="pre">get_minor_alarms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.get_minor_alarms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.get_not_viewed_alarms">
+<span class="sig-name descname"><span class="pre">get_not_viewed_alarms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.get_not_viewed_alarms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.mark_all_as_viewed">
+<span class="sig-name descname"><span class="pre">mark_all_as_viewed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.mark_all_as_viewed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marks all alarms as viewed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if all alarms are viewed</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.Viewed">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.alarms_api.</span></span><span class="sig-name descname"><span class="pre">Viewed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.alarms_api.Viewed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.Viewed.no">
+<span class="sig-name descname"><span class="pre">no</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'false'</span></em><a class="headerlink" href="#vmngclient.api.alarms_api.Viewed.no" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.Viewed.yes">
+<span class="sig-name descname"><span class="pre">yes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'true'</span></em><a class="headerlink" href="#vmngclient.api.alarms_api.Viewed.yes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="basic-api-module">
-<h3>basic_api module<a class="headerlink" href="#basic-api-module" title="Permalink to this heading">¶</a></h3>
+<section id="module-vmngclient.api.basic_api">
+<span id="basic-api-module"></span><h3>basic_api module<a class="headerlink" href="#module-vmngclient.api.basic_api" title="Permalink to this heading">¶</a></h3>
+<p>Methods covering essential API endpoints and related data classes.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.basic_api.</span></span><span class="sig-name descname"><span class="pre">Device</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">personality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hostname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reachability</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_system_ip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memUsage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mem_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpu_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpu_load</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connected_vManages</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">NOTHING</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_serial</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vedgeCertificateState</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chasis_number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.basic_api.Device" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.DataclassBase" title="vmngclient.dataclasses.DataclassBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataclassBase</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.board_serial">
+<span class="sig-name descname"><span class="pre">board_serial</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.board_serial" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.chasis_number">
+<span class="sig-name descname"><span class="pre">chasis_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.chasis_number" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.connected_vManages">
+<span class="sig-name descname"><span class="pre">connected_vManages</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.connected_vManages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.cpu_load">
+<span class="sig-name descname"><span class="pre">cpu_load</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.cpu_load" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.cpu_state">
+<span class="sig-name descname"><span class="pre">cpu_state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.cpu_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.hostname">
+<span class="sig-name descname"><span class="pre">hostname</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.hostname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.is_reachable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_reachable</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.is_reachable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.local_system_ip">
+<span class="sig-name descname"><span class="pre">local_system_ip</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.local_system_ip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.memUsage">
+<span class="sig-name descname"><span class="pre">memUsage</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.memUsage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.mem_state">
+<span class="sig-name descname"><span class="pre">mem_state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.mem_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.model">
+<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.personality">
+<span class="sig-name descname"><span class="pre">personality</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="vmngclient.utils.html#vmngclient.utils.personality.Personality" title="vmngclient.utils.personality.Personality"><span class="pre">Personality</span></a></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.personality" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.reachability">
+<span class="sig-name descname"><span class="pre">reachability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="vmngclient.utils.html#vmngclient.utils.reachability.Reachability" title="vmngclient.utils.reachability.Reachability"><span class="pre">Reachability</span></a></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.reachability" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.state_description">
+<span class="sig-name descname"><span class="pre">state_description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.state_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.uuid">
+<span class="sig-name descname"><span class="pre">uuid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.uuid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.basic_api.Device.vedgeCertificateState">
+<span class="sig-name descname"><span class="pre">vedgeCertificateState</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.api.basic_api.Device.vedgeCertificateState" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="device-action-api-module">
-<h3>device_action_api module<a class="headerlink" href="#device-action-api-module" title="Permalink to this heading">¶</a></h3>
+<section id="module-vmngclient.api.device_action_api">
+<span id="device-action-api-module"></span><h3>device_action_api module<a class="headerlink" href="#module-vmngclient.api.device_action_api" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.device_action_api.DecommissionAction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.device_action_api.</span></span><span class="sig-name descname"><span class="pre">DecommissionAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.device_action_api.DecommissionAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vmngclient.api.device_action_api.DeviceActionAPI" title="vmngclient.api.device_action_api.DeviceActionAPI"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceActionAPI</span></code></a></p>
+<p>API method to decommission Device</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.device_action_api.DecommissionAction.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.device_action_api.DecommissionAction.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>validate device</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.device_action_api.DecommissionAction.wait_for_completed">
+<span class="sig-name descname"><span class="pre">wait_for_completed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sleep_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'tokengenerated'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_reachability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'unreachable'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.device_action_api.DecommissionAction.wait_for_completed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.device_action_api.DeviceActionAPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.device_action_api.</span></span><span class="sig-name descname"><span class="pre">DeviceActionAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.device_action_api.DeviceActionAPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>API method to execute action on Device.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.device_action_api.DeviceActionAPI.execute">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.device_action_api.DeviceActionAPI.execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.device_action_api.DeviceActionAPI.wait_for_completed">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">wait_for_completed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sleep_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_reachability</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.device_action_api.DeviceActionAPI.wait_for_completed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.device_action_api.RebootAction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.device_action_api.</span></span><span class="sig-name descname"><span class="pre">RebootAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.device_action_api.RebootAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vmngclient.api.device_action_api.DeviceActionAPI" title="vmngclient.api.device_action_api.DeviceActionAPI"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceActionAPI</span></code></a></p>
+<p>API method to perform reboot on Device.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.device_action_api.RebootAction.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.device_action_api.RebootAction.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reboots the device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>reboot process id</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception when reboot was not successful.</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.device_action_api.RebootAction.wait_for_completed">
+<span class="sig-name descname"><span class="pre">wait_for_completed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sleep_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1800</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Success'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_reachability</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'reachable'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.device_action_api.RebootAction.wait_for_completed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.device_action_api.ValidateAction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.device_action_api.</span></span><span class="sig-name descname"><span class="pre">ValidateAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.device_action_api.ValidateAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vmngclient.api.device_action_api.DeviceActionAPI" title="vmngclient.api.device_action_api.DeviceActionAPI"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceActionAPI</span></code></a></p>
+<p>API method to perform validate Device</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.device_action_api.ValidateAction.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">valid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.device_action_api.ValidateAction.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>validate device</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.device_action_api.ValidateAction.wait_for_completed">
+<span class="sig-name descname"><span class="pre">wait_for_completed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sleep_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">180</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'valid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_reachability</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'reachable'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.device_action_api.ValidateAction.wait_for_completed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="logs-api-module">
-<h3>logs_api module<a class="headerlink" href="#logs-api-module" title="Permalink to this heading">¶</a></h3>
+<section id="module-vmngclient.api.logs_api">
+<span id="logs-api-module"></span><h3>logs_api module<a class="headerlink" href="#module-vmngclient.api.logs_api" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.logs_api.LogsAPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.logs_api.</span></span><span class="sig-name descname"><span class="pre">LogsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.logs_api.LogsAPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.logs_api.LogsAPI.get_auditlogs">
+<span class="sig-name descname"><span class="pre">get_auditlogs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#vmngclient.api.logs_api.LogsAPI.get_auditlogs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="omp-api-module">
-<h3>omp_api module<a class="headerlink" href="#omp-api-module" title="Permalink to this heading">¶</a></h3>
+<section id="module-vmngclient.api.omp_api">
+<span id="omp-api-module"></span><h3>omp_api module<a class="headerlink" href="#module-vmngclient.api.omp_api" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.omp_api.OmpAPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.omp_api.</span></span><span class="sig-name descname"><span class="pre">OmpAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.omp_api.OmpAPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>OMP API methods of vManage for get common omp data.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.omp_api.OmpAPI.session">
+<span class="sig-name descname"><span class="pre">session</span></span><a class="headerlink" href="#vmngclient.api.omp_api.OmpAPI.session" title="Permalink to this definition">¶</a></dt>
+<dd><p>logged in API client session</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession">vManageSession</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.omp_api.OmpAPI.get_advertised_routes">
+<span class="sig-name descname"><span class="pre">get_advertised_routes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.OmpAdvertisedRouteData" title="vmngclient.dataclasses.OmpAdvertisedRouteData"><span class="pre">OmpAdvertisedRouteData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.omp_api.OmpAPI.get_advertised_routes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets OMP advertised routes data for a device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>device_id</strong> (<em>str</em>) – device ID (usually system-ip)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>OmpAdvertisedRouteData objects</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.OmpAdvertisedRouteData" title="vmngclient.dataclasses.OmpAdvertisedRouteData">OmpAdvertisedRouteData</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.omp_api.OmpAPI.get_advertised_tlocs">
+<span class="sig-name descname"><span class="pre">get_advertised_tlocs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.OmpAdvertisedTlocData" title="vmngclient.dataclasses.OmpAdvertisedTlocData"><span class="pre">OmpAdvertisedTlocData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.omp_api.OmpAPI.get_advertised_tlocs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets OMP advertised TLOCs data for a device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>device_id</strong> (<em>str</em>) – device_id: device ID (usually system-ip)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>OmpAdvertisedTlocData objects</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.OmpAdvertisedTlocData" title="vmngclient.dataclasses.OmpAdvertisedTlocData">OmpAdvertisedTlocData</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.omp_api.OmpAPI.get_omp_peers">
+<span class="sig-name descname"><span class="pre">get_omp_peers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.OmpPeerData" title="vmngclient.dataclasses.OmpPeerData"><span class="pre">OmpPeerData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.omp_api.OmpAPI.get_omp_peers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets OMP peers for a device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>device_id</strong> (<em>str</em>) – device ID (usually system-ip)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>OmpPeerData object</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.OmpPeerData" title="vmngclient.dataclasses.OmpPeerData">OmpPeerData</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.omp_api.OmpAPI.get_omp_summary">
+<span class="sig-name descname"><span class="pre">get_omp_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.OmpSummaryData" title="vmngclient.dataclasses.OmpSummaryData"><span class="pre">OmpSummaryData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.omp_api.OmpAPI.get_omp_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets OMP summaries data for a device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>device_id</strong> (<em>str</em>) – device ID (usually system-ip)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>OmpSummaryData objects</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.OmpSummaryData" title="vmngclient.dataclasses.OmpSummaryData">OmpSummaryData</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.omp_api.OmpAPI.get_received_routes">
+<span class="sig-name descname"><span class="pre">get_received_routes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.OmpReceivedRouteData" title="vmngclient.dataclasses.OmpReceivedRouteData"><span class="pre">OmpReceivedRouteData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.omp_api.OmpAPI.get_received_routes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets OMP received routes data for a device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>device_id</strong> (<em>str</em>) – device ID (usually system-ip)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>OmpReceivedRouteData objects</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.OmpReceivedRouteData" title="vmngclient.dataclasses.OmpReceivedRouteData">OmpReceivedRouteData</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.omp_api.OmpAPI.get_received_tlocs">
+<span class="sig-name descname"><span class="pre">get_received_tlocs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.OmpReceivedTlocData" title="vmngclient.dataclasses.OmpReceivedTlocData"><span class="pre">OmpReceivedTlocData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.omp_api.OmpAPI.get_received_tlocs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets OMP received TLOCs for a device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>device_id</strong> (<em>str</em>) – device ID (usually system-ip)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>OmpReceivedTlocData objects</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.OmpReceivedTlocData" title="vmngclient.dataclasses.OmpReceivedTlocData">OmpReceivedTlocData</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.omp_api.OmpAPI.get_services">
+<span class="sig-name descname"><span class="pre">get_services</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.OmpServiceData" title="vmngclient.dataclasses.OmpServiceData"><span class="pre">OmpServiceData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.omp_api.OmpAPI.get_services" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets OMP services data for a device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>device_id</strong> (<em>str</em>) – device ID (usually system-ip)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>OmpServiceData objects</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.OmpServiceData" title="vmngclient.dataclasses.OmpServiceData">OmpServiceData</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="packet-capture-api-module">
-<h3>packet_capture_api module<a class="headerlink" href="#packet-capture-api-module" title="Permalink to this heading">¶</a></h3>
+<section id="module-vmngclient.api.packet_capture_api">
+<span id="packet-capture-api-module"></span><h3>packet_capture_api module<a class="headerlink" href="#module-vmngclient.api.packet_capture_api" title="Permalink to this heading">¶</a></h3>
+<p>Methods for setting up packet capture session,
+and download .pcap session file.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Returns:</dt><dd><p>status: Status</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.packet_capture_api.DownloadStatus">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.packet_capture_api.</span></span><span class="sig-name descname"><span class="pre">DownloadStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.packet_capture_api.DownloadStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.packet_capture_api.DownloadStatus.COMPLETED">
+<span class="sig-name descname"><span class="pre">COMPLETED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'COMPLETED'</span></em><a class="headerlink" href="#vmngclient.api.packet_capture_api.DownloadStatus.COMPLETED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.packet_capture_api.DownloadStatus.FILESIZE">
+<span class="sig-name descname"><span class="pre">FILESIZE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#vmngclient.api.packet_capture_api.DownloadStatus.FILESIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.packet_capture_api.DownloadStatus.IMPOSSIBLE">
+<span class="sig-name descname"><span class="pre">IMPOSSIBLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'IMPOSSIBLE'</span></em><a class="headerlink" href="#vmngclient.api.packet_capture_api.DownloadStatus.IMPOSSIBLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.packet_capture_api.PacketCaptureAPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.packet_capture_api.</span></span><span class="sig-name descname"><span class="pre">PacketCaptureAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vpn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ge0/1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.packet_capture_api.PacketCaptureAPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.packet_capture_api.PacketCaptureAPI.channel">
+<span class="sig-name descname"><span class="pre">channel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span></span></span><a class="headerlink" href="#vmngclient.api.packet_capture_api.PacketCaptureAPI.channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates packet capture session.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>device</strong> (<a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><em>Device</em></a>) – Device class object</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>PermissionError</strong> – if already another packet capture session is active</p>
+</dd>
+<dt class="field-odd">Yields<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Iterator</em> – packet_channel which contains session ID</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.packet_capture_api.PacketCaptureAPI.download_capture_session">
+<span class="sig-name descname"><span class="pre">download_capture_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.PacketSetup" title="vmngclient.dataclasses.PacketSetup"><span class="pre">PacketSetup</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.packet_capture_api.PacketCaptureAPI.download_capture_session" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.packet_capture_api.PacketCaptureAPI.get_interface_name">
+<span class="sig-name descname"><span class="pre">get_interface_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#vmngclient.api.packet_capture_api.PacketCaptureAPI.get_interface_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.packet_capture_api.PacketCaptureAPI.get_packets">
+<span class="sig-name descname"><span class="pre">get_packets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration_seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">120</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Status" title="vmngclient.dataclasses.Status"><span class="pre">Status</span></a></span></span><a class="headerlink" href="#vmngclient.api.packet_capture_api.PacketCaptureAPI.get_packets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initate packet capture process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>device</strong> (<a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><em>Device</em></a>) – Device class object</p></li>
+<li><p><strong>duration_seconds</strong> (<em>int</em><em>, </em><em>optional</em>) – Duration od packet capturing . Defaults to 20.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Status</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.packet_capture_api.PacketCaptureAPI.get_status">
+<span class="sig-name descname"><span class="pre">get_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet_channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.PacketSetup" title="vmngclient.dataclasses.PacketSetup"><span class="pre">PacketSetup</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Status" title="vmngclient.dataclasses.Status"><span class="pre">Status</span></a></span></span><a class="headerlink" href="#vmngclient.api.packet_capture_api.PacketCaptureAPI.get_status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.packet_capture_api.PacketCaptureAPI.start_stop">
+<span class="sig-name descname"><span class="pre">start_stop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span></span></span><a class="headerlink" href="#vmngclient.api.packet_capture_api.PacketCaptureAPI.start_stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start and stops packet capturing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Yields<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Iterator</em> – None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="speedtest-api-module">
-<h3>speedtest_api module<a class="headerlink" href="#speedtest-api-module" title="Permalink to this heading">¶</a></h3>
+<section id="module-vmngclient.api.speedtest_api">
+<span id="speedtest-api-module"></span><h3>speedtest_api module<a class="headerlink" href="#module-vmngclient.api.speedtest_api" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.speedtest_api.SpeedtestAPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.speedtest_api.</span></span><span class="sig-name descname"><span class="pre">SpeedtestAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.speedtest_api.SpeedtestAPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.speedtest_api.SpeedtestAPI.perform">
+<span class="sig-name descname"><span class="pre">perform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_duration_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#vmngclient.api.speedtest_api.SpeedtestAPI.perform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.speedtest_api.SpeedtestAPI.speedtest">
+<span class="sig-name descname"><span class="pre">speedtest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_duration_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Speedtest" title="vmngclient.dataclasses.Speedtest"><span class="pre">Speedtest</span></a></span></span><a class="headerlink" href="#vmngclient.api.speedtest_api.SpeedtestAPI.speedtest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-vmngclient.api">
 <span id="module-contents"></span><h3>Module contents<a class="headerlink" href="#module-vmngclient.api" title="Permalink to this heading">¶</a></h3>
@@ -98,15 +938,15 @@
     <ul>
 <li><a class="reference internal" href="#">vmngclient.api package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a><ul>
-<li><a class="reference internal" href="#admin-tech-api-module">admin_tech_api module</a></li>
-<li><a class="reference internal" href="#administration-module">administration module</a></li>
-<li><a class="reference internal" href="#alarms-api-module">alarms_api module</a></li>
-<li><a class="reference internal" href="#basic-api-module">basic_api module</a></li>
-<li><a class="reference internal" href="#device-action-api-module">device_action_api module</a></li>
-<li><a class="reference internal" href="#logs-api-module">logs_api module</a></li>
-<li><a class="reference internal" href="#omp-api-module">omp_api module</a></li>
-<li><a class="reference internal" href="#packet-capture-api-module">packet_capture_api module</a></li>
-<li><a class="reference internal" href="#speedtest-api-module">speedtest_api module</a></li>
+<li><a class="reference internal" href="#module-vmngclient.api.admin_tech_api">admin_tech_api module</a></li>
+<li><a class="reference internal" href="#module-vmngclient.api.administration">administration module</a></li>
+<li><a class="reference internal" href="#module-vmngclient.api.alarms_api">alarms_api module</a></li>
+<li><a class="reference internal" href="#module-vmngclient.api.basic_api">basic_api module</a></li>
+<li><a class="reference internal" href="#module-vmngclient.api.device_action_api">device_action_api module</a></li>
+<li><a class="reference internal" href="#module-vmngclient.api.logs_api">logs_api module</a></li>
+<li><a class="reference internal" href="#module-vmngclient.api.omp_api">omp_api module</a></li>
+<li><a class="reference internal" href="#module-vmngclient.api.packet_capture_api">packet_capture_api module</a></li>
+<li><a class="reference internal" href="#module-vmngclient.api.speedtest_api">speedtest_api module</a></li>
 <li><a class="reference internal" href="#module-vmngclient.api">Module contents</a></li>
 </ul>
 </li>
