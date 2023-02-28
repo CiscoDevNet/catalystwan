@@ -77,7 +77,8 @@ class CiscoAAAModel(FeatureTemplate):
     radius: List[RadiusGroup] = []
     domain_stripping: Optional[DomainStripping] = Field(alias="domain-stripping", default=None)
     port: int = 1700
-    tacacs: List[TacacsGroup]
+    tacacs: List[TacacsGroup] = []
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "tenant.json.j2"
     type: ClassVar[str] = "cedge_aaa"
+
