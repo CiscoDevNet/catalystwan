@@ -81,6 +81,8 @@ class CiscoVpnInterfaceEthernetModel(FeatureTemplate):
     type_address: TypeAddress = TypeAddress.STATIC
     ip: Optional[str]
     tunnel: Optional[Tunnel]
+    mtu: Optional[int]
+    autonegotiate: Optional[bool]
 
     class Config:
         arbitrary_types_allowed = True
