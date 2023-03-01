@@ -61,7 +61,7 @@ def create_vManageSession(
         password (str): password
         subdomain: subdomain specifying to which view switch when creating provider as a tenant session,
             works only on provider user mode
-        logger: logger to log API requests to
+        logger: logger for logging API requests
 
     Returns:
         Session object
