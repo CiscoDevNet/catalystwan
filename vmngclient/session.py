@@ -50,6 +50,7 @@ def create_vManageSession(
     password: str,
     port: Optional[int] = None,
     subdomain: Optional[str] = None,
+    logger: Optional[logging.Logger] = None
 ) -> vManageSession:
     """Factory function that creates session object based on provided arguments.
 
@@ -60,12 +61,15 @@ def create_vManageSession(
         password (str): password
         subdomain: subdomain specifying to which view switch when creating provider as a tenant session,
             works only on provider user mode
+        logger: logger to log API requests to
 
     Returns:
         Session object
 
     """
     session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
+    if logger:
+        session.logger = logger
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
 
     if subdomain:
