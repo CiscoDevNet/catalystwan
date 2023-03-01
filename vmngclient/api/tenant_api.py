@@ -36,7 +36,6 @@ class TenantsAPI:
 
     def get_tiers(self) -> DataSequence[TierInfo]:
         response = self.session.get(url="dataservice/device/tier")
-        print(response)
         tiers = response.dataseq(TierInfo)
 
         return tiers
