@@ -1,18 +1,20 @@
-from typing import Optional
+from __future__ import annotations
 
-from vmngclient.api.basic_api import Device
-from vmngclient.dataclasses import TenantInfo, TierInfo
-from vmngclient.session import vManageSession
+from typing import TYPE_CHECKING, Optional
+
+from vmngclient.dataclasses import Device, TenantInfo, TierInfo
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
+
 from vmngclient.typed_list import DataSequence
-from vmngclient.utils.creation_tools import create_dataclass
 
 
-# TODO tests
 class TenantsAPI:
     def __init__(self, session: vManageSession):
         self.session = session
 
-    def get_tenants(self, device_id: Optional[Device] = None) -> DataSequence:
+    def get_tenants(self, device_id: Optional[Device] = None) -> DataSequence[TenantInfo]:
         """Lists all the tenants on the vManage.
 
         In a multitenant vManage system, this API is only avaiable in the Provider view.
@@ -27,15 +29,14 @@ class TenantsAPI:
         if device_id:
             raise NotImplementedError()
 
-        response = self.session.get_data("/dataservice/tenant")
-        tenants = [create_dataclass(TenantInfo, tenant_info) for tenant_info in response]
+        response = self.session.get("/dataservice/tenant")
+        tenants = response.dataseq(TenantInfo)
 
-        return DataSequence(TenantInfo, tenants)
+        return tenants
 
-    def get_tiers(self) -> DataSequence:
-        """TODO"""
+    def get_tiers(self) -> DataSequence[TierInfo]:
+        response = self.session.get(url="dataservice/device/tier")
+        print(response)
+        tiers = response.dataseq(TierInfo)
 
-        response = self.session.get_data("dataservice/device/tier")
-        tiers = [create_dataclass(TierInfo, tier) for tier in response]
-
-        return DataSequence(TierInfo, tiers)
+        return tiers

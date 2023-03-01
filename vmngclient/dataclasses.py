@@ -317,7 +317,10 @@ class TLOC:
 
 @define(frozen=True)
 class TierInfo(DataclassBase):
-    """Endpoint: /dataservice/tier"""
+    """Endpoint: /dataservice/tier
+
+    Since vManage 20.12 version, object has been renamed to "Resource Profile".
+    """
 
     name: str = field(metadata={FIELD_NAME: "tierName"})
     vpn: int
