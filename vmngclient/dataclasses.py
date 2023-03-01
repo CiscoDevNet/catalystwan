@@ -329,6 +329,8 @@ class TierInfo(DataclassBase):
     ipv6_route_limit_threshold: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimitThreshold"})
     ipv6_route_limit: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimit"})
     tlocs: List[TLOC] = field(factory=list)
+    # New in 20.12 version
+    nat_session_limit: Optional[int] = field(default=None, metadata={FIELD_NAME: "natSessionLimit"})
 
 
 @define(frozen=True)
