@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Generic, Iterable, MutableSequence, TypeVar, overload
+from typing import Any, Generic, Iterable, MutableSequence, Type, TypeVar, overload
 
 from vmngclient.exceptions import InvalidOperationError
 from vmngclient.utils.creation_tools import AttrsInstance
@@ -121,7 +121,7 @@ class TypedList(MutableSequence[T], Generic[T]):
         self.data.reverse()
 
 
-class DataSequence(TypedList[AttrsInstance]):
+class DataSequence(TypedList[T], Generic[T]):
     """
     ## Example:
 
@@ -132,11 +132,11 @@ class DataSequence(TypedList[AttrsInstance]):
     """
 
     @overload
-    def __init__(self, _type: AttrsInstance) -> None:
+    def __init__(self, _type: Type[T]) -> None:
         ...
 
     @overload
-    def __init__(self, _type: AttrsInstance, _iterable: Iterable[AttrsInstance], /) -> None:
+    def __init__(self, _type: Type[T], _iterable: Iterable[T], /) -> None:
         ...
 
     def __init__(self, _type, _iterable=None, /):
