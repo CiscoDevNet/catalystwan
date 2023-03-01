@@ -14,7 +14,7 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fi
 
 from vmngclient.api.api_containter import APIContainter
 from vmngclient.exceptions import InvalidOperationError
-from vmngclient.utils.response import response_history_debug
+from vmngclient.response import response_history_debug, vManageResponse
 from vmngclient.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
@@ -113,7 +113,24 @@ def create_vManageSession(
     return session
 
 
-class vManageSession(Session):
+class vManageResponseAdapter(Session):
+    def request(self, method, url, *args, **kwargs) -> vManageResponse:
+        return vManageResponse(super().request(method, url, *args, **kwargs))
+
+    def get(self, url, *args, **kwargs) -> vManageResponse:
+        return vManageResponse(super().get(url, *args, **kwargs))
+
+    def post(self, url, *args, **kwargs) -> vManageResponse:
+        return vManageResponse(super().post(url, *args, **kwargs))
+
+    def put(self, url, *args, **kwargs) -> vManageResponse:
+        return vManageResponse(super().put(url, *args, **kwargs))
+
+    def delete(self, url, *args, **kwargs) -> vManageResponse:
+        return vManageResponse(super().delete(url, *args, **kwargs))
+
+
+class vManageSession(vManageResponseAdapter):
     """Base class for API sessions for vManage client.
 
     Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
@@ -153,9 +170,9 @@ class vManageSession(Session):
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
 
-        self.api = APIContainter(session=self)
+        self.api = APIContainter(self)
 
-    def request(self, method, url, *args, **kwargs) -> Any:
+    def request(self, method, url, *args, **kwargs) -> vManageResponse:
         full_url = self.get_full_url(url)
         try:
             response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
