@@ -43,15 +43,6 @@ class TestPartitionManagerAPI(unittest.TestCase):
         self.mock_device_versions = DeviceVersions(self.mock_repository_object, DeviceCategory.CONTROLLERS)
         self.mock_partition_manager_obj = PartitionManagerAPI(mock_session, DeviceCategory.CONTROLLERS)
 
-    @patch.object(PartitionManagerAPI, "_check_remove_partition_possibility")
-    @patch.object(DeviceVersions, "get_device_available")
-    def test_remove_partition_raise_error_force_false(self, get_device_list, mock_check_remove):
-        # Prepare mock data
-        get_device_list.return_value = self.mock_device_version_payload
-        mock_check_remove.return_value = ["mock_uuid"]
-        # Assert
-        self.assertRaises(ValueError, self.mock_partition_manager_obj.remove_partition, [self.device], "ver1", False)
-
     @patch.object(DeviceVersions, "get_device_available")
     def test_remove_partition_if_force_true(self, mock_get_device_list):
         # Prepare mock data
@@ -63,8 +54,8 @@ class TestPartitionManagerAPI(unittest.TestCase):
         self.mock_repository_object.session.post.return_value.json.return_value = {"id": "mock_action_id"}
 
         # Assert
-        answer = self.mock_partition_manager_obj.remove_partition([self.device], "ver1", True)
-        self.assertEqual(answer, "mock_action_id", "action ids not equal")
+        answer = self.mock_partition_manager_obj.remove_partition(self.mock_device_version_payload, True)
+        self.assertEqual(answer, "mock_action_id")
 
     @patch.object(PartitionManagerAPI, "_check_remove_partition_possibility")
     @patch.object(DeviceVersions, "get_device_available")
@@ -76,7 +67,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         self.mock_repository_object.session.post.return_value.json.return_value = {"id": "mock_action_id"}
 
         # Assert
-        answer = self.mock_partition_manager_obj.remove_partition("ver1", True)
+        answer = self.mock_partition_manager_obj.remove_partition(self.mock_device_version_payload, False)
         self.assertEqual(answer, "mock_action_id", "action ids not equal")
 
     @patch.object(RepositoryAPI, "get_devices_versions_repository")
@@ -86,8 +77,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         mock_devices = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "curr_ver"}]
 
         # Assert
-        answer = self.mock_partition_manager_obj._check_remove_partition_possibility(mock_devices)
-        self.assertEqual(answer, ["mock_uuid"], "lists are not equal")
+        self.assertRaises(ValueError, self.mock_partition_manager_obj._check_remove_partition_possibility, mock_devices)
 
     @patch.object(RepositoryAPI, "get_devices_versions_repository")
     def test_check_remove_partition_possibility_if_version_correct(self, mock_get_devices_versions_repository):
@@ -97,7 +87,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
 
         # Assert
         answer = self.mock_partition_manager_obj._check_remove_partition_possibility(mock_devices)
-        self.assertEqual(answer, [], "lists are not equal")
+        self.assertEqual(answer, None, "lists are not equal")
 
     @patch("vmngclient.session.vManageSession")
     def test_set_default_partition(self, mock_session):
@@ -105,7 +95,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         mock_partition_manager = PartitionManagerAPI(mock_session, DeviceCategory.CONTROLLERS)
         mock_partition_manager.session.post.return_value.json.return_value = {"id": "id_1"}
         # Act
-        answer = mock_partition_manager._set_default_partition([self.device])
+        answer = mock_partition_manager.set_default_partition(self.mock_device_version_payload)
 
         # Assert
         self.assertEqual(answer, "id_1")
