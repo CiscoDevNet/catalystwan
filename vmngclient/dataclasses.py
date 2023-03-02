@@ -317,7 +317,10 @@ class TLOC:
 
 @define(frozen=True)
 class TierInfo(DataclassBase):
-    """Endpoint: /dataservice/tier"""
+    """Endpoint: /dataservice/tier
+
+    Since vManage 20.12 version, object has been renamed to "Resource Profile".
+    """
 
     name: str = field(metadata={FIELD_NAME: "tierName"})
     vpn: int
@@ -329,6 +332,8 @@ class TierInfo(DataclassBase):
     ipv6_route_limit_threshold: str = field(default="", metadata={FIELD_NAME: "ipv6RouteLimitThreshold"})
     ipv6_route_limit: str = field(default="", metadata={FIELD_NAME: "ipv6RouteLimit"})
     tlocs: List[TLOC] = field(factory=list)
+    # New in 20.12 version
+    nat_session_limit: Optional[int] = field(default=None, metadata={FIELD_NAME: "natSessionLimit"})
 
 
 @define(frozen=True)
@@ -393,6 +398,7 @@ class TenantAAA(DataclassBase):
     """
     Provider-Tenant -> Tenant -> Administration -> Manage users -> Remote AAA
     """
+
     accounting: bool = field(metadata={FIELD_NAME: "accounting"})
     admin_auth_order: bool = field(metadata={FIELD_NAME: "adminAuthOrder"})
     audit_disable: bool = field(metadata={FIELD_NAME: "auditDisable"})
@@ -406,6 +412,7 @@ class RadiusServer(DataclassBase):
     """
     Provider-Tenant -> Tenant -> Administration -> Manage users -> Remote AAA -> RADIUS
     """
+
     address: str = field(metadata={FIELD_NAME: "address"})
     auth_port: int = field(metadata={FIELD_NAME: "authPort"})
     acct_port: int = field(metadata={FIELD_NAME: "acctPort"})
@@ -422,6 +429,7 @@ class TenantRadiusServer(DataclassBase):
     """
     Provider-Tenant -> Tenant -> Administration -> Manage users -> Remote AAA -> RADIUS
     """
+
     timeout: int = field(default=3, metadata={FIELD_NAME: "timeout"})
     retransmit: int = field(default=5, metadata={FIELD_NAME: "retransmit"})
     server: List[RadiusServer] = field(factory=list, metadata={FIELD_NAME: "server"})
@@ -432,6 +440,7 @@ class TacacsServer(DataclassBase):
     """
     Provider-Tenant -> Tenant -> Administration -> Manage users -> Remote AAA -> TACACS server
     """
+
     address: str = field(metadata={FIELD_NAME: "address"})
     auth_port: int = field(metadata={FIELD_NAME: "authPort"})
     vpn: int = field(metadata={FIELD_NAME: "vpn"})
@@ -446,6 +455,7 @@ class TenantTacacsServer(DataclassBase):
     """
     Provider-Tenant -> Tenant -> Administration -> Manage users -> Remote AAA -> TACACS server
     """
+
     timeout: int = field(default=3, metadata={FIELD_NAME: "timeout"})
     authentication: str = field(default="PAP", metadata={FIELD_NAME: "authentication"})
     server: List[TacacsServer] = field(factory=list, metadata={FIELD_NAME: "server"})
