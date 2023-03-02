@@ -12,8 +12,9 @@ from requests.auth import AuthBase
 from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
+from vmngclient.api.api_containter import APIContainter
 from vmngclient.exceptions import InvalidOperationError
-from vmngclient.utils.response import response_history_debug
+from vmngclient.response import response_history_debug, vManageResponse
 from vmngclient.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
@@ -65,7 +66,6 @@ def create_vManageSession(
         Session object
 
     """
-
     session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
 
@@ -93,26 +93,44 @@ def create_vManageSession(
     except ValueError:
         view_mode = ViewMode.NOT_RECOGNIZED
         session.logger.warning(f"Unrecognized user mode is: '{server_info.get('viewMode')}'")
+
     if user_mode is UserMode.TENANT and not subdomain and view_mode is ViewMode.TENANT:
-        session.session_type = SessionType.TENANT
+        session._session_type = SessionType.TENANT
     elif user_mode is UserMode.PROVIDER and not subdomain and view_mode is ViewMode.PROVIDER:
-        session.session_type = SessionType.PROVIDER
+        session._session_type = SessionType.PROVIDER
     elif user_mode is UserMode.PROVIDER and view_mode is ViewMode.TENANT:
-        session.session_type = SessionType.PROVIDER_AS_TENANT
+        session._session_type = SessionType.PROVIDER_AS_TENANT
     elif user_mode is UserMode.TENANT and subdomain:
         raise SessionNotCreatedError(
             f"Session not created. Subdomain {subdomain} passed to tenant session, "
             "cannot switch to tenant from tenant user mode."
         )
     else:
-        session.session_type = SessionType.NOT_DEFINED
+        session._session_type = SessionType.NOT_DEFINED
         session.logger.warning(f"Session created with {user_mode} and {view_mode}.")
 
     session.logger.info(f"Logged as {username}. The session type is {session.session_type}")
     return session
 
 
-class vManageSession(Session):
+class vManageResponseAdapter(Session):
+    def request(self, method, url, *args, **kwargs) -> vManageResponse:
+        return vManageResponse(super().request(method, url, *args, **kwargs))
+
+    def get(self, url, *args, **kwargs) -> vManageResponse:
+        return vManageResponse(super().get(url, *args, **kwargs))
+
+    def post(self, url, *args, **kwargs) -> vManageResponse:
+        return vManageResponse(super().post(url, *args, **kwargs))
+
+    def put(self, url, *args, **kwargs) -> vManageResponse:
+        return vManageResponse(super().put(url, *args, **kwargs))
+
+    def delete(self, url, *args, **kwargs) -> vManageResponse:
+        return vManageResponse(super().delete(url, *args, **kwargs))
+
+
+class vManageSession(vManageResponseAdapter):
     """Base class for API sessions for vManage client.
 
     Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
@@ -143,7 +161,7 @@ class vManageSession(Session):
         self.password = password
         self.subdomain = subdomain
 
-        self.session_type = SessionType.NOT_DEFINED
+        self._session_type = SessionType.NOT_DEFINED
         self.server_name = None
         self.logger = logging.getLogger(__name__)
         self.response_trace: Callable[
@@ -152,7 +170,9 @@ class vManageSession(Session):
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
 
-    def request(self, method, url, *args, **kwargs) -> Any:
+        self.api = APIContainter(self)
+
+    def request(self, method, url, *args, **kwargs) -> vManageResponse:
         full_url = self.get_full_url(url)
         try:
             response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
@@ -290,6 +310,10 @@ class vManageSession(Session):
             return False
         else:
             return True
+
+    @property
+    def session_type(self) -> SessionType:
+        return self._session_type
 
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"

@@ -37,7 +37,7 @@ class TestSoftwareAcionAPI(unittest.TestCase):
         self.mock_repository_object = RepositoryAPI(mock_session)
         self.mock_device_versions = DeviceVersions(self.mock_repository_object, DeviceCategory.CONTROLLERS)
         self.mock_software_action_obj = SoftwareActionAPI(
-            mock_session, self.mock_device_versions, self.mock_repository_object
+            mock_session, DeviceCategory.VEDGES
         )
 
     @patch.object(SoftwareActionAPI, "_downgrade_check")
@@ -52,10 +52,10 @@ class TestSoftwareAcionAPI(unittest.TestCase):
             ValueError,
             self.mock_software_action_obj.upgrade_software,
             [self.device],
-            "path",
             self.install_spec,
             True,
             True,
+            "path"
         )
 
     @patch("vmngclient.session.vManageSession")
@@ -69,10 +69,9 @@ class TestSoftwareAcionAPI(unittest.TestCase):
         mock_downgrade_check.return_value = False
         self.mock_repository_object.session.post.return_value.json.return_value = {"id": "mock_action_id"}
         mock_session.post.return_value = {"id": "mock_action_id"}
-        # self.mock_software_action_obj.session.post.json.return_value = {"id": "mock_action_id"}
 
         # Assert
-        answer = self.mock_software_action_obj.upgrade_software([self.device], "path", self.install_spec, True, True)
+        answer = self.mock_software_action_obj.upgrade_software([self.device], self.install_spec, True, True, "path")
         self.assertEqual(answer, "mock_action_id", "action ids not equal")
 
     @patch.object(RepositoryAPI, "get_devices_versions_repository")
