@@ -4,7 +4,7 @@ import logging
 import time
 from enum import Enum, auto
 from pathlib import Path
-from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Protocol, Union
 from urllib.parse import urljoin
 
 from requests import PreparedRequest, Request, Response, Session, head
@@ -43,6 +43,21 @@ class ViewMode(Enum):
 
 class SessionNotCreatedError(Exception):
     pass
+
+
+class OnSessionCreateHook(Protocol):
+    def __call__(self) -> None:
+        ...
+
+
+class OnRequestHook(Protocol):
+    def __call__(self, method: str, url: Union[str, bytes], *args, **kwargs) -> None:
+        ...
+
+
+class ResponseTrace(Protocol):
+    def __call__(self, response: Optional[Response], request: Union[Request, PreparedRequest, None]) -> str:
+        ...
 
 
 def create_vManageSession(
@@ -147,7 +162,8 @@ class vManageSession(vManageResponseAdapter):
         password: password
     """
 
-    on_session_create_hook: ClassVar[Callable[[vManageSession], Any]] = lambda *args: None
+    on_session_create_hook: OnSessionCreateHook = lambda *args: None
+    on_request_hook: OnRequestHook = lambda *args, **kwargs: None
 
     def __init__(
         self,
@@ -169,9 +185,9 @@ class vManageSession(vManageResponseAdapter):
         self._session_type = SessionType.NOT_DEFINED
         self.server_name = None
         self.logger = logging.getLogger(__name__)
-        self.response_trace: Callable[
-            [Optional[Response], Union[Request, PreparedRequest, None]], str
-        ] = response_history_debug
+        self.response_trace: ResponseTrace = response_history_debug
+        self.on_session_create_hook: OnSessionCreateHook = vManageSession.on_session_create_hook
+        self.on_request_hook: OnRequestHook = vManageSession.on_request_hook
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
 
@@ -179,6 +195,7 @@ class vManageSession(vManageResponseAdapter):
 
     def request(self, method, url, *args, **kwargs) -> vManageResponse:
         full_url = self.get_full_url(url)
+        self.on_request_hook(method, full_url)
         try:
             response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
             self.logger.debug(self.response_trace(response, None))

@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import Optional, Protocol, Union
 from urllib.parse import urljoin
 
 import requests
@@ -8,6 +8,11 @@ from requests.auth import AuthBase
 from requests.cookies import RequestsCookieJar
 
 from vmngclient import with_proc_info_header
+
+
+class OnRequestHook(Protocol):
+    def __call__(self, method: str, url: Union[str, bytes], *args, **kwargs) -> None:
+        ...
 
 
 class InvalidCredentialsError(Exception):
@@ -54,6 +59,8 @@ class vManageAuth(AuthBase):
 
     """
 
+    on_request_hook: OnRequestHook = lambda *args, **kwargs: None
+
     def __init__(self, base_url: str, username: str, password: str, verify: bool = False):
         self.base_url = base_url
         self.username = username
@@ -63,6 +70,7 @@ class vManageAuth(AuthBase):
         self.set_cookie: Optional[RequestsCookieJar] = None
         self.token: str = ""
         self.logger = logging.getLogger(__name__)
+        self.on_request_hook: OnRequestHook = vManageAuth.on_request_hook
 
     def get_cookie(self) -> RequestsCookieJar:
         """Check whether a user is successfully authenticated.
@@ -83,6 +91,7 @@ class vManageAuth(AuthBase):
         }
         full_url = urljoin(self.base_url, "/j_security_check")
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        self.on_request_hook("post", full_url)
         response = requests.post(
             url=full_url,
             data=security_payload,
@@ -108,6 +117,7 @@ class vManageAuth(AuthBase):
         """
         full_url = urljoin(self.base_url, "/dataservice/client/token")
         headers = {"Content-Type": "application/json"}
+        self.on_request_hook("get", full_url)
         response = requests.get(
             url=full_url,
             cookies=cookies,
