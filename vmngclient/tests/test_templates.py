@@ -5,8 +5,10 @@ from ciscoconfparse import CiscoConfParse  # type: ignore
 
 from vmngclient.api.task_status_api import TaskStatus
 from vmngclient.api.template_api import AttachedError, TemplateNotFoundError, TemplatesAPI
-from vmngclient.dataclasses import Device, TemplateInfo
+from vmngclient.api.templates.feature_template import FeatureTemplate
+from vmngclient.dataclasses import Device, FeatureTemplateInfo, TemplateInfo
 from vmngclient.exceptions import AlreadyExistsError
+from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
@@ -46,7 +48,9 @@ class TestTemplatesAPI(unittest.TestCase):
                 "templateAttached": 0,
             },
         ]
-        self.templates = [create_dataclass(TemplateInfo, template) for template in self.data_template]
+        self.templates = DataSequence(
+            TemplateInfo, [create_dataclass(TemplateInfo, template) for template in self.data_template]
+        )
         self.device_info = Device(
             personality=Personality.EDGE,
             uuid="dummy_uuid",
@@ -62,28 +66,32 @@ class TestTemplatesAPI(unittest.TestCase):
         self.task = TaskStatus("Success", "success", [])
 
     @patch("vmngclient.session.vManageSession")
-    def test_templates_success(self, mock_session):
+    @patch("vmngclient.response.vManageResponse")
+    def test_templates_success(self, mock_session, mocked_response):
 
         # Arrange
-        mock_session.get_data.return_value = self.data_template
+        mock_session.get.return_value = mocked_response
+        mocked_response.dataseq.return_value = self.templates
 
         # Act
-        answer = TemplatesAPI(mock_session).templates
+        answer = TemplatesAPI(mock_session).get(FeatureTemplate)
 
         # Assert
         self.assertEqual(answer, self.templates)
 
     @patch("vmngclient.session.vManageSession")
-    def test_templates_no_data(self, mock_session):
+    @patch("vmngclient.response.vManageResponse")
+    def test_templates_no_data(self, mock_session, mocked_response):
 
         # Arrange
-        mock_session.get_data.return_value = []
+        mock_session.get_data.return_value = mocked_response
+        mocked_response.dataseq.return_value = DataSequence(FeatureTemplateInfo, [])
 
         # Act
-        answer = TemplatesAPI(mock_session).templates
+        answer = TemplatesAPI(mock_session).get(FeatureTemplate)
 
         # Assert
-        self.assertEqual(answer, [])
+        self.assertEqual(answer, DataSequence(FeatureTemplateInfo))
 
     @patch.object(TemplatesAPI, "templates")
     def test_get_success(self, mock_templates):
@@ -114,40 +122,6 @@ class TestTemplatesAPI(unittest.TestCase):
         # Act
         def answer():
             return test_object.get("no_exist_name")
-
-        # Assert
-        self.assertRaises(TemplateNotFoundError, answer)
-
-    @patch.object(TemplatesAPI, "templates")
-    def test_get_id_success(self, mock_templates):
-
-        # Arrage
-        MockTemplates = Mock()
-        mock_templates.return_value = MockTemplates
-        session = Mock()
-        test_object = TemplatesAPI(session)
-        test_object.templates = self.templates
-
-        # Act
-        answer = [test_object.get_id(template.name) for template in self.templates]
-
-        ids = [template.id for template in self.templates]
-        # Assert
-        self.assertEqual(answer, ids)
-
-    @patch.object(TemplatesAPI, "templates")
-    def test_get_id_exception(self, mock_templates):
-
-        # Arrage
-        MockTemplates = Mock()
-        mock_templates.return_value = MockTemplates
-        session = Mock()
-        test_object = TemplatesAPI(session)
-        test_object.templates = self.templates
-
-        # Act
-        def answer():
-            return test_object.get_id("no_exist_name")
 
         # Assert
         self.assertRaises(TemplateNotFoundError, answer)
