@@ -8,7 +8,7 @@
   "templateMinVersion": "15.0.0",
   "templateDefinition": {
     "ip": {
-      {% if type_address == "static" %}
+      {% if type_address.value == "static" %}
         "address": {
           "vipObjectType": "object",
           {% if ip is defined %}
@@ -40,7 +40,7 @@
     "if-name": {
       "vipObjectType": "object",
       "vipType": "constant",
-      "vipValue": "{{ interface_name.value }}",
+      "vipValue": "{{ interface_name.type.value }}{% if interface_name.number is not none %}{{ interface_name.number }}{% endif %}",
       "vipVariableName": "vpn_if_name"
     },
     "description": {
