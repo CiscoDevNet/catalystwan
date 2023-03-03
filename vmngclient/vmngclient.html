@@ -1860,6 +1860,27 @@ It is intended to be used as a probe, so it doesn’t raise original error from 
 </section>
 <section id="module-vmngclient">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-vmngclient" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="vmngclient.get_first_external_stack_frame">
+<span class="sig-prename descclassname"><span class="pre">vmngclient.</span></span><span class="sig-name descname"><span class="pre">get_first_external_stack_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">StackSummary</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">FrameSummary</span></span></span><a class="headerlink" href="#vmngclient.get_first_external_stack_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the first python frame
+on the stack before entering vmngclient module</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="vmngclient.is_file_in_package">
+<span class="sig-prename descclassname"><span class="pre">vmngclient.</span></span><span class="sig-name descname"><span class="pre">is_file_in_package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.is_file_in_package" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if filepath given by string
+is part of vmngclient source code</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="vmngclient.list_package_sources">
+<span class="sig-prename descclassname"><span class="pre">vmngclient.</span></span><span class="sig-name descname"><span class="pre">list_package_sources</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.list_package_sources" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a list containing paths to all python source files
+for current package</p>
+</dd></dl>
+
 </section>
 </section>
 
@@ -1928,7 +1949,12 @@ It is intended to be used as a probe, so it doesn’t raise original error from 
 <li><a class="reference internal" href="#vmngclient.session.vManageSession"><code class="docutils literal notranslate"><span class="pre">vManageSession</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-vmngclient">Module contents</a></li>
+<li><a class="reference internal" href="#module-vmngclient">Module contents</a><ul>
+<li><a class="reference internal" href="#vmngclient.get_first_external_stack_frame"><code class="docutils literal notranslate"><span class="pre">get_first_external_stack_frame()</span></code></a></li>
+<li><a class="reference internal" href="#vmngclient.is_file_in_package"><code class="docutils literal notranslate"><span class="pre">is_file_in_package()</span></code></a></li>
+<li><a class="reference internal" href="#vmngclient.list_package_sources"><code class="docutils literal notranslate"><span class="pre">list_package_sources()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
