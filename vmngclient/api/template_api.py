@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import json
 import logging
 from difflib import Differ
@@ -23,16 +24,9 @@ from vmngclient.exceptions import AlreadyExistsError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.operation_status import OperationStatus
-from typing import List, Final
-from enum import Enum
-from pydantic import BaseModel
-# from vmngclient.api.templates import FeatureTemplate
-from vmngclient.session import vManageSession
-from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
-from pathlib import Path
-import json
-from pydantic import parse_obj_as
-from vmngclient.typed_list import DataSequence
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -65,13 +59,14 @@ class TemplateTypeError(Exception):
     def __init__(self, name):
         self.message = f"Template: {name} - wrong template type."
 
-class GeneralTemplate(BaseModel):
-    templateId: str
-    templateType: str
-    subTemplates: List[GeneralTemplate] = []
 
-    class Config:
-        arbitrary_types_allowed = True
+class DeviceTemplateFeature(Enum):
+    LAWFUL_INTERCEPTION = "lawful-interception"
+    CLOUD_DOCK = "cloud-dock"
+    NETWORK_DESIGN = "network-design"
+    VMANAGE_DEFAULT = "vmanage-default"
+    ALL = "all"
+
 
 class DeviceTemplateFeature(Enum):
     LAWFUL_INTERCEPTION = "lawful-interception"
@@ -251,6 +246,7 @@ class TemplatesAPI:
         Returns:
             bool: True if attaching template is successful, otherwise - False.
         """
+        raise NotImplementedError()
         try:
             template_id = self.get(CLITemplate).filter(id=name).single_or_default().id
             self.template_validation(template_id, device=device)
@@ -674,7 +670,7 @@ class TemplatesAPI:
         ).load_running(device)
         return self.compare_template(running_config, template, debug)
 
- 
+
 class CLITemplate:
     def __init__(
         self,
