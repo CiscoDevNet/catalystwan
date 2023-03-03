@@ -4,8 +4,9 @@ from unittest.mock import MagicMock, Mock, patch
 from ciscoconfparse import CiscoConfParse  # type: ignore
 
 from vmngclient.api.task_status_api import TaskStatus
-from vmngclient.api.template_api import AttachedError, TemplateAlreadyExistsError, TemplateNotFoundError, TemplatesAPI
-from vmngclient.dataclasses import Device, Template
+from vmngclient.api.template_api import AttachedError, TemplateNotFoundError, TemplatesAPI
+from vmngclient.dataclasses import Device, TemplateInfo
+from vmngclient.exceptions import AlreadyExistsError
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
@@ -45,7 +46,7 @@ class TestTemplatesAPI(unittest.TestCase):
                 "templateAttached": 0,
             },
         ]
-        self.templates = [create_dataclass(Template, template) for template in self.data_template]
+        self.templates = [create_dataclass(TemplateInfo, template) for template in self.data_template]
         self.device_info = Device(
             personality=Personality.EDGE,
             uuid="dummy_uuid",
@@ -295,4 +296,4 @@ class TestTemplatesAPI(unittest.TestCase):
             return test_object.create(self.device_info, "template_1", "new_description", config)
 
         # Assert
-        self.assertRaises(TemplateAlreadyExistsError, answer)
+        self.assertRaises(AlreadyExistsError, answer)
