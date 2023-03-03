@@ -1,10 +1,14 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
 from pydantic import BaseModel  # type: ignore
 
-from vmngclient.session import vManageSession
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 
 class FeatureTemplate(BaseModel, ABC):

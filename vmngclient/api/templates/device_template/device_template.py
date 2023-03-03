@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Final, List, Union
+from typing import TYPE_CHECKING, Final, List, Union
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
 from pydantic import BaseModel  # type: ignore
 
-from vmngclient.session import vManageSession
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 
 logger = logging.getLogger(__name__)
@@ -25,6 +26,8 @@ class GeneralTemplate(BaseModel):
     # def get(cls, session: vManageSession, name: str) -> GeneralTemplate:
     #     template = TemplatesAPI(session).get_single_feature_template(name)
     #     return cls(templateId=template.id, templateType=template.type)
+
+
 class DeviceTemplate(BaseModel):
     """
     ## Example:
@@ -83,8 +86,5 @@ class DeviceTemplate(BaseModel):
     #             templates_exist = False
 
     #     return templates_exist
-
-
-        
 
     payload_path: Final[Path] = Path(__file__).parent / "device_template_payload.json.j2"
