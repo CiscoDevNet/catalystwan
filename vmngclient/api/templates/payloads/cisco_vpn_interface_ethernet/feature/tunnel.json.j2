@@ -10,7 +10,7 @@
                     "vipType": "constant",
                     "vipValue": {{ encap.preference }},
                 {% else %}
-                    "vipType": "ignore"
+                    "vipType": "ignore",
                 {% endif %} 
                 "vipVariableName": "vpn_if_tunnel_{{ encap.type.value }}_preference"
               },
@@ -20,7 +20,7 @@
                     "vipType": "constant",
                     "vipValue": {{ encap.weight }},
                 {% else %}
-                    "vipType": "ignore"
+                    "vipType": "ignore",
                     "vipValue": 1,
                 {% endif %} 
                 "vipVariableName": "vpn_if_tunnel_{{ encap.type.value }}_weight"
