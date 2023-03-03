@@ -156,7 +156,7 @@ class DataSequence(TypedList[T], Generic[T]):
         return f"DataSequence({self._type.__name__}, {repr(self.data)})"
 
     @overload
-    def single_or_default(self) -> AttrsInstance:
+    def single_or_default(self) -> T:
         ...
 
     @overload

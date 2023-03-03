@@ -37,11 +37,12 @@ class DeviceTemplate(BaseModel):
             "default_logging", # Cisco Logging
             "default_banner", # Banner
         ]
-    >>> DeviceTemplate(
+    >>> device_template = DeviceTemplate(
             name="python",
             description="python",
             general_templates=templates
-        ).create(session)
+        )
+    >>> session.api.templates.create(device_template)
     """
 
     class Config:
