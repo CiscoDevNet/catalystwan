@@ -8,9 +8,6 @@ templates in vManage.
 """
 
 # Device Template
-from vmngclient.api.templates.device_template.device_template import DeviceTemplate, GeneralTemplate
-
-# Basic FeatureTemplate class
 
 # AAA Templates
 from vmngclient.api.templates.payloads.aaa.aaa_model import AAAModel
@@ -40,6 +37,9 @@ from vmngclient.api.templates.payloads.cisco_vpn_interface_ethernet.cisco_vpn_in
 
 # CEdge Templates
 from vmngclient.api.templates.payloads.tenant.tenant_model import TenantModel
+
+# Basic FeatureTemplate class
+
 
 __all__ = [
     "DeviceTemplate" "FeatureTemplate",
