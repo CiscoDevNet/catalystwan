@@ -57,6 +57,18 @@ class ColorType(Enum):
     SILVER = "silver"
 
 
+class EncapType(Enum):
+    GRE = "gre"
+    IPSEC = "ipsec"
+
+
+@define
+class Encapsulation:
+    type: EncapType
+    preference: Optional[int] = None
+    weight: Optional[int] = None
+
+
 @define
 class Tunnel:
     color: Optional[ColorType] = None
@@ -72,6 +84,7 @@ class Tunnel:
     stun: Optional[bool] = None
     https: Optional[bool] = None
     snmp: Optional[bool] = None
+    encapsulation: list[Encapsulation] = []
 
 
 class CiscoVpnInterfaceEthernetModel(FeatureTemplate):
