@@ -67,13 +67,13 @@ class PartitionManagerAPI:
             str: action id
         """
 
-        devices_payload = [
+        remove_partition_payload = [
             RemovePartitionPayload(device.deviceId, device.deviceIP, device.version) for device in devices_payload
         ]
         url = "/dataservice/device/action/removepartition"
         payload = {
             "action": "removepartition",
-            "devices": [asdict(device) for device in devices_payload],  # type: ignore
+            "devices": [asdict(device) for device in remove_partition_payload],  # type: ignore
             "deviceType": "vmanage",
         }
         if force is False:
