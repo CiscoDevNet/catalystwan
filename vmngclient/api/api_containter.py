@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from vmngclient.api.tenant_api import TenantsAPI
 from vmngclient.api.template_api import TemplatesAPI
+from vmngclient.api.tenant_api import TenantsAPI
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
