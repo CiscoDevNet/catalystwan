@@ -2,29 +2,42 @@
     "encapsulation": {
       "vipType": "constant",
       "vipValue": [
-        {
-          "preference": {
-            "vipObjectType": "object",
-            "vipType": "ignore",
-            "vipVariableName": "vpn_if_tunnel_ipsec_preference"
-          },
-          "weight": {
-            "vipObjectType": "object",
-            "vipType": "ignore",
-            "vipValue": 1,
-            "vipVariableName": "vpn_if_tunnel_ipsec_weight"
-          },
-          "encap": {
-            "vipType": "constant",
-            "vipValue": "ipsec",
-            "vipObjectType": "object"
-          },
-          "priority-order": [
-            "encap",
-            "preference",
-            "weight"
-          ]
-        }
+          {% for encap in tunnel.encapsulation %}
+            {
+              "preference": {
+                "vipObjectType": "object",
+                {% if encap.preference is not none %}
+                    "vipType": "constant",
+                    "vipValue": {{ encap.preference }},
+                {% else %}
+                    "vipType": "ignore",
+                {% endif %} 
+                "vipVariableName": "vpn_if_tunnel_{{ encap.type.value }}_preference"
+              },
+              "weight": {
+                "vipObjectType": "object",
+                {% if encap.weight is not none %}
+                    "vipType": "constant",
+                    "vipValue": {{ encap.weight }},
+                {% else %}
+                    "vipType": "ignore",
+                    "vipValue": 1,
+                {% endif %} 
+                "vipVariableName": "vpn_if_tunnel_{{ encap.type.value }}_weight"
+              },
+              "encap": {
+                "vipType": "constant",
+                "vipValue": "{{ encap.type.value }}",
+                "vipObjectType": "object"
+              },
+              "priority-order": [
+                "encap",
+                "preference",
+                "weight"
+              ]
+            }
+            {% if not loop.last %},{% endif %}
+          {% endfor %}
       ],
       "vipObjectType": "tree",
       "vipPrimaryKey": [
