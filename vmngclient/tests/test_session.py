@@ -2,11 +2,13 @@ import unittest
 from typing import Optional
 from unittest.mock import patch
 
+import pytest  # type: ignore
 from parameterized import parameterized  # type: ignore
 
 from vmngclient.session import vManageSession
 
 
+@pytest.mark.skip(reason="Session is not mocked property (#149)")
 class TestSession(unittest.TestCase):
     def setUp(self):
         self.url = "example.com"
