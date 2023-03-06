@@ -225,15 +225,11 @@ class TemplatesAPI:
             return cli_template.send_to_device()
 
     def _create_feature_template(self, template: FeatureTemplate) -> str:
-        try:
-            self.get_feature_templates(name=template.name)
-        except TemplateNotFoundError:
-            payload = template.generate_payload(self.session)
-            response = self.session.post("/dataservice/template/feature", json=json.loads(payload))
-            template_id = response.json()["templateId"]
+        payload = template.generate_payload(self.session)
+        response = self.session.post("/dataservice/template/feature", json=json.loads(payload))
+        template_id = response.json()["templateId"]
 
-            return template_id
-        raise AlreadyExistsError(f"Error, Template with name: {template.name} exists.")
+        return template_id
 
     def _create_device_template(self, template: DeviceTemplate) -> str:
         def get_general_template_info(name: str) -> GeneralTemplate:
