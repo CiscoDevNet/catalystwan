@@ -3,14 +3,16 @@ from __future__ import annotations
 
 from enum import Enum
 from pathlib import Path
-from typing import ClassVar, List, Optional
+from typing import TYPE_CHECKING, ClassVar, List, Optional
 
 from attr import define, field  # type: ignore
 from pydantic import validator  # type: ignore
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.api.templates.payloads.aaa.aaa_model import VpnType
-from vmngclient.session import vManageSession
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 
 class GatewayType(Enum):

@@ -57,6 +57,24 @@ class ColorType(Enum):
     SILVER = "silver"
 
 
+class EncapType(Enum):
+    GRE = "gre"
+    IPSEC = "ipsec"
+
+
+@define
+class InterfaceName:
+    type: InterfaceType
+    number: Optional[str] = None
+
+
+@define
+class Encapsulation:
+    type: EncapType
+    preference: Optional[int] = None
+    weight: Optional[int] = None
+
+
 @define
 class Tunnel:
     color: Optional[ColorType] = None
@@ -72,11 +90,12 @@ class Tunnel:
     stun: Optional[bool] = None
     https: Optional[bool] = None
     snmp: Optional[bool] = None
+    encapsulation: list[Encapsulation] = []
 
 
 class CiscoVpnInterfaceEthernetModel(FeatureTemplate):
     payload_path: ClassVar[Path] = Path(__file__).parent / "feature/cisco_vpn_interface_ethernet.json.j2"
-    interface_name: InterfaceType
+    interface_name: InterfaceName
     shutdown: Optional[bool]
     type_address: TypeAddress = TypeAddress.STATIC
     ip: Optional[str]

@@ -1,11 +1,15 @@
+from __future__ import annotations
+
 import logging
 from time import sleep
-from typing import List, cast
+from typing import TYPE_CHECKING, List, cast
 
 from attr import define, field  # type: ignore
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
-from vmngclient.session import vManageSession
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
+
 from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 

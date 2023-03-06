@@ -1,13 +1,17 @@
+from __future__ import annotations
+
 import logging
 from enum import Enum
 from pathlib import PurePath
-from typing import Dict, List, Union
+from typing import TYPE_CHECKING, Dict, List, Union
 
 from attr import define, field  # type: ignore
 
 from vmngclient.dataclasses import Device
-from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
 

@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 import logging
+from typing import TYPE_CHECKING
 
 from vmngclient.dataclasses import TenantAAA, TenantRadiusServer, TenantTacacsServer
-from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import asdict, create_dataclass
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
 
