@@ -1,18 +1,22 @@
 """Methods covering essential API endpoints and related data classes."""
-import json
+from __future__ import annotations
+
 import logging
 from contextlib import contextmanager
-from typing import Iterator, List, Union
+from typing import TYPE_CHECKING, Iterator, List, Union
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.dataclasses import BfdSessionData, Connection, Device, Reboot, WanInterface
-from vmngclient.session import vManageSession
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.operation_status import OperationStatus
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
+
 
 logger = logging.getLogger(__name__)
 
@@ -38,34 +42,20 @@ class DevicesAPI:
     @property
     def system_ips(self) -> List[str]:
         """List of device system IP addresses."""
-        return [device.local_system_ip for device in self.devices]
+        return [device.local_system_ip for device in self.get()]
 
     @property
     def ips(self):
         """List of device IP addresses."""
-        return [device.id for device in self.devices]
+        return [device.id for device in self.get()]
 
     def get_system_ip_based_on_local_system_ip(self, local_system_ip) -> str:
-        for dev in self.devices:
+        for dev in self.get():
             if local_system_ip == dev.local_system_ip:
                 return dev.id
         return ""
 
-    @property
-    def devices(self) -> List[Device]:
-        """List of all devices."""
-        logger.warning("Devices property is deprecated. Please use get_devices() method.")
-        devices_basic_info = self.session.get_data("/dataservice/device")
-
-        devices_ids = ""
-        for device in devices_basic_info:
-            devices_ids += f"&deviceId={device['deviceId']}"
-
-        devices_full_info = self.session.get_data(f"/dataservice/device/system/info?{devices_ids}")
-
-        return [create_dataclass(Device, device) for device in devices_full_info]
-
-    def get_device_details(self, uuid: str) -> Device:
+    def get_device_details(self, uuid: str) -> DataSequence[Device]:
         """Gets system information for a device.
 
         Args:
@@ -74,11 +64,12 @@ class DevicesAPI:
         Returns:
             Device object
         """
-        devices = self.session.get_data(f"/dataservice/system/device/vedges?uuid={uuid}")
+        response = self.session.get(f"/dataservice/system/device/vedges?uuid={uuid}")
 
+        devices = response.dataseq(Device)
         assert len(devices) == 1, "Expected system info response list to have one member"
 
-        return create_dataclass(Device, devices[0])
+        return devices
 
     def count_devices(self, personality: Personality) -> int:
         """Gets number of devices of given personality.
@@ -89,17 +80,7 @@ class DevicesAPI:
         Returns:
             count of devices
         """
-        return sum([1 for device in self.devices if device.personality == personality.value])
-
-    def get_tenants(self) -> Union[list, dict]:
-        """Gets Tenants.
-
-        Returns:
-            Tenants
-        """
-        tenants = self.session.get_data("/dataservice/tenant")
-
-        return tenants
+        return sum([1 for device in self.get() if device.personality == personality])
 
     def get_reachable_devices(self, personality: Personality):
         """Get reachable devices by personality.
@@ -150,7 +131,7 @@ class DevicesAPI:
 
         return True if wait_for_state() else False
 
-    def get_devices(self, rediscover: bool = False) -> DataSequence[Device]:
+    def get(self, rediscover: bool = False) -> DataSequence[Device]:
         """Data sequence of all devices.
 
         ## Examples:
@@ -166,12 +147,10 @@ class DevicesAPI:
         devices_basic_info = self.session.get_data("/dataservice/device")
 
         parameters = {"deviceId": [device["deviceId"] for device in devices_basic_info]}
-        devices_full_info = self.session.get(url="/dataservice/device/system/info", params=parameters).json()["data"]
+        devices_full_info = self.session.get(url="/dataservice/device/system/info", params=parameters)
 
-        devices = DataSequence(Device, [create_dataclass(Device, device) for device in devices_full_info])
-
-
-
+        devices = devices_full_info.dataseq(Device)
+        # from IPython import embed; embed()
         return devices
 
 
