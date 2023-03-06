@@ -1,4 +1,6 @@
-from typing import List
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, List
 
 from vmngclient.dataclasses import (
     OmpAdvertisedRouteData,
@@ -9,8 +11,10 @@ from vmngclient.dataclasses import (
     OmpServiceData,
     OmpSummaryData,
 )
-from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 
 class OmpAPI:

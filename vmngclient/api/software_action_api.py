@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import logging
 from enum import Enum
 from pathlib import PurePath
-from typing import Any, Dict, List, Optional, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
 
 from attr import define  # type: ignore
 from clint.textui.progress import Bar as ProgressBar  # type: ignore
@@ -10,9 +12,12 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncod
 from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.exceptions import VersionDeclarationError  # type: ignore
-from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
+
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 
 class Family(Enum):
