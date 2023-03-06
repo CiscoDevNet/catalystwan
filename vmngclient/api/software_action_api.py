@@ -79,7 +79,6 @@ class SoftwareActionAPI:
 
     # Check action status
     wait_for_completed(session, software_action_id, 3000)
-
     """
 
     def __init__(self, session: vManageSession, device_category: DeviceCategory) -> None:
