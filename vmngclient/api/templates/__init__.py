@@ -42,7 +42,8 @@ from vmngclient.api.templates.payloads.tenant.tenant_model import TenantModel
 
 
 __all__ = [
-    "DeviceTemplate" "FeatureTemplate",
+    "DeviceTemplate",
+    "FeatureTemplate",
     "TenantModel",
     "AAAModel",
     "CiscoVPNModel",
