@@ -31,6 +31,7 @@ from vmngclient.api.templates.payloads.cisco_vpn_interface_ethernet.cisco_vpn_in
     ColorType,
     Encapsulation,
     EncapType,
+    InterfaceName,
     InterfaceType,
     Tunnel,
     TypeAddress,
@@ -58,4 +59,5 @@ __all__ = [
     "Tunnel",
     "Encapsulation",
     "EncapType",
+    "InterfaceName",
 ]
