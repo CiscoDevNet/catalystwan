@@ -66,15 +66,12 @@ class EncapType(Enum):
 class InterfaceName:
     type: InterfaceType
     name: Optional[str] = None
-    number: Optional[int] = None
-    sub_number: Optional[int] = None
+    number: Optional[str] = None
 
     def __attrs_post_init__(self):
         self.name = self.type.value
         if self.number is not None:
-            self.name += str(self.number)
-            if self.sub_number is not None:
-                self.name += f".{self.sub_number}"
+            self.name += self.number
 
 
 @define
