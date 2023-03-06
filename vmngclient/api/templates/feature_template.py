@@ -29,6 +29,6 @@ class FeatureTemplate(BaseModel, ABC):
         raise NotImplementedError()
 
     @property
-    @abstractmethod
+    # @abstractmethod
     def payload_path(self) -> Path:
         raise NotImplementedError()

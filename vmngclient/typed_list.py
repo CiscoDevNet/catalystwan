@@ -156,7 +156,7 @@ class DataSequence(TypedList[T], Generic[T]):
         return f"DataSequence({self._type.__name__}, {repr(self.data)})"
 
     @overload
-    def single_or_default(self) -> AttrsInstance:
+    def single_or_default(self) -> T:
         ...
 
     @overload
@@ -190,7 +190,7 @@ class DataSequence(TypedList[T], Generic[T]):
 
         return self.data[0]
 
-    def filter(self, **kwargs) -> DataSequence:
+    def filter(self, **kwargs) -> DataSequence[T]:
         """Filters a sequence of values based on attributes.
 
         >>> seq = DataSequence(User, [User(username="User1"), User(username="User2")])
