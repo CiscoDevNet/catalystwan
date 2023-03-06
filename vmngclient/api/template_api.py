@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import json
 import logging
 from difflib import Differ
 from enum import Enum
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
 from requests.exceptions import HTTPError
@@ -11,12 +13,14 @@ from vmngclient.api.task_status_api import wait_for_completed
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.dataclasses import Device, FeatureTemplateInformation, Template
 from vmngclient.exceptions import InvalidOperationError
-from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.operation_status import OperationStatus
 
 logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 
 class TemplateType(Enum):

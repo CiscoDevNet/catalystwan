@@ -1,12 +1,15 @@
+from __future__ import annotations
+
 import logging
 from datetime import datetime as dt
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 from urllib.parse import quote
 
-from vmngclient.session import vManageSession
-
 logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 
 class LogsAPI:

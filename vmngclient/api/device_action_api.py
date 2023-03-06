@@ -1,11 +1,13 @@
+from __future__ import annotations
+
 import logging
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.api.basic_api import DevicesAPI, DeviceStateAPI
 from vmngclient.dataclasses import Device
-from vmngclient.session import vManageSession
 from vmngclient.utils.certificate_status import CertificateStatus
 from vmngclient.utils.operation_status import OperationStatus
 from vmngclient.utils.personality import Personality
@@ -13,6 +15,9 @@ from vmngclient.utils.reachability import Reachability
 from vmngclient.utils.validate_status import ValidateStatus
 
 logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 
 class DeviceActionAPI(ABC):

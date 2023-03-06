@@ -1,20 +1,26 @@
+from __future__ import annotations
+
 """ Methods for setting up packet capture session,
    and download .pcap session file.
 
     Returns:
         status: Status
 """
+
+
 import logging
 import time
 from contextlib import contextmanager
 from enum import Enum
 from pathlib import Path
-from typing import Iterator, Optional
+from typing import TYPE_CHECKING, Iterator, Optional
 
 from vmngclient.api.basic_api import DeviceStateAPI
 from vmngclient.dataclasses import Device, PacketSetup, Status
-from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
 
