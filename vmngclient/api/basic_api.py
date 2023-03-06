@@ -1,16 +1,20 @@
 """Methods covering essential API endpoints and related data classes."""
+from __future__ import annotations
+
 from contextlib import contextmanager
 from enum import Enum
-from typing import Iterator, List, Union
+from typing import TYPE_CHECKING, Iterator, List, Union
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.dataclasses import BfdSessionData, Connection, Device, Reboot, WanInterface
-from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.operation_status import OperationStatus
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 
 # TODO link that with dataclass

@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import logging
-from typing import Dict, List, cast
+from typing import TYPE_CHECKING, Dict, List, cast
 
 from vmngclient.api.versions_utils import (
     DeviceCategory,
@@ -12,6 +14,9 @@ from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import asdict
 
 logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 
 class PartitionManagerAPI:

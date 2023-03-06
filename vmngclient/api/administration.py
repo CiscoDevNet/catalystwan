@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import logging
 from http import HTTPStatus
-from typing import List, Union, cast, overload
+from typing import TYPE_CHECKING, List, Union, cast, overload
 
 from requests import Response
 
@@ -15,8 +17,10 @@ from vmngclient.dataclasses import (
     Vbond,
 )
 from vmngclient.exceptions import InvalidOperationError
-from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import asdict, create_dataclass
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
 
