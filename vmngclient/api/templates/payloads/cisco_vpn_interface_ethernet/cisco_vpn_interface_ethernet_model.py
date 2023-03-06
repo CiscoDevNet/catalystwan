@@ -64,6 +64,14 @@ class EncapType(Enum):
 
 @define
 class InterfaceName:
+    """
+    The number of interface in the form:
+    - 0,
+    - 0.0
+    - 0/0
+    - 0/0/0
+    """
+
     type: InterfaceType
     name: Optional[str] = None
     number: Optional[str] = None
