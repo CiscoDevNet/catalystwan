@@ -1,14 +1,18 @@
+from __future__ import annotations
+
 import logging
 import math
 from time import sleep
-from typing import cast
+from typing import TYPE_CHECKING, cast
 from urllib.error import HTTPError
 
 from vmngclient.api.basic_api import DeviceStateAPI
 from vmngclient.dataclasses import Device, Speedtest
-from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 
 class SpeedtestAPI:

@@ -1,0 +1,327 @@
+{
+    "encapsulation": {
+      "vipType": "constant",
+      "vipValue": [
+          {% for encap in tunnel.encapsulation %}
+            {
+              "preference": {
+                "vipObjectType": "object",
+                {% if encap.preference is not none %}
+                    "vipType": "constant",
+                    "vipValue": {{ encap.preference }},
+                {% else %}
+                    "vipType": "ignore",
+                {% endif %} 
+                "vipVariableName": "vpn_if_tunnel_{{ encap.type.value }}_preference"
+              },
+              "weight": {
+                "vipObjectType": "object",
+                {% if encap.weight is not none %}
+                    "vipType": "constant",
+                    "vipValue": {{ encap.weight }},
+                {% else %}
+                    "vipType": "ignore",
+                    "vipValue": 1,
+                {% endif %} 
+                "vipVariableName": "vpn_if_tunnel_{{ encap.type.value }}_weight"
+              },
+              "encap": {
+                "vipType": "constant",
+                "vipValue": "{{ encap.type.value }}",
+                "vipObjectType": "object"
+              },
+              "priority-order": [
+                "encap",
+                "preference",
+                "weight"
+              ]
+            }
+            {% if not loop.last %},{% endif %}
+          {% endfor %}
+      ],
+      "vipObjectType": "tree",
+      "vipPrimaryKey": [
+        "encap"
+      ]
+    },
+    "group": {
+      "vipObjectType": "list",
+      "vipType": "ignore",
+      "vipVariableName": "vpn_if_tunnel_group"
+    },
+    "border": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipValue": "false",
+      "vipVariableName": "vpn_if_tunnel_border"
+    },
+    "color": {
+      "value": {
+        "vipObjectType": "object",
+        {% if tunnel.color is not none %}
+            "vipType": "constant",
+            "vipValue": "{{ tunnel.color.value }}",
+        {% else %}
+            "vipType": "ignore",
+            "vipValue":"default",
+        {% endif %} 
+        "vipVariableName": "vpn_if_tunnel_color_value"
+      },
+      "restrict": {
+        "vipObjectType": "node-only",
+        "vipType": "ignore",
+        "vipValue": "false",
+        {% if tunnel.color is not none %}
+            "vipVariableName": "vpn_if_tunnel_color_restrict"
+        {% endif %} 
+      }
+    },
+    "carrier": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipValue": "default",
+      "vipVariableName": "vpn_if_tunnel_carrier"
+    },
+    "bind": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipVariableName": "vpn_if_tunnel_bind"
+    },
+    "allow-service": {
+      "dhcp": {
+        "vipObjectType": "object",
+        {% if tunnel.dhcp is not none %}
+            "vipType": "constant",
+            "vipValue": "{{ tunnel.dhcp | tojson}}",
+        {% else %}
+            "vipType": "ignore",
+            "vipValue": "false",
+        {% endif %} 
+        "vipVariableName": "vpn_if_tunnel_dhcp"
+      },
+      "dns": {
+        "vipObjectType": "object",
+        {% if tunnel.dns is not none %}
+            "vipType": "constant",
+            "vipValue": "{{ tunnel.dns | tojson}}",
+        {% else %}
+            "vipType": "ignore",
+            "vipValue": "false",
+        {% endif %} 
+        "vipVariableName": "vpn_if_tunnel_dns"
+      },
+      "icmp": {
+        "vipObjectType": "object",
+        {% if tunnel.icmp is not none %}
+            "vipType": "constant",
+            "vipValue": "{{ tunnel.icmp | tojson}}",
+        {% else %}
+            "vipType": "ignore",
+            "vipValue": "false",
+        {% endif %} 
+        "vipVariableName": "vpn_if_tunnel_icmp"
+      },
+      "sshd": {
+        "vipObjectType": "object",
+        {% if tunnel.ssh is not none %}
+            "vipType": "constant",
+            "vipValue": "{{ tunnel.ssh | tojson}}",
+        {% else %}
+            "vipType": "ignore",
+            "vipValue": "false",
+        {% endif %} 
+        "vipVariableName": "vpn_if_tunnel_sshd"
+      },
+      "ntp": {
+        "vipObjectType": "object",
+        {% if tunnel.ntp is not none %}
+            "vipType": "constant",
+            "vipValue": "{{ tunnel.ntp | tojson}}",
+        {% else %}
+            "vipType": "ignore",
+            "vipValue": "false",
+        {% endif %} 
+        "vipVariableName": "vpn_if_tunnel_ntp"
+      },
+      "stun": {
+        "vipObjectType": "object",
+        {% if tunnel.stun is not none %}
+            "vipType": "constant",
+            "vipValue": "{{ tunnel.stun | tojson}}",
+        {% else %}
+            "vipType": "ignore",
+            "vipValue": "false",
+        {% endif %} 
+        "vipVariableName": "vpn_if_tunnel_stun"
+      },
+      "all": {
+        "vipObjectType": "object",
+        {% if tunnel.all is not none %}
+            "vipType": "constant",
+            "vipValue": "{{ tunnel.all | tojson}}",
+        {% else %}
+            "vipType": "ignore",
+            "vipValue": "false",
+        {% endif %} 
+        "vipVariableName": "vpn_if_tunnel_all"
+      },
+      "bgp": {
+        "vipObjectType": "object",
+        {% if tunnel.bgp is not none %}
+            "vipType": "constant",
+            "vipValue": "{{ tunnel.bgp | tojson}}",
+        {% else %}
+            "vipType": "ignore",
+            "vipValue": "false",
+        {% endif %} 
+        "vipVariableName": "vpn_if_tunnel_bgp"
+      },
+      "ospf": {
+        "vipObjectType": "object",
+        {% if tunnel.ospf is not none %}
+            "vipType": "constant",
+            "vipValue": "{{ tunnel.ospf | tojson}}",
+        {% else %}
+            "vipType": "ignore",
+            "vipValue": "false",
+        {% endif %} 
+        "vipVariableName": "vpn_if_tunnel_ospf"
+      },
+      "netconf": {
+        "vipObjectType": "object",
+        {% if tunnel.netconf is not none %}
+            "vipType": "constant",
+            "vipValue": "{{ tunnel.netconf | tojson}}",
+        {% else %}
+            "vipType": "ignore",
+            "vipValue": "false",
+        {% endif %} 
+        "vipVariableName": "vpn_if_tunnel_netconf"
+      },
+      "snmp": {
+        "vipObjectType": "object",
+        {% if tunnel.snmp is not none %}
+            "vipType": "constant",
+            "vipValue": "{{ tunnel.snmp | tojson}}",
+        {% else %}
+            "vipType": "ignore",
+            "vipValue": "false",
+        {% endif %} 
+        "vipVariableName": "vpn_if_tunnel_snmp"
+      },
+      "https": {
+        "vipObjectType": "object",
+        {% if tunnel.https is not none %}
+            "vipType": "constant",
+            "vipValue": "{{ tunnel.https | tojson}}",
+        {% else %}
+            "vipType": "ignore",
+            "vipValue": "false",
+        {% endif %} 
+        "vipVariableName": "vpn_if_tunnel_https"
+      }
+    },
+    "max-control-connections": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipVariableName": "vpn_if_tunnel_max_control_connections"
+    },
+    "vbond-as-stun-server": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipValue": "false",
+      "vipVariableName": "vpn_if_tunnel_vbond_as_stun_server"
+    },
+    "exclude-controller-group-list": {
+      "vipObjectType": "list",
+      "vipType": "ignore",
+      "vipVariableName": "vpn_if_tunnel_exclude_controller_group_list"
+    },
+    "vmanage-connection-preference": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipValue": 5,
+      "vipVariableName": "vpn_if_tunnel_vmanage_connection_preference"
+    },
+    "port-hop": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipValue": "true",
+      "vipVariableName": "vpn_if_tunnel_port_hop"
+    },
+    "low-bandwidth-link": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipValue": "false",
+      "vipVariableName": "vpn_if_tunnel_low_bandwidth_link"
+    },
+    "last-resort-circuit": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipValue": "false",
+      "vipVariableName": "vpn_if_tunnel_last_resort_circuit"
+    },
+    "nat-refresh-interval": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipValue": 5,
+      "vipVariableName": "vpn_if_tunnel_nat_refresh_interval"
+    },
+    "hello-interval": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipValue": 1000,
+      "vipVariableName": "vpn_if_tunnel_hello_interval"
+    },
+    "hello-tolerance": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipValue": 12,
+      "vipVariableName": "vpn_if_tunnel_hello_tolerance"
+    },
+    "tloc-extension-gre-to": {
+      "dst-ip": {
+        "vipObjectType": "object",
+        "vipType": "ignore",
+        "vipVariableName": "vpn_if_tunnel_tloc_ext_gre_to_dst_ip"
+      }
+    },
+    "enable-core-region": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipValue": "false"
+    },
+    "core-region": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipValue": "core"
+    },
+    "secondary-region": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipValue": "off"
+    },
+    "tunnel-tcp-mss-adjust": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipVariableName": "vpn_if_tunnel_tunnel_tcp_mss_adjust"
+    },
+    "clear-dont-fragment": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipValue": "false",
+      "vipVariableName": "vpn_if_tunnel_tunnel_clear_dont_fragment"
+    },
+    "propagate-sgt": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipValue": "false",
+      "vipVariableName": "vpn_if_tunnel_tunnel_propagate_sgt"
+    },
+    "network-broadcast": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipValue": "false",
+      "vipVariableName": "vpn_if_tunnel_tunnel_network_broadcast"
+    }
+}

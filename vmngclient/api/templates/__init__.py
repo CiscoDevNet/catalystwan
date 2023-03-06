@@ -25,6 +25,18 @@ from vmngclient.api.templates.payloads.cisco_vpn.cisco_vpn_model import (
     NextHop,
 )
 
+# Cisco VPN Interface Ethernet Templates
+from vmngclient.api.templates.payloads.cisco_vpn_interface_ethernet.cisco_vpn_interface_ethernet_model import (
+    CiscoVpnInterfaceEthernetModel,
+    ColorType,
+    Encapsulation,
+    EncapType,
+    InterfaceName,
+    InterfaceType,
+    Tunnel,
+    TypeAddress,
+)
+
 # CEdge Templates
 from vmngclient.api.templates.payloads.tenant.tenant_model import TenantModel
 
@@ -40,4 +52,12 @@ __all__ = [
     "GatewayType",
     "NextHop",
     "CiscoSystemModel",
+    "CiscoVpnInterfaceEthernetModel",
+    "InterfaceType",
+    "TypeAddress",
+    "ColorType",
+    "Tunnel",
+    "Encapsulation",
+    "EncapType",
+    "InterfaceName",
 ]
