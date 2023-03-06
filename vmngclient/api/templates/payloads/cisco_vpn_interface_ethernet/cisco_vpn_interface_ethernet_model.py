@@ -65,7 +65,16 @@ class EncapType(Enum):
 @define
 class InterfaceName:
     type: InterfaceType
-    number: Optional[str] = None
+    name: Optional[str] = None
+    number: Optional[int] = None
+    sub_number: Optional[int] = None
+
+    def __attrs_post_init__(self):
+        self.name = self.type.value
+        if self.number is not None:
+            self.name += str(self.number)
+            if self.sub_number is not None:
+                self.name += f".{self.sub_number}"
 
 
 @define
@@ -95,7 +104,7 @@ class Tunnel:
 
 class CiscoVpnInterfaceEthernetModel(FeatureTemplate):
     payload_path: ClassVar[Path] = Path(__file__).parent / "feature/cisco_vpn_interface_ethernet.json.j2"
-    interface_name: InterfaceName
+    interface: InterfaceName
     shutdown: Optional[bool]
     type_address: TypeAddress = TypeAddress.STATIC
     ip: Optional[str]
