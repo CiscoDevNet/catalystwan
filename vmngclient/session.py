@@ -144,6 +144,10 @@ class vManageSession(vManageResponseAdapter):
         port: port
         username: username
         password: password
+
+    Attributes:
+        enable_relogin (bool): defaults to True, in case that session is not properly logged-in, session will try to
+            relogin and try the same request again
     """
 
     on_session_create_hook: ClassVar[Callable[[vManageSession], Any]] = lambda *args: None
@@ -168,6 +172,8 @@ class vManageSession(vManageResponseAdapter):
         self._session_type = SessionType.NOT_DEFINED
         self.server_name = None
         self.logger = logging.getLogger(__name__)
+        self.enable_relogin: bool = True
+        self.__second_relogin_try: bool = False
         self.response_trace: Callable[
             [Optional[Response], Union[Request, PreparedRequest, None]], str
         ] = response_history_debug
@@ -188,6 +194,17 @@ class vManageSession(vManageResponseAdapter):
 
         if response.request.url and "passwordReset.html" in response.request.url:
             raise InvalidOperationError("Password must be changed to use this session.")
+
+        if self.enable_relogin and response.headers.get("set-cookie"):
+            if not self.__second_relogin_try:
+                self.logger.warning("Relogin session...")
+                self.auth = vManageAuth(self.base_url, self.username, self.password, verify=False)
+                self.__second_relogin_try = True
+                return self.request(method, url, *args, **kwargs)
+            else:
+                self.logger.warning("Relogin failed.")
+        else:
+            self.__second_relogin_try = False
 
         try:
             response.raise_for_status()
