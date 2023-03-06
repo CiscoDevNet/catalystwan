@@ -661,3 +661,10 @@ class TestDevicesStateAPI(TestCase):
     @patch("vmngclient.session.vManageSession")
     def test_wait_for_device_state_unreachable(self, mock_session):
         pass  # TODO fix method before test
+
+
+# Jacek Rogalski
+
+# CI/CD -> technologie i cały scope do niego Jenkins ()
+
+# Inkubator ->
