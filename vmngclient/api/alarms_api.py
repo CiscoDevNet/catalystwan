@@ -1,12 +1,16 @@
+from __future__ import annotations
+
 import logging
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Set
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Set
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.dataclasses import AlarmData
-from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass, flatten_dict
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
 

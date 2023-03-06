@@ -1,13 +1,17 @@
 """
 Module for apidocs/#/Tenant Backup Restore
 """
+from __future__ import annotations
+
 import logging
 import re
 from pathlib import Path
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from vmngclient.api.task_status_api import TaskStatus, wait_for_completed
-from vmngclient.session import vManageSession
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
 

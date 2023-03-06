@@ -1,17 +1,21 @@
 """
 Module for handling admintech logs for a device
 """
+from __future__ import annotations
+
 import logging
 import time
 from pathlib import Path
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from requests import Response
 from requests.exceptions import HTTPError
 
 from vmngclient.dataclasses import AdminTech, DeviceAdminTech
-from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
 
