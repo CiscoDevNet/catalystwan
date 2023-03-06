@@ -67,12 +67,14 @@ class SoftwareActionAPI:
     session = create_vManageSession(...)
 
     # Prepare devices list
-    devices = [dev for dev in DevicesAPI(session).devices if dev.hostname in ["vm5", "vm6"]]
-    software_image = PurePath("c8000v-universalk9.17.06.03a.0.56.SPA.bin")
+    devices = [device for device in DevicesAPI(session).devices 
+                if dev.personality == Personality.VSMART]
+    software_image = "viptela-20.7.2-x86_64.tar.gz"
 
     # Upgrade
-    software_action = SoftwareActionAPI(session,DeviceCategory.VEDGES.value)
-    software_action_id = software_action.upgrade_software(devices,
+    devices_payload = DeviceVersions(session, DeviceCategory.CONTROLLERS).get_devices_current_version(devices)
+    software_action = SoftwareActionAPI(session, DeviceCategory.VEDGES)
+    software_action_id = software_action.upgrade_software(devices_payload,
         InstallSpecHelper.CEDGE.value, reboot = False, sync = True, software_image=software_image)
 
     # Check action status
