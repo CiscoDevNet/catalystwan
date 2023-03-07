@@ -10,7 +10,6 @@ from vmngclient.api.versions_utils import (
     RemovePartitionPayload,
     RepositoryAPI,
 )
-from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import asdict
 
 logger = logging.getLogger(__name__)
