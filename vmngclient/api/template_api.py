@@ -454,7 +454,7 @@ class TemplatesAPI:
         if isinstance(template, list):
             return [self.create(t) for t in template]
 
-        template_id: Optional[str] = None  # type: ignore
+        template_id: Osptional[str] = None  # type: ignore
         template_type = None
 
         # exists = self.get(type(template)).filter(name=template.name)
