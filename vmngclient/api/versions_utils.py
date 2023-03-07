@@ -140,7 +140,18 @@ class RepositoryAPI:
         return upload.status_code
 
     def delete_image(self, image_name: str) -> int:
+        """
+        Delete image from vManage software repository
 
+        Args:
+            image_name (str): image name
+
+        Raises:
+            ImageNotInRepositoryError: raise error if image not in repository
+
+        Returns:
+            int: Reponse status code
+        """
         for image in self.get_all_software_images():
             if image_name in image["availableFiles"]:
                 version_id = image["versionId"]
