@@ -212,7 +212,7 @@ class TestDevicesAPI(TestCase):
         answer = DevicesAPI(mock_session).get_device_details(uuid=uuid)
 
         # Assert
-        self.assertEqual(answer[0], create_dataclass(Device, self.devices[device_number]))
+        self.assertEqual(answer, create_dataclass(Device, self.devices[device_number]))
 
     @parameterized.expand(
         [[Personality.EDGE, 1], [Personality.VBOND, 1], [Personality.VMANAGE, 1], [Personality.VSMART, 1]]
