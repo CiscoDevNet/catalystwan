@@ -15,7 +15,7 @@ class GeneralTemplate(BaseModel):
         arbitrary_types_allowed = True
 
     name: str
-    subtemplates: List[GeneralTemplate] = []
+    subTemplates: List[GeneralTemplate] = []
 
     templateId: str = ""
     templateType: str = ""
@@ -69,5 +69,6 @@ class DeviceTemplate(BaseModel):
             else:
                 output.append(template)
         return output
+
 
     payload_path: Final[Path] = Path(__file__).parent / "device_template_payload.json.j2"

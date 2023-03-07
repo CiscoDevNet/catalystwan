@@ -100,7 +100,25 @@ class TemplatesAPI:
 
         return DataSequence(TemplateInfo)
 
-    def attach(self, name: str, device: Device) -> bool:
+    @overload
+    def attach(self, template: CLITemplate, name: str, device: Device) -> bool:
+        ...
+    
+    @overload    
+    def attach(self, template: DeviceTemplate) -> bool:
+        ...
+        
+    def attach(self, template, name = None, device = None):
+        if isinstance(template, CLITemplate):
+            return self._attach_cli(template, name, device)
+
+        if isinstance(template, DeviceTemplate):
+            self.attach_feature()
+    
+    def attach_feature(self):
+        endpoint = "/dataservice/template/device/config/attachfeature"
+    
+    def _attach_cli(self, name: str, device: Device) -> bool:
         """
 
         Args:
@@ -110,7 +128,6 @@ class TemplatesAPI:
         Returns:
             bool: True if attaching template is successful, otherwise - False.
         """
-        raise NotImplementedError()
         try:
             template_id = self.get_id(name)
             self.template_validation(template_id, device=device)
@@ -242,15 +259,15 @@ class TemplatesAPI:
         def parse_general_template(
             general_template: GeneralTemplate, fr_templates: DataSequence[FeatureTemplateInfo]
         ) -> GeneralTemplate:
-            if general_template.subtemplates:
-                general_template.subtemplates = [
-                    parse_general_template(_t, fr_templates) for _t in general_template.subtemplates
+            if general_template.subTemplates:
+                general_template.subTemplates = [
+                    parse_general_template(_t, fr_templates) for _t in general_template.subTemplates
                 ]
 
             info = get_general_template_info(general_template.name, fr_templates)
             return GeneralTemplate(
                 name=general_template.name,
-                subtemplates=general_template.subtemplates,
+                subTemplates=general_template.subTemplates,
                 templateId=info.id,
                 templateType=info.template_type,
             )
