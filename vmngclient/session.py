@@ -46,7 +46,7 @@ class SessionNotCreatedError(Exception):
 
 
 class OnSessionCreateHook(Protocol):
-    def __call__(self) -> None:
+    def __call__(self, session: Session) -> None:
         ...
 
 
@@ -100,7 +100,7 @@ def create_vManageSession(
         server_info = {}
 
     session.server_name = server_info.get("server")
-    session.on_session_create_hook()
+    session.on_session_create_hook(session)
 
     try:
         user_mode = UserMode(server_info.get("userMode", "not found"))
@@ -195,7 +195,7 @@ class vManageSession(vManageResponseAdapter):
 
     def request(self, method, url, *args, **kwargs) -> vManageResponse:
         full_url = self.get_full_url(url)
-        self.on_request_hook(method, full_url)
+        self.on_request_hook(method, full_url, *args, **kwargs)
         try:
             response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
             self.logger.debug(self.response_trace(response, None))
