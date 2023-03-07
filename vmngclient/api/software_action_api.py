@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import logging
 from enum import Enum
-from pathlib import PurePath
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
 
 from attr import define  # type: ignore
+
 from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.exceptions import VersionDeclarationError  # type: ignore
