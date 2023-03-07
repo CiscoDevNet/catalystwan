@@ -276,10 +276,6 @@ class TemplatesAPI:
     def create(self, template: CLITemplate) -> str:
         ...
 
-    # @overload
-    # def create(self, template: List[FeatureTemplate]) -> List[str]:
-    #     ...
-
     def create(self, template):
         if isinstance(template, list):
             return [self.create(t) for t in template]
