@@ -22,7 +22,7 @@ class SpeedtestAPI:
     Example:
         session = create_vManageSession(...)
         devices = session.api.basic_api.devices
-        speed = session.api.speedtest_api.speedtest(devices[0], devices[1])
+        speed = session.api.speedtest.speedtest(devices[0], devices[1])
 
         speed is a Speedtest object containing source and destination device info and up and down speed between them
     """
