@@ -6,9 +6,6 @@ from pathlib import PurePath
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
 
 from attr import define  # type: ignore
-from clint.textui.progress import Bar as ProgressBar  # type: ignore
-from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
-
 from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.exceptions import VersionDeclarationError  # type: ignore
@@ -184,35 +181,6 @@ class SoftwareActionAPI:
             self._downgrade_check(payload["devices"], payload["input"]["version"], install_spec.family.value)
         upgrade = dict(self.session.post(url, json=payload).json())
         return upgrade["id"]
-
-    def _create_callback(self, encoder: MultipartEncoder):
-
-        bar = ProgressBar(expected_size=encoder._calculate_length(), filled_char="=")
-
-        def callback(monitor: MultipartEncoderMonitor):
-            bar.show(monitor.bytes_read)
-
-        return callback
-
-    def upload_image(self, image_path: str) -> int:
-        """
-        Upload software image 'tar.gz' to Vmanage
-        software repository
-
-        Args:
-            image_path (str): path to software image
-
-        Returns:
-            str: Response status code
-        """
-        url = "/dataservice/device/action/software/package"
-        encoder = MultipartEncoder(
-            fields={"file": (PurePath(image_path).name, open(image_path, "rb"), "application/x-gzip")}
-        )
-        callback = self._create_callback(encoder)
-        monitor = MultipartEncoderMonitor(encoder, callback)
-        upload = self.session.post(url, data=monitor, headers={"content-type": monitor.content_type})
-        return upload.status_code
 
     def _downgrade_check(self, payload_devices: List[dict], version_to_upgrade: str, family: str) -> None:
         """
