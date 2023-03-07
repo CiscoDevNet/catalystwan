@@ -150,7 +150,7 @@ class DevicesAPI:
         devices_full_info = self.session.get(url="/dataservice/device/system/info", params=parameters)
 
         devices = devices_full_info.dataseq(Device)
-        # from IPython import embed; embed()
+
         return devices
 
 
