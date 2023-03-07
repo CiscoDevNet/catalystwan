@@ -4,7 +4,7 @@ import json
 import logging
 from difflib import Differ
 from enum import Enum
-from typing import TYPE_CHECKING, List, Optional, overload
+from typing import TYPE_CHECKING, Optional, overload
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
 from requests.exceptions import HTTPError
@@ -15,7 +15,6 @@ from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, TemplateInfo
 from vmngclient.exceptions import AlreadyExistsError
 from vmngclient.typed_list import DataSequence
-from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.operation_status import OperationStatus
 
@@ -214,9 +213,8 @@ class TemplatesAPI:
         Returns:
             bool: True if create template is successful, otherwise - False.
         """
-        raise NotImplementedError()
         try:
-            # self.get(name)
+            self.get(CLITemplate)
             raise AlreadyExistsError(f"Error, Template with name: {name} exists.")
         except TemplateNotFoundError:
             cli_template = CLITemplate(self.session, device_model, name, description)
@@ -231,35 +229,39 @@ class TemplatesAPI:
 
         return template_id
 
-    def _create_device_template(self, template: DeviceTemplate) -> str:
-        def get_general_template_info(name: str) -> GeneralTemplate:
-            _template = self.get(FeatureTemplate).filter(name=name).single_or_default()
-            return GeneralTemplate(templateId=_template.id, templateType=_template.template_type)
+    def _create_device_template(self, device_template: DeviceTemplate) -> str:
+        def get_general_template_info(
+            name: str, fr_templates: DataSequence[FeatureTemplateInfo]
+        ) -> FeatureTemplateInfo:
+            _template = fr_templates.filter(name=name).single_or_default()
+            if not _template:
+                raise TypeError(f"{name} does not exists. Device Template is invalid.")
 
-        def validate_names(fr_templates: List[FeatureTemplateInfo]) -> bool:
-            templates = set(template.name for template in fr_templates)
-            templates_exist = True
-            for _template in template.general_templates:
-                if _template not in set(templates):
-                    logger.error(f"{_template} does not exists.")
-                    templates_exist = False
+            return _template
 
-            return templates_exist
+        def parse_general_template(
+            general_template: GeneralTemplate, fr_templates: DataSequence[FeatureTemplateInfo]
+        ) -> GeneralTemplate:
+            if general_template.subtemplates:
+                general_template.subtemplates = [
+                    parse_general_template(_t, fr_templates) for _t in general_template.subtemplates
+                ]
 
-        def validate() -> bool:
-            fr_templates = self.get_feature_templates()
-            return validate_names(fr_templates)
-
-        if not validate():
-            raise TypeError("Device Template is invalid.")
-
-        if isinstance(template.general_templates[0], str):
-            template.general_templates = list(
-                map(lambda x: get_general_template_info(x), template.general_templates)  # type: ignore
+            info = get_general_template_info(general_template.name, fr_templates)
+            return GeneralTemplate(
+                name=general_template.name,
+                subtemplates=general_template.subtemplates,
+                templateId=info.id,
+                templateType=info.template_type,
             )
 
+        fr_templates = self.get(FeatureTemplate)
+        device_template.general_templates = list(
+            map(lambda x: parse_general_template(x, fr_templates), device_template.general_templates)  # type: ignore
+        )
+
         endpoint = "/dataservice/template/device/feature/"
-        payload = json.loads(template.generate_payload(self.session))
+        payload = json.loads(device_template.generate_payload())
         response = self.session.post(endpoint, json=payload)
 
         return response.text
@@ -303,20 +305,6 @@ class TemplatesAPI:
 
         logger.info(f"Template {template.name} ({template_type}) was created successfully ({template_id}).")
         return template_id
-
-    def get_feature_templates(self, name: Optional[str] = None) -> List[FeatureTemplateInfo]:
-        """Get feature template list.
-
-        Note: In a multitenant vManage system, this API is only available in the Provider view.
-        """
-        payload = {"summary": "true"}
-        response = self.session.get("/dataservice/template/feature", params=payload)
-        parsed_response = response.json()["data"]
-        fr_templates = [create_dataclass(FeatureTemplateInfo, feature_template) for feature_template in parsed_response]
-
-        if name is None:
-            return fr_templates
-        return list(filter(lambda template: template.name == name, fr_templates))
 
     def template_validation(self, id: str, device: Device) -> str:
         """Checking the template of the configuration on the machine.

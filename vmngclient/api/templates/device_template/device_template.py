@@ -2,30 +2,23 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Final, List, Union
+from typing import Final, List
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
-from pydantic import BaseModel  # type: ignore
-
-if TYPE_CHECKING:
-    from vmngclient.session import vManageSession
-
+from pydantic import BaseModel, validator  # type: ignore
 
 logger = logging.getLogger(__name__)
 
 
 class GeneralTemplate(BaseModel):
-    templateId: str
-    templateType: str
-    subTemplates: List[GeneralTemplate] = []
-
     class Config:
         arbitrary_types_allowed = True
 
-    # @classmethod
-    # def get(cls, session: vManageSession, name: str) -> GeneralTemplate:
-    #     template = TemplatesAPI(session).get_single_feature_template(name)
-    #     return cls(templateId=template.id, templateType=template.type)
+    name: str
+    subtemplates: List[GeneralTemplate] = []
+
+    templateId: str = ""
+    templateType: str = ""
 
 
 class DeviceTemplate(BaseModel):
@@ -45,16 +38,13 @@ class DeviceTemplate(BaseModel):
     >>> session.api.templates.create(device_template)
     """
 
-    class Config:
-        arbitrary_types_allowed = True
-
     name: str
     description: str
-    general_templates: Union[List[str], List[GeneralTemplate]]
+    general_templates: List[GeneralTemplate]
     device_role: str = ""
     device_type: str = ""
 
-    def generate_payload(self, session: vManageSession) -> str:
+    def generate_payload(self) -> str:
         env = Environment(
             loader=FileSystemLoader(self.payload_path.parent),
             trim_blocks=True,
@@ -62,10 +52,6 @@ class DeviceTemplate(BaseModel):
             undefined=DebugUndefined,
         )
         template = env.get_template(self.payload_path.name)
-        # if isinstance(self.general_templates[0], str):
-        #     self.general_templates = list(
-        #         map(lambda x: GeneralTemplate.get(session, x), self.general_templates)  # type: ignore
-        #     )
         output = template.render(self.dict())
 
         ast = env.parse(output)
@@ -74,18 +60,14 @@ class DeviceTemplate(BaseModel):
             raise Exception
         return output
 
-    # def validate(self, session: vManageSession) -> bool:
-    #     fr_templates = TemplatesAPI(session).get_feature_templates()
-    #     return self._validate_names(fr_templates)
-
-    # def _validate_names(self, fr_templates: List[FeatureTemplateInformation]) -> bool:
-    #     templates = set(template.name for template in fr_templates)
-    #     templates_exist = True
-    #     for template in self.general_templates:
-    #         if template not in set(templates):
-    #             logger.error(f"{template} does not exists.")
-    #             templates_exist = False
-
-    #     return templates_exist
+    @validator("general_templates", pre=True)
+    def parse_templates(cls, value):
+        output = []
+        for template in value:
+            if isinstance(template, str):
+                output.append(GeneralTemplate(name=template))
+            else:
+                output.append(template)
+        return output
 
     payload_path: Final[Path] = Path(__file__).parent / "device_template_payload.json.j2"
