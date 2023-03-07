@@ -30,7 +30,6 @@ class DevicesAPI:
 
     Attributes:
         session: logged in API client session
-        devices: List with system status for all devices
     """
 
     def __init__(self, session: vManageSession) -> None:
@@ -82,7 +81,7 @@ class DevicesAPI:
         """
         return sum([1 for device in self.get() if device.personality == personality])
 
-    def get_reachable_devices(self, personality: Personality):
+    def get_reachable_devices(self, personality: Personality) -> DataSequence[Device]:
         """Get reachable devices by personality.
 
         Args:
@@ -93,7 +92,9 @@ class DevicesAPI:
         """
         unsupported_personality = [Personality.VMANAGE]
         assert personality not in unsupported_personality, "Unsupported personality for reachable endpoint"
-        return self.session.get_data(f"/dataservice/device/reachable?personality={personality.value}")
+
+        devices = self.session.get(f"/dataservice/device/reachable?personality={personality.value}")
+        return devices.dataseq(Device)
 
     def send_certificate_state_to_controllers(
         self,
@@ -134,10 +135,16 @@ class DevicesAPI:
     def get(self, rediscover: bool = False) -> DataSequence[Device]:
         """Data sequence of all devices.
 
+        Args:
+            rediscover: Rediscover device request payload
+
+        Returns:
+            DataSequence[Device] of all devices
+
         ## Examples:
 
         Get all vManages:
-        >>> devices = DevicesAPI(session).get_devices()
+        >>> devices = DevicesAPI(session).get()
         >>> vManages = devices.filter(personality=Personality.VMANAGE)
         """
         if rediscover:

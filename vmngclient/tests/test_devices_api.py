@@ -92,14 +92,12 @@ class TestDevicesAPI(TestCase):
         self.controllers_dataclass = DataSequence(
             Device, [create_dataclass(Device, device) for device in self.devices[:2]]
         )
-        self.orchestrators_dataclass = DataSequence(Device, [create_dataclass(Device, self.devices[2])])
-        self.edges_dataclass = DataSequence(Device, [create_dataclass(Device, self.devices[3])])
-        self.vsmarts_dataclass = DataSequence(Device, [create_dataclass(Device, self.devices[1])])
+        self.orchestrators_dataseq = DataSequence(Device, [create_dataclass(Device, self.devices[2])])
+        self.vsmarts_dataseq = DataSequence(Device, [create_dataclass(Device, self.devices[1])])
+        self.vbonds_dataseq = DataSequence(Device, [create_dataclass(Device, self.devices[2])])
+        self.edges_dataseq = DataSequence(Device, [create_dataclass(Device, self.devices[3])])
         self.system_ips_list = [device["local-system-ip"] for device in self.devices]
         self.ips_list = [device["deviceId"] for device in self.devices]
-        self.devices_vbonds = [self.devices[2]]
-        self.devices_vsmatrs = [self.devices[1]]
-        self.devices_edges = [self.devices[3]]
 
     @patch.object(DevicesAPI, "get")
     def test_controllers(self, mock_devices):
@@ -126,7 +124,7 @@ class TestDevicesAPI(TestCase):
         answer = DevicesAPI(mock_session).get().filter(personality=Personality.VBOND)
 
         # Assert
-        self.assertEqual(answer, self.orchestrators_dataclass)
+        self.assertEqual(answer, self.orchestrators_dataseq)
 
     @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
@@ -139,7 +137,7 @@ class TestDevicesAPI(TestCase):
         answer = DevicesAPI(mock_session).get().filter(personality=Personality.EDGE)
 
         # Assert
-        self.assertEqual(answer, self.edges_dataclass)
+        self.assertEqual(answer, self.edges_dataseq)
 
     @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
@@ -152,7 +150,7 @@ class TestDevicesAPI(TestCase):
         answer = DevicesAPI(mock_session).get().filter(personality=Personality.VSMART)
 
         # Assert
-        self.assertEqual(answer, self.vsmarts_dataclass)
+        self.assertEqual(answer, self.vsmarts_dataseq)
 
     @patch("vmngclient.session.vManageSession")
     @patch.object(DevicesAPI, "get")
@@ -229,38 +227,44 @@ class TestDevicesAPI(TestCase):
         # Assert
         self.assertEqual(answer, devices_number)
 
+    @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
-    def test_get_reachable_devices_for_vsmatrs(self, mock_session, personality=Personality.VSMART):
+    def test_get_reachable_devices_vsmarts(self, mock_session, mock_response):
         # Arrange
-        mock_session.get_data.return_value = [
-            device for device in self.devices if device["personality"] == personality.value
-        ]
-        # Act
-        answer = DevicesAPI(mock_session).get_reachable_devices(personality)
-        # Assert
-        self.assertEqual(answer, self.devices_vsmatrs)
+        mock_session.get.return_value = mock_response
+        mock_response.dataseq.return_value = DataSequence(Device, [create_dataclass(Device, self.devices[1])])
 
-    @patch("vmngclient.session.vManageSession")
-    def test_get_reachable_devices_for_vbonds(self, mock_session, personality=Personality.VBOND):
-        # Arrange
-        mock_session.get_data.return_value = [
-            device for device in self.devices if device["personality"] == personality.value
-        ]
         # Act
-        answer = DevicesAPI(mock_session).get_reachable_devices(personality)
-        # Assert
-        self.assertEqual(answer, self.devices_vbonds)
+        answer = DevicesAPI(mock_session).get_reachable_devices(personality=Personality.VSMART)
 
-    @patch("vmngclient.session.vManageSession")
-    def test_get_reachable_devices_for_edges(self, mock_session, personality=Personality.EDGE):
-        # Arrange
-        mock_session.get_data.return_value = [
-            device for device in self.devices if device["personality"] == personality.value
-        ]
-        # Act
-        answer = DevicesAPI(mock_session).get_reachable_devices(personality)
         # Assert
-        self.assertEqual(answer, self.devices_edges)
+        self.assertEqual(answer, self.vsmarts_dataseq)
+
+    @patch("vmngclient.response.vManageResponse")
+    @patch("vmngclient.session.vManageSession")
+    def test_get_reachable_devices_vbonds(self, mock_session, mock_response):
+        # Arrange
+        mock_session.get.return_value = mock_response
+        mock_response.dataseq.return_value = DataSequence(Device, [create_dataclass(Device, self.devices[2])])
+
+        # Act
+        answer = DevicesAPI(mock_session).get_reachable_devices(personality=Personality.VBOND)
+
+        # Assert
+        self.assertEqual(answer, self.vbonds_dataseq)
+
+    @patch("vmngclient.response.vManageResponse")
+    @patch("vmngclient.session.vManageSession")
+    def test_get_reachable_devices_vedgess(self, mock_session, mock_response):
+        # Arrange
+        mock_session.get.return_value = mock_response
+        mock_response.dataseq.return_value = DataSequence(Device, [create_dataclass(Device, self.devices[3])])
+
+        # Act
+        answer = DevicesAPI(mock_session).get_reachable_devices(personality=Personality.EDGE)
+
+        # Assert
+        self.assertEqual(answer, self.edges_dataseq)
 
     @patch("vmngclient.session.vManageSession")
     def test_get_reachable_devices_for_vmanage(self, mock_session, personality=Personality.VMANAGE):
