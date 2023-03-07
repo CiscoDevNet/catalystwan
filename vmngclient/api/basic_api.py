@@ -55,7 +55,7 @@ class DevicesAPI:
                 return dev.id
         return ""
 
-    def get_device_details(self, uuid: str) -> DataSequence[Device]:
+    def get_device_details(self, uuid: str) -> Device:
         """Gets system information for a device.
 
         Args:
@@ -69,7 +69,7 @@ class DevicesAPI:
         devices = response.dataseq(Device)
         assert len(devices) == 1, "Expected system info response list to have one member"
 
-        return devices
+        return devices[0]
 
     def count_devices(self, personality: Personality) -> int:
         """Gets number of devices of given personality.
