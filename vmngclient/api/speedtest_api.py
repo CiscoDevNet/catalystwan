@@ -35,6 +35,14 @@ class SpeedtestAPI:
         destination_device: Device,
         test_duration_seconds: int = 300,
     ) -> Speedtest:
+        """
+        Performs speedtest between 2 edge devices.
+
+        Args:
+            source_device (Device): device from which the speed will be measured
+            destination_device (Device): device to which the speed will be measured
+            test_duration_seconds (int): duration of the speed measuring in seconds, defaults to 300 (5 minutes)
+        """
 
         source_color = DeviceStateAPI(self.session).get_colors(source_device.id)[0]
         destination_color = DeviceStateAPI(self.session).get_colors(destination_device.id)[0]
@@ -52,7 +60,7 @@ class SpeedtestAPI:
         if source_device.is_reachable and destination_device.is_reachable:
             with DeviceStateAPI(self.session).enable_data_stream():
                 try:
-                    self.perform(
+                    self.__perform(
                         source_device,
                         destination_device,
                         source_color,
@@ -69,7 +77,7 @@ class SpeedtestAPI:
 
         return self.speedtest_output
 
-    def perform(
+    def __perform(
         self,
         source_device: Device,
         destination_device: Device,
