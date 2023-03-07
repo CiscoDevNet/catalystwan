@@ -899,15 +899,29 @@ it will not poll any further.</p>
 <dt class="sig sig-object py" id="vmngclient.api.speedtest_api.SpeedtestAPI">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.speedtest_api.</span></span><span class="sig-name descname"><span class="pre">SpeedtestAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.speedtest_api.SpeedtestAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="vmngclient.api.speedtest_api.SpeedtestAPI.perform">
-<span class="sig-name descname"><span class="pre">perform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_duration_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#vmngclient.api.speedtest_api.SpeedtestAPI.perform" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<p>API methods to perform speedtest between 2 edge devices.</p>
+<p class="rubric">Example</p>
+<p>session = create_vManageSession(…)
+devices = session.api.basic_api.devices
+speed = session.api.speedtest.speedtest(devices[0], devices[1])</p>
+<dl class="simple">
+<dt>speed is a Speedtest object containing source and destination device info and</dt><dd><p>upload and download speed between them</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="vmngclient.api.speedtest_api.SpeedtestAPI.speedtest">
 <span class="sig-name descname"><span class="pre">speedtest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_duration_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Speedtest" title="vmngclient.dataclasses.Speedtest"><span class="pre">Speedtest</span></a></span></span><a class="headerlink" href="#vmngclient.api.speedtest_api.SpeedtestAPI.speedtest" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Performs speedtest between 2 edge devices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_device</strong> (<a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><em>Device</em></a>) – device from which the speed will be measured</p></li>
+<li><p><strong>destination_device</strong> (<a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><em>Device</em></a>) – device to which the speed will be measured</p></li>
+<li><p><strong>test_duration_seconds</strong> (<em>int</em>) – duration of the speed measuring in seconds, defaults to 300 (5 minutes)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
