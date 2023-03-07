@@ -13,7 +13,7 @@ import multiprocessing
 import threading
 import time
 from ipaddress import IPv4Address, IPv6Address, ip_address
-from socket import gaierror, gethostbyaddr
+from socket import gaierror, gethostbyaddr, herror
 from typing import Dict, Union
 
 from urllib3.exceptions import LocationParseError, LocationValueError
@@ -71,9 +71,10 @@ def url_to_host(url: Union[str, bytes]) -> Union[IPv4Address, IPv6Address, None]
     else:
         _url = url
     try:
-        adressess = gethostbyaddr(str(parse_url(_url).host))[2]
+        host = str(parse_url(_url).host)
+        adressess = gethostbyaddr(host)[2]
         return ip_address(adressess[0])
-    except (LocationValueError, LocationParseError, gaierror):
+    except (LocationValueError, LocationParseError, gaierror, herror):
         logger.warning(f"Cannot obtain host ip from url: {_url}")
         return None
 
@@ -97,7 +98,8 @@ def ratelimit(max_requests_per_minute: int, host: Union[IPv4Address, IPv6Address
 def throttle(host: Union[IPv4Address, IPv6Address, None], **kwargs):
     """
     Ensures that each call is separated with min_interval for given Host
-    One ratelimiter is shared for all throttle calls when host is not provided
+    Creates new Ratelimiter for given host if it does not exist
+    One shared RateLimiter is used for all throttle calls for which host ip cannot be determined from url
     """
     global ratelimiters
     if not ratelimiters.get(host):
