@@ -6,8 +6,11 @@ from pathlib import PurePath
 from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
 from attr import define, field  # type: ignore
+from clint.textui.progress import Bar as ProgressBar  # type: ignore
+from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
 
 from vmngclient.dataclasses import DataclassBase, Device
+from vmngclient.exceptions import ImageNotInRepositoryError
 from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
 
 if TYPE_CHECKING:
@@ -106,6 +109,45 @@ class RepositoryAPI:
                 return image_version
         logger.error(f"Software image {image_name} is not in available images")
         return None
+
+    def _create_callback(self, encoder: MultipartEncoder):
+
+        bar = ProgressBar(expected_size=encoder._calculate_length(), filled_char="=")
+
+        def callback(monitor: MultipartEncoderMonitor):
+            bar.show(monitor.bytes_read)
+
+        return callback
+
+    def upload_image(self, image_path: str) -> int:
+        """
+        Upload software image 'tar.gz' to Vmanage
+        software repository
+
+        Args:
+            image_path (str): path to software image
+
+        Returns:
+            str: Response status code
+        """
+        url = "/dataservice/device/action/software/package"
+        encoder = MultipartEncoder(
+            fields={"file": (PurePath(image_path).name, open(image_path, "rb"), "application/x-gzip")}
+        )
+        callback = self._create_callback(encoder)
+        monitor = MultipartEncoderMonitor(encoder, callback)
+        upload = self.session.post(url, data=monitor, headers={"content-type": monitor.content_type})
+        return upload.status_code
+
+    def delete_image(self, image_name: str) -> int:
+
+        for image in self.get_all_software_images():
+            if image_name in image["availableFiles"]:
+                version_id = image["versionId"]
+                url = f"/dataservice/device/action/software/{version_id}"
+                delete = self.session.delete(url)
+                return delete.status_code
+        raise ImageNotInRepositoryError(f"Image: {image_name} is not the vManage software repository")
 
 
 class DeviceVersions:
