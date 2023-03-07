@@ -246,7 +246,6 @@ class TemplatesAPI:
         Returns:
             bool: True if attaching template is successful, otherwise - False.
         """
-        raise NotImplementedError()
         try:
             template_id = self.get(CLITemplate).filter(id=name).single_or_default().id
             self.template_validation(template_id, device=device)
