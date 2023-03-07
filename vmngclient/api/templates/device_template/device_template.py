@@ -7,7 +7,6 @@ from typing import Final, List
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
 from pydantic import BaseModel, validator  # type: ignore
 
-
 logger = logging.getLogger(__name__)
 
 
