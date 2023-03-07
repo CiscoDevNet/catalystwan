@@ -12,6 +12,7 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncod
 from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.exceptions import VersionDeclarationError  # type: ignore
+from vmngclient.utils.creation_tools import asdict
 
 logger = logging.getLogger(__name__)
 
