@@ -24,7 +24,8 @@ class SpeedtestAPI:
         devices = session.api.basic_api.devices
         speed = session.api.speedtest.speedtest(devices[0], devices[1])
 
-        speed is a Speedtest object containing source and destination device info and upload and download speed between them
+        speed is a Speedtest object containing source and destination device info and
+            upload and download speed between them
     """
     def __init__(self, session: vManageSession):
         self.session = session
