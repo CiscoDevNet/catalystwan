@@ -19,7 +19,7 @@ from typing import Dict, Union
 from urllib3.exceptions import LocationParseError, LocationValueError
 from urllib3.util import parse_url
 
-DEFAULT_MAX_REQUESTS_PER_MINUTE = 1000
+DEFAULT_MAX_REQUESTS_PER_MINUTE = 6000
 max_requests_per_minute_setting = DEFAULT_MAX_REQUESTS_PER_MINUTE
 logger = logging.getLogger(__name__)
 
@@ -83,7 +83,7 @@ def ratelimit(max_requests_per_minute: int, host: Union[IPv4Address, IPv6Address
     """
     Sets or changes ratelimit for given IP host
     If host not provided it changes default ratelimit setting for new ratelimiters
-    (ratelimiters can be created automatically on traffic by throttle function)
+    RateLimiters are also created automatically by throttle function
     """
     global ratelimiters
     global max_requests_per_minute_setting
