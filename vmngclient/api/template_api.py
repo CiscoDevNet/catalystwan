@@ -10,7 +10,7 @@ from ciscoconfparse import CiscoConfParse  # type: ignore
 from requests.exceptions import HTTPError
 
 from vmngclient.api.task_status_api import wait_for_completed
-from vmngclient.api.templates.device_template.device_template import DeviceTemplate, GeneralTemplate
+from vmngclient.api.templates.device_template.device_template import DeviceSpecificValue, DeviceTemplate, GeneralTemplate
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, TemplateInfo
 from vmngclient.exceptions import AlreadyExistsError
@@ -107,16 +107,76 @@ class TemplatesAPI:
     @overload    
     def attach(self, template: DeviceTemplate) -> bool:
         ...
-        
-    def attach(self, template, name = None, device = None):
+
+
+    def attach(self, template, device, name=None, **kwargs):
         if isinstance(template, CLITemplate):
             return self._attach_cli(template, name, device)
-
+        
         if isinstance(template, DeviceTemplate):
-            self.attach_feature()
+            return self.attach_feature(template.name, device, **kwargs)
+
+        if template is DeviceTemplate and name:
+            self.attach_feature(name, device, **kwargs)
+        
+        raise NotImplementedError()
     
-    def attach_feature(self):
+    # TODO list of devices
+    def attach_feature(self, name: str, device: Device, **kwargs):
+        def get_device_specific_variables(name: str):
+            endpoint = "/dataservice/template/device/config/exportcsv"
+            template_id = self.get(DeviceTemplate).filter(name=name).single_or_default().id
+            body = {
+                "templateId": template_id,
+                "isEdited": False,
+                "isMasterEdited": False
+            }
+
+            values = self.session.post(endpoint, json=body).json()["header"]["columns"]
+            return [DeviceSpecificValue(**value) for value in values]
+        
+        vars = get_device_specific_variables(name)
+        template_id = self.get(DeviceTemplate).filter(name=name).single_or_default().id
+        payload = {
+            "deviceTemplateList": [
+                {
+                    "templateId": template_id,
+                    "device": [
+                        {
+                            "csv-status": "complete",
+                            "csv-deviceId": device.uuid,
+                            "csv-deviceIP": device.id,
+                            "csv-host-name": device.hostname,
+                            "csv-templateId": template_id,
+                        }
+                    ],
+                }
+            ]
+        }
+        
+        invalid = False
+        for var in vars:
+            if var.property not in payload["deviceTemplateList"][0]["device"][0]:
+                pointer = payload["deviceTemplateList"][0]["device"][0]
+                if var.property not in kwargs["device_specific_vars"]:
+                    invalid = True
+                    logger.error(f"{var.property} should be provided in attach method as device_specific_vars kwarg.")
+                else:
+                    pointer[var.property] = kwargs["device_specific_vars"][var.property]
+                    
+        if invalid:
+            raise TypeError()
+
         endpoint = "/dataservice/template/device/config/attachfeature"
+        logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
+        response = self.session.post(url=endpoint, json=payload).json()
+        task = wait_for_completed(session=self.session, action_id=response["id"])
+        if task.status == OperationStatus.SUCCESS.value:
+            return True
+        logger.warning(f"Failed to attach tempate: {name} to the device: {device.hostname}.")
+        logger.warning(f"Task activity information: {task.activity}")
+        return False
+        
     
     def _attach_cli(self, name: str, device: Device) -> bool:
         """
