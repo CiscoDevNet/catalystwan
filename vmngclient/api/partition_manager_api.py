@@ -29,7 +29,7 @@ class PartitionManagerAPI:
 
         # Prepare devices list
         devices = [device for device in DevicesAPI(session).devices
-                    if dev.personality == VSMART]
+                    if device.personality == VSMART]
 
         # Set default partition
         payload_devices = DeviceVersions(provider,DeviceCategory.CONTROLLERS).get_devices_current_version(devices)
