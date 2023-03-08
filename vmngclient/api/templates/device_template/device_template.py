@@ -72,3 +72,7 @@ class DeviceTemplate(BaseModel):
 
 
     payload_path: Final[Path] = Path(__file__).parent / "device_template_payload.json.j2"
+
+
+class DeviceSpecificValue(BaseModel):
+    property: str
