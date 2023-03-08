@@ -10,8 +10,8 @@
     "ip": {
       {% if type_address.value == "static" %}
         "address": {
-          "vipObjectType": "object",
-          {% if ip is defined %}
+              "vipObjectType": "object",
+          {% if ip %}
               "vipType": "constant",
               "vipValue": "{{ ip }}",
           {% else %}
