@@ -14,7 +14,7 @@ from vmngclient.utils.ratelimit import (
 )
 
 
-class TestTypedList(unittest.TestCase):
+class TestUtilsRateLimit(unittest.TestCase):
     def setUp(self) -> None:
         global ratelimiter
         ratelimiters.clear()
