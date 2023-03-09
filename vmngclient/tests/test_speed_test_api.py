@@ -50,7 +50,7 @@ class TestSpeedTestAPI(unittest.TestCase):
             "ip", "device_name", "ip", "device_name", "status", "up_speed", "down_speed"
         )
         # Act
-        speed_test_api.perform(self.device, self.device, "blue", "red", 1)
+        speed_test_api._SpeedtestAPI__perform(self.device, self.device, "blue", "red", 1)
         # Assert
         self.assertEqual(speed_test_api.speedtest_output, speed_test_api_compare.speedtest_output)
 
@@ -66,11 +66,11 @@ class TestSpeedTestAPI(unittest.TestCase):
             "ip", "device_name", "ip", "device_name", "No speed received", None, None
         )
         # Act
-        speed_test_api.perform(self.device, self.device, "blue", "red", 1)
+        speed_test_api._SpeedtestAPI__perform(self.device, self.device, "blue", "red", 1)
         # Assert
         self.assertEqual(speed_test_api.speedtest_output, speed_test_api_compare.speedtest_output)
 
-    @patch.object(SpeedtestAPI, "perform")
+    @patch.object(SpeedtestAPI, "_SpeedtestAPI__perform")
     @patch.object(DeviceStateAPI, "enable_data_stream")
     @patch.object(DeviceStateAPI, "get_colors")
     @patch("vmngclient.session.vManageSession")
@@ -93,7 +93,7 @@ class TestSpeedTestAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, speed_test_api_compare.speedtest_output)
 
-    @patch.object(SpeedtestAPI, "perform")
+    @patch.object(SpeedtestAPI, "_SpeedtestAPI__perform")
     @patch.object(DeviceStateAPI, "enable_data_stream")
     @patch.object(DeviceStateAPI, "get_colors")
     @patch("vmngclient.session.vManageSession")
@@ -116,7 +116,7 @@ class TestSpeedTestAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, speed_test_api_compare.speedtest_output)
 
-    @patch.object(SpeedtestAPI, "perform")
+    @patch.object(SpeedtestAPI, "_SpeedtestAPI__perform")
     @patch.object(DeviceStateAPI, "enable_data_stream")
     @patch.object(DeviceStateAPI, "get_colors")
     @patch("vmngclient.session.vManageSession")

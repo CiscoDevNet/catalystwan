@@ -73,12 +73,12 @@ class AlarmData(DataclassBase):
 @define
 class Device(DataclassBase):
     uuid: str
-    status: str
     personality: Personality = field(converter=Personality)
     id: str = field(metadata={FIELD_NAME: "deviceId"})
     hostname: str = field(metadata={FIELD_NAME: "host-name"})
     reachability: Reachability = field(converter=Reachability)
     local_system_ip: str = field(metadata={FIELD_NAME: "local-system-ip"})
+    status: Optional[str] = field(default=None)
     memUsage: Optional[float] = field(default=None)
     mem_state: Optional[str] = field(default=None, metadata={FIELD_NAME: "memState"})
     cpu_state: Optional[str] = field(default=None, metadata={FIELD_NAME: "cpuState"})
@@ -459,3 +459,9 @@ class TenantTacacsServer(DataclassBase):
     timeout: int = field(default=3, metadata={FIELD_NAME: "timeout"})
     authentication: str = field(default="PAP", metadata={FIELD_NAME: "authentication"})
     server: List[TacacsServer] = field(factory=list, metadata={FIELD_NAME: "server"})
+
+
+@define
+class SoftwareInstallTimeout(DataclassBase):
+    download_timeout_min: int = field(converter=str, metadata={FIELD_NAME: "downloadTimeoutInMin"})
+    activate_timeout_min: int = field(converter=str, metadata={FIELD_NAME: "activateTimeoutInMin"})

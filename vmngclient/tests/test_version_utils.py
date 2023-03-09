@@ -1,7 +1,13 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from vmngclient.api.versions_utils import DeviceCategory, DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
+from vmngclient.api.versions_utils import (
+    DeviceCategory,
+    DeviceSoftwareRepository,
+    DeviceVersionPayload,
+    DeviceVersions,
+    RepositoryAPI,
+)
 from vmngclient.dataclasses import Device
 
 
@@ -72,17 +78,17 @@ class TestRepositoryAPI(unittest.TestCase):
         )
 
     @patch.object(RepositoryAPI, "get_devices_versions_repository")
-    def test_get_device_list_in_available(self, mock_get_devices_versions_repository):
+    def test_get_device_available(self, mock_get_devices_versions_repository):
         # Prepare mock data
         mock_get_devices_versions_repository.return_value = Mock()
         mock_session = Mock()
         mock_repository_object = RepositoryAPI(mock_session)
         mock_device_versions = DeviceVersions(mock_repository_object, DeviceCategory.CONTROLLERS.value)
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
-        answer = mock_device_versions.get_device_list_in_available("ver1", [self.device])
-        expected_result = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "ver1"}]
+        answer = mock_device_versions.get_device_available("ver1", [self.device])
+        expected_result = [DeviceVersionPayload("mock_uuid", "mock_ip", "ver1")]
 
-        # Assertcom
+        # Assert
         self.assertEqual(
             answer,
             expected_result,
@@ -98,7 +104,7 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_device_versions = DeviceVersions(mock_repository_object, DeviceCategory.CONTROLLERS.value)
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
         answer = mock_device_versions.get_device_list_in_installed("ver1", [self.device])
-        expected_result = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "ver1"}]
+        expected_result = [DeviceVersionPayload("mock_uuid", "mock_ip", "ver1")]
 
         # Assert
         self.assertEqual(
@@ -118,5 +124,5 @@ class TestRepositoryAPI(unittest.TestCase):
         # Act
         answer = mock_device_versions.get_devices_current_version([self.device])
         # Answer
-        proper_answer = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "curr_ver"}]
+        proper_answer = [DeviceVersionPayload("mock_uuid", "mock_ip", "curr_ver")]
         self.assertEqual(answer, proper_answer)
