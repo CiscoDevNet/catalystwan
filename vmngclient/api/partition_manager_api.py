@@ -1,10 +1,16 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING, Dict, List, cast
 
-from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, RepositoryAPI
-from vmngclient.dataclasses import Device
+from vmngclient.api.versions_utils import (
+    DeviceCategory,
+    DeviceVersionPayload,
+    DeviceVersions,
+    RemovePartitionPayload,
+    RepositoryAPI,
+)
+from vmngclient.utils.creation_tools import asdict
 
 logger = logging.getLogger(__name__)
 
@@ -22,12 +28,13 @@ class PartitionManagerAPI:
         session = create_vManageSession(...)
 
         # Prepare devices list
-        cedges = [dev for dev in DevicesAPI(session).devices
-                    if dev.hostname in ["vm5", "vm6"]]
+        devices = [device for device in DevicesAPI(session).devices
+                    if device.personality == VSMART]
 
         # Set default partition
-        partition_manager = PartitionManagerAPI(provider_session_as_tenant_session,DeviceCategory.VEDGES)
-        set_partition_id = partition_manager.set_default_partition(cedges, version="9.17.06.03a.0.56")
+        payload_devices = DeviceVersions(provider,DeviceCategory.CONTROLLERS).get_devices_current_version(devices)
+        partition_manager = PartitionManagerAPI(provider_session_as_tenant_session,DeviceCategory.CONTROLLERS)
+        set_partition_id = partition_manager.set_default_partition(payload_devices)
 
         # Check action status
         wait_for_completed(session, set_partition_id, 3000)
@@ -38,50 +45,22 @@ class PartitionManagerAPI:
 
         self.session = session
         self.repository = RepositoryAPI(self.session)
-        self.device_versions = DeviceVersions(self.repository, device_category)
+        self.device_versions = DeviceVersions(self.session, device_category)
 
-    def _set_default_partition(self, payload_devices: List[dict]) -> str:
+    def set_default_partition(self, payload_devices: List[DeviceVersionPayload]) -> str:
+
         url = "/dataservice/device/action/defaultpartition"
         payload = {
             "action": "defaultpartition",
-            "devices": payload_devices,
+            "devices": [asdict(device) for device in payload_devices],  # type: ignore
             "deviceType": "vmanage",
         }
         set_default = dict(self.session.post(url, json=payload).json())
         return set_default["id"]
 
-    def set_current_partition_as_default(self, devices: List[Device]) -> str:
+    def remove_partition(self, devices_payload: List[DeviceVersionPayload], force: bool = False) -> str:
         """
-        Method to set current software version as default version
-
-        Args:
-            devices (List[Device]): For those devices default partition
-            going to be set
-
-        Returns:
-            str: action id
-        """
-        devs = self.device_versions.get_devices_current_version(devices)
-        return self._set_default_partition(devs)
-
-    def set_default_partition(self, devices: List[Device], version: str) -> str:
-        """
-        Method to set choosen software version as current version
-
-        Args:
-            devices (List[Device]): For those devices default partition
-            going to be set
-            version (str): version to be set as default version
-
-        Returns:
-            str: action id
-        """
-        devs = self.device_versions.get_device_list_in_installed(version, devices)
-        return self._set_default_partition(devs)
-
-    def remove_partition(self, devices: List[Device], version: str, force: bool = False) -> str:
-        """
-        Method to remove choosen software version from Vmanage repository
+        Remove chosen software version from Vmanage repository
 
         Args:
             devices (List[Device]): remove partition for those devices
@@ -92,33 +71,34 @@ class PartitionManagerAPI:
             str: action id
         """
 
+        remove_partition_payload = [
+            RemovePartitionPayload(device.deviceId, device.deviceIP, device.version) for device in devices_payload
+        ]
         url = "/dataservice/device/action/removepartition"
         payload = {
             "action": "removepartition",
-            "devices": self.device_versions.get_device_list_in_available(version, devices),
+            "devices": [asdict(device) for device in remove_partition_payload],  # type: ignore
             "deviceType": "vmanage",
         }
         if force is False:
-            invalid_devices = self._check_remove_partition_possibility(payload["devices"])
-            if invalid_devices:
-                raise ValueError(
-                    f"Current or default version of devices with ids {invalid_devices} \
-                        are equal to remove version. Action denied!"
-                )
-        remove_action: Dict[str, str] = self.repository.session.post(url, json=payload).json()
+            self._check_remove_partition_possibility(cast(list, payload["devices"]))
+        remove_action: Dict[str, str] = self.session.post(url, json=payload).json()
         return remove_action["id"]
 
-    def _check_remove_partition_possibility(self, devices) -> List["str"]:
-
+    def _check_remove_partition_possibility(self, payload_devices: List[dict]) -> None:
         devices_versions_repository = self.repository.get_devices_versions_repository(
             self.device_versions.device_category
         )
         invalid_devices = []
-        for device in devices:
+        for device in payload_devices:
 
             if device["version"] in (
                 devices_versions_repository[device["deviceId"]].current_version,
                 devices_versions_repository[device["deviceId"]].default_version,
             ):
                 invalid_devices.append((device["deviceId"]))
-        return invalid_devices
+        if invalid_devices:
+            raise ValueError(
+                f"Current or default version of devices with ids {invalid_devices} \
+                    are equal to remove version. Action denied!"
+            )
