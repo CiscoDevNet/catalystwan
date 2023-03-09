@@ -88,11 +88,11 @@ class TemplatesAPI:
         return templates.dataseq(DeviceTemplateInfo)
 
     @overload
-    def get(self, template: type) -> DataSequence[FeatureTemplate]:
+    def get(self, template: type) -> DataSequence[TemplateInfo]:
         ...
 
     @overload
-    def get(self, template: DeviceTemplate) -> DataSequence[DeviceTemplate]:
+    def get(self, template: DeviceTemplate) -> DataSequence[TemplateInfo]:
         ...
 
     def get(self, template):
@@ -161,7 +161,7 @@ class TemplatesAPI:
                     invalid = True
                     logger.error(f"{var.property} should be provided in attach method as device_specific_vars kwarg.")
                 else:
-                    pointer[var.property] = kwargs["device_specific_vars"][var.property]
+                    pointer[var.property] = kwargs["device_specific_vars"][var.property]  # type: ignore
 
         if invalid:
             raise TypeError()

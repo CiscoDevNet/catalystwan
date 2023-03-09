@@ -62,8 +62,8 @@ class TestTemplatesAPI(unittest.TestCase):
         )
         self.task = TaskStatus("Success", "success", [])
 
-    @patch("vmngclient.session.vManageSession")
     @patch("vmngclient.response.vManageResponse")
+    @patch("vmngclient.session.vManageSession")
     def test_templates_success(self, mock_session, mocked_response):
 
         # Arrange
@@ -76,8 +76,8 @@ class TestTemplatesAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, self.templates)
 
-    @patch("vmngclient.session.vManageSession")
     @patch("vmngclient.response.vManageResponse")
+    @patch("vmngclient.session.vManageSession")
     def test_templates_get(self, mock_session, mocked_response):
 
         # Arrange
