@@ -6,9 +6,9 @@ We're really glad you want to help.
 
   * Want to add something from yourself? [Make a PR](https://github.com/CiscoDevNet/vManage-client/pulls) - remember to follow code guidelines.
     ### Contributors from CiscoDevNet organization:
-    * To make a PR - pull the repository, create branch for your changes, make said changes and make the pull request. Now just wait for the review and feedback from our developers.  
+    To make a PR - pull the repository, create branch for your changes, make said changes and make the pull request. Now just wait for the review and feedback from our developers.  
     ### Contributors outside CiscoDevNet organization
-    * To make a PR - fork our repository, make your changes and make the pull request. Now just wait for the review and feedback from our developers.
+    To make a PR - fork our repository, make your changes and make the pull request. Now just wait for the review and feedback from our developers.
   * Feel free to review existing [PR](https://github.com/CiscoDevNet/vManage-client/pulls)s, any suggestion is welcome.
   * Want to help but you don't have any new ideas for improvement or feature? Take any [issue](https://github.com/CiscoDevNet/vManage-client/issues) and fix it.
   * Bugs? [Report it here](https://github.com/CiscoDevNet/vManage-client/issues/new?assignees=&labels=needs+review&template=bug_report.yml) - remember to provide as much information as you can.
