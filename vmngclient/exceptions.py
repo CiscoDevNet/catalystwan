@@ -20,3 +20,9 @@ class AlreadyExistsError(Exception):
     """Raised when an entity that we attempted to create already exists."""
 
     pass
+
+
+class ImageNotInRepositoryError(Exception):
+    """The exception that is thrown, if image is not in vManage images Repository"""
+
+    pass

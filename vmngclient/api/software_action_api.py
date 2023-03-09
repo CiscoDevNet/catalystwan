@@ -2,16 +2,14 @@ from __future__ import annotations
 
 import logging
 from enum import Enum
-from pathlib import PurePath
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
 
 from attr import define  # type: ignore
-from clint.textui.progress import Bar as ProgressBar  # type: ignore
-from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
 
 from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.exceptions import VersionDeclarationError  # type: ignore
+from vmngclient.utils.creation_tools import asdict
 
 logger = logging.getLogger(__name__)
 
@@ -71,30 +69,31 @@ class SoftwareActionAPI:
     session = create_vManageSession(...)
 
     # Prepare devices list
-    devices = [dev for dev in DevicesAPI(session).devices if dev.hostname in ["vm5", "vm6"]]
-    software_image = PurePath("c8000v-universalk9.17.06.03a.0.56.SPA.bin")
+    devices = [device for device in DevicesAPI(session).devices
+                if device .personality == Personality.VSMART]
+    software_image = "viptela-20.7.2-x86_64.tar.gz"
 
     # Upgrade
-    software_action = SoftwareActionAPI(session,DeviceCategory.VEDGES.value)
-    software_action_id = software_action.upgrade_software(devices,
+    devices_payload = DeviceVersions(session, DeviceCategory.CONTROLLERS).get_devices_current_version(devices)
+    software_action = SoftwareActionAPI(session, DeviceCategory.VEDGES)
+    software_action_id = software_action.upgrade_software(devices_payload,
         InstallSpecHelper.CEDGE.value, reboot = False, sync = True, software_image=software_image)
 
     # Check action status
     wait_for_completed(session, software_action_id, 3000)
-
     """
 
     def __init__(self, session: vManageSession, device_category: DeviceCategory) -> None:
 
         self.session = session
         self.repository = RepositoryAPI(self.session)
-        self.device_versions = DeviceVersions(self.repository, device_category)
+        self.device_versions = DeviceVersions(self.session, device_category)
 
     def activate_software(
         self, devices: List[Device], version_to_activate: Optional[str] = "", software_image: Optional[str] = ""
     ) -> str:
         """
-        Method to set choosen version as current version
+        Set chosen version as current version
 
         Args:
             devices (List[Device]): For those devices software will be activated
@@ -105,18 +104,20 @@ class SoftwareActionAPI:
             software_image)
 
         Returns:
-            str: action id
+            str: Activate software action id
         """
         if software_image and not version_to_activate:
             version = cast(str, self.repository.get_image_version(software_image))
         elif version_to_activate and not software_image:
             version = cast(str, version_to_activate)
         else:
-            raise VersionDeclarationError("You can not provide software_image and image version at the same time")
+            raise VersionDeclarationError("You can not provide software_image and image version at the same time!")
         url = "/dataservice/device/action/changepartition"
         payload = {
             "action": "changepartition",
-            "devices": self.device_versions.get_device_list_in_available(version, devices),
+            "devices": [
+                asdict(device) for device in self.device_versions.get_device_available(version, devices)  # type: ignore
+            ],
             "deviceType": "vmanage",
         }
         activate = dict(self.session.post(url, json=payload).json())
@@ -170,53 +171,18 @@ class SoftwareActionAPI:
                 "reboot": reboot,
                 "sync": sync,
             },
-            "devices": self.device_versions.get_device_list(devices),
+            "devices": [
+                {"deviceId": device.deviceId, "deviceIP": device.deviceIP}
+                for device in self.device_versions.get_device_list(devices)
+            ],  # type: ignore
             "deviceType": install_spec.device_type.value,
         }
         if install_spec.family.value in (DeviceClass.VMANAGE.value, DeviceClass.CEDGE.value):
-            incorrect_devices = self._downgrade_check(
-                payload["devices"],
-                payload["input"]["version"],
-                install_spec.family.value,
-            )
-            if incorrect_devices:
-                raise ValueError(
-                    f"Current version of devices with id's {incorrect_devices} is \
-                    higher than upgrade version. Action denied!"
-                )
+            self._downgrade_check(payload["devices"], payload["input"]["version"], install_spec.family.value)
         upgrade = dict(self.session.post(url, json=payload).json())
         return upgrade["id"]
 
-    def _create_callback(self, encoder: MultipartEncoder):
-
-        bar = ProgressBar(expected_size=encoder._calculate_length(), filled_char="=")
-
-        def callback(monitor: MultipartEncoderMonitor):
-            bar.show(monitor.bytes_read)
-
-        return callback
-
-    def upload_image(self, image_path: str) -> int:
-        """
-        Upload software image 'tar.gz' to Vmanage
-        software repository
-
-        Args:
-            image_path (str): path to software image
-
-        Returns:
-            str: Response status code
-        """
-        url = "/dataservice/device/action/software/package"
-        encoder = MultipartEncoder(
-            fields={"file": (PurePath(image_path).name, open(image_path, "rb"), "application/x-gzip")}
-        )
-        callback = self._create_callback(encoder)
-        monitor = MultipartEncoderMonitor(encoder, callback)
-        upload = self.session.post(url, data=monitor, headers={"content-type": monitor.content_type})
-        return upload.status_code
-
-    def _downgrade_check(self, devices, version_to_upgrade: str, family) -> List[str]:
+    def _downgrade_check(self, payload_devices: List[dict], version_to_upgrade: str, family: str) -> None:
         """
         Check if upgrade operation is not actually a downgrade opeartion.
         If so, in some cases action is being blocked.
@@ -226,19 +192,29 @@ class SoftwareActionAPI:
             devices_category (DeviceCategory): devices category
 
         Returns:
-            Union[None, List[str]]: [None, list of devices with no permission to downgrade]
+            List[str]: list of devices with no permission to downgrade
         """
         incorrect_devices = []
         devices_versions_repo = self.repository.get_devices_versions_repository(self.device_versions.device_category)
-        for dev in devices:
-            dev_current_version = str(devices_versions_repo[dev["deviceId"]].current_version)
+        for device in payload_devices:
+            dev_current_version = str(devices_versions_repo[device["deviceId"]].current_version)
             splited_version_to_upgrade = version_to_upgrade.split(".")
             for priority, label in enumerate(dev_current_version.split("-")[0].split(".")):
-                if str(label) > str(splited_version_to_upgrade[priority]):
+                try:
+                    label = int(label)  # type: ignore
+                    version = int(splited_version_to_upgrade[priority])
+                except ValueError:
+                    pass
+
+                if label > version:  # type: ignore
                     if family == "vmanage" and label == 2:
                         continue
-                    incorrect_devices.append(dev["deviceId"])
+                    incorrect_devices.append(device["deviceId"])
                     break
-                elif str(label) < str(splited_version_to_upgrade[priority]):
+                elif label < version:  # type: ignore
                     break
-        return incorrect_devices
+        if incorrect_devices:
+            raise ValueError(
+                f"Current version of devices with id's {incorrect_devices} is \
+                higher than upgrade version. Action denied!"
+            )
