@@ -459,3 +459,9 @@ class TenantTacacsServer(DataclassBase):
     timeout: int = field(default=3, metadata={FIELD_NAME: "timeout"})
     authentication: str = field(default="PAP", metadata={FIELD_NAME: "authentication"})
     server: List[TacacsServer] = field(factory=list, metadata={FIELD_NAME: "server"})
+
+
+@define
+class SoftwareInstallTimeout(DataclassBase):
+    download_timeout_min: int = field(converter=str, metadata={FIELD_NAME: "downloadTimeoutInMin"})
+    activate_timeout_min: int = field(converter=str, metadata={FIELD_NAME: "activateTimeoutInMin"})
