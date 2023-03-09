@@ -145,7 +145,7 @@ def wait_for_completed(
                 raise ValueError(f"Task id {action_id} is not registered by vManage.")
 
         task = create_dataclass(TaskStatus, action_data)
-        logger.debug(
+        logger.info(
             f"Statuses of action {action_id} is: "
             f"status: {task.status}, status_id: {task.status_id}, activity: {task.activity}."
         )
