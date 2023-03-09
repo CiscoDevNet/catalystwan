@@ -74,8 +74,6 @@ class FeatureTemplateField(BaseModel):
 
         output["vipObjectType"] = self.objectType.value
 
-        # output["vipType"] = self.defaultOption.value
-
         if value:
             output["vipType"] = FeatureTemplateOptionType.CONSTANT.value
             if self.children:
