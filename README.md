@@ -17,7 +17,7 @@ pip install vmngclient
 from vmngclient.session import create_vManageSession
 
 
-base_url = "sandbox-sdwan-2.cisco.com/"
+base_url = "sandbox-sdwan-2.cisco.com"
 username = "devnetuser"
 password = "RG!_Yw919_83"
 session = create_vManageSession(url=base_url, username=username, password=password)
