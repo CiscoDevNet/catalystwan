@@ -4,6 +4,7 @@ from typing import List, Optional
 from attr import define, field  # type: ignore
 
 from vmngclient.exceptions import RetrieveIntervalOutOfRange
+from vmngclient.utils.alarm_status import Severity
 from vmngclient.utils.certificate_status import ValidityPeriod
 from vmngclient.utils.creation_tools import FIELD_NAME, asdict, convert_attributes
 from vmngclient.utils.device_model import DeviceModel
@@ -43,9 +44,10 @@ class DeviceAdminTech(DataclassBase):
 
 @define(frozen=True, field_transformer=convert_attributes)
 class AlarmData(DataclassBase):
+
     component: Optional[str] = field(default=None)
-    severity: Optional[str] = field(default=None)
     active: Optional[bool] = field(default=None)
+    severity: Optional[Severity] = field(converter=Severity, default=None)
     name: Optional[str] = field(default=None, metadata={FIELD_NAME: "type"})
     system_ip: Optional[str] = field(default=None, metadata={FIELD_NAME: "system-ip"})
     hostname: Optional[str] = field(default=None, metadata={FIELD_NAME: "host-name"})
@@ -53,6 +55,7 @@ class AlarmData(DataclassBase):
     new_state: Optional[str] = field(default=None, metadata={FIELD_NAME: "new-state"})
     interface_name: Optional[str] = field(default=None, metadata={FIELD_NAME: "if-name"})
     vpn_id: Optional[str] = field(default=None, metadata={FIELD_NAME: "vpn-id"})
+    viewed: Optional[bool] = field(default=None, metadata={FIELD_NAME: "acknowledged"})
 
     def issubset(self, other: "AlarmData") -> bool:
         field_keys = {field_key for field_key in self.__annotations__ if getattr(self, field_key)}
