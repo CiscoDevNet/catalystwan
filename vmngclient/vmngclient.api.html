@@ -315,35 +315,8 @@
 <section id="module-vmngclient.api.alarms_api">
 <span id="alarms-api-module"></span><h3>alarms_api module<a class="headerlink" href="#module-vmngclient.api.alarms_api" title="Permalink to this heading">¶</a></h3>
 <dl class="py class">
-<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmLevel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.alarms_api.</span></span><span class="sig-name descname"><span class="pre">AlarmLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmLevel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
-<p>An enumeration.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmLevel.critical">
-<span class="sig-name descname"><span class="pre">critical</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Critical'</span></em><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmLevel.critical" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmLevel.major">
-<span class="sig-name descname"><span class="pre">major</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Major'</span></em><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmLevel.major" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmLevel.medium">
-<span class="sig-name descname"><span class="pre">medium</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Medium'</span></em><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmLevel.medium" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmLevel.minor">
-<span class="sig-name descname"><span class="pre">minor</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Minor'</span></em><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmLevel.minor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmVerification">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.alarms_api.</span></span><span class="sig-name descname"><span class="pre">AlarmVerification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alarms_getter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmVerification" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.alarms_api.</span></span><span class="sig-name descname"><span class="pre">AlarmVerification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alarms_getter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DataSequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmVerification" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The Alarms verification class</p>
 <dl class="py attribute">
@@ -389,6 +362,13 @@
 <dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.alarms_api.</span></span><span class="sig-name descname"><span class="pre">AlarmsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>API methods of vManage for Alarms.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.session">
+<span class="sig-name descname"><span class="pre">session</span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.session" title="Permalink to this definition">¶</a></dt>
+<dd><p>logged in API client session</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.URL">
 <span class="sig-name descname"><span class="pre">URL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/dataservice/alarms'</span></em><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.URL" title="Permalink to this definition">¶</a></dt>
@@ -413,37 +393,45 @@ it will not poll any further.</p>
 <dd class="field-even"><p>The dictionary with alarms that occurred (key ‘found’) and did not (key ‘no-found’)</p>
 </dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">expected_alarms</span> <span class="o">=</span> <span class="p">[{</span>
+<span class="go">    &quot;type&quot;: &quot;memory-usage&quot;,</span>
+<span class="go">    &quot;rulename&quot;: &quot;memory-usage&quot;,</span>
+<span class="go">    &quot;component&quot;: &quot;System&quot;,</span>
+<span class="go">    &quot;severity&quot;: &quot;Medium&quot;,</span>
+<span class="go">    &quot;system_ip&quot;: &quot;192.168.1.2&quot;,</span>
+<span class="go">    &quot;acknowledged&quot;: true,</span>
+<span class="go">    &quot;active&quot;: true,</span>
+<span class="go">    }]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">AlarmsAPI</span><span class="p">(</span><span class="n">session</span><span class="p">)</span><span class="o">.</span><span class="n">check_alarms</span><span class="p">(</span><span class="n">expected</span> <span class="o">=</span> <span class="n">expected_alarms</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.get_alarms">
-<span class="sig-name descname"><span class="pre">get_alarms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.get_alarms" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.get_critical_alarms">
-<span class="sig-name descname"><span class="pre">get_critical_alarms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.get_critical_alarms" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.get_major_alarms">
-<span class="sig-name descname"><span class="pre">get_major_alarms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.get_major_alarms" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.get_medium_alarms">
-<span class="sig-name descname"><span class="pre">get_medium_alarms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.get_medium_alarms" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.get_minor_alarms">
-<span class="sig-name descname"><span class="pre">get_minor_alarms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">viewed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.get_minor_alarms" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.get_not_viewed_alarms">
-<span class="sig-name descname"><span class="pre">get_not_viewed_alarms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.get_not_viewed_alarms" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataSequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.AlarmData" title="vmngclient.dataclasses.AlarmData"><span class="pre">AlarmData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.alarms_api.AlarmsAPI.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data sequence of alarms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>from_time</strong> – Gets alarms from time in hour. Defaults to None - gets all alrams.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataSequence[AlarmData] of getted alarms.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Get all alarms:
+&gt;&gt;&gt; alarms = AlarmsAPI(session).get()</p>
+<p>Get all alarms from 3 hours:
+&gt;&gt;&gt; alarms = AlarmsAPI(session).get(from_time=3)</p>
+<p>Get all not viewed alarms:
+&gt;&gt;&gt; alarms = AlarmsAPI(session).get()
+&gt;&gt;&gt; not_viewed_alarms = alarms.filter(viewed=False)</p>
+<p>Get all critical alarms:
+&gt;&gt;&gt; alarms = AlarmsAPI(session).get()
+&gt;&gt;&gt; critical_alarms = alarms.filter(severity=Severity.CRITICAL)</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="vmngclient.api.alarms_api.AlarmsAPI.mark_all_as_viewed">
@@ -455,23 +443,6 @@ it will not poll any further.</p>
 </dd>
 </dl>
 </dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="vmngclient.api.alarms_api.Viewed">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.alarms_api.</span></span><span class="sig-name descname"><span class="pre">Viewed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.alarms_api.Viewed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
-<p>An enumeration.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="vmngclient.api.alarms_api.Viewed.no">
-<span class="sig-name descname"><span class="pre">no</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'false'</span></em><a class="headerlink" href="#vmngclient.api.alarms_api.Viewed.no" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="vmngclient.api.alarms_api.Viewed.yes">
-<span class="sig-name descname"><span class="pre">yes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'true'</span></em><a class="headerlink" href="#vmngclient.api.alarms_api.Viewed.yes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
