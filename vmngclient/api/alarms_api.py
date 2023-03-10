@@ -49,7 +49,7 @@ class AlarmsAPI:
 
             Get all critical alarms:
             >>> alarms = AlarmsAPI(session).get()
-            >>> not_viewed_alarms = alarms.filter(severity=Severity.CRITICAL)
+            >>> critical_alarms = alarms.filter(severity=Severity.CRITICAL)
         """
         query: Dict[str, Any] = {"query": {"condition": "AND", "rules": []}}
         if from_time:
