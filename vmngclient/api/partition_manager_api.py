@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Dict, List, cast
 
+from vmngclient.api.software_action_api import DeviceType
 from vmngclient.api.versions_utils import (
     DeviceCategory,
     DeviceVersionPayload,
@@ -46,6 +47,7 @@ class PartitionManagerAPI:
         self.session = session
         self.repository = RepositoryAPI(self.session)
         self.device_versions = DeviceVersions(self.session, device_category)
+        self.device_type = DeviceType
 
     def set_default_partition(self, payload_devices: List[DeviceVersionPayload]) -> str:
 
@@ -53,7 +55,7 @@ class PartitionManagerAPI:
         payload = {
             "action": "defaultpartition",
             "devices": [asdict(device) for device in payload_devices],  # type: ignore
-            "deviceType": "vmanage",
+            "deviceType": self.device_type.value,
         }
         set_default = dict(self.session.post(url, json=payload).json())
         return set_default["id"]
@@ -78,7 +80,7 @@ class PartitionManagerAPI:
         payload = {
             "action": "removepartition",
             "devices": [asdict(device) for device in remove_partition_payload],  # type: ignore
-            "deviceType": "vmanage",
+            "deviceType": self.device_type.value,
         }
         if force is False:
             self._check_remove_partition_possibility(cast(list, payload["devices"]))
