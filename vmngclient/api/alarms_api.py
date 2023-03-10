@@ -36,21 +36,20 @@ class AlarmsAPI:
         Returns:
             DataSequence[AlarmData] of getted alarms.
 
-        ## Examples:
+        Examples:
+            Get all alarms:
+            >>> alarms = AlarmsAPI(session).get()
 
-        Get all alarms:
-        >>> alarms = AlarmsAPI(session).get()
+            Get all alarms from 3 hours:
+            >>> alarms = AlarmsAPI(session).get(from_time=3)
 
-        Get all alarms from 3 hours:
-        >>> alarms = AlarmsAPI(session).get(from_time=3)
+            Get all not viewed alarms:
+            >>> alarms = AlarmsAPI(session).get()
+            >>> not_viewed_alarms = alarms.filter(viewed=False)
 
-        Get all not viewed alarms:
-        >>> alarms = AlarmsAPI(session).get()
-        >>> not_viewed_alarms = alarms.filter(viewed=False)
-
-        Get all critical alarms:
-        >>> alarms = AlarmsAPI(session).get()
-        >>> not_viewed_alarms = alarms.filter(severity=Severity.CRITICAL)
+            Get all critical alarms:
+            >>> alarms = AlarmsAPI(session).get()
+            >>> not_viewed_alarms = alarms.filter(severity=Severity.CRITICAL)
         """
         query: Dict[str, Any] = {"query": {"condition": "AND", "rules": []}}
         if from_time:
@@ -100,18 +99,17 @@ class AlarmsAPI:
         Returns:
           The dictionary with alarms that occurred (key 'found') and did not (key 'no-found')
 
-        ## Examples:
-
-        >>> expected_alarms = [{
-            "type": "memory-usage",
-            "rulename": "memory-usage",
-            "component": "System",
-            "severity": "Medium",
-            "system_ip": "192.168.1.2",
-            "acknowledged": true,
-            "active": true,
-            }]
-        >>> result = AlarmsAPI(session).check_alarms(expected = expected_alarms)
+        Examples:
+            >>> expected_alarms = [{
+                "type": "memory-usage",
+                "rulename": "memory-usage",
+                "component": "System",
+                "severity": "Medium",
+                "system_ip": "192.168.1.2",
+                "acknowledged": true,
+                "active": true,
+                }]
+            >>> result = AlarmsAPI(session).check_alarms(expected = expected_alarms)
         """
 
         alarms_expected = {create_dataclass(AlarmData, flatten_dict(expected_alarm)) for expected_alarm in expected}
