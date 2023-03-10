@@ -34,8 +34,8 @@ class PartitionManagerAPI:
 
         # Set default partition
         payload_devices = DeviceVersions(provider,DeviceCategory.CONTROLLERS).get_devices_current_version(devices)
-        partition_manager = PartitionManagerAPI(provider_session_as_tenant_session,DeviceCategory.CONTROLLERS,  
-                             DeviceType.CONTROLLERS)
+        partition_manager = PartitionManagerAPI(provider_session_as_tenant_session,DeviceCategory.CONTROLLERS,
+                            DeviceType.CONTROLLERS)
         set_partition_id = partition_manager.set_default_partition(payload_devices)
 
         # Check action status
