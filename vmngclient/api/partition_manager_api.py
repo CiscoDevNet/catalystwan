@@ -42,12 +42,12 @@ class PartitionManagerAPI:
 
     """
 
-    def __init__(self, session: vManageSession, device_category: DeviceCategory) -> None:
+    def __init__(self, session: vManageSession, device_category: DeviceCategory, device_type: DeviceType) -> None:
 
         self.session = session
         self.repository = RepositoryAPI(self.session)
         self.device_versions = DeviceVersions(self.session, device_category)
-        self.device_type = DeviceType
+        self.device_type = device_type
 
     def set_default_partition(self, payload_devices: List[DeviceVersionPayload]) -> str:
 
