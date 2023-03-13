@@ -85,8 +85,7 @@ admintech.delete(filename)
 </details>
 
 
-## Contributing, reporting issues, seeking support
-Please contact authors direcly or via Issues Github page.
+## [Contributing, reporting issues, seeking support](https://github.com/CiscoDevNet/vManage-client/blob/main/CONTRIBUTING.md)
 
 ## **Enviroment setup**
 1. Download Python3.8 or higher.
