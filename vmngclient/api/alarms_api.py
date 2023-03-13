@@ -68,8 +68,7 @@ class AlarmsAPI:
         return alarms
 
     def mark_all_as_viewed(self) -> None:
-        """Marks all alarms as viewed.
-        """
+        """Marks all alarms as viewed."""
 
         self.session.post(f"{AlarmsAPI.URL}/markallasviewed")
         logger.info("Alarms mark as viewed.")
