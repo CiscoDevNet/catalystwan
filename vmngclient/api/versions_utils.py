@@ -33,7 +33,7 @@ class DeviceSoftwareRepository(DataclassBase):
     device_id: str = field(default=None, metadata={FIELD_NAME: "uuid"})
 
 
-@define(frozen=False)
+@define
 class DeviceVersionPayload(DataclassBase):
     deviceId: str
     deviceIP: str
@@ -193,7 +193,7 @@ class DeviceVersions:
         Returns:
             list : list of devices
         """
-        devices_payload = [DeviceVersionPayload(device.uuid, device.id) for device in devices]
+        devices_payload = [DeviceVersionPayload(device.uuid, device.id) for device in devices]  # type: ignore
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
         for device in devices_payload:
             device_versions = getattr(all_dev_versions[device.deviceId], version_type)
@@ -250,7 +250,7 @@ class DeviceVersions:
         Returns:
             list : list of devices
         """
-        devices_payload = [DeviceVersionPayload(device.uuid, device.id) for device in devices]
+        devices_payload = [DeviceVersionPayload(device.uuid, device.id) for device in devices]  # type: ignore
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
         for device in devices_payload:
             device.version = getattr(all_dev_versions[device.deviceId], version_type)
@@ -287,4 +287,4 @@ class DeviceVersions:
 
     def get_device_list(self, devices: List[Device]) -> List[DeviceVersionPayload]:
 
-        return [DeviceVersionPayload(device.uuid, device.id) for device in devices]
+        return [DeviceVersionPayload(device.uuid, device.id) for device in devices]  # type: ignore

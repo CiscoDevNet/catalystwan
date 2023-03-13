@@ -4,7 +4,7 @@ import json
 import logging
 from difflib import Differ
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, overload
+from typing import TYPE_CHECKING, Optional, Type, overload
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
 from requests.exceptions import HTTPError
@@ -88,11 +88,15 @@ class TemplatesAPI:
         return templates.dataseq(DeviceTemplateInfo)
 
     @overload
-    def get(self, template: type) -> DataSequence[TemplateInfo]:
+    def get(self, template: Type[DeviceTemplate]) -> DataSequence[DeviceTemplateInfo]:  # type: ignore
         ...
 
     @overload
-    def get(self, template: DeviceTemplate) -> DataSequence[TemplateInfo]:
+    def get(self, template: Type[FeatureTemplate]) -> DataSequence[FeatureTemplateInfo]:  # type: ignore
+        ...
+
+    @overload
+    def get(self, template: Type[CLITemplate]) -> DataSequence[TemplateInfo]:  # type: ignore
         ...
 
     def get(self, template):
@@ -102,7 +106,7 @@ class TemplatesAPI:
         if template is DeviceTemplate:
             return self._get_device_templates()
 
-        return DataSequence(TemplateInfo)
+        raise NotImplementedError()
 
     @overload
     def attach(self, template: CLITemplate, name: str, device: Device) -> bool:
@@ -330,7 +334,7 @@ class TemplatesAPI:
                 templateType=info.template_type,
             )
 
-        fr_templates = self.get(FeatureTemplate)
+        fr_templates = self.get(FeatureTemplate)  # type: ignore
         device_template.general_templates = list(
             map(lambda x: parse_general_template(x, fr_templates), device_template.general_templates)  # type: ignore
         )
@@ -357,7 +361,7 @@ class TemplatesAPI:
         if isinstance(template, list):
             return [self.create(t) for t in template]
 
-        template_id: Optional[str] = None
+        template_id: Optional[str] = None  # type: ignore
         template_type = None
 
         exists = self.get(type(template)).filter(name=template.name)
