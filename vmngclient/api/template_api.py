@@ -124,7 +124,7 @@ class TemplatesAPI:
             return self.attach_feature(template.name, device, **kwargs)
 
         if template is DeviceTemplate and name:
-            self.attach_feature(name, device, **kwargs)
+            return self.attach_feature(name, device, **kwargs)
 
         raise NotImplementedError()
 
