@@ -67,17 +67,12 @@ class AlarmsAPI:
 
         return alarms
 
-    def mark_all_as_viewed(self) -> bool:
+    def mark_all_as_viewed(self) -> None:
         """Marks all alarms as viewed.
-
-        Returns:
-          True if all alarms are viewed
         """
 
         self.session.post(f"{AlarmsAPI.URL}/markallasviewed")
         logger.info("Alarms mark as viewed.")
-
-        return not self.get().filter(viewed=False)
 
     def check_alarms(
         self,
