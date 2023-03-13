@@ -32,8 +32,8 @@ class PacketCaptureAPI:
         interface: Defaults to ge0/1.
 
     Examples:
-        >>> vsmart = session.api.devices.filter(personality=Personality.VSMART)[0]
-        >>> packet_capture = session.api.packet_capture.get_packets(vsmart)
+        >>> edge_device = session.api.devices.get().filter(personality=Personality.EDGE)[0]
+        >>> packet_capture = session.api.packet_capture.get_packets(edge_device)
     """
     def __init__(
         self,
