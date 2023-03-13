@@ -77,7 +77,7 @@ class AlarmsAPI:
         self.session.post(f"{AlarmsAPI.URL}/markallasviewed")
         logger.info("Alarms mark as viewed.")
 
-        return not self.get().filter(viewed=True)
+        return not self.get().filter(viewed=False)
 
     def check_alarms(
         self,
