@@ -90,7 +90,11 @@ class SoftwareActionAPI:
         self.device_versions = DeviceVersions(self.session, device_category)
 
     def activate_software(
-        self, devices: List[Device], version_to_activate: Optional[str] = "", software_image: Optional[str] = ""
+        self,
+        devices: List[Device],
+        device_type: DeviceType,
+        version_to_activate: Optional[str] = "",
+        software_image: Optional[str] = "",
     ) -> str:
         """
         Set chosen version as current version
@@ -118,7 +122,7 @@ class SoftwareActionAPI:
             "devices": [
                 asdict(device) for device in self.device_versions.get_device_available(version, devices)  # type: ignore
             ],
-            "deviceType": "vmanage",
+            "deviceType": device_type.value,
         }
         activate = dict(self.session.post(url, json=payload).json())
         return activate["id"]

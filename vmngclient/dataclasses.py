@@ -4,6 +4,7 @@ from typing import List, Optional
 from attr import define, field  # type: ignore
 
 from vmngclient.exceptions import RetrieveIntervalOutOfRange
+from vmngclient.utils.alarm_status import Severity
 from vmngclient.utils.certificate_status import ValidityPeriod
 from vmngclient.utils.creation_tools import FIELD_NAME, asdict, convert_attributes
 from vmngclient.utils.personality import Personality
@@ -42,9 +43,10 @@ class DeviceAdminTech(DataclassBase):
 
 @define(frozen=True, field_transformer=convert_attributes)
 class AlarmData(DataclassBase):
+
     component: Optional[str] = field(default=None)
-    severity: Optional[str] = field(default=None)
     active: Optional[bool] = field(default=None)
+    severity: Optional[Severity] = field(converter=Severity, default=None)
     name: Optional[str] = field(default=None, metadata={FIELD_NAME: "type"})
     system_ip: Optional[str] = field(default=None, metadata={FIELD_NAME: "system-ip"})
     hostname: Optional[str] = field(default=None, metadata={FIELD_NAME: "host-name"})
@@ -52,6 +54,7 @@ class AlarmData(DataclassBase):
     new_state: Optional[str] = field(default=None, metadata={FIELD_NAME: "new-state"})
     interface_name: Optional[str] = field(default=None, metadata={FIELD_NAME: "if-name"})
     vpn_id: Optional[str] = field(default=None, metadata={FIELD_NAME: "vpn-id"})
+    viewed: Optional[bool] = field(default=None, metadata={FIELD_NAME: "acknowledged"})
 
     def issubset(self, other: "AlarmData") -> bool:
         field_keys = {field_key for field_key in self.__annotations__ if getattr(self, field_key)}
@@ -332,13 +335,13 @@ class TierInfo(DataclassBase):
     name: str = field(metadata={FIELD_NAME: "tierName"})
     vpn: int
     rid: int = field(metadata={FIELD_NAME: "@rid"})
-    ipv4_route_limit_type: str = field(default="", metadata={FIELD_NAME: "ipv4RouteLimitType"})
-    ipv4_route_limit_threshold: str = field(default="", metadata={FIELD_NAME: "ipv4RouteLimitThreshold"})
-    ipv4_route_limit: str = field(default="", metadata={FIELD_NAME: "ipv4RouteLimit"})
-    ipv6_route_limit_type: str = field(default="", metadata={FIELD_NAME: "ipv6RouteLimitType"})
-    ipv6_route_limit_threshold: str = field(default="", metadata={FIELD_NAME: "ipv6RouteLimitThreshold"})
-    ipv6_route_limit: str = field(default="", metadata={FIELD_NAME: "ipv6RouteLimit"})
-    tlocs: List[TLOC] = field(factory=list)
+    ipv4_route_limit_type: Optional[str] = field(default=None, metadata={FIELD_NAME: "ipv4RouteLimitType"})
+    ipv4_route_limit_threshold: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv4RouteLimitThreshold"})
+    ipv4_route_limit: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv4RouteLimit"})
+    ipv6_route_limit_type: Optional[str] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimitType"})
+    ipv6_route_limit_threshold: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimitThreshold"})
+    ipv6_route_limit: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimit"})
+    tlocs: List[TLOC] = field(default=[])
     # New in 20.12 version
     nat_session_limit: Optional[int] = field(default=None, metadata={FIELD_NAME: "natSessionLimit"})
 

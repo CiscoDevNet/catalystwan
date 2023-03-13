@@ -49,7 +49,15 @@ class RemovePartitionPayload(DataclassBase):
 
 class RepositoryAPI:
     """
-    API methods to get information about images and devices versions
+    API methods to get information about images and devices software versions
+
+    Usage example:
+        # Create session
+        session = create_vManageSession(...)
+
+        # Upload image
+        software_image = <path_to_your_image>
+        RepositoryAPI(provider).upload_image(software_image)
     """
 
     def __init__(
