@@ -128,7 +128,6 @@ class TemplatesAPI:
 
         raise NotImplementedError()
 
-    # TODO list of devices
     def attach_feature(self, name: str, device: Device, **kwargs):
         """Attach Device Template created with Feature Templates.
 
