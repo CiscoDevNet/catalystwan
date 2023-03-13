@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 from vmngclient.api.partition_manager_api import PartitionManagerAPI
+from vmngclient.api.software_action_api import DeviceType
 from vmngclient.api.versions_utils import (
     DeviceCategory,
     DeviceSoftwareRepository,
@@ -41,7 +42,9 @@ class TestPartitionManagerAPI(unittest.TestCase):
         mock_session = Mock()
         self.mock_repository_object = RepositoryAPI(mock_session)
         self.mock_device_versions = DeviceVersions(self.mock_repository_object, DeviceCategory.CONTROLLERS)
-        self.mock_partition_manager_obj = PartitionManagerAPI(mock_session, DeviceCategory.CONTROLLERS)
+        self.mock_partition_manager_obj = PartitionManagerAPI(
+            mock_session, DeviceCategory.CONTROLLERS, DeviceType.CONTROLLER
+        )
 
     @patch.object(DeviceVersions, "get_device_available")
     def test_remove_partition_if_force_true(self, mock_get_device_list):
@@ -92,7 +95,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
     @patch("vmngclient.session.vManageSession")
     def test_set_default_partition(self, mock_session):
         # Arrange
-        mock_partition_manager = PartitionManagerAPI(mock_session, DeviceCategory.CONTROLLERS)
+        mock_partition_manager = PartitionManagerAPI(mock_session, DeviceCategory.CONTROLLERS, DeviceType.CONTROLLER)
         mock_partition_manager.session.post.return_value.json.return_value = {"id": "id_1"}
         # Act
         answer = mock_partition_manager.set_default_partition(self.mock_device_version_payload)
