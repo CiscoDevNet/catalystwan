@@ -56,8 +56,8 @@ class DeviceTemplate(BaseModel):
 
         ast = env.parse(output)
         if meta.find_undeclared_variables(ast):
-            print(meta.find_undeclared_variables(ast))
-            raise Exception
+            logger.info(meta.find_undeclared_variables(ast))
+            raise Exception("There are undeclared variables.")
         return output
 
     @validator("general_templates", pre=True)
