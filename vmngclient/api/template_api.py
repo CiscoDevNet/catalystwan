@@ -130,6 +130,17 @@ class TemplatesAPI:
 
     # TODO list of devices
     def attach_feature(self, name: str, device: Device, **kwargs):
+        """Attach Device Template created with Feature Templates.
+
+        Args:
+            name: Name of the Device Template to be attached.
+            device: Device object under which the template should be attached.
+            **device_specific_vars: For parameters in a feature template that you configure as device-specific,
+                when you attach a device template to a device, Cisco vManage prompts you for the values to use
+                for these parameters. Entering device-specific values in this manner is useful in test or POC networks,
+                or if you are deploying a small network. This method generally does not scale well for larger networks.
+        """
+
         def get_device_specific_variables(name: str):
             endpoint = "/dataservice/template/device/config/exportcsv"
             template_id = self.get(DeviceTemplate).filter(name=name).single_or_default().id
