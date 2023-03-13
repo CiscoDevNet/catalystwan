@@ -103,7 +103,7 @@ class TemplatesAPI:
         if template is FeatureTemplate:
             return self._get_feature_templates()
 
-        if template is DeviceTemplate:
+        if template in [DeviceTemplate, CLITemplate]:
             return self._get_device_templates()
 
         raise NotImplementedError()
@@ -302,14 +302,13 @@ class TemplatesAPI:
         Returns:
             bool: True if create template is successful, otherwise - False.
         """
-        try:
-            self.get(CLITemplate)
+        if self.get(CLITemplate).filter(name=name).single_or_default():
             raise AlreadyExistsError(f"Error, Template with name: {name} exists.")
-        except TemplateNotFoundError:
-            cli_template = CLITemplate(self.session, device_model, name, description)
-            cli_template.config = config
-            logger.info(f"Template with name: {name} - created.")
-            return cli_template.send_to_device()
+
+        cli_template = CLITemplate(self.session, device_model, name, description)
+        cli_template.config = config
+        logger.info(f"Template with name: {name} - created.")
+        return cli_template.send_to_device()
 
     def _create_feature_template(self, template: FeatureTemplate) -> str:
         payload = template.generate_payload(self.session)
