@@ -7,6 +7,12 @@
   ],
   "templateMinVersion": "15.0.0",
   "templateDefinition": {
+	"if-name": {
+      "vipObjectType": "object",
+      "vipType": "constant",
+      "vipValue": "{{ interface_name.type.value }}{% if interface_name.number is not none %}{{ interface_name.number }}{% endif %}",
+      "vipVariableName": "vpn_if_name"
+    },
     "ip": {
       {% if type_address.value == "static" %}
         "address": {
@@ -18,6 +24,16 @@
               "vipType": "ignore",
           {% endif %} 
           "vipVariableName": "vpn_if_ipv4_address"
+        },
+        "secondary-address": {
+        "vipType": "ignore",
+        "vipValue": [
+        
+        ],
+        "vipObjectType": "tree",
+        "vipPrimaryKey": [
+            "address"
+        ]
         }
       {% else %}
         "dhcp-client": {
@@ -37,26 +53,10 @@
         }
       {% endif %} 
     },
-    "if-name": {
-      "vipObjectType": "object",
-      "vipType": "constant",
-      "vipValue": "{{ interface_name.type.value }}{% if interface_name.number is not none %}{{ interface_name.number }}{% endif %}",
-      "vipVariableName": "vpn_if_name"
-    },
     "description": {
       "vipObjectType": "object",
       "vipType": "ignore",
       "vipVariableName": "vpn_if_description"
-    },
-    "secondary-address": {
-      "vipType": "ignore",
-      "vipValue": [
-      
-      ],
-      "vipObjectType": "tree",
-      "vipPrimaryKey": [
-        "address"
-      ]
     },
     "dhcp-helper": {
       "vipObjectType": "list",
@@ -122,7 +122,6 @@
         "vipValue": "{{ autonegotiate | tojson}}",
       {% else %}
         "vipType": "ignore",
-        "vipValue": "true",
       {% endif %}
       "vipVariableName": "vpn_if_autonegotiate"
     },
@@ -221,7 +220,12 @@
       "vipValue": "_empty",
       "vipVariableName": "vpn_if_media-type"
     },
-    "intrf-mtu": {},
+    "intrf-mtu": {
+        "vipObjectType": "object",
+        "vipType": "ignore",
+        "vipValue": 1500,
+        "vipVariableName": "vpn_if_intrf_mtu"
+    },
     "ip-directed-broadcast": {
       "vipObjectType": "object",
       "vipType": "ignore",
