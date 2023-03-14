@@ -129,8 +129,8 @@ class TemplatesAPI:
         endpoint = "/dataservice/template/device/config/input/"
         logger.info(f"Editing template: {name} of device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
-        if ((response.get('data') != None) and
-            (response['data'][0].get('csv-status') == 'complete')):
+        if ((response.get("data") is not None) and
+                (response["data"][0].get("csv-status") == "complete")):
             return True
         logger.warning(f"Failed to edit tempate: {name} of device: {device.hostname}.")
         return False
@@ -174,7 +174,7 @@ class TemplatesAPI:
             ]
         }
         if is_edited:
-            payload['deviceTemplateList'][0]['isEdited'] = True  # type: ignore
+            payload["deviceTemplateList"][0]["isEdited"] = True  # type: ignore
         endpoint = "/dataservice/template/device/config/attachcli"
         logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
