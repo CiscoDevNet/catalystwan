@@ -71,6 +71,7 @@ def response_debug(response: Optional[Response], request: Union[Request, Prepare
         response_debug = {
             "status": response.status_code,
             "reason": response.reason,
+            "elapsed-seconds": float(response.elapsed.microseconds) / 1000000,
             "headers": dict(response.headers.items()),
         }
         try:
