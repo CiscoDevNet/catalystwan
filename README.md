@@ -84,12 +84,11 @@ alarms = session.api.alarms.get()
 
 </br>
 
-## [Contributing, reporting issues, seeking support](https://github.com/CiscoDevNet/vManage-client/blob/main/CONTRIBUTING.md)
-
-
 ### Note:
 To remove `InsecureRequestWarning`, you can include in your scripts:
 ```Python
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 ```
+
+## [Contributing, reporting issues, seeking support](https://github.com/CiscoDevNet/vManage-client/blob/main/CONTRIBUTING.md)
