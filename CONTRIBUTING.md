@@ -18,13 +18,46 @@ We're really glad you want to help.
 
 Test newly implemented features on Cisco SD-WAN, ideally on different versions. If you don't have access to any SD-WAN you can use [Cisco provided sandboxes](https://developer.cisco.com/sdwan/sandbox/).
 
+- **Building package for tests**\
+  To make a `.whl` file run
+  ```
+  poetry build
+  ```
+  Then in `/vManage-client/dist/` directory there is a `.whl` file named `vmngclient-<version>-py3-none-any.whl`, which can be installed by running
+  ```
+  pip install vmngclient-<version>-py3-none-any.whl
+  ```
+
 ## Submitting changes
 
 Make clear PR description and include doc strings in your code to make it easily understandable.
 
 Always write a clear log message for your commits.
 
-## [Enviroment setup](https://github.com/CiscoDevNet/vManage-client#enviroment-setup)
+## Enviroment setup
+1. Download Python3.8 or higher.
+2. Download repository
+    ```
+    git clone https://github.com/CiscoDevNet/vManage-client.git
+    ```
+3. Install and configure poetry (v1.3.1 or higher)
+    https://python-poetry.org/docs/#installation
+
+    On linux/mac this usually means:
+    ```
+    curl -sSL https://install.python-poetry.org | python3 -
+    poetry config virtualenvs.in-project true
+    ```
+4. Install dependecies 
+    ```
+    poetry install
+    ```
+5. Activate `pre-commit`
+    ```
+    pre-commit install
+    ```
+### Environment Variables
+- `VMNGCLIENT_DEVEL` when set: loggers will be configured according to `./logging.conf` and `urllib3.exceptions.InsecureRequestWarning` will be suppressed
 
 ## Code guidelines
 
