@@ -62,22 +62,17 @@ class AlarmsAPI:
                 }
             )
 
-        alarms = self.session.post(url=AlarmsAPI.URL, json=query).dataseq(AlarmData)
+        response = self.session.post(url=AlarmsAPI.URL, json=query).json()["data"]
+        alarms = [create_dataclass(AlarmData, flatten_dict(alarm)) for alarm in response]
         logger.info("Current alarms collected successfully.")
 
-        return alarms
+        return DataSequence(AlarmData, alarms)
 
-    def mark_all_as_viewed(self) -> bool:
-        """Marks all alarms as viewed.
-
-        Returns:
-          True if all alarms are viewed
-        """
+    def mark_all_as_viewed(self) -> None:
+        """Marks all alarms as viewed."""
 
         self.session.post(f"{AlarmsAPI.URL}/markallasviewed")
         logger.info("Alarms mark as viewed.")
-
-        return not self.get().filter(viewed=True)
 
     def check_alarms(
         self,

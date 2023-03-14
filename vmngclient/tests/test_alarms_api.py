@@ -134,7 +134,7 @@ class TestAlarmsAPI(TestCase):
     def test_get_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
-        mock_response.dataseq.return_value = self.alarms_dataseq
+        mock_response.json.return_value = self.alarms_data
         # Act
         answer = AlarmsAPI(mock_session).get()
         # Assert
@@ -145,7 +145,7 @@ class TestAlarmsAPI(TestCase):
     def test_get_critical_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
-        mock_response.dataseq.return_value = self.alarms_dataseq
+        mock_response.json.return_value = self.alarms_data
         # Act
         answer = AlarmsAPI(mock_session).get().filter(severity=Severity.CRITICAL)
         # Assert
@@ -156,7 +156,7 @@ class TestAlarmsAPI(TestCase):
     def test_get_major_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
-        mock_response.dataseq.return_value = self.alarms_dataseq
+        mock_response.json.return_value = self.alarms_data
         # Act
         answer = AlarmsAPI(mock_session).get().filter(severity=Severity.MAJOR)
         # Assert
@@ -167,7 +167,7 @@ class TestAlarmsAPI(TestCase):
     def test_get_medium_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
-        mock_response.dataseq.return_value = self.alarms_dataseq
+        mock_response.json.return_value = self.alarms_data
         # Act
         answer = AlarmsAPI(mock_session).get().filter(severity=Severity.MEDIUM)
         # Assert
@@ -178,7 +178,7 @@ class TestAlarmsAPI(TestCase):
     def test_get_minor_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
-        mock_response.dataseq.return_value = self.alarms_dataseq
+        mock_response.json.return_value = self.alarms_data
         # Act
         answer = AlarmsAPI(mock_session).get().filter(severity=Severity.MINOR)
         # Assert
@@ -189,7 +189,7 @@ class TestAlarmsAPI(TestCase):
     def test_get_not_viewed_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
-        mock_response.dataseq.return_value = self.alarms_dataseq
+        mock_response.json.return_value = self.alarms_data
         # Act
         answer = AlarmsAPI(mock_session).get().filter(viewed=False)
         # Assert
@@ -197,21 +197,10 @@ class TestAlarmsAPI(TestCase):
 
     @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
-    def test_mark_all_as_viewed(self, mock_session, mock_response):
-        # Arrange
-        mock_session.post.return_value = mock_response
-        mock_response.dataseq.return_value = self.alarms_dataseq
-        # Act
-        answer = AlarmsAPI(mock_session).mark_all_as_viewed()
-        # Assert
-        self.assertTrue(answer)
-
-    @patch("vmngclient.response.vManageResponse")
-    @patch("vmngclient.session.vManageSession")
     def test_check_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
-        mock_response.dataseq.return_value = self.alarms_dataseq
+        mock_response.json.return_value = self.alarms_data
         # Act
         answer = AlarmsAPI(mock_session).check_alarms(self.minor_alarms_data["data"])
         # Assert
@@ -228,7 +217,7 @@ class TestAlarmsAPI(TestCase):
         # Assert
         self.assertEqual(answer, {"found": set(), "not-found": set(self.minor_alarms_dataseq)})
 
-    # # test AlarmVerification class
+    # # # test AlarmVerification class
     @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
     def test_verify(self, mock_session, mock_response):
