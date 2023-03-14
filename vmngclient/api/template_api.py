@@ -174,7 +174,7 @@ class TemplatesAPI:
             ]
         }
         if is_edited:
-            payload['deviceTemplateList'][0]['isEdited'] = True # type: ignore
+            payload['deviceTemplateList'][0]['isEdited'] = True  # type: ignore
         endpoint = "/dataservice/template/device/config/attachcli"
         logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
