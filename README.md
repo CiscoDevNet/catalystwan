@@ -9,7 +9,7 @@ pip install vmngclient
 ```
 
 ## Session usage example
-Our session is an extension to `requests.Session` designe to make it easier to communicate via API calls with vmanage. We provide ready to use authenticetion, you have to simply provide the vmanage url, username and password as as if you were doing it through a GUI. 
+Our session is an extension to `requests.Session` designed to make it easier to communicate via API calls with vManage. We provide ready to use authenticetion, you have to simply provide the vmanage url, username and password as as if you were doing it through a GUI. 
 ```python
 from vmngclient.session import create_vManageSession
 
