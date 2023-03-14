@@ -305,7 +305,7 @@ class TemplatesAPI:
         Returns:
             bool: True if deletion is successful, otherwise - False.
         """
-        template = self.get(DeviceTemplate).filter(name=name).single_or_default()
+        template = self.get(DeviceTemplate).filter(name=name).single_or_default()  # type: ignore
         if template:
             endpoint = f"/dataservice/template/device/{template.id}"
             if template.devices_attached == 0:
