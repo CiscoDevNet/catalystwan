@@ -103,7 +103,7 @@ class TemplatesAPI:
         if template is FeatureTemplate:
             return self._get_feature_templates()
 
-        if template in [DeviceTemplate, CLITemplate]:
+        if template is DeviceTemplate or template is CLITemplate:
             return self._get_device_templates()
 
         raise NotImplementedError()
@@ -259,7 +259,41 @@ class TemplatesAPI:
         logger.warning(f"Task activity information: {task.activity}")
         return False
 
-    def delete(self, name: str) -> bool:
+    @overload
+    def delete(self, template: Type[DeviceTemplate], name: str) -> bool:  # type: ignore
+        ...
+
+    @overload
+    def delete(self, template: Type[FeatureTemplate], name: str) -> bool:  # type: ignore
+        ...
+
+    @overload
+    def delete(self, template: Type[CLITemplate], name: str) -> bool:  # type: ignore
+        ...
+
+    def delete(self, template, name):
+        status = False
+
+        if template is FeatureTemplate:
+            status = self._delete_feature_template(name)
+
+        if template is DeviceTemplate and name:
+            status = self._delete_device_template(name)
+
+        if status:
+            logger.info(f"Template {name} was successfuly deleted.")
+            return status
+
+        raise NotImplementedError(f"Not implemented for {template}")
+
+    def _delete_feature_template(self, name: str) -> bool:
+        template = self.get(FeatureTemplate).filter(name=name).single_or_default()
+        if template:
+            endpoint = f"/dataservice/template/feature/{template.id}"
+            self.session.delete(url=endpoint)
+        return True
+
+    def _delete_device_template(self, name: str) -> bool:
         """
 
         Args:
@@ -271,15 +305,16 @@ class TemplatesAPI:
         Returns:
             bool: True if deletion is successful, otherwise - False.
         """
-        raise NotImplementedError()
-        template = self.get(name)
-        endpoint = f"/dataservice/template/device/{template.id}"
-        if template.devices_attached == 0:
-            response = self.session.delete(url=endpoint)
-            logger.info(f"Template with name: {name} - deleted.")
-            return response.ok
-        logger.warning(f"Template: {template} is attached to device - cannot be deleted.")
-        raise AttachedError(template.name)
+        template = self.get(DeviceTemplate).filter(name=name).single_or_default()
+        if template:
+            endpoint = f"/dataservice/template/device/{template.id}"
+            if template.devices_attached == 0:
+                response = self.session.delete(url=endpoint)
+                logger.info(f"Template with name: {name} - deleted.")
+                return response.ok
+            logger.warning(f"Template: {template} is attached to device - cannot be deleted.")
+            raise AttachedError(template.name)
+        return True
 
     def _create_cli_template(
         self,
@@ -373,9 +408,9 @@ class TemplatesAPI:
         template_id: Optional[str] = None  # type: ignore
         template_type = None
 
-        exists = self.get(type(template)).filter(name=template.name)
-        if exists:
-            raise AlreadyExistsError(f"Template [{template.name}] already exists.")
+        # exists = self.get(type(template)).filter(name=template.name)
+        # if exists:
+        #     raise AlreadyExistsError(f"Template [{template.name}] already exists.")
 
         if isinstance(template, FeatureTemplate):
             template_id = self._create_feature_template(template)
