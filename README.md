@@ -82,8 +82,6 @@ alarms = session.api.alarms.get()
 
 </details>
 
-</br>
-
 ### Note:
 To remove `InsecureRequestWarning`, you can include in your scripts:
 ```Python
