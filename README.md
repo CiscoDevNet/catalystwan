@@ -34,7 +34,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     <summary> <b>Get devices</b> <i>(click to expand)</i></summary>
 
 ```python
-devices = session.ap.devices.get()
+devices = session.api.devices.get()
 ```
 
 </details>
@@ -43,9 +43,9 @@ devices = session.ap.devices.get()
     <summary> <b>Admin Tech</b> <i>(click to expand)</i></summary>
 
 ```Python
-admin_tch_file = session.api.admin_tech.generate("172.16.255.11")
-admintech.download(admin_tch_file)
-admintech.delete(admin_tch_file)
+admin_tech_file = session.api.admin_tech.generate("172.16.255.11")
+admintech.download(admin_tech_file)
+admintech.delete(admin_tech_file)
 ```
 </details>
 
