@@ -1,10 +1,13 @@
+import logging
 from typing import Optional
 from urllib.parse import urljoin
 
 import requests
-from requests import PreparedRequest
+from requests import PreparedRequest, Response
 from requests.auth import AuthBase
 from requests.cookies import RequestsCookieJar
+
+from vmngclient import with_proc_info_header
 
 
 class InvalidCredentialsError(Exception):
@@ -27,9 +30,7 @@ class InvalidCredentialsError(Exception):
         self.message = message
 
     def __str__(self):
-        return (
-            f"Trying to access vManage with the following credentials: {self.username}/****. {self.message}"
-        )
+        return f"Trying to access vManage with the following credentials: {self.username}/****. {self.message}"
 
 
 class vManageAuth(AuthBase):
@@ -61,6 +62,7 @@ class vManageAuth(AuthBase):
         self.expiration_time: Optional[int] = None  # Unlimited
         self.set_cookie: Optional[RequestsCookieJar] = None
         self.token: str = ""
+        self.logger = logging.getLogger(__name__)
 
     def get_cookie(self) -> RequestsCookieJar:
         """Check whether a user is successfully authenticated.
@@ -87,6 +89,7 @@ class vManageAuth(AuthBase):
             verify=self.verify,
             headers=headers,
         )
+        self.logger.debug(self._auth_request_debug(response))
         if response.text != "":
             raise InvalidCredentialsError(self.username, self.password)
         return response.cookies
@@ -111,6 +114,7 @@ class vManageAuth(AuthBase):
             verify=self.verify,
             headers=headers,
         )
+        self.logger.debug(self._auth_request_debug(response))
         return response.text
 
     def __call__(self, prepared_request: PreparedRequest) -> PreparedRequest:
@@ -122,3 +126,7 @@ class vManageAuth(AuthBase):
         prepared_request.prepare_cookies(self.set_cookie)
         prepared_request.headers.update({"x-xsrf-token": self.token})
         return prepared_request
+
+    @with_proc_info_header
+    def _auth_request_debug(self, response: Response) -> str:
+        return f"User: {self.username} {response.request} {response.request.url} {response}"
