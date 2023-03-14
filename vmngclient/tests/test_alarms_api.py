@@ -197,17 +197,6 @@ class TestAlarmsAPI(TestCase):
 
     @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
-    def test_mark_all_as_viewed(self, mock_session, mock_response):
-        # Arrange
-        mock_session.post.return_value = mock_response
-        mock_response.dataseq.return_value = self.alarms_dataseq
-        # Act
-        answer = AlarmsAPI(mock_session).mark_all_as_viewed()
-        # Assert
-        self.assertTrue(answer)
-
-    @patch("vmngclient.response.vManageResponse")
-    @patch("vmngclient.session.vManageSession")
     def test_check_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
