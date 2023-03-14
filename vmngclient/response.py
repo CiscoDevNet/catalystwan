@@ -84,7 +84,7 @@ def response_debug(response: Optional[Response], request: Union[Request, Prepare
                 else:
                     response_debug.update({"text(trimmed)": response.text[:1024]})
             else:
-                response_debug.update({"text": "cannot convert to string: unknown encoding"})
+                response_debug.update({"text(cannot convert to string: unknown encoding)": None})
         debug_dict["response"] = response_debug
     return pformat(debug_dict, width=80, sort_dicts=False)
 
