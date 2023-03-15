@@ -129,4 +129,6 @@ class vManageAuth(AuthBase):
 
     @with_proc_info_header
     def _auth_request_debug(self, response: Response) -> str:
-        return f"User: {self.username} {response.request} {response.request.url} {response}"
+        return (
+            f"Authenticating: {self.username} {response.request.method} {response.request.url} <{response.status_code}>"
+        )
