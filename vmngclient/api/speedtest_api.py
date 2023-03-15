@@ -25,7 +25,7 @@ class SpeedtestAPI:
         speedtest = session.api.speedtest.speedtest(devices[0], devices[1])
 
         print(f"Upload speed from {speedtest.device_name} is {speedtest.up_speed} Mbps.)
-        
+
         # example output: Upload speed from vm2 is 217.82 Mbps.
 
         speedtest is a Speedtest object containing source and destination device info and
