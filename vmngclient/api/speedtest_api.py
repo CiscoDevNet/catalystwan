@@ -22,9 +22,13 @@ class SpeedtestAPI:
     Example:
         session = create_vManageSession(...)
         devices = session.api.basic_api.devices
-        speed = session.api.speedtest.speedtest(devices[0], devices[1])
+        speedtest = session.api.speedtest.speedtest(devices[0], devices[1])
 
-        speed is a Speedtest object containing source and destination device info and
+        print(f"Upload speed from {speedtest.device_name} is {speedtest.up_speed} Mbps.)
+        
+        # example output: Upload speed from vm2 is 217.82 Mbps.
+
+        speedtest is a Speedtest object containing source and destination device info and
             upload and download speed between them
     """
     def __init__(self, session: vManageSession):
