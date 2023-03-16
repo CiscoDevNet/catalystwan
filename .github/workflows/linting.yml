@@ -2,13 +2,9 @@ name: Static code analyzer
 
 on:
   push:
-    paths-ignore:
-      - '**.md'
   pull_request:
     branches:
-      - master
-    paths-ignore:
-      - '**.md'
+      - main
 
 jobs:
   analyze_code:
