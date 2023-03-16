@@ -879,9 +879,11 @@ it will not poll any further.</p>
 <p class="rubric">Example</p>
 <p>session = create_vManageSession(…)
 devices = session.api.basic_api.devices
-speed = session.api.speedtest.speedtest(devices[0], devices[1])</p>
+speedtest = session.api.speedtest.speedtest(devices[0], devices[1])</p>
+<p>print(f”Upload speed from {speedtest.device_name} is {speedtest.up_speed} Mbps.)</p>
+<p># example output: Upload speed from vm2 is 217.82 Mbps.</p>
 <dl class="simple">
-<dt>speed is a Speedtest object containing source and destination device info and</dt><dd><p>upload and download speed between them</p>
+<dt>speedtest is a Speedtest object containing source and destination device info and</dt><dd><p>upload and download speed between them</p>
 </dd>
 </dl>
 <dl class="py method">
