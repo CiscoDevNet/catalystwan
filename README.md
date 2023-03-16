@@ -1,7 +1,7 @@
 # vManage-client
 [![Python3.8](https://img.shields.io/static/v1?label=Python&logo=Python&color=3776AB&message=3.8)](https://www.python.org/)
 
-vManage client is a package for creating simple and parallel automatic requests via official vManageAPI. It is intended to serve as a multiple session handler (provider, provider as a tenant, tenant). The library is not dependent on environment which is being run, you just need a connection to any vManage.
+vManage client is a package for creating simple and parallel automatic requests via official vManageAPI. It is intended to serve as a multiple session handler (provider, provider as a tenant, tenant). The library is not dependent on environment which is being run in, you just need a connection to any vManage.
 
 ## Installation
 ```console
@@ -9,7 +9,7 @@ pip install vmngclient
 ```
 
 ## Session usage example
-Our session is an extension to `requests.Session` designe to make it easier to communicate via API calls with vmanage. We provide ready to use authenticetion, you have to simply provide the vmanage url, username and password as as if you were doing it through a GUI. 
+Our session is an extension to `requests.Session` designed to make it easier to communicate via API calls with vManage. We provide ready to use authenticetion, you have to simply provide the vmanage url, username and password as as if you were doing it through a GUI. 
 ```python
 from vmngclient.session import create_vManageSession
 
