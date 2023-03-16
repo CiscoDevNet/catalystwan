@@ -57,14 +57,16 @@ speedtest = session.api.speedtest.speedtest(devices[0], devices[1])
 
 ```python
 # Prepare devices list
-devices = [device for device in DevicesAPI(session).devices
+vsmarts = [device for device in DevicesAPI(session).devices
             if device .personality == Personality.VSMART]
 software_image = "viptela-20.7.2-x86_64.tar.gz"
 
+# Upload image
+session.api.repository.upload_image(software_image)
+
 # Upgrade
-devices_payload = DeviceVersions(session, DeviceCategory.CONTROLLERS.)get_devices_current_version(devices)
 software_action = SoftwareActionAPI(session, DeviceCategory.VEDGES)
-software_action_id = software_action.upgrade_software(devices_payload,
+software_action_id = software_action.upgrade_software(vsmarts,
     InstallSpecHelper.CEDGE.value, reboot = False, sync = True, software_image=software_image)
 
 # Check action status
