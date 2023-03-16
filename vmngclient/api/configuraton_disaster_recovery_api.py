@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from attr import define, field  # type: ignore
 
@@ -7,22 +7,22 @@ from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
 
 
-@define
+@define(kw_only=True)
 class ClusterInfoDevice(DataclassBase):
     hostname: str = field(metadata={FIELD_NAME: "host-name"})
     device_ip: str = field(metadata={FIELD_NAME: "deviceIP"})
     state: str  # might be good idea to have enum here
     is_current_vmanage: bool = field(metadata={FIELD_NAME: "isCurrentVManage"})
 
-    @staticmethod
-    def from_dict(dict):
-        return create_dataclass(ClusterInfoDevice, dict)
 
-
-@define
+@define(kw_only=True)
 class ClusterInfo(DataclassBase):
-    primary: List[ClusterInfoDevice] = field(converter=ClusterInfoDevice.from_dict)
-    secondary: List[ClusterInfoDevice] = field(converter=ClusterInfoDevice.from_dict)
+    primary: Optional[List[ClusterInfoDevice]] = field(
+        default=None, converter=lambda l: [create_dataclass(ClusterInfoDevice, info) for info in l]
+    )
+    secondary: Optional[List[ClusterInfoDevice]] = field(
+        default=None, converter=lambda l: [create_dataclass(ClusterInfoDevice, info) for info in l]
+    )
 
 
 class ConfigurationDisasterRecoveryApi:
@@ -34,7 +34,7 @@ class ConfigurationDisasterRecoveryApi:
         return create_dataclass(ClusterInfo, response.payload.json.get("clusterInfo"))
 
 
-def test_dataclass_parse():
+def test_nested_dataclass_parse():
     json_payload = {
         "clusterInfo": {
             "primary": [
@@ -46,8 +46,18 @@ def test_dataclass_parse():
                 }
             ],
             "secondary": [
-                {"host-name": "dc1-vm3", "deviceIP": "123.10.1.103", "state": "UP", "isCurrentVManage": True},
-                {"host-name": "dc1-vm2", "deviceIP": "123.10.1.102", "state": "UP", "isCurrentVManage": True},
+                {
+                    "host-name": "dc1-vm3",
+                    "deviceIP": "123.10.1.103",
+                    "state": "UP",
+                    "isCurrentVManage": True,
+                },
+                {
+                    "host-name": "dc1-vm2",
+                    "deviceIP": "123.10.1.102",
+                    "state": "UP",
+                    "isCurrentVManage": True,
+                },
             ],
         }
     }
