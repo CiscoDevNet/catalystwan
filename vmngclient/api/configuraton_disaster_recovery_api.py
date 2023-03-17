@@ -36,6 +36,6 @@ class ConfigurationDisasterRecoveryApi:
     def __init__(self, session: vManageSession):
         self.session = session
 
-    def get_cluster_info(self):
+    def get_cluster_info(self) -> ClusterInfo:
         response = self.session.get("dataservice/disasterrecovery/clusterInfo")
         return create_dataclass(ClusterInfo, response.payload.json.get("clusterInfo"))
