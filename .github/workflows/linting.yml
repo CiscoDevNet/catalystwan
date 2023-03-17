@@ -2,8 +2,6 @@ name: Static code analyzer
 
 on:
   pull_request:
-    branches:
-      - main
 
 jobs:
   analyze_code:
