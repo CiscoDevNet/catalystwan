@@ -11,6 +11,7 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncod
 
 from vmngclient.dataclasses import DataclassBase, Device
 from vmngclient.exceptions import ImageNotInRepositoryError
+from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
 
 if TYPE_CHECKING:
@@ -179,8 +180,8 @@ class DeviceVersions:
         self.device_category = device_category
 
     def _get_device_list_in(
-        self, version_to_set_up: str, devices: List[Device], version_type: str
-    ) -> List[DeviceVersionPayload]:
+        self, version_to_set_up: str, devices: DataSequence[Device], version_type: str
+    ) -> DataSequence[DeviceVersionPayload]:
         """
         Create devices payload list included requested version, if requested version
         is in specified version type
@@ -193,7 +194,9 @@ class DeviceVersions:
         Returns:
             list : list of devices
         """
-        devices_payload = [DeviceVersionPayload(device.uuid, device.id) for device in devices]
+        devices_payload = DataSequence(
+            DeviceVersionPayload, [DeviceVersionPayload(device.uuid, device.id) for device in devices]
+        )
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
         for device in devices_payload:
             device_versions = getattr(all_dev_versions[device.deviceId], version_type)
@@ -209,7 +212,9 @@ class DeviceVersions:
                 )
         return devices_payload
 
-    def get_device_list_in_installed(self, version_to_set_up: str, devices: List[Device]) -> List[DeviceVersionPayload]:
+    def get_device_list_in_installed(
+        self, version_to_set_up: str, devices: DataSequence[Device]
+    ) -> DataSequence[DeviceVersionPayload]:
         """
         Create devices payload list included requested version, if requested version
         is in installed versions
@@ -223,7 +228,9 @@ class DeviceVersions:
         """
         return self._get_device_list_in(version_to_set_up, devices, "installed_versions")
 
-    def get_device_available(self, version_to_set_up: str, devices: List[Device]) -> List[DeviceVersionPayload]:
+    def get_device_available(
+        self, version_to_set_up: str, devices: DataSequence[Device]
+    ) -> DataSequence[DeviceVersionPayload]:
         """
         Create devices payload list included requested, if requested version
         is in available versions
@@ -238,7 +245,9 @@ class DeviceVersions:
         """
         return self._get_device_list_in(version_to_set_up, devices, "available_versions")
 
-    def _get_devices_chosen_version(self, devices: List[Device], version_type: str) -> List[DeviceVersionPayload]:
+    def _get_devices_chosen_version(
+        self, devices: DataSequence[Device], version_type: str
+    ) -> DataSequence[DeviceVersionPayload]:
         """
         Create devices payload list included software version key
         for every device in devices list
@@ -250,13 +259,15 @@ class DeviceVersions:
         Returns:
             list : list of devices
         """
-        devices_payload = [DeviceVersionPayload(device.uuid, device.id) for device in devices]
+        devices_payload = DataSequence(
+            DeviceVersionPayload, [DeviceVersionPayload(device.uuid, device.id) for device in devices]
+        )
         all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
         for device in devices_payload:
             device.version = getattr(all_dev_versions[device.deviceId], version_type)
         return devices_payload
 
-    def get_devices_current_version(self, devices: List[Device]) -> List[DeviceVersionPayload]:
+    def get_devices_current_version(self, devices: DataSequence[Device]) -> DataSequence[DeviceVersionPayload]:
         """
         Create devices payload list included current software version key
         for every device in devices list
@@ -271,7 +282,7 @@ class DeviceVersions:
 
         return self._get_devices_chosen_version(devices, "current_version")
 
-    def get_devices_available_versions(self, devices: List[Device]) -> List[DeviceVersionPayload]:
+    def get_devices_available_versions(self, devices: DataSequence[Device]) -> DataSequence[DeviceVersionPayload]:
         """
         Create devices payload list included available software versions key
         for every device in devices list
@@ -285,6 +296,6 @@ class DeviceVersions:
 
         return self._get_devices_chosen_version(devices, "available_versions")
 
-    def get_device_list(self, devices: List[Device]) -> List[DeviceVersionPayload]:
+    def get_device_list(self, devices: DataSequence[Device]) -> List[DeviceVersionPayload]:
 
         return [DeviceVersionPayload(device.uuid, device.id) for device in devices]
