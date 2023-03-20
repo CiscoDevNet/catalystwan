@@ -1,10 +1,7 @@
 name: Run unittests
 
 on:
-  push:
   pull_request:
-    branches:
-      - main
 
 jobs:
   unittests:
