@@ -9,6 +9,7 @@ from attr import define  # type: ignore
 from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.exceptions import VersionDeclarationError  # type: ignore
+from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import asdict
 
 logger = logging.getLogger(__name__)
@@ -91,7 +92,7 @@ class SoftwareActionAPI:
 
     def activate_software(
         self,
-        devices: List[Device],
+        devices: DataSequence[Device],
         device_type: DeviceType,
         version_to_activate: Optional[str] = "",
         software_image: Optional[str] = "",
@@ -129,7 +130,7 @@ class SoftwareActionAPI:
 
     def upgrade_software(
         self,
-        devices: List[Device],
+        devices: DataSequence[Device],
         install_spec: InstallSpecification,
         reboot: bool,
         sync: bool = True,
