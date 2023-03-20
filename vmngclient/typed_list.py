@@ -207,3 +207,22 @@ class DataSequence(TypedList[T], Generic[T]):
         return DataSequence(
             self._type, filter(lambda x: all(getattr(x, a) == kwargs[a] for a in annotations), self.data)
         )
+
+    def filter_not(self, **kwargs) -> DataSequence[T]:
+        """Filters a sequence of values based on attributes.
+        Works the opposite way to filter.
+
+        >>> seq = DataSequence(User, [User(username="User1"), User(username="User2")])
+        >>> seq.filter_not(username="User1")
+        DataSequence(User, [
+            User(username='User2', password=None, group=[], locale=None, description=None, resource_group=None)
+        ])
+
+        Returns:
+            DataSequence: Filtered DataSequence.
+        """
+        annotations = set(kwargs.keys())
+
+        return DataSequence(
+            self._type, filter(lambda x: all(getattr(x, a) != kwargs[a] for a in annotations), self.data)
+        )
