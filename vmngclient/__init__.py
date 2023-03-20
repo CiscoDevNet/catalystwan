@@ -1,14 +1,31 @@
 import logging
 import logging.config
-from functools import lru_cache
+import multiprocessing
+from functools import lru_cache, wraps
 from importlib import metadata
 from importlib.machinery import PathFinder
 from os import environ
 from pathlib import Path
-from traceback import FrameSummary, StackSummary
-from typing import Final, List
+from traceback import FrameSummary, StackSummary, extract_stack
+from typing import Callable, Final, List
 
 import urllib3
+
+
+def with_proc_info_header(method: Callable[..., str]) -> Callable[..., str]:
+    """
+    Adds process ID and external caller information before first line of returned string
+    """
+
+    @wraps(method)
+    def wrapper(*args, **kwargs) -> str:
+        wrapped = method(*args, **kwargs)
+        fname, line_no, function, _ = get_first_external_stack_frame(extract_stack())
+        external_caller_info = "%s:%d %s(...)" % (fname, line_no, function)
+        header = f"{multiprocessing.current_process()} {external_caller_info}\n"
+        return header + wrapped
+
+    return wrapper
 
 
 def get_first_external_stack_frame(stack: StackSummary) -> FrameSummary:

@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import logging
 from http import HTTPStatus
-from typing import List, Union, cast, overload
+from typing import TYPE_CHECKING, List, Union, cast, overload
 
 from requests import Response
 
@@ -11,12 +13,15 @@ from vmngclient.dataclasses import (
     Organization,
     Password,
     ServiceConfigurationData,
+    SoftwareInstallTimeout,
     User,
     Vbond,
 )
 from vmngclient.exceptions import InvalidOperationError
-from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import asdict, create_dataclass
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
 
@@ -156,6 +161,22 @@ class AdministrationSettingsAPI:
         endpoint = "/dataservice/settings/configuration/organization"
 
         return create_dataclass(Organization, self.session.get_data(endpoint)[0])
+
+    def get_software_install_timeout(self) -> SoftwareInstallTimeout:
+        url_path = "/settings/configuration/softwareMaintenance"
+
+        return create_dataclass(SoftwareInstallTimeout, self.session.get_data(url_path)[0])
+
+    def set_software_install_timeout(self, download_timeout_min: int, activate_timeout_min: int):
+        MINIMAL_DOWNLOAD_TIMEOUT_MIN = 60
+        MINIMAL_ACTIVATE_TIMEOUT_MIN = 30
+        assert download_timeout_min >= MINIMAL_DOWNLOAD_TIMEOUT_MIN
+        assert activate_timeout_min >= MINIMAL_ACTIVATE_TIMEOUT_MIN
+
+        url_path = "/settings/configuration/softwareMaintenance"
+        data = asdict(SoftwareInstallTimeout(download_timeout_min, activate_timeout_min))  # type: ignore
+        response = self.session.post(url_path, json=data)
+        return True if response.status_code == 200 else False
 
     @overload
     def update(self, payload: Password) -> bool:

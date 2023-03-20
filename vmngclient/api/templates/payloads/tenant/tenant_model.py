@@ -1,13 +1,18 @@
+from __future__ import annotations
+
 from functools import lru_cache
 from pathlib import Path
-from typing import ClassVar, List
+from typing import TYPE_CHECKING, ClassVar, List
 
 from pydantic import BaseModel  # type: ignore
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.api.tenant_api import TenantsAPI
 from vmngclient.dataclasses import TenantInfo, TierInfo
-from vmngclient.session import vManageSession
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
+
 from vmngclient.typed_list import DataSequence
 
 

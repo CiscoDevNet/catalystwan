@@ -1,11 +1,15 @@
+from __future__ import annotations
+
 import logging
 from time import sleep
-from typing import List, cast
+from typing import TYPE_CHECKING, List, cast
 
 from attr import define, field  # type: ignore
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
-from vmngclient.session import vManageSession
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
+
 from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 
@@ -141,7 +145,7 @@ def wait_for_completed(
                 raise ValueError(f"Task id {action_id} is not registered by vManage.")
 
         task = create_dataclass(TaskStatus, action_data)
-        logger.debug(
+        logger.info(
             f"Statuses of action {action_id} is: "
             f"status: {task.status}, status_id: {task.status_id}, activity: {task.activity}."
         )

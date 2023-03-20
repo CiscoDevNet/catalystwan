@@ -4,6 +4,8 @@ from unittest.mock import patch
 
 from vmngclient.api.alarms_api import AlarmsAPI, AlarmVerification
 from vmngclient.dataclasses import AlarmData
+from vmngclient.typed_list import DataSequence
+from vmngclient.utils.alarm_status import Severity
 from vmngclient.utils.creation_tools import create_dataclass, flatten_dict
 
 
@@ -16,6 +18,7 @@ class TestAlarmsAPI(TestCase):
                     "component": "OMP",
                     "severity": "Critical",
                     "active": False,
+                    "acknowledged": False,
                     "consumed_events": [
                         {
                             "eventname": "omp-peer-state-change",
@@ -39,6 +42,7 @@ class TestAlarmsAPI(TestCase):
                     "component": "OMP",
                     "severity": "Major",
                     "active": False,
+                    "acknowledged": False,
                     "consumed_events": [
                         {
                             "eventname": "omp-peer-state-change",
@@ -62,6 +66,7 @@ class TestAlarmsAPI(TestCase):
                     "component": "OMP",
                     "severity": "Medium",
                     "active": False,
+                    "acknowledged": False,
                     "consumed_events": [
                         {
                             "eventname": "omp-peer-state-change",
@@ -85,6 +90,7 @@ class TestAlarmsAPI(TestCase):
                     "component": "OMP",
                     "severity": "Minor",
                     "active": False,
+                    "acknowledged": False,
                     "consumed_events": [
                         {
                             "eventname": "omp-peer-state-change",
@@ -110,139 +116,134 @@ class TestAlarmsAPI(TestCase):
         self.major_alarms_data = {"data": [self.alarms[1]]}
         self.medium_alarms_data = {"data": [self.alarms[2]]}
         self.minor_alarms_data = {"data": [self.alarms[3]]}
-        self.alarms_dataclass = [create_dataclass(AlarmData, flatten_dict(alarm)) for alarm in self.alarms]
-        self.critical_alarms_dataclass = [create_dataclass(AlarmData, flatten_dict(self.alarms[0]))]
-        self.major_alarms_dataclass = [create_dataclass(AlarmData, flatten_dict(self.alarms[1]))]
-        self.medium_alarms_dataclass = [create_dataclass(AlarmData, flatten_dict(self.alarms[2]))]
-        self.minor_alarms_dataclass = [create_dataclass(AlarmData, flatten_dict(self.alarms[3]))]
+        self.alarms_dataseq = DataSequence(
+            AlarmData, [create_dataclass(AlarmData, flatten_dict(alarm)) for alarm in self.alarms]
+        )
+        self.critical_alarms_dataseq = DataSequence(
+            AlarmData, [create_dataclass(AlarmData, flatten_dict(self.alarms[0]))]
+        )
+        self.major_alarms_dataseq = DataSequence(AlarmData, [create_dataclass(AlarmData, flatten_dict(self.alarms[1]))])
+        self.medium_alarms_dataseq = DataSequence(
+            AlarmData, [create_dataclass(AlarmData, flatten_dict(self.alarms[2]))]
+        )
+        self.minor_alarms_dataseq = DataSequence(AlarmData, [create_dataclass(AlarmData, flatten_dict(self.alarms[3]))])
         self.maxDiff = None
 
+    @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
-    @patch("requests.Response")
     def test_get_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
         mock_response.json.return_value = self.alarms_data
         # Act
-        answer = AlarmsAPI(mock_session).get_alarms()
+        answer = AlarmsAPI(mock_session).get()
         # Assert
-        self.assertEqual(answer, self.alarms_dataclass)
+        self.assertEqual(answer, self.alarms_dataseq)
 
+    @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
-    @patch("requests.Response")
     def test_get_critical_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
-        mock_response.json.return_value = self.critical_alarms_data
+        mock_response.json.return_value = self.alarms_data
         # Act
-        answer = AlarmsAPI(mock_session).get_critical_alarms()
+        answer = AlarmsAPI(mock_session).get().filter(severity=Severity.CRITICAL)
         # Assert
-        self.assertEqual(answer, self.critical_alarms_dataclass)
+        self.assertEqual(answer, self.critical_alarms_dataseq)
 
+    @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
-    @patch("requests.Response")
     def test_get_major_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
-        mock_response.json.return_value = self.major_alarms_data
+        mock_response.json.return_value = self.alarms_data
         # Act
-        answer = AlarmsAPI(mock_session).get_major_alarms()
+        answer = AlarmsAPI(mock_session).get().filter(severity=Severity.MAJOR)
         # Assert
-        self.assertEqual(answer, self.major_alarms_dataclass)
+        self.assertEqual(answer, self.major_alarms_dataseq)
 
+    @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
-    @patch("requests.Response")
     def test_get_medium_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
-        mock_response.json.return_value = self.medium_alarms_data
+        mock_response.json.return_value = self.alarms_data
         # Act
-        answer = AlarmsAPI(mock_session).get_medium_alarms()
+        answer = AlarmsAPI(mock_session).get().filter(severity=Severity.MEDIUM)
         # Assert
-        self.assertEqual(answer, self.medium_alarms_dataclass)
+        self.assertEqual(answer, self.medium_alarms_dataseq)
 
+    @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
-    @patch("requests.Response")
     def test_get_minor_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
-        mock_response.json.return_value = self.minor_alarms_data
+        mock_response.json.return_value = self.alarms_data
         # Act
-        answer = AlarmsAPI(mock_session).get_minor_alarms()
+        answer = AlarmsAPI(mock_session).get().filter(severity=Severity.MINOR)
         # Assert
-        self.assertEqual(answer, self.minor_alarms_dataclass)
+        self.assertEqual(answer, self.minor_alarms_dataseq)
 
+    @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
-    @patch("requests.Response")
     def test_get_not_viewed_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
         mock_response.json.return_value = self.alarms_data
         # Act
-        answer = AlarmsAPI(mock_session).get_not_viewed_alarms()
+        answer = AlarmsAPI(mock_session).get().filter(viewed=False)
         # Assert
-        self.assertEqual(answer, self.alarms_dataclass)
+        self.assertEqual(answer, self.alarms_dataseq)
 
+    @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
-    @patch("requests.Response")
-    def test_mark_all_as_viewed(self, mock_session, mock_response):
-        # Arrange
-        mock_session.post.return_value = mock_response
-        mock_response.json.return_value = {"data": []}
-        # Act
-        answer = AlarmsAPI(mock_session).mark_all_as_viewed()
-        # Assert
-        self.assertTrue(answer)
-
-    @patch("vmngclient.session.vManageSession")
-    @patch("requests.Response")
     def test_check_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
-        mock_response.json.return_value = self.minor_alarms_data
+        mock_response.json.return_value = self.alarms_data
         # Act
         answer = AlarmsAPI(mock_session).check_alarms(self.minor_alarms_data["data"])
         # Assert
-        self.assertEqual(answer, {"found": set(self.minor_alarms_dataclass), "not-found": set()})
+        self.assertEqual(answer, {"found": set(self.minor_alarms_dataseq), "not-found": set()})
 
+    @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
-    @patch("requests.Response")
     def test_check_alarms_not_found(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
-        mock_response.json.return_value = self.critical_alarms_data
+        mock_response.dataseq.return_value = self.major_alarms_dataseq
         # Act
         answer = AlarmsAPI(mock_session).check_alarms(self.minor_alarms_data["data"], 2, 1)
         # Assert
-        self.assertEqual(answer, {"found": set(), "not-found": set(self.minor_alarms_dataclass)})
+        self.assertEqual(answer, {"found": set(), "not-found": set(self.minor_alarms_dataseq)})
 
-    # test AlarmVerification class
+    # # # test AlarmVerification class
+    @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
-    @patch("requests.Response")
     def test_verify(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
-        mock_response.json.return_value = self.minor_alarms_data
-        alarms_getter = AlarmsAPI(mock_session).get_not_viewed_alarms
+        mock_response.dataseq.return_value = self.major_alarms_dataseq
+        alarms_getter = AlarmsAPI(mock_session).get
         logger = logging.getLogger("test")
         # Act
         answer = AlarmVerification(logger, alarms_getter)
-        answer.verify(set(self.minor_alarms_dataclass), 2, 1)
+        answer.verify(set(self.minor_alarms_dataseq), 2, 1)
         # Assert
-        self.assertEqual(answer.found, set(self.minor_alarms_dataclass))
-        self.assertEqual(answer.not_found, set())
+        self.assertEqual(answer.found, set())
+        self.assertEqual(answer.not_found, set(self.minor_alarms_dataseq))
 
+    @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
-    @patch("requests.Response")
     def test_verify_not_found(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
-        mock_response.json.return_value = self.critical_alarms_data
-        alarms_getter = AlarmsAPI(mock_session).get_not_viewed_alarms
+        mock_response.dataseq.return_value = self.critical_alarms_dataseq
+        alarms_getter = AlarmsAPI(mock_session).get
         logger = logging.getLogger("test")
         # Act
         answer = AlarmVerification(logger, alarms_getter)
-        answer.verify(set(self.minor_alarms_dataclass), 2, 1)
+        answer.verify(set(self.minor_alarms_dataseq), 2, 1)
         # Assert
         self.assertEqual(answer.found, set())
-        self.assertEqual(answer.not_found, set(self.minor_alarms_dataclass))
+        self.assertEqual(answer.not_found, set(self.minor_alarms_dataseq))

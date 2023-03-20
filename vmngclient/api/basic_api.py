@@ -1,22 +1,24 @@
 """Methods covering essential API endpoints and related data classes."""
+from __future__ import annotations
+
+import logging
 from contextlib import contextmanager
-from enum import Enum
-from typing import Iterator, List, Union
+from typing import TYPE_CHECKING, Iterator, List, Union
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.dataclasses import BfdSessionData, Connection, Device, Reboot, WanInterface
-from vmngclient.session import vManageSession
+from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.operation_status import OperationStatus
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
 
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
-# TODO link that with dataclass
-class DeviceField(Enum):
-    HOSTNAME = "hostname"
-    ID = "id"
+
+logger = logging.getLogger(__name__)
 
 
 class DeviceNotFoundError(Exception):
@@ -28,7 +30,6 @@ class DevicesAPI:
 
     Attributes:
         session: logged in API client session
-        devices: List with system status for all devices
     """
 
     def __init__(self, session: vManageSession) -> None:
@@ -38,57 +39,20 @@ class DevicesAPI:
         return str(self.session)
 
     @property
-    def controllers(self) -> List[Device]:
-        """List of controller devices only."""
-        return [
-            controller
-            for controller in self.devices
-            if controller.personality in [Personality.VMANAGE, Personality.VSMART]
-        ]
-
-    @property
-    def orchestrators(self) -> List[Device]:
-        """List of orchestrator devices only."""
-        return [orchestrator for orchestrator in self.devices if Personality.VBOND is orchestrator.personality]
-
-    @property
-    def edges(self) -> List[Device]:
-        """List of edge devices only."""
-        return [edge for edge in self.devices if Personality.EDGE is edge.personality]
-
-    @property
-    def vsmarts(self) -> List[Device]:
-        """List of vsmart devices only."""
-        return [vsmart for vsmart in self.devices if Personality.VSMART is vsmart.personality]
-
-    @property
     def system_ips(self) -> List[str]:
         """List of device system IP addresses."""
-        return [device.local_system_ip for device in self.devices]
+        return [device.local_system_ip for device in self.get()]
 
     @property
     def ips(self):
         """List of device IP addresses."""
-        return [device.id for device in self.devices]
+        return [device.id for device in self.get()]
 
     def get_system_ip_based_on_local_system_ip(self, local_system_ip) -> str:
-        for dev in self.devices:
+        for dev in self.get():
             if local_system_ip == dev.local_system_ip:
                 return dev.id
         return ""
-
-    @property
-    def devices(self) -> List[Device]:
-        """List of all devices."""
-        devices_basic_info = self.session.get_data("/dataservice/device")
-
-        devices_ids = ""
-        for device in devices_basic_info:
-            devices_ids += f"&deviceId={device['deviceId']}"
-
-        devices_full_info = self.session.get_data(f"/dataservice/device/system/info?{devices_ids}")
-
-        return [create_dataclass(Device, device) for device in devices_full_info]
 
     def get_device_details(self, uuid: str) -> Device:
         """Gets system information for a device.
@@ -99,11 +63,12 @@ class DevicesAPI:
         Returns:
             Device object
         """
-        devices = self.session.get_data(f"/dataservice/system/device/vedges?uuid={uuid}")
+        response = self.session.get(f"/dataservice/system/device/vedges?uuid={uuid}")
 
+        devices = response.dataseq(Device)
         assert len(devices) == 1, "Expected system info response list to have one member"
 
-        return create_dataclass(Device, devices[0])
+        return devices[0]
 
     def count_devices(self, personality: Personality) -> int:
         """Gets number of devices of given personality.
@@ -114,19 +79,9 @@ class DevicesAPI:
         Returns:
             count of devices
         """
-        return sum([1 for device in self.devices if device.personality == personality.value])
+        return sum([1 for device in self.get() if device.personality == personality])
 
-    def get_tenants(self) -> Union[list, dict]:
-        """Gets Tenants.
-
-        Returns:
-            Tenants
-        """
-        tenants = self.session.get_data("/dataservice/tenant")
-
-        return tenants
-
-    def get_reachable_devices(self, personality: Personality):
+    def get_reachable_devices(self, personality: Personality) -> DataSequence[Device]:
         """Get reachable devices by personality.
 
         Args:
@@ -137,7 +92,9 @@ class DevicesAPI:
         """
         unsupported_personality = [Personality.VMANAGE]
         assert personality not in unsupported_personality, "Unsupported personality for reachable endpoint"
-        return self.session.get_data(f"/dataservice/device/reachable?personality={personality.value}")
+
+        devices = self.session.get(f"/dataservice/device/reachable?personality={personality.value}")
+        return devices.dataseq(Device)
 
     def send_certificate_state_to_controllers(
         self,
@@ -175,19 +132,33 @@ class DevicesAPI:
 
         return True if wait_for_state() else False
 
-    def get(self, field: DeviceField, value: str) -> Device:
-        supported_fields = [
-            DeviceField.HOSTNAME,
-            DeviceField.ID,
-        ]
+    def get(self, rediscover: bool = False) -> DataSequence[Device]:
+        """Data sequence of all devices.
 
-        if field not in supported_fields:
-            raise TypeError(f"{field} is not supported. Available fields: {supported_fields}")
+        Args:
+            rediscover: Rediscover device request payload
 
-        for device in self.devices:
-            if getattr(device, field.value) == value:
-                return device
-        raise DeviceNotFoundError(f"Device with `{field.value}` equals to `{value}` does not exists.")
+        Returns:
+            DataSequence[Device] of all devices
+
+        ## Examples:
+
+        Get all vManages:
+        >>> devices = DevicesAPI(session).get()
+        >>> vManages = devices.filter(personality=Personality.VMANAGE)
+        """
+        if rediscover:
+            logger.info("Rediscovering devices...")
+            api = "/dataservice/device/action/rediscoverall"
+            self.session.post(url=api)
+        devices_basic_info = self.session.get_data("/dataservice/device")
+
+        parameters = {"deviceId": [device["deviceId"] for device in devices_basic_info]}
+        devices_full_info = self.session.get(url="/dataservice/device/system/info", params=parameters)
+
+        devices = devices_full_info.dataseq(Device)
+
+        return devices
 
 
 class DeviceStateAPI:

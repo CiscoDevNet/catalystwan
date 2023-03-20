@@ -1,17 +1,36 @@
+from __future__ import annotations
+
 import logging
 import math
 from time import sleep
-from typing import cast
+from typing import TYPE_CHECKING, cast
 from urllib.error import HTTPError
 
 from vmngclient.api.basic_api import DeviceStateAPI
 from vmngclient.dataclasses import Device, Speedtest
-from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
 
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
+
 
 class SpeedtestAPI:
+    """
+    API methods to perform speedtest between 2 edge devices.
+
+    Example:
+        session = create_vManageSession(...)
+        devices = session.api.basic_api.devices
+        speedtest = session.api.speedtest.speedtest(devices[0], devices[1])
+
+        print(f"Upload speed from {speedtest.device_name} is {speedtest.up_speed} Mbps.)
+
+        # example output: Upload speed from vm2 is 217.82 Mbps.
+
+        speedtest is a Speedtest object containing source and destination device info and
+            upload and download speed between them
+    """
     def __init__(self, session: vManageSession):
         self.session = session
 
@@ -21,6 +40,14 @@ class SpeedtestAPI:
         destination_device: Device,
         test_duration_seconds: int = 300,
     ) -> Speedtest:
+        """
+        Performs speedtest between 2 edge devices.
+
+        Args:
+            source_device (Device): device from which the speed will be measured
+            destination_device (Device): device to which the speed will be measured
+            test_duration_seconds (int): duration of the speed measuring in seconds, defaults to 300 (5 minutes)
+        """
 
         source_color = DeviceStateAPI(self.session).get_colors(source_device.id)[0]
         destination_color = DeviceStateAPI(self.session).get_colors(destination_device.id)[0]
@@ -38,7 +65,7 @@ class SpeedtestAPI:
         if source_device.is_reachable and destination_device.is_reachable:
             with DeviceStateAPI(self.session).enable_data_stream():
                 try:
-                    self.perform(
+                    self.__perform(
                         source_device,
                         destination_device,
                         source_color,
@@ -55,7 +82,7 @@ class SpeedtestAPI:
 
         return self.speedtest_output
 
-    def perform(
+    def __perform(
         self,
         source_device: Device,
         destination_device: Device,

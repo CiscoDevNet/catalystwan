@@ -1,110 +1,78 @@
+from __future__ import annotations
+
 import logging
-from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Set
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Set
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.dataclasses import AlarmData
-from vmngclient.session import vManageSession
+from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass, flatten_dict
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
 
 
-class AlarmLevel(Enum):
-    minor = "Minor"
-    medium = "Medium"
-    major = "Major"
-    critical = "Critical"
-
-
-class Viewed(Enum):
-    yes = "true"
-    no = "false"
-
-
 class AlarmsAPI:
+    """API methods of vManage for Alarms.
+
+    Attributes:
+        session: logged in API client session
+    """
 
     URL = "/dataservice/alarms"
 
     def __init__(self, session: vManageSession):
         self.session = session
 
-    def get_alarms(
-        self,
-        hours: Optional[int] = None,
-        level: Optional[str] = None,
-        viewed: Optional[bool] = None,
-    ) -> List[AlarmData]:
-        query: Dict[str, Any] = {"query": {"condition": "AND", "rules": []}}
+    def get(self, from_time: Optional[int] = None) -> DataSequence[AlarmData]:
+        """Data sequence of alarms.
 
-        if hours:
+        Args:
+            from_time: Gets alarms from time in hour. Defaults to None - gets all alrams.
+
+        Returns:
+            DataSequence[AlarmData] of getted alarms.
+
+        Examples:
+            Get all alarms:
+            >>> alarms = AlarmsAPI(session).get()
+
+            Get all alarms from 3 hours:
+            >>> alarms = AlarmsAPI(session).get(from_time=3)
+
+            Get all not viewed alarms:
+            >>> alarms = AlarmsAPI(session).get()
+            >>> not_viewed_alarms = alarms.filter(viewed=False)
+
+            Get all critical alarms:
+            >>> alarms = AlarmsAPI(session).get()
+            >>> critical_alarms = alarms.filter(severity=Severity.CRITICAL)
+        """
+        query: Dict[str, Any] = {"query": {"condition": "AND", "rules": []}}
+        if from_time:
             query["query"]["rules"].append(
                 {
-                    "value": [str(hours)],
+                    "value": [str(from_time)],
                     "field": "entry_time",
                     "type": "date",
                     "operator": "last_n_hours",
                 }
             )
 
-        if level:
-            query["query"]["rules"].append(
-                {
-                    "value": [level],
-                    "field": "severity",
-                    "type": "string",
-                    "operator": "in",
-                }
-            )
-
-        if viewed is not None:
-            if viewed:
-                value = Viewed.yes.value
-            else:
-                value = Viewed.no.value
-
-            query["query"]["rules"].append(
-                {
-                    "value": [value],
-                    "field": "acknowledged",
-                    "type": "bool",
-                    "operator": "equal",
-                }
-            )
-
-        alarms = self.session.post(url=AlarmsAPI.URL, json=query).json()["data"]
-
+        response = self.session.post(url=AlarmsAPI.URL, json=query).json()["data"]
+        alarms = [create_dataclass(AlarmData, flatten_dict(alarm)) for alarm in response]
         logger.info("Current alarms collected successfully.")
 
-        return [create_dataclass(AlarmData, flatten_dict(alarm)) for alarm in alarms]
+        return DataSequence(AlarmData, alarms)
 
-    def get_critical_alarms(self, hours: Optional[int] = None, viewed: Optional[bool] = None) -> List[AlarmData]:
-        return self.get_alarms(hours, AlarmLevel.critical.value, viewed)
-
-    def get_major_alarms(self, hours: Optional[int] = None, viewed: Optional[bool] = None) -> List[AlarmData]:
-        return self.get_alarms(hours, AlarmLevel.major.value, viewed)
-
-    def get_medium_alarms(self, hours: Optional[int] = None, viewed: Optional[bool] = None) -> List[AlarmData]:
-        return self.get_alarms(hours, AlarmLevel.medium.value, viewed)
-
-    def get_minor_alarms(self, hours: Optional[int] = None, viewed: Optional[bool] = None) -> List[AlarmData]:
-        return self.get_alarms(hours, AlarmLevel.minor.value, viewed)
-
-    def get_not_viewed_alarms(self, hours: Optional[int] = None) -> List[AlarmData]:
-        return self.get_alarms(hours=hours, viewed=False)
-
-    def mark_all_as_viewed(self) -> bool:
-        """Marks all alarms as viewed.
-
-        Returns:
-          True if all alarms are viewed
-        """
+    def mark_all_as_viewed(self) -> None:
+        """Marks all alarms as viewed."""
 
         self.session.post(f"{AlarmsAPI.URL}/markallasviewed")
         logger.info("Alarms mark as viewed.")
-
-        return not self.get_not_viewed_alarms()
 
     def check_alarms(
         self,
@@ -125,11 +93,23 @@ class AlarmsAPI:
 
         Returns:
           The dictionary with alarms that occurred (key 'found') and did not (key 'no-found')
+
+        Examples:
+            >>> expected_alarms = [{
+                "type": "memory-usage",
+                "rulename": "memory-usage",
+                "component": "System",
+                "severity": "Medium",
+                "system_ip": "192.168.1.2",
+                "acknowledged": true,
+                "active": true,
+                }]
+            >>> result = AlarmsAPI(session).check_alarms(expected = expected_alarms)
         """
 
         alarms_expected = {create_dataclass(AlarmData, flatten_dict(expected_alarm)) for expected_alarm in expected}
 
-        verification = AlarmVerification(logger, self.get_not_viewed_alarms)
+        verification = AlarmVerification(logger, self.get)
         verification.verify(alarms_expected, timeout_seconds, sleep_seconds)
 
         logger.info(f"found alarms: {verification.found}")
@@ -146,7 +126,7 @@ class AlarmVerification:
         logger (Logger): Logger.
     """
 
-    def __init__(self, logger: logging.Logger, alarms_getter: Callable[[], List[AlarmData]]) -> None:
+    def __init__(self, logger: logging.Logger, alarms_getter: Callable[[], DataSequence[AlarmData]]) -> None:
         self.alarms_getter = alarms_getter
         self.logger = logger
 
@@ -159,7 +139,8 @@ class AlarmVerification:
         Returns:
           True if the requested alarm appears in the current alarm set.
         """
-        checked = {expected.lowercase().issubset(actual.lowercase()) for actual in self.alarms_getter()}
+        not_viewed_alarms = self.alarms_getter().filter(viewed=False)
+        checked = {expected.lowercase().issubset(actual.lowercase()) for actual in not_viewed_alarms}
         return any(checked)
 
     def verify(self, expected: Set[AlarmData], timeout_seconds: int, sleep_seconds: int):

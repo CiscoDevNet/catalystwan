@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 import logging
+from typing import TYPE_CHECKING
 
 from vmngclient.dataclasses import TenantAAA, TenantRadiusServer, TenantTacacsServer
-from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import asdict, create_dataclass
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
 
@@ -27,10 +32,13 @@ class TenantAaaAPI:
     def __init__(self, session: vManageSession) -> None:
         self.session = session
         self.url_path = "/dataservice/admin/aaa"
-        self.tenant_id = self.session.get_tenant_id()
 
     def __str__(self) -> str:
         return str(self.session)
+
+    @property
+    def tenant_id(self):
+        return self.session.get_tenant_id()
 
     def aaa_exists(self) -> bool:
         return True if self.session.get_data(self.url_path) else False

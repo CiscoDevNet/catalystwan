@@ -51,7 +51,7 @@ def create_vManageSession(
     password: str,
     port: Optional[int] = None,
     subdomain: Optional[str] = None,
-    logger: Optional[logging.Logger] = None
+    logger: Optional[logging.Logger] = None,
 ) -> vManageSession:
     """Factory function that creates session object based on provided arguments.
 
@@ -69,9 +69,10 @@ def create_vManageSession(
 
     """
     session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
+    session.auth = vManageAuth(session.base_url, username, password, verify=False)
     if logger:
         session.logger = logger
-    session.auth = vManageAuth(session.base_url, username, password, verify=False)
+        session.auth.logger = logger
 
     if subdomain:
         tenant_id = session.get_tenant_id()

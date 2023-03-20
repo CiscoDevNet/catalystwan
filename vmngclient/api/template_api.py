@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import json
 import logging
 from difflib import Differ
 from enum import Enum
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
 from requests.exceptions import HTTPError
@@ -11,12 +13,14 @@ from vmngclient.api.task_status_api import wait_for_completed
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.dataclasses import Device, FeatureTemplateInformation, Template
 from vmngclient.exceptions import InvalidOperationError
-from vmngclient.session import vManageSession
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.operation_status import OperationStatus
 
 logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 
 class TemplateType(Enum):
@@ -95,12 +99,50 @@ class TemplatesAPI:
         """
         return self.get(name).id
 
-    def attach(self, name: str, device: Device) -> bool:
+    def edit_before_push(self, name: str, device: Device) -> bool:
+        """
+        Edits device / CLI template before pushing modified config to device(s)
+
+        Args:
+            name (str): Template name to edit.
+            device (Device): Device to attach template.
+
+        Returns:
+            bool: True if edit template is successful, otherwise - False.
+        """
+        try:
+            template_id = self.get_id(name)
+            self.template_validation(template_id, device=device)
+        except TemplateNotFoundError:
+            logger.error(f"Error, Template with name {name} not found on {device}.")
+            return False
+        except HTTPError as error:
+            error_details = json.loads(error.response.text)
+            logger.error(f"Error in config: {error_details['error']['details']}.")
+            return False
+        payload = {
+            "templateId": template_id,
+            "deviceIds": [device.uuid],
+            "isEdited": True,
+            "isMasterEdited": True
+        }
+        endpoint = "/dataservice/template/device/config/input/"
+        logger.info(f"Editing template: {name} of device: {device.hostname}.")
+        response = self.session.post(url=endpoint, json=payload).json()
+        if ((response.get("data") is not None) and
+                (response["data"][0].get("csv-status") == "complete")):
+            return True
+        logger.warning(f"Failed to edit tempate: {name} of device: {device.hostname}.")
+        return False
+
+    def attach(self, name: str, device: Device, is_edited: bool = False) -> bool:
         """
 
         Args:
             name (str): Template name to attached.
             device (Device): Device to attach template.
+            is_edited (bool): Flag to indicate whether template is being
+                              attached as part of edit
 
         Returns:
             bool: True if attaching template is successful, otherwise - False.
@@ -131,6 +173,8 @@ class TemplatesAPI:
                 }
             ]
         }
+        if is_edited:
+            payload["deviceTemplateList"][0]["isEdited"] = True  # type: ignore
         endpoint = "/dataservice/template/device/config/attachcli"
         logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
