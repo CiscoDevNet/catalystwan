@@ -1,6 +1,8 @@
 import unittest
 from unittest import TestCase, mock
 
+from requests import Request
+
 from vmngclient.vmanage_auth import InvalidCredentialsError, vManageAuth
 
 
@@ -8,6 +10,7 @@ class MockResponse:
     def __init__(self, status_code: int, text: str):
         self._status_code = status_code
         self._text = text
+        self.request = Request()
 
     def cookies(self) -> str:  # TODO
         return "JSESSIONID=xyz"
