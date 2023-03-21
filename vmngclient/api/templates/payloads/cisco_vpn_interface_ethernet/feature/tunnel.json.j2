@@ -70,9 +70,11 @@
       "restrict": {
         "vipObjectType": "node-only",
         "vipType": "ignore",
-        "vipValue": "false",
         {% if tunnel.color is not none %}
+            "vipValue": "false",
             "vipVariableName": "vpn_if_tunnel_color_restrict"
+        {% else %}
+            "vipValue": "false"
         {% endif %} 
       }
     },
