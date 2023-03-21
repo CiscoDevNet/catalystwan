@@ -21,8 +21,8 @@
     "ip": {
       {% if type_address.value == "static" %}
         "address": {
-          "vipObjectType": "object",
-          {% if ip is defined %}
+              "vipObjectType": "object",
+          {% if ip %}
               "vipType": "constant",
               "vipValue": "{{ ip }}",
           {% else %}
@@ -132,7 +132,6 @@
         "vipValue": "{{ autonegotiate | tojson}}",
       {% else %}
         "vipType": "ignore",
-        "vipValue": "true",
       {% endif %}
       "vipVariableName": "vpn_if_autonegotiate"
     },
@@ -216,6 +215,9 @@
         "direction"
       ]
     },
+    {% if tunnel is not none %}
+      "tunnel-interface": {% include 'tunnel.json.j2' %},
+    {% endif %}
     "auto-bandwidth-detect": {
       "vipObjectType": "object",
       "vipType": "ignore",
@@ -231,7 +233,12 @@
       "vipValue": "_empty",
       "vipVariableName": "vpn_if_media-type"
     },
-    "intrf-mtu": {},
+    "intrf-mtu": {
+        "vipObjectType": "object",
+        "vipType": "ignore",
+        "vipValue": 1500,
+        "vipVariableName": "vpn_if_intrf_mtu"
+    },
     "ip-directed-broadcast": {
       "vipObjectType": "object",
       "vipType": "ignore",
