@@ -321,7 +321,7 @@ class TemplatesAPI:
         raise NotImplementedError(f"Not implemented for {template}")
 
     def _delete_feature_template(self, name: str) -> bool:
-        template = self.get(FeatureTemplate).filter(name=name).single_or_default()
+        template = self.get(FeatureTemplate).filter(name=name).single_or_default()  # type: ignore
         if template:
             endpoint = f"/dataservice/template/feature/{template.id}"
             self.session.delete(url=endpoint)

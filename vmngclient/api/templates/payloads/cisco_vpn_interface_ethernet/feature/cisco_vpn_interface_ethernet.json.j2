@@ -215,6 +215,9 @@
         "direction"
       ]
     },
+	{% if tunnel is not none %}
+	"tunnel-interface": {% include 'tunnel.json.j2' %},
+	{% endif %}
     "auto-bandwidth-detect": {
       "vipObjectType": "object",
       "vipType": "ignore",
