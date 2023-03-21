@@ -309,7 +309,7 @@ class TenantInfo(DataclassBase):
     organization_name: str = field(metadata={FIELD_NAME: "orgName"})
     sub_domain: str = field(metadata={FIELD_NAME: "subDomain"})
     id: str = field(metadata={FIELD_NAME: "tenantId"})
-    flake_id: int = field(metadata={FIELD_NAME: "flakeId"})
+    flake_id: Optional[int] = field(default=None, metadata={FIELD_NAME: "flakeId"})
 
 
 @define(frozen=True)
