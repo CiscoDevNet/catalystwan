@@ -36,6 +36,8 @@ class Tenant(BaseModel):
 
 
 class TenantModel(FeatureTemplate):
+    type: ClassVar[str] = "tenant"  # Tenant
+
     class Config:
         arbitrary_types_allowed = True
 

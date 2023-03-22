@@ -120,17 +120,11 @@ class TemplatesAPI:
             error_details = json.loads(error.response.text)
             logger.error(f"Error in config: {error_details['error']['details']}.")
             return False
-        payload = {
-            "templateId": template_id,
-            "deviceIds": [device.uuid],
-            "isEdited": True,
-            "isMasterEdited": True
-        }
+        payload = {"templateId": template_id, "deviceIds": [device.uuid], "isEdited": True, "isMasterEdited": True}
         endpoint = "/dataservice/template/device/config/input/"
         logger.info(f"Editing template: {name} of device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
-        if ((response.get("data") is not None) and
-                (response["data"][0].get("csv-status") == "complete")):
+        if (response.get("data") is not None) and (response["data"][0].get("csv-status") == "complete"):
             return True
         logger.warning(f"Failed to edit tempate: {name} of device: {device.hostname}.")
         return False
@@ -297,6 +291,26 @@ class TemplatesAPI:
             raise InvalidOperationError("The input sequence contains more than one element.")
 
         return fr_templates[0]
+
+    def validate_device_model(self, template: FeatureTemplate) -> bool:
+        """Verify if selected template can be used with provided device model"""
+        template_name = template.type
+        template_type = self._get_feature_template_types().filter(name=template_name).single_or_default()
+
+        available_devices_for_template = [device["name"] for device in template_type.device_models]
+        if not all(
+            dev in available_devices_for_template for dev in [dev_mod.value for dev_mod in template.device_models]
+        ):
+            raise TemplateTypeError(
+                f"Provided template {template_name} not available for this device model {template.device_models}"
+            )
+
+    def _get_feature_template_types(self, type: str = "all"):
+        """Gets list off all templates and devices associated with these templates"""
+        endpoint = f"/dataservice/template/feature/types"
+        params = {"type": type}
+        response = self.session.get(endpoint, params=params)
+        return response.dataseq(FeatureTemplatesTypes)
 
     def template_validation(self, id: str, device: Device) -> str:
         """Checking the template of the configuration on the machine.

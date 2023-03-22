@@ -65,6 +65,8 @@ class AuthTask:
 
 
 class AAAModel(FeatureTemplate):
+    type: ClassVar[str] = "aaa"  # AAA
+
     class Config:
         arbitrary_types_allowed = True
 

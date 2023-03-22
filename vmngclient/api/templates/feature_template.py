@@ -1,13 +1,16 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import List
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
 from pydantic import BaseModel  # type: ignore
+from utils.device_model import DeviceModel
 
 
 class FeatureTemplate(BaseModel, ABC):
     name: str
     description: str
+    device_models: List[DeviceModel]
 
     def generate_payload(self, session) -> str:
         env = Environment(

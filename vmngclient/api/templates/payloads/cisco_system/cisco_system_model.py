@@ -5,6 +5,7 @@ from vmngclient.api.templates.feature_template import FeatureTemplate
 
 
 class CiscoSystemModel(FeatureTemplate):
+    type: ClassVar[str] = "cisco_system"  # Cisco System
     hostname: str
     system_ip: str
     site_id: str
