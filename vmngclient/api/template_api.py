@@ -11,7 +11,7 @@ from requests.exceptions import HTTPError
 
 from vmngclient.api.task_status_api import wait_for_completed
 from vmngclient.api.templates.feature_template import FeatureTemplate
-from vmngclient.dataclasses import Device, FeatureTemplateInformation, Template
+from vmngclient.dataclasses import Device, FeatureTemplateInformation, FeatureTemplatesTypes, Template
 from vmngclient.exceptions import InvalidOperationError
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.device_model import DeviceModel
@@ -304,6 +304,7 @@ class TemplatesAPI:
             raise TemplateTypeError(
                 f"Provided template {template_name} not available for this device model {template.device_models}"
             )
+        return True
 
     def _get_feature_template_types(self, type: str = "all"):
         """Gets list off all templates and devices associated with these templates"""

@@ -4,7 +4,8 @@ from typing import List
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
 from pydantic import BaseModel  # type: ignore
-from utils.device_model import DeviceModel
+
+from vmngclient.utils.device_model import DeviceModel
 
 
 class FeatureTemplate(BaseModel, ABC):
