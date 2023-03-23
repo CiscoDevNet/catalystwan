@@ -1,4 +1,5 @@
 from enum import Enum
+from pathlib import Path
 from typing import ClassVar, List, Optional
 
 from pydantic import BaseModel, Field  # type: ignore
@@ -78,4 +79,5 @@ class CiscoAAAModel(FeatureTemplate):
     port: int = 1700
     tacacs: List[TacacsGroup] = []
 
+    payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cedge_aaa"

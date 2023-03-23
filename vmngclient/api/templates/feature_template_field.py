@@ -82,12 +82,8 @@ class FeatureTemplateField(BaseModel):
                 for obj in value:  # obj is User
                     child_payload = {}
                     for child in self.children:
-                        # print(obj, child.key)
-                        # child_payload = child.payload_scheme(getattr(obj, child.key))
                         child_payload.update(child.payload_scheme(obj[child.key]))
-                        # print(child_payload)
                     children_output.append(child_payload)
-                    # print(children_output)
                 output["vipValue"] = children_output
             else:
                 output["vipValue"] = value
@@ -99,7 +95,9 @@ class FeatureTemplateField(BaseModel):
                 output["vipValue"] = []
                 output["vipType"] = FeatureTemplateOptionType.IGNORE.value
 
-        # DataType do dataclassy, brak defaultowych wartości dla wszystkiego
+        # TODO
+        # DataType to dataclass Model
+        # No default values for everything
 
         if self.primaryKeys:
             output["vipPrimaryKey"] = self.primaryKeys

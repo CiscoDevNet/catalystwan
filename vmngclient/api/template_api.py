@@ -4,7 +4,7 @@ import json
 import logging
 from difflib import Differ
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, Type, overload
+from typing import TYPE_CHECKING, Any, Optional, Type, overload
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
 from requests.exceptions import HTTPError
@@ -16,6 +16,9 @@ from vmngclient.api.templates.device_template.device_template import (
     GeneralTemplate,
 )
 from vmngclient.api.templates.feature_template import FeatureTemplate
+from vmngclient.api.templates.feature_template_field import FeatureTemplateField, get_path_dict
+from vmngclient.api.templates.feature_template_payload import FeatureTemplatePayload
+from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
 from vmngclient.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, TemplateInfo
 from vmngclient.exceptions import AlreadyExistsError
 from vmngclient.typed_list import DataSequence
@@ -435,7 +438,7 @@ class TemplatesAPI:
     def create(self, template: CLITemplate) -> str:
         ...
 
-    def create(self, template):
+    def create(self, template, debug: bool = False):
         if isinstance(template, list):
             return [self.create(t) for t in template]
 
@@ -447,7 +450,10 @@ class TemplatesAPI:
         #     raise AlreadyExistsError(f"Template [{template.name}] already exists.")
 
         if isinstance(template, FeatureTemplate):
-            template_id = self._create_feature_template(template)
+            if self.is_created_by_generator(template):
+                template_id = self.create_by_generator(template, debug)
+            else:
+                template_id = self._create_feature_template(template)
             template_type = FeatureTemplate.__name__
 
         if isinstance(template, DeviceTemplate):
@@ -462,6 +468,68 @@ class TemplatesAPI:
 
         logger.info(f"Template {template.name} ({template_type}) was created successfully ({template_id}).")
         return template_id
+
+    def is_created_by_generator(self, template: FeatureTemplate) -> bool:
+        """Checks if template is created by generator
+
+        Method will be deleted if every template's payload will be generated dynamically.
+        """
+        ported_templates = (CiscoAAAModel,)
+
+        return isinstance(template, ported_templates)
+
+    def get_feature_template_schema(self, template: FeatureTemplate, debug: bool = False) -> Any:
+        endpoint = f"/dataservice/template/feature/types/definition/{template.type}/15.0.0"
+        schema = self.session.get(url=endpoint).json()
+
+        if debug:
+            with open(f"response_{template.type}.json", "w") as f:
+                f.write(json.dumps(schema, indent=4))
+
+        return schema
+
+    def create_by_generator(self, template: FeatureTemplate, debug: bool) -> str:
+        schema = self.get_feature_template_schema(template, debug)
+        payload = self.generate_feature_template_payload(template, schema, debug)
+
+        endpoint = "/dataservice/template/feature"
+        response = self.session.post(endpoint, json=payload.dict(by_alias=True))
+
+        return response.json()["templateId"]
+
+    def generate_feature_template_payload(
+        self, template: FeatureTemplate, schema: Any, debug: bool = False
+    ) -> FeatureTemplatePayload:
+        payload = FeatureTemplatePayload(
+            name=template.name,
+            description=template.description,
+            template_type=template.type,
+            device_types=["vedge-C8000V"],  # TODO
+            definition={},
+        )
+
+        fr_template_fields = [FeatureTemplateField(**field) for field in schema["fields"]]  # TODO
+        payload.definition.update(get_path_dict([field.dataPath for field in fr_template_fields]))
+
+        for field in fr_template_fields:
+            payload.definition.update(field.data_path(output={}))
+
+        for i, field in enumerate(fr_template_fields):
+            pointer = payload.definition
+
+            value = template.dict(by_alias=True).get(field.key, None)
+            if isinstance(value, bool):
+                value = str(value).lower()
+
+            for path in field.dataPath:
+                pointer = pointer[path]
+            pointer.update(field.payload_scheme(value, payload.definition))
+
+        if debug:
+            with open(f"payload_{template.type}.json", "w") as f:
+                f.write(json.dumps(payload.dict(by_alias=True), indent=4))
+
+        return payload
 
     def template_validation(self, id: str, device: Device) -> str:
         """Checking the template of the configuration on the machine.
