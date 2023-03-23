@@ -364,38 +364,17 @@ class TemplatesAPI:
             raise AttachedError(template.name)
         return True
 
-    def _create_cli_template(
-        self,
-        device_model: DeviceModel,
-        name: str,
-        description: str,
-        config: CiscoConfParse,
-    ) -> bool:
-        """
-
-        Args:
-            device_model (DeviceModel): Device model to create template.
-            name (str): Name template to create.
-            description (str): Description template to create.
-            config (CiscoConfParse): The config to device.
-
-        Raises:
-            AlreadyExistsError: If such template name already exists.
-
-        Returns:
-            bool: True if create template is successful, otherwise - False.
-        """
-        if self.get(CLITemplate).filter(name=name).single_or_default():
-            raise AlreadyExistsError(f"Error, Template with name: {name} exists.")
-
-        cli_template = CLITemplate(self.session, device_model, name, description)
-        cli_template.config = config
-        logger.info(f"Template with name: {name} - created.")
-        return cli_template.send_to_device()
-
     def _create_feature_template(self, template: FeatureTemplate) -> str:
         payload = template.generate_payload(self.session)
         response = self.session.post("/dataservice/template/feature", json=json.loads(payload))
+        template_id = response.json()["templateId"]
+
+        return template_id
+
+    def _create_cli_template(self, template: CLITemplate) -> str:
+
+        payload = template.generate_payload()
+        response = self.session.post("/dataservice/template/device/cli/", json=payload)
         template_id = response.json()["templateId"]
 
         return template_id
@@ -472,7 +451,8 @@ class TemplatesAPI:
             template_type = DeviceTemplate.__name__
 
         if isinstance(template, CLITemplate):
-            raise NotImplementedError("CLITemplate is not supported.")
+            template_id = self._create_cli_template(template)
+            template_type = CLITemplate.__name__
 
         if not template_id:
             raise NotImplementedError()
@@ -569,6 +549,92 @@ class TemplatesAPI:
         response = self.session.post(url=endpoint, json=payload)
         return response.text
 
+
+class CLITemplate:
+    def __init__(
+        self,
+        session: vManageSession,
+        device_model: DeviceModel,
+        name: str,
+        description: str,
+        device: Optional[Device] = None,
+    ):
+        self.session = session
+        self.device = device
+        self.device_model = device_model
+        self.name = name
+        self.description = description
+        self.config: CiscoConfParse = CiscoConfParse([])
+
+    def load_running(self, device: Device) -> CiscoConfParse:
+        """Load running config from device.
+
+        Args:
+            device (Device): The device from which load config.
+
+        Returns:
+            CiscoConfParse: A working configuration on the machine.
+        """
+        endpoint = f"/dataservice/template/config/running/{device.uuid}"
+        config = self.session.get_json(endpoint)
+        self.config = CiscoConfParse(config["config"].splitlines())
+        logger.debug(f"Template loaded from {device.hostname}.")
+        return self.config
+
+    def generate_payload(self) -> dict:
+        config_str = "\n".join(self.config.ioscfg)
+        payload = {
+            "templateName": self.name,
+            "templateDescription": self.description,
+            "deviceType": self.device_model.value,
+            "templateConfiguration": config_str,
+            "factoryDefault": False,
+            "configType": "file",
+        }
+        if self.device_model not in [
+            DeviceModel.VEDGE,
+            DeviceModel.VSMART,
+            DeviceModel.VMANAGE,
+            DeviceModel.VBOND,
+        ]:
+            payload["cliType"] = "device"
+            payload["draftMode"] = False
+        return payload
+
+    def update(self, id: str, config: CiscoConfParse) -> bool:
+        """Update an existing cli template.
+
+        Args:
+            id (str): Template id to update.
+            config (CiscoConfParse): Updated config.
+
+        Returns:
+            bool: True if update template is successful, otherwise - False.
+
+        """
+        self.config = config
+        config_str = "\n".join(self.config.ioscfg)
+        payload = {
+            "templateId": id,
+            "templateName": self.name,
+            "templateDescription": self.description,
+            "deviceType": self.device_model.value,
+            "templateConfiguration": config_str,
+            "factoryDefault": False,
+            "configType": "file",
+            "draftMode": False,
+        }
+        endpoint = f"/dataservice/template/device/{id}"
+        try:
+            self.session.put(url=endpoint, json=payload)
+        except HTTPError as error:
+            response = json.loads(error.response.text)["error"]
+            logger.error(f'Response message: {response["message"]}')
+            logger.error(f'Response details: {response["details"]}')
+            return False
+        logger.info(f"Template with name: {self.name} - updated.")
+        return True
+
     @staticmethod
     def compare_template(
         first: CiscoConfParse,
@@ -624,7 +690,6 @@ class TemplatesAPI:
         self,
         template: CiscoConfParse,
         device: Device,
-        full: bool = False,
         debug: bool = False,
     ) -> str:
         """The comparison of the config with the one running on the machine.
@@ -664,139 +729,5 @@ class TemplatesAPI:
         .
         .
         """
-        running_config = CLITemplate(
-            self.session, DeviceModel(device.model), "running_conf", "running_conf"
-        ).load_running(device)
+        running_config = self.load_running(device)
         return self.compare_template(running_config, template, debug)
-
-
-class CLITemplate:
-    def __init__(
-        self,
-        session: vManageSession,
-        device_model: DeviceModel,
-        name: str,
-        description: str,
-        device: Optional[Device] = None,
-    ):
-        self.session = session
-        self.device = device
-        self.device_model = device_model
-        self.name = name
-        self.description = description
-        self.config: CiscoConfParse = CiscoConfParse([])
-
-    def load(self, id: str) -> CiscoConfParse:
-        """Load CLI config from template.
-
-        Args:
-            id (str): The template id from which load config.
-
-        Raises:
-            TemplateTypeError: wrong template type - CLI required.
-
-        Returns:
-            CiscoConfParse: Loaded template.
-        """
-        endpoint = f"/dataservice/template/device/object/{id}"
-        config = self.session.get_json(endpoint)
-        if TemplateType(config["configType"]) == TemplateType.FEATURE:
-            raise TemplateTypeError(config["templateName"])
-        self.config = CiscoConfParse(config["templateConfiguration"].splitlines())
-        return self.config
-
-    def load_running(self, device: Device) -> CiscoConfParse:
-        """Load running config from device.
-
-        Args:
-            device (Device): The device from which load config.
-
-        Returns:
-            CiscoConfParse: A working configuration on the machine.
-        """
-        endpoint = f"/dataservice/template/config/running/{device.uuid}"
-        config = self.session.get_json(endpoint)
-        self.config = CiscoConfParse(config["config"].splitlines())
-        logger.debug(f"Template loaded from {device.hostname}.")
-        return self.config
-
-    def send_to_device(self) -> bool:
-        """
-
-        Returns:
-            bool: True if send template to device is successful, otherwise - False.
-
-        The payload differs depending on the type of machine - for physical machines it has two more attributes.
-        """
-        config_str = "\n".join(self.config.ioscfg)
-        payload = {
-            "templateName": self.name,
-            "templateDescription": self.description,
-            "deviceType": self.device_model.value,
-            "templateConfiguration": config_str,
-            "factoryDefault": False,
-            "configType": "file",
-        }
-        if self.device_model not in [
-            DeviceModel.VEDGE,
-            DeviceModel.VSMART,
-            DeviceModel.VMANAGE,
-            DeviceModel.VBOND,
-        ]:
-            payload["cliType"] = "device"
-            payload["draftMode"] = False
-
-        endpoint = "/dataservice/template/device/cli/"
-        try:
-            self.session.post(url=endpoint, json=payload).json()
-        except HTTPError as error:
-            response = json.loads(error.response.text)["error"]
-            logger.error(f'Response message: {response["message"]}')
-            logger.error(f'Response details: {response["details"]}')
-            return False
-        logger.info(f"Template with name: {self.name} - sent to the device.")
-        return True
-
-    def update(self, id: str, config: CiscoConfParse) -> bool:
-        """Update an existing cli template.
-
-        Args:
-            id (str): Template id to update.
-            config (CiscoConfParse): Updated config.
-
-        Returns:
-            bool: True if update template is successful, otherwise - False.
-
-        """
-        self.config = config
-        config_str = "\n".join(self.config.ioscfg)
-        payload = {
-            "templateId": id,
-            "templateName": self.name,
-            "templateDescription": self.description,
-            "deviceType": self.device_model.value,
-            "templateConfiguration": config_str,
-            "factoryDefault": False,
-            "configType": "file",
-            "draftMode": False,
-        }
-        endpoint = f"/dataservice/template/device/{id}"
-        try:
-            self.session.put(url=endpoint, json=payload)
-        except HTTPError as error:
-            response = json.loads(error.response.text)["error"]
-            logger.error(f'Response message: {response["message"]}')
-            logger.error(f'Response details: {response["details"]}')
-            return False
-        logger.info(f"Template with name: {self.name} - updated.")
-        return True
-
-    def add_to_config(self, add_config: CiscoConfParse, add_before: str) -> None:
-        """Add config to existing config before provided value.
-
-        Args:
-            add_config (CiscoConfParse): Config to added.
-            add_before (str): The value before which to add config.
-        """
-        for comand in add_config.ioscfg:
-            self.config.ConfigObjs.insert_before(add_before, comand, atomic=True)
