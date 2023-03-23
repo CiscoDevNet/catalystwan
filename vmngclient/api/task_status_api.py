@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from time import sleep
-from typing import TYPE_CHECKING, List, cast
+from typing import TYPE_CHECKING, List, cast, Union
 
 from attr import define, field  # type: ignore
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
@@ -91,7 +91,7 @@ def wait_for_completed(
     exit_statuses = [cast(OperationStatus, exit_status.value) for exit_status in exit_statuses]
     exit_statuses_ids = [cast(OperationStatusId, exit_status_id.value) for exit_status_id in exit_statuses_ids]
 
-    def check_status(task: TaskStatus) -> bool:
+    def check_status(tasks: Union[List[TaskStatus], TaskStatus]) -> bool:
         """
         Function checks if condition is met. If so,
         wait_for_completed stops asking for task status
@@ -104,9 +104,14 @@ def wait_for_completed(
         Returns:
             bool: False if condition is met
         """
-
-        if (task.status in exit_statuses) and (task.status_id in exit_statuses_ids):
-            if not activity_text or activity_text in task.activity:
+        if not isinstance (tasks, list):
+            tasks = [tasks]
+        
+        task_statuses_bool = [True if task.status in exit_statuses else False for task in tasks]
+        task_statuses_id_bool = [True if task.status_id in exit_statuses else False for task in tasks]
+        task_activities_bool = [True if activity_text in task.activity else False for task in tasks]
+        if all(task_statuses_bool) and all(task_statuses_id_bool):
+            if not activity_text or all(task_activities_bool):
                 return False
         return True
 
@@ -129,13 +134,13 @@ def wait_for_completed(
         """
         url = f"{action_url}{action_id}"
         try:
-            action_data = session.get_data(url)[0]
+            action_dataset = session.get_data(url)
         except IndexError:
             tasks_ids = get_all_tasks(session)
             if action_id in tasks_ids:
                 sleep(delay_seconds)
                 try:
-                    action_data = session.get_data(url)[0]
+                    action_dataset = session.get_data(url)[0]
                 except IndexError:
                     raise IndexError(
                         f"Task id {action_id} registered by vManage in all tasks list, "
@@ -144,11 +149,14 @@ def wait_for_completed(
             else:
                 raise ValueError(f"Task id {action_id} is not registered by vManage.")
 
-        task = create_dataclass(TaskStatus, action_data)
+        tasks = [create_dataclass(TaskStatus, action_data) for action_data in action_dataset]
+        task_statuses = [task.status for task in tasks]
+        task_statuses_id = [task.status_id for task in tasks]
+        task_activities = [task.activity for task in tasks]
         logger.info(
             f"Statuses of action {action_id} is: "
-            f"status: {task.status}, status_id: {task.status_id}, activity: {task.activity}."
+            f"status: {task_statuses}, status_id: {task_statuses_id}, activity: {task_activities}."
         )
-        return task
+        return tasks if len(tasks) > 1 else tasks[0]
 
     return wait_for_action_finish()
