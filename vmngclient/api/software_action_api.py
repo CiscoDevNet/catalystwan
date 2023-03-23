@@ -191,7 +191,7 @@ class SoftwareActionAPI:
             ],  # type: ignore
             "deviceType": install_spec.device_type.value,
         }
-        if personality in (Personality.VMANAGE, Personality.EDGE):  # block also vedges
+        if personality in (Personality.VMANAGE, Personality.EDGE):  # block downgrade for edges and vmanages
             self._downgrade_check(payload["devices"], payload["input"]["version"], install_spec.family.value)
         upgrade = dict(self.session.post(url, json=payload).json())
         return upgrade["id"]
