@@ -165,7 +165,7 @@ class DecommissionAction(DeviceActionAPI):
         """
         url = f"/dataservice/system/device/decommission/{self.dev.uuid}"
         response = self.session.put(url)
-        if response.status != 200:
+        if response.status_code != 200:
             raise Exception(f"Problem with decomission of {self.dev.id} occurred")
 
     def wait_for_completed(
