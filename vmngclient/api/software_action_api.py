@@ -11,6 +11,7 @@ from vmngclient.dataclasses import Device
 from vmngclient.exceptions import VersionDeclarationError  # type: ignore
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import asdict
+from vmngclient.utils.personality import Personality
 
 logger = logging.getLogger(__name__)
 
@@ -48,16 +49,14 @@ class InstallSpecification:
     family: Family
     version_type: VersionType
     device_type: DeviceType
-    device_class: DeviceClass
 
 
 class InstallSpecHelper(Enum):
 
-    VMANAGE = InstallSpecification(Family.VMANAGE, VersionType.VMANAGE, DeviceType.VMANAGE, DeviceClass.VMANAGE)
-    VSMART = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER, DeviceClass.VSMART)
-    VBOND = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER, DeviceClass.VBOND)
-    VEDGE = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE, DeviceClass.VEDGE)
-    CEDGE = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE, DeviceClass.CEDGE)
+    VMANAGE = InstallSpecification(Family.VMANAGE, VersionType.VMANAGE, DeviceType.VMANAGE)
+    VSMART = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)
+    VBOND = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)
+    VEDGE = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE)
 
 
 class SoftwareActionAPI:
@@ -131,7 +130,6 @@ class SoftwareActionAPI:
     def upgrade_software(
         self,
         devices: DataSequence[Device],
-        install_spec: InstallSpecification,
         reboot: bool,
         sync: bool = True,
         software_image: Optional[str] = "",
@@ -149,7 +147,7 @@ class SoftwareActionAPI:
             software_image (Optional[str]): path to software image
             image_version (Optional[str]): version of software image
 
-            Notice: Have to pass one of those arguments (version_to_activate,
+            Notice: Have to pass one of those arguments (image_version,
             software_image)
 
         Raises:
@@ -164,6 +162,17 @@ class SoftwareActionAPI:
             version = cast(str, image_version)
         else:
             raise VersionDeclarationError("You can not provide software_image and image version at the same time")
+
+        specification_container = {
+            Personality.VMANAGE: InstallSpecHelper.VMANAGE.value,
+            Personality.VBOND: InstallSpecHelper.VBOND.value,
+            Personality.VSMART: InstallSpecHelper.VSMART.value,
+            Personality.EDGE: InstallSpecHelper.VEDGE.value,
+        }
+
+        personality = devices[0].personality
+        install_spec = specification_container[personality]
+
         url = "/dataservice/device/action/install"
         payload: Dict[str, Any] = {
             "action": "install",
@@ -182,7 +191,7 @@ class SoftwareActionAPI:
             ],  # type: ignore
             "deviceType": install_spec.device_type.value,
         }
-        if install_spec.family.value in (DeviceClass.VMANAGE.value, DeviceClass.CEDGE.value):
+        if personality in (Personality.VMANAGE, Personality.EDGE):  # block downgrade for edges and vmanages
             self._downgrade_check(payload["devices"], payload["input"]["version"], install_spec.family.value)
         upgrade = dict(self.session.post(url, json=payload).json())
         return upgrade["id"]
