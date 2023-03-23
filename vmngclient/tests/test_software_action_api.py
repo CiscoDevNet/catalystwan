@@ -51,7 +51,7 @@ class TestSoftwareAcionAPI(unittest.TestCase):
         mock_session.post.return_value = {"id": "mock_action_id"}
 
         # Assert
-        answer = self.mock_software_action_obj.upgrade_software([self.device], self.install_spec, True, True, "path")
+        answer = self.mock_software_action_obj.upgrade_software([self.device], True, True, "path")
         self.assertEqual(answer, "mock_action_id", "action ids not equal")
 
     @patch.object(RepositoryAPI, "get_devices_versions_repository")
