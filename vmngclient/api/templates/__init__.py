@@ -7,8 +7,7 @@ In addition, they are used to convert CLI config into separate feature
 templates in vManage.
 """
 
-# Basic FeatureTemplate class
-from vmngclient.api.templates.feature_template import FeatureTemplate
+# Device Template
 
 # AAA Templates
 from vmngclient.api.templates.payloads.aaa.aaa_model import AAAModel
@@ -40,7 +39,11 @@ from vmngclient.api.templates.payloads.cisco_vpn_interface_ethernet.cisco_vpn_in
 # CEdge Templates
 from vmngclient.api.templates.payloads.tenant.tenant_model import TenantModel
 
+# Basic FeatureTemplate class
+
+
 __all__ = [
+    "DeviceTemplate",
     "FeatureTemplate",
     "TenantModel",
     "AAAModel",
