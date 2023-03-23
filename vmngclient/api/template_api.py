@@ -4,23 +4,28 @@ import json
 import logging
 from difflib import Differ
 from enum import Enum
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional, Type, overload
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
 from requests.exceptions import HTTPError
 
 from vmngclient.api.task_status_api import wait_for_completed
+from vmngclient.api.templates.device_template.device_template import (
+    DeviceSpecificValue,
+    DeviceTemplate,
+    GeneralTemplate,
+)
 from vmngclient.api.templates.feature_template import FeatureTemplate
-from vmngclient.dataclasses import Device, FeatureTemplateInformation, Template
-from vmngclient.exceptions import InvalidOperationError
-from vmngclient.utils.creation_tools import create_dataclass
+from vmngclient.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, TemplateInfo
+from vmngclient.exceptions import AlreadyExistsError
+from vmngclient.typed_list import DataSequence
 from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.operation_status import OperationStatus
 
-logger = logging.getLogger(__name__)
-
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
+
+logger = logging.getLogger(__name__)
 
 
 class TemplateType(Enum):
@@ -33,13 +38,6 @@ class TemplateNotFoundError(Exception):
 
     def __init__(self, template):
         self.message = f"No such template: '{template}'"
-
-
-class TemplateAlreadyExistsError(Exception):
-    """Used when a template item exists."""
-
-    def __init__(self, name):
-        self.message = f"Template with that name '{name}' exists."
 
 
 class AttachedError(Exception):
@@ -56,48 +54,141 @@ class TemplateTypeError(Exception):
         self.message = f"Template: {name} - wrong template type."
 
 
+class DeviceTemplateFeature(Enum):
+    LAWFUL_INTERCEPTION = "lawful-interception"
+    CLOUD_DOCK = "cloud-dock"
+    NETWORK_DESIGN = "network-design"
+    VMANAGE_DEFAULT = "vmanage-default"
+    ALL = "all"
+
+
 class TemplatesAPI:
     def __init__(self, session: vManageSession) -> None:
         self.session = session
 
-    @property
-    def templates(self) -> List[Template]:
-        """
+    def _get_feature_templates(
+        self, summary: bool = True, offset: Optional[int] = None, limit: Optional[int] = None
+    ) -> DataSequence[FeatureTemplateInfo]:
+        """In a multitenant vManage system, this API is only available in the Provider view."""
+        endpoint = "/dataservice/template/feature"
+        params = {"summary": summary}
 
-        Returns:
-            List[Template]: List of existing templates.
-        """
+        fr_templates = self.session.get(url=endpoint, params=params)
+
+        return fr_templates.dataseq(FeatureTemplateInfo)
+
+    def _get_device_templates(
+        self, feature: DeviceTemplateFeature = DeviceTemplateFeature.ALL
+    ) -> DataSequence[DeviceTemplateInfo]:
+        """In a multitenant vManage system, this API is only available in the Provider view."""
         endpoint = "/dataservice/template/device"
-        data = self.session.get_data(endpoint)
-        return [create_dataclass(Template, template) for template in data]
+        params = {"feature": feature.value}
 
-    def get(self, name: str) -> Template:
-        """
+        templates = self.session.get(url=endpoint, params=params)
+        return templates.dataseq(DeviceTemplateInfo)
+
+    @overload
+    def get(self, template: Type[DeviceTemplate]) -> DataSequence[DeviceTemplateInfo]:  # type: ignore
+        ...
+
+    @overload
+    def get(self, template: Type[FeatureTemplate]) -> DataSequence[FeatureTemplateInfo]:  # type: ignore
+        ...
+
+    @overload
+    def get(self, template: Type[CLITemplate]) -> DataSequence[TemplateInfo]:  # type: ignore
+        ...
+
+    def get(self, template):
+        if template is FeatureTemplate:
+            return self._get_feature_templates()
+
+        if template is DeviceTemplate or template is CLITemplate:
+            return self._get_device_templates()
+
+        raise NotImplementedError()
+
+    @overload
+    def attach(self, template: CLITemplate, name: str, device: Device) -> bool:
+        ...
+
+    @overload
+    def attach(self, template: DeviceTemplate) -> bool:
+        ...
+
+    def attach(self, template, device, name=None, **kwargs):
+        if isinstance(template, CLITemplate):
+            return self._attach_cli(template, name, device)
+
+        if isinstance(template, DeviceTemplate):
+            return self.attach_feature(template.name, device, **kwargs)
+
+        if template is DeviceTemplate and name:
+            return self.attach_feature(name, device, **kwargs)
+
+        raise NotImplementedError()
+
+    def attach_feature(self, name: str, device: Device, **kwargs):
+        """Attach Device Template created with Feature Templates.
 
         Args:
-            name (str): Name of template.
-
-        Raises:
-            TemplateNotFoundError: If template does not exist.
-
-        Returns:
-            Template: Selected template.
-        """
-        for template in self.templates:
-            if name == template.name:
-                return template
-        raise TemplateNotFoundError(name)
-
-    def get_id(self, name: str) -> str:
+            name: Name of the Device Template to be attached.
+            device: Device object under which the template should be attached.
+            **device_specific_vars: For parameters in a feature template that you configure as device-specific,
+                when you attach a device template to a device, Cisco vManage prompts you for the values to use
+                for these parameters. Entering device-specific values in this manner is useful in test or POC networks,
+                or if you are deploying a small network. This method generally does not scale well for larger networks.
         """
 
-        Args:
-            name (str): Name of template to get id.
+        def get_device_specific_variables(name: str):
+            endpoint = "/dataservice/template/device/config/exportcsv"
+            template_id = self.get(DeviceTemplate).filter(name=name).single_or_default().id
+            body = {"templateId": template_id, "isEdited": False, "isMasterEdited": False}
 
-        Returns:
-            str: Template id.
-        """
-        return self.get(name).id
+            values = self.session.post(endpoint, json=body).json()["header"]["columns"]
+            return [DeviceSpecificValue(**value) for value in values]
+
+        vars = get_device_specific_variables(name)
+        template_id = self.get(DeviceTemplate).filter(name=name).single_or_default().id
+        payload = {
+            "deviceTemplateList": [
+                {
+                    "templateId": template_id,
+                    "device": [
+                        {
+                            "csv-status": "complete",
+                            "csv-deviceId": device.uuid,
+                            "csv-deviceIP": device.id,
+                            "csv-host-name": device.hostname,
+                            "csv-templateId": template_id,
+                        }
+                    ],
+                }
+            ]
+        }
+
+        invalid = False
+        for var in vars:
+            if var.property not in payload["deviceTemplateList"][0]["device"][0]:
+                pointer = payload["deviceTemplateList"][0]["device"][0]
+                if var.property not in kwargs["device_specific_vars"]:
+                    invalid = True
+                    logger.error(f"{var.property} should be provided in attach method as device_specific_vars kwarg.")
+                else:
+                    pointer[var.property] = kwargs["device_specific_vars"][var.property]  # type: ignore
+
+        if invalid:
+            raise TypeError()
+
+        endpoint = "/dataservice/template/device/config/attachfeature"
+        logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
+        response = self.session.post(url=endpoint, json=payload).json()
+        task = wait_for_completed(session=self.session, action_id=response["id"])
+        if task.status == OperationStatus.SUCCESS.value:
+            return True
+        logger.warning(f"Failed to attach tempate: {name} to the device: {device.hostname}.")
+        logger.warning(f"Task activity information: {task.activity}")
+        return False
 
     def edit_before_push(self, name: str, device: Device) -> bool:
         """
@@ -111,7 +202,7 @@ class TemplatesAPI:
             bool: True if edit template is successful, otherwise - False.
         """
         try:
-            template_id = self.get_id(name)
+            template_id = self.get_id(name)  # type: ignore
             self.template_validation(template_id, device=device)
         except TemplateNotFoundError:
             logger.error(f"Error, Template with name {name} not found on {device}.")
@@ -120,22 +211,16 @@ class TemplatesAPI:
             error_details = json.loads(error.response.text)
             logger.error(f"Error in config: {error_details['error']['details']}.")
             return False
-        payload = {
-            "templateId": template_id,
-            "deviceIds": [device.uuid],
-            "isEdited": True,
-            "isMasterEdited": True
-        }
+        payload = {"templateId": template_id, "deviceIds": [device.uuid], "isEdited": True, "isMasterEdited": True}
         endpoint = "/dataservice/template/device/config/input/"
         logger.info(f"Editing template: {name} of device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
-        if ((response.get("data") is not None) and
-                (response["data"][0].get("csv-status") == "complete")):
+        if (response.get("data") is not None) and (response["data"][0].get("csv-status") == "complete"):
             return True
         logger.warning(f"Failed to edit tempate: {name} of device: {device.hostname}.")
         return False
 
-    def attach(self, name: str, device: Device, is_edited: bool = False) -> bool:
+    def _attach_cli(self, name: str, device: Device, is_edited: bool = False) -> bool:
         """
 
         Args:
@@ -148,7 +233,7 @@ class TemplatesAPI:
             bool: True if attaching template is successful, otherwise - False.
         """
         try:
-            template_id = self.get_id(name)
+            template_id = self.get(CLITemplate).filter(id=name).single_or_default().id
             self.template_validation(template_id, device=device)
         except TemplateNotFoundError:
             logger.error(f"Error, Template with name {name} not found on {device}.")
@@ -208,7 +293,41 @@ class TemplatesAPI:
         logger.warning(f"Task activity information: {task.activity}")
         return False
 
-    def delete(self, name: str) -> bool:
+    @overload
+    def delete(self, template: Type[DeviceTemplate], name: str) -> bool:  # type: ignore
+        ...
+
+    @overload
+    def delete(self, template: Type[FeatureTemplate], name: str) -> bool:  # type: ignore
+        ...
+
+    @overload
+    def delete(self, template: Type[CLITemplate], name: str) -> bool:  # type: ignore
+        ...
+
+    def delete(self, template, name):
+        status = False
+
+        if template is FeatureTemplate:
+            status = self._delete_feature_template(name)
+
+        if template is DeviceTemplate and name:
+            status = self._delete_device_template(name)
+
+        if status:
+            logger.info(f"Template {name} was successfuly deleted.")
+            return status
+
+        raise NotImplementedError(f"Not implemented for {template}")
+
+    def _delete_feature_template(self, name: str) -> bool:
+        template = self.get(FeatureTemplate).filter(name=name).single_or_default()  # type: ignore
+        if template:
+            endpoint = f"/dataservice/template/feature/{template.id}"
+            self.session.delete(url=endpoint)
+        return True
+
+    def _delete_device_template(self, name: str) -> bool:
         """
 
         Args:
@@ -220,16 +339,18 @@ class TemplatesAPI:
         Returns:
             bool: True if deletion is successful, otherwise - False.
         """
-        template = self.get(name)
-        endpoint = f"/dataservice/template/device/{template.id}"
-        if template.devices_attached == 0:
-            response = self.session.delete(url=endpoint)
-            logger.info(f"Template with name: {name} - deleted.")
-            return response.ok
-        logger.warning(f"Template: {template} is attached to device - cannot be deleted.")
-        raise AttachedError(template.name)
+        template = self.get(DeviceTemplate).filter(name=name).single_or_default()  # type: ignore
+        if template:
+            endpoint = f"/dataservice/template/device/{template.id}"
+            if template.devices_attached == 0:
+                response = self.session.delete(url=endpoint)
+                logger.info(f"Template with name: {name} - deleted.")
+                return response.ok
+            logger.warning(f"Template: {template} is attached to device - cannot be deleted.")
+            raise AttachedError(template.name)
+        return True
 
-    def create(
+    def _create_cli_template(
         self,
         device_model: DeviceModel,
         name: str,
@@ -245,58 +366,102 @@ class TemplatesAPI:
             config (CiscoConfParse): The config to device.
 
         Raises:
-            TemplateAlreadyExistsError: If such template name already exists.
+            AlreadyExistsError: If such template name already exists.
 
         Returns:
             bool: True if create template is successful, otherwise - False.
         """
-        try:
-            self.get(name)
-            logger.error(f"Error, Template with name: {name} exists.")
-            raise TemplateAlreadyExistsError(name)
-        except TemplateNotFoundError:
-            cli_template = CLITemplate(self.session, device_model, name, description)
-            cli_template.config = config
-            logger.info(f"Template with name: {name} - created.")
-            return cli_template.send_to_device()
+        if self.get(CLITemplate).filter(name=name).single_or_default():
+            raise AlreadyExistsError(f"Error, Template with name: {name} exists.")
 
-    def create_feature_template(self, template: FeatureTemplate) -> str:
-        try:
-            self.get_single_feature_template(name=template.name)
-        except TemplateNotFoundError:
-            payload = template.generate_payload(self.session)
-            response = self.session.post("/dataservice/template/feature", json=json.loads(payload))
-            template_id = response.json()["templateId"]
-            logger.info(f"Template {template.name} was created successfully ({template_id}).")
-            return template_id
-        raise TemplateAlreadyExistsError(template.name)
+        cli_template = CLITemplate(self.session, device_model, name, description)
+        cli_template.config = config
+        logger.info(f"Template with name: {name} - created.")
+        return cli_template.send_to_device()
 
-    def get_feature_templates(self, name: Optional[str] = None) -> List[FeatureTemplateInformation]:
-        """Get feature template list.
+    def _create_feature_template(self, template: FeatureTemplate) -> str:
+        payload = template.generate_payload(self.session)
+        response = self.session.post("/dataservice/template/feature", json=json.loads(payload))
+        template_id = response.json()["templateId"]
 
-        Note: In a multitenant vManage system, this API is only available in the Provider view.
-        """
-        payload = {"summary": "true"}
-        response = self.session.get("/dataservice/template/feature", params=payload)
-        parsed_response = response.json()["data"]
-        fr_templates = [
-            create_dataclass(FeatureTemplateInformation, feature_template) for feature_template in parsed_response
-        ]
+        return template_id
 
-        if name is None:
-            return fr_templates
-        return list(filter(lambda template: template.name == name, fr_templates))
+    def _create_device_template(self, device_template: DeviceTemplate) -> str:
+        def get_general_template_info(
+            name: str, fr_templates: DataSequence[FeatureTemplateInfo]
+        ) -> FeatureTemplateInfo:
+            _template = fr_templates.filter(name=name).single_or_default()
+            if not _template:
+                raise TypeError(f"{name} does not exists. Device Template is invalid.")
 
-    def get_single_feature_template(self, name: str) -> FeatureTemplateInformation:
-        fr_templates = self.get_feature_templates(name=name)
+            return _template
 
-        if not fr_templates:
-            raise TemplateNotFoundError(name)
+        def parse_general_template(
+            general_template: GeneralTemplate, fr_templates: DataSequence[FeatureTemplateInfo]
+        ) -> GeneralTemplate:
+            if general_template.subTemplates:
+                general_template.subTemplates = [
+                    parse_general_template(_t, fr_templates) for _t in general_template.subTemplates
+                ]
 
-        if len(fr_templates) > 1:
-            raise InvalidOperationError("The input sequence contains more than one element.")
+            info = get_general_template_info(general_template.name, fr_templates)
+            return GeneralTemplate(
+                name=general_template.name,
+                subTemplates=general_template.subTemplates,
+                templateId=info.id,
+                templateType=info.template_type,
+            )
 
-        return fr_templates[0]
+        fr_templates = self.get(FeatureTemplate)  # type: ignore
+        device_template.general_templates = list(
+            map(lambda x: parse_general_template(x, fr_templates), device_template.general_templates)  # type: ignore
+        )
+
+        endpoint = "/dataservice/template/device/feature/"
+        payload = json.loads(device_template.generate_payload())
+        response = self.session.post(endpoint, json=payload)
+
+        return response.text
+
+    @overload
+    def create(self, template: FeatureTemplate) -> str:
+        ...
+
+    @overload
+    def create(self, template: DeviceTemplate) -> str:
+        ...
+
+    @overload
+    def create(self, template: CLITemplate) -> str:
+        ...
+
+    def create(self, template):
+        if isinstance(template, list):
+            return [self.create(t) for t in template]
+
+        template_id: Optional[str] = None  # type: ignore
+        template_type = None
+
+        # exists = self.get(type(template)).filter(name=template.name)
+        # if exists:
+        #     raise AlreadyExistsError(f"Template [{template.name}] already exists.")
+
+        if isinstance(template, FeatureTemplate):
+            template_id = self._create_feature_template(template)
+            template_type = FeatureTemplate.__name__
+
+        if isinstance(template, DeviceTemplate):
+            template_id = self._create_device_template(template)
+            template_type = DeviceTemplate.__name__
+
+        if isinstance(template, CLITemplate):
+            raise NotImplementedError("CLITemplate is not supported.")
+
+        if not template_id:
+            raise NotImplementedError()
+
+        logger.info(f"Template {template.name} ({template_type}) was created successfully ({template_id}).")
+        return template_id
 
     def template_validation(self, id: str, device: Device) -> str:
         """Checking the template of the configuration on the machine.
@@ -433,8 +598,10 @@ class CLITemplate:
         device_model: DeviceModel,
         name: str,
         description: str,
-    ) -> None:
+        device: Optional[Device] = None,
+    ):
         self.session = session
+        self.device = device
         self.device_model = device_model
         self.name = name
         self.description = description
