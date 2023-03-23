@@ -57,6 +57,14 @@ class TemplateTypeError(Exception):
         self.message = f"Template: {name} - wrong template type."
 
 
+class DeviceModelError(Exception):
+    """Used when unsupported device model used in template."""
+
+    def __init__(self, template, device_models):
+        self.message = f"Provided template type '{template.type}' not available for device models: {device_models}"
+        super().__init__(self.message)
+
+
 class DeviceTemplateFeature(Enum):
     LAWFUL_INTERCEPTION = "lawful-interception"
     CLOUD_DOCK = "cloud-dock"
@@ -538,13 +546,13 @@ class TemplatesAPI:
         template_type = self._get_feature_template_types().filter(name=template.type).single_or_default()
 
         available_devices_for_template = [device["name"] for device in template_type.device_models]
-        provided_device_models = [dev_mod.value for dev_mod in template.device_models]
-        # from IPython import embed; embed()
+        provided_device_models = [
+            dev_mod.value if type(dev_mod) is DeviceModel else dev_mod for dev_mod in template.device_models
+        ]
+
         if not all(dev in available_devices_for_template for dev in provided_device_models):
             logger.debug(f"Available devices for template '{template.type}': {available_devices_for_template}")
-            raise TemplateTypeError(
-                f"Provided template '{template.type}' not available for these device models: {provided_device_models}\n"
-            )
+            raise DeviceModelError(template, provided_device_models)
         return True
 
     def _get_feature_template_types(self, type: str = "all"):

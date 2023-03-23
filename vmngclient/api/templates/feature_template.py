@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class FeatureTemplate(BaseModel, ABC):
     name: str
     description: str
-    device_models: List[DeviceModel]
+    device_models: List[DeviceModel | str]
 
     def generate_payload(self, session: vManageSession) -> str:
         env = Environment(
