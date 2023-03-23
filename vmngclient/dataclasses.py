@@ -475,3 +475,17 @@ class TenantTacacsServer(DataclassBase):
 class SoftwareInstallTimeout(DataclassBase):
     download_timeout_min: int = field(converter=str, metadata={FIELD_NAME: "downloadTimeoutInMin"})
     activate_timeout_min: int = field(converter=str, metadata={FIELD_NAME: "activateTimeoutInMin"})
+
+
+@define
+class FeatureTemplatesTypes(DataclassBase):
+    parent: str = field(metadata={FIELD_NAME: "parent"})
+    default: str = field(metadata={FIELD_NAME: "default"})
+    display_name: str = field(metadata={FIELD_NAME: "displayName"})
+    name: str = field(metadata={FIELD_NAME: "name"})
+    type_class: str = field(metadata={FIELD_NAME: "typeClass"})
+    description: str = field(metadata={FIELD_NAME: "description"})
+    write_permission: str = field(metadata={FIELD_NAME: "write_permission"})
+    read_permission: str = field(metadata={FIELD_NAME: "read_permission"})
+    helper_type: List[str] = field(factory=list, metadata={FIELD_NAME: "helperType"})
+    device_models: List[dict] = field(factory=list, metadata={FIELD_NAME: "deviceModels"})

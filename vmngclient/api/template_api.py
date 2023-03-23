@@ -19,7 +19,7 @@ from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.api.templates.feature_template_field import FeatureTemplateField, get_path_dict
 from vmngclient.api.templates.feature_template_payload import FeatureTemplatePayload
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
-from vmngclient.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, TemplateInfo
+from vmngclient.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, FeatureTemplatesTypes, TemplateInfo
 from vmngclient.exceptions import AlreadyExistsError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.device_model import DeviceModel
@@ -450,6 +450,8 @@ class TemplatesAPI:
         #     raise AlreadyExistsError(f"Template [{template.name}] already exists.")
 
         if isinstance(template, FeatureTemplate):
+            assert self.validate_device_model(template)
+            raise ValueError
             if self.is_created_by_generator(template):
                 template_id = self.create_by_generator(template, debug)
             else:
@@ -530,6 +532,27 @@ class TemplatesAPI:
                 f.write(json.dumps(payload.dict(by_alias=True), indent=4))
 
         return payload
+
+    def validate_device_model(self, template: FeatureTemplate) -> bool:
+        """Verify if selected template can be used with provided device model"""
+        template_type = self._get_feature_template_types().filter(name=template.type).single_or_default()
+
+        available_devices_for_template = [device["name"] for device in template_type.device_models]
+        provided_device_models = [dev_mod.value for dev_mod in template.device_models]
+        # from IPython import embed; embed()
+        if not all(dev in available_devices_for_template for dev in provided_device_models):
+            logger.debug(f"Available devices for template '{template.type}': {available_devices_for_template}")
+            raise TemplateTypeError(
+                f"Provided template '{template.type}' not available for these device models: {provided_device_models}\n"
+            )
+        return True
+
+    def _get_feature_template_types(self, type: str = "all"):
+        """Gets list off all templates and devices associated with these templates"""
+        endpoint = "/dataservice/template/feature/types"
+        params = {"type": type}
+        response = self.session.get(endpoint, params=params)
+        return response.dataseq(FeatureTemplatesTypes)
 
     def template_validation(self, id: str, device: Device) -> str:
         """Checking the template of the configuration on the machine.

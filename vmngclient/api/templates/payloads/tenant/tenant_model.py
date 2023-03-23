@@ -39,6 +39,7 @@ class TenantModel(FeatureTemplate):
     class Config:
         arbitrary_types_allowed = True
 
+    type: ClassVar[str] = "tenant"  # Tenant
     payload_path: ClassVar[Path] = Path(__file__).parent / "tenant.json.j2"
 
     tenants: List[Tenant] = []

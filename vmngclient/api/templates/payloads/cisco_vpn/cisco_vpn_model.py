@@ -58,6 +58,7 @@ class IPv6Route:
 
 
 class CiscoVPNModel(FeatureTemplate):
+    type: ClassVar[str] = "cisco_vpn"  # Cisco VPN
     payload_path: ClassVar[Path] = Path(__file__).parent / "feature/cisco_vpn.json.j2"
     tenant_vpn: Optional[int]
     tenant_org_name: Optional[str]
