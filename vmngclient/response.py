@@ -1,14 +1,12 @@
-import multiprocessing
 from functools import wraps
 from pprint import pformat
-from traceback import extract_stack
 from typing import Any, Callable, Optional, Sequence, Type, TypeVar, Union, cast
 
 from attr import define  # type: ignore
 from requests import PreparedRequest, Request, Response
 from requests.exceptions import JSONDecodeError
 
-from vmngclient import get_first_external_stack_frame
+from vmngclient import with_proc_info_header
 from vmngclient.dataclasses import DataclassBase
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
@@ -21,22 +19,6 @@ class ErrorInfo(DataclassBase):
     message: str
     details: str
     code: str
-
-
-def with_proc_info_header(method: Callable[..., str]) -> Callable[..., str]:
-    """
-    Adds process ID and external caller information before first line of returned string
-    """
-
-    @wraps(method)
-    def wrapper(*args, **kwargs) -> str:
-        wrapped = method(*args, **kwargs)
-        fname, line_no, function, _ = get_first_external_stack_frame(extract_stack())
-        external_caller_info = "%s:%d %s(...)" % (fname, line_no, function)
-        header = f"{multiprocessing.current_process()} {external_caller_info}\n"
-        return header + wrapped
-
-    return wrapper
 
 
 def response_debug(response: Optional[Response], request: Union[Request, PreparedRequest, None]) -> str:
@@ -71,6 +53,7 @@ def response_debug(response: Optional[Response], request: Union[Request, Prepare
         response_debug = {
             "status": response.status_code,
             "reason": response.reason,
+            "elapsed-seconds": round(float(response.elapsed.microseconds) / 1000000, 3),
             "headers": dict(response.headers.items()),
         }
         try:
@@ -78,10 +61,13 @@ def response_debug(response: Optional[Response], request: Union[Request, Prepare
             json.pop("header", None)
             response_debug.update({"json": json})
         except JSONDecodeError:
-            if len(response.text) <= 1024:
-                response_debug.update({"text": response.text})
+            if response.encoding is not None:
+                if len(response.text) <= 1024:
+                    response_debug.update({"text": response.text})
+                else:
+                    response_debug.update({"text(trimmed)": response.text[:1024]})
             else:
-                response_debug.update({"text(trimmed)": response.text[:128]})
+                response_debug.update({"text(cannot convert to string: unknown encoding)": None})
         debug_dict["response"] = response_debug
     return pformat(debug_dict, width=80, sort_dicts=False)
 

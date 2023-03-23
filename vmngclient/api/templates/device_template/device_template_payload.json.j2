@@ -1,0 +1,18 @@
+{
+  "templateName": "{{ name }}",
+  "templateDescription": "{{ description }}",
+  "deviceType": "vedge-C8000V",
+  "deviceRole": "sdwan-edge",
+  "configType": "template",
+  "factoryDefault": false,
+  "policyId": "",
+  "featureTemplateUidRange": [],
+  "connectionPreferenceRequired": true,
+  "connectionPreference": true,
+  "generalTemplates": [
+        {% for template in general_templates %}
+			{{ template | tojson }}
+		{% if not loop.last %},{% endif %}
+		{% endfor %}
+  ]
+}

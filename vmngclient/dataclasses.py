@@ -4,9 +4,9 @@ from typing import List, Optional
 from attr import define, field  # type: ignore
 
 from vmngclient.exceptions import RetrieveIntervalOutOfRange
+from vmngclient.utils.alarm_status import Severity
 from vmngclient.utils.certificate_status import ValidityPeriod
 from vmngclient.utils.creation_tools import FIELD_NAME, asdict, convert_attributes
-from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
 
@@ -43,9 +43,10 @@ class DeviceAdminTech(DataclassBase):
 
 @define(frozen=True, field_transformer=convert_attributes)
 class AlarmData(DataclassBase):
+
     component: Optional[str] = field(default=None)
-    severity: Optional[str] = field(default=None)
     active: Optional[bool] = field(default=None)
+    severity: Optional[Severity] = field(converter=Severity, default=None)
     name: Optional[str] = field(default=None, metadata={FIELD_NAME: "type"})
     system_ip: Optional[str] = field(default=None, metadata={FIELD_NAME: "system-ip"})
     hostname: Optional[str] = field(default=None, metadata={FIELD_NAME: "host-name"})
@@ -53,6 +54,7 @@ class AlarmData(DataclassBase):
     new_state: Optional[str] = field(default=None, metadata={FIELD_NAME: "new-state"})
     interface_name: Optional[str] = field(default=None, metadata={FIELD_NAME: "if-name"})
     vpn_id: Optional[str] = field(default=None, metadata={FIELD_NAME: "vpn-id"})
+    viewed: Optional[bool] = field(default=None, metadata={FIELD_NAME: "acknowledged"})
 
     def issubset(self, other: "AlarmData") -> bool:
         field_keys = {field_key for field_key in self.__annotations__ if getattr(self, field_key)}
@@ -213,24 +215,32 @@ class User(DataclassBase):
 
 
 @define
-class Template(DataclassBase):
-    device_type_str: str = field(metadata={FIELD_NAME: "deviceType"})
-    device_type: DeviceModel = field(init=False)
+class TemplateInfo(DataclassBase):
     last_updated_by: str = field(metadata={FIELD_NAME: "lastUpdatedBy"})
     resource_group: str = field(metadata={FIELD_NAME: "resourceGroup"})
-    template_class: str = field(metadata={FIELD_NAME: "templateClass"})
     config_type: str = field(metadata={FIELD_NAME: "configType"})
     id: str = field(metadata={FIELD_NAME: "templateId"})
     factory_default: bool = field(metadata={FIELD_NAME: "factoryDefault"})
     name: str = field(metadata={FIELD_NAME: "templateName"})
     devices_attached: int = field(metadata={FIELD_NAME: "devicesAttached"})
     description: str = field(metadata={FIELD_NAME: "templateDescription"})
-    draft_mode: str = field(metadata={FIELD_NAME: "draftMode"})
     last_updated_on: dt.datetime = field(metadata={FIELD_NAME: "lastUpdatedOn"})
-    template_attached: int = field(metadata={FIELD_NAME: "templateAttached"})
 
-    def __attrs_post_init__(self):
-        self.device_type = DeviceModel(self.device_type_str)
+
+@define
+class FeatureTemplateInfo(TemplateInfo):
+    template_type: str = field(metadata={FIELD_NAME: "templateType"})
+    device_type: List[str] = field(metadata={FIELD_NAME: "deviceType"})
+    version: str = field(metadata={FIELD_NAME: "templateMinVersion"})
+
+
+@define
+class DeviceTemplateInfo(TemplateInfo):
+    device_type: str = field(metadata={FIELD_NAME: "deviceType"})
+    template_class: str = field(metadata={FIELD_NAME: "templateClass"})
+    draft_mode: str = field(metadata={FIELD_NAME: "draftMode"})
+    template_attached: int = field(metadata={FIELD_NAME: "templateAttached"})
+    device_role: Optional[str] = field(default=None, metadata={FIELD_NAME: "deviceRole"})
 
 
 @define
@@ -306,7 +316,7 @@ class TenantInfo(DataclassBase):
     organization_name: str = field(metadata={FIELD_NAME: "orgName"})
     sub_domain: str = field(metadata={FIELD_NAME: "subDomain"})
     id: str = field(metadata={FIELD_NAME: "tenantId"})
-    flake_id: int = field(metadata={FIELD_NAME: "flakeId"})
+    flake_id: Optional[int] = field(default=None, metadata={FIELD_NAME: "flakeId"})
 
 
 @define(frozen=True)
@@ -331,7 +341,7 @@ class TierInfo(DataclassBase):
     ipv6_route_limit_type: Optional[str] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimitType"})
     ipv6_route_limit_threshold: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimitThreshold"})
     ipv6_route_limit: Optional[int] = field(default=None, metadata={FIELD_NAME: "ipv6RouteLimit"})
-    tlocs: List[TLOC] = field(factory=list)
+    tlocs: List[TLOC] = field(default=[])
     # New in 20.12 version
     nat_session_limit: Optional[int] = field(default=None, metadata={FIELD_NAME: "natSessionLimit"})
 

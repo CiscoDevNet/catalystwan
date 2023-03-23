@@ -1,31 +1,87 @@
 # vManage-client
 [![Python3.8](https://img.shields.io/static/v1?label=Python&logo=Python&color=3776AB&message=3.8)](https://www.python.org/)
 
-vManage client is a package for creating simple and parallel automatic requests via official vManageAPI. It is intended to serve as a multiple session handler (provider, provider as a tenant, tenant). The library is not dependent on environment which is being run, you just need a connection to any vManage.
+vManage client is a package for creating simple and parallel automatic requests via official vManageAPI. It is intended to serve as a multiple session handler (provider, provider as a tenant, tenant). The library is not dependent on environment which is being run in, you just need a connection to any vManage.
 
 ## Installation
 ```console
 pip install vmngclient
 ```
 
-## Hello world example
-
-<details>
-    <summary>Python (click to expand)</summary>
-
-```Python
+## Session usage example
+Our session is an extension to `requests.Session` designed to make it easier to communicate via API calls with vManage. We provide ready to use authenticetion, you have to simply provide the vmanage url, username and password as as if you were doing it through a GUI. 
+```python
 from vmngclient.session import create_vManageSession
 
+url = "example.com"
+username = "admin"
+password = "password123"
+session = create_vManageSession(url=url, username=username, password=password)
 
-base_url = "sandbox-sdwan-2.cisco.com/"
-username = "devnetuser"
-password = "RG!_Yw919_83"
-session = create_vManageSession(url=base_url, username=username, password=password)
-
-
->>> "Logged as devnetuser. The session type is SessionType.TENANT"
->>> {'title': 'Cisco vManage', 'version': '20.4.2.1', 'applicationVersion': '20.4R-vbamboo-16-Dec-2021 19:07:17 PST', 'applicationServer': 'vmanage', 'copyright': 'Copyright (c) 2022, Cisco. All rights reserved.', 'time': '2022-12-01 13:45:44', 'timeZone': 'UTC', 'logo': '/dataservice/client/logo.png'}
+session.get("/dataservice/device")
 ```
+
+## API usage examples
+
+<details>
+    <summary> <b>Get devices</b> <i>(click to expand)</i></summary>
+
+```python
+devices = session.api.devices.get()
+```
+
+</details>
+
+<details>
+    <summary> <b>Admin Tech</b> <i>(click to expand)</i></summary>
+
+```Python
+admin_tech_file = session.api.admin_tech.generate("172.16.255.11")
+admintech.download(admin_tech_file)
+admintech.delete(admin_tech_file)
+```
+</details>
+
+<details>
+    <summary> <b>Speed test</b> <i>(click to expand)</i></summary>
+
+```python
+devices = session.api.devices.get()
+speedtest = session.api.speedtest.speedtest(devices[0], devices[1])
+```
+
+</details>
+
+<details>
+    <summary> <b>Upgrade device</b> <i>(click to expand)</i></summary>
+
+```python
+# Prepare devices list
+vsmarts = [device for device in DevicesAPI(session).devices
+            if device .personality == Personality.VSMART]
+software_image = "viptela-20.7.2-x86_64.tar.gz"
+
+# Upload image
+session.api.repository.upload_image(software_image)
+
+# Upgrade
+software_action = SoftwareActionAPI(session, DeviceCategory.VEDGES)
+software_action_id = software_action.upgrade_software(vsmarts,
+    InstallSpecHelper.CEDGE.value, reboot = False, sync = True, software_image=software_image)
+
+# Check action status
+wait_for_completed(session, software_action_id, 3000)
+```
+
+</details>
+
+<details>
+    <summary> <b>Get alarms</b> <i>(click to expand)</i></summary>
+
+```python
+alarms = session.api.alarms.get()
+```
+
 </details>
 
 ### Note:
@@ -35,92 +91,8 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 ```
 
-## User creation example
+## [Contributing, bug reporting and feature requests](https://github.com/CiscoDevNet/vManage-client/blob/main/CONTRIBUTING.md)
 
-<details>
-    <summary>Python (click to expand)</summary>
+## Seeking support
 
-```Python
-from vmngclient.api.administration import UserAlreadyExistsError, UserApi
-from vmngclient.dataclasses import User
-from vmngclient.session import create_vManageSession
-
-session = create_vManageSession(url=..., username=..., password=...)
-user_api = UserApi(session)
-
-test_user = User(
-    group=["basic"],
-    description="Demo User",
-    username="demouser",
-    password="password",
-    locale="en_US",
-    resource_group="global"
-)
-
-try:
-    user_api.create_user(test_user)
-except UserAlreadyExistsError as error:
-    print(f"User {username} already exists.")
-```
-</details>
-
-## API usage examples
-
-### AdminTechAPI
-
-<details>
-    <summary>Python (click to expand)</summary>
-
-```Python
-from vmngclient.session import create_vManageSession
-from vmngclient.api.admin_tech_api import AdminTechAPI
-
-session = create_vManageSession(url=..., username=..., password=...)
-admintech = AdminTechAPI(session)
-filename = admintech.generate("172.16.255.11")
-admintech.download(filename)
-admintech.delete(filename)
-```
-
-</details>
-
-
-## Contributing, reporting issues, seeking support
-Please contact authors direcly or via Issues Github page.
-
-## **Enviroment setup**
-1. Download Python3.8 or higher.
-2. Download repository
-    ```
-    git clone https://github.com/CiscoDevNet/vManage-client.git
-    ```
-3. Install and configure poetry (v1.3.1 or higher)
-    https://python-poetry.org/docs/#installation
-
-    On linux/mac this usually means:
-    ```
-    curl -sSL https://install.python-poetry.org | python3 -
-    poetry config virtualenvs.in-project true
-    ```
-4. Install dependecies 
-    ```
-    poetry install
-    ```
-5. Activate `pre-commit`
-    ```
-    pre-commit install
-    ```
-### **Environment Variables**
-- **`VMNGCLIENT_DEVEL`** when set: loggers will be configured according to `./logging.conf` and `urllib3.exceptions.InsecureRequestWarning` will be suppressed
-
-## **Add new feature**
-To add new feature create new branch and implement it. Before making a pull request make sure that `pre-commit` passes.
-- **Building package for tests**\
-    To make a `.whl` file run
-    ```
-    poetry build
-    ```
-    Then in `/vManage-client/dist/` directory there is a `.whl` file named `vmngclient-<version>-py3-none-any.whl`, which can be installed by running
-    ```
-    pip install vmngclient-<version>-py3-none-any.whl
-    ```
+You can contact us by submitting [issues](https://github.com/CiscoDevNet/vManage-client/issues), or directly via mail on vmngclient@cisco.com.
