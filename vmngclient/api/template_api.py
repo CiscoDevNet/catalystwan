@@ -2,14 +2,13 @@ from __future__ import annotations
 
 import json
 import logging
-from difflib import Differ
 from enum import Enum
 from typing import TYPE_CHECKING, Any, Optional, Type, overload
 
-from ciscoconfparse import CiscoConfParse  # type: ignore
 from requests.exceptions import HTTPError
 
 from vmngclient.api.task_status_api import wait_for_completed
+from vmngclient.api.templates.cli_template import CLITemplate
 from vmngclient.api.templates.device_template.device_template import (
     DeviceSpecificValue,
     DeviceTemplate,
@@ -101,6 +100,11 @@ class TemplatesAPI:
         templates = self.session.get(url=endpoint, params=params)
         return templates.dataseq(DeviceTemplateInfo)
 
+    def _get_cli_templates(self) -> DataSequence[TemplateInfo]:
+        endpoint = "/dataservice/template/device"
+        templates = self.session.get(url=endpoint)
+        return templates.dataseq(TemplateInfo)
+
     @overload
     def get(self, template: Type[DeviceTemplate]) -> DataSequence[DeviceTemplateInfo]:  # type: ignore
         ...
@@ -117,8 +121,11 @@ class TemplatesAPI:
         if template is FeatureTemplate:
             return self._get_feature_templates()
 
-        if template is DeviceTemplate or template is CLITemplate:
-            return self._get_device_templates()
+        if template is DeviceTemplate:
+            return self._get_device_templates(template)
+
+        if template is CLITemplate:
+            return self._get_cli_templates()
 
         raise NotImplementedError()
 
@@ -132,7 +139,10 @@ class TemplatesAPI:
 
     def attach(self, template, device, name=None, **kwargs):
         if isinstance(template, CLITemplate):
-            return self._attach_cli(template, name, device)
+            return self.attach_cli(template.name, device)
+
+        if template is CLITemplate and name:
+            return self.attach_cli(name, device)
 
         if isinstance(template, DeviceTemplate):
             return self.attach_feature(template.name, device, **kwargs)
@@ -240,14 +250,13 @@ class TemplatesAPI:
         Args:
             name (str): Template name to attached.
             device (Device): Device to attach template.
-            is_edited (bool): Flag to indicate whether template is being
-                              attached as part of edit
+            is_edited (bool): Flag to indicate whether template is being attached as part of edit
 
         Returns:
             bool: True if attaching template is successful, otherwise - False.
         """
         try:
-            template_id = self.get(CLITemplate).filter(id=name).single_or_default().id
+            template_id = self.get(CLITemplate).filter(name=name).single_or_default().id
             self.template_validation(template_id, device=device)
         except TemplateNotFoundError:
             logger.error(f"Error, Template with name {name} not found on {device}.")
@@ -282,6 +291,56 @@ class TemplatesAPI:
             return True
         logger.warning(f"Failed to attach tempate: {name} to the device: {device.hostname}.")
         logger.warning(f"Task activity information: {task.activity}")
+        return False
+
+    @overload
+    def deattach(self, template: CLITemplate, name: str, device: Device) -> bool:
+        ...
+
+    @overload
+    def deattach(self, template: DeviceTemplate) -> bool:
+        ...
+
+    def deattach(self, template, device, name=None, **kwargs):
+        if isinstance(template, CLITemplate):
+            return self.device_to_cli(device)
+
+        if isinstance(template, DeviceTemplate):
+            raise NotImplementedError()
+
+        if template is DeviceTemplate and name:
+            raise NotImplementedError()
+
+        raise NotImplementedError()
+
+    def edit_before_push(self, name: str, device: Device) -> bool:
+        """
+        Edits device / CLI template before pushing modified config to device(s)
+
+        Args:
+            name (str): Template name to edit.
+            device (Device): Device to attach template.
+
+        Returns:
+            bool: True if edit template is successful, otherwise - False.
+        """
+        try:
+            template_id = self.get_id(name)  # type: ignore
+            self.template_validation(template_id, device=device)
+        except TemplateNotFoundError:
+            logger.error(f"Error, Template with name {name} not found on {device}.")
+            return False
+        except HTTPError as error:
+            error_details = json.loads(error.response.text)
+            logger.error(f"Error in config: {error_details['error']['details']}.")
+            return False
+        payload = {"templateId": template_id, "deviceIds": [device.uuid], "isEdited": True, "isMasterEdited": True}
+        endpoint = "/dataservice/template/device/config/input/"
+        logger.info(f"Editing template: {name} of device: {device.hostname}.")
+        response = self.session.post(url=endpoint, json=payload).json()
+        if (response.get("data") is not None) and (response["data"][0].get("csv-status") == "complete"):
+            return True
+        logger.warning(f"Failed to edit tempate: {name} of device: {device.hostname}.")
         return False
 
     def device_to_cli(self, device: Device) -> bool:
@@ -328,6 +387,12 @@ class TemplatesAPI:
         if template is DeviceTemplate and name:
             status = self._delete_device_template(name)
 
+        if isinstance(template, CLITemplate):
+            status = self._delete_cli_template(name)
+
+        if template is CLITemplate and name:
+            status = self._delete_cli_template(name)
+
         if status:
             logger.info(f"Template {name} was successfuly deleted.")
             return status
@@ -354,6 +419,29 @@ class TemplatesAPI:
             bool: True if deletion is successful, otherwise - False.
         """
         template = self.get(DeviceTemplate).filter(name=name).single_or_default()  # type: ignore
+        if template:
+            endpoint = f"/dataservice/template/device/{template.id}"
+            if template.devices_attached == 0:
+                response = self.session.delete(url=endpoint)
+                logger.info(f"Template with name: {name} - deleted.")
+                return response.ok
+            logger.warning(f"Template: {template} is attached to device - cannot be deleted.")
+            raise AttachedError(template.name)
+        return True
+
+    def _delete_cli_template(self, name: str) -> bool:
+        """
+
+        Args:
+            name (str): Name template to delete.
+
+        Raises:
+            AttachedError: If template is attached to device.
+
+        Returns:
+            bool: True if deletion is successful, otherwise - False.
+        """
+        template = self.get(CLITemplate).filter(name=name).single_or_default()  # type: ignore
         if template:
             endpoint = f"/dataservice/template/device/{template.id}"
             if template.devices_attached == 0:
@@ -548,186 +636,3 @@ class TemplatesAPI:
         endpoint = "/dataservice/template/device/config/config/"
         response = self.session.post(url=endpoint, json=payload)
         return response.text
-
-
-class CLITemplate:
-    def __init__(
-        self,
-        session: vManageSession,
-        device_model: DeviceModel,
-        name: str,
-        description: str,
-        device: Optional[Device] = None,
-    ):
-        self.session = session
-        self.device = device
-        self.device_model = device_model
-        self.name = name
-        self.description = description
-        self.config: CiscoConfParse = CiscoConfParse([])
-
-    def load_running(self, device: Device) -> CiscoConfParse:
-        """Load running config from device.
-
-        Args:
-            device (Device): The device from which load config.
-
-        Returns:
-            CiscoConfParse: A working configuration on the machine.
-        """
-        endpoint = f"/dataservice/template/config/running/{device.uuid}"
-        config = self.session.get_json(endpoint)
-        self.config = CiscoConfParse(config["config"].splitlines())
-        logger.debug(f"Template loaded from {device.hostname}.")
-        return self.config
-
-    def generate_payload(self) -> dict:
-        config_str = "\n".join(self.config.ioscfg)
-        payload = {
-            "templateName": self.name,
-            "templateDescription": self.description,
-            "deviceType": self.device_model.value,
-            "templateConfiguration": config_str,
-            "factoryDefault": False,
-            "configType": "file",
-        }
-        if self.device_model not in [
-            DeviceModel.VEDGE,
-            DeviceModel.VSMART,
-            DeviceModel.VMANAGE,
-            DeviceModel.VBOND,
-        ]:
-            payload["cliType"] = "device"
-            payload["draftMode"] = False
-        return payload
-
-    def update(self, id: str, config: CiscoConfParse) -> bool:
-        """Update an existing cli template.
-
-        Args:
-            id (str): Template id to update.
-            config (CiscoConfParse): Updated config.
-
-        Returns:
-            bool: True if update template is successful, otherwise - False.
-
-        """
-        self.config = config
-        config_str = "\n".join(self.config.ioscfg)
-        payload = {
-            "templateId": id,
-            "templateName": self.name,
-            "templateDescription": self.description,
-            "deviceType": self.device_model.value,
-            "templateConfiguration": config_str,
-            "factoryDefault": False,
-            "configType": "file",
-            "draftMode": False,
-        }
-        endpoint = f"/dataservice/template/device/{id}"
-        try:
-            self.session.put(url=endpoint, json=payload)
-        except HTTPError as error:
-            response = json.loads(error.response.text)["error"]
-            logger.error(f'Response message: {response["message"]}')
-            logger.error(f'Response details: {response["details"]}')
-            return False
-        logger.info(f"Template with name: {self.name} - updated.")
-        return True
-
-    @staticmethod
-    def compare_template(
-        first: CiscoConfParse,
-        second: CiscoConfParse,
-        full: bool = False,
-        debug: bool = False,
-    ) -> str:
-        """
-
-        Args:
-            first: First template for comparison.
-            second: Second template for comparison.
-            full: Return a full comparison if True, otherwise only the lines that differ.
-            debug: Adding debug to the logger. Defaults to False.
-
-        Returns:
-            str: The compared templates.
-
-        Code    Meaning
-        '- '    line unique to sequence 1
-        '+ '    line unique to sequence 2
-        '  '    line common to both sequences
-        '? '    line not present in either input sequence
-
-        Example:
-        >>> a = "!\n  tacacs\n  server 192.168.1.1\n   vpn 2\n   secret-key a\n   auth-port 151\n exit".splitlines()
-        >>> b = "!\n  tacacs\n  server 192.168.1.1\n   vpn 3\n   secret-key a\n   auth-port 151\n exit".splitlines()
-        >>> a_conf = CiscoConfParse(a)
-        >>> b_conf = CiscoConfParse(b)
-        >>> compare = TemplateAPI.compare_template(a_conf, b_conf full=True)
-        >>> print(compare)
-          !
-            tacacs
-            server 192.168.1.1
-        -    vpn 2
-        ?        ^
-        +    vpn 3
-        ?        ^
-            secret-key a
-            auth-port 151
-        exit
-        """
-        first_n = list(map(lambda x: x + "\n", first.ioscfg))
-        second_n = list(map(lambda x: x + "\n", second.ioscfg))
-        compare = list(Differ().compare(first_n, second_n))
-        if not full:
-            compare = [x for x in compare if x[0] in ["?", "-", "+"]]
-        if debug:
-            logger.debug("".join(compare))
-        return "".join(compare)
-
-    def compare_with_running(
-        self,
-        template: CiscoConfParse,
-        device: Device,
-        debug: bool = False,
-    ) -> str:
-        """The comparison of the config with the one running on the machine.
-
-        Args:
-            template: The template to compare.
-            device: The device on which to compare config.
-            full: Return a full comparison if True, otherwise only the lines that differ.
-            debug: Adding debug to the logger. Defaults to False.
-
-        Returns:
-            str: The compared templates.
-
-        Example:
-        >>> a = "!\n  tacacs\n  server 192.168.1.1\n   vpn 512\n   secret-key a\n   auth-port 151\n exit".splitlines()
-        >>> a_conf = CiscoConfParse(a)
-        >>> device = DevicesAPI(API_SESSION).get(DeviceField.HOSTNAME, device_name)
-        >>> compare = TemplateAPI.compare_template(a_conf, device, full=True)
-        >>> print(compare)
-        .
-        .
-        .
-            zbfw-udp-idle-time    30
-           !
-          !
-        + !
-        +   tacacs
-        +   server 192.168.1.1
-        +    vpn vpn 512
-        +    secret-key a
-        +    auth-port 151
-        +  exit
-          omp
-           no shutdown
-           ecmp-limit       6
-        .
-        .
-        .
-        """
-        running_config = self.load_running(device)
-        return self.compare_template(running_config, template, debug)
