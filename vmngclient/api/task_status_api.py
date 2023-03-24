@@ -10,6 +10,7 @@ from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # t
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
+from vmngclient.exceptions import EmptyTaskResponseError, TaskNotRegisteredError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
@@ -143,21 +144,20 @@ def wait_for_completed(
             TaskStatus: TaskStatus instance
         """
         url = f"{action_url}{action_id}"
-        try:
-            action_dataset = session.get_data(url)
-        except IndexError:
+
+        action_dataset = session.get_data(url)
+        if not action_dataset:
             tasks_ids = get_all_tasks(session)
             if action_id in tasks_ids:
                 sleep(delay_seconds)
-                try:
-                    action_dataset = session.get_data(url)
-                except IndexError:
-                    raise IndexError(
+                action_dataset = session.get_data(url)
+                if not action_dataset:
+                    raise EmptyTaskResponseError(
                         f"Task id {action_id} registered by vManage in all tasks list, "
                         f"but response about it's status didn't contain any information."
                     )
             else:
-                raise ValueError(f"Task id {action_id} is not registered by vManage.")
+                raise TaskNotRegisteredError(f"Task id {action_id} is not registered by vManage.")
 
         tasks = DataSequence(TaskStatus, [create_dataclass(TaskStatus, action_data) for action_data in action_dataset])
         task_statuses = [task.status for task in tasks]
