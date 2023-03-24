@@ -158,8 +158,6 @@ class DevicesAPI:
 
         devices = devices_full_info.dataseq(Device)
 
-        devices = devices_full_info.dataseq(Device)
-        # from IPython import embed; embed()
         return devices
 
 

@@ -19,13 +19,8 @@ from vmngclient.api.templates.feature_template_field import FeatureTemplateField
 from vmngclient.api.templates.feature_template_payload import FeatureTemplatePayload
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
 from vmngclient.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, TemplateInfo
-from vmngclient.exceptions import AlreadyExistsError
 from vmngclient.typed_list import DataSequence
-from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.operation_status import OperationStatus
-
-if TYPE_CHECKING:
-    from vmngclient.session import vManageSession
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -57,14 +52,6 @@ class TemplateTypeError(Exception):
 
     def __init__(self, name):
         self.message = f"Template: {name} - wrong template type."
-
-
-class DeviceTemplateFeature(Enum):
-    LAWFUL_INTERCEPTION = "lawful-interception"
-    CLOUD_DOCK = "cloud-dock"
-    NETWORK_DESIGN = "network-design"
-    VMANAGE_DEFAULT = "vmanage-default"
-    ALL = "all"
 
 
 class DeviceTemplateFeature(Enum):
@@ -313,36 +300,6 @@ class TemplatesAPI:
 
         raise NotImplementedError()
 
-    def edit_before_push(self, name: str, device: Device) -> bool:
-        """
-        Edits device / CLI template before pushing modified config to device(s)
-
-        Args:
-            name (str): Template name to edit.
-            device (Device): Device to attach template.
-
-        Returns:
-            bool: True if edit template is successful, otherwise - False.
-        """
-        try:
-            template_id = self.get_id(name)  # type: ignore
-            self.template_validation(template_id, device=device)
-        except TemplateNotFoundError:
-            logger.error(f"Error, Template with name {name} not found on {device}.")
-            return False
-        except HTTPError as error:
-            error_details = json.loads(error.response.text)
-            logger.error(f"Error in config: {error_details['error']['details']}.")
-            return False
-        payload = {"templateId": template_id, "deviceIds": [device.uuid], "isEdited": True, "isMasterEdited": True}
-        endpoint = "/dataservice/template/device/config/input/"
-        logger.info(f"Editing template: {name} of device: {device.hostname}.")
-        response = self.session.post(url=endpoint, json=payload).json()
-        if (response.get("data") is not None) and (response["data"][0].get("csv-status") == "complete"):
-            return True
-        logger.warning(f"Failed to edit tempate: {name} of device: {device.hostname}.")
-        return False
-
     def device_to_cli(self, device: Device) -> bool:
         """
 
@@ -520,7 +477,7 @@ class TemplatesAPI:
         if isinstance(template, list):
             return [self.create(t) for t in template]
 
-        template_id: Osptional[str] = None  # type: ignore
+        template_id: Optional[str] = None  # type: ignore
         template_type = None
 
         # exists = self.get(type(template)).filter(name=template.name)
