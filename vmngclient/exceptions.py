@@ -26,3 +26,15 @@ class ImageNotInRepositoryError(Exception):
     """The exception that is thrown, if image is not in vManage images Repository"""
 
     pass
+
+
+class EmptyTaskResponseError(Exception):
+    """Raised if task is registred by vManage, but reponse content is empty"""
+
+    pass
+
+
+class TaskNotRegisteredError(Exception):
+    """Raised if task_id is generated, but it's not registere in vManage"""
+
+    pass
