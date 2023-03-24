@@ -186,7 +186,7 @@ class TemplatesAPI:
         endpoint = "/dataservice/template/device/config/attachfeature"
         logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
-        task = wait_for_completed(session=self.session, action_id=response["id"])
+        task = wait_for_completed(session=self.session, action_id=response["id"])[0]
         if task.status == OperationStatus.SUCCESS.value:
             return True
         logger.warning(f"Failed to attach tempate: {name} to the device: {device.hostname}.")
@@ -266,7 +266,7 @@ class TemplatesAPI:
         endpoint = "/dataservice/template/device/config/attachcli"
         logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
-        task = wait_for_completed(session=self.session, action_id=response["id"])
+        task = wait_for_completed(session=self.session, action_id=response["id"])[0]
         if task.status == OperationStatus.SUCCESS.value:
             return True
         logger.warning(f"Failed to attach tempate: {name} to the device: {device.hostname}.")
@@ -289,7 +289,7 @@ class TemplatesAPI:
         endpoint = "/dataservice/template/config/device/mode/cli"
         logger.info(f"Changing mode to cli mode for {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
-        task = wait_for_completed(session=self.session, action_id=response["id"])
+        task = wait_for_completed(session=self.session, action_id=response["id"])[0]
         if task.status == OperationStatus.SUCCESS.value:
             return True
         logger.warning(f"Failed to change to cli mode for device: {device.hostname}.")

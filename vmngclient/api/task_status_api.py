@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from time import sleep
-from typing import TYPE_CHECKING, List, Union, cast
+from typing import TYPE_CHECKING, List, cast
 
 from attr import define, field  # type: ignore
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
@@ -58,7 +58,7 @@ def wait_for_completed(
         OperationStatusId.FAILURE,
     ],
     activity_text: str = "",
-) -> TaskStatus:
+) -> DataSequence[TaskStatus]:
     """
     Method to check action status
 
@@ -98,7 +98,7 @@ def wait_for_completed(
     success_statuses_ids = [cast(OperationStatusId, exit_status_id.value) for exit_status_id in success_statuses_ids]
     failure_statuses_ids = [cast(OperationStatusId, exit_status_id.value) for exit_status_id in failure_statuses_ids]
 
-    def check_status(tasks: Union[DataSequence[TaskStatus], TaskStatus]) -> bool:
+    def check_status(tasks: DataSequence[TaskStatus]) -> bool:
         """
         Function checks if condition is met. If so,
         wait_for_completed stops asking for task status
@@ -111,8 +111,6 @@ def wait_for_completed(
         Returns:
             bool: False if condition is met
         """
-        if not isinstance(tasks, DataSequence):
-            tasks = DataSequence(TaskStatus, [tasks])
 
         task_statuses_success = [task.status in success_statuses for task in tasks]
         task_statuses_failure = [task.status in failure_statuses for task in tasks]
@@ -136,7 +134,7 @@ def wait_for_completed(
         retry=retry_if_result(check_status),
         retry_error_callback=log_exception,
     )
-    def wait_for_action_finish() -> Union[DataSequence[TaskStatus], TaskStatus]:
+    def wait_for_action_finish() -> DataSequence[TaskStatus]:
         """
         Keep asking for task status, status_id,
         activity(optional), utill check_status is True
@@ -169,6 +167,6 @@ def wait_for_completed(
             f"Statuses of action {action_id} is: "
             f"status: {task_statuses}, status_id: {task_statuses_id}, activity: {task_activities}."
         )
-        return tasks if len(tasks) > 1 else tasks[0]
+        return tasks
 
     return wait_for_action_finish()
