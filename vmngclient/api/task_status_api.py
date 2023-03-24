@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from time import sleep
-from typing import TYPE_CHECKING, List, cast, Union
+from typing import TYPE_CHECKING, List, Union, cast
 
 from attr import define, field  # type: ignore
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
@@ -10,6 +10,7 @@ from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # t
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
+from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 
@@ -44,12 +45,16 @@ def wait_for_completed(
     timeout_seconds: int = 300,
     interval_seconds: int = 5,
     delay_seconds: int = 10,
-    exit_statuses: List[OperationStatus] = [
+    success_statuses: List[OperationStatus] = [
         OperationStatus.SUCCESS,
+    ],
+    failure_statuses: List[OperationStatus] = [
         OperationStatus.FAILURE,
     ],
-    exit_statuses_ids: List[OperationStatusId] = [
+    success_statuses_ids: List[OperationStatusId] = [
         OperationStatusId.SUCCESS,
+    ],
+    failure_statuses_ids: List[OperationStatusId] = [
         OperationStatusId.FAILURE,
     ],
     activity_text: str = "",
@@ -88,10 +93,12 @@ def wait_for_completed(
         task (TaskStatus):
     """
     action_url = "/dataservice/device/action/status/"
-    exit_statuses = [cast(OperationStatus, exit_status.value) for exit_status in exit_statuses]
-    exit_statuses_ids = [cast(OperationStatusId, exit_status_id.value) for exit_status_id in exit_statuses_ids]
+    success_statuses = [cast(OperationStatus, exit_status.value) for exit_status in success_statuses]
+    failure_statuses = [cast(OperationStatus, exit_status.value) for exit_status in failure_statuses]
+    success_statuses_ids = [cast(OperationStatusId, exit_status_id.value) for exit_status_id in success_statuses_ids]
+    failure_statuses_ids = [cast(OperationStatusId, exit_status_id.value) for exit_status_id in failure_statuses_ids]
 
-    def check_status(tasks: Union[List[TaskStatus], TaskStatus]) -> bool:
+    def check_status(tasks: Union[DataSequence[TaskStatus], TaskStatus]) -> bool:
         """
         Function checks if condition is met. If so,
         wait_for_completed stops asking for task status
@@ -104,14 +111,19 @@ def wait_for_completed(
         Returns:
             bool: False if condition is met
         """
-        if not isinstance (tasks, list):
-            tasks = [tasks]
-        
-        task_statuses_bool = [True if task.status in exit_statuses else False for task in tasks]
-        task_statuses_id_bool = [True if task.status_id in exit_statuses else False for task in tasks]
-        task_activities_bool = [True if activity_text in task.activity else False for task in tasks]
-        if all(task_statuses_bool) and all(task_statuses_id_bool):
-            if not activity_text or all(task_activities_bool):
+        if not isinstance(tasks, DataSequence):
+            tasks = DataSequence(TaskStatus, [tasks])
+
+        task_statuses_success = [task.status in success_statuses for task in tasks]
+        task_statuses_failure = [task.status in failure_statuses for task in tasks]
+        task_statuses_id_success = [task.status_id in success_statuses_ids for task in tasks]
+        task_statuses_id_failure = [task.status_id in failure_statuses_ids for task in tasks]
+        task_activities = [activity_text in task.activity for task in tasks]
+
+        if all(task_statuses_success + task_statuses_id_success) and not any(
+            task_statuses_failure + task_statuses_id_failure
+        ):
+            if not activity_text or all(task_activities):
                 return False
         return True
 
@@ -124,7 +136,7 @@ def wait_for_completed(
         retry=retry_if_result(check_status),
         retry_error_callback=log_exception,
     )
-    def wait_for_action_finish() -> TaskStatus:
+    def wait_for_action_finish() -> Union[DataSequence[TaskStatus], TaskStatus]:
         """
         Keep asking for task status, status_id,
         activity(optional), utill check_status is True
@@ -149,7 +161,7 @@ def wait_for_completed(
             else:
                 raise ValueError(f"Task id {action_id} is not registered by vManage.")
 
-        tasks = [create_dataclass(TaskStatus, action_data) for action_data in action_dataset]
+        tasks = DataSequence(TaskStatus, [create_dataclass(TaskStatus, action_data) for action_data in action_dataset])
         task_statuses = [task.status for task in tasks]
         task_statuses_id = [task.status_id for task in tasks]
         task_activities = [task.activity for task in tasks]
