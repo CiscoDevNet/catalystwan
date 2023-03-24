@@ -2,11 +2,13 @@ import unittest
 from unittest.mock import patch
 
 from vmngclient.api.task_status_api import TaskStatus, get_all_tasks, wait_for_completed
+from vmngclient.exceptions import TaskNotRegisteredError
+from vmngclient.typed_list import DataSequence
 
 
 class TestTaskStatusApi(unittest.TestCase):
     def setUp(self):
-        self.task = TaskStatus("Success", "success", [])
+        self.task = DataSequence(TaskStatus, [TaskStatus("Success", "success", [])])
         self.action_data = [{"status": "Success", "statusId": "success", "activity": []}]
 
     @patch("vmngclient.session.vManageSession")
@@ -32,7 +34,7 @@ class TestTaskStatusApi(unittest.TestCase):
     @patch("vmngclient.session.vManageSession")
     def test_raise_index_error_actionid_in_tasks_ids_data_exists(self, mock_session, mock_get_tasks, mock_sleep):
         # Arrange
-        mock_session.get_data.side_effect = [IndexError(), self.action_data]
+        mock_session.get_data.side_effect = [[], self.action_data]
         mock_get_tasks.return_value = ["action_id"]
         # Act
         answer = wait_for_completed(mock_session, "action_id", 1, 1)
@@ -54,10 +56,10 @@ class TestTaskStatusApi(unittest.TestCase):
     @patch("vmngclient.session.vManageSession")
     def test_raise_index_error_actionid_not_in_tasks(self, mock_session, mock_get_tasks, mock_sleep):
         # Arrange
-        mock_session.get_data.side_effect = IndexError()
+        mock_session.get_data.return_value = []
         mock_get_tasks.return_value = ["no_id"]
         # Act&Assert
-        self.assertRaises(ValueError, wait_for_completed, mock_session, "action_id", 1, 1)
+        self.assertRaises(TaskNotRegisteredError, wait_for_completed, mock_session, "action_id", 1, 1)
 
     @patch("vmngclient.session.vManageSession")
     def test_get_all_tasks(self, mock_session):
