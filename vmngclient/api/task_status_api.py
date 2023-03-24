@@ -152,7 +152,7 @@ def wait_for_completed(
             if action_id in tasks_ids:
                 sleep(delay_seconds)
                 try:
-                    action_dataset = session.get_data(url)[0]
+                    action_dataset = session.get_data(url)
                 except IndexError:
                     raise IndexError(
                         f"Task id {action_id} registered by vManage in all tasks list, "
