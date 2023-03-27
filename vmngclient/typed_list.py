@@ -167,9 +167,10 @@ class DataSequence(TypedList[T], Generic[T]):
         """Returns the only element of a sequence, or a default value if the sequence is empty.
 
         ## Example:
-        >>> seq = DataSequence(User, [User(username="User1"), User(username="User2")])
+        >>> seq = DataSequence(User, [User(username="User1")])
         >>> seq.single_or_default()
         User(username='User1', password=None, group=[], locale=None, description=None, resource_group=None)
+        >>> seq = DataSequence(User, [User(username="User1"), User(username="User2")])
         >>> seq.filter(username="User1").single_or_default()
         User(username='User1', password=None, group=[], locale=None, description=None, resource_group=None)
 
@@ -208,21 +209,22 @@ class DataSequence(TypedList[T], Generic[T]):
             self._type, filter(lambda x: all(getattr(x, a) == kwargs[a] for a in annotations), self.data)
         )
 
-    def filter_not(self, **kwargs) -> DataSequence[T]:
-        """Filters a sequence of values based on attributes.
-        Works the opposite way to filter.
+    def first(self):
+        """Returns the first element of a sequence.
 
-        >>> seq = DataSequence(User, [User(username="User1"), User(username="User2")])
-        >>> seq.filter_not(username="User1")
-        DataSequence(User, [
-            User(username='User2', password=None, group=[], locale=None, description=None, resource_group=None)
-        ])
+        ## Example:
+        >>> seq = DataSequence(Device, [Device(hostname="1", ), Device(hostname="2"), Device(hostname="3")])
+        >>> seq.first()
+        User(username='User1', password=None, group=[], locale=None, description=None, resource_group=None)
+
+        Raises:
+            InvalidOperationError: Raises when there is no elements in the sequence.
 
         Returns:
-            DataSequence: Filtered DataSequence.
+            [T]: The single element of the input sequence.
         """
-        annotations = set(kwargs.keys())
 
-        return DataSequence(
-            self._type, filter(lambda x: all(getattr(x, a) != kwargs[a] for a in annotations), self.data)
-        )
+        if len(self.data) < 1:
+            raise InvalidOperationError("The input sequence contains no elements.")
+
+        return self.data[0]
