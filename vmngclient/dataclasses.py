@@ -9,6 +9,7 @@ from vmngclient.utils.certificate_status import ValidityPeriod
 from vmngclient.utils.creation_tools import FIELD_NAME, asdict, convert_attributes
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
+from vmngclient.utils.template_type import TemplateType
 
 
 class DataclassBase:
@@ -218,7 +219,7 @@ class User(DataclassBase):
 class TemplateInfo(DataclassBase):
     last_updated_by: str = field(metadata={FIELD_NAME: "lastUpdatedBy"})
     resource_group: str = field(metadata={FIELD_NAME: "resourceGroup"})
-    config_type: str = field(metadata={FIELD_NAME: "configType"})
+    config_type: TemplateType = field(converter=TemplateType, metadata={FIELD_NAME: "configType"})
     id: str = field(metadata={FIELD_NAME: "templateId"})
     factory_default: bool = field(metadata={FIELD_NAME: "factoryDefault"})
     name: str = field(metadata={FIELD_NAME: "templateName"})
