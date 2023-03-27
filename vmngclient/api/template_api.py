@@ -209,10 +209,10 @@ class TemplatesAPI:
         """
 
         Args:
-            device (Device): Device to change mode.
+            device (Device): Device to deaatach template (change mode).
 
         Returns:
-            bool: True if change mode to cli is successful, otherwise - False.
+            bool: True if change deaatach template (mode to CLI) is successful, otherwise - False.
         """
         payload = {
             "deviceType": device.personality.value,
