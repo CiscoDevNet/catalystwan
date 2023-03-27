@@ -209,7 +209,7 @@ class DataSequence(TypedList[T], Generic[T]):
             self._type, filter(lambda x: all(getattr(x, a) == kwargs[a] for a in annotations), self.data)
         )
 
-    def first(self):
+    def first(self) -> T:
         """Returns the first element of a sequence.
 
         ## Example:
