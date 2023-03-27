@@ -458,8 +458,7 @@ class TemplatesAPI:
         #     raise AlreadyExistsError(f"Template [{template.name}] already exists.")
 
         if isinstance(template, FeatureTemplate):
-            assert self.validate_device_model(template)
-            raise ValueError
+            self.validate_device_model(template)
             if self.is_created_by_generator(template):
                 template_id = self.create_by_generator(template, debug)
             else:
