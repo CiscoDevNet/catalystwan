@@ -213,9 +213,9 @@ class DataSequence(TypedList[T], Generic[T]):
         """Returns the first element of a sequence.
 
         ## Example:
-        >>> seq = DataSequence(Device, [Device(hostname="1", ), Device(hostname="2"), Device(hostname="3")])
+        >>> seq = DataSequence(Device, [Device(hostname="dev-1", ), Device(hostname="dev-2"), Device(hostname="dev-3")])
         >>> seq.first()
-        User(username='User1', password=None, group=[], locale=None, description=None, resource_group=None)
+        Device(hostname="dev-1", personality=Personality.EDGE, ...)
 
         Raises:
             InvalidOperationError: Raises when there is no elements in the sequence.
