@@ -479,13 +479,13 @@ class SoftwareInstallTimeout(DataclassBase):
 
 @define
 class FeatureTemplatesTypes(DataclassBase):
-    parent: str = field(metadata={FIELD_NAME: "parent"})
-    default: str = field(metadata={FIELD_NAME: "default"})
+    parent: str
+    default: str
     display_name: str = field(metadata={FIELD_NAME: "displayName"})
-    name: str = field(metadata={FIELD_NAME: "name"})
+    name: str
     type_class: str = field(metadata={FIELD_NAME: "typeClass"})
-    description: str = field(metadata={FIELD_NAME: "description"})
-    write_permission: str = field(metadata={FIELD_NAME: "write_permission"})
-    read_permission: str = field(metadata={FIELD_NAME: "read_permission"})
+    description: str
+    write_permission: str
+    read_permission: str
     helper_type: List[str] = field(factory=list, metadata={FIELD_NAME: "helperType"})
     device_models: List[dict] = field(factory=list, metadata={FIELD_NAME: "deviceModels"})
