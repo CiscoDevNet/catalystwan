@@ -5,7 +5,8 @@ from time import sleep
 from typing import TYPE_CHECKING, List, cast
 
 from attr import define, field  # type: ignore
-from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
+from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed
+from vmngclient.dataclasses import DataclassBase  # type: ignore
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -23,6 +24,18 @@ class TaskStatus:
     status: str
     status_id: str = field(metadata={FIELD_NAME: "statusId"})
     activity: List[str]
+
+@define
+class TaskData(DataclassBase):
+    status: str
+    status_id: str = field(metadata={FIELD_NAME: "statusId"})
+    action: str
+    activity: List[str]
+    current_activity: str = field(metadata={FIELD_NAME: "currentActivity"})
+    action_config: str = field(metadata={FIELD_NAME: "actionConfig"})
+    order: int
+    uuid: str
+    site_id: str
 
 
 def get_all_tasks(session: vManageSession) -> List[str]:
@@ -170,3 +183,9 @@ def wait_for_completed(
         return tasks
 
     return wait_for_action_finish()
+
+def get_task_data(session: vManageSession):
+    url = "/dataservice/device/action/status/"
+    task_data = session.get_data(url)
+    return DataSequence(TaskStatus, [create_dataclass(TaskStatus, subtask_data) for subtask_data in task_data])
+
