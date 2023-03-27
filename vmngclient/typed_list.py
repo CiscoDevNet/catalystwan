@@ -213,7 +213,7 @@ class DataSequence(TypedList[T], Generic[T]):
         """Returns the first element of a sequence.
 
         ## Example:
-        >>> seq = DataSequence(Device, [Device(hostname="dev-1", ), Device(hostname="dev-2"), Device(hostname="dev-3")])
+        >>> seq = DataSequence(Device, [Device(hostname="dev-1"), Device(hostname="dev-2"), Device(hostname="dev-3")])
         >>> seq.first()
         Device(hostname="dev-1", personality=Personality.EDGE, ...)
 
