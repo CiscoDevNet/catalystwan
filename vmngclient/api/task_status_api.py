@@ -35,7 +35,7 @@ class TaskData(DataclassBase):
     action_config: str = field(metadata={FIELD_NAME: "actionConfig"})
     order: int
     uuid: str
-    site_id: str
+    site_id: str = field(metadata={FIELD_NAME: "site-id"})
 
 
 def get_all_tasks(session: vManageSession) -> List[str]:
@@ -55,7 +55,7 @@ def get_all_tasks(session: vManageSession) -> List[str]:
 
 def wait_for_completed(
     session: vManageSession,
-    action_id: str,
+    task_id: str,
     timeout_seconds: int = 300,
     interval_seconds: int = 5,
     delay_seconds: int = 10,
@@ -86,7 +86,7 @@ def wait_for_completed(
 
         # Keep asking for reboot status until it's not in exit_statuses (Failure or Success)
           or timeout is not achieved (3000s)
-        task = wait_for_completed(session,reboot_action.action_id,3000)
+        task = wait_for_completed(session,reboot_action.task_id,3000)
         if task.status == OperationStatus.SUCCESS.value:
             #do something
         else:
@@ -94,7 +94,7 @@ def wait_for_completed(
 
     Args:
         session (vManageSession): session
-        action_id (str): inspected action id
+        task_id (str): inspected action id
         timeout_seconds (int): After this time, function will stop requesting action status
         interval_seconds (int): interval between action status requests
         delay_seconds (int): if Vmanage didn't report task status, after this time api call would be repeated
@@ -106,13 +106,12 @@ def wait_for_completed(
     Returns:
         task (TaskStatus):
     """
-    action_url = "/dataservice/device/action/status/"
     success_statuses = [cast(OperationStatus, exit_status.value) for exit_status in success_statuses]
     failure_statuses = [cast(OperationStatus, exit_status.value) for exit_status in failure_statuses]
     success_statuses_ids = [cast(OperationStatusId, exit_status_id.value) for exit_status_id in success_statuses_ids]
     failure_statuses_ids = [cast(OperationStatusId, exit_status_id.value) for exit_status_id in failure_statuses_ids]
 
-    def check_status(tasks: DataSequence[TaskStatus]) -> bool:
+    def check_status(task_data: DataSequence[TaskData]) -> bool:
         """
         Function checks if condition is met. If so,
         wait_for_completed stops asking for task status
@@ -126,11 +125,11 @@ def wait_for_completed(
             bool: False if condition is met
         """
 
-        task_statuses_success = [task.status in success_statuses for task in tasks]
-        task_statuses_failure = [task.status in failure_statuses for task in tasks]
-        task_statuses_id_success = [task.status_id in success_statuses_ids for task in tasks]
-        task_statuses_id_failure = [task.status_id in failure_statuses_ids for task in tasks]
-        task_activities = [activity_text in task.activity for task in tasks]
+        task_statuses_success = [task.status in success_statuses for task in task_data]
+        task_statuses_failure = [task.status in failure_statuses for task in task_data]
+        task_statuses_id_success = [task.status_id in success_statuses_ids for task in task_data]
+        task_statuses_id_failure = [task.status_id in failure_statuses_ids for task in task_data]
+        task_activities = [activity_text in task.activity for task in task_data]
 
         if all(task_statuses_success + task_statuses_id_success) and not any(
             task_statuses_failure + task_statuses_id_failure
@@ -148,7 +147,7 @@ def wait_for_completed(
         retry=retry_if_result(check_status),
         retry_error_callback=log_exception,
     )
-    def wait_for_action_finish() -> DataSequence[TaskStatus]:
+    def wait_for_action_finish() -> DataSequence[TaskData]:
         """
         Keep asking for task status, status_id,
         activity(optional), utill check_status is True
@@ -156,36 +155,37 @@ def wait_for_completed(
         Returns:
             TaskStatus: TaskStatus instance
         """
-        url = f"{action_url}{action_id}"
-
-        action_dataset = session.get_data(url)
-        if not action_dataset:
-            tasks_ids = get_all_tasks(session)
-            if action_id in tasks_ids:
-                sleep(delay_seconds)
-                action_dataset = session.get_data(url)
-                if not action_dataset:
-                    raise EmptyTaskResponseError(
-                        f"Task id {action_id} registered by vManage in all tasks list, "
-                        f"but response about it's status didn't contain any information."
-                    )
-            else:
-                raise TaskNotRegisteredError(f"Task id {action_id} is not registered by vManage.")
-
-        tasks = DataSequence(TaskStatus, [create_dataclass(TaskStatus, action_data) for action_data in action_dataset])
-        task_statuses = [task.status for task in tasks]
-        task_statuses_id = [task.status_id for task in tasks]
-        task_activities = [task.activity for task in tasks]
+        task_data = get_task_data(session, task_id, delay_seconds)
+        task_statuses = [task.status for task in task_data]
+        task_statuses_id = [task.status_id for task in task_data]
+        task_activities = [task.activity for task in task_data]
         logger.info(
-            f"Statuses of action {action_id} is: "
+            f"Statuses of action {task_id} is: "
             f"status: {task_statuses}, status_id: {task_statuses_id}, activity: {task_activities}."
         )
-        return tasks
+        return task_data
 
     return wait_for_action_finish()
 
-def get_task_data(session: vManageSession):
-    url = "/dataservice/device/action/status/"
+def get_task_data(session: vManageSession, task_id: str, delay_seconds: int = 10) -> DataSequence[TaskData]:
+    url = f"/dataservice/device/action/status/{task_id}"
     task_data = session.get_data(url)
-    return DataSequence(TaskStatus, [create_dataclass(TaskStatus, subtask_data) for subtask_data in task_data])
+    check_if_data_is_available(session = session,
+    task_data = task_data, task_id = task_id, url=url, delay_seconds=delay_seconds)
+    return DataSequence(TaskData, [create_dataclass(TaskData, subtask_data) for subtask_data in task_data])
+
+def check_if_data_is_available(session: vManageSession, task_data: list, task_id: str, delay_seconds: int, url: str):
+    
+    if not task_data:
+        all_tasks_ids = get_all_tasks(session)
+        if task_id in all_tasks_ids:
+            sleep(delay_seconds)
+            task_data = session.get_data(url)
+            if not task_data:
+                raise EmptyTaskResponseError(
+                    f"Task id {task_id} registered by vManage in all tasks list, "
+                    f"but response about it's status didn't contain any information."
+                )
+        else:
+            raise TaskNotRegisteredError(f"Task id {task_id} is not registered by vManage.")
 
