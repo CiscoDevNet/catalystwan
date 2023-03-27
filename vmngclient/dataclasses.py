@@ -316,6 +316,8 @@ class TenantInfo(DataclassBase):
     organization_name: str = field(metadata={FIELD_NAME: "orgName"})
     sub_domain: str = field(metadata={FIELD_NAME: "subDomain"})
     id: str = field(metadata={FIELD_NAME: "tenantId"})
+    description: Optional[str] = field(default="", metadata={FIELD_NAME: "desc"})
+    state: Optional[str] = field(default="", metadata={FIELD_NAME: "state"})
     flake_id: Optional[int] = field(default=None, metadata={FIELD_NAME: "flakeId"})
 
 
