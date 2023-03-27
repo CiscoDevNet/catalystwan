@@ -207,6 +207,7 @@ class TemplatesAPI:
 
     def deattach(self, device: Device) -> bool:
         """
+        Deaatach it`s the same to change device mode to CLI mode.
 
         Args:
             device (Device): Device to deaatach template (change mode).
