@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>vManage-client package &#8212; vmngclient 0.7.2 documentation</title>
+    <title>vManage-client package &#8212; vmngclient 0.8.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="modules.html" title="vManage-client"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">vmngclient 0.7.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">vmngclient 0.8.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">vManage-client</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">vManage-client package</a></li> 
       </ul>
@@ -1282,7 +1282,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="vmngclient.dataclasses.TenantRadiusServer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.dataclasses.</span></span><span class="sig-name descname"><span class="pre">TenantRadiusServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retransmit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#vmngclient.dataclasses.RadiusServer" title="vmngclient.dataclasses.RadiusServer"><span class="pre">RadiusServer</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">NOTHING</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.dataclasses.TenantRadiusServer" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.dataclasses.</span></span><span class="sig-name descname"><span class="pre">TenantRadiusServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retransmit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">servers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#vmngclient.dataclasses.RadiusServer" title="vmngclient.dataclasses.RadiusServer"><span class="pre">RadiusServer</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">NOTHING</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.dataclasses.TenantRadiusServer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#vmngclient.dataclasses.DataclassBase" title="vmngclient.dataclasses.DataclassBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataclassBase</span></code></a></p>
 <p>Provider-Tenant -&gt; Tenant -&gt; Administration -&gt; Manage users -&gt; Remote AAA -&gt; RADIUS</p>
 <dl class="py attribute">
@@ -1291,8 +1291,8 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="vmngclient.dataclasses.TenantRadiusServer.server">
-<span class="sig-name descname"><span class="pre">server</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#vmngclient.dataclasses.RadiusServer" title="vmngclient.dataclasses.RadiusServer"><span class="pre">RadiusServer</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.dataclasses.TenantRadiusServer.server" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="vmngclient.dataclasses.TenantRadiusServer.servers">
+<span class="sig-name descname"><span class="pre">servers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#vmngclient.dataclasses.RadiusServer" title="vmngclient.dataclasses.RadiusServer"><span class="pre">RadiusServer</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.dataclasses.TenantRadiusServer.servers" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1304,7 +1304,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="vmngclient.dataclasses.TenantTacacsServer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.dataclasses.</span></span><span class="sig-name descname"><span class="pre">TenantTacacsServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authentication</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'PAP'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#vmngclient.dataclasses.TacacsServer" title="vmngclient.dataclasses.TacacsServer"><span class="pre">TacacsServer</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">NOTHING</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.dataclasses.TenantTacacsServer" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.dataclasses.</span></span><span class="sig-name descname"><span class="pre">TenantTacacsServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">authentication</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'PAP'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">servers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#vmngclient.dataclasses.TacacsServer" title="vmngclient.dataclasses.TacacsServer"><span class="pre">TacacsServer</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">NOTHING</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.dataclasses.TenantTacacsServer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#vmngclient.dataclasses.DataclassBase" title="vmngclient.dataclasses.DataclassBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataclassBase</span></code></a></p>
 <p>Provider-Tenant -&gt; Tenant -&gt; Administration -&gt; Manage users -&gt; Remote AAA -&gt; TACACS server</p>
 <dl class="py attribute">
@@ -1313,8 +1313,8 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="vmngclient.dataclasses.TenantTacacsServer.server">
-<span class="sig-name descname"><span class="pre">server</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#vmngclient.dataclasses.TacacsServer" title="vmngclient.dataclasses.TacacsServer"><span class="pre">TacacsServer</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.dataclasses.TenantTacacsServer.server" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="vmngclient.dataclasses.TenantTacacsServer.servers">
+<span class="sig-name descname"><span class="pre">servers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#vmngclient.dataclasses.TacacsServer" title="vmngclient.dataclasses.TacacsServer"><span class="pre">TacacsServer</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#vmngclient.dataclasses.TenantTacacsServer.servers" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -2075,7 +2075,7 @@ for current package</p>
         <li class="right" >
           <a href="modules.html" title="vManage-client"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">vmngclient 0.7.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">vmngclient 0.8.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >vManage-client</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">vManage-client package</a></li> 
       </ul>
