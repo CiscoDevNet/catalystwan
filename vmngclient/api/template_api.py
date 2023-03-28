@@ -205,15 +205,15 @@ class TemplatesAPI:
         logger.warning(f"Task activity information: {task.activity}")
         return False
 
-    def deattach(self, device: Device) -> bool:
+    def deatach(self, device: Device) -> bool:
         """
-        Deaatach it`s the same to change device mode to CLI mode.
+        Deatach it`s the same to change device mode to CLI mode.
 
         Args:
-            device (Device): Device to deaatach template (change mode).
+            device (Device): Device to deatach template (change mode).
 
         Returns:
-            bool: True if change deaatach template (mode to CLI) is successful, otherwise - False.
+            bool: True if change deatach template (mode to CLI) is successful, otherwise - False.
         """
         payload = {
             "deviceType": device.personality.value,
