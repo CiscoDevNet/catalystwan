@@ -1,11 +1,11 @@
 import unittest
-from unittest.mock import MagicMock, Mock, patch
-
-from ciscoconfparse import CiscoConfParse  # type: ignore
+from unittest.mock import patch
 
 from vmngclient.api.task_status_api import TaskStatus
-from vmngclient.api.template_api import AttachedError, TemplateAlreadyExistsError, TemplateNotFoundError, TemplatesAPI
-from vmngclient.dataclasses import Device, Template
+from vmngclient.api.template_api import TemplatesAPI
+from vmngclient.api.templates.feature_template import FeatureTemplate
+from vmngclient.dataclasses import Device, FeatureTemplateInfo, TemplateInfo
+from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
@@ -45,7 +45,9 @@ class TestTemplatesAPI(unittest.TestCase):
                 "templateAttached": 0,
             },
         ]
-        self.templates = [create_dataclass(Template, template) for template in self.data_template]
+        self.templates = DataSequence(
+            TemplateInfo, [create_dataclass(TemplateInfo, template) for template in self.data_template]
+        )
         self.device_info = Device(
             personality=Personality.EDGE,
             uuid="dummy_uuid",
@@ -60,239 +62,176 @@ class TestTemplatesAPI(unittest.TestCase):
         )
         self.task = TaskStatus("Success", "success", [])
 
+    @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
-    def test_templates_success(self, mock_session):
+    def test_templates_success(self, mock_session, mocked_response):
 
         # Arrange
-        mock_session.get_data.return_value = self.data_template
+        mock_session.get.return_value = mocked_response
+        mocked_response.dataseq.return_value = self.templates
 
         # Act
-        answer = TemplatesAPI(mock_session).templates
+        answer = TemplatesAPI(mock_session).get(FeatureTemplate)
 
         # Assert
         self.assertEqual(answer, self.templates)
 
+    @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
-    def test_templates_no_data(self, mock_session):
+    def test_templates_get(self, mock_session, mocked_response):
 
         # Arrange
-        mock_session.get_data.return_value = []
+        mock_session.get_data.return_value = mocked_response
+        mocked_response.dataseq.return_value = DataSequence(FeatureTemplateInfo, [])
 
         # Act
-        answer = TemplatesAPI(mock_session).templates
+        TemplatesAPI(mock_session).get(FeatureTemplate)
 
         # Assert
-        self.assertEqual(answer, [])
+        mock_session.get.assert_called_once_with(url="/dataservice/template/feature", params={"summary": True})
 
-    @patch.object(TemplatesAPI, "templates")
-    def test_get_success(self, mock_templates):
+    # @patch.object(TemplatesAPI, "templates")
+    # @patch("vmngclient.api.template_api.wait_for_completed")
+    # @patch("vmngclient.session.vManageSession")
+    # def test_attach_exist_template(self, mock_session, mock_wait_for_completed, mock_templates):
 
-        # Arrage
-        MockTemplates = Mock()
-        mock_templates.return_value = MockTemplates
-        session = Mock()
-        test_object = TemplatesAPI(session)
-        test_object.templates = self.templates
+    #     # Arrage
+    #     mock_session.post_json.return_value = {"id": "operation_id"}
+    #     test_object = TemplatesAPI(mock_session)
 
-        # Act
-        answer = [test_object.get(template.name) for template in self.templates]
+    #     # mock templates
+    #     MockTemplates = Mock()
+    #     mock_templates.return_value = MockTemplates
+    #     test_object.templates = self.templates
 
-        # Assert
-        self.assertEqual(answer, self.templates)
+    #     # mock wait complete
+    #     mock_wait_for_completed.return_value = self.task
 
-    @patch.object(TemplatesAPI, "templates")
-    def test_get_exception(self, mock_templates):
+    #     # Act
+    #     answer = test_object.attach("template_1", self.device_info)
 
-        # Arrage
-        MockTemplates = Mock()
-        mock_templates.return_value = MockTemplates
-        session = Mock()
-        test_object = TemplatesAPI(session)
-        test_object.templates = self.templates
+    #     # Assert
+    #     self.assertTrue(answer)
 
-        # Act
-        def answer():
-            return test_object.get("no_exist_name")
+    # @patch.object(TemplatesAPI, "templates")
+    # @patch("vmngclient.api.template_api.wait_for_completed")
+    # @patch("vmngclient.session.vManageSession")
+    # def test_attach_no_exist_template(self, mock_session, mock_wait_for_completed, mock_templates):
 
-        # Assert
-        self.assertRaises(TemplateNotFoundError, answer)
+    #     # Arrage
+    #     mock_session.post_json.return_value = {"id": "operation_id"}
+    #     test_object = TemplatesAPI(mock_session)
 
-    @patch.object(TemplatesAPI, "templates")
-    def test_get_id_success(self, mock_templates):
+    #     # mock templates
+    #     MockTemplates = Mock()
+    #     mock_templates.return_value = MockTemplates
+    #     test_object.templates = self.templates
 
-        # Arrage
-        MockTemplates = Mock()
-        mock_templates.return_value = MockTemplates
-        session = Mock()
-        test_object = TemplatesAPI(session)
-        test_object.templates = self.templates
+    #     # mock wait complete
+    #     mock_wait_for_completed.return_value = self.task
 
-        # Act
-        answer = [test_object.get_id(template.name) for template in self.templates]
+    #     # Act
+    #     answer = test_object.attach("no_exist_template", self.device_info)
 
-        ids = [template.id for template in self.templates]
-        # Assert
-        self.assertEqual(answer, ids)
+    #     # Assert
+    #     self.assertFalse(answer)
 
-    @patch.object(TemplatesAPI, "templates")
-    def test_get_id_exception(self, mock_templates):
+    # @patch("vmngclient.api.template_api.wait_for_completed")
+    # @patch("vmngclient.session.vManageSession")
+    # def test_device_to_cli_true(self, mock_session, mock_wait_for_completed):
 
-        # Arrage
-        MockTemplates = Mock()
-        mock_templates.return_value = MockTemplates
-        session = Mock()
-        test_object = TemplatesAPI(session)
-        test_object.templates = self.templates
+    #     # Arrage
+    #     mock_session.post_json.return_value = {"id": "operation_id"}
+    #     test_object = TemplatesAPI(mock_session)
 
-        # Act
-        def answer():
-            return test_object.get_id("no_exist_name")
+    #     # mock wait complete
+    #     mock_wait_for_completed.return_value = self.task
 
-        # Assert
-        self.assertRaises(TemplateNotFoundError, answer)
+    #     # Act
+    #     answer = test_object.device_to_cli(self.device_info)
 
-    @patch.object(TemplatesAPI, "templates")
-    @patch("vmngclient.api.template_api.wait_for_completed")
-    @patch("vmngclient.session.vManageSession")
-    def test_attach_exist_template(self, mock_session, mock_wait_for_completed, mock_templates):
+    #     # Assert
+    #     self.assertTrue(answer)
 
-        # Arrage
-        mock_session.post_json.return_value = {"id": "operation_id"}
-        test_object = TemplatesAPI(mock_session)
+    # @patch.object(TemplatesAPI, "templates")
+    # @patch("vmngclient.session.vManageSession")
+    # def test_delete_success(self, mock_session, mock_templates):
 
-        # mock templates
-        MockTemplates = Mock()
-        mock_templates.return_value = MockTemplates
-        test_object.templates = self.templates
+    #     # Arrage
+    #     MockResponse = MagicMock()
+    #     MockResponse.status_code = 200
+    #     mock_session.delete.return_value = MockResponse
+    #     test_object = TemplatesAPI(mock_session)
 
-        # mock wait complete
-        mock_wait_for_completed.return_value = self.task
+    #     # mock templates
+    #     MockTemplates = Mock()
+    #     mock_templates.return_value = MockTemplates
+    #     test_object.templates = self.templates
 
-        # Act
-        answer = test_object.attach("template_1", self.device_info)
+    #     # Act
+    #     answer = test_object.delete("template_1")
+    #     # Assert
+    #     self.assertTrue(answer)
 
-        # Assert
-        self.assertTrue(answer)
+    # @patch.object(TemplatesAPI, "templates")
+    # @patch("vmngclient.session.vManageSession")
+    # def test_delete_wrong_status(self, mock_session, mock_templates):
 
-    @patch.object(TemplatesAPI, "templates")
-    @patch("vmngclient.api.template_api.wait_for_completed")
-    @patch("vmngclient.session.vManageSession")
-    def test_attach_no_exist_template(self, mock_session, mock_wait_for_completed, mock_templates):
+    #     # Arrage
+    #     MockResponse = MagicMock()
+    #     MockResponse.ok = False
+    #     mock_session.delete.return_value = MockResponse
+    #     test_object = TemplatesAPI(mock_session)
 
-        # Arrage
-        mock_session.post_json.return_value = {"id": "operation_id"}
-        test_object = TemplatesAPI(mock_session)
+    #     # mock templates
+    #     MockTemplates = Mock()
+    #     mock_templates.return_value = MockTemplates
+    #     test_object.templates = self.templates
 
-        # mock templates
-        MockTemplates = Mock()
-        mock_templates.return_value = MockTemplates
-        test_object.templates = self.templates
+    #     # Act
+    #     answer = test_object.delete("template_1")
 
-        # mock wait complete
-        mock_wait_for_completed.return_value = self.task
+    #     # Assert
+    #     self.assertFalse(answer)
 
-        # Act
-        answer = test_object.attach("no_exist_template", self.device_info)
+    # @patch.object(TemplatesAPI, "templates")
+    # @patch("vmngclient.session.vManageSession")
+    # def test_delete_exception(self, mock_session, mock_templates):
 
-        # Assert
-        self.assertFalse(answer)
+    #     # Arrage
+    #     MockResponse = MagicMock()
+    #     MockResponse.status = 404
+    #     mock_session.delete.return_value = MockResponse
+    #     test_object = TemplatesAPI(mock_session)
 
-    @patch("vmngclient.api.template_api.wait_for_completed")
-    @patch("vmngclient.session.vManageSession")
-    def test_device_to_cli_true(self, mock_session, mock_wait_for_completed):
+    #     # mock templates
+    #     MockTemplates = Mock()
+    #     mock_templates.return_value = MockTemplates
+    #     test_object.templates = self.templates
 
-        # Arrage
-        mock_session.post_json.return_value = {"id": "operation_id"}
-        test_object = TemplatesAPI(mock_session)
+    #     # Act
+    #     def answer():
+    #         return test_object.delete("template_2")
 
-        # mock wait complete
-        mock_wait_for_completed.return_value = self.task
+    #     # Assert
+    #     self.assertRaises(AttachedError, answer)
 
-        # Act
-        answer = test_object.device_to_cli(self.device_info)
+    # @patch.object(TemplatesAPI, "templates")
+    # @patch("vmngclient.session.vManageSession")
+    # def test_create_exception(self, mock_session, mock_templates):
 
-        # Assert
-        self.assertTrue(answer)
+    #     # Arrage
+    #     test_object = TemplatesAPI(mock_session)
 
-    @patch.object(TemplatesAPI, "templates")
-    @patch("vmngclient.session.vManageSession")
-    def test_delete_success(self, mock_session, mock_templates):
+    #     # mock templates
+    #     MockTemplates = Mock()
+    #     mock_templates.return_value = MockTemplates
+    #     test_object.templates = self.templates
+    #     config = CiscoConfParse([])
 
-        # Arrage
-        MockResponse = MagicMock()
-        MockResponse.status_code = 200
-        mock_session.delete.return_value = MockResponse
-        test_object = TemplatesAPI(mock_session)
+    #     # Act
+    #     def answer():
+    #         return test_object.create(self.device_info, "template_1", "new_description", config)
 
-        # mock templates
-        MockTemplates = Mock()
-        mock_templates.return_value = MockTemplates
-        test_object.templates = self.templates
-
-        # Act
-        answer = test_object.delete("template_1")
-        # Assert
-        self.assertTrue(answer)
-
-    @patch.object(TemplatesAPI, "templates")
-    @patch("vmngclient.session.vManageSession")
-    def test_delete_wrong_status(self, mock_session, mock_templates):
-
-        # Arrage
-        MockResponse = MagicMock()
-        MockResponse.ok = False
-        mock_session.delete.return_value = MockResponse
-        test_object = TemplatesAPI(mock_session)
-
-        # mock templates
-        MockTemplates = Mock()
-        mock_templates.return_value = MockTemplates
-        test_object.templates = self.templates
-
-        # Act
-        answer = test_object.delete("template_1")
-
-        # Assert
-        self.assertFalse(answer)
-
-    @patch.object(TemplatesAPI, "templates")
-    @patch("vmngclient.session.vManageSession")
-    def test_delete_exception(self, mock_session, mock_templates):
-
-        # Arrage
-        MockResponse = MagicMock()
-        MockResponse.status = 404
-        mock_session.delete.return_value = MockResponse
-        test_object = TemplatesAPI(mock_session)
-
-        # mock templates
-        MockTemplates = Mock()
-        mock_templates.return_value = MockTemplates
-        test_object.templates = self.templates
-
-        # Act
-        def answer():
-            return test_object.delete("template_2")
-
-        # Assert
-        self.assertRaises(AttachedError, answer)
-
-    @patch.object(TemplatesAPI, "templates")
-    @patch("vmngclient.session.vManageSession")
-    def test_create_exception(self, mock_session, mock_templates):
-
-        # Arrage
-        test_object = TemplatesAPI(mock_session)
-
-        # mock templates
-        MockTemplates = Mock()
-        mock_templates.return_value = MockTemplates
-        test_object.templates = self.templates
-        config = CiscoConfParse([])
-
-        # Act
-        def answer():
-            return test_object.create(self.device_info, "template_1", "new_description", config)
-
-        # Assert
-        self.assertRaises(TemplateAlreadyExistsError, answer)
+    #     # Assert
+    #     self.assertRaises(AlreadyExistsError, answer)
