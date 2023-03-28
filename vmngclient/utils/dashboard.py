@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, List, Optional, Union
+from typing import Optional, Union
 
 from attr import define, field  # type: ignore
 
