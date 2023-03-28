@@ -38,7 +38,7 @@ class Count(DataclassBase):
     details_url: str = field(metadata={FIELD_NAME: "detailsURL"})
     status: str
     message: Optional[str] = field(default=None)
-    status_list: Union[Optional[List[Dict[str, Union[str, int]]]], "Count"] = field(
+    status_list: Union[Optional["Count"]] = field(
         default=None, metadata={FIELD_NAME: "statusList"}
     )
 

@@ -28,7 +28,11 @@ class DashboardAPI:
         """
         vmanages = self.session.get_data("/dataservice/clusterManagement/health/summary")
 
-        return DataSequence(Count, [create_dataclass(Count, vmanage) for vmanage in vmanages])
+        vmanages = DataSequence(Count, [create_dataclass(Count, vmanage) for vmanage in vmanages])
+        for vmanage in vmanages:
+            vmanage.status_list = DataSequence(Count, [create_dataclass(Count, item) for item in vmanage.status_list])
+
+        return vmanages
 
     def get_devices(self) -> DataSequence[Count]:
         """
@@ -37,9 +41,13 @@ class DashboardAPI:
         Returns:
             DataSequance of Count dataclass with devices
         """
-        devices = self.session.get_data("/dataservice/network/connectionssummary")
+        devices = self.session.get_data("/dataservice/clusterManagement/health/summary")
 
-        return DataSequence(Count, [create_dataclass(Count, device) for device in devices])
+        devices = DataSequence(Count, [create_dataclass(Count, device) for device in devices])
+        for device in devices:
+            device.status_list = DataSequence(Count, [create_dataclass(Count, item) for item in device.status_list])
+
+        return devices
 
     def get_certificates_status(self) -> DataSequence[CertificatesStatus]:
         """
