@@ -7,9 +7,10 @@ from ciscoconfparse import CiscoConfParse  # type: ignore
 from requests.exceptions import HTTPError
 
 from vmngclient.dataclasses import Device
-
-# from vmngclient.session import vManageSession
+from vmngclient.exceptions import TemplateTypeError
+from vmngclient.session import vManageSession
 from vmngclient.utils.device_model import DeviceModel
+from vmngclient.utils.template_type import TemplateType
 
 logger = logging.getLogger(__name__)
 
@@ -22,11 +23,28 @@ class CLITemplate:
     device_model: DeviceModel
     config: CiscoConfParse = CiscoConfParse([])
 
-    def load_running(self, session, device: Device) -> CiscoConfParse:
+    def load(self, session: vManageSession, id: str) -> CiscoConfParse:
+        """Load CLI config from template.
+        Args:
+            id (str): The template id from which load config.
+        Raises:
+            TemplateTypeError: wrong template type - CLI required.
+        Returns:
+            CiscoConfParse: Loaded template.
+        """
+        endpoint = f"/dataservice/template/device/object/{id}"
+        config = session.get_json(endpoint)
+        if TemplateType(config["configType"]) == TemplateType.FEATURE:
+            raise TemplateTypeError(config["templateName"])
+        self.config = CiscoConfParse(config["templateConfiguration"].splitlines())
+        return self.config
+
+    def load_running(self, session: vManageSession, device: Device) -> CiscoConfParse:
         """Load running config from device.
 
         Args:
-            device (Device): The device from which load config.
+            session: logged in API client session
+            device: The device from which load config.
 
         Returns:
             CiscoConfParse: A working configuration on the machine.
@@ -57,12 +75,13 @@ class CLITemplate:
             payload["draftMode"] = False
         return payload
 
-    def update(self, session, id: str, config: CiscoConfParse) -> bool:
+    def update(self, session: vManageSession, id: str, config: CiscoConfParse) -> bool:
         """Update an existing cli template.
 
         Args:
-            id (str): Template id to update.
-            config (CiscoConfParse): Updated config.
+            session: logged in API client session
+            id: Template id to update.
+            config: Updated config.
 
         Returns:
             bool: True if update template is successful, otherwise - False.
