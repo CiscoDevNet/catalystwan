@@ -87,7 +87,7 @@ class TemplatesAPI:
     def attach(self, name: str, device: Device, **kwargs):
         template_type = self.get(DeviceTemplate).filter(name=name).single_or_default().config_type
         if template_type == TemplateType.CLI:
-            return self._attach_cli(name, device)
+            return self._attach_cli(name, device, **kwargs)
 
         if template_type == TemplateType.FEATURE:
             return self._attach_feature(name, device, **kwargs)
