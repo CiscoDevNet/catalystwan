@@ -1,13 +1,38 @@
 # type: ignore
 import json
 import unittest
+from typing import Optional
 
+from attrs import define, field
 from parameterized import parameterized
 
 from vmngclient.dataclasses import TLOC, Device, PacketSetup, TacacsServer, TenantTacacsServer
-from vmngclient.utils.creation_tools import asdict
+from vmngclient.utils.creation_tools import FIELD_NAME, asdict
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
+
+
+@define
+class _TestObjectD:
+    d: int
+
+
+@define
+class _TestObjectC:
+    c: int
+    dd: Optional[_TestObjectD] = None
+
+
+@define
+class _TestObjectB:
+    rnd: int = field(metadata={FIELD_NAME: "RANDOM"})
+
+
+@define
+class _TestObjectA:
+    a: int = field(metadata={FIELD_NAME: "A"})
+    b: _TestObjectB = field(metadata={FIELD_NAME: "BBB"})
+    c: Optional[_TestObjectC] = None
 
 
 class TestCreationTools(unittest.TestCase):
@@ -37,20 +62,40 @@ class TestCreationTools(unittest.TestCase):
                     "state_description": None,
                 },
             ),
+            (_TestObjectA(1, _TestObjectB(2)), {"BBB": {"RANDOM": 2}, "A": 1, "c": None}),
             (
-                TenantTacacsServer(1, "2", TacacsServer(*range(7))),
+                _TestObjectA(1, _TestObjectB(2), _TestObjectC(1)),
+                {"BBB": {"RANDOM": 2}, "A": 1, "c": {"c": 1, "dd": None}},
+            ),
+            (
+                _TestObjectA(1, _TestObjectB(2), _TestObjectC(1, _TestObjectD(111))),
+                {"BBB": {"RANDOM": 2}, "A": 1, "c": {"c": 1, "dd": {"d": 111}}},
+            ),
+            (
+                TenantTacacsServer(1, "2", [TacacsServer(*range(7)), TacacsServer(*range(2, 9))]),
                 {
                     "timeout": 1,
                     "authentication": "2",
-                    "server": {
-                        "address": 0,
-                        "authPort": 1,
-                        "vpn": 2,
-                        "vpnIpSubnet": 3,
-                        "key": 4,
-                        "secretKey": 5,
-                        "priority": 6,
-                    },
+                    "server": [
+                        {
+                            "address": 0,
+                            "authPort": 1,
+                            "vpn": 2,
+                            "vpnIpSubnet": 3,
+                            "key": 4,
+                            "secretKey": 5,
+                            "priority": 6,
+                        },
+                        {
+                            "address": 2,
+                            "authPort": 3,
+                            "vpn": 4,
+                            "vpnIpSubnet": 5,
+                            "key": 6,
+                            "secretKey": 7,
+                            "priority": 8,
+                        },
+                    ],
                 },
             ),
         ]
