@@ -445,7 +445,7 @@ class TenantRadiusServer(DataclassBase):
 
     timeout: int = field(default=3, metadata={FIELD_NAME: "timeout"})
     retransmit: int = field(default=5, metadata={FIELD_NAME: "retransmit"})
-    server: List[RadiusServer] = field(factory=list, metadata={FIELD_NAME: "server"})
+    servers: List[RadiusServer] = field(factory=list, metadata={FIELD_NAME: "server"})
 
 
 @define(frozen=True)
@@ -471,7 +471,7 @@ class TenantTacacsServer(DataclassBase):
 
     timeout: int = field(default=3, metadata={FIELD_NAME: "timeout"})
     authentication: str = field(default="PAP", metadata={FIELD_NAME: "authentication"})
-    server: List[TacacsServer] = field(factory=list, metadata={FIELD_NAME: "server"})
+    servers: List[TacacsServer] = field(factory=list, metadata={FIELD_NAME: "server"})
 
 
 @define
