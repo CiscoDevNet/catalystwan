@@ -1,6 +1,7 @@
 import json
 import logging
 from difflib import Differ
+from typing import TYPE_CHECKING
 
 from attr import define  # type: ignore
 from ciscoconfparse import CiscoConfParse  # type: ignore
@@ -8,11 +9,13 @@ from requests.exceptions import HTTPError
 
 from vmngclient.dataclasses import Device
 from vmngclient.exceptions import TemplateTypeError
-from vmngclient.session import vManageSession
 from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.template_type import TemplateType
 
 logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 
 @define
