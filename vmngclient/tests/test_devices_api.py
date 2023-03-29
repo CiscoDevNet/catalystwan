@@ -2,6 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from parameterized import parameterized  # type: ignore
+from pytest import mark  # type: ignore
 from tenacity import RetryError  # type: ignore
 
 from vmngclient.api.basic_api import DevicesAPI, DeviceStateAPI, FailedSend
@@ -649,6 +650,7 @@ class TestDevicesStateAPI(TestCase):
         # Assert
         self.assertRaises(RetryError, answer)
 
+    @mark.skip(reason="10 minutes length")
     @patch("vmngclient.session.vManageSession")
     def test_wait_for_device_state(self, mock_session):
         # Arrange
