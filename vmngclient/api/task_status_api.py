@@ -72,7 +72,7 @@ def wait_for_completed(
         OperationStatusId.FAILURE,
     ],
     activity_text: str = "",
-) -> DataSequence[TaskStatus]:
+) -> DataSequence[TaskData]:
     """
     Method to check action status
 
