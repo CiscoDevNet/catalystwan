@@ -55,9 +55,12 @@ class TemplatesAPI:
         ...
 
     def get(self, template):
+        if isinstance(template, FeatureTemplate):
+            return self._get_feature_templates()
         if template is FeatureTemplate:
             return self._get_feature_templates()
-
+        if isinstance(template, (DeviceTemplate, CLITemplate)):
+            return self._get_device_templates()
         if template in [DeviceTemplate, CLITemplate]:
             return self._get_device_templates()
 
@@ -334,7 +337,7 @@ class TemplatesAPI:
         template_id: Optional[str] = None  # type: ignore
         template_type = None
 
-        exists = self.get(type(template)).filter(name=template.name)
+        exists = self.get(template).filter(name=template.name)
         if exists:
             raise AlreadyExistsError(f"Template with name [{template.name}] already exists.")
 
