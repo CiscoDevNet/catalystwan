@@ -1,6 +1,6 @@
 from enum import Enum
 
 
-class Reachability(Enum):
+class Reachability(str, Enum):
     REACHABLE = "reachable"
     UNREACHABLE = "unreachable"
