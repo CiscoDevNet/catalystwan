@@ -219,7 +219,6 @@ class User(DataclassBase):
 class TemplateInfo(DataclassBase):
     last_updated_by: str = field(metadata={FIELD_NAME: "lastUpdatedBy"})
     resource_group: str = field(metadata={FIELD_NAME: "resourceGroup"})
-    config_type: TemplateType = field(converter=TemplateType, metadata={FIELD_NAME: "configType"})
     id: str = field(metadata={FIELD_NAME: "templateId"})
     factory_default: bool = field(metadata={FIELD_NAME: "factoryDefault"})
     name: str = field(metadata={FIELD_NAME: "templateName"})
@@ -239,6 +238,7 @@ class FeatureTemplateInfo(TemplateInfo):
 class DeviceTemplateInfo(TemplateInfo):
     device_type: str = field(metadata={FIELD_NAME: "deviceType"})
     template_class: str = field(metadata={FIELD_NAME: "templateClass"})
+    config_type: TemplateType = field(converter=TemplateType, metadata={FIELD_NAME: "configType"})
     draft_mode: str = field(metadata={FIELD_NAME: "draftMode"})
     template_attached: int = field(metadata={FIELD_NAME: "templateAttached"})
     device_role: Optional[str] = field(default=None, metadata={FIELD_NAME: "deviceRole"})
