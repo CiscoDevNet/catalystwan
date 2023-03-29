@@ -12,6 +12,7 @@ class DeviceName(Enum):
     VBOND: str = "vBond"
     VSMART: str = "vSmart"
     EDGE: str = "WAN Edge"
+    VEDGE: str = "vEdge"
 
 
 class StatusName(Enum):
@@ -38,9 +39,7 @@ class Count(DataclassBase):
     details_url: str = field(metadata={FIELD_NAME: "detailsURL"})
     status: str
     message: Optional[str] = field(default=None)
-    status_list: Union[Optional["Count"]] = field(
-        default=None, metadata={FIELD_NAME: "statusList"}
-    )
+    status_list: Union[Optional["Count"]] = field(default=None, metadata={FIELD_NAME: "statusList"})
 
 
 @define
