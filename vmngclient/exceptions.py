@@ -16,14 +16,35 @@ class VersionDeclarationError(Exception):
     pass
 
 
-class AlreadyExistsError(Exception):
-    """Raised when an entity that we attempted to create already exists."""
+class ImageNotInRepositoryError(Exception):
+    """The exception that is thrown, if image is not in vManage images Repository"""
 
     pass
 
 
-class ImageNotInRepositoryError(Exception):
-    """The exception that is thrown, if image is not in vManage images Repository"""
+class TemplateNotFoundError(Exception):
+    """Used when a template item is not found."""
+
+    def __init__(self, template):
+        self.message = f"No such template: '{template}'"
+
+
+class AttachedError(Exception):
+    """Used when delete attached template."""
+
+    def __init__(self, template):
+        self.message = f"Template: {template} is attached to device."
+
+
+class TemplateTypeError(Exception):
+    """Used when wrong type template."""
+
+    def __init__(self, name):
+        self.message = f"Template: {name} - wrong template type."
+
+
+class AlreadyExistsError(Exception):
+    """Raised when an entity that we attempted to create already exists."""
 
     pass
 

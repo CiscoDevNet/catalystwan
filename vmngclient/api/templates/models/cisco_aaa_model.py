@@ -11,7 +11,7 @@ class User(BaseModel):
     name: str
     password: str
     secret: str
-    privilege: int
+    privilege: Optional[str]
     pubkey_chain: List[str] = Field(default=[], alias="pubkey-chain")
 
 
