@@ -155,7 +155,7 @@ class TemplatesAPI:
         if task[0]:
             return True
         logger.warning(f"Failed to attach tempate: {name} to the device: {device.hostname}.")
-        logger.warning(f"Task activity information: {task[1][0].activity}")
+        logger.warning(f"Task activity information: {task[1].single_or_default().activity}")
         return False
 
     def _attach_cli(self, name: str, device: Device, is_edited: bool = False) -> bool:
@@ -204,7 +204,7 @@ class TemplatesAPI:
         if task[0]:
             return True
         logger.warning(f"Failed to attach tempate: {name} to the device: {device.hostname}.")
-        logger.warning(f"Task activity information: {task[1][0].activity}")
+        logger.warning(f"Task activity information: {task[1].single_or_default().activity}")
         return False
 
     def deatach(self, device: Device) -> bool:
@@ -228,7 +228,7 @@ class TemplatesAPI:
         if task[0]:
             return True
         logger.warning(f"Failed to change to cli mode for device: {device.hostname}.")
-        logger.warning(f"Task activity information: {task[1][0].activity}")
+        logger.warning(f"Task activity information: {task[1].single_or_default().activity}")
         return False
 
     @overload
