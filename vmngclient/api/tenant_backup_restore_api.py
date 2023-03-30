@@ -8,7 +8,7 @@ import re
 from pathlib import Path
 from typing import TYPE_CHECKING, List, Optional
 
-from vmngclient.api.task_status_api import TaskStatus, wait_for_completed
+from vmngclient.api.task_status_api import SubTaskData, TaskAPI
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -74,8 +74,8 @@ class TenantBackupRestoreAPI:
             fileName = ProviderBackupRestore.export()
         """
         response = self.session.get_json("/dataservice/tenantbackup/export")
-        status = wait_for_completed(self.session, response["processId"], timeout)[0]
-        string = re.search("""file location: (.*)""", status.activity[-1])
+        status = TaskAPI(self.session, response["processId"]).wait_for_completed(timeout_seconds=timeout)
+        string = re.search("""file location: (.*)""", status[1][0].activity[-1])
         assert string, "File location not found."
         return string.group(1)
 
@@ -128,7 +128,7 @@ class TenantBackupRestoreAPI:
         self.session.get_file(file, download)
         return download
 
-    def import_file(self, file: Path, timeout: int = 300) -> TaskStatus:
+    def import_file(self, file: Path, timeout: int = 300) -> SubTaskData:
         """Upload the file for tenant import to the DB and poll for Success
 
         Args:
@@ -145,4 +145,4 @@ class TenantBackupRestoreAPI:
         url = "/dataservice/tenantbackup/import"
         files = {"file": (file.name, open(str(file), "rb"))}
         response = self.session.post(url, data={}, files=files)
-        return wait_for_completed(self.session, response.json()["processId"], timeout)[0]
+        return TaskAPI(self.session, response.json()["processId"]).wait_for_completed(timeout_seconds=timeout)[1][0]

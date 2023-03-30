@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Optional, Type, overload
 
 from requests.exceptions import HTTPError
 
-from vmngclient.api.task_status_api import wait_for_completed
+from vmngclient.api.task_status_api import TaskAPI
 from vmngclient.api.templates.cli_template import CLITemplate
 from vmngclient.api.templates.device_template.device_template import (
     DeviceSpecificValue,
@@ -21,7 +21,6 @@ from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
 from vmngclient.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, TemplateInfo
 from vmngclient.exceptions import AlreadyExistsError, AttachedError, TemplateNotFoundError
 from vmngclient.typed_list import DataSequence
-from vmngclient.utils.operation_status import OperationStatus
 from vmngclient.utils.template_type import TemplateType
 
 if TYPE_CHECKING:
@@ -149,11 +148,11 @@ class TemplatesAPI:
         endpoint = "/dataservice/template/device/config/attachfeature"
         logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
-        task = wait_for_completed(session=self.session, action_id=response["id"])[0]
-        if task.status == OperationStatus.SUCCESS.value:
+        task = TaskAPI(session=self.session, task_id=response["id"]).wait_for_completed()
+        if task[0]:
             return True
         logger.warning(f"Failed to attach tempate: {name} to the device: {device.hostname}.")
-        logger.warning(f"Task activity information: {task.activity}")
+        logger.warning(f"Task activity information: {task[1][0].activity}")
         return False
 
     def _attach_cli(self, name: str, device: Device, is_edited: bool = False) -> bool:
@@ -198,11 +197,11 @@ class TemplatesAPI:
         endpoint = "/dataservice/template/device/config/attachcli"
         logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
-        task = wait_for_completed(session=self.session, action_id=response["id"])[0]
-        if task.status == OperationStatus.SUCCESS.value:
+        task = TaskAPI(session=self.session, task_id=response["id"]).wait_for_completed()
+        if task[0]:
             return True
         logger.warning(f"Failed to attach tempate: {name} to the device: {device.hostname}.")
-        logger.warning(f"Task activity information: {task.activity}")
+        logger.warning(f"Task activity information: {task[1][0].activity}")
         return False
 
     def deatach(self, device: Device) -> bool:
@@ -222,11 +221,11 @@ class TemplatesAPI:
         endpoint = "/dataservice/template/config/device/mode/cli"
         logger.info(f"Changing mode to cli mode for {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
-        task = wait_for_completed(session=self.session, action_id=response["id"])[0]
-        if task.status == OperationStatus.SUCCESS.value:
+        task = TaskAPI(session=self.session, task_id=response["id"]).wait_for_completed()
+        if task[0]:
             return True
         logger.warning(f"Failed to change to cli mode for device: {device.hostname}.")
-        logger.warning(f"Task activity information: {task.activity}")
+        logger.warning(f"Task activity information: {task[1][0].activity}")
         return False
 
     @overload
