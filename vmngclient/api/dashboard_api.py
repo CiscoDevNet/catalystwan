@@ -63,7 +63,7 @@ class DashboardAPI:
 
     def get_control_statuses_count(self) -> DataSequence[Count]:
         """
-        Get information abot control statuses.
+        Get information about control statuses.
 
         Returns:
             DataSequance of Count dataclass with control statuses
