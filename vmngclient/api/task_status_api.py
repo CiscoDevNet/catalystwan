@@ -183,7 +183,7 @@ class TaskAPI:
     def __check_if_data_is_available(self, delay_seconds):
 
         if not self.task_data:
-            all_tasks_ids = self.__get_all_tasks(self.session)
+            all_tasks_ids = self.__get_all_tasks()
             if self.task_id in all_tasks_ids:
                 sleep(delay_seconds)
                 self.task_data = self.session.get_data(self.url)
@@ -195,7 +195,7 @@ class TaskAPI:
             else:
                 raise TaskNotRegisteredError(f"Task id {self.task_id} is not registered by vManage.")
 
-    def __get_all_tasks(self, session: vManageSession) -> List[str]:
+    def __get_all_tasks(self) -> List[str]:
         """
         Get list of active tasks id's in vmanage
 
@@ -206,5 +206,5 @@ class TaskAPI:
         List[str]: active tasks id's
         """
         url = "dataservice/device/action/status/tasks"
-        tasks = session.get_json(url)
+        tasks = self.session.get_json(url)
         return [process["processId"] for process in tasks["runningTasks"]]
