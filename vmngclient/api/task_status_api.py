@@ -96,7 +96,8 @@ class TaskAPI:
             activity_text (str): activity text
 
         Returns:
-            task (TaskStatus):
+            Tuple[bool, DataSequence[SubTaskData]]: returns True if all subtasks are success
+             or returns False if at least one is failed
         """
         success_statuses = [cast(OperationStatus, exit_status.value) for exit_status in success_statuses]
         failure_statuses = [cast(OperationStatus, exit_status.value) for exit_status in failure_statuses]
