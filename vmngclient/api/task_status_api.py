@@ -84,7 +84,7 @@ class TaskAPI:
             # Keep asking for reboot status until it's not in exit_statuses (Failure or Success)
             or timeout is not achieved (3000s)
             task = TaskAPI(session,reboot_action.task_id).wait_for_completed()
-            if task[0]:
+            if task.result:
                 #do something
             else:
                 #do something else
