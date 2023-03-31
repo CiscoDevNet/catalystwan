@@ -87,7 +87,6 @@ class TestCLITemplate(unittest.TestCase):
         # Act
         answer = template.generate_payload()
         # Assert
-        print(answer)
         templateConfiguration = (
             "        system\n"
             "        host-name               host5\n"
