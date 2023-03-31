@@ -30,7 +30,6 @@ class ResourcePoolAPI:
         return response.dataseq(ResourcePoolData)
 
     def create(self) -> DataSequence[ResourcePoolData]:
-
         response = self.session.put(url="/dataservice/resourcepool/resource/vpn")
         return response.dataseq(ResourcePoolData)
 
