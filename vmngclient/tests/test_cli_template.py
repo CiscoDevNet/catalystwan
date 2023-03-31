@@ -107,7 +107,6 @@ class TestCLITemplate(unittest.TestCase):
             "        !\n"
             "        usergroup netadmin"
         )
-
         proper_answer = {
             "templateName": "test",
             "templateDescription": "test",
