@@ -25,6 +25,19 @@ class TaskResult:
     result: bool
     sub_tasks_data: DataSequence[SubTaskData]
 
+class TaskData(DataclassBase):
+    details_url: str = field(metadata={FIELD_NAME: "detailsURL"})
+    user_session_username: str = field(metadata={FIELD_NAME: "userSessionUserName"})
+    rid: int = field(metadata={FIELD_NAME: "@rid"})
+    tenant_name: str = field(metadata={FIELD_NAME: "tenantName"})
+    process_id: str = field(metadata={FIELD_NAME: "processId"})
+    name: str
+    tenant_id: str = field(metadata={FIELD_NAME: "tenantId"})
+    user_session_ip: str = field(metadata={FIELD_NAME: "userSessionIP"})
+    action: str
+    start_time: int = field(metadata={FIELD_NAME: "startTime"})
+    end_time: int = field(metadata={FIELD_NAME: "endTime"})
+    status: str
 
 @define
 class SubTaskData(DataclassBase):
@@ -39,6 +52,27 @@ class SubTaskData(DataclassBase):
     hostname: str = field(metadata={FIELD_NAME: "host-name"})
     site_id: str = field(metadata={FIELD_NAME: "site-id"})
 
+class TasksAPI():
+    """
+    API class for getting data about tasks
+    """
+
+    def __init__(self, session: vManageSession):
+        self.session = session
+
+    def get_all_tasks(self) -> DataSequence[TaskData]:
+        """
+        Get list of active tasks id's in vmanage
+
+        Args:
+            session (vManageSession): session
+
+        Returns:
+        List[str]: active tasks id's
+        """
+        url = "dataservice/device/action/status/tasks"
+        tasks = self.session.get_json(url)
+        return DataSequence(TaskData, [create_dataclass(task) for task in tasks["runningTasks"]])
 
 class TaskAPI:
     """
@@ -179,22 +213,23 @@ class TaskAPI:
         return TaskResult(result, self.task_data)  # type: ignore
 
     def get_task_data(self, delay_seconds: int = 5) -> DataSequence[SubTaskData]:
-        self.task_data = self.session.get_data(self.url)
         self.__check_if_data_is_available(delay_seconds)
+        task_data = self.session.get_data(self.url)
 
         return DataSequence(
             SubTaskData,
-            [create_dataclass(SubTaskData, subtask_data) for subtask_data in self.task_data],  # type: ignore
+            [create_dataclass(SubTaskData, subtask_data) for subtask_data in task_data],  # type: ignore
         )
 
     def __check_if_data_is_available(self, delay_seconds):
 
-        if not self.task_data:
-            all_tasks_ids = self.__get_all_tasks()
+        task_data = self.session.get_data(self.url)
+        if not task_data:
+            all_tasks_ids = [task.process_id for task in TasksAPI(self.session).get_all_tasks()]
             if self.task_id in all_tasks_ids:
                 sleep(delay_seconds)
-                self.task_data = self.session.get_data(self.url)
-                if not self.task_data:
+                task_data = self.session.get_data(self.url)
+                if not task_data:
                     raise EmptyTaskResponseError(
                         f"Task id {self.task_id} registered by vManage in all tasks list, "
                         f"but response about it's status didn't contain any information."
@@ -202,16 +237,3 @@ class TaskAPI:
             else:
                 raise TaskNotRegisteredError(f"Task id {self.task_id} is not registered by vManage.")
 
-    def __get_all_tasks(self) -> List[str]:
-        """
-        Get list of active tasks id's in vmanage
-
-        Args:
-            session (vManageSession): session
-
-        Returns:
-        List[str]: active tasks id's
-        """
-        url = "dataservice/device/action/status/tasks"
-        tasks = self.session.get_json(url)
-        return [process["processId"] for process in tasks["runningTasks"]]
