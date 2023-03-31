@@ -7,9 +7,9 @@ from vmngclient.exceptions import RetrieveIntervalOutOfRange
 from vmngclient.utils.alarm_status import Severity
 from vmngclient.utils.certificate_status import ValidityPeriod
 from vmngclient.utils.creation_tools import FIELD_NAME, asdict, convert_attributes
-from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
+from vmngclient.utils.template_type import TemplateType
 
 
 class DataclassBase:
@@ -216,24 +216,32 @@ class User(DataclassBase):
 
 
 @define
-class Template(DataclassBase):
-    device_type_str: str = field(metadata={FIELD_NAME: "deviceType"})
-    device_type: DeviceModel = field(init=False)
+class TemplateInfo(DataclassBase):
     last_updated_by: str = field(metadata={FIELD_NAME: "lastUpdatedBy"})
     resource_group: str = field(metadata={FIELD_NAME: "resourceGroup"})
-    template_class: str = field(metadata={FIELD_NAME: "templateClass"})
-    config_type: str = field(metadata={FIELD_NAME: "configType"})
     id: str = field(metadata={FIELD_NAME: "templateId"})
     factory_default: bool = field(metadata={FIELD_NAME: "factoryDefault"})
     name: str = field(metadata={FIELD_NAME: "templateName"})
     devices_attached: int = field(metadata={FIELD_NAME: "devicesAttached"})
     description: str = field(metadata={FIELD_NAME: "templateDescription"})
-    draft_mode: str = field(metadata={FIELD_NAME: "draftMode"})
     last_updated_on: dt.datetime = field(metadata={FIELD_NAME: "lastUpdatedOn"})
-    template_attached: int = field(metadata={FIELD_NAME: "templateAttached"})
 
-    def __attrs_post_init__(self):
-        self.device_type = DeviceModel(self.device_type_str)
+
+@define
+class FeatureTemplateInfo(TemplateInfo):
+    template_type: str = field(metadata={FIELD_NAME: "templateType"})
+    device_type: List[str] = field(metadata={FIELD_NAME: "deviceType"})
+    version: str = field(metadata={FIELD_NAME: "templateMinVersion"})
+
+
+@define
+class DeviceTemplateInfo(TemplateInfo):
+    device_type: str = field(metadata={FIELD_NAME: "deviceType"})
+    template_class: str = field(metadata={FIELD_NAME: "templateClass"})
+    config_type: TemplateType = field(converter=TemplateType, metadata={FIELD_NAME: "configType"})
+    draft_mode: str = field(metadata={FIELD_NAME: "draftMode"})
+    template_attached: int = field(metadata={FIELD_NAME: "templateAttached"})
+    device_role: Optional[str] = field(default=None, metadata={FIELD_NAME: "deviceRole"})
 
 
 @define
@@ -309,7 +317,9 @@ class TenantInfo(DataclassBase):
     organization_name: str = field(metadata={FIELD_NAME: "orgName"})
     sub_domain: str = field(metadata={FIELD_NAME: "subDomain"})
     id: str = field(metadata={FIELD_NAME: "tenantId"})
-    flake_id: int = field(metadata={FIELD_NAME: "flakeId"})
+    description: Optional[str] = field(default=None, metadata={FIELD_NAME: "desc"})
+    state: Optional[str] = field(default=None)
+    flake_id: Optional[int] = field(default=None, metadata={FIELD_NAME: "flakeId"})
 
 
 @define(frozen=True)
@@ -435,7 +445,7 @@ class TenantRadiusServer(DataclassBase):
 
     timeout: int = field(default=3, metadata={FIELD_NAME: "timeout"})
     retransmit: int = field(default=5, metadata={FIELD_NAME: "retransmit"})
-    server: List[RadiusServer] = field(factory=list, metadata={FIELD_NAME: "server"})
+    servers: List[RadiusServer] = field(factory=list, metadata={FIELD_NAME: "server"})
 
 
 @define(frozen=True)
@@ -461,7 +471,7 @@ class TenantTacacsServer(DataclassBase):
 
     timeout: int = field(default=3, metadata={FIELD_NAME: "timeout"})
     authentication: str = field(default="PAP", metadata={FIELD_NAME: "authentication"})
-    server: List[TacacsServer] = field(factory=list, metadata={FIELD_NAME: "server"})
+    servers: List[TacacsServer] = field(factory=list, metadata={FIELD_NAME: "server"})
 
 
 @define

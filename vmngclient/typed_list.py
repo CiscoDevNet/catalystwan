@@ -167,9 +167,10 @@ class DataSequence(TypedList[T], Generic[T]):
         """Returns the only element of a sequence, or a default value if the sequence is empty.
 
         ## Example:
-        >>> seq = DataSequence(User, [User(username="User1"), User(username="User2")])
+        >>> seq = DataSequence(User, [User(username="User1")])
         >>> seq.single_or_default()
         User(username='User1', password=None, group=[], locale=None, description=None, resource_group=None)
+        >>> seq = DataSequence(User, [User(username="User1"), User(username="User2")])
         >>> seq.filter(username="User1").single_or_default()
         User(username='User1', password=None, group=[], locale=None, description=None, resource_group=None)
 
@@ -207,3 +208,23 @@ class DataSequence(TypedList[T], Generic[T]):
         return DataSequence(
             self._type, filter(lambda x: all(getattr(x, a) == kwargs[a] for a in annotations), self.data)
         )
+
+    def first(self) -> T:
+        """Returns the first element of a sequence.
+
+        ## Example:
+        >>> seq = DataSequence(Device, [Device(hostname="dev-1"), Device(hostname="dev-2"), Device(hostname="dev-3")])
+        >>> seq.first()
+        Device(hostname="dev-1", personality=Personality.EDGE, ...)
+
+        Raises:
+            InvalidOperationError: Raises when there is no elements in the sequence.
+
+        Returns:
+            [T]: The single element of the input sequence.
+        """
+
+        if len(self.data) < 1:
+            raise InvalidOperationError("The input sequence contains no elements.")
+
+        return self.data[0]
