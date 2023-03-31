@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from time import sleep
-from typing import TYPE_CHECKING, List, Tuple, cast
+from typing import TYPE_CHECKING, List, cast
 
 from attr import define, field  # type: ignore
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
@@ -18,6 +18,12 @@ from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 
 logger = logging.getLogger(__name__)
+
+
+@define
+class TaskResult:
+    result: bool
+    sub_tasks_data: DataSequence[SubTaskData]
 
 
 @define
@@ -63,7 +69,7 @@ class TaskAPI:
             OperationStatusId.FAILURE,
         ],
         activity_text: str = "",
-    ) -> Tuple[bool, DataSequence[SubTaskData]]:
+    ) -> TaskResult:
         """
         Method to check subtasks statuses
 
@@ -96,8 +102,8 @@ class TaskAPI:
             activity_text (str): activity text
 
         Returns:
-            Tuple[bool, DataSequence[SubTaskData]]: returns True if all subtasks are success
-             or returns False if at least one is failed
+            TaskResult(): result attr is True if all subtasks are success
+             or is False if at least one is failed
         """
         success_statuses = [cast(OperationStatus, exit_status.value) for exit_status in success_statuses]
         failure_statuses = [cast(OperationStatus, exit_status.value) for exit_status in failure_statuses]
@@ -170,7 +176,7 @@ class TaskAPI:
             logger.info("Task polling finished, because all subtasks successfully finished.")
         else:
             logger.info("Task polling finished, because at least one subtask failed.")
-        return result, self.task_data
+        return TaskResult(result, self.task_data)  # type: ignore
 
     def get_task_data(self, delay_seconds: int = 5) -> DataSequence[SubTaskData]:
         self.task_data = self.session.get_data(self.url)

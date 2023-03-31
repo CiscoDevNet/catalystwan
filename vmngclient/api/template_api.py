@@ -152,10 +152,10 @@ class TemplatesAPI:
         logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
         task = TaskAPI(session=self.session, task_id=response["id"]).wait_for_completed()
-        if task[0]:
+        if task.result:
             return True
         logger.warning(f"Failed to attach tempate: {name} to the device: {device.hostname}.")
-        logger.warning(f"Task activity information: {task[1].single_or_default().activity}")
+        logger.warning(f"Task activity information: {task.sub_tasks_data.single_or_default().activity}")
         return False
 
     def _attach_cli(self, name: str, device: Device, is_edited: bool = False) -> bool:
@@ -201,10 +201,10 @@ class TemplatesAPI:
         logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
         task = TaskAPI(session=self.session, task_id=response["id"]).wait_for_completed()
-        if task[0]:
+        if task.result:
             return True
         logger.warning(f"Failed to attach tempate: {name} to the device: {device.hostname}.")
-        logger.warning(f"Task activity information: {task[1].single_or_default().activity}")
+        logger.warning(f"Task activity information: {task.sub_tasks_data.single_or_default().activity}")
         return False
 
     def deatach(self, device: Device) -> bool:
@@ -225,10 +225,10 @@ class TemplatesAPI:
         logger.info(f"Changing mode to cli mode for {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
         task = TaskAPI(session=self.session, task_id=response["id"]).wait_for_completed()
-        if task[0]:
+        if task.result:
             return True
         logger.warning(f"Failed to change to cli mode for device: {device.hostname}.")
-        logger.warning(f"Task activity information: {task[1].single_or_default().activity}")
+        logger.warning(f"Task activity information: {task.sub_tasks_data.single_or_default().activity}")
         return False
 
     @overload

@@ -75,7 +75,7 @@ class TenantBackupRestoreAPI:
         """
         response = self.session.get_json("/dataservice/tenantbackup/export")
         status = TaskAPI(self.session, response["processId"]).wait_for_completed(timeout_seconds=timeout)
-        string = re.search("""file location: (.*)""", status[1].single_or_default().activity[-1])
+        string = re.search("""file location: (.*)""", status.sub_tasks_data.single_or_default().activity[-1])
         assert string, "File location not found."
         return string.group(1)
 
@@ -147,6 +147,6 @@ class TenantBackupRestoreAPI:
         response = self.session.post(url, data={}, files=files)
         return (
             TaskAPI(self.session, response.json()["processId"])
-            .wait_for_completed(timeout_seconds=timeout)[1]
-            .single_or_default()
+            .wait_for_completed(timeout_seconds=timeout)
+            .sub_tasks_data.single_or_default()
         )
