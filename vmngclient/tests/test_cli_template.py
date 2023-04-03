@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import patch
+from urllib.error import HTTPError
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
 
@@ -115,3 +116,82 @@ class TestCLITemplate(unittest.TestCase):
             "configType": "file",
         }
         self.assertEqual(answer, proper_answer)
+
+    def test_generate_payload_cedge(self):
+        # Arrange
+        template = CLITemplate(
+            name="test", description="test", device_model=DeviceModel.VEDGE_C8000V, config=self.template
+        )
+        # Act
+        answer = template.generate_payload()
+        # Assert
+        templateConfiguration = (
+            "        system\n"
+            "        host-name               host5\n"
+            "        system-ip               192.168.1.25\n"
+            "        site-id                 2\n"
+            "        admin-tech-on-failure\n"
+            "        no route-consistency-check\n"
+            "        no vrrp-advt-with-phymac\n"
+            '        sp-organization-name    "organization"\n'
+            '        organization-name       "organization"\n'
+            "        vbond vbond\n"
+            "        aaa\n"
+            "        auth-order      local radius tacacs\n"
+            "        usergroup basic\n"
+            "        task system read\n"
+            "        task interface read\n"
+            "        !\n"
+            "        usergroup netadmin"
+        )
+        proper_answer = {
+            "templateName": "test",
+            "templateDescription": "test",
+            "deviceType": "vedge-C8000V",
+            "templateConfiguration": templateConfiguration,
+            "factoryDefault": False,
+            "configType": "file",
+            "cliType": "device",
+            "draftMode": False,
+        }
+        self.assertEqual(answer, proper_answer)
+
+    @patch("vmngclient.session.vManageSession")
+    def test_update_suceess(self, mock_session):
+        # Arrange
+        mock_session.put.return_value = {"data": {"attachedDevices": []}}
+        templateConfiguration = (
+            "        system\n"
+            "        host-name               host6\n"
+            "        system-ip               192.168.1.26\n"
+        )
+        config = CiscoConfParse(templateConfiguration.splitlines())
+        # Act
+        temp = CLITemplate(name="test", description="test", device_model=DeviceModel.VEDGE)
+        result = temp.update(session=mock_session, id="temp_id", config=config)
+        # Assert
+        self.assertTrue(result)
+
+    @patch("vmngclient.session.vManageSession")
+    def test_update_template_failure(self, mock_session):
+        # Arrange
+
+        mock_session.put.side_effect = HTTPError("url", 400, "error_400", "msg", 1)
+
+        templateConfiguration = (
+            "        system\n"
+            "        host-name               host6\n"
+            "        system-ip               192.168.1.26\n"
+        )
+        config = CiscoConfParse(templateConfiguration.splitlines())
+        temp = CLITemplate(name="test", description="test", device_model=DeviceModel.VEDGE)
+
+        # Act
+        with self.assertRaises(HTTPError):
+            temp.update(session=mock_session, id="temp_id", config=config)
+
+    # def test_compare_template_suceess(self):
+    #     pass
+
+    # def test_compare_template_false(self):
+    #     pass
