@@ -167,8 +167,8 @@ class TestCLITemplate(unittest.TestCase):
         )
         config = CiscoConfParse(templateConfiguration.splitlines())
         # Act
-        temp = CLITemplate(name="test", description="test", device_model=DeviceModel.VEDGE)
-        result = temp.update(session=mock_session, id="temp_id", config=config)
+        template = CLITemplate(name="test", description="test", device_model=DeviceModel.VEDGE)
+        result = template.update(session=mock_session, id="temp_id", config=config)
         # Assert
         self.assertTrue(result)
 
@@ -184,14 +184,29 @@ class TestCLITemplate(unittest.TestCase):
             "        system-ip               192.168.1.26\n"
         )
         config = CiscoConfParse(templateConfiguration.splitlines())
-        temp = CLITemplate(name="test", description="test", device_model=DeviceModel.VEDGE)
+        template = CLITemplate(name="test", description="test", device_model=DeviceModel.VEDGE)
 
         # Act
         with self.assertRaises(HTTPError):
-            temp.update(session=mock_session, id="temp_id", config=config)
+            template.update(session=mock_session, id="temp_id", config=config)
 
-    # def test_compare_template_suceess(self):
-    #     pass
-
-    # def test_compare_template_false(self):
-    #     pass
+    def test_compare_template(self):
+        # Arrange
+        templateConfiguration1 = (
+            "        system\n"
+            "        host-name               host6\n"
+            "        system-ip               192.168.1.26\n"
+        )
+        config1 = CiscoConfParse(templateConfiguration1.splitlines())
+        templateConfiguration2 = (
+            "        system\n"
+            "        host-name               host6\n"
+            "        system-ip               192.168.1.26\n"
+        )
+        config2 = CiscoConfParse(templateConfiguration2.splitlines())
+        # Act
+        result = CLITemplate(name="test", description="test", device_model=DeviceModel.VEDGE).compare_template(
+            config1, config2
+        )
+        # Assert
+        self.assertEqual(result, "")
