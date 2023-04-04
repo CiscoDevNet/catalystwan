@@ -60,9 +60,21 @@ class TestTemplatesAPI(unittest.TestCase):
             model="vedge-cloud",
             status="normal",
         )
-        self.task = TaskResult(
-            True, DataSequence(SubTaskData, [SubTaskData("Success", "success", "", [], "", "", 1, "", "", "")])
+        sub_tasks_data = SubTaskData.parse_obj(
+            {
+                "status": "Success",
+                "statusId": "success",
+                "action": "",
+                "activity": [],
+                "currentActivity": "",
+                "actionConfig": "",
+                "order": 1,
+                "uuid": "",
+                "host-name": "",
+                "site-id": "",
+            }
         )
+        self.task = TaskResult(result=True, sub_tasks_data=[sub_tasks_data])
 
     @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
