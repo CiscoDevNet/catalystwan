@@ -83,7 +83,6 @@ class TasksAPI:
         self.__check_if_data_is_available(delay_seconds)
         task_data = self.session.get_data(self.url)
         return [SubTaskData.parse_obj(subtask_data) for subtask_data in task_data]
-        return DataSequence(SubTaskData, [SubTaskData.parse_obj(subtask_data) for subtask_data in task_data])
 
     def __check_if_data_is_available(self, delay_seconds):
 
