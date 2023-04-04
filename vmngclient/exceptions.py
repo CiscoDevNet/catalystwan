@@ -47,3 +47,13 @@ class AlreadyExistsError(Exception):
     """Raised when an entity that we attempted to create already exists."""
 
     pass
+
+
+class NotLoggedInError(Exception):
+    """Raised when session is not properly logged in."""
+
+    pass
+
+
+class CookieNotValid(Exception):
+    pass

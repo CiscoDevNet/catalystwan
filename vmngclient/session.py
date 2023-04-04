@@ -13,7 +13,7 @@ from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.api.api_containter import APIContainter
-from vmngclient.exceptions import InvalidOperationError
+from vmngclient.exceptions import CookieNotValid, InvalidOperationError, NotLoggedInError
 from vmngclient.response import response_history_debug, vManageResponse
 from vmngclient.vmanage_auth import vManageAuth
 
@@ -192,20 +192,21 @@ class vManageSession(vManageResponseAdapter):
             self.logger.debug(self.response_trace(exception.response, exception.request))
             self.logger.error(exception)
             raise
-
-        if response.request.url and "passwordReset.html" in response.request.url:
-            raise InvalidOperationError("Password must be changed to use this session.")
-
-        if self.enable_relogin and response.headers.get("set-cookie"):
-            if not self.__second_relogin_try:
-                self.logger.warning("Relogin session...")
+        except CookieNotValid as exception:
+            if self.enable_relogin and not self.__second_relogin_try:
+                self.logger.warning(f"Loging to session again. Reason: '{str(exception)}'")
                 self.auth = vManageAuth(self.base_url, self.username, self.password, verify=False)
                 self.__second_relogin_try = True
                 return self.request(method, url, *args, **kwargs)
+            elif self.enable_relogin and self.__second_relogin_try:
+                raise NotLoggedInError("Session is not properly logged in and relogin failed.")
             else:
-                self.logger.warning("Relogin failed.")
-        else:
-            self.__second_relogin_try = False
+                raise NotLoggedInError("Session is not properly logged in and relogin is not enabled.")
+
+        self.__second_relogin_try = False
+
+        if response.request.url and "passwordReset.html" in response.request.url:
+            raise InvalidOperationError("Password must be changed to use this session.")
 
         try:
             response.raise_for_status()
