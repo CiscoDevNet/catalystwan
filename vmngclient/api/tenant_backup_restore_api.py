@@ -8,7 +8,7 @@ import re
 from pathlib import Path
 from typing import TYPE_CHECKING, List, Optional
 
-from vmngclient.api.task_status_api import SubTaskData, TaskAPI
+from vmngclient.api.task_status_api import SubTaskData, Task
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -74,8 +74,8 @@ class TenantBackupRestoreAPI:
             fileName = ProviderBackupRestore.export()
         """
         response = self.session.get_json("/dataservice/tenantbackup/export")
-        status = TaskAPI(self.session, response["processId"]).wait_for_completed(timeout_seconds=timeout)
-        string = re.search("""file location: (.*)""", status.sub_tasks_data.single_or_default().activity[-1])
+        status = Task(self.session, response["processId"]).wait_for_completed(timeout_seconds=timeout)
+        string = re.search("""file location: (.*)""", status.sub_tasks_data[0].activity[-1])
         assert string, "File location not found."
         return string.group(1)
 
@@ -146,7 +146,7 @@ class TenantBackupRestoreAPI:
         files = {"file": (file.name, open(str(file), "rb"))}
         response = self.session.post(url, data={}, files=files)
         return (
-            TaskAPI(self.session, response.json()["processId"])
+            Task(self.session, response.json()["processId"])
             .wait_for_completed(timeout_seconds=timeout)
-            .sub_tasks_data.single_or_default()
+            .sub_tasks_data[0]
         )

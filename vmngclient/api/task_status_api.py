@@ -4,63 +4,68 @@ import logging
 from time import sleep
 from typing import TYPE_CHECKING, List, cast
 
-from attr import define, field  # type: ignore
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
-
-from vmngclient.dataclasses import DataclassBase  # type: ignore
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
+from pydantic import BaseModel, Field  # type: ignore
+
 from vmngclient.exceptions import EmptyTaskResponseError, TaskNotRegisteredError
 from vmngclient.typed_list import DataSequence
-from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 
 logger = logging.getLogger(__name__)
 
 
-@define
-class TaskResult:
-    result: bool
-    sub_tasks_data: DataSequence[SubTaskData]
-
-class TaskData(DataclassBase):
-    details_url: str = field(metadata={FIELD_NAME: "detailsURL"})
-    user_session_username: str = field(metadata={FIELD_NAME: "userSessionUserName"})
-    rid: int = field(metadata={FIELD_NAME: "@rid"})
-    tenant_name: str = field(metadata={FIELD_NAME: "tenantName"})
-    process_id: str = field(metadata={FIELD_NAME: "processId"})
-    name: str
-    tenant_id: str = field(metadata={FIELD_NAME: "tenantId"})
-    user_session_ip: str = field(metadata={FIELD_NAME: "userSessionIP"})
-    action: str
-    start_time: int = field(metadata={FIELD_NAME: "startTime"})
-    end_time: int = field(metadata={FIELD_NAME: "endTime"})
+class SubTaskData(BaseModel):
     status: str
-
-@define
-class SubTaskData(DataclassBase):
-    status: str
-    status_id: str = field(metadata={FIELD_NAME: "statusId"})
+    status_id: str = Field(alias="statusId")
     action: str
     activity: List[str]
-    current_activity: str = field(metadata={FIELD_NAME: "currentActivity"})
-    action_config: str = field(metadata={FIELD_NAME: "actionConfig"})
+    current_activity: str = Field(alias="currentActivity")
+    action_config: str = Field(alias="actionConfig")
     order: int
     uuid: str
-    hostname: str = field(metadata={FIELD_NAME: "host-name"})
-    site_id: str = field(metadata={FIELD_NAME: "site-id"})
+    hostname: str = Field(alias="host-name")
+    site_id: str = Field(alias="site-id")
 
-class TasksAPI():
+
+class TaskResult(BaseModel):
+    result: bool
+    sub_tasks_data: List[SubTaskData]
+
+
+class RunningTaskData(BaseModel):
+    details_url: str = Field(alias="detailsURL")
+    user_session_username: str = Field(alias="userSessionUserName")
+    rid: int = Field(alias="@rid")
+    tenant_name: str = Field("tenantName")
+    process_id: str = Field(alias="processId")
+    name: str
+    tenant_id: str = Field(alias="tenantId")
+    user_session_ip: str = Field(alias="userSessionIP")
+    action: str
+    start_time: int = Field(alias="startTime")
+    end_time: int = Field(alias="endTime")
+    status: str
+
+
+class TasksData(BaseModel):
+    running_tasks: List[RunningTaskData] = Field(alias="runningTasks")
+
+
+class TasksAPI:
     """
     API class for getting data about tasks
     """
 
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: vManageSession, task_id: str):
         self.session = session
+        self.task_id = task_id
+        self.url = f"/dataservice/device/action/status/{self.task_id}"
 
-    def get_all_tasks(self) -> DataSequence[TaskData]:
+    def get_all_tasks(self) -> TasksData:
         """
         Get list of active tasks id's in vmanage
 
@@ -71,10 +76,33 @@ class TasksAPI():
         List[str]: active tasks id's
         """
         url = "dataservice/device/action/status/tasks"
-        tasks = self.session.get_json(url)
-        return DataSequence(TaskData, [create_dataclass(task) for task in tasks["runningTasks"]])
+        json = self.session.get_json(url)
+        return TasksData.parse_obj(json)
 
-class TaskAPI:
+    def get_task_data(self, delay_seconds: int = 5) -> List[SubTaskData]:
+        self.__check_if_data_is_available(delay_seconds)
+        task_data = self.session.get_data(self.url)
+        return [SubTaskData.parse_obj(subtask_data) for subtask_data in task_data]
+        return DataSequence(SubTaskData, [SubTaskData.parse_obj(subtask_data) for subtask_data in task_data])
+
+    def __check_if_data_is_available(self, delay_seconds):
+
+        task_data = self.session.get_data(self.url)
+        if not task_data:
+            all_tasks_ids = [task.process_id for task in self.get_all_tasks().running_tasks]
+            if self.task_id in all_tasks_ids:
+                sleep(delay_seconds)
+                task_data = self.session.get_data(self.url)
+                if not task_data:
+                    raise EmptyTaskResponseError(
+                        f"Task id {self.task_id} registered by vManage in all tasks list, "
+                        f"but response about it's status didn't contain any information."
+                    )
+            else:
+                raise TaskNotRegisteredError(f"Task id {self.task_id} is not registered by vManage.")
+
+
+class Task:
     """
     API class for getting data about task/sub-tasks
     """
@@ -83,7 +111,7 @@ class TaskAPI:
         self.session = session
         self.task_id = task_id
         self.url = f"/dataservice/device/action/status/{self.task_id}"
-        self.task_data: DataSequence[SubTaskData]
+        self.task_data: List[SubTaskData]
 
     def wait_for_completed(
         self,
@@ -185,7 +213,7 @@ class TaskAPI:
             retry=retry_if_result(check_status),
             retry_error_callback=log_exception,
         )
-        def wait_for_action_finish() -> DataSequence[SubTaskData]:
+        def wait_for_action_finish() -> List[SubTaskData]:
             """
             Keep asking for task status, status_id,
             activity(optional), untill check_status is True
@@ -194,13 +222,13 @@ class TaskAPI:
                 DataSequence[SubTaskData]
             """
 
-            self.task_data = self.get_task_data(delay_seconds)
-            task_statuses = [task.status for task in self.task_data]
-            task_statuses_id = [task.status_id for task in self.task_data]
-            task_activities = [task.activity for task in self.task_data]
+            self.task_data = TasksAPI(self.session, self.task_id).get_task_data(delay_seconds)
+            sub_task_statuses = [task.status for task in self.task_data]
+            sub_task_statuses_id = [task.status_id for task in self.task_data]
+            sub_task_activities = [task.activity for task in self.task_data]
             logger.info(
                 f"Sub-tasks data for task {self.task_id}: \n "
-                f"statuses: {task_statuses}, status_ids: {task_statuses_id}, activities: {task_activities}."
+                f"statuses: {sub_task_statuses}, status_ids: {sub_task_statuses_id}, activities: {sub_task_activities}."
             )
             return self.task_data
 
@@ -209,31 +237,5 @@ class TaskAPI:
         if result:
             logger.info("Task polling finished, because all subtasks successfully finished.")
         else:
-            logger.info("Task polling finished, because at least one subtask failed.")
-        return TaskResult(result, self.task_data)  # type: ignore
-
-    def get_task_data(self, delay_seconds: int = 5) -> DataSequence[SubTaskData]:
-        self.__check_if_data_is_available(delay_seconds)
-        task_data = self.session.get_data(self.url)
-
-        return DataSequence(
-            SubTaskData,
-            [create_dataclass(SubTaskData, subtask_data) for subtask_data in task_data],  # type: ignore
-        )
-
-    def __check_if_data_is_available(self, delay_seconds):
-
-        task_data = self.session.get_data(self.url)
-        if not task_data:
-            all_tasks_ids = [task.process_id for task in TasksAPI(self.session).get_all_tasks()]
-            if self.task_id in all_tasks_ids:
-                sleep(delay_seconds)
-                task_data = self.session.get_data(self.url)
-                if not task_data:
-                    raise EmptyTaskResponseError(
-                        f"Task id {self.task_id} registered by vManage in all tasks list, "
-                        f"but response about it's status didn't contain any information."
-                    )
-            else:
-                raise TaskNotRegisteredError(f"Task id {self.task_id} is not registered by vManage.")
-
+            logger.info("Task polling finished, because at least one subtask failed or task is timeout.")
+        return TaskResult(result=result, sub_tasks_data=self.task_data)
