@@ -135,16 +135,17 @@ class Task:
         Method to check subtasks statuses
 
         Example:
+            # create session
             session = create_vManageSession(ip_address,admin_username,password,port=port)
-            devices = DevicesAPI(session).devices
-            vsmart_device = [dev for dev in devices if dev.personality == Personality.VSMART][0]
+            devices = DevicesAPI(session).get()
+            vsmart = devices.filter(personality= Personality.VSMART]).single_or_default()
 
-            reboot_action = RebootAction(session,devices)
-            reboot_action.execute()
+            # Prepare some action, and get it's id
+            upgrade_id = SoftwareAction().upgrade_software()
 
             # Keep asking for reboot status until it's not in exit_statuses (Failure or Success)
             or timeout is not achieved (3000s)
-            task = TaskAPI(session,reboot_action.task_id).wait_for_completed()
+            task = Task(session,reboot_action.task_id).wait_for_completed()
             if task.result:
                 #do something
             else:
