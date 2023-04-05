@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 from vmngclient.api.software_action_api import Family, InstallSpecHelper, SoftwareActionAPI
-from vmngclient.api.versions_utils import DeviceCategory, DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
+from vmngclient.api.versions_utils import DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 
 
@@ -35,8 +35,8 @@ class TestSoftwareAcionAPI(unittest.TestCase):
 
         mock_session = Mock()
         self.mock_repository_object = RepositoryAPI(mock_session)
-        self.mock_device_versions = DeviceVersions(self.mock_repository_object, DeviceCategory.CONTROLLERS)
-        self.mock_software_action_obj = SoftwareActionAPI(mock_session, DeviceCategory.VEDGES)
+        self.mock_device_versions = DeviceVersions(self.mock_repository_object)
+        self.mock_software_action_obj = SoftwareActionAPI(mock_session)
 
     @patch("vmngclient.session.vManageSession")
     @patch.object(SoftwareActionAPI, "_downgrade_check")
