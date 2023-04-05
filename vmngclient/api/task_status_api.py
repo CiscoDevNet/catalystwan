@@ -72,7 +72,7 @@ class TasksAPI:
             session (vManageSession): session
 
         Returns:
-        List[str]: active tasks id's
+        TasksData: Data about all tasks in vmanage
         """
         url = "dataservice/device/action/status/tasks"
         json = self.session.get_json(url)
