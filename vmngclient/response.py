@@ -8,7 +8,7 @@ from requests.exceptions import JSONDecodeError
 
 from vmngclient import with_proc_info_header
 from vmngclient.dataclasses import DataclassBase
-from vmngclient.exceptions import CookieNotValid
+from vmngclient.exceptions import CookieNotValidError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 
@@ -110,7 +110,7 @@ class vManageResponse(Response):
 
     def __init__(self, response: Response):
         if response.headers.get("set-cookie"):
-            raise CookieNotValid("Session cookie is not valid.")
+            raise CookieNotValidError("Session cookie is not valid.")
         self.__dict__.update(response.__dict__)
         try:
             self.payload = JsonPayload(response.json())

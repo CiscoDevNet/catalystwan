@@ -49,11 +49,9 @@ class AlreadyExistsError(Exception):
     pass
 
 
-class NotLoggedInError(Exception):
-    """Raised when session is not properly logged in."""
-
+class AuthenticationError(Exception):
     pass
 
 
-class CookieNotValid(Exception):
+class CookieNotValidError(Exception):
     pass

@@ -13,7 +13,7 @@ from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.api.api_containter import APIContainter
-from vmngclient.exceptions import CookieNotValid, InvalidOperationError, NotLoggedInError
+from vmngclient.exceptions import AuthenticationError, CookieNotValidError, InvalidOperationError
 from vmngclient.response import response_history_debug, vManageResponse
 from vmngclient.vmanage_auth import vManageAuth
 
@@ -192,16 +192,16 @@ class vManageSession(vManageResponseAdapter):
             self.logger.debug(self.response_trace(exception.response, exception.request))
             self.logger.error(exception)
             raise
-        except CookieNotValid as exception:
+        except CookieNotValidError as exception:
             if self.enable_relogin and not self.__second_relogin_try:
                 self.logger.warning(f"Loging to session again. Reason: '{str(exception)}'")
                 self.auth = vManageAuth(self.base_url, self.username, self.password, verify=False)
                 self.__second_relogin_try = True
                 return self.request(method, url, *args, **kwargs)
             elif self.enable_relogin and self.__second_relogin_try:
-                raise NotLoggedInError("Session is not properly logged in and relogin failed.")
+                raise AuthenticationError("Session is not properly logged in and relogin failed.")
             else:
-                raise NotLoggedInError("Session is not properly logged in and relogin is not enabled.")
+                raise AuthenticationError("Session is not properly logged in and relogin is not enabled.")
 
         self.__second_relogin_try = False
 
