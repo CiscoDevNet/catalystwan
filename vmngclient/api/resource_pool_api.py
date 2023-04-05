@@ -46,7 +46,8 @@ class ResourcePoolAPI:
         Returns:
             DataSequence[ResourcePoolData].
         """
-        response = self.session.put(url="/dataservice/resourcepool/resource/vpn")
+        response = self.session.put(url=ResourcePoolAPI.URL)
+        logger.info("Create Resource poll vpn.")
         return response.dataseq(ResourcePoolData)
 
     def delete(self, tenant_id: str, tenant_vpn: int) -> bool:
@@ -63,6 +64,4 @@ class ResourcePoolAPI:
         """
         parameters = {"tenantId": tenant_id, "tenant_vpn": tenant_vpn}
         response = self.session.delete(url=ResourcePoolAPI.URL, params=parameters)
-        if response:
-            return True
-        return False
+        return response.ok
