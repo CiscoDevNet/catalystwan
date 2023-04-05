@@ -12,7 +12,6 @@ if TYPE_CHECKING:
 from pydantic import BaseModel, Field  # type: ignore
 
 from vmngclient.exceptions import EmptyTaskResponseError, TaskNotRegisteredError
-from vmngclient.typed_list import DataSequence
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 
 logger = logging.getLogger(__name__)
@@ -80,12 +79,21 @@ class TasksAPI:
         return TasksData.parse_obj(json)
 
     def get_task_data(self, delay_seconds: int = 5) -> List[SubTaskData]:
+        """
+        Get data about all sub-tasks in task
+
+        Args:
+            delay_seconds (int, optional): If vmanage doesn't get data about task, after this time will asks again.
+            Defaults to 5.
+
+        Returns:
+            List[SubTaskData]: List of all sub-tusks
+        """
         self.__check_if_data_is_available(delay_seconds)
         task_data = self.session.get_data(self.url)
         return [SubTaskData.parse_obj(subtask_data) for subtask_data in task_data]
 
     def __check_if_data_is_available(self, delay_seconds):
-
         task_data = self.session.get_data(self.url)
         if not task_data:
             all_tasks_ids = [task.process_id for task in self.get_all_tasks().running_tasks]
@@ -132,7 +140,7 @@ class Task:
         activity_text: str = "",
     ) -> TaskResult:
         """
-        Method to check subtasks statuses
+        Method to check subtasks statuses of the task
 
         Example:
             # create session
@@ -145,7 +153,7 @@ class Task:
 
             # Keep asking for reboot status until it's not in exit_statuses (Failure or Success)
             or timeout is not achieved (3000s)
-            task = Task(session,reboot_action.task_id).wait_for_completed()
+            task = Task(session,upgrade_id).wait_for_completed()
             if task.result:
                 #do something
             else:
@@ -177,7 +185,7 @@ class Task:
         ]
         activity_text = activity_text
 
-        def check_status(task_data: DataSequence[SubTaskData]) -> bool:
+        def check_status(task_data: List[SubTaskData]) -> bool:
             """
             Function checks if condition is met. If so,
             wait_for_completed stops asking for task status
@@ -219,7 +227,7 @@ class Task:
             activity(optional), untill check_status is True
 
             Returns:
-                DataSequence[SubTaskData]
+                List[SubTaskData]
             """
 
             self.task_data = TasksAPI(self.session, self.task_id).get_task_data(delay_seconds)
