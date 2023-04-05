@@ -9,6 +9,7 @@ from vmngclient.api.dashboard_api import DashboardAPI
 from vmngclient.api.logs_api import LogsAPI
 from vmngclient.api.omp_api import OmpAPI
 from vmngclient.api.packet_capture_api import PacketCaptureAPI
+from vmngclient.api.software_action_api import SoftwareActionAPI
 from vmngclient.api.speedtest_api import SpeedtestAPI
 from vmngclient.api.template_api import TemplatesAPI
 from vmngclient.api.tenant_api import TenantsAPI
@@ -34,3 +35,4 @@ class APIContainter:
         self.templates = TemplatesAPI(session)
         self.tenant_backup = TenantBackupRestoreAPI(session)
         self.repository = RepositoryAPI(session)
+        self.software_action = SoftwareActionAPI(session)

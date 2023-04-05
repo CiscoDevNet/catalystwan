@@ -4,13 +4,7 @@ import logging
 from typing import TYPE_CHECKING, Dict, List, cast
 
 from vmngclient.api.software_action_api import DeviceType
-from vmngclient.api.versions_utils import (
-    DeviceCategory,
-    DeviceVersionPayload,
-    DeviceVersions,
-    RemovePartitionPayload,
-    RepositoryAPI,
-)
+from vmngclient.api.versions_utils import DeviceVersionPayload, DeviceVersions, RemovePartitionPayload, RepositoryAPI
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import asdict
 
@@ -30,25 +24,24 @@ class PartitionManagerAPI:
         session = create_vManageSession(...)
 
         # Prepare devices list
-        devices = [device for device in DevicesAPI(session).devices
-                    if device.personality == VSMART]
+        devices = DevicesAPI(session).get()
+        vsmarts = devices.filter(personality=Personality.VSMART)
 
         # Set default partition
-        payload_devices = DeviceVersions(provider,DeviceCategory.CONTROLLERS).get_devices_current_version(devices)
-        partition_manager = PartitionManagerAPI(provider_session_as_tenant_session,DeviceCategory.CONTROLLERS,
-                            DeviceType.CONTROLLERS)
+        payload_devices = DeviceVersions(session).get_devices_current_version(vsmarts)
+        partition_manager = PartitionManagerAPI(session,DeviceType.CONTROLLERS)
         set_partition_id = partition_manager.set_default_partition(payload_devices)
 
         # Check action status
-        wait_for_completed(session, set_partition_id, 3000)
+        TaskAPI(session, software_action_id).wait_for_completed()
 
     """
 
-    def __init__(self, session: vManageSession, device_category: DeviceCategory, device_type: DeviceType) -> None:
+    def __init__(self, session: vManageSession, device_type: DeviceType) -> None:
 
         self.session = session
         self.repository = RepositoryAPI(self.session)
-        self.device_versions = DeviceVersions(self.session, device_category)
+        self.device_versions = DeviceVersions(self.session)
         self.device_type = device_type
 
     def set_default_partition(self, payload_devices: DataSequence[DeviceVersionPayload]) -> str:
@@ -76,7 +69,8 @@ class PartitionManagerAPI:
         """
 
         remove_partition_payload = [
-            RemovePartitionPayload(device.deviceId, device.deviceIP, device.version) for device in devices_payload
+            RemovePartitionPayload(device.deviceId, device.deviceIP, device.version)  # type: ignore
+            for device in devices_payload
         ]
         url = "/dataservice/device/action/removepartition"
         payload = {
@@ -90,9 +84,7 @@ class PartitionManagerAPI:
         return remove_action["id"]
 
     def _check_remove_partition_possibility(self, payload_devices: List[dict]) -> None:
-        devices_versions_repository = self.repository.get_devices_versions_repository(
-            self.device_versions.device_category
-        )
+        devices_versions_repository = self.repository.get_devices_versions_repository()
         invalid_devices = []
         for device in payload_devices:
 

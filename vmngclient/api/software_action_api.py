@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
 
 from attr import define  # type: ignore
 
-from vmngclient.api.versions_utils import DeviceCategory, DeviceVersions, RepositoryAPI
+from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.exceptions import VersionDeclarationError  # type: ignore
 from vmngclient.typed_list import DataSequence
@@ -53,10 +53,10 @@ class InstallSpecification:
 
 class InstallSpecHelper(Enum):
 
-    VMANAGE = InstallSpecification(Family.VMANAGE, VersionType.VMANAGE, DeviceType.VMANAGE)
-    VSMART = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)
-    VBOND = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)
-    VEDGE = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE)
+    VMANAGE = InstallSpecification(Family.VMANAGE, VersionType.VMANAGE, DeviceType.VMANAGE)  # type: ignore
+    VSMART = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)  # type: ignore
+    VBOND = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)  # type: ignore
+    VEDGE = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE)  # type: ignore
 
 
 class SoftwareActionAPI:
@@ -69,25 +69,23 @@ class SoftwareActionAPI:
     session = create_vManageSession(...)
 
     # Prepare devices list
-    devices = [device for device in DevicesAPI(session).devices
-                if device .personality == Personality.VSMART]
+    devices = DevicesAPI(session).get()
+    vsmarts = devices.filter(personality=Personality.VSMART)
     software_image = "viptela-20.7.2-x86_64.tar.gz"
 
     # Upgrade
-    devices_payload = DeviceVersions(session, DeviceCategory.CONTROLLERS).get_devices_current_version(devices)
-    software_action = SoftwareActionAPI(session, DeviceCategory.VEDGES)
-    software_action_id = software_action.upgrade_software(devices_payload,
-        InstallSpecHelper.CEDGE.value, reboot = False, sync = True, software_image=software_image)
+    upgrade_id = SoftwareActionAPI(session).upgrade_software(devices = vmanages,
+     software_image=software_image)
 
-    # Check action status
-    wait_for_completed(session, software_action_id, 3000)
+    # Check upgrade status
+    TaskAPI(session, software_action_id).wait_for_completed()
     """
 
-    def __init__(self, session: vManageSession, device_category: DeviceCategory) -> None:
+    def __init__(self, session: vManageSession) -> None:
 
         self.session = session
         self.repository = RepositoryAPI(self.session)
-        self.device_versions = DeviceVersions(self.session, device_category)
+        self.device_versions = DeviceVersions(self.session)
 
     def activate_software(
         self,
@@ -130,7 +128,7 @@ class SoftwareActionAPI:
     def upgrade_software(
         self,
         devices: DataSequence[Device],
-        reboot: bool,
+        reboot: bool = False,
         sync: bool = True,
         software_image: Optional[str] = "",
         image_version: Optional[str] = "",
@@ -209,7 +207,7 @@ class SoftwareActionAPI:
             List[str]: list of devices with no permission to downgrade
         """
         incorrect_devices = []
-        devices_versions_repo = self.repository.get_devices_versions_repository(self.device_versions.device_category)
+        devices_versions_repo = self.repository.get_devices_versions_repository()
         for device in payload_devices:
             dev_current_version = str(devices_versions_repo[device["deviceId"]].current_version)
             splited_version_to_upgrade = version_to_upgrade.split(".")
