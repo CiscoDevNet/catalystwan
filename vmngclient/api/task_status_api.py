@@ -191,9 +191,7 @@ class Task:
             wait_for_completed stops asking for task status
 
             Args:
-                status (str): status of task
-                status_id (str): status id of task
-                activity (str): activity text
+                task_data (List[SubTaskData]): list of all sub_tasks
 
             Returns:
                 bool: False if condition is met
