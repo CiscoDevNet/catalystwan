@@ -478,3 +478,12 @@ class TenantTacacsServer(DataclassBase):
 class SoftwareInstallTimeout(DataclassBase):
     download_timeout_min: int = field(converter=str, metadata={FIELD_NAME: "downloadTimeoutInMin"})
     activate_timeout_min: int = field(converter=str, metadata={FIELD_NAME: "activateTimeoutInMin"})
+
+
+@define
+class ResourcePoolData(DataclassBase):
+    """Endpoint: /resourcepool/resource/vpn"""
+
+    tenant_id: str = field(metadata={FIELD_NAME: "tenantId"})
+    tenant_vpn: int = field(metadata={FIELD_NAME: "tenantVpn"})
+    device_vpn: Optional[int] = field(default=None, metadata={FIELD_NAME: "deviceVpn"})
