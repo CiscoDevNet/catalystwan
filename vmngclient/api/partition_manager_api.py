@@ -3,10 +3,10 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Dict, List, cast
 
-from vmngclient.api.software_action_api import DeviceType
 from vmngclient.api.versions_utils import DeviceVersionPayload, DeviceVersions, RemovePartitionPayload, RepositoryAPI
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import asdict
+from vmngclient.utils.upgrades_helper import get_install_specification
 
 logger = logging.getLogger(__name__)
 
@@ -37,12 +37,10 @@ class PartitionManagerAPI:
 
     """
 
-    def __init__(self, session: vManageSession, device_type: DeviceType) -> None:
+    def __init__(self, session: vManageSession) -> None:
 
         self.session = session
         self.repository = RepositoryAPI(self.session)
-        self.device_versions = DeviceVersions(self.session)
-        self.device_type = device_type
 
     def set_default_partition(self, payload_devices: DataSequence[DeviceVersionPayload]) -> str:
 
@@ -50,7 +48,7 @@ class PartitionManagerAPI:
         payload = {
             "action": "defaultpartition",
             "devices": [asdict(device) for device in payload_devices],  # type: ignore
-            "deviceType": self.device_type.value,
+            "deviceType": device_type.value,
         }
         set_default = dict(self.session.post(url, json=payload).json())
         return set_default["id"]

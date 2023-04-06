@@ -12,51 +12,13 @@ from vmngclient.exceptions import VersionDeclarationError  # type: ignore
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import asdict
 from vmngclient.utils.personality import Personality
+from utils.upgrades_helper import get_install_specification
 
 logger = logging.getLogger(__name__)
 
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
-
-
-class Family(Enum):
-    VEDGE = "vedge"
-    VMANAGE = "vmanage"
-
-
-class VersionType(Enum):
-    VMANAGE = "vmanage"
-
-
-class DeviceType(Enum):
-    CONTROLLER = "controller"
-    VEDGE = "vedge"
-    VMANAGE = "vmanage"
-
-
-class DeviceClass(Enum):
-    VEDGE = "vedge"
-    VMANAGE = "vmanage"
-    VSMART = "vsmart"
-    VBOND = "vbond"
-    CEDGE = "cedge"
-
-
-@define
-class InstallSpecification:
-
-    family: Family
-    version_type: VersionType
-    device_type: DeviceType
-
-
-class InstallSpecHelper(Enum):
-
-    VMANAGE = InstallSpecification(Family.VMANAGE, VersionType.VMANAGE, DeviceType.VMANAGE)  # type: ignore
-    VSMART = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)  # type: ignore
-    VBOND = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)  # type: ignore
-    VEDGE = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE)  # type: ignore
 
 
 class SoftwareActionAPI:
@@ -90,7 +52,6 @@ class SoftwareActionAPI:
     def activate_software(
         self,
         devices: DataSequence[Device],
-        device_type: DeviceType,
         version_to_activate: Optional[str] = "",
         software_image: Optional[str] = "",
     ) -> str:
@@ -114,13 +75,14 @@ class SoftwareActionAPI:
             version = cast(str, version_to_activate)
         else:
             raise VersionDeclarationError("You can not provide software_image and image version at the same time!")
+        
         url = "/dataservice/device/action/changepartition"
         payload = {
             "action": "changepartition",
             "devices": [
                 asdict(device) for device in self.device_versions.get_device_available(version, devices)  # type: ignore
             ],
-            "deviceType": device_type.value,
+            "deviceType": get_install_specification(devices.first()).device_type.value,
         }
         activate = dict(self.session.post(url, json=payload).json())
         return activate["id"]
@@ -160,16 +122,7 @@ class SoftwareActionAPI:
             version = cast(str, image_version)
         else:
             raise VersionDeclarationError("You can not provide software_image and image version at the same time")
-
-        specification_container = {
-            Personality.VMANAGE: InstallSpecHelper.VMANAGE.value,
-            Personality.VBOND: InstallSpecHelper.VBOND.value,
-            Personality.VSMART: InstallSpecHelper.VSMART.value,
-            Personality.EDGE: InstallSpecHelper.VEDGE.value,
-        }
-
-        personality = devices[0].personality
-        install_spec = specification_container[personality]
+        install_specification = get_install_specification(devices.first())
 
         url = "/dataservice/device/action/install"
         payload: Dict[str, Any] = {
@@ -177,9 +130,9 @@ class SoftwareActionAPI:
             "input": {
                 "vEdgeVPN": 0,
                 "vSmartVPN": 0,
-                "family": install_spec.family.value,
+                "family": install_specification.family.value,
                 "version": version,
-                "versionType": install_spec.version_type.value,
+                "versionType": install_specification.version_type.value,
                 "reboot": reboot,
                 "sync": sync,
             },
@@ -187,10 +140,10 @@ class SoftwareActionAPI:
                 {"deviceId": device.deviceId, "deviceIP": device.deviceIP}
                 for device in self.device_versions.get_device_list(devices)
             ],  # type: ignore
-            "deviceType": install_spec.device_type.value,
+            "deviceType": install_specification.device_type.value,
         }
-        if personality in (Personality.VMANAGE, Personality.EDGE):  # block downgrade for edges and vmanages
-            self._downgrade_check(payload["devices"], payload["input"]["version"], install_spec.family.value)
+        if devices.first().personality in (Personality.VMANAGE, Personality.EDGE):  # block downgrade for edges and vmanages
+            self._downgrade_check(payload["devices"], payload["input"]["version"], install_specification.family.value)
         upgrade = dict(self.session.post(url, json=payload).json())
         return upgrade["id"]
 
