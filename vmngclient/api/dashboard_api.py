@@ -75,3 +75,46 @@ class DashboardAPI:
             status.status_list = DataSequence(Count, [create_dataclass(Count, item) for item in status.status_list])
 
         return statuses
+
+    def get_bfd_connectivity_count(self) -> DataSequence[Count]:
+        """
+        Get information about bfd connectivity count.
+
+        Returns:
+            DataSequance of Count dataclass with bfd connectivity
+        """
+        response = self.session.get_data("/dataservice/device/bfd/sites/summary")
+
+        bfd_response = DataSequence(Count, [create_dataclass(Count, item) for item in response])
+        for item in bfd_response:
+            item.status_list = DataSequence(
+                Count, [create_dataclass(Count, bfd_connection) for bfd_connection in item.status_list]  # type:ignore
+            )
+
+        return bfd_response
+
+    def get_edges_inventory_count(self) -> DataSequence[Count]:
+        """
+        Get information about edges inventory.
+
+        Returns:
+            DataSequance of Count dataclass with edges inventory count
+        """
+        response = self.session.get_data("/dataservice/device/vedgeinventory/summary")
+
+        edges_inventory = DataSequence(Count, [create_dataclass(Count, item) for item in response])
+
+        return edges_inventory
+
+    def get_transport_interface_distribution(self) -> DataSequence[Count]:
+        """
+        Get information about transport interface distribution.
+
+        Returns:
+            DataSequance of Count dataclass with transport interface distributio
+        """
+        response = self.session.get_data("/dataservice/device/tlocutil")
+
+        edges_inventory = DataSequence(Count, [create_dataclass(Count, item) for item in response])
+
+        return edges_inventory

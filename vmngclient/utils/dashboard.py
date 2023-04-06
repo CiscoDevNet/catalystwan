@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 from attr import define, field  # type: ignore
 
@@ -22,8 +22,37 @@ class StatusName(Enum):
     CONTROL_DOWN: str = "Control down"
 
 
+class BfdConnectivityName(Enum):
+    FULL: str = "Full WAN Connectivity"
+    PARTIAL: str = "Partial WAN Connectivity"
+    NO_CONNECTIVITY: str = "No WAN Connectivity"
+
+
+class InventoryName(Enum):
+    TOTAL: str = "Total"
+    AUTHORIZED: str = "Authorized"
+    DEPLOYED: str = "Deployed"
+    STAGING: str = "Staging"
+
+
+class PercentageDistributionName(Enum):
+    BELOW_10_MBPS: str = "less_than_10_mbps"
+    BETWEEN_10_AND_100_MBPS: str = "10_mbps_100_mbps"
+    BETWEEN_100_AND_500_MBPS: str = "100_mbps_500_mbps"
+    ABOVE_500_MBPS: str = "greater_than_500_mbps"
+
+
+class PercentageDistribution(Enum):
+    BELOW_10_MBPS: str = "< 10 Mbps"
+    BETWEEN_10_AND_100_MBPS: str = "10 Mbps - 100 Mbps"
+    BETWEEN_100_AND_500_MBPS: str = "100 Mbps - 500 Mbps"
+    ABOVE_500_MBPS: str = "> 500 Mbps"
+
+
 def name_converter(name):
-    for enum_type in (StatusName, DeviceName):
+    if name is None:
+        return None
+    for enum_type in (StatusName, DeviceName, BfdConnectivityName, InventoryName, PercentageDistributionName):
         try:
             return enum_type(name)
         except ValueError:
@@ -34,12 +63,22 @@ def name_converter(name):
 
 @define
 class Count(DataclassBase):
-    name: Union[DeviceName, StatusName] = field(converter=name_converter)
-    count: int
     details_url: str = field(metadata={FIELD_NAME: "detailsURL"})
-    status: str
+    count: Optional[int] = field(default=None)
+    status: Optional[str] = field(default=None)
+    name: Optional[
+        Union[DeviceName, StatusName, BfdConnectivityName, InventoryName, PercentageDistributionName]
+    ] = field(default=None, converter=name_converter)
     message: Optional[str] = field(default=None)
-    status_list: Union[Optional["Count"]] = field(default=None, metadata={FIELD_NAME: "statusList"})
+    status_list: Optional[List["Count"]] = field(default=None, metadata={FIELD_NAME: "statusList"})
+    list: Optional[str] = field(default=None)
+    value: Optional[int] = field(default=None)
+    percentageDistribution: Optional[PercentageDistribution] = field(default=None)
+
+    @value.validator  # type: ignore
+    def value_or_count_provided(self, attribute, value):
+        if value is None and self.count is None:
+            raise ValueError("For 'Count' dataclass 'value' or 'count' attribute must be provided.")
 
 
 @define
