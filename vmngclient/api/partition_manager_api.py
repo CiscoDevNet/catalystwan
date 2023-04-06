@@ -28,10 +28,9 @@ class PartitionManagerAPI:
         devices = DevicesAPI(session).get()
         vsmarts = devices.filter(personality=Personality.VSMART)
 
-        # Set default partition
-        payload_devices = DeviceVersions(session).get_devices_current_version(vsmarts)
-        partition_manager = PartitionManagerAPI(session,DeviceType.CONTROLLERS)
-        set_partition_id = partition_manager.set_default_partition(payload_devices)
+        # Set current partion as default partition
+        partition_manager = PartitionManagerAPI(session)
+        set_partition_id = partition_manager.set_default_partition(vsmarts)
 
         # Check action status
         TaskAPI(session, software_action_id).wait_for_completed()
