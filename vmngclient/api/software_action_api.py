@@ -1,10 +1,7 @@
 from __future__ import annotations
 
 import logging
-from enum import Enum
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
-
-from attr import define  # type: ignore
 
 from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
@@ -12,7 +9,7 @@ from vmngclient.exceptions import VersionDeclarationError  # type: ignore
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import asdict
 from vmngclient.utils.personality import Personality
-from utils.upgrades_helper import get_install_specification
+from vmngclient.utils.upgrades_helper import get_install_specification
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +72,7 @@ class SoftwareActionAPI:
             version = cast(str, version_to_activate)
         else:
             raise VersionDeclarationError("You can not provide software_image and image version at the same time!")
-        
+
         url = "/dataservice/device/action/changepartition"
         payload = {
             "action": "changepartition",
@@ -142,7 +139,10 @@ class SoftwareActionAPI:
             ],  # type: ignore
             "deviceType": install_specification.device_type.value,
         }
-        if devices.first().personality in (Personality.VMANAGE, Personality.EDGE):  # block downgrade for edges and vmanages
+        if devices.first().personality in (
+            Personality.VMANAGE,
+            Personality.EDGE,
+        ):  # block downgrade for edges and vmanages
             self._downgrade_check(payload["devices"], payload["input"]["version"], install_specification.family.value)
         upgrade = dict(self.session.post(url, json=payload).json())
         return upgrade["id"]

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Dict, List, cast
+from typing import TYPE_CHECKING, Dict, List, Optional, cast
 
-from vmngclient.api.versions_utils import DeviceVersionPayload, DeviceVersions, RemovePartitionPayload, RepositoryAPI
+from vmngclient.api.versions_utils import DeviceVersions, RemovePartitionPayload, RepositoryAPI
+from vmngclient.dataclasses import Device
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import asdict
 from vmngclient.utils.upgrades_helper import get_install_specification
@@ -41,40 +42,64 @@ class PartitionManagerAPI:
 
         self.session = session
         self.repository = RepositoryAPI(self.session)
+        self.device_version = DeviceVersions(self.session)
 
-    def set_default_partition(self, payload_devices: DataSequence[DeviceVersionPayload]) -> str:
+    def set_default_partition(self, devices: DataSequence[Device], partition: Optional[str] = None) -> str:
+        """
+        Set defualt software versions for devices
+
+        Args:
+            devices (DataSequence[Device]): devices
+            partition (Optional[str], optional): If none, current partition will be set as default,
+                else selected partition will be set as default
+
+        Returns:
+            str: set partition task id
+        """
+        if partition:
+            payload_devices = self.device_version.get_device_available(partition, devices)
+        else:
+            payload_devices = self.device_version.get_devices_current_version(devices)
 
         url = "/dataservice/device/action/defaultpartition"
         payload = {
             "action": "defaultpartition",
             "devices": [asdict(device) for device in payload_devices],  # type: ignore
-            "deviceType": device_type.value,
+            "deviceType": get_install_specification(devices.first()).device_type.value,
         }
         set_default = dict(self.session.post(url, json=payload).json())
         return set_default["id"]
 
-    def remove_partition(self, devices_payload: DataSequence[DeviceVersionPayload], force: bool = False) -> str:
+    def remove_partition(
+        self, devices: DataSequence[Device], partition: Optional[str] = None, force: bool = False
+    ) -> str:
         """
-        Remove chosen software version from Vmanage repository
+        Remove chosen software version from device
 
         Args:
-            devices (List[Device]): remove partition for those devices
-            version (str): software version to be removed from repository
+            devices (DataSequence[Device]): remove partition for those devices
+            partition (str): If none, all availables partitions will be removed,
+                else selected partition will be removed
             force (bool): bypass version checks
 
         Returns:
             str: action id
         """
+        if partition:
+            payload_devices = self.device_version.get_device_available(partition, devices)
+        else:
+            payload_devices = self.device_version.get_devices_available_versions(devices)
 
         remove_partition_payload = [
             RemovePartitionPayload(device.deviceId, device.deviceIP, device.version)  # type: ignore
-            for device in devices_payload
+            for device in payload_devices
         ]
+
         url = "/dataservice/device/action/removepartition"
         payload = {
             "action": "removepartition",
             "devices": [asdict(device) for device in remove_partition_payload],  # type: ignore
-            "deviceType": self.device_type.value,
+            "deviceType": get_install_specification(devices.first()).device_type.value,
         }
         if force is False:
             self._check_remove_partition_possibility(cast(list, payload["devices"]))
