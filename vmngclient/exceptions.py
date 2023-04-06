@@ -55,3 +55,15 @@ class AuthenticationError(Exception):
 
 class CookieNotValidError(Exception):
     pass
+
+
+class EmptyTaskResponseError(Exception):
+    """Raised if task is registred by vManage, but reponse content is empty"""
+
+    pass
+
+
+class TaskNotRegisteredError(Exception):
+    """Raised if task_id is generated, but it's not registere in vManage"""
+
+    pass
