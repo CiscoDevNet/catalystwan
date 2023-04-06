@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from vmngclient.api.task_status_api import TaskStatus
+from vmngclient.api.task_status_api import SubTaskData, TaskResult
 from vmngclient.api.template_api import TemplatesAPI
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.dataclasses import Device, FeatureTemplateInfo, TemplateInfo
@@ -60,7 +60,21 @@ class TestTemplatesAPI(unittest.TestCase):
             model="vedge-cloud",
             status="normal",
         )
-        self.task = TaskStatus("Success", "success", [])
+        sub_tasks_data = SubTaskData.parse_obj(
+            {
+                "status": "Success",
+                "statusId": "success",
+                "action": "",
+                "activity": [],
+                "currentActivity": "",
+                "actionConfig": "",
+                "order": 1,
+                "uuid": "",
+                "host-name": "",
+                "site-id": "",
+            }
+        )
+        self.task = TaskResult(result=True, sub_tasks_data=[sub_tasks_data])
 
     @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
