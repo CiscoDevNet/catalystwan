@@ -1,9 +1,11 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from vmngclient.api.software_action_api import Family, InstallSpecHelper, SoftwareActionAPI
+from vmngclient.api.software_action_api import SoftwareActionAPI
 from vmngclient.api.versions_utils import DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
+from vmngclient.typed_list import DataSequence
+from vmngclient.utils.upgrades_helper import Family, InstallSpecHelper
 
 
 class TestSoftwareAcionAPI(unittest.TestCase):
@@ -51,7 +53,7 @@ class TestSoftwareAcionAPI(unittest.TestCase):
         mock_session.post.return_value = {"id": "mock_action_id"}
 
         # Assert
-        answer = self.mock_software_action_obj.upgrade_software([self.device], True, True, "path")
+        answer = self.mock_software_action_obj.install(DataSequence(Device, [self.device]), True, True, "path")
         self.assertEqual(answer, "mock_action_id", "action ids not equal")
 
     @patch.object(RepositoryAPI, "get_devices_versions_repository")
