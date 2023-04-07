@@ -28,7 +28,7 @@ class SoftwareActionAPI:
     session = create_vManageSession(...)
 
     # Prepare devices list
-    devices = DevicesAPI(session).get()
+    devices = session.api.devices.get()
     vsmarts = devices.filter(personality=Personality.VSMART)
     software_image = "viptela-20.7.2-x86_64.tar.gz"
 
