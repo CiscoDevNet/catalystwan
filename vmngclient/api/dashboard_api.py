@@ -111,7 +111,7 @@ class DashboardAPI:
         Get information about transport interface distribution.
 
         Returns:
-            DataSequance of Count dataclass with transport interface distributio
+            DataSequance of Count dataclass with transport interface distribution
         """
         response = self.session.get("/dataservice/device/tlocutil")
 
@@ -128,7 +128,7 @@ class DashboardAPI:
         - vSmart status
 
         Returns:
-            DataSequance of Count dataclass with tenant status information
+            DataSequance of TenantStatus dataclass with tenant status information
         """
         response = self.session.get("/dataservice/tenantstatus")
 
