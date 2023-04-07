@@ -1,10 +1,14 @@
 from enum import Enum
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 
 from attr import define, field  # type: ignore
 
+from vmngclient.api.software_action_api import DeviceType
 from vmngclient.dataclasses import DataclassBase
-from vmngclient.utils.creation_tools import FIELD_NAME
+from vmngclient.typed_list import DataSequence
+from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
+from vmngclient.utils.personality import Personality
+from vmngclient.utils.reachability import Reachability
 
 
 class DeviceName(Enum):
@@ -49,6 +53,12 @@ class PercentageDistribution(Enum):
     ABOVE_500_MBPS: str = "> 500 Mbps"
 
 
+class DeviceHealthColor(Enum):
+    GREEN: str = "green"
+    YELLOW: str = "yellow"
+    RED: str = "red"
+
+
 def name_converter(name):
     if name is None:
         return None
@@ -86,3 +96,90 @@ class CertificatesStatus(DataclassBase):
     invalid: int
     warning: int
     revoked: int
+
+
+@define
+class ControlStatus(DataclassBase):
+    up: int = field(metadata={FIELD_NAME: "controlUp"})
+    partial: int
+    down: int = field(metadata={FIELD_NAME: "controlDown"})
+
+
+@define
+class SiteHealth(DataclassBase):
+    full_connectivity: int = field(metadata={FIELD_NAME: "fullConnectivity"})
+    partial_connectivity: int = field(metadata={FIELD_NAME: "partialConnectivity"})
+    no_connectivity: int = field(metadata={FIELD_NAME: "noConnectivity"})
+
+
+@define
+class vEdgeHealth(DataclassBase):
+    normal: int
+    warning: int
+    error: int
+
+
+@define
+class vSmartStatus(DataclassBase):
+    up: int
+    down: int
+
+
+@define
+class TenantStatus(DataclassBase):
+    id: str = field(metadata={FIELD_NAME: "tenantId"})
+    name: str = field(metadata={FIELD_NAME: "tenantName"})
+    control_status: ControlStatus = field(
+        metadata={FIELD_NAME: "controlStatus"}, converter=lambda x: create_dataclass(ControlStatus, x)
+    )
+    site_health: SiteHealth = field(
+        metadata={FIELD_NAME: "siteHealth"}, converter=lambda x: create_dataclass(SiteHealth, x)
+    )
+    vedge_health: vEdgeHealth = field(
+        metadata={FIELD_NAME: "vEdgeHealth"}, converter=lambda x: create_dataclass(vEdgeHealth, x)
+    )
+    vsmatr_status: vSmartStatus = field(
+        metadata={FIELD_NAME: "vSmartStatus"}, converter=lambda x: create_dataclass(vSmartStatus, x)
+    )
+
+
+@define
+class DeviceHealth(DataclassBase):
+    name: str
+    personality: Personality
+    uuid: str
+    reachability: Reachability
+    longitude: float
+    latitude: float
+    health: DeviceHealthColor
+    qoe: int
+    location: str
+    site_id: str
+    system_ip: str
+    device_type: DeviceType
+    local_system_ip: str
+    device_model: str
+    software_version: str
+    cpu_load: float
+    memory_utilization: float
+    control_connections: int
+    control_connections_up: int
+    vsmart_control_connections: int
+    expected_vsmart_connections: int
+    has_geo_data: bool
+    uptime_date: int
+    device_groups: List[str]
+    connected_vmanages: List[str]
+    bfd_sessions_up: int
+    bfd_sessions: Any
+    omp_peers: int
+    omp_peers_up: Any
+    board_serial_number: int
+    chassis_number: str
+    vpn_ids: Any
+
+
+@define
+class DevicesHealth(DataclassBase):
+    total_devices: int
+    devices: DataSequence[DeviceHealth]

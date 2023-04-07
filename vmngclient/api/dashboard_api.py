@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
-from vmngclient.utils.dashboard import CertificatesStatus, Count
+from vmngclient.utils.dashboard import CertificatesStatus, Count, DeviceHealth, DevicesHealth, TenantStatus
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -118,3 +118,36 @@ class DashboardAPI:
         transport_interface = response.dataseq(Count)
 
         return transport_interface
+
+    def get_tenant_status(self) -> DataSequence[TenantStatus]:
+        """
+        Get information about tenant status, including:
+        - control status
+        - site health
+        - vEdge health
+        - vSmart status
+
+        Returns:
+            DataSequance of Count dataclass with tenant status information
+        """
+        response = self.session.get("/dataservice/tenantstatus")
+
+        transport_interface = response.dataseq(TenantStatus)
+
+        return transport_interface
+
+    def get_devices_health(self) -> DevicesHealth:
+        """
+        Get information about devices health
+
+        Returns:
+            DevicesHealth object
+        """
+        response = self.session.get_json("/dataservice/health/devices")
+        devices_health = create_dataclass(DevicesHealth, response)
+
+        devices_health.devices = DataSequence(
+            DeviceHealth, [create_dataclass(DeviceHealth, device) for device in devices_health.devices]  # type: ignore
+        )
+
+        return devices_health
