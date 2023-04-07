@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import Enum
 from typing import Any, List, Optional, Union
 
@@ -73,6 +75,13 @@ def name_converter(name):
 
 @define
 class Count(DataclassBase):
+    """Dataclass used to handle endpoints that return count of something
+
+    Example:
+        Endpoint '/dataservice/clusterManagement/health/summary' returns count of vmanages, which
+            contains details_url, name, count, status and status_list
+    """
+
     details_url: str = field(metadata={FIELD_NAME: "detailsURL"})
     count: Optional[int] = field(default=None)
     status: Optional[str] = field(default=None)
@@ -80,13 +89,14 @@ class Count(DataclassBase):
         Union[DeviceName, StatusName, BfdConnectivityName, InventoryName, PercentageDistributionName]
     ] = field(default=None, converter=name_converter)
     message: Optional[str] = field(default=None)
-    status_list: Optional[List["Count"]] = field(default=None, metadata={FIELD_NAME: "statusList"})
+    status_list: Optional[DataSequence[Count]] = field(default=None, metadata={FIELD_NAME: "statusList"})
     list: Optional[str] = field(default=None)
     value: Optional[int] = field(default=None)
     percentageDistribution: Optional[PercentageDistribution] = field(default=None)
 
     @value.validator  # type: ignore
     def value_or_count_provided(self, attribute, value):
+        """Count dataclass requires count or value attribute in order to show the number of thing it is displaying"""
         if value is None and self.count is None:
             raise ValueError("For 'Count' dataclass 'value' or 'count' attribute must be provided.")
 
@@ -94,6 +104,7 @@ class Count(DataclassBase):
 @define
 class CertificatesStatus(DataclassBase):
     """Number of certificates with given status"""
+
     invalid: int
     warning: int
     revoked: int
@@ -102,6 +113,7 @@ class CertificatesStatus(DataclassBase):
 @define
 class ControlStatus(DataclassBase):
     """Number of given control statuses"""
+
     up: int = field(metadata={FIELD_NAME: "controlUp"})
     partial: int
     down: int = field(metadata={FIELD_NAME: "controlDown"})
@@ -110,6 +122,7 @@ class ControlStatus(DataclassBase):
 @define
 class SiteHealth(DataclassBase):
     """Number connectivity to devices on sites with given health"""
+
     full_connectivity: int = field(metadata={FIELD_NAME: "fullConnectivity"})
     partial_connectivity: int = field(metadata={FIELD_NAME: "partialConnectivity"})
     no_connectivity: int = field(metadata={FIELD_NAME: "noConnectivity"})
@@ -118,6 +131,7 @@ class SiteHealth(DataclassBase):
 @define
 class vEdgeHealth(DataclassBase):
     """Number of vEdges with given health"""
+
     normal: int
     warning: int
     error: int
@@ -126,6 +140,7 @@ class vEdgeHealth(DataclassBase):
 @define
 class vSmartStatus(DataclassBase):
     """Number of vSmarts with given status"""
+
     up: int
     down: int
 
