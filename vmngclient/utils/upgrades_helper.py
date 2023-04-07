@@ -54,7 +54,7 @@ def get_install_specification(device: Device):
     return specification_container[device.personality]
 
 
-def validate_personalities_homogeneity(devices: DataSequence[Device]):
+def validate_personality_homogeneity(devices: DataSequence[Device]):
     personalities = set([device.personality for device in devices])
     if not len(personalities) == 1:
         raise MultiplePersonalityError(
