@@ -30,6 +30,11 @@ class InstallSpecification:
 
 
 class InstallSpecHelper(Enum):
+    """
+    Container class for storage payload data for all personalities.
+    It's created, because personality is not clearly connected to Family, VersionType
+    or DeviceType
+    """
 
     VMANAGE = InstallSpecification(Family.VMANAGE, VersionType.VMANAGE, DeviceType.VMANAGE)  # type: ignore
     VSMART = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)  # type: ignore
