@@ -46,7 +46,7 @@ class SoftwareActionAPI:
         self.repository = RepositoryAPI(self.session)
         self.device_versions = DeviceVersions(self.session)
 
-    def activate_software(
+    def activate(
         self,
         devices: DataSequence[Device],
         version_to_activate: Optional[str] = "",
@@ -84,7 +84,7 @@ class SoftwareActionAPI:
         activate = dict(self.session.post(url, json=payload).json())
         return activate["id"]
 
-    def upgrade_software(
+    def install(
         self,
         devices: DataSequence[Device],
         reboot: bool = False,

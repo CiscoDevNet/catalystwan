@@ -38,5 +38,5 @@ class APIContainter:
         self.tenant_backup = TenantBackupRestoreAPI(session)
         self.repository = RepositoryAPI(session)
         self.resource_pool = ResourcePoolAPI(session)
-        self.software_action = SoftwareActionAPI(session)
-        self.partition_manager = PartitionManagerAPI(session)
+        self.software = SoftwareActionAPI(session)
+        self.partition = PartitionManagerAPI(session)
