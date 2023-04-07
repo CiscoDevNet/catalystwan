@@ -33,8 +33,8 @@ class SoftwareActionAPI:
     software_image = "viptela-20.7.2-x86_64.tar.gz"
 
     # Upgrade
-    upgrade_id = SoftwareActionAPI(session).upgrade_software(devices = vmanages,
-     software_image=software_image)
+    upgrade_id = SoftwareActionAPI(session).install(devices = vmanages,
+    software_image=software_image)
 
     # Check upgrade status
     TaskAPI(session, software_action_id).wait_for_completed()
