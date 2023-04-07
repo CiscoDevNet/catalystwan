@@ -171,9 +171,9 @@ class DeviceHealth(DataclassBase):
     device_groups: List[str]
     connected_vmanages: List[str]
     bfd_sessions_up: int
-    bfd_sessions: Any
+    bfd_sessions: int
     omp_peers: int
-    omp_peers_up: Any
+    omp_peers_up: int
     board_serial_number: int
     chassis_number: str
     vpn_ids: Any
