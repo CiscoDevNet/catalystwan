@@ -7,7 +7,7 @@ from vmngclient.api.versions_utils import DeviceVersions, RemovePartitionPayload
 from vmngclient.dataclasses import Device
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import asdict
-from vmngclient.utils.upgrades_helper import get_install_specification
+from vmngclient.utils.upgrades_helper import get_install_specification, validate_personalities_homogeneity
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class PartitionManagerAPI:
         session = create_vManageSession(...)
 
         # Prepare devices list
-        devices = DevicesAPI(session).get()
+        devices = session.api.devices.get()
         vsmarts = devices.filter(personality=Personality.VSMART)
 
         # Set current partion as default partition
@@ -55,6 +55,7 @@ class PartitionManagerAPI:
         Returns:
             str: set partition task id
         """
+        validate_personalities_homogeneity(devices)
         if partition:
             payload_devices = self.device_version.get_device_available(partition, devices)
         else:
@@ -84,6 +85,7 @@ class PartitionManagerAPI:
         Returns:
             str: action id
         """
+        validate_personalities_homogeneity(devices)
         if partition:
             payload_devices = self.device_version.get_device_available(partition, devices)
         else:

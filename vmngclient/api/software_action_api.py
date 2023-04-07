@@ -9,7 +9,7 @@ from vmngclient.exceptions import VersionDeclarationError  # type: ignore
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import asdict
 from vmngclient.utils.personality import Personality
-from vmngclient.utils.upgrades_helper import get_install_specification
+from vmngclient.utils.upgrades_helper import get_install_specification, validate_personalities_homogeneity
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +66,7 @@ class SoftwareActionAPI:
         Returns:
             str: Activate software action id
         """
+        validate_personalities_homogeneity(devices)
         if software_image and not version_to_activate:
             version = cast(str, self.repository.get_image_version(software_image))
         elif version_to_activate and not software_image:
@@ -113,6 +114,7 @@ class SoftwareActionAPI:
         Returns:
             str: action id
         """
+        validate_personalities_homogeneity(devices)
         if software_image and not image_version:
             version = cast(str, self.repository.get_image_version(software_image))
         elif image_version and not software_image:

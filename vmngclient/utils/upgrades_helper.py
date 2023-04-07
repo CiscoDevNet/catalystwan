@@ -3,6 +3,8 @@ from enum import Enum
 from attr import define  # type: ignore
 
 from vmngclient.dataclasses import Device
+from vmngclient.exceptions import MultiplePersonalityError
+from vmngclient.typed_list import DataSequence
 from vmngclient.utils.personality import Personality
 
 
@@ -50,3 +52,11 @@ def get_install_specification(device: Device):
         Personality.EDGE: InstallSpecHelper.VEDGE.value,
     }
     return specification_container[device.personality]
+
+
+def validate_personalities_homogeneity(devices: DataSequence[Device]):
+    personalities = set([device.personality for device in devices])
+    if not len(personalities) == 1:
+        raise MultiplePersonalityError(
+            f"devices has got more than 1 personality, devices personalities: {personalities}"
+        )
