@@ -1,13 +1,7 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from vmngclient.api.versions_utils import (
-    DeviceCategory,
-    DeviceSoftwareRepository,
-    DeviceVersionPayload,
-    DeviceVersions,
-    RepositoryAPI,
-)
+from vmngclient.api.versions_utils import DeviceSoftwareRepository, DeviceVersionPayload, DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.typed_list import DataSequence
 
@@ -70,7 +64,7 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_session.get_data.return_value = api_mock_response
         mock_repository_object = RepositoryAPI(mock_session)
 
-        answer = mock_repository_object.get_devices_versions_repository(DeviceCategory.CONTROLLERS)
+        answer = mock_repository_object.get_devices_versions_repository()
 
         self.assertEqual(
             answer["mock_uuid"],
@@ -84,7 +78,7 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_get_devices_versions_repository.return_value = Mock()
         mock_session = Mock()
         mock_repository_object = RepositoryAPI(mock_session)
-        mock_device_versions = DeviceVersions(mock_repository_object, DeviceCategory.CONTROLLERS.value)
+        mock_device_versions = DeviceVersions(mock_repository_object)
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
         answer = mock_device_versions.get_device_available("ver1", [self.device])
         expected_result = DataSequence(DeviceVersionPayload, [DeviceVersionPayload("mock_uuid", "mock_ip", "ver1")])
@@ -102,7 +96,7 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_get_devices_versions_repository.return_value = Mock()
         mock_session = Mock()
         mock_repository_object = RepositoryAPI(mock_session)
-        mock_device_versions = DeviceVersions(mock_repository_object, DeviceCategory.CONTROLLERS.value)
+        mock_device_versions = DeviceVersions(mock_repository_object)
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
         answer = mock_device_versions.get_device_list_in_installed("ver1", [self.device])
         expected_result = DataSequence(DeviceVersionPayload, [DeviceVersionPayload("mock_uuid", "mock_ip", "ver1")])
@@ -121,7 +115,7 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_get_devices_versions_repository.return_value = Mock()
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
         mock_repository_object = RepositoryAPI(mock_session)
-        mock_device_versions = DeviceVersions(mock_repository_object, DeviceCategory.CONTROLLERS)
+        mock_device_versions = DeviceVersions(mock_repository_object)
         # Act
         answer = mock_device_versions.get_devices_current_version([self.device])
         # Answer
