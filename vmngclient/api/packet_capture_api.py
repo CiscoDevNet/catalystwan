@@ -146,6 +146,6 @@ class PacketCaptureAPI:
 
     def get_status(self, packet_channel: PacketSetup) -> Status:
         url_path = f"/dataservice/stream/device/capture/status/{packet_channel.session_id}"
-        status = dict(self.session.get_json(url_path))
+        status = self.session.get_json(url_path)
         self.status = create_dataclass(Status, status)
         return self.status
