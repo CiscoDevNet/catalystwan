@@ -58,7 +58,7 @@ speedtest = session.api.speedtest.speedtest(devices[0], devices[1])
 ```python
 # Prepare devices list
 vsmarts = session.api.devices.get().filter(personality = Personality.VSMART)
-software_image = "viptela-20.7.2-x86_64.tar.gz"
+image = "viptela-20.7.2-x86_64.tar.gz"
 
 # Upload image
 session.api.repository.upload_image(software_image)
@@ -66,7 +66,7 @@ session.api.repository.upload_image(software_image)
 # Install software
 
 install_task = session.api.software.install(devices = vsmarts,
-    software_image= software_image)
+    software_image= image)
 
 # Check action status
 install_task.wait_for_completed()
