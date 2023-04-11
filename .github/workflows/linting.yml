@@ -1,10 +1,7 @@
 name: Static code analyzer
 
 on:
-  push:
   pull_request:
-    branches:
-      - main
 
 jobs:
   analyze_code:

@@ -91,4 +91,8 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 ```
 
-## [Contributing, reporting issues, seeking support](https://github.com/CiscoDevNet/vManage-client/blob/main/CONTRIBUTING.md)
+## [Contributing, bug reporting and feature requests](https://github.com/CiscoDevNet/vManage-client/blob/main/CONTRIBUTING.md)
+
+## Seeking support
+
+You can contact us by submitting [issues](https://github.com/CiscoDevNet/vManage-client/issues), or directly via mail on vmngclient@cisco.com.

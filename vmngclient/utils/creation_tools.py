@@ -82,12 +82,26 @@ def asdict(dataclass: AttrsInstance) -> dict:
     Returns:
         dict: Serialized dict
     """
+
     json_fields_excluded = attrs.asdict(dataclass, filter=lambda x, _: FIELD_NAME not in x.metadata)
     json_fields = attrs.asdict(dataclass, filter=lambda x, _: FIELD_NAME in x.metadata)
+
     for field in fields(dataclass.__class__):
+        field_value = getattr(dataclass, field.name)
+
         json_field_name = field.metadata.get(FIELD_NAME, None)
         if json_field_name:
             json_fields[json_field_name] = json_fields.pop(field.name)
+            if isinstance(field_value, AttrsInstance):
+                json_fields[json_field_name] = asdict(field_value)
+
+            if isinstance(field_value, list):  # tuple, List[AttrsInstance], set, frozenset
+                if len(field_value) > 0 and isinstance(field_value[0], AttrsInstance):
+                    json_fields[json_field_name] = [asdict(_f) for _f in field_value]
+        else:
+            if isinstance(field_value, AttrsInstance):
+                json_fields_excluded[field.name] = asdict(field_value)
+
     return {**json_fields, **json_fields_excluded}
 
 

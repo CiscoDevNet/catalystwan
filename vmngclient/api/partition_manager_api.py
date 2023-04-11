@@ -11,6 +11,7 @@ from vmngclient.api.versions_utils import (
     RemovePartitionPayload,
     RepositoryAPI,
 )
+from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import asdict
 
 logger = logging.getLogger(__name__)
@@ -50,7 +51,7 @@ class PartitionManagerAPI:
         self.device_versions = DeviceVersions(self.session, device_category)
         self.device_type = device_type
 
-    def set_default_partition(self, payload_devices: List[DeviceVersionPayload]) -> str:
+    def set_default_partition(self, payload_devices: DataSequence[DeviceVersionPayload]) -> str:
 
         url = "/dataservice/device/action/defaultpartition"
         payload = {
@@ -61,7 +62,7 @@ class PartitionManagerAPI:
         set_default = dict(self.session.post(url, json=payload).json())
         return set_default["id"]
 
-    def remove_partition(self, devices_payload: List[DeviceVersionPayload], force: bool = False) -> str:
+    def remove_partition(self, devices_payload: DataSequence[DeviceVersionPayload], force: bool = False) -> str:
         """
         Remove chosen software version from Vmanage repository
 
