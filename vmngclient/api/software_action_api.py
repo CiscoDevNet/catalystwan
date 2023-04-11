@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
 
+from vmngclient.api.task_status_api import Task
 from vmngclient.api.versions_utils import DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.exceptions import VersionDeclarationError  # type: ignore
@@ -51,7 +52,7 @@ class SoftwareActionAPI:
         devices: DataSequence[Device],
         version_to_activate: Optional[str] = "",
         software_image: Optional[str] = "",
-    ) -> str:
+    ) -> Task:
         """
         Set chosen version as current version
 
@@ -83,7 +84,7 @@ class SoftwareActionAPI:
             "deviceType": get_install_specification(devices.first()).device_type.value,
         }
         activate = dict(self.session.post(url, json=payload).json())
-        return activate["id"]
+        return Task(self.session, activate["id"])
 
     def install(
         self,
@@ -92,7 +93,7 @@ class SoftwareActionAPI:
         sync: bool = True,
         software_image: Optional[str] = "",
         image_version: Optional[str] = "",
-    ) -> str:
+    ) -> Task:
         """
         Method to install new software
 
@@ -147,7 +148,7 @@ class SoftwareActionAPI:
         ):  # block downgrade for edges and vmanages
             self._downgrade_check(payload["devices"], payload["input"]["version"], install_specification.family.value)
         upgrade = dict(self.session.post(url, json=payload).json())
-        return upgrade["id"]
+        return Task(self.session, upgrade["id"])
 
     def _downgrade_check(self, payload_devices: List[dict], version_to_upgrade: str, family: str) -> None:
         """
