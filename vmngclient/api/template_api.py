@@ -399,7 +399,6 @@ class TemplatesAPI:
         return template_id
 
     def _create_cli_template(self, template: CLITemplate) -> str:
-
         payload = template.generate_payload()
         response = self.session.post("/dataservice/template/device/cli/", json=payload)
         template_id = response.json()["templateId"]
@@ -480,7 +479,7 @@ class TemplatesAPI:
             template_type=template.type,
             device_types=["vedge-C8000V"],  # TODO
             definition={},
-        )
+        )  # type: ignore
 
         fr_template_fields = [FeatureTemplateField(**field) for field in schema["fields"]]  # TODO
         payload.definition.update(get_path_dict([field.dataPath for field in fr_template_fields]))

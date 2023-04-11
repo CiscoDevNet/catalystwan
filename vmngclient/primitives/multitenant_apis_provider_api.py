@@ -72,7 +72,7 @@ class MultitenantAPIsProviderAPI(APIPrimitiveBase):
         ...
 
     def get_all_tenants(self) -> DataSequence[Tenant]:
-        return self.session.get("/dataservice/tenant").dataseq(Tenant)
+        return self.get("/tenant").dataseq(Tenant)
 
     def get_tenant(self):
         # GET /tenant/{tenantId}

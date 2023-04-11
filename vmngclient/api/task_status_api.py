@@ -9,7 +9,7 @@ from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # t
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
-from pydantic import BaseModel, Field  # type: ignore
+from pydantic import BaseModel, Field
 
 from vmngclient.exceptions import EmptyTaskResponseError, TaskNotRegisteredError
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId

@@ -182,8 +182,8 @@ class vManageSession(vManageResponseAdapter):
 
         self.api = APIContainter(self)
         self.primitives = APIPrimitiveContainter(self)
-        self._platform_version: Optional[Version] = None
-        self._api_version: Optional[Version] = None
+        self._platform_version: Version
+        self._api_version: Version
 
     def request(self, method, url, *args, **kwargs) -> vManageResponse:
         full_url = self.get_full_url(url)

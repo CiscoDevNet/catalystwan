@@ -25,7 +25,7 @@ class ServerInfo(BaseModel):
     locale: Optional[str]
     roles: List[str] = []
     external_user: Optional[bool] = Field(alias="externalUser")
-    platform_version: Optional[VersionField] = Field(alias="platformVersion")
+    platform_version: VersionField = Field(alias="platformVersion")
     general_template: Optional[bool] = Field(alias="generalTemplate")
     disable_full_config_push: Optional[bool] = Field(alias="disableFullConfigPush")
     enable_server_events: Optional[bool] = Field(alias="enableServerEvents")
@@ -36,7 +36,7 @@ class ServerInfo(BaseModel):
 
 class AboutInfo(BaseModel):
     title: Optional[str]
-    version: Optional[VersionField]
+    version: VersionField
     application_version: Optional[str] = Field(alias="applicationVersion")
     application_server: Optional[str] = Field(alias="applicationServer")
     copyright: Optional[str]
@@ -47,7 +47,7 @@ class AboutInfo(BaseModel):
 
 class ClientAPI(APIPrimitiveBase):
     def server(self) -> ServerInfo:
-        return self.session.get("/dataservice/client/server").dataobj(ServerInfo)
+        return self.get("/client/server").dataobj(ServerInfo)
 
     def about(self) -> AboutInfo:
-        return self.session.get("/dataservice/client/about").dataobj(AboutInfo)
+        return self.get("/client/about").dataobj(AboutInfo)
