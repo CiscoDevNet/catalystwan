@@ -9,6 +9,7 @@ from vmngclient.api.versions_utils import (
     RepositoryAPI,
 )
 from vmngclient.dataclasses import Device
+from vmngclient.typed_list import DataSequence
 
 
 class TestRepositoryAPI(unittest.TestCase):
@@ -86,7 +87,7 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_device_versions = DeviceVersions(mock_repository_object, DeviceCategory.CONTROLLERS.value)
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
         answer = mock_device_versions.get_device_available("ver1", [self.device])
-        expected_result = [DeviceVersionPayload("mock_uuid", "mock_ip", "ver1")]
+        expected_result = DataSequence(DeviceVersionPayload, [DeviceVersionPayload("mock_uuid", "mock_ip", "ver1")])
 
         # Assert
         self.assertEqual(
@@ -104,7 +105,7 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_device_versions = DeviceVersions(mock_repository_object, DeviceCategory.CONTROLLERS.value)
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
         answer = mock_device_versions.get_device_list_in_installed("ver1", [self.device])
-        expected_result = [DeviceVersionPayload("mock_uuid", "mock_ip", "ver1")]
+        expected_result = DataSequence(DeviceVersionPayload, [DeviceVersionPayload("mock_uuid", "mock_ip", "ver1")])
 
         # Assert
         self.assertEqual(
@@ -124,5 +125,5 @@ class TestRepositoryAPI(unittest.TestCase):
         # Act
         answer = mock_device_versions.get_devices_current_version([self.device])
         # Answer
-        proper_answer = [DeviceVersionPayload("mock_uuid", "mock_ip", "curr_ver")]
+        proper_answer = DataSequence(DeviceVersionPayload, [DeviceVersionPayload("mock_uuid", "mock_ip", "curr_ver")])
         self.assertEqual(answer, proper_answer)
