@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from enum import Enum
 from pathlib import PurePath
 from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
@@ -18,11 +17,6 @@ if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
-
-
-class DeviceCategory(Enum):
-    CONTROLLERS = "controllers"
-    VEDGES = "vedges"
 
 
 @define
@@ -79,7 +73,7 @@ class RepositoryAPI:
         software_images = list(self.session.get_data(url))
         return software_images
 
-    def get_devices_versions_repository(self, device_category: DeviceCategory) -> Dict[str, DeviceSoftwareRepository]:
+    def get_devices_versions_repository(self) -> Dict[str, DeviceSoftwareRepository]:
         """
         Create DeviceSoftwareRepository dataclass,
         which cointains information about all possible version types for certain devices
@@ -89,10 +83,12 @@ class RepositoryAPI:
             information
         """
 
-        url = f"/dataservice/system/device/{device_category.value}"
-        devices_versions_info = self.session.get_data(url)
+        url = "/dataservice/system/device/controllers"
+        controllers_versions_info = self.session.get_data(url)
+        url = "/dataservice/system/device/vedges"
+        edges_versions_info = self.session.get_data(url)
         devices_versions_repository = {}
-        for device in devices_versions_info:
+        for device in controllers_versions_info + edges_versions_info:
             device_all_versions = create_dataclass(DeviceSoftwareRepository, device)
             device_all_versions.installed_versions = [version for version in device_all_versions.available_versions]
             device_all_versions.installed_versions.append(device_all_versions.current_version)
@@ -175,9 +171,8 @@ class DeviceVersions:
     Methods to prepare devices list for payload
     """
 
-    def __init__(self, session: vManageSession, device_category: DeviceCategory):
+    def __init__(self, session: vManageSession):
         self.repository = RepositoryAPI(session)
-        self.device_category = device_category
 
     def _get_device_list_in(
         self, version_to_set_up: str, devices: DataSequence[Device], version_type: str
@@ -197,7 +192,7 @@ class DeviceVersions:
         devices_payload = DataSequence(
             DeviceVersionPayload, [DeviceVersionPayload(device.uuid, device.id) for device in devices]  # type: ignore
         )
-        all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
+        all_dev_versions = self.repository.get_devices_versions_repository()
         for device in devices_payload:
             device_versions = getattr(all_dev_versions[device.deviceId], version_type)
             try:
@@ -262,7 +257,7 @@ class DeviceVersions:
         devices_payload = DataSequence(
             DeviceVersionPayload, [DeviceVersionPayload(device.uuid, device.id) for device in devices]  # type: ignore
         )
-        all_dev_versions = self.repository.get_devices_versions_repository(self.device_category)
+        all_dev_versions = self.repository.get_devices_versions_repository()
         for device in devices_payload:
             device.version = getattr(all_dev_versions[device.deviceId], version_type)
         return devices_payload
