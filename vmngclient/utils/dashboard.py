@@ -5,7 +5,7 @@ from typing import Any, List, Optional, Union
 
 from attr import define, field  # type: ignore
 
-from vmngclient.api.software_action_api import DeviceType
+from vmngclient.utils.upgrades_helper import DeviceType
 from vmngclient.dataclasses import DataclassBase
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
