@@ -67,3 +67,7 @@ class TaskNotRegisteredError(Exception):
     """Raised if task_id is generated, but it's not registere in vManage"""
 
     pass
+
+
+class MultiplePersonalityError(Exception):
+    """Raised if Device DataSequnce contains devices with multiples personalities"""
