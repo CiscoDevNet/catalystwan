@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Dict, List, Optional, cast
 
+from vmngclient.api.task_status_api import Task
 from vmngclient.api.versions_utils import DeviceVersions, RemovePartitionPayload, RepositoryAPI
 from vmngclient.dataclasses import Device
 from vmngclient.typed_list import DataSequence
@@ -43,7 +44,7 @@ class PartitionManagerAPI:
         self.repository = RepositoryAPI(self.session)
         self.device_version = DeviceVersions(self.session)
 
-    def set_default_partition(self, devices: DataSequence[Device], partition: Optional[str] = None) -> str:
+    def set_default_partition(self, devices: DataSequence[Device], partition: Optional[str] = None) -> Task:
         """
         Set defualt software versions for devices
 
@@ -68,11 +69,11 @@ class PartitionManagerAPI:
             "deviceType": get_install_specification(devices.first()).device_type.value,
         }
         set_default = dict(self.session.post(url, json=payload).json())
-        return set_default["id"]
+        return Task(self.session, set_default["id"])
 
     def remove_partition(
         self, devices: DataSequence[Device], partition: Optional[str] = None, force: bool = False
-    ) -> str:
+    ) -> Task:
         """
         Remove chosen software version from device
 
@@ -105,7 +106,7 @@ class PartitionManagerAPI:
         if force is False:
             self._check_remove_partition_possibility(cast(list, payload["devices"]))
         remove_action: Dict[str, str] = self.session.post(url, json=payload).json()
-        return remove_action["id"]
+        return Task(self.session, remove_action["id"])
 
     def _check_remove_partition_possibility(self, payload_devices: List[dict]) -> None:
         devices_versions_repository = self.repository.get_devices_versions_repository()
