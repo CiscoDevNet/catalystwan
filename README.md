@@ -66,7 +66,7 @@ session.api.repository.upload_image(software_image)
 # Install software
 
 install_task = session.api.software.install(devices = vsmarts,
-    software_image= image)
+    image= image)
 
 # Check action status
 install_task.wait_for_completed()

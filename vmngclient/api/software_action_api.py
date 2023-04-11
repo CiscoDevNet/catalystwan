@@ -51,7 +51,7 @@ class SoftwareActionAPI:
         self,
         devices: DataSequence[Device],
         version_to_activate: Optional[str] = "",
-        software_image: Optional[str] = "",
+        image: Optional[str] = "",
     ) -> Task:
         """
         Set chosen version as current version
@@ -68,9 +68,9 @@ class SoftwareActionAPI:
             str: Activate software action id
         """
         validate_personality_homogeneity(devices)
-        if software_image and not version_to_activate:
-            version = cast(str, self.repository.get_image_version(software_image))
-        elif version_to_activate and not software_image:
+        if image and not version_to_activate:
+            version = cast(str, self.repository.get_image_version(image))
+        elif version_to_activate and not image:
             version = cast(str, version_to_activate)
         else:
             raise VersionDeclarationError("You can not provide software_image and image version at the same time!")
@@ -91,7 +91,7 @@ class SoftwareActionAPI:
         devices: DataSequence[Device],
         reboot: bool = False,
         sync: bool = True,
-        software_image: Optional[str] = "",
+        image: Optional[str] = "",
         image_version: Optional[str] = "",
     ) -> Task:
         """
@@ -116,9 +116,9 @@ class SoftwareActionAPI:
             str: action id
         """
         validate_personality_homogeneity(devices)
-        if software_image and not image_version:
-            version = cast(str, self.repository.get_image_version(software_image))
-        elif image_version and not software_image:
+        if image and not image_version:
+            version = cast(str, self.repository.get_image_version(image))
+        elif image_version and not image:
             version = cast(str, image_version)
         else:
             raise VersionDeclarationError("You can not provide software_image and image version at the same time")
