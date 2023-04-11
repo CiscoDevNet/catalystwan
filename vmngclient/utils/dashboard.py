@@ -158,7 +158,7 @@ class TenantStatus(DataclassBase):
     vedge_health: vEdgeHealth = field(
         metadata={FIELD_NAME: "vEdgeHealth"}, converter=lambda x: create_dataclass(vEdgeHealth, x)
     )
-    vsmatr_status: vSmartStatus = field(
+    vsmart_status: vSmartStatus = field(
         metadata={FIELD_NAME: "vSmartStatus"}, converter=lambda x: create_dataclass(vSmartStatus, x)
     )
 
