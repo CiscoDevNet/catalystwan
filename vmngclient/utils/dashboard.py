@@ -5,12 +5,12 @@ from typing import Any, List, Optional, Union
 
 from attr import define, field  # type: ignore
 
-from vmngclient.utils.upgrades_helper import DeviceType
 from vmngclient.dataclasses import DataclassBase
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
+from vmngclient.utils.upgrades_helper import DeviceType
 
 
 class DeviceName(Enum):
