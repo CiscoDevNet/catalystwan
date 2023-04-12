@@ -10,7 +10,6 @@ from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import FIELD_NAME, create_dataclass
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
-from vmngclient.utils.upgrades_helper import DeviceType
 
 
 class DeviceName(Enum):
@@ -166,17 +165,17 @@ class TenantStatus(DataclassBase):
 @define
 class DeviceHealth(DataclassBase):
     name: str
-    personality: Personality
+    personality: Personality = field(converter=Personality)
     uuid: str
-    reachability: Reachability
+    reachability: Reachability = field(converter=Reachability)
     longitude: float
     latitude: float
-    health: DeviceHealthColor
+    health: DeviceHealthColor = field(converter=DeviceHealthColor)
     qoe: int
     location: str
     site_id: str
     system_ip: str
-    device_type: DeviceType
+    device_type: Personality = field(converter=Personality)
     local_system_ip: str
     device_model: str
     software_version: str
