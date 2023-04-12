@@ -57,7 +57,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         self.mock_repository_object.session.post.return_value.json.return_value = {"id": "mock_action_id"}
 
         # Assert
-        answer = self.mock_partition_manager_obj.remove_partition(self.device, force=True)
+        answer = self.mock_partition_manager_obj.remove_partition(self.device, force=True).task_id
         self.assertEqual(answer, "mock_action_id")
 
     @patch.object(PartitionManagerAPI, "_check_remove_partition_possibility")
@@ -70,7 +70,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         self.mock_repository_object.session.post.return_value.json.return_value = {"id": "mock_action_id"}
 
         # Assert
-        answer = self.mock_partition_manager_obj.remove_partition(self.device, force=False)
+        answer = self.mock_partition_manager_obj.remove_partition(self.device, force=False).task_id
         self.assertEqual(answer, "mock_action_id", "action ids not equal")
 
     @patch.object(RepositoryAPI, "get_devices_versions_repository")
@@ -99,7 +99,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         mock_partition_manager = PartitionManagerAPI(mock_session)
         mock_partition_manager.session.post.return_value.json.return_value = {"id": "id_1"}
         # Act
-        answer = mock_partition_manager.set_default_partition(self.device)
+        answer = mock_partition_manager.set_default_partition(self.device).task_id
 
         # Assert
         self.assertEqual(answer, "id_1")
