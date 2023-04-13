@@ -16,7 +16,6 @@ class TestAaaAPI(unittest.TestCase):
             "adminAuthOrder": True,
             "auditDisable": False,
             "accounting": False,
-            "radiusServers": "server1",
         }
         self.p_aaa = {
             "authOrder": ["radius", "local"],
@@ -24,7 +23,6 @@ class TestAaaAPI(unittest.TestCase):
             "adminAuthOrder": True,
             "auditDisable": True,
             "accounting": True,
-            "radiusServers": "serverX",
         }
         self.aaa_dataclass = create_dataclass(TenantAAA, self.aaa)
         self.p_aaa_dataclass = create_dataclass(TenantAAA, self.p_aaa)
@@ -43,8 +41,8 @@ class TestAaaAPI(unittest.TestCase):
         self.assertEqual(answer, expected_outcome)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.Session")
     @patch("requests.Response")
+    @patch("vmngclient.session.Session")
     def test_add_aaa(self, status_code, expected_outcome, mock_session, mock_response):
         # Arrange
         mock_session.get_data.return_value = self.aaa
@@ -84,7 +82,6 @@ class TestRadiusAPI(unittest.TestCase):
                 "address": "10.0.5.143",
                 "authPort": 1812,
                 "acctPort": 1813,
-                "tag": "test",
                 "vpn": 1,
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
@@ -95,7 +92,6 @@ class TestRadiusAPI(unittest.TestCase):
                 "address": "10.0.5.144",
                 "authPort": 1812,
                 "acctPort": 1813,
-                "tag": "test",
                 "vpn": 1,
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
@@ -106,7 +102,6 @@ class TestRadiusAPI(unittest.TestCase):
                 "address": "10.0.5.145",
                 "authPort": 1812,
                 "acctPort": 1813,
-                "tag": "test",
                 "vpn": 1,
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
@@ -120,7 +115,6 @@ class TestRadiusAPI(unittest.TestCase):
                 "address": "10.0.5.143",
                 "authPort": 1812,
                 "acctPort": 1813,
-                "tag": "test",
                 "vpn": 1,
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
@@ -131,7 +125,6 @@ class TestRadiusAPI(unittest.TestCase):
                 "address": "10.0.5.144",
                 "authPort": 1812,
                 "acctPort": 1813,
-                "tag": "test",
                 "vpn": 1,
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",

@@ -58,7 +58,10 @@ def response_debug(response: Optional[Response], request: Union[Request, Prepare
         }
         try:
             json = response.json()
-            json.pop("header", None)
+
+            if isinstance(json, dict):
+                json.pop("header", None)
+
             response_debug.update({"json": json})
         except JSONDecodeError:
             if response.encoding is not None:
