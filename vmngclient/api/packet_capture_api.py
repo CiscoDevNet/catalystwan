@@ -1,13 +1,5 @@
 from __future__ import annotations
 
-""" Methods for setting up packet capture session,
-   and download .pcap session file.
-
-    Returns:
-        status: Status
-"""
-
-
 import logging
 import time
 from contextlib import contextmanager
@@ -32,20 +24,30 @@ class DownloadStatus(Enum):
 
 
 class PacketCaptureAPI:
+    """Methods for setting up packet capture session, and download .pcap session file.
+
+    Args:
+        session:
+        vpn: Defaults to 0.
+        interface: Defaults to ge0/1.
+
+    Examples:
+        >>> edge_device = session.api.devices.get().filter(personality=Personality.EDGE)[0]
+        >>> packet_capture = session.api.packet_capture.get_packets(edge_device)
+    """
+
     def __init__(
         self,
         session: vManageSession,
         vpn: str = "0",
         interface: str = "ge0/1",
-        status=None,
     ) -> None:
         self.session = session
         self.vpn = vpn
         self.interface = interface
-        self.status = status
 
     def get_packets(self, device: Device, duration_seconds=120) -> Status:
-        """Initate packet capture process.
+        """Initiate packet capture process.
 
         Args:
             device (Device): Device class object
@@ -96,7 +98,7 @@ class PacketCaptureAPI:
             if self.packet_channel.is_new_session is True:
                 yield self.packet_channel
             else:
-                self.status = None
+                self.status = None  # type: ignore
                 raise PermissionError("Can't start new session, another is already open")
         finally:
             for _ in range(3):
@@ -144,6 +146,6 @@ class PacketCaptureAPI:
 
     def get_status(self, packet_channel: PacketSetup) -> Status:
         url_path = f"/dataservice/stream/device/capture/status/{packet_channel.session_id}"
-        self.status = dict(self.session.get_json(url_path))
-        self.status = create_dataclass(Status, self.status)
+        status = self.session.get_json(url_path)
+        self.status = create_dataclass(Status, status)
         return self.status
