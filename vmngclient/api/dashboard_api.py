@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
-from vmngclient.utils.dashboard import CertificatesStatus, Count
+from vmngclient.utils.dashboard import CertificatesStatus, Count, DeviceHealth, DevicesHealth, TenantStatus
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -75,3 +75,79 @@ class DashboardAPI:
             status.status_list = DataSequence(Count, [create_dataclass(Count, item) for item in status.status_list])
 
         return statuses
+
+    def get_bfd_connectivity_count(self) -> DataSequence[Count]:
+        """
+        Get information about bfd connectivity count.
+
+        Returns:
+            DataSequance of Count dataclass with bfd connectivity
+        """
+        response = self.session.get("/dataservice/device/bfd/sites/summary")
+
+        bfd_response = response.dataseq(Count)
+        for item in bfd_response:
+            item.status_list = DataSequence(
+                Count, [create_dataclass(Count, bfd_connection) for bfd_connection in item.status_list]  # type:ignore
+            )
+
+        return bfd_response
+
+    def get_edges_inventory_count(self) -> DataSequence[Count]:
+        """
+        Get information about edges inventory.
+
+        Returns:
+            DataSequance of Count dataclass with edges inventory count
+        """
+        response = self.session.get("/dataservice/device/vedgeinventory/summary")
+
+        edges_inventory = response.dataseq(Count)
+
+        return edges_inventory
+
+    def get_transport_interface_distribution(self) -> DataSequence[Count]:
+        """
+        Get information about transport interface distribution.
+
+        Returns:
+            DataSequance of Count dataclass with transport interface distribution
+        """
+        response = self.session.get("/dataservice/device/tlocutil")
+
+        transport_interface = response.dataseq(Count)
+
+        return transport_interface
+
+    def get_tenant_status(self) -> DataSequence[TenantStatus]:
+        """
+        Get information about tenant status, including:
+        - control status
+        - site health
+        - vEdge health
+        - vSmart status
+
+        Returns:
+            DataSequance of TenantStatus dataclass with tenant status information
+        """
+        response = self.session.get("/dataservice/tenantstatus")
+
+        transport_interface = response.dataseq(TenantStatus)
+
+        return transport_interface
+
+    def get_devices_health(self) -> DevicesHealth:
+        """
+        Get information about devices health
+
+        Returns:
+            DevicesHealth object
+        """
+        response = self.session.get_json("/dataservice/health/devices")
+        devices_health = create_dataclass(DevicesHealth, response)
+
+        devices_health.devices = DataSequence(
+            DeviceHealth, [create_dataclass(DeviceHealth, device) for device in devices_health.devices]  # type: ignore
+        )
+
+        return devices_health
