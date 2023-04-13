@@ -53,8 +53,8 @@ class TestSoftwareAcionAPI(unittest.TestCase):
         mock_session.post.return_value = {"id": "mock_action_id"}
 
         # Assert
-        answer = self.mock_software_action_obj.install(DataSequence(Device, [self.device]), True, True, "path")
-        self.assertEqual(answer, "mock_action_id", "action ids not equal")
+        answer = self.mock_software_action_obj.install(DataSequence(Device, [self.device]), True, True, "path").task_id
+        self.assertEqual(answer, "mock_action_id")
 
     @patch.object(RepositoryAPI, "get_devices_versions_repository")
     def test_downgrade_check_no_incorrect_devices(self, mock_get_devices_versions_repository):
