@@ -417,7 +417,6 @@ class TenantAAA(DataclassBase):
     audit_disable: bool = field(metadata={FIELD_NAME: "auditDisable"})
     auth_fallback: bool = field(metadata={FIELD_NAME: "authFallback"})
     auth_order: List[str] = field(metadata={FIELD_NAME: "authOrder"})
-    radius_servers: str = field(metadata={FIELD_NAME: "radiusServers"})
 
 
 @define(frozen=True)
@@ -429,7 +428,6 @@ class RadiusServer(DataclassBase):
     address: str = field(metadata={FIELD_NAME: "address"})
     auth_port: int = field(metadata={FIELD_NAME: "authPort"})
     acct_port: int = field(metadata={FIELD_NAME: "acctPort"})
-    tag: str = field(metadata={FIELD_NAME: "tag"})
     vpn: int = field(metadata={FIELD_NAME: "vpn"})
     vpn_ip_subnet: str = field(metadata={FIELD_NAME: "vpnIpSubnet"})
     key: str = field(metadata={FIELD_NAME: "key"})

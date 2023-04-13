@@ -66,6 +66,7 @@ class TenantAaaAPI:
         """
         logger.debug(f"AAA config {self.tenant_id}.")
         tenant_aaa = self.session.get_data(self.url_path)
+        # return tenant_aaa
         return create_dataclass(TenantAAA, tenant_aaa)
 
     @status_ok
