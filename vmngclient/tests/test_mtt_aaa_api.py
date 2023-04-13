@@ -41,8 +41,8 @@ class TestAaaAPI(unittest.TestCase):
         self.assertEqual(answer, expected_outcome)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.Session")
     @patch("requests.Response")
+    @patch("vmngclient.session.Session")
     def test_add_aaa(self, status_code, expected_outcome, mock_session, mock_response):
         # Arrange
         mock_session.get_data.return_value = self.aaa
