@@ -324,7 +324,7 @@ class TemplatesAPI:
 
     @overload
     def edit(self, template: CLITemplate) -> Any:
-        pass
+        ...
 
     def edit(self, template):
         template_info = self.get(template).filter(name=template.name).single_or_default()
