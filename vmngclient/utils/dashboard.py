@@ -54,7 +54,7 @@ class PercentageDistribution(Enum):
     ABOVE_500_MBPS: str = "> 500 Mbps"
 
 
-class DeviceHealthColor(Enum):
+class HealthColor(Enum):
     GREEN: str = "green"
     YELLOW: str = "yellow"
     RED: str = "red"
@@ -170,7 +170,7 @@ class DeviceHealth(DataclassBase):
     reachability: Reachability = field(converter=Reachability)
     longitude: float
     latitude: float
-    health: DeviceHealthColor = field(converter=DeviceHealthColor)
+    health: HealthColor = field(converter=HealthColor)
     qoe: int
     location: str
     site_id: str
@@ -202,3 +202,52 @@ class DeviceHealth(DataclassBase):
 class DevicesHealth(DataclassBase):
     total_devices: int
     devices: DataSequence[DeviceHealth]
+
+
+@define
+class LicensedDevices(DataclassBase):
+    """Number of total and licensed devices"""
+
+    total_devices: int = field(metadata={FIELD_NAME: "totalDevices"})
+    licensed_devices: int = field(metadata={FIELD_NAME: "licensedDevice"})
+
+
+@define
+class DeviceHealthOverview(DataclassBase):
+    """Number of devices with given health overview"""
+
+    good: int
+    fair: int
+    poor: int
+
+
+@define
+class TransportHealth(DataclassBase):
+    """Contains information about loss percentage, latency and jitter for a given color."""
+
+    entry_time: int
+    jitter: int
+    color: str
+    loss_percentage: float
+    latency: int
+    app_probe_class: str
+    summary_time: int
+
+
+@define
+class TunnelHealth(DataclassBase):
+    """Contains information about health for a given tunnel."""
+
+    name: str
+    remote_color: str
+    remote_system_ip: str
+    local_color: str
+    local_system_ip: str
+    vqoe_score: float
+    jitter: float
+    rx_octets: float
+    loss_percentage: float
+    latency: float
+    state: str
+    tx_octets: int
+    health: HealthColor = field(converter=HealthColor)
