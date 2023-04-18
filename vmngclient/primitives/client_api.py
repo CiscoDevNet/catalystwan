@@ -1,7 +1,7 @@
 from datetime import datetime
-from distutils.version import Version
 from typing import Any, List, Optional
 
+from packaging.version import Version  # type: ignore
 from pydantic import BaseModel, Field
 
 from vmngclient.primitives import APIPrimitiveBase
