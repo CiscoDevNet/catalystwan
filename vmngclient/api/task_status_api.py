@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from time import sleep
-from typing import TYPE_CHECKING, List, cast
+from typing import TYPE_CHECKING, List, Optional, cast
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
@@ -27,7 +27,7 @@ class SubTaskData(BaseModel):
     order: int
     uuid: str
     hostname: str = Field(alias="host-name")
-    site_id: str = Field(alias="site-id")
+    site_id: Optional[str] = Field(alias="site-id")
 
 
 class TaskResult(BaseModel):
