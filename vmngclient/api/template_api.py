@@ -20,6 +20,7 @@ from vmngclient.api.templates.feature_template_payload import FeatureTemplatePay
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
 from vmngclient.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, TemplateInfo
 from vmngclient.exceptions import AlreadyExistsError, AttachedError, TemplateNotFoundError
+from vmngclient.response import vManageResponse
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.template_type import TemplateType
 
@@ -316,6 +317,35 @@ class TemplatesAPI:
             logger.warning(f"Template: {template} is attached to device - cannot be deleted.")
             raise AttachedError(template.name)
         return True
+
+    @overload
+    def edit(self, template: FeatureTemplate) -> Any:
+        ...
+
+    @overload
+    def edit(self, template: CLITemplate) -> Any:
+        ...
+
+    def edit(self, template):
+        template_info = self.get(template).filter(name=template.name).single_or_default()
+        if not template_info:
+            raise TemplateNotFoundError(f"Template with name [{template.name}] does not exists.")
+
+        if isinstance(template, FeatureTemplate):
+            return self._edit_feature_template(template, template_info)
+
+        raise NotImplementedError()
+
+    def _edit_feature_template(self, template: FeatureTemplate, data: FeatureTemplateInfo) -> vManageResponse:
+        if self.is_created_by_generator(template):
+            debug = False
+            schema = self.get_feature_template_schema(template, debug)
+            payload = self.generate_feature_template_payload(template, schema, debug).dict(by_alias=True)
+        else:
+            payload = json.loads(template.generate_payload(self.session))
+
+        response = self.session.put(f"/dataservice/template/feature/{data.id}", json=payload)
+        return response
 
     @overload
     def create(self, template: FeatureTemplate) -> str:
