@@ -4,7 +4,17 @@ from typing import TYPE_CHECKING
 
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
-from vmngclient.utils.dashboard import CertificatesStatus, Count, DeviceHealth, DevicesHealth, TenantStatus
+from vmngclient.utils.dashboard import (
+    CertificatesStatus,
+    Count,
+    DeviceHealth,
+    DeviceHealthOverview,
+    DevicesHealth,
+    LicensedDevices,
+    TenantStatus,
+    TransportHealth,
+    TunnelHealth,
+)
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -151,3 +161,47 @@ class DashboardAPI:
         )
 
         return devices_health
+
+    def get_licensed_devices(self) -> DataSequence[LicensedDevices]:
+        """
+        Get information about licensed devices.
+
+        Returns:
+            DataSequance of LicensedDevices dataclass with licences information.
+        """
+        response = self.session.get("/dataservice/msla/monitoring/licensedDeviceCount")
+
+        return response.dataseq(LicensedDevices)
+
+    def get_devices_health_overview(self) -> DataSequence[DeviceHealthOverview]:
+        """
+        Get information about health overview devices.
+
+        Returns:
+            DataSequance of DeviceHealthOverview dataclass with health information.
+        """
+        response = self.session.get_json("/dataservice/health/devices/overview")
+
+        return DataSequence(DeviceHealthOverview, [create_dataclass(DeviceHealthOverview, response)])
+
+    def get_transport_health(self) -> DataSequence[TransportHealth]:
+        """
+        Get information about loss percentage, latency and jitter for all links and combinations of colors.
+
+        Returns:
+            DataSequance of TransportHealth dataclass with loss percentage, latency and jitter information.
+        """
+        response = self.session.get("/dataservice/statistics/approute/transport/summary/loss_percentage")
+
+        return response.dataseq(TransportHealth)
+
+    def get_tunnel_health(self) -> DataSequence[TunnelHealth]:
+        """
+        Get information about state, loss percentage, latency and jitter for tunnels.
+
+        Returns:
+            DataSequance of TunnelHealth dataclass with tunnel health information.
+        """
+        response = self.session.get("/dataservice/statistics/approute/tunnels/health/latency")
+
+        return response.dataseq(TunnelHealth)
