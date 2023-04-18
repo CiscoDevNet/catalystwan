@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from attr import define, field  # type: ignore
 from parameterized import parameterized  # type: ignore
-from pydantic import BaseModel  # type: ignore
+from pydantic import BaseModel, Field
 
 from vmngclient.dataclasses import DataclassBase
 from vmngclient.response import ErrorInfo, vManageResponse
@@ -21,7 +21,7 @@ class ParsedDataTypeAttrs(DataclassBase):
 class ParsedDataTypePydantic(BaseModel):
     key1: str
     key2: int
-    key3: Optional[float] = field(default=None)
+    key3: Optional[float] = Field(default=None)
 
 
 PARSE_DATASEQ_TEST_DATA: List = [
