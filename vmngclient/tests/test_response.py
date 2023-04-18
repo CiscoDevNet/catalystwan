@@ -1,9 +1,10 @@
 import unittest
-from typing import Any, Optional
+from typing import Any, List, Optional
 from unittest.mock import patch
 
 from attr import define, field  # type: ignore
 from parameterized import parameterized  # type: ignore
+from pydantic import BaseModel  # type: ignore
 
 from vmngclient.dataclasses import DataclassBase
 from vmngclient.response import ErrorInfo, vManageResponse
@@ -11,41 +12,99 @@ from vmngclient.typed_list import DataSequence
 
 
 @define
-class ParsedDataType(DataclassBase):
+class ParsedDataTypeAttrs(DataclassBase):
     key1: str
     key2: int
     key3: Optional[float] = field(default=None)
 
 
+class ParsedDataTypePydantic(BaseModel):
+    key1: str
+    key2: int
+    key3: Optional[float] = field(default=None)
+
+
+PARSE_DATASEQ_TEST_DATA: List = [
+    (True, None, 0, "data"),
+    (True, "string", 0, "data"),
+    (True, {}, 0, "data"),
+    (True, {"key1": "string", "key2": 12, "key3": 4.5}, 0, "data"),
+    (True, 15, 0, "data"),
+    (True, {"data": None}, 0, "data"),
+    (True, {"data": {}}, 0, "data"),
+    (False, {"data": []}, 0, "data"),
+    (True, {"data": "something"}, 0, "data"),
+    (False, {"data": {"key1": "string", "key2": 12, "key3": None}}, 1, "data"),
+    (True, {"data": {"key1": "string", "key2": 12, "key3": None}}, 1, "other"),
+    (False, {"other": {"key1": "string", "key2": 12, "key3": None}}, 1, "other"),
+    (False, {"data": [{"key1": "string", "key2": 66}, {"key1": "required", "key2": 18, "key3": 0.1}]}, 2, "data"),
+    (True, {"headers": {"key1": 1, "key2": "two"}}, 0, "data"),
+    (True, {"error": {"message": "Error happened!", "details": "error details", "code": "ABC123"}}, 0, "data"),
+]
+
+
+PARSE_DATAOBJ_TEST_DATA: List = [
+    (True, None, "data"),
+    (True, "string", "data"),
+    (True, {}, "data"),
+    (True, {"data": "something"}, "data"),
+    (False, {"data": {"key1": "string", "key2": 12, "key3": None}}, "data"),
+    (True, {"data": {"key1": "string", "key2": 12, "key3": None}}, "other"),
+    (False, {"other": {"key1": "string", "key2": 12, "key3": 55.13}}, "other"),
+    (True, {"data": [{"key1": "string", "key2": 66}, {"key1": "required", "key2": 18, "key3": 0.1}]}, "data"),
+]
+
+
 class TestResponse(unittest.TestCase):
-    @parameterized.expand(
-        [
-            (True, None, 0),
-            (True, "string", 0),
-            (True, {}, 0),
-            (True, {"key1": "string", "key2": 12, "key3": 4.5}, 0),
-            (True, 15, 0),
-            (True, {"data": None}, 0),
-            (True, {"data": {}}, 0),
-            (False, {"data": []}, 0),
-            (True, {"data": "something"}, 0),
-            (False, {"data": {"key1": "string", "key2": 12, "key3": None}}, 1),
-            (False, {"data": [{"key1": "string", "key2": 66}, {"key1": "required", "key2": 18, "key3": 0.1}]}, 2),
-            (True, {"headers": {"key1": 1, "key2": "two"}}, 0),
-            (True, {"error": {"message": "Error happened!", "details": "error details", "code": "ABC123"}}, 0),
-        ]
-    )
+    @parameterized.expand(PARSE_DATASEQ_TEST_DATA)
     @patch("requests.Response")
-    def test_dataseq(self, raises: bool, json: Any, expected_len: int, mock_response):
+    def test_dataseq_attrs(self, raises: bool, json: Any, expected_len: int, sourcekey: str, mock_response):
         mock_response.json.return_value = json
         vmng_response = vManageResponse(mock_response)
         if not raises:
-            data_sequence = vmng_response.dataseq(ParsedDataType)
+            data_sequence = vmng_response.dataseq(ParsedDataTypeAttrs, sourcekey)
             assert isinstance(data_sequence, DataSequence)
             assert len(data_sequence) == expected_len
         else:
             with self.assertRaises(Exception):
-                vmng_response.dataseq(ParsedDataType)
+                vmng_response.dataseq(ParsedDataTypeAttrs, sourcekey)
+
+    @parameterized.expand(PARSE_DATASEQ_TEST_DATA)
+    @patch("requests.Response")
+    def test_dataseq_pydantic(self, raises: bool, json: Any, expected_len: int, sourcekey: str, mock_response):
+        mock_response.json.return_value = json
+        vmng_response = vManageResponse(mock_response)
+        if not raises:
+            data_sequence = vmng_response.dataseq(ParsedDataTypePydantic, sourcekey)
+            assert isinstance(data_sequence, DataSequence)
+            assert len(data_sequence) == expected_len
+        else:
+            with self.assertRaises(Exception):
+                vmng_response.dataseq(ParsedDataTypePydantic, sourcekey)
+
+    @parameterized.expand(PARSE_DATAOBJ_TEST_DATA)
+    @patch("requests.Response")
+    def test_dataobj_attrs(self, raises: bool, json: Any, sourcekey: str, mock_response):
+        mock_response.json.return_value = json
+        vmng_response = vManageResponse(mock_response)
+        if not raises:
+            data_object = vmng_response.dataobj(ParsedDataTypeAttrs, sourcekey)
+            assert isinstance(data_object, ParsedDataTypeAttrs)
+        else:
+            with self.assertRaises(Exception):
+                vmng_response.dataobj(ParsedDataTypeAttrs, sourcekey)
+
+    @parameterized.expand(PARSE_DATAOBJ_TEST_DATA)
+    @patch("requests.Response")
+    def test_dataobj_pydantic(self, raises: bool, json: Any, sourcekey: str, mock_response):
+        mock_response.json.return_value = json
+        vmng_response = vManageResponse(mock_response)
+        if not raises:
+            data_object = vmng_response.dataobj(ParsedDataTypePydantic, sourcekey)
+            assert isinstance(data_object, ParsedDataTypePydantic)
+        else:
+            with self.assertRaises(Exception):
+                vmng_response.dataobj(ParsedDataTypePydantic, sourcekey)
 
     @parameterized.expand(
         [

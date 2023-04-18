@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from packaging.specifiers import SpecifierSet  # type: ignore
 from packaging.version import Version  # type: ignore
@@ -37,6 +37,10 @@ class APIPrimitiveBase:
     def delete(self, urn: str, *args, **kwargs) -> vManageResponse:
         return self.request("DELETE", urn, *args, **kwargs)
 
+    @property
+    def version(self) -> Optional[Version]:
+        return self.session.api_version
+
 
 class Versions:
     """
@@ -53,7 +57,7 @@ class Versions:
             api = args[0]
             if not isinstance(api, APIPrimitiveBase):
                 raise TypeError("Only APIPrimitiveBase instance methods can be annotated with @Versions decorator")
-            current = api.session.api_version
+            current = api.version
             supported = self.versions
             if current and current not in supported:
                 if self.raises:
@@ -65,13 +69,3 @@ class Versions:
             return func(*args, **kwargs)
 
         return wrapper
-
-
-class VersionField(Version):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, value):
-        return Version(value)
