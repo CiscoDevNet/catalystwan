@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Optional
 from packaging.specifiers import SpecifierSet  # type: ignore
 from packaging.version import Version  # type: ignore
 
-from vmngclient.exceptions import APIVersionException
+from vmngclient.exceptions import APIVersionError
 
 if TYPE_CHECKING:
     from vmngclient.response import vManageResponse
@@ -61,7 +61,7 @@ class Versions:
             supported = self.versions
             if current and current not in supported:
                 if self.raises:
-                    raise APIVersionException(func, supported, current)
+                    raise APIVersionError(func, supported, current)
                 else:
                     logger.warning(
                         f"vManage runs: {current} but {func.__qualname__} only supported for API versions: {supported}"

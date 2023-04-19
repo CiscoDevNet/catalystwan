@@ -49,9 +49,9 @@ class AlreadyExistsError(Exception):
     pass
 
 
-class APIVersionException(Exception):
+class APIVersionError(Exception):
     def __init__(self, item, supported, current):
-        self.message = f"vManage is: {current} but {item} only supported in API version: {supported}"
+        self.message = f"vManage is running: {current} but {item} only supported in API version: {supported}"
 
 
 class EmptyTaskResponseError(Exception):

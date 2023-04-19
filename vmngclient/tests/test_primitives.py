@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 from packaging.version import Version  # type: ignore
 from parameterized import parameterized  # type: ignore
 
-from vmngclient.exceptions import APIVersionException
+from vmngclient.exceptions import APIVersionError
 from vmngclient.primitives import APIPrimitiveBase, Versions
 from vmngclient.primitives import logger as primitives_logger
 
@@ -65,7 +65,7 @@ class TestAPIPrimitives(unittest.TestCase):
 
         self.session_mock.api_version = Version(current_version)
         api = ExampleAPI(self.session_mock)
-        with self.assertRaises(APIVersionException):
+        with self.assertRaises(APIVersionError):
             api.versions_decorated_method()
 
     def test_version_decorator_logs_warning(self):
