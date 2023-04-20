@@ -1605,9 +1605,9 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>url</strong> (<em>str</em>) – IP address or domain name</p></li>
-<li><p><strong>port</strong> (<em>int</em>) – port</p></li>
 <li><p><strong>username</strong> (<em>str</em>) – username</p></li>
 <li><p><strong>password</strong> (<em>str</em>) – password</p></li>
+<li><p><strong>port</strong> (<em>int</em>) – port</p></li>
 <li><p><strong>subdomain</strong> – subdomain specifying to which view switch when creating provider as a tenant session,
 works only on provider user mode</p></li>
 <li><p><strong>logger</strong> – logger for logging API requests</p></li>
@@ -1778,7 +1778,12 @@ relogin and try the same request again</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="vmngclient.session.vManageSession.about">
-<span class="sig-name descname"><span class="pre">about</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="headerlink" href="#vmngclient.session.vManageSession.about" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">about</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AboutInfo</span></span></span><a class="headerlink" href="#vmngclient.session.vManageSession.about" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="vmngclient.session.vManageSession.api_version">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">api_version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Version</span></em><a class="headerlink" href="#vmngclient.session.vManageSession.api_version" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1854,6 +1859,11 @@ relogin and try the same request again</p>
 <span class="sig-name descname"><span class="pre">on_session_create_hook</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.session.vManageSession.on_session_create_hook" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="vmngclient.session.vManageSession.platform_version">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">platform_version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Version</span></em><a class="headerlink" href="#vmngclient.session.vManageSession.platform_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="vmngclient.session.vManageSession.request">
 <span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">vManageResponse</span></span></span><a class="headerlink" href="#vmngclient.session.vManageSession.request" title="Permalink to this definition">¶</a></dt>
@@ -1906,7 +1916,7 @@ If Tuple, (‘cert’, ‘key’) pair.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="vmngclient.session.vManageSession.server">
-<span class="sig-name descname"><span class="pre">server</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="headerlink" href="#vmngclient.session.vManageSession.server" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">server</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ServerInfo</span></span></span><a class="headerlink" href="#vmngclient.session.vManageSession.server" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
