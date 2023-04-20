@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Final, Optional
 
 from packaging.specifiers import SpecifierSet  # type: ignore
 from packaging.version import Version  # type: ignore
@@ -13,14 +13,14 @@ if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
 
-BasePath = "/dataservice"
+BASE_PATH: Final[str] = "/dataservice"
 logger = logging.getLogger(__name__)
 
 
 class APIPrimitiveBase:
     def __init__(self, session: vManageSession):
         self.session = session
-        self.basepath = BasePath
+        self.basepath = BASE_PATH
 
     def request(self, method: str, urn: str, *args, **kwargs) -> vManageResponse:
         return self.session.request(method, self.basepath + urn, *args, **kwargs)
