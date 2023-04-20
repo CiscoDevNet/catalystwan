@@ -49,6 +49,14 @@ class AlreadyExistsError(Exception):
     pass
 
 
+class AuthenticationError(Exception):
+    pass
+
+
+class CookieNotValidError(Exception):
+    pass
+
+
 class EmptyTaskResponseError(Exception):
     """Raised if task is registred by vManage, but reponse content is empty"""
 

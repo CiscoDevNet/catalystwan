@@ -13,7 +13,7 @@ from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.api.api_containter import APIContainter
-from vmngclient.exceptions import InvalidOperationError
+from vmngclient.exceptions import AuthenticationError, CookieNotValidError, InvalidOperationError
 from vmngclient.response import response_history_debug, vManageResponse
 from vmngclient.vmanage_auth import vManageAuth
 
@@ -145,6 +145,10 @@ class vManageSession(vManageResponseAdapter):
         port: port
         username: username
         password: password
+
+    Attributes:
+        enable_relogin (bool): defaults to True, in case that session is not properly logged-in, session will try to
+            relogin and try the same request again
     """
 
     on_session_create_hook: ClassVar[Callable[[vManageSession], Any]] = lambda *args: None
@@ -169,6 +173,8 @@ class vManageSession(vManageResponseAdapter):
         self._session_type = SessionType.NOT_DEFINED
         self.server_name = None
         self.logger = logging.getLogger(__name__)
+        self.enable_relogin: bool = True
+        self.__second_relogin_try: bool = False
         self.response_trace: Callable[
             [Optional[Response], Union[Request, PreparedRequest, None]], str
         ] = response_history_debug
@@ -186,6 +192,18 @@ class vManageSession(vManageResponseAdapter):
             self.logger.debug(self.response_trace(exception.response, exception.request))
             self.logger.error(exception)
             raise
+        except CookieNotValidError as exception:
+            if self.enable_relogin and not self.__second_relogin_try:
+                self.logger.warning(f"Loging to session again. Reason: '{str(exception)}'")
+                self.auth = vManageAuth(self.base_url, self.username, self.password, verify=False)
+                self.__second_relogin_try = True
+                return self.request(method, url, *args, **kwargs)
+            elif self.enable_relogin and self.__second_relogin_try:
+                raise AuthenticationError("Session is not properly logged in and relogin failed.")
+            else:
+                raise AuthenticationError("Session is not properly logged in and relogin is not enabled.")
+
+        self.__second_relogin_try = False
 
         if response.request.url and "passwordReset.html" in response.request.url:
             raise InvalidOperationError("Password must be changed to use this session.")
