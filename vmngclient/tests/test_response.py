@@ -56,12 +56,15 @@ PARSE_DATAOBJ_TEST_DATA: List = [
 
 
 class TestResponse(unittest.TestCase):
-    @parameterized.expand(PARSE_DATASEQ_TEST_DATA)
     @patch("requests.Response")
-    def test_dataseq_attrs(self, raises: bool, json: Any, expected_len: int, sourcekey: str, mock_response):
-        mock_response.json.return_value = json
-        mock_response.headers = {"set-cookie": None}
-        vmng_response = vManageResponse(mock_response)
+    def setUp(self, response_mock) -> None:
+        self.response_mock = response_mock
+        self.response_mock.headers = {"set-cookie": None}
+
+    @parameterized.expand(PARSE_DATASEQ_TEST_DATA)
+    def test_dataseq_attrs(self, raises: bool, json: Any, expected_len: int, sourcekey: str):
+        self.response_mock.json.return_value = json
+        vmng_response = vManageResponse(self.response_mock)
         if not raises:
             data_sequence = vmng_response.dataseq(ParsedDataTypeAttrs, sourcekey)
             assert isinstance(data_sequence, DataSequence)
@@ -71,10 +74,9 @@ class TestResponse(unittest.TestCase):
                 vmng_response.dataseq(ParsedDataTypeAttrs, sourcekey)
 
     @parameterized.expand(PARSE_DATASEQ_TEST_DATA)
-    @patch("requests.Response")
-    def test_dataseq_pydantic(self, raises: bool, json: Any, expected_len: int, sourcekey: str, mock_response):
-        mock_response.json.return_value = json
-        vmng_response = vManageResponse(mock_response)
+    def test_dataseq_pydantic(self, raises: bool, json: Any, expected_len: int, sourcekey: str):
+        self.response_mock.json.return_value = json
+        vmng_response = vManageResponse(self.response_mock)
         if not raises:
             data_sequence = vmng_response.dataseq(ParsedDataTypePydantic, sourcekey)
             assert isinstance(data_sequence, DataSequence)
@@ -84,10 +86,9 @@ class TestResponse(unittest.TestCase):
                 vmng_response.dataseq(ParsedDataTypePydantic, sourcekey)
 
     @parameterized.expand(PARSE_DATAOBJ_TEST_DATA)
-    @patch("requests.Response")
-    def test_dataobj_attrs(self, raises: bool, json: Any, sourcekey: str, mock_response):
-        mock_response.json.return_value = json
-        vmng_response = vManageResponse(mock_response)
+    def test_dataobj_attrs(self, raises: bool, json: Any, sourcekey: str):
+        self.response_mock.json.return_value = json
+        vmng_response = vManageResponse(self.response_mock)
         if not raises:
             data_object = vmng_response.dataobj(ParsedDataTypeAttrs, sourcekey)
             assert isinstance(data_object, ParsedDataTypeAttrs)
@@ -96,10 +97,9 @@ class TestResponse(unittest.TestCase):
                 vmng_response.dataobj(ParsedDataTypeAttrs, sourcekey)
 
     @parameterized.expand(PARSE_DATAOBJ_TEST_DATA)
-    @patch("requests.Response")
-    def test_dataobj_pydantic(self, raises: bool, json: Any, sourcekey: str, mock_response):
-        mock_response.json.return_value = json
-        vmng_response = vManageResponse(mock_response)
+    def test_dataobj_pydantic(self, raises: bool, json: Any, sourcekey: str):
+        self.response_mock.json.return_value = json
+        vmng_response = vManageResponse(self.response_mock)
         if not raises:
             data_object = vmng_response.dataobj(ParsedDataTypePydantic, sourcekey)
             assert isinstance(data_object, ParsedDataTypePydantic)
@@ -124,11 +124,9 @@ class TestResponse(unittest.TestCase):
             (False, {"error": {"message": "Error happened!", "details": "error details", "code": "ABC123"}}),
         ]
     )
-    @patch("requests.Response")
-    def test_get_error(self, raises: bool, json: Any, mock_response):
-        mock_response.json.return_value = json
-        mock_response.headers = {"set-cookie": None}
-        vmng_response = vManageResponse(mock_response)
+    def test_get_error(self, raises: bool, json: Any):
+        self.response_mock.json.return_value = json
+        vmng_response = vManageResponse(self.response_mock)
         if not raises:
             assert isinstance(vmng_response.get_error_info(), ErrorInfo)
         else:
