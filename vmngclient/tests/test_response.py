@@ -60,6 +60,7 @@ class TestResponse(unittest.TestCase):
     @patch("requests.Response")
     def test_dataseq_attrs(self, raises: bool, json: Any, expected_len: int, sourcekey: str, mock_response):
         mock_response.json.return_value = json
+        mock_response.headers = {"set-cookie": None}
         vmng_response = vManageResponse(mock_response)
         if not raises:
             data_sequence = vmng_response.dataseq(ParsedDataTypeAttrs, sourcekey)
@@ -126,6 +127,7 @@ class TestResponse(unittest.TestCase):
     @patch("requests.Response")
     def test_get_error(self, raises: bool, json: Any, mock_response):
         mock_response.json.return_value = json
+        mock_response.headers = {"set-cookie": None}
         vmng_response = vManageResponse(mock_response)
         if not raises:
             assert isinstance(vmng_response.get_error_info(), ErrorInfo)
