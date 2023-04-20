@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Generic, Iterable, MutableSequence, Type, TypeVar, overload
 
-from pydantic import BaseModel  # type: ignore
+from pydantic import BaseModel
 
 from vmngclient.exceptions import InvalidOperationError
 from vmngclient.utils.creation_tools import AttrsInstance

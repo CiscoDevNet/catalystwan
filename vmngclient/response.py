@@ -3,6 +3,7 @@ from pprint import pformat
 from typing import Any, Callable, Optional, Sequence, Type, TypeVar, Union, cast
 
 from attr import define  # type: ignore
+from pydantic import BaseModel
 from requests import PreparedRequest, Request, Response
 from requests.exceptions import JSONDecodeError
 
@@ -132,21 +133,48 @@ class vManageResponse(Response):
             return response_history_debug(self, None)
         return response_debug(self, None)
 
-    def dataseq(self, cls: Type[T]) -> DataSequence[T]:
-        """Returns data contents from JSON payload deserialized to Sequence of Dataclass instances
+    def dataseq(self, cls: Type[T], sourcekey: Optional[str] = "data") -> DataSequence[T]:
+        """Returns data contents from JSON payload parsed as DataSequence of Dataclass/BaseModel instances
         Args:
-            cls: Dataclass subtype (eg. Devices)
+            cls: Dataclass/BaseModel subtype (eg. Devices)
+            sourcekey: name of the JSON key from response payload to be parsed. If None whole JSON payload will be used
 
         Returns:
-            DataSequence of given type,
+            DataSequence[T] of given type T which is subclassing from Dataclass/BaseModel,
             in case JSON payload was containing a single Object - sequence with one element is returned
         """
-        data = self.payload.data
+        if sourcekey is None:
+            data = self.payload.json
+        else:
+            data = self.payload.json.get(sourcekey)
+
         if isinstance(data, Sequence):
             sequence = data
         else:
             sequence = [cast(dict, data)]
+
+        if issubclass(cls, BaseModel):
+            return DataSequence(cls, [cls.parse_obj(item) for item in sequence])  # type: ignore
         return DataSequence(cls, [create_dataclass(cls, item) for item in sequence])
+
+    def dataobj(self, cls: Type[T], sourcekey: Optional[str] = "data") -> T:
+        """Returns data contents from JSON payload parsed as Dataclass/BaseModel instance
+        Args:
+            cls: Dataclass/BaseModel subtype (eg. Devices)
+            sourcekey: name of the JSON key from response payload to be parsed. If None whole JSON payload will be used
+
+        Returns:
+            Object of given type T which is subclassing from Dataclass/BaseModel,
+
+        """
+        if sourcekey is None:
+            data = self.payload.json
+        else:
+            data = self.payload.json.get(sourcekey)
+
+        if issubclass(cls, BaseModel):
+            return cls.parse_obj(data)  # type: ignore
+        return create_dataclass(cls, data)
 
     def get_error_info(self) -> ErrorInfo:
         """Returns error information from JSON payload"""

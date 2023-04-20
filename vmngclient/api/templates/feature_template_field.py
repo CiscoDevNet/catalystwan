@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any, Dict, List
 
-from pydantic import BaseModel  # type: ignore
+from pydantic import BaseModel
 
 
 class FeatureTemplateOptionType(Enum):
@@ -56,7 +56,6 @@ class FeatureTemplateField(BaseModel):
     children: List[FeatureTemplateField] = []
 
     def data_path(self, output):
-
         for child in self.children:
             child.data_path(output)
         output.update(get_path_dict([t.dataPath for t in self.children]))

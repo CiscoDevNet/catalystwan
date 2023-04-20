@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
 from urllib.parse import urljoin
 
+from packaging.version import Version  # type: ignore
 from requests import PreparedRequest, Request, Response, Session, head
 from requests.auth import AuthBase
 from requests.exceptions import ConnectionError, HTTPError, RequestException
@@ -14,6 +15,8 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fi
 
 from vmngclient.api.api_containter import APIContainter
 from vmngclient.exceptions import AuthenticationError, CookieNotValidError, InvalidOperationError
+from vmngclient.primitives.client_api import AboutInfo, ServerInfo
+from vmngclient.primitives.primitive_container import APIPrimitiveContainter
 from vmngclient.response import response_history_debug, vManageResponse
 from vmngclient.vmanage_auth import vManageAuth
 
@@ -57,9 +60,9 @@ def create_vManageSession(
 
     Args:
         url (str): IP address or domain name
-        port (int): port
         username (str): username
         password (str): password
+        port (int): port
         subdomain: subdomain specifying to which view switch when creating provider as a tenant session,
             works only on provider user mode
         logger: logger for logging API requests
@@ -82,22 +85,22 @@ def create_vManageSession(
     try:
         server_info = session.server()
     except InvalidOperationError:
-        server_info = {}
+        server_info = ServerInfo.parse_obj({})
 
-    session.server_name = server_info.get("server")
+    session.server_name = server_info.server
     session.on_session_create_hook()
 
     try:
-        user_mode = UserMode(server_info.get("userMode", "not found"))
+        user_mode = UserMode(server_info.user_mode or "not found")
     except ValueError:
         user_mode = UserMode.NOT_RECOGNIZED
-        session.logger.warning(f"Unrecognized user mode is: '{server_info.get('userMode')}'")
+        session.logger.warning(f"Unrecognized user mode is: '{server_info.user_mode}'")
 
     try:
-        view_mode = ViewMode(server_info.get("viewMode", "not found"))
+        view_mode = ViewMode(server_info.view_mode or "not found")
     except ValueError:
         view_mode = ViewMode.NOT_RECOGNIZED
-        session.logger.warning(f"Unrecognized user mode is: '{server_info.get('viewMode')}'")
+        session.logger.warning(f"Unrecognized user mode is: '{server_info.view_mode}'")
 
     if user_mode is UserMode.TENANT and not subdomain and view_mode is ViewMode.TENANT:
         session._session_type = SessionType.TENANT
@@ -114,7 +117,9 @@ def create_vManageSession(
         session._session_type = SessionType.NOT_DEFINED
         session.logger.warning(f"Session created with {user_mode} and {view_mode}.")
 
-    session.logger.info(f"Logged as {username}. The session type is {session.session_type}")
+    session.logger.info(
+        f"Logged to vManage({session.platform_version}) as {username}. The session type is {session.session_type}"
+    )
     return session
 
 
@@ -171,7 +176,7 @@ class vManageSession(vManageResponseAdapter):
         self.subdomain = subdomain
 
         self._session_type = SessionType.NOT_DEFINED
-        self.server_name = None
+        self.server_name: Optional[str] = None
         self.logger = logging.getLogger(__name__)
         self.enable_relogin: bool = True
         self.__second_relogin_try: bool = False
@@ -182,6 +187,9 @@ class vManageSession(vManageResponseAdapter):
         self.__prepare_session(verify, auth)
 
         self.api = APIContainter(self)
+        self.primitives = APIPrimitiveContainter(self)
+        self._platform_version: Version
+        self._api_version: Version
 
     def request(self, method, url, *args, **kwargs) -> vManageResponse:
         full_url = self.get_full_url(url)
@@ -232,11 +240,13 @@ class vManageSession(vManageResponseAdapter):
             return f"https://{self.url}:{self.port}"
         return f"https://{self.url}"
 
-    def about(self) -> Dict:
-        return self.get_data(url="/dataservice/client/about")
+    def about(self) -> AboutInfo:
+        return self.primitives.client_api.about()
 
-    def server(self) -> Dict:
-        return self.get_data(url="/dataservice/client/server")
+    def server(self) -> ServerInfo:
+        server_info = self.primitives.client_api.server()
+        self.platform_version = server_info.platform_version
+        return server_info
 
     def get_data(self, url: str) -> Any:
         return self.get_json(url)["data"]
@@ -304,8 +314,8 @@ class vManageSession(vManageResponseAdapter):
         Returns:
             Tenant UUID.
         """
-        tenants = self.get_data(url="/dataservice/tenant")
-        tenant_id = [tenant.get("tenantId", None) for tenant in tenants if tenant["subDomain"] == self.subdomain][0]
+        tenants = self.primitives.multitenant_apis_provider_api.get_all_tenants()
+        tenant_id = tenants.filter(sub_domain=self.subdomain).single_or_default("")
         return tenant_id
 
     def get_virtual_session_id(self, tenant_id: str) -> str:
@@ -337,6 +347,19 @@ class vManageSession(vManageResponseAdapter):
     @property
     def session_type(self) -> SessionType:
         return self._session_type
+
+    @property
+    def platform_version(self) -> Version:
+        return self._platform_version
+
+    @platform_version.setter
+    def platform_version(self, version: Version):
+        self._platform_version = version
+        self._api_version = Version(f"{version.major}.{version.minor}")
+
+    @property
+    def api_version(self) -> Version:
+        return self._api_version
 
     def __str__(self) -> str:
         return f"{self.username}@{self.base_url}"

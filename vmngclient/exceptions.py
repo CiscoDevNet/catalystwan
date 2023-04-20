@@ -49,6 +49,11 @@ class AlreadyExistsError(Exception):
     pass
 
 
+class APIVersionError(Exception):
+    def __init__(self, item, supported, current):
+        self.message = f"vManage is running: {current} but {item} only supported in API version: {supported}"
+
+
 class AuthenticationError(Exception):
     pass
 
