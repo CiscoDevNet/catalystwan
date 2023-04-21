@@ -81,8 +81,8 @@ class View:
     Logs warning or raises exception when incompatibility found.
     """
 
-    def __init__(self, allowed_sessions: Set[SessionType], raises: bool = False):
-        self.allowed_sessions = allowed_sessions
+    def __init__(self, allowed_session_types: Set[SessionType], raises: bool = False):
+        self.allowed_session_types = allowed_session_types
         self.raises = raises
 
     def __call__(self, func):
@@ -91,7 +91,7 @@ class View:
             if not isinstance(api, APIPrimitiveBase):
                 raise TypeError("Only APIPrimitiveBase instance methods can be annotated with @Versions decorator")
             current = api.session_type
-            allowed = self.allowed_sessions
+            allowed = self.allowed_session_types
             if current and current not in allowed:
                 if self.raises:
                     raise APIViewError(func, allowed, current)

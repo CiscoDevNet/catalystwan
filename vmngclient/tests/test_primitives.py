@@ -95,7 +95,7 @@ class TestAPIPrimitives(unittest.TestCase):
     )
     def test_view_decorator_passes(self, allowed_sessions, current_session):
         class ExampleAPI(APIPrimitiveBase):
-            @View(allowed_sessions=allowed_sessions, raises=True)
+            @View(allowed_session_types=allowed_sessions, raises=True)
             def versions_decorated_method(self):
                 pass
 
@@ -112,7 +112,7 @@ class TestAPIPrimitives(unittest.TestCase):
     )
     def test_view_decorator_raises(self, allowed_sessions, current_session):
         class ExampleAPI(APIPrimitiveBase):
-            @View(allowed_sessions=allowed_sessions, raises=True)
+            @View(allowed_session_types=allowed_sessions, raises=True)
             def versions_decorated_method(self):
                 pass
 
@@ -126,7 +126,7 @@ class TestAPIPrimitives(unittest.TestCase):
         current_session = ProviderView
 
         class ExampleAPI(APIPrimitiveBase):
-            @View(allowed_sessions=allowed_sessions)
+            @View(allowed_session_types=allowed_sessions)
             def versions_decorated_method(self):
                 pass
 
