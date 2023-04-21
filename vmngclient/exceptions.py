@@ -54,6 +54,11 @@ class APIVersionError(Exception):
         self.message = f"vManage is running: {current} but {item} only supported in API version: {supported}"
 
 
+class APIViewError(Exception):
+    def __init__(self, item, allowed, current):
+        self.message = f"Current view is: {current} but {item} only allowed for views: {allowed}"
+
+
 class AuthenticationError(Exception):
     pass
 

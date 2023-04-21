@@ -30,6 +30,11 @@ class SessionType(Enum):
     NOT_DEFINED = auto()
 
 
+ProviderView = SessionType.PROVIDER
+TenantView = SessionType.TENANT
+ProviderAsTenantView = SessionType.PROVIDER_AS_TENANT
+
+
 class UserMode(Enum):
     PROVIDER = "provider"
     TENANT = "tenant"

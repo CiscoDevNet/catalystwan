@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Final, Optional
+from typing import TYPE_CHECKING, Final, Optional, Set
 
 from packaging.specifiers import SpecifierSet  # type: ignore
 from packaging.version import Version  # type: ignore
 
-from vmngclient.exceptions import APIVersionError
+from vmngclient.exceptions import APIVersionError, APIViewError
 
 if TYPE_CHECKING:
     from vmngclient.response import vManageResponse
-    from vmngclient.session import vManageSession
+    from vmngclient.session import SessionType, vManageSession
 
 
 BASE_PATH: Final[str] = "/dataservice"
@@ -41,15 +41,19 @@ class APIPrimitiveBase:
     def version(self) -> Optional[Version]:
         return self.session.api_version
 
+    @property
+    def session_type(self) -> Optional[SessionType]:
+        return self.session.session_type
+
 
 class Versions:
     """
-    decorator to annotate api primitives methods with supported versions
-    logs warning or raises exception when incompatibility found
+    Decorator to annotate api primitives methods with supported versions.
+    Logs warning or raises exception when incompatibility found.
     """
 
-    def __init__(self, versions: str, raises: bool = False):
-        self.versions = SpecifierSet(versions)
+    def __init__(self, supported_versions: str, raises: bool = False):
+        self.supported_versions = SpecifierSet(supported_versions)
         self.raises = raises
 
     def __call__(self, func):
@@ -58,13 +62,42 @@ class Versions:
             if not isinstance(api, APIPrimitiveBase):
                 raise TypeError("Only APIPrimitiveBase instance methods can be annotated with @Versions decorator")
             current = api.version
-            supported = self.versions
+            supported = self.supported_versions
             if current and current not in supported:
                 if self.raises:
                     raise APIVersionError(func, supported, current)
                 else:
                     logger.warning(
                         f"vManage runs: {current} but {func.__qualname__} only supported for API versions: {supported}"
+                    )
+            return func(*args, **kwargs)
+
+        return wrapper
+
+
+class View:
+    """
+    Decorator to annotate api primitives methods with session type (view) restriction
+    Logs warning or raises exception when incompatibility found.
+    """
+
+    def __init__(self, allowed_sessions: Set[SessionType], raises: bool = False):
+        self.allowed_sessions = allowed_sessions
+        self.raises = raises
+
+    def __call__(self, func):
+        def wrapper(*args, **kwargs):
+            api = args[0]
+            if not isinstance(api, APIPrimitiveBase):
+                raise TypeError("Only APIPrimitiveBase instance methods can be annotated with @Versions decorator")
+            current = api.session_type
+            allowed = self.allowed_sessions
+            if current and current not in allowed:
+                if self.raises:
+                    raise APIViewError(func, allowed, current)
+                else:
+                    logger.warning(
+                        f"Current view is: {current} but {func.__qualname__} only allowed for views: {allowed}"
                     )
             return func(*args, **kwargs)
 
