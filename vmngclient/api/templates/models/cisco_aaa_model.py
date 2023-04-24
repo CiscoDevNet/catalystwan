@@ -2,7 +2,7 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, Field  # type: ignore
+from pydantic import BaseModel, Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 
@@ -11,7 +11,7 @@ class User(BaseModel):
     name: str
     password: str
     secret: str
-    privilege: int
+    privilege: Optional[str]
     pubkey_chain: List[str] = Field(default=[], alias="pubkey-chain")
 
 

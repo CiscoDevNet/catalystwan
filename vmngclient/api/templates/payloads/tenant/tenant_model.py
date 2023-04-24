@@ -4,7 +4,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, List
 
-from pydantic import BaseModel  # type: ignore
+from pydantic import BaseModel
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.api.tenant_api import TenantsAPI

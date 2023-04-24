@@ -1,9 +1,11 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from vmngclient.api.software_action_api import Family, InstallSpecHelper, SoftwareActionAPI
-from vmngclient.api.versions_utils import DeviceCategory, DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
+from vmngclient.api.software_action_api import SoftwareActionAPI
+from vmngclient.api.versions_utils import DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
 from vmngclient.dataclasses import Device
+from vmngclient.typed_list import DataSequence
+from vmngclient.utils.upgrades_helper import Family, InstallSpecHelper
 
 
 class TestSoftwareAcionAPI(unittest.TestCase):
@@ -35,8 +37,8 @@ class TestSoftwareAcionAPI(unittest.TestCase):
 
         mock_session = Mock()
         self.mock_repository_object = RepositoryAPI(mock_session)
-        self.mock_device_versions = DeviceVersions(self.mock_repository_object, DeviceCategory.CONTROLLERS)
-        self.mock_software_action_obj = SoftwareActionAPI(mock_session, DeviceCategory.VEDGES)
+        self.mock_device_versions = DeviceVersions(self.mock_repository_object)
+        self.mock_software_action_obj = SoftwareActionAPI(mock_session)
 
     @patch("vmngclient.session.vManageSession")
     @patch.object(SoftwareActionAPI, "_downgrade_check")
@@ -51,8 +53,8 @@ class TestSoftwareAcionAPI(unittest.TestCase):
         mock_session.post.return_value = {"id": "mock_action_id"}
 
         # Assert
-        answer = self.mock_software_action_obj.upgrade_software([self.device], True, True, "path")
-        self.assertEqual(answer, "mock_action_id", "action ids not equal")
+        answer = self.mock_software_action_obj.install(DataSequence(Device, [self.device]), True, True, "path").task_id
+        self.assertEqual(answer, "mock_action_id")
 
     @patch.object(RepositoryAPI, "get_devices_versions_repository")
     def test_downgrade_check_no_incorrect_devices(self, mock_get_devices_versions_repository):

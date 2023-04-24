@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Generic, Iterable, MutableSequence, Type, TypeVar, overload
 
+from pydantic import BaseModel
+
 from vmngclient.exceptions import InvalidOperationError
 from vmngclient.utils.creation_tools import AttrsInstance
 
@@ -140,8 +142,10 @@ class DataSequence(TypedList[T], Generic[T]):
         ...
 
     def __init__(self, _type, _iterable=None, /):
-        if not isinstance(_type, AttrsInstance):
-            raise TypeError(f"Expected {AttrsInstance.__name__} item type, got {_type.__name__}.")
+        if not isinstance(_type, AttrsInstance) and not issubclass(_type, BaseModel):
+            raise TypeError(
+                f"Expected {AttrsInstance.__name__} or {BaseModel.__name__} item type, got {_type.__name__}."
+            )
 
         super().__init__(_type, _iterable)
 
