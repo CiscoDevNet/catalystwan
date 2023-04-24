@@ -26,12 +26,12 @@ We're really glad you want to help.
 
   Definitions can be found in: `vmngclient/primitives` directory.
 
-  The names organization of methods **strictly** follows an OpenAPI spec: https://developer.cisco.com/docs/sdwan/#!sd-wan-vmanage-v20-9
+  The organization of items **strictly** follows an OpenAPI spec: https://developer.cisco.com/docs/sdwan/#!sd-wan-vmanage-v20-9
 
   Auto generated methods names can also be found in: https://github.com/sbasan/vmanage-python-open-api/blob/main/README.md
 
 1. Check that endpoints you want to utilize in your API already defined in `vmngclient/primitives`.
-2. If endpoint not present, create new file with implementation including data-model and `@View` and `@Version` decorators when needed.
+2. If endpoint not present, create new file with endpoint including data-model and methods with `@View` and `@Version` decorators when needed.
 3. Implement higher level API in `vmngclient/api` using created primitives.
 
 ## Testing
