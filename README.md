@@ -37,8 +37,8 @@ devices = session.api.devices.get()
 
 ```Python
 admin_tech_file = session.api.admin_tech.generate("172.16.255.11")
-admintech.download(admin_tech_file)
-admintech.delete(admin_tech_file)
+session.api.admin_tech.download(admin_tech_file)
+session.api.admin_tech.delete(admin_tech_file)
 ```
 </details>
 
