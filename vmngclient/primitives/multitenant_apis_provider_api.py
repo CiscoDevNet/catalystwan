@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field, IPvAnyAddress
 
-from vmngclient.primitives import APIPrimitiveBase, View
+from vmngclient.primitives import APIPrimitiveBase, Versions, View
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.session_type import ProviderView
 
@@ -70,6 +70,7 @@ class MultitenantAPIsProviderAPI(APIPrimitiveBase):
         response = self.post("/tenant/async", payload=tenant)
         return response.dataobj(TenantTaskId, None)
 
+    @Versions(">=20.4")
     @View({ProviderView})
     def create_tenant_async_bulk(self, tenants: List[Tenant]) -> TenantTaskId:
         response = self.post("/tenant/bulk/async", payload=tenants)
@@ -79,6 +80,7 @@ class MultitenantAPIsProviderAPI(APIPrimitiveBase):
         # POST /tenant/{tenantId}/delete
         ...
 
+    @Versions(">=20.4")
     @View({ProviderView})
     def delete_tenant_async_bulk(self, delete_request: TenantBulkDeleteRequest) -> TenantTaskId:
         response = self.delete("/tenant/bulk/async", payload=delete_request)
