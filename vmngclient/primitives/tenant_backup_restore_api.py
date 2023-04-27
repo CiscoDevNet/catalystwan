@@ -1,5 +1,5 @@
 from vmngclient.primitives import APIPrimitiveBase, View
-from vmngclient.session import ProviderAsTenantView, TenantView
+from vmngclient.utils.session_type import ProviderAsTenantView, TenantView
 
 
 class TenantBackupRestoreApi(APIPrimitiveBase):

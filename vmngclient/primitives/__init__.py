@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import json
 import logging
-from typing import TYPE_CHECKING, Final, Optional, Set
+from typing import TYPE_CHECKING, Final, Iterable, Mapping, Optional, Sequence, Set, TypedDict, Union
 
 from packaging.specifiers import SpecifierSet  # type: ignore
 from packaging.version import Version  # type: ignore
+from pydantic import BaseModel
 
-from vmngclient.exceptions import APIVersionError, APIViewError
+from vmngclient.exceptions import APIRequestPayloadTypeError, APIVersionError, APIViewError
+from vmngclient.typed_list import DataSequence
+from vmngclient.utils.creation_tools import AttrsInstance, asdict
 
 if TYPE_CHECKING:
     from vmngclient.response import vManageResponse
@@ -15,6 +19,46 @@ if TYPE_CHECKING:
 
 BASE_PATH: Final[str] = "/dataservice"
 logger = logging.getLogger(__name__)
+PayloadType = Union[DataSequence, Sequence[Union[AttrsInstance, BaseModel]], AttrsInstance, BaseModel]
+
+
+class PreparedPayload(TypedDict):
+    data: Union[str, bytes]
+    headers: Mapping[str, str]
+
+
+def prepare_payload(payload: PayloadType) -> PreparedPayload:
+    if isinstance(payload, BaseModel):
+        return _prepare_basemodel_payload(payload)
+    if isinstance(payload, AttrsInstance):
+        return _prepare_attrs_payload(payload)
+    if isinstance(payload, (DataSequence, Sequence)):
+        return _prepare_sequence_payload(payload)
+    else:
+        raise APIRequestPayloadTypeError(payload)
+
+
+def _prepare_basemodel_payload(payload: BaseModel) -> PreparedPayload:
+    return PreparedPayload(
+        data=payload.json(exclude_none=True, by_alias=True), headers={"content-type": "application/json"}
+    )
+
+
+def _prepare_attrs_payload(payload: AttrsInstance) -> PreparedPayload:
+    return PreparedPayload(data=json.dumps(asdict(payload)), headers={"content-type": "application/json"})
+
+
+def _prepare_sequence_payload(payload: Iterable[Union[BaseModel, AttrsInstance]]) -> PreparedPayload:
+    items = []
+    for item in payload:
+        if isinstance(item, BaseModel):
+            items.append(item.dict(exclude_none=True, by_alias=True))
+        elif isinstance(item, AttrsInstance):
+            items.append(asdict(item))
+        else:
+            raise APIRequestPayloadTypeError(payload)
+    data = json.dumps(items)
+    return PreparedPayload(data=data, headers={"content-type": "application/json"})
 
 
 class APIPrimitiveBase:
@@ -22,20 +66,22 @@ class APIPrimitiveBase:
         self.session = session
         self.basepath = BASE_PATH
 
-    def request(self, method: str, urn: str, *args, **kwargs) -> vManageResponse:
-        return self.session.request(method, self.basepath + urn, *args, **kwargs)
+    def request(self, method: str, url: str, payload: Optional[PayloadType] = None, **kwargs) -> vManageResponse:
+        if payload is not None:
+            kwargs.update(prepare_payload(payload))
+        return self.session.request(method, self.basepath + url, **kwargs)
 
-    def get(self, urn: str, *args, **kwargs) -> vManageResponse:
-        return self.request("GET", urn, *args, **kwargs)
+    def get(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> vManageResponse:
+        return self.request("GET", url, payload, **kwargs)
 
-    def put(self, urn: str, *args, **kwargs) -> vManageResponse:
-        return self.request("PUT", urn, *args, **kwargs)
+    def put(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> vManageResponse:
+        return self.request("PUT", url, payload, **kwargs)
 
-    def post(self, urn: str, *args, **kwargs) -> vManageResponse:
-        return self.request("POST", urn, *args, **kwargs)
+    def post(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> vManageResponse:
+        return self.request("POST", url, payload, **kwargs)
 
-    def delete(self, urn: str, *args, **kwargs) -> vManageResponse:
-        return self.request("DELETE", urn, *args, **kwargs)
+    def delete(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> vManageResponse:
+        return self.request("DELETE", url, payload, **kwargs)
 
     @property
     def version(self) -> Optional[Version]:

@@ -1,13 +1,34 @@
+import json
 import unittest
 from unittest.mock import MagicMock, patch
 
+from attr import define  # type: ignore
 from packaging.version import Version  # type: ignore
 from parameterized import parameterized  # type: ignore
+from pydantic import BaseModel
 
-from vmngclient.exceptions import APIVersionError, APIViewError
+from vmngclient.dataclasses import DataclassBase  # type: ignore
+from vmngclient.exceptions import APIRequestPayloadTypeError, APIVersionError, APIViewError
 from vmngclient.primitives import APIPrimitiveBase, Versions, View
 from vmngclient.primitives import logger as primitives_logger
-from vmngclient.session import ProviderAsTenantView, ProviderView, TenantView
+from vmngclient.typed_list import DataSequence
+from vmngclient.utils.creation_tools import create_dataclass
+from vmngclient.utils.session_type import ProviderAsTenantView, ProviderView, TenantView
+
+
+@define
+class AttrsModelExample(DataclassBase):
+    id: str
+    size: int
+    capacity: float
+    active: bool
+
+
+class BaseModelExample(BaseModel):
+    id: str
+    size: int
+    capacity: float
+    active: bool
 
 
 class TestAPIPrimitives(unittest.TestCase):
@@ -18,6 +39,17 @@ class TestAPIPrimitives(unittest.TestCase):
         self.session_mock.api_version = None
         self.session_mock.session_type = None
         self.primitive = APIPrimitiveBase(self.session_mock)
+        self.dict_payload = {
+            "id": "XYZ-189",
+            "size": 100,
+            "capacity": 1.7,
+            "active": True,
+        }
+        self.attrs_payload = create_dataclass(AttrsModelExample, self.dict_payload)
+        self.basemodel_payload = BaseModelExample.parse_obj(self.dict_payload)
+        self.list_dict_payload = [self.dict_payload] * 2
+        self.list_attrs_payload = [self.attrs_payload] * 2
+        self.datasequence_payload = DataSequence(AttrsModelExample, self.list_attrs_payload)
 
     def test_get(self):
         self.primitive.get("/get_endpoint/1")
@@ -137,3 +169,27 @@ class TestAPIPrimitives(unittest.TestCase):
             for allowed in allowed_sessions:
                 assert str(allowed) in log.output[0]
             assert str(current_session) in log.output[0]
+
+    def test_attrs_payload(self):
+        self.primitive.get("/1", payload=self.attrs_payload)
+        _, kwargs = self.session_mock.request.call_args
+        assert json.loads(kwargs.get("data")) == self.dict_payload
+
+    def test_basemodel_payload(self):
+        self.primitive.get("/2", payload=self.basemodel_payload)
+        _, kwargs = self.session_mock.request.call_args
+        assert json.loads(kwargs.get("data")) == self.dict_payload
+
+    def test_datasequence_payload(self):
+        self.primitive.get("/3", payload=self.datasequence_payload)
+        _, kwargs = self.session_mock.request.call_args
+        assert json.loads(kwargs.get("data")) == self.list_dict_payload
+
+    def test_list_payload(self):
+        self.primitive.get("/4", payload=self.list_attrs_payload)
+        _, kwargs = self.session_mock.request.call_args
+        assert json.loads(kwargs.get("data")) == self.list_dict_payload
+
+    def test_unexpected_payload(self):
+        with self.assertRaises(APIRequestPayloadTypeError):
+            self.primitive.get("/5", payload=[1, 2, 3])

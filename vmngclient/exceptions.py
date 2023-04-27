@@ -50,13 +50,24 @@ class AlreadyExistsError(Exception):
 
 
 class APIVersionError(Exception):
+    """Raised when API is unsupported in running vManage version."""
+
     def __init__(self, item, supported, current):
         self.message = f"vManage is running: {current} but {item} only supported in API version: {supported}"
 
 
 class APIViewError(Exception):
+    """Raised when API is not allowed for given session type / view."""
+
     def __init__(self, item, allowed, current):
         self.message = f"Current view is: {current} but {item} only allowed for views: {allowed}"
+
+
+class APIRequestPayloadTypeError(Exception):
+    """Raised when unsupported payload type is passed to vManage request."""
+
+    def __init__(self, item):
+        self.message = f"Unsupported payload type: {type(item)} for vManage request"
 
 
 class AuthenticationError(Exception):
