@@ -14,6 +14,26 @@ We're really glad you want to help.
   * Bugs? [Report it here](https://github.com/CiscoDevNet/vManage-client/issues/new?assignees=&labels=needs+review&template=bug_report.yml) - remember to provide as much information as you can.
   * Need some additional feature? [Let us know here](https://github.com/CiscoDevNet/vManage-client/issues/new?assignees=&labels=enhancement&template=feature_request.yml)
 
+## Introducing new API
+
+  ### API Primitives:
+  vManage-client APIs should make requests only through API Primitives layer. This layer defines:
+  * http method
+  * endpoint url
+  * payload data-model (subtyping `vmngclient.dataclasses.DataclassBase` or `pydantic.BaseModel`)
+  * allowed sessions/views
+  * supported versions
+
+  Definitions can be found in: `vmngclient/primitives` directory.
+
+  The organization of items **strictly** follows an OpenAPI spec: https://developer.cisco.com/docs/sdwan/#!sd-wan-vmanage-v20-9
+
+  Auto generated python methods names can be found in: https://github.com/sbasan/vmanage-python-open-api/blob/main/README.md
+
+1. Check that endpoints you want to utilize in your API already defined in `vmngclient/primitives`.
+2. If endpoint not present, create new file with endpoint including data-model and methods with `@View` and `@Version` decorators when needed.
+3. Implement higher level API in `vmngclient/api` using created primitives.
+
 ## Testing
 
 Test newly implemented features on Cisco SD-WAN, ideally on different versions. If you don't have access to any SD-WAN you can use [Cisco provided sandboxes](https://developer.cisco.com/sdwan/sandbox/).
