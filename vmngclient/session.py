@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import time
-from enum import Enum, auto
+from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
 from urllib.parse import urljoin
@@ -18,21 +18,10 @@ from vmngclient.exceptions import AuthenticationError, CookieNotValidError, Inva
 from vmngclient.primitives.client_api import AboutInfo, ServerInfo
 from vmngclient.primitives.primitive_container import APIPrimitiveContainter
 from vmngclient.response import response_history_debug, vManageResponse
+from vmngclient.utils.session_type import SessionType
 from vmngclient.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
-
-
-class SessionType(Enum):
-    PROVIDER = auto()
-    TENANT = auto()
-    PROVIDER_AS_TENANT = auto()
-    NOT_DEFINED = auto()
-
-
-ProviderView = SessionType.PROVIDER
-TenantView = SessionType.TENANT
-ProviderAsTenantView = SessionType.PROVIDER_AS_TENANT
 
 
 class UserMode(Enum):
