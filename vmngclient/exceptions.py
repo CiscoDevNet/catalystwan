@@ -74,6 +74,13 @@ class AuthenticationError(Exception):
     pass
 
 
+class UnknownTenantDomain(Exception):
+    """Raised when there is no tenant registered with given domain."""
+
+    def __init__(self, domain):
+        self.message = f"No tenant exist with given domain: {domain}"
+
+
 class CookieNotValidError(Exception):
     pass
 

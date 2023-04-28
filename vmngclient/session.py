@@ -14,7 +14,7 @@ from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.api.api_containter import APIContainter
-from vmngclient.exceptions import AuthenticationError, CookieNotValidError, InvalidOperationError
+from vmngclient.exceptions import AuthenticationError, CookieNotValidError, InvalidOperationError, UnknownTenantDomain
 from vmngclient.primitives.client_api import AboutInfo, ServerInfo
 from vmngclient.primitives.primitive_container import APIPrimitiveContainter
 from vmngclient.response import response_history_debug, vManageResponse
@@ -309,8 +309,10 @@ class vManageSession(vManageResponseAdapter):
             Tenant UUID.
         """
         tenants = self.primitives.multitenant_apis_provider_api.get_all_tenants()
-        tenant_id = tenants.filter(sub_domain=self.subdomain).single_or_default("")
-        return tenant_id
+        filtered = tenants.filter(subdomain=self.subdomain)
+        if len(filtered) == 0:
+            raise UnknownTenantDomain(self.subdomain)
+        return filtered[0].tenant_id
 
     def get_virtual_session_id(self, tenant_id: str) -> str:
         """Get VSessionId for a specific tenant
