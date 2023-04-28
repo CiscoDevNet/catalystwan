@@ -76,9 +76,11 @@ class MultitenantAPIsProviderAPI(APIPrimitiveBase):
         response = self.post("/tenant/bulk/async", payload=tenants)
         return response.dataobj(TenantTaskId, None)
 
-    def delete_tenant(self):
+    @View({ProviderView})
+    def delete_tenant(self, tenant_id: str):
         # POST /tenant/{tenantId}/delete
-        ...
+        response = self.post(f"/tenant/{tenant_id}/delete")
+        return response
 
     @Versions(">=20.4")
     @View({ProviderView})
@@ -109,9 +111,8 @@ class MultitenantAPIsProviderAPI(APIPrimitiveBase):
     def get_all_tenants(self) -> DataSequence[Tenant]:
         return self.get("/tenant").dataseq(Tenant)
 
-    def get_tenant(self):
-        # GET /tenant/{tenantId}
-        ...
+    def get_tenant(self, tenant_id: str) -> Tenant:
+        return self.get(f"/tenant/{tenant_id}").dataobj(Tenant, None)
 
     def get_tenant_hosting_capacity_on_vsmarts(self):
         # GET /tenant/vsmart/capacity
