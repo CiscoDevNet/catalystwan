@@ -22,7 +22,7 @@ class Tenant(BaseModel):
     rid: Optional[int] = Field(alias="@rid")
     edge_connector_tunnel_interface_name: Optional[str] = Field(alias="edgeConnectorTunnelInterfaceName")
     name: Optional[str]
-    tenant_id: Optional[str] = Field(alias="tenantId")
+    tenant_id: str = Field(alias="tenantId")
     wan_edge_forecast: Optional[str] = Field(alias="wanEdgeForecast")
     sp_metadata: Optional[str] = Field(alias="spMetadata")
     state: Optional[str]

@@ -2,13 +2,11 @@ from functools import wraps
 from pprint import pformat
 from typing import Any, Callable, Optional, Sequence, Type, TypeVar, Union, cast
 
-from attr import define  # type: ignore
 from pydantic import BaseModel
 from requests import PreparedRequest, Request, Response
 from requests.exceptions import JSONDecodeError
 
 from vmngclient import with_proc_info_header
-from vmngclient.dataclasses import DataclassBase
 from vmngclient.exceptions import CookieNotValidError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
@@ -16,8 +14,7 @@ from vmngclient.utils.creation_tools import create_dataclass
 T = TypeVar("T")
 
 
-@define(frozen=True)
-class ErrorInfo(DataclassBase):
+class ErrorInfo(BaseModel):
     message: str
     details: str
     code: str
@@ -176,9 +173,13 @@ class vManageResponse(Response):
             return cls.parse_obj(data)  # type: ignore
         return create_dataclass(cls, data)
 
-    def get_error_info(self) -> ErrorInfo:
+    def get_error_info(self) -> Optional[ErrorInfo]:
         """Returns error information from JSON payload"""
-        return create_dataclass(ErrorInfo, cast(dict, self.payload.error))
+
+        if self.payload.error:
+            return ErrorInfo(**self.payload.error)
+        else:
+            return None
 
 
 def with_vmanage_response(method: Callable[[Any], Response]) -> Callable[[Any], vManageResponse]:

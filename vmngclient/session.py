@@ -14,13 +14,26 @@ from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.api.api_containter import APIContainter
-from vmngclient.exceptions import AuthenticationError, CookieNotValidError, InvalidOperationError
+from vmngclient.exceptions import AuthenticationError, CookieNotValidError, InvalidOperationError, vManageClientError
 from vmngclient.primitives.client_api import AboutInfo, ServerInfo
 from vmngclient.primitives.primitive_container import APIPrimitiveContainter
-from vmngclient.response import response_history_debug, vManageResponse
+from vmngclient.response import ErrorInfo, response_history_debug, vManageResponse
 from vmngclient.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
+
+
+class vManageBadRequestError(vManageClientError):
+    """Indicates that vManage returned HTTP status code 400.
+
+    A 400 Bad Request response status code indicates that the server
+    could not understand the request due to invalid syntax,
+    malformed request message, or missing request parameters.
+    """
+
+    def __init__(self, error: Optional[ErrorInfo], response: vManageResponse):
+        self.response = response
+        super().__init__(error)
 
 
 class SessionType(Enum):
@@ -49,7 +62,7 @@ class ViewMode(Enum):
     NOT_FOUND = "not found"
 
 
-class SessionNotCreatedError(Exception):
+class SessionNotCreatedError(vManageClientError):
     pass
 
 
@@ -227,6 +240,8 @@ class vManageSession(vManageResponseAdapter):
             self.logger.debug(error)
             if response.status_code == 403:
                 self.logger.info(f"User {self.username} is unauthorized for method {method} {full_url}")
+            elif response.status_code == 400:
+                raise vManageBadRequestError(response.get_error_info(), response)
             else:
                 raise error
         return response
@@ -320,8 +335,12 @@ class vManageSession(vManageResponseAdapter):
             Tenant UUID.
         """
         tenants = self.primitives.multitenant_apis_provider_api.get_all_tenants()
-        tenant_id = tenants.filter(sub_domain=self.subdomain).single_or_default("")
-        return tenant_id
+        tenant = tenants.filter(sub_domain=self.subdomain).single_or_default()
+
+        if not tenant:
+            raise InvalidOperationError()
+
+        return tenant.tenant_id
 
     def get_virtual_session_id(self, tenant_id: str) -> str:
         """Get VSessionId for a specific tenant
