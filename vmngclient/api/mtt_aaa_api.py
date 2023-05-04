@@ -4,6 +4,7 @@ import logging
 from typing import TYPE_CHECKING
 
 from vmngclient.dataclasses import TenantAAA, TenantRadiusServer, TenantTacacsServer
+from vmngclient.exceptions import vManageClientError
 from vmngclient.utils.creation_tools import asdict, create_dataclass
 
 if TYPE_CHECKING:
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class AAAConfigNotPresent(Exception):
+class AAAConfigNotPresent(vManageClientError):
     pass
 
 

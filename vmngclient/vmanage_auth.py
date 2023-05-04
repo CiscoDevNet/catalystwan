@@ -8,9 +8,10 @@ from requests.auth import AuthBase
 from requests.cookies import RequestsCookieJar
 
 from vmngclient import with_proc_info_header
+from vmngclient.exceptions import vManageClientError
 
 
-class InvalidCredentialsError(Exception):
+class InvalidCredentialsError(vManageClientError):
     """Exception raised for invalid credentials.
 
     Attributes:
