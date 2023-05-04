@@ -81,3 +81,13 @@ class TaskNotRegisteredError(Exception):
 
 class MultiplePersonalityError(Exception):
     """Raised if Device DataSequnce contains devices with multiples personalities"""
+
+
+class SessionNotCreatedError(Exception):
+    """Raised when vManage session cannot be created"""
+
+    pass
+
+
+class TenantSubdomainNotFound(Exception):
+    """Raised when given subdomain does not exist"""
