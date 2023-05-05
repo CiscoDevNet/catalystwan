@@ -157,15 +157,15 @@ class MultitenantAPIsProviderAPI(APIPrimitiveBase):
         # POST /tenantstatus/force
         ...
 
-    @View({ProviderView})
+    @View({ProviderView, ProviderAsTenantView})
     def get_all_tenant_statuses(self):
         self.get("/tenantstatus").dataseq(TenantStatus)
 
-    @View({ProviderView})
+    @View({ProviderView, ProviderAsTenantView})
     def get_all_tenants(self) -> DataSequence[Tenant]:
         return self.get("/tenant").dataseq(Tenant)
 
-    @View({ProviderView})
+    @View({ProviderView, ProviderAsTenantView})
     def get_tenant(self, tenant_id: str) -> Tenant:
         return self.get(f"/tenant/{tenant_id}").dataobj(Tenant, None)
 
@@ -173,7 +173,7 @@ class MultitenantAPIsProviderAPI(APIPrimitiveBase):
     def get_tenant_hosting_capacity_on_vsmarts(self) -> DataSequence[vSmartTenantCapacity]:
         return self.get("/tenant/vsmart/capacity").dataseq(vSmartTenantCapacity)
 
-    @View({ProviderView})
+    @View({ProviderView, ProviderAsTenantView})
     def get_tenant_vsmart_mapping(self) -> vSmartTenantMap:
         return self.get("/tenant/vsmart").dataobj(vSmartTenantMap, None)
 
@@ -201,6 +201,6 @@ class MultitenantAPIsProviderAPI(APIPrimitiveBase):
         # PUT /tenant/{tenantId}/vsmart
         ...
 
-    @View({ProviderAsTenantView})
+    @View({ProviderView})
     def vsession_id(self, tenant_id: str):
         return self.post(f"/tenant/{tenant_id}/vsessionid").dataobj(vSessionId, None)

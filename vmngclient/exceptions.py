@@ -74,13 +74,6 @@ class AuthenticationError(Exception):
     pass
 
 
-class UnknownTenantDomain(Exception):
-    """Raised when there is no tenant registered with given domain."""
-
-    def __init__(self, domain):
-        self.message = f"No tenant exist with given domain: {domain}"
-
-
 class CookieNotValidError(Exception):
     pass
 
@@ -99,3 +92,13 @@ class TaskNotRegisteredError(Exception):
 
 class MultiplePersonalityError(Exception):
     """Raised if Device DataSequnce contains devices with multiples personalities"""
+
+
+class SessionNotCreatedError(Exception):
+    """Raised when vManage session cannot be created"""
+
+    pass
+
+
+class TenantSubdomainNotFound(Exception):
+    """Raised when given subdomain does not exist"""

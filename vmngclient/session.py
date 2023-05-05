@@ -14,7 +14,13 @@ from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.api.api_containter import APIContainter
-from vmngclient.exceptions import AuthenticationError, CookieNotValidError, InvalidOperationError, UnknownTenantDomain
+from vmngclient.exceptions import (
+    AuthenticationError,
+    CookieNotValidError,
+    InvalidOperationError,
+    SessionNotCreatedError,
+    TenantSubdomainNotFound,
+)
 from vmngclient.primitives.client_api import AboutInfo, ServerInfo
 from vmngclient.primitives.primitive_container import APIPrimitiveContainter
 from vmngclient.response import response_history_debug, vManageResponse
@@ -36,10 +42,6 @@ class ViewMode(Enum):
     TENANT = "tenant"
     NOT_RECOGNIZED = "not recognized"
     NOT_FOUND = "not found"
-
-
-class SessionNotCreatedError(Exception):
-    pass
 
 
 def create_vManageSession(
@@ -308,11 +310,11 @@ class vManageSession(vManageResponseAdapter):
         Returns:
             Tenant UUID.
         """
-        tenants = self.primitives.multitenant_apis_provider_api.get_all_tenants()
-        filtered = tenants.filter(subdomain=self.subdomain)
-        if len(filtered) == 0:
-            raise UnknownTenantDomain(self.subdomain)
-        return filtered[0].tenant_id
+        tenants = self.get_data(url="/dataservice/tenant")
+        tenant_ids = [tenant.get("tenantId", None) for tenant in tenants if tenant["subDomain"] == self.subdomain]
+        if len(tenant_ids) < 1:
+            raise TenantSubdomainNotFound(f"Tenant with sub-domain: {self.subdomain} not found")
+        return tenant_ids[0]
 
     def get_virtual_session_id(self, tenant_id: str) -> str:
         """Get VSessionId for a specific tenant
