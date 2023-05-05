@@ -14,7 +14,14 @@ from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.api.api_containter import APIContainter
-from vmngclient.exceptions import AuthenticationError, CookieNotValidError, InvalidOperationError, vManageClientError
+from vmngclient.exceptions import (
+    AuthenticationError,
+    CookieNotValidError,
+    InvalidOperationError,
+    SessionNotCreatedError,
+    TenantSubdomainNotFound,
+    vManageClientError,
+)
 from vmngclient.primitives.client_api import AboutInfo, ServerInfo
 from vmngclient.primitives.primitive_container import APIPrimitiveContainter
 from vmngclient.response import ErrorInfo, response_history_debug, vManageResponse
@@ -60,10 +67,6 @@ class ViewMode(Enum):
     TENANT = "tenant"
     NOT_RECOGNIZED = "not recognized"
     NOT_FOUND = "not found"
-
-
-class SessionNotCreatedError(vManageClientError):
-    pass
 
 
 def create_vManageSession(
@@ -338,7 +341,7 @@ class vManageSession(vManageResponseAdapter):
         tenant = tenants.filter(sub_domain=self.subdomain).single_or_default()
 
         if not tenant:
-            raise InvalidOperationError()
+            raise TenantSubdomainNotFound(f"Tenant with sub-domain: {self.subdomain} not found")
 
         return tenant.tenant_id
 
