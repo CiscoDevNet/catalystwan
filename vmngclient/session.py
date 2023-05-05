@@ -21,7 +21,7 @@ from vmngclient.exceptions import (
     SessionNotCreatedError,
     TenantSubdomainNotFound,
 )
-from vmngclient.primitives.client_api import AboutInfo, ServerInfo
+from vmngclient.primitives.client import AboutInfo, ServerInfo
 from vmngclient.primitives.primitive_container import APIPrimitiveContainter
 from vmngclient.response import response_history_debug, vManageResponse
 from vmngclient.utils.session_type import SessionType
@@ -237,10 +237,10 @@ class vManageSession(vManageResponseAdapter):
         return f"https://{self.url}"
 
     def about(self) -> AboutInfo:
-        return self.primitives.client_api.about()
+        return self.primitives.client.about()
 
     def server(self) -> ServerInfo:
-        server_info = self.primitives.client_api.server()
+        server_info = self.primitives.client.server()
         self.platform_version = server_info.platform_version
         return server_info
 

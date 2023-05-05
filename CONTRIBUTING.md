@@ -99,7 +99,7 @@ Start reading our code, and you'll get the hang of it.
   class TenantTaskId(BaseModel):
     id: str
 
-  class MultitenantAPIsProviderAPI(APIPrimitiveBase):
+  class TenantManagementPrimitives(APIPrimitiveBase):
 
     @Versions(">=20.4")
     @View({ProviderView})

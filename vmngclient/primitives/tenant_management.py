@@ -54,7 +54,8 @@ class TenantDeleteRequest(BaseModel):
     password: str
 
 
-class TenantBulkDeleteRequest(TenantDeleteRequest):
+class TenantBulkDeleteRequest(BaseModel):
+    password: str
     tenant_id_list: List[str] = Field(alias="tenantIdList")
 
 
@@ -114,7 +115,7 @@ class vSessionId(BaseModel):
     vsessionid: str = Field(alias="VSessionId")
 
 
-class MultitenantAPIsProviderAPI(APIPrimitiveBase):
+class TenantManagementPrimitives(APIPrimitiveBase):
     @View({ProviderView})
     def create_tenant(self, tenant: Tenant) -> Tenant:
         response = self.post("/tenant", payload=tenant)
@@ -141,18 +142,6 @@ class MultitenantAPIsProviderAPI(APIPrimitiveBase):
         response = self.delete("/tenant/bulk/async", payload=delete_request)
         return response.dataobj(TenantTaskId, None)
 
-    def delete_tenant_backup(self):
-        # DELETE /tenantbackup/delete
-        ...
-
-    def download_existing_backup_file(self):
-        # GET /tenantbackup/download/{path}
-        ...
-
-    def export_tenant_backup(self):
-        # GET /tenantbackup/export
-        ...
-
     def force_status_collection(self):
         # POST /tenantstatus/force
         ...
@@ -177,19 +166,11 @@ class MultitenantAPIsProviderAPI(APIPrimitiveBase):
     def get_tenant_vsmart_mapping(self) -> vSmartTenantMap:
         return self.get("/tenant/vsmart").dataobj(vSmartTenantMap, None)
 
-    def import_tenant_backup(self):
-        # POST /tenantbackup/import
-        ...
-
-    def list_tenant_backup(self):
-        # GET /tenantbackup/list
-        ...
-
     def switch_tenant(self):
         # POST /tenant/{tenantId}/switch
         ...
 
-    def tenantv_smart_mt_migrate(self):
+    def tenant_vsmart_mt_migrate(self):
         # POST /tenant/vsmart-mt/migrate
         ...
 

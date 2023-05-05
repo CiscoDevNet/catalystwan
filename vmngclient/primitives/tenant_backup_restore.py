@@ -2,7 +2,7 @@ from vmngclient.primitives import APIPrimitiveBase, View
 from vmngclient.utils.session_type import ProviderAsTenantView, TenantView
 
 
-class TenantBackupRestoreApi(APIPrimitiveBase):
+class TenantBackupRestorePrimitives(APIPrimitiveBase):
     @View({ProviderAsTenantView})
     def delete_tenant_backup(self):
         # DELETE /tenantbackup/delete
