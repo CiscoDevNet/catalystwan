@@ -103,7 +103,7 @@ status = UsersAPI(session).delete_user(username="new_user")
 </details>
 
 ### Note:
-To remove `InsecureRequestWarning`, you can include in your scripts (warning is supressed when `VMNGCLIENT_DEVEL` environment variable is set):
+To remove `InsecureRequestWarning`, you can include in your scripts (warning is suppressed when `VMNGCLIENT_DEVEL` environment variable is set):
 ```Python
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
