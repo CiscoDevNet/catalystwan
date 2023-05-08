@@ -27,10 +27,6 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class UserDoesNotExists(Exception):
-    pass
-
-
 class UsersAPI:
     def __init__(self, session: vManageSession) -> None:
         self.session = session
