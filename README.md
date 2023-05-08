@@ -83,6 +83,25 @@ alarms = session.api.alarms.get()
 
 </details>
 
+<details>
+    <summary> <b>User operations</b> <i>(click to expand)</i></summary>
+
+```python
+from vmngclient.api.administration import User, UsersAPI
+
+# Get all users
+all_users = UsersAPI(session).get_all_users()
+
+# Create a user
+new_user = User(username="new_user", password="new_user", group=["netadmin"], description="new user")
+status = UsersAPI(session).create_user(new_user)
+
+# Delete a user
+status = UsersAPI(session).delete_user(username="new_user")
+```
+
+</details>
+
 ### Note:
 To remove `InsecureRequestWarning`, you can include in your scripts:
 ```Python
