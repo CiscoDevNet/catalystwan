@@ -173,13 +173,12 @@ class vManageResponse(Response):
             return cls.parse_obj(data)  # type: ignore
         return create_dataclass(cls, data)
 
-    def get_error_info(self) -> Optional[ErrorInfo]:
+    def get_error_info(self) -> ErrorInfo:
         """Returns error information from JSON payload"""
 
-        if self.payload.error:
-            return ErrorInfo(**self.payload.error)
-        else:
-            return None
+        if self.payload.error is None:
+            raise TypeError("Payload error should not be None.")
+        return ErrorInfo(**self.payload.error)
 
 
 def with_vmanage_response(method: Callable[[Any], Response]) -> Callable[[Any], vManageResponse]:

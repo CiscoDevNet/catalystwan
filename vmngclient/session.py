@@ -38,9 +38,10 @@ class vManageBadRequestError(vManageClientError):
     malformed request message, or missing request parameters.
     """
 
-    def __init__(self, error: Optional[ErrorInfo], response: vManageResponse):
+    def __init__(self, error_info: Optional[ErrorInfo], response: vManageResponse):
         self.response = response
-        super().__init__(error)
+        self.info = error_info
+        super().__init__(error_info)
 
 
 class SessionType(Enum):
