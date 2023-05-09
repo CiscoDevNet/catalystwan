@@ -447,7 +447,7 @@ class TemplatesAPI:
 
         Method will be deleted if every template's payload will be generated dynamically.
         """
-        ported_templates = (CiscoAAAModel,)
+        ported_templates = (CiscoAAAModel, )
 
         return isinstance(template, ported_templates)
 
