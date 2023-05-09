@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import time
-from enum import Enum, auto
+from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
 from urllib.parse import urljoin
@@ -14,25 +14,20 @@ from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.api.api_containter import APIContainter
-from vmngclient.exceptions import AuthenticationError, CookieNotValidError, InvalidOperationError
-from vmngclient.primitives.client_api import AboutInfo, ServerInfo
+from vmngclient.exceptions import (
+    AuthenticationError,
+    CookieNotValidError,
+    InvalidOperationError,
+    SessionNotCreatedError,
+    TenantSubdomainNotFound,
+)
+from vmngclient.primitives.client import AboutInfo, ServerInfo
 from vmngclient.primitives.primitive_container import APIPrimitiveContainter
 from vmngclient.response import response_history_debug, vManageResponse
+from vmngclient.utils.session_type import SessionType
 from vmngclient.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
-
-
-class SessionType(Enum):
-    PROVIDER = auto()
-    TENANT = auto()
-    PROVIDER_AS_TENANT = auto()
-    NOT_DEFINED = auto()
-
-
-ProviderView = SessionType.PROVIDER
-TenantView = SessionType.TENANT
-ProviderAsTenantView = SessionType.PROVIDER_AS_TENANT
 
 
 class UserMode(Enum):
@@ -47,10 +42,6 @@ class ViewMode(Enum):
     TENANT = "tenant"
     NOT_RECOGNIZED = "not recognized"
     NOT_FOUND = "not found"
-
-
-class SessionNotCreatedError(Exception):
-    pass
 
 
 def create_vManageSession(
@@ -246,10 +237,10 @@ class vManageSession(vManageResponseAdapter):
         return f"https://{self.url}"
 
     def about(self) -> AboutInfo:
-        return self.primitives.client_api.about()
+        return self.primitives.client.about()
 
     def server(self) -> ServerInfo:
-        server_info = self.primitives.client_api.server()
+        server_info = self.primitives.client.server()
         self.platform_version = server_info.platform_version
         return server_info
 
@@ -319,9 +310,11 @@ class vManageSession(vManageResponseAdapter):
         Returns:
             Tenant UUID.
         """
-        tenants = self.primitives.multitenant_apis_provider_api.get_all_tenants()
-        tenant_id = tenants.filter(sub_domain=self.subdomain).single_or_default("")
-        return tenant_id
+        tenants = self.get_data(url="/dataservice/tenant")
+        tenant_ids = [tenant.get("tenantId", None) for tenant in tenants if tenant["subDomain"] == self.subdomain]
+        if len(tenant_ids) < 1:
+            raise TenantSubdomainNotFound(f"Tenant with sub-domain: {self.subdomain} not found")
+        return tenant_ids[0]
 
     def get_virtual_session_id(self, tenant_id: str) -> str:
         """Get VSessionId for a specific tenant
