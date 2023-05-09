@@ -1,12 +1,14 @@
 import datetime as dt
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from attr import define, field  # type: ignore
+from pydantic import BaseModel, Field  # type: ignore
 
 from vmngclient.exceptions import RetrieveIntervalOutOfRange
 from vmngclient.utils.alarm_status import Severity
 from vmngclient.utils.certificate_status import ValidityPeriod
 from vmngclient.utils.creation_tools import FIELD_NAME, asdict, convert_attributes
+from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
 from vmngclient.utils.template_type import TemplateType
@@ -477,18 +479,17 @@ class SoftwareInstallTimeout(DataclassBase):
     activate_timeout_min: int = field(converter=str, metadata={FIELD_NAME: "activateTimeoutInMin"})
 
 
-@define
-class FeatureTemplatesTypes(DataclassBase):
+class FeatureTemplatesTypes(BaseModel):
     parent: str
     default: str
-    display_name: str = field(metadata={FIELD_NAME: "displayName"})
+    display_name: str = Field(alias="displayName")
     name: str
-    type_class: str = field(metadata={FIELD_NAME: "typeClass"})
+    type_class: str = Field(alias="typeClass")
     description: str
-    write_permission: str
-    read_permission: str
-    helper_type: List[str] = field(factory=list, metadata={FIELD_NAME: "helperType"})
-    device_models: List[dict] = field(factory=list, metadata={FIELD_NAME: "deviceModels"})
+    write_permission: bool
+    read_permission: bool
+    helper_type: List[str] = Field(default=[], alias="helperType")
+    device_models: List[Dict[str, DeviceModel]] = Field(default=[], alias="deviceModels")
 
 
 @define
