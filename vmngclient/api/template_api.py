@@ -515,9 +515,11 @@ class TemplatesAPI:
 
     def validate_device_model(self, template: FeatureTemplate) -> bool:
         """Verify if selected template can be used with provided device model"""
+
         template_type = self._get_feature_template_types().filter(name=template.type).single_or_default()
 
         available_devices_for_template = [device["name"] for device in template_type.device_models]
+
         provided_device_models = [
             dev_mod.value if type(dev_mod) is DeviceModel else dev_mod for dev_mod in template.device_models
         ]
@@ -527,11 +529,13 @@ class TemplatesAPI:
             raise DeviceModelError(template, provided_device_models)
         return True
 
-    def _get_feature_template_types(self, type: str = "all"):
+    def _get_feature_template_types(self, type: str = "all") -> DataSequence[FeatureTemplatesTypes]:
         """Gets list off all templates and devices associated with these templates"""
+
         endpoint = "/dataservice/template/feature/types"
         params = {"type": type}
         response = self.session.get(endpoint, params=params)
+
         return response.dataseq(FeatureTemplatesTypes)
 
     def template_validation(self, id: str, device: Device) -> str:

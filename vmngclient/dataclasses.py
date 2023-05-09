@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from attr import define, field  # type: ignore
 from pydantic import BaseModel, Field  # type: ignore
@@ -8,7 +8,6 @@ from vmngclient.exceptions import RetrieveIntervalOutOfRange
 from vmngclient.utils.alarm_status import Severity
 from vmngclient.utils.certificate_status import ValidityPeriod
 from vmngclient.utils.creation_tools import FIELD_NAME, asdict, convert_attributes
-from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
 from vmngclient.utils.template_type import TemplateType
@@ -489,7 +488,7 @@ class FeatureTemplatesTypes(BaseModel):
     write_permission: bool
     read_permission: bool
     helper_type: List[str] = Field(default=[], alias="helperType")
-    device_models: List[Dict[str, DeviceModel]] = Field(default=[], alias="deviceModels")
+    device_models: List[dict] = Field(default=[], alias="deviceModels")
 
 
 @define

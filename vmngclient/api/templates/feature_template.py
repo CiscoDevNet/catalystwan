@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, List, Union
+from typing import TYPE_CHECKING, List
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
 from pydantic import BaseModel
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class FeatureTemplate(BaseModel, ABC):
     name: str
     description: str
-    device_models: List[Union[DeviceModel, str]]
+    device_models: List[DeviceModel]
 
     def generate_payload(self, session: vManageSession) -> str:
         env = Environment(
