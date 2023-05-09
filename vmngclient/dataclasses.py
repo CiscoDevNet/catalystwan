@@ -2,7 +2,7 @@ import datetime as dt
 from typing import List, Optional
 
 from attr import define, field  # type: ignore
-from pydantic import BaseModel, Field  # type: ignore
+from pydantic import BaseModel, Field
 
 from vmngclient.exceptions import RetrieveIntervalOutOfRange
 from vmngclient.utils.alarm_status import Severity
