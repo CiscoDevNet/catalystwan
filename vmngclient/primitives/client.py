@@ -56,7 +56,7 @@ class AboutInfo(BaseModel):
     logo: Optional[str]
 
 
-class ClientAPI(APIPrimitiveBase):
+class ClientPrimitives(APIPrimitiveBase):
     def server(self) -> ServerInfo:
         return self.get("/client/server").dataobj(ServerInfo)
 

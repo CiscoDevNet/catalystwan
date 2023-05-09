@@ -60,6 +60,7 @@ class TestResponse(unittest.TestCase):
     def setUp(self, response_mock) -> None:
         self.response_mock = response_mock
         self.response_mock.headers = {"set-cookie": None}
+        self.response_mock.status_code = 200
 
     @parameterized.expand(PARSE_DATASEQ_TEST_DATA)
     def test_dataseq_attrs(self, raises: bool, json: Any, expected_len: int, sourcekey: str):

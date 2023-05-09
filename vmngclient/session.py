@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import time
-from enum import Enum, auto
+from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
 from urllib.parse import urljoin
@@ -22,9 +22,10 @@ from vmngclient.exceptions import (
     TenantSubdomainNotFound,
     vManageClientError,
 )
-from vmngclient.primitives.client_api import AboutInfo, ServerInfo
+from vmngclient.primitives.client import AboutInfo, ServerInfo
 from vmngclient.primitives.primitive_container import APIPrimitiveContainter
 from vmngclient.response import ErrorInfo, response_history_debug, vManageResponse
+from vmngclient.utils.session_type import SessionType
 from vmngclient.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
@@ -42,18 +43,6 @@ class vManageBadRequestError(vManageClientError):
         self.response = response
         self.info = error_info
         super().__init__(error_info)
-
-
-class SessionType(Enum):
-    PROVIDER = auto()
-    TENANT = auto()
-    PROVIDER_AS_TENANT = auto()
-    NOT_DEFINED = auto()
-
-
-ProviderView = SessionType.PROVIDER
-TenantView = SessionType.TENANT
-ProviderAsTenantView = SessionType.PROVIDER_AS_TENANT
 
 
 class UserMode(Enum):
@@ -265,10 +254,10 @@ class vManageSession(vManageResponseAdapter):
         return f"https://{self.url}"
 
     def about(self) -> AboutInfo:
-        return self.primitives.client_api.about()
+        return self.primitives.client.about()
 
     def server(self) -> ServerInfo:
-        server_info = self.primitives.client_api.server()
+        server_info = self.primitives.client.server()
         self.platform_version = server_info.platform_version
         return server_info
 
@@ -338,7 +327,7 @@ class vManageSession(vManageResponseAdapter):
         Returns:
             Tenant UUID.
         """
-        tenants = self.primitives.multitenant_apis_provider_api.get_all_tenants()
+        tenants = self.primitives.tenant_management.get_all_tenants()
         tenant = tenants.filter(sub_domain=self.subdomain).single_or_default()
 
         if not tenant:
