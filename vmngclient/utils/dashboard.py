@@ -106,7 +106,7 @@ class CertificatesStatus(DataclassBase):
 
     invalid: int
     warning: int
-    revoked: int
+    revoked: Optional[int] = field(default=None)
 
 
 @define
