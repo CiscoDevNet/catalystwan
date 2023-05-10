@@ -197,6 +197,7 @@ class vManageSession(vManageResponseAdapter):
             self.logger.error(exception)
             raise
         except CookieNotValidError as exception:
+            self.logger.debug(self.response_trace(exception.response, None))
             if self.enable_relogin and not self.__second_relogin_try:
                 self.logger.warning(f"Loging to session again. Reason: '{str(exception)}'")
                 self.auth = vManageAuth(self.base_url, self.username, self.password, verify=False)

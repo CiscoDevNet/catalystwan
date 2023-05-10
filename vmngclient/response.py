@@ -113,9 +113,10 @@ class vManageResponse(Response):
     """Extends Response object with methods specific to vManage"""
 
     def __init__(self, response: Response):
-        if response.headers.get("set-cookie"):
-            raise CookieNotValidError("Session cookie is not valid.")
         self.__dict__.update(response.__dict__)
+        if cookies := response.headers.get("set-cookie", ""):
+            if "JSESSIONID=" in cookies:
+                raise CookieNotValidError(response)
         try:
             self.payload = JsonPayload(response.json())
         except JSONDecodeError:

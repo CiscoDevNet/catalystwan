@@ -1,3 +1,6 @@
+from requests import Response
+
+
 class InvalidOperationError(Exception):
     """The exception that is thrown when a method call is invalid for the object's current state."""
 
@@ -75,7 +78,9 @@ class AuthenticationError(Exception):
 
 
 class CookieNotValidError(Exception):
-    pass
+    def __init__(self, response: Response):
+        self.response = response
+        self.message = "Session cookie is not valid."
 
 
 class EmptyTaskResponseError(Exception):
