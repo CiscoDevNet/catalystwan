@@ -114,6 +114,8 @@ Start reading our code, and you'll get the hang of it.
 
   Auto generated python methods names can be found in: https://github.com/sbasan/vmanage-python-open-api/blob/main/README.md
 
+  If common data-model is being reused by more than one primitive class it should be moved to `vmngclient/model` folder with appropriate module name.
+
 1. Check that endpoints you want to utilize in your API already defined in `vmngclient/primitives`.
 2. If endpoint not present, create new file with endpoint including data-model and methods with `@View` and `@Version` decorators when needed.
 3. Implement higher level API in `vmngclient/api` using created primitives.

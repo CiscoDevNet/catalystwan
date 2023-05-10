@@ -1,14 +1,22 @@
+from typing import Optional
+
+from pydantic import BaseModel, Field
+
+from vmngclient.model.tenant import Tenant
 from vmngclient.primitives import APIPrimitiveBase
 
 
-class TenantMigrationPrimitives(APIPrimitiveBase):
-    def download_tenant_data(self):
-        # GET /tenantmigration/download/{path}
-        pass
+class ExportProcessId(BaseModel):
+    process_id: str = Field(alias="processId")
 
-    def export_tenant_data(self):
-        # POST /tenantmigration/export
-        pass
+
+class TenantMigrationPrimitives(APIPrimitiveBase):
+    def download_tenant_data(self, path: Optional[str] = "default.tar.gz") -> bytes:
+        return self.get(f"/tenantmigration/download/{path}").content
+
+    def export_tenant_data(self, tenant: Tenant):
+        response = self.post("/tenantmigration/export", payload=tenant)
+        return response.dataobj(ExportProcessId, None)
 
     def get_migration_token(self):
         # GET /tenantmigration/migrationToken
@@ -22,6 +30,6 @@ class TenantMigrationPrimitives(APIPrimitiveBase):
         # POST /tenantmigration/networkMigration
         pass
 
-    def re_trigger_network_migration(self):
+    def retrigger_network_migration(self):
         # GET /tenantmigration/networkMigration
         pass
