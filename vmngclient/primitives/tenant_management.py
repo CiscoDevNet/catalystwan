@@ -39,7 +39,7 @@ class Tenant(BaseModel):
     created_at: Optional[datetime] = Field(alias="createdAt")
     rid: Optional[int] = Field(alias="@rid")
     edge_connector_tunnel_interface_name: Optional[str] = Field(alias="edgeConnectorTunnelInterfaceName")
-    tenant_id: str = Field(alias="tenantId")
+    tenant_id: Optional[str] = Field(alias="tenantId")
     sp_metadata: Optional[str] = Field(alias="spMetadata")
     state: Optional[str]
     wan_edge_present: Optional[int] = Field(alias="wanEdgePresent")
