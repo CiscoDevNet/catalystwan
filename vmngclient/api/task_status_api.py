@@ -21,10 +21,10 @@ class SubTaskData(BaseModel):
     action: str
     activity: List[str]
     current_activity: str = Field(alias="currentActivity")
-    action_config: str = Field(alias="actionConfig")
-    order: int
-    uuid: str
-    hostname: str = Field(alias="host-name")
+    action_config: Optional[str] = Field(alias="actionConfig")
+    order: Optional[int]
+    uuid: Optional[str]
+    hostname: Optional[str] = Field(alias="host-name")
     site_id: Optional[str] = Field(alias="site-id")
 
 
