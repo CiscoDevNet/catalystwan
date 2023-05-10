@@ -2,6 +2,7 @@ import datetime as dt
 from typing import List, Optional
 
 from attr import define, field  # type: ignore
+from pydantic import BaseModel, Field
 
 from vmngclient.exceptions import RetrieveIntervalOutOfRange
 from vmngclient.utils.alarm_status import Severity
@@ -44,7 +45,6 @@ class DeviceAdminTech(DataclassBase):
 
 @define(frozen=True, field_transformer=convert_attributes)
 class AlarmData(DataclassBase):
-
     component: Optional[str] = field(default=None)
     active: Optional[bool] = field(default=None)
     severity: Optional[Severity] = field(converter=Severity, default=None)
@@ -476,6 +476,19 @@ class TenantTacacsServer(DataclassBase):
 class SoftwareInstallTimeout(DataclassBase):
     download_timeout_min: int = field(converter=str, metadata={FIELD_NAME: "downloadTimeoutInMin"})
     activate_timeout_min: int = field(converter=str, metadata={FIELD_NAME: "activateTimeoutInMin"})
+
+
+class FeatureTemplatesTypes(BaseModel):
+    parent: str
+    default: str
+    display_name: str = Field(alias="displayName")
+    name: str
+    type_class: str = Field(alias="typeClass")
+    description: str
+    write_permission: bool
+    read_permission: bool
+    helper_type: List[str] = Field(default=[], alias="helperType")
+    device_models: List[dict] = Field(default=[], alias="deviceModels")
 
 
 @define
