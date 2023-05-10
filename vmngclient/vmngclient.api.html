@@ -143,19 +143,19 @@
 <dl class="py exception">
 <dt class="sig sig-object py" id="vmngclient.api.admin_tech_api.DownloadAdminTechLogError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.admin_tech_api.</span></span><span class="sig-name descname"><span class="pre">DownloadAdminTechLogError</span></span><a class="headerlink" href="#vmngclient.api.admin_tech_api.DownloadAdminTechLogError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">vManageClientError</span></code></p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="vmngclient.api.admin_tech_api.GenerateAdminTechLogError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.admin_tech_api.</span></span><span class="sig-name descname"><span class="pre">GenerateAdminTechLogError</span></span><a class="headerlink" href="#vmngclient.api.admin_tech_api.GenerateAdminTechLogError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">vManageClientError</span></code></p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="vmngclient.api.admin_tech_api.RequestTokenIdNotFound">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.admin_tech_api.</span></span><span class="sig-name descname"><span class="pre">RequestTokenIdNotFound</span></span><a class="headerlink" href="#vmngclient.api.admin_tech_api.RequestTokenIdNotFound" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">vManageClientError</span></code></p>
 </dd></dl>
 
 </section>
@@ -273,25 +273,13 @@
 
 </dd></dl>
 
-<dl class="py exception">
-<dt class="sig sig-object py" id="vmngclient.api.administration.UserAlreadyExistsError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.administration.</span></span><span class="sig-name descname"><span class="pre">UserAlreadyExistsError</span></span><a class="headerlink" href="#vmngclient.api.administration.UserAlreadyExistsError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
-</dd></dl>
-
-<dl class="py exception">
-<dt class="sig sig-object py" id="vmngclient.api.administration.UserDoesNotExists">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.administration.</span></span><span class="sig-name descname"><span class="pre">UserDoesNotExists</span></span><a class="headerlink" href="#vmngclient.api.administration.UserDoesNotExists" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
-</dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.administration.</span></span><span class="sig-name descname"><span class="pre">UsersAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.create_user">
-<span class="sig-name descname"><span class="pre">create_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.User" title="vmngclient.dataclasses.User"><span class="pre">User</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.create_user" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.create">
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.User" title="vmngclient.dataclasses.User"><span class="pre">User</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.create" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -302,6 +290,11 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.exists">
 <span class="sig-name descname"><span class="pre">exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.exists" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataSequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.User" title="vmngclient.dataclasses.User"><span class="pre">User</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.get" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
