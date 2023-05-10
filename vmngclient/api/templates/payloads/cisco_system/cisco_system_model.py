@@ -15,3 +15,4 @@ class CiscoSystemModel(FeatureTemplate):
         arbitrary_types_allowed = True
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "feature/cisco_system.json.j2"
+    type: ClassVar[str] = "cisco_system"  # Cisco System

@@ -2,7 +2,6 @@ import unittest
 from unittest.mock import patch
 
 from vmngclient.api.task_status_api import RunningTaskData, SubTaskData, Task, TaskResult, TasksAPI, TasksData
-from vmngclient.exceptions import EmptyTaskResponseError, TaskNotRegisteredError
 
 
 class TestTaskStatusApi(unittest.TestCase):
@@ -102,28 +101,6 @@ class TestTaskStatusApi(unittest.TestCase):
         # Assert
         answer = Task(mock_session, "mock_action_id").wait_for_completed(1, 1).result
         self.assertEqual(answer, False)
-
-    @patch("vmngclient.api.task_status_api.sleep")
-    @patch.object(TasksAPI, "get_all_tasks")
-    @patch("vmngclient.session.vManageSession")
-    def test_raise_error_actionid_in_tasks_ids_data_dosnt_exists(self, mock_session, mock_get_tasks, mock_sleep):
-        # Arrange
-        mock_session.get_data.return_value = []
-        mock_get_tasks.return_value = TasksData.parse_obj(self.running_task_data_json)
-        # Act&Assert
-        self.assertRaises(EmptyTaskResponseError, Task(mock_session, "processId_1").wait_for_completed, 1, 1)
-
-    @patch("vmngclient.api.task_status_api.sleep")
-    @patch.object(TasksAPI, "get_all_tasks")
-    @patch("vmngclient.session.vManageSession")
-    def test_raise_TaskNotRegistered_error(self, mock_session, mock_get_tasks, mock_sleep):
-        # Arrange
-        mock_session.get_data.return_value = []
-        mock_get_tasks.return_value = TasksData.parse_obj(self.running_task_data_json)
-        # Act&Assert
-        self.assertRaises(
-            TaskNotRegisteredError, Task(mock_session, "missing_id").wait_for_completed, mock_session, 1, 1
-        )
 
     @patch("vmngclient.session.vManageSession")
     def test_get_all_tasks(self, mock_session):

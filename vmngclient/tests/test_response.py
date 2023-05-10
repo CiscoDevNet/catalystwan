@@ -131,5 +131,5 @@ class TestResponse(unittest.TestCase):
         if not raises:
             assert isinstance(vmng_response.get_error_info(), ErrorInfo)
         else:
-            with self.assertRaises(Exception):
+            with self.assertRaises(TypeError):
                 vmng_response.get_error_info()

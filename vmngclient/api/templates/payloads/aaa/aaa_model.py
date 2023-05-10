@@ -69,6 +69,7 @@ class AAAModel(FeatureTemplate):
         arbitrary_types_allowed = True
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "feature" / "aaa.json.j2"
+    type: ClassVar[str] = "aaa"  # AAA
 
     auth_order: List[AuthenticationOrder]
     auth_fallback: bool

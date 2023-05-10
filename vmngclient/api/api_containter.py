@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from vmngclient.api.admin_tech_api import AdminTechAPI
+from vmngclient.api.administration import UsersAPI
 from vmngclient.api.alarms_api import AlarmsAPI
 from vmngclient.api.basic_api import DevicesAPI, DeviceStateAPI
 from vmngclient.api.dashboard_api import DashboardAPI
@@ -42,3 +43,4 @@ class APIContainter:
         self.resource_pool = ResourcePoolAPI(session)
         self.software = SoftwareActionAPI(session)
         self.partition = PartitionManagerAPI(session)
+        self.users = UsersAPI(session)

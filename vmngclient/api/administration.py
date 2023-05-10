@@ -4,7 +4,7 @@ import logging
 from http import HTTPStatus
 from typing import TYPE_CHECKING, List, Union, cast, overload
 
-from requests import Response
+from requests import HTTPError, Response
 
 from vmngclient.dataclasses import (
     Certificate,
@@ -17,7 +17,8 @@ from vmngclient.dataclasses import (
     User,
     Vbond,
 )
-from vmngclient.exceptions import InvalidOperationError
+from vmngclient.exceptions import AlreadyExistsError, InvalidOperationError
+from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import asdict, create_dataclass
 
 if TYPE_CHECKING:
@@ -26,17 +27,15 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class UserAlreadyExistsError(Exception):
-    pass
-
-
-class UserDoesNotExists(Exception):
-    pass
-
-
 class UsersAPI:
     def __init__(self, session: vManageSession) -> None:
         self.session = session
+
+    def get(self) -> DataSequence[User]:
+        endpoint = "/dataservice/admin/user"
+        users = self.session.get(endpoint)
+
+        return users.dataseq(User)
 
     def get_all_users(self) -> List[User]:
         url_path = "/dataservice/admin/user"
@@ -47,21 +46,21 @@ class UsersAPI:
     def exists(self, username: str) -> bool:
         return username in [user.username for user in self.get_all_users()]
 
-    def create_user(self, user: User) -> bool:
+    def create(self, user: User) -> bool:
         if self.exists(user.username):
-            raise UserAlreadyExistsError(f"{user.username} already exists.")
+            raise AlreadyExistsError(f"User {user.username} already exists.")
         url_path = "/dataservice/admin/user"
         data = asdict(user)  # type: ignore
 
-        response = self.session.post(url=url_path, json=data)
-        logger.info(response)
+        try:
+            response = self.session.post(url=url_path, json=data)
+        except HTTPError:
+            logger.error(response.json)
+
         return True if response.status_code == 200 else False
 
     def delete_user(self, username: str) -> bool:
-        if not self.exists(username):
-            raise UserDoesNotExists(f"{username} does not exists.")
         url_path = f"/dataservice/admin/user/{username}"
-        logger.debug(f"Deleting user {username}.")
         response = self.session.delete(url_path)
         return True if response.status_code == 200 else False
 

@@ -94,6 +94,7 @@ class Tunnel:
 
 
 class CiscoVpnInterfaceEthernetModel(FeatureTemplate):
+    type: ClassVar[str] = "cisco_vpn_interface"  # Cisco VPN Interface Ethernet
     payload_path: ClassVar[Path] = Path(__file__).parent / "feature/cisco_vpn_interface_ethernet.json.j2"
     interface_name: InterfaceName
     shutdown: Optional[bool]

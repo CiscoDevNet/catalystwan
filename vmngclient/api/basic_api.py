@@ -21,10 +21,6 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class DeviceNotFoundError(Exception):
-    pass
-
-
 class DevicesAPI:
     """API methods of vManage for getting devices and controllers.
 

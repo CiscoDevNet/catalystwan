@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from time import sleep
 from typing import TYPE_CHECKING, List, Optional, cast
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
@@ -11,7 +10,6 @@ if TYPE_CHECKING:
 
 from pydantic import BaseModel, Field
 
-from vmngclient.exceptions import EmptyTaskResponseError, TaskNotRegisteredError
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 
 logger = logging.getLogger(__name__)
@@ -78,7 +76,7 @@ class TasksAPI:
         json = self.session.get_json(url)
         return TasksData.parse_obj(json)
 
-    def get_task_data(self, delay_seconds: int = 5) -> List[SubTaskData]:
+    def get_task_data(self) -> List[SubTaskData]:
         """
         Get data about all sub-tasks in task
 
@@ -89,24 +87,8 @@ class TasksAPI:
         Returns:
             List[SubTaskData]: List of all sub-tusks
         """
-        self.__check_if_data_is_available(delay_seconds)
         task_data = self.session.get_data(self.url)
         return [SubTaskData.parse_obj(subtask_data) for subtask_data in task_data]
-
-    def __check_if_data_is_available(self, delay_seconds):
-        task_data = self.session.get_data(self.url)
-        if not task_data:
-            all_tasks_ids = [task.process_id for task in self.get_all_tasks().running_tasks]
-            if self.task_id in all_tasks_ids:
-                sleep(delay_seconds)
-                task_data = self.session.get_data(self.url)
-                if not task_data:
-                    raise EmptyTaskResponseError(
-                        f"Task id {self.task_id} registered by vManage in all tasks list, "
-                        f"but response about it's status didn't contain any information."
-                    )
-            else:
-                raise TaskNotRegisteredError(f"Task id {self.task_id} is not registered by vManage.")
 
 
 class Task:
@@ -124,7 +106,6 @@ class Task:
         self,
         timeout_seconds: int = 300,
         interval_seconds: int = 5,
-        delay_seconds: int = 10,
         success_statuses: List[OperationStatus] = [
             OperationStatus.SUCCESS,
         ],
@@ -228,7 +209,7 @@ class Task:
                 List[SubTaskData]
             """
 
-            self.task_data = TasksAPI(self.session, self.task_id).get_task_data(delay_seconds)
+            self.task_data = TasksAPI(self.session, self.task_id).get_task_data()
             sub_task_statuses = [task.status for task in self.task_data]
             sub_task_statuses_id = [task.status_id for task in self.task_data]
             sub_task_activities = [task.activity for task in self.task_data]
