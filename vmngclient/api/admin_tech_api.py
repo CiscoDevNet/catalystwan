@@ -12,6 +12,7 @@ from requests import Response
 from requests.exceptions import HTTPError
 
 from vmngclient.dataclasses import AdminTech, DeviceAdminTech
+from vmngclient.exceptions import vManageClientError
 from vmngclient.utils.creation_tools import create_dataclass
 
 if TYPE_CHECKING:
@@ -20,15 +21,15 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class GenerateAdminTechLogError(Exception):
+class GenerateAdminTechLogError(vManageClientError):
     pass
 
 
-class DownloadAdminTechLogError(Exception):
+class DownloadAdminTechLogError(vManageClientError):
     pass
 
 
-class RequestTokenIdNotFound(Exception):
+class RequestTokenIdNotFound(vManageClientError):
     pass
 
 

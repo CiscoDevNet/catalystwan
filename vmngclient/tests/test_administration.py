@@ -1,16 +1,11 @@
+# type: ignore
 import unittest
 from unittest.mock import patch
 
 from attr.exceptions import NotAnAttrsClassError
 from parameterized import parameterized  # type: ignore
 
-from vmngclient.api.administration import (
-    AdministrationSettingsAPI,
-    ClusterManagementAPI,
-    UserAlreadyExistsError,
-    UserDoesNotExists,
-    UsersAPI,
-)
+from vmngclient.api.administration import AdministrationSettingsAPI, ClusterManagementAPI, UsersAPI
 from vmngclient.dataclasses import (
     Certificate,
     CloudConnectorData,
@@ -21,11 +16,11 @@ from vmngclient.dataclasses import (
     User,
     Vbond,
 )
-from vmngclient.exceptions import InvalidOperationError
+from vmngclient.exceptions import AlreadyExistsError, InvalidOperationError
 from vmngclient.utils.certificate_status import ValidityPeriod
 from vmngclient.utils.creation_tools import create_dataclass
 
-password_dataclass = Password("old_password_123", "new_password_123")
+password_dataclass = Password(old_password="old_password_123", new_password="new_password_123")
 certificate_dataclass = Certificate("cert", "Name", "Surname", "name@sur.name", ValidityPeriod.ONE_YEAR, 10)
 vbond_dataclass = Vbond("1.1.1.1", 1234)
 organization_dataclass = Organization("My org name", 1)
@@ -82,7 +77,7 @@ class TestUsersAPI(unittest.TestCase):
         mock_session.post.return_value = mock_response
         mock_response.status_code = status_code
         # Act
-        answer = UsersAPI(mock_session).create_user(self.user_dataclass[0])
+        answer = UsersAPI(mock_session).create(self.user_dataclass[0])
         # Assert
         self.assertEqual(answer, expected_outcome)
 
@@ -93,10 +88,10 @@ class TestUsersAPI(unittest.TestCase):
 
         # Act
         def answer():
-            UsersAPI(mock_session).create_user(self.user_dataclass[0])
+            UsersAPI(mock_session).create(self.user_dataclass[0])
 
         # Assert
-        self.assertRaises(UserAlreadyExistsError, answer)
+        self.assertRaises(AlreadyExistsError, answer)
 
     @parameterized.expand([[200, True], [400, False]])
     @patch("vmngclient.session.vManageSession")
@@ -110,18 +105,6 @@ class TestUsersAPI(unittest.TestCase):
         answer = UsersAPI(mock_session).delete_user("admin")
         # Assert
         self.assertEqual(answer, expected_outcome)
-
-    @patch("vmngclient.session.vManageSession")
-    def test_delete_user_not_existing(self, mock_session):
-        # Arrange
-        mock_session.get_data.return_value = [self.users[1]]
-
-        # Act
-        def answer():
-            UsersAPI(mock_session).delete_user("no_user")
-
-        # Assert
-        self.assertRaises(UserDoesNotExists, answer)
 
 
 class TestClusterManagementAPI(unittest.TestCase):

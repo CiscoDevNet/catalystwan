@@ -103,10 +103,23 @@ status = UsersAPI(session).delete_user(username="new_user")
 </details>
 
 ### Note:
-To remove `InsecureRequestWarning`, you can include in your scripts:
+To remove `InsecureRequestWarning`, you can include in your scripts (warning is suppressed when `VMNGCLIENT_DEVEL` environment variable is set):
 ```Python
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+```
+
+## Catching Exceptions
+```python
+try:
+	session.api.users.delete_user("XYZ")
+except vManageBadRequestError as error:
+	# Process an error.
+	logger.error(error.info.details)
+
+# message = 'Delete users request failed' 
+# details = 'No user with name XYZ was found' 
+# code = 'USER0006'
 ```
 
 ## [Contributing, bug reporting and feature requests](https://github.com/CiscoDevNet/vManage-client/blob/main/CONTRIBUTING.md)

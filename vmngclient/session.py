@@ -20,14 +20,29 @@ from vmngclient.exceptions import (
     InvalidOperationError,
     SessionNotCreatedError,
     TenantSubdomainNotFound,
+    vManageClientError,
 )
 from vmngclient.primitives.client import AboutInfo, ServerInfo
 from vmngclient.primitives.primitive_container import APIPrimitiveContainter
-from vmngclient.response import response_history_debug, vManageResponse
+from vmngclient.response import ErrorInfo, response_history_debug, vManageResponse
 from vmngclient.utils.session_type import SessionType
 from vmngclient.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
+
+
+class vManageBadRequestError(vManageClientError):
+    """Indicates that vManage returned HTTP status code 400.
+
+    A 400 Bad Request response status code indicates that the server
+    could not understand the request due to invalid syntax,
+    malformed request message, or missing request parameters.
+    """
+
+    def __init__(self, error_info: Optional[ErrorInfo], response: vManageResponse):
+        self.response = response
+        self.info = error_info
+        super().__init__(error_info)
 
 
 class UserMode(Enum):
@@ -218,6 +233,8 @@ class vManageSession(vManageResponseAdapter):
             self.logger.debug(error)
             if response.status_code == 403:
                 self.logger.info(f"User {self.username} is unauthorized for method {method} {full_url}")
+            elif response.status_code == 400:
+                raise vManageBadRequestError(response.get_error_info(), response)
             else:
                 raise error
         return response
@@ -310,11 +327,13 @@ class vManageSession(vManageResponseAdapter):
         Returns:
             Tenant UUID.
         """
-        tenants = self.get_data(url="/dataservice/tenant")
-        tenant_ids = [tenant.get("tenantId", None) for tenant in tenants if tenant["subDomain"] == self.subdomain]
-        if len(tenant_ids) < 1:
+        tenants = self.primitives.tenant_management.get_all_tenants()
+        tenant = tenants.filter(sub_domain=self.subdomain).single_or_default()
+
+        if not tenant:
             raise TenantSubdomainNotFound(f"Tenant with sub-domain: {self.subdomain} not found")
-        return tenant_ids[0]
+
+        return tenant.tenant_id
 
     def get_virtual_session_id(self, tenant_id: str) -> str:
         """Get VSessionId for a specific tenant
