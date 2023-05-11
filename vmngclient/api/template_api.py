@@ -335,6 +335,10 @@ class TemplatesAPI:
     def edit(self, template: CLITemplate) -> Any:
         ...
 
+    @overload
+    def edit(self, template: DeviceTemplate) -> Any:
+        ...
+
     def edit(self, template):
         template_info = self.get(template).filter(name=template.name).single_or_default()
         if not template_info:
@@ -343,7 +347,16 @@ class TemplatesAPI:
         if isinstance(template, FeatureTemplate):
             return self._edit_feature_template(template, template_info)
 
+        if isinstance(template, DeviceTemplate):
+            return self._edit_device_template(template)
+
         raise NotImplementedError()
+
+    def _edit_device_template(self, template: DeviceTemplate):
+        # template_id = self.session.api.templates.get(DeviceTemplate).filter(name=template.name).single_or_default()
+        # response = self.session.put(f"/dataservice/template/device/{template_id}")
+
+        self._create_device_template(template, True)
 
     def _edit_feature_template(self, template: FeatureTemplate, data: FeatureTemplateInfo) -> vManageResponse:
         if self.is_created_by_generator(template):
@@ -414,11 +427,12 @@ class TemplatesAPI:
 
         return template_id
 
-    def _create_device_template(self, device_template: DeviceTemplate) -> str:
+    def _create_device_template(self, device_template: DeviceTemplate, edit: bool = False) -> str:
         def get_general_template_info(
             name: str, fr_templates: DataSequence[FeatureTemplateInfo]
         ) -> FeatureTemplateInfo:
             _template = fr_templates.filter(name=name).single_or_default()
+
             if not _template:
                 raise TypeError(f"{name} does not exists. Device Template is invalid.")
 
@@ -431,23 +445,32 @@ class TemplatesAPI:
                 general_template.subTemplates = [
                     parse_general_template(_t, fr_templates) for _t in general_template.subTemplates
                 ]
-
-            info = get_general_template_info(general_template.name, fr_templates)
-            return GeneralTemplate(
-                name=general_template.name,
-                subTemplates=general_template.subTemplates,
-                templateId=info.id,
-                templateType=info.template_type,
-            )
+            if general_template.name:
+                info = get_general_template_info(general_template.name, fr_templates)
+                return GeneralTemplate(
+                    name=general_template.name,
+                    subTemplates=general_template.subTemplates,
+                    templateId=info.id,
+                    templateType=info.template_type,
+                )
+            else:
+                return general_template
 
         fr_templates = self.get(FeatureTemplate)  # type: ignore
         device_template.general_templates = list(
             map(lambda x: parse_general_template(x, fr_templates), device_template.general_templates)  # type: ignore
         )
 
-        endpoint = "/dataservice/template/device/feature/"
-        payload = json.loads(device_template.generate_payload())
-        response = self.session.post(endpoint, json=payload)
+        if edit:
+            template_id = (
+                self.session.api.templates.get(DeviceTemplate).filter(name=device_template.name).single_or_default().id
+            )
+            payload = json.loads(device_template.generate_payload())
+            response = self.session.put(f"/dataservice/template/device/{template_id}", json=payload)
+        else:
+            endpoint = "/dataservice/template/device/feature/"
+            payload = json.loads(device_template.generate_payload())
+            response = self.session.post(endpoint, json=payload)
 
         return response.text
 
@@ -456,7 +479,7 @@ class TemplatesAPI:
 
         Method will be deleted if every template's payload will be generated dynamically.
         """
-        ported_templates = (CiscoAAAModel, )
+        ported_templates = (CiscoAAAModel,)
 
         return isinstance(template, ported_templates)
 
