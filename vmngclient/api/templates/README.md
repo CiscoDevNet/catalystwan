@@ -19,7 +19,7 @@ These steps will help you to automate feature template creation. We'll explain w
 1. Get your template type name and version. Note: display name is not template type name!
 - For example, you could extract it from response body. Go to your vManage and create any template which you would like to automate in vmngclient. Send template creation request and check for `templateType` and `templateMinVersion` variable names. `OMP` (display name) for vSmart has `omp-vsmart` template type name.
 
-1. With corresponding `templateType` we are able to create new class which implements `FeatureTemplate` interface. Create new file in `vmngclient\api\templates\models\` and copy-paste the code and change name of the class with its type attribute.
+2. With corresponding `templateType` we are able to create new class which implements `FeatureTemplate` interface. Create new file in `vmngclient\api\templates\models\` and copy-paste the code and change name of the class with its type attribute.
 
 	```python
 	from pathlib import Path
