@@ -19,6 +19,7 @@ from vmngclient.api.templates.feature_template_field import FeatureTemplateField
 from vmngclient.api.templates.feature_template_payload import FeatureTemplatePayload
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
 from vmngclient.api.templates.models.omp_vsmart_model import OMPvSmart
+from vmngclient.api.templates.models.system_vsmart_model import SystemVsmart
 from vmngclient.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, FeatureTemplatesTypes, TemplateInfo
 from vmngclient.exceptions import AlreadyExistsError, AttachedError, TemplateNotFoundError
 from vmngclient.response import vManageResponse
@@ -457,7 +458,7 @@ class TemplatesAPI:
 
         Method will be deleted if every template's payload will be generated dynamically.
         """
-        ported_templates = (CiscoAAAModel, OMPvSmart)
+        ported_templates = (CiscoAAAModel, OMPvSmart, SystemVsmart)
 
         return isinstance(template, ported_templates)
 
