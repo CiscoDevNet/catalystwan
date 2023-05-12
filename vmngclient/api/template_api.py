@@ -6,7 +6,6 @@ from enum import Enum
 from typing import TYPE_CHECKING, Any, Optional, Type, overload
 
 from requests.exceptions import HTTPError
-from templates.models.system_vsmart_model import SystemVsmart  # type: ignore
 
 from vmngclient.api.task_status_api import Task
 from vmngclient.api.templates.cli_template import CLITemplate
@@ -19,6 +18,7 @@ from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.api.templates.feature_template_field import FeatureTemplateField, get_path_dict
 from vmngclient.api.templates.feature_template_payload import FeatureTemplatePayload
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
+from vmngclient.api.templates.models.system_vsmart_model import SystemVsmart
 from vmngclient.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, FeatureTemplatesTypes, TemplateInfo
 from vmngclient.exceptions import AlreadyExistsError, AttachedError, TemplateNotFoundError
 from vmngclient.response import vManageResponse
