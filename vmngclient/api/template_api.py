@@ -6,6 +6,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Any, Optional, Type, overload
 
 from requests.exceptions import HTTPError
+from templates.models.system_vsmart_model import SystemVsmart  # type: ignore
 
 from vmngclient.api.task_status_api import Task
 from vmngclient.api.templates.cli_template import CLITemplate
@@ -456,7 +457,10 @@ class TemplatesAPI:
 
         Method will be deleted if every template's payload will be generated dynamically.
         """
-        ported_templates = (CiscoAAAModel, )
+        ported_templates = (
+            CiscoAAAModel,
+            SystemVsmart,
+        )
 
         return isinstance(template, ported_templates)
 
