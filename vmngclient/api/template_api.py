@@ -18,6 +18,7 @@ from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.api.templates.feature_template_field import FeatureTemplateField, get_path_dict
 from vmngclient.api.templates.feature_template_payload import FeatureTemplatePayload
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
+from vmngclient.api.templates.models.omp_vsmart_model import OMPvSmart
 from vmngclient.api.templates.models.system_vsmart_model import SystemVsmart
 from vmngclient.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, FeatureTemplatesTypes, TemplateInfo
 from vmngclient.exceptions import AlreadyExistsError, AttachedError, TemplateNotFoundError
@@ -459,9 +460,9 @@ class TemplatesAPI:
         """
         ported_templates = (
             CiscoAAAModel,
+            OMPvSmart,
             SystemVsmart,
         )
-
         return isinstance(template, ported_templates)
 
     def get_feature_template_schema(self, template: FeatureTemplate, debug: bool = False) -> Any:
@@ -479,7 +480,7 @@ class TemplatesAPI:
         payload = self.generate_feature_template_payload(template, schema, debug)
 
         endpoint = "/dataservice/template/feature"
-        response = self.session.post(endpoint, json=payload.dict(by_alias=True))
+        response = self.session.post(endpoint, json=payload.dict(by_alias=True, exclude_none=True))
 
         return response.json()["templateId"]
 
@@ -490,7 +491,7 @@ class TemplatesAPI:
             name=template.name,
             description=template.description,
             template_type=template.type,
-            device_types=["vedge-C8000V"],  # TODO
+            device_types=["omp-vsmart"],  # TODO
             definition={},
         )  # type: ignore
 
