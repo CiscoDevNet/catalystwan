@@ -86,6 +86,20 @@ class TemplatesAPI:
 
         return fr_templates.dataseq(FeatureTemplateInfo)
 
+    def get_feature_template(self, template_name: str) -> FeatureTemplateInfo:  # Update return value accordinly later
+        """Get feature template by name
+
+        1. Get specified template by name
+        2. Create TemplateDefiniton
+
+        """
+        all_templates = self._get_feature_templates(summary=False)
+        requested_template = all_templates.filter(name=template_name).single_or_default()
+        # template_as_json = json.loads(requested_template.template_definition)
+        # parse to dataclass here
+        # return create_dataclass(cls=TemplateFieldDefinition, data=values)
+        return requested_template
+
     def _get_device_templates(
         self, feature: DeviceTemplateFeature = DeviceTemplateFeature.ALL
     ) -> DataSequence[DeviceTemplateInfo]:
@@ -456,7 +470,7 @@ class TemplatesAPI:
 
         Method will be deleted if every template's payload will be generated dynamically.
         """
-        ported_templates = (CiscoAAAModel, )
+        ported_templates = (CiscoAAAModel,)
 
         return isinstance(template, ported_templates)
 

@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import datetime as dt
-from typing import List, Optional
+from typing import Dict, List, Optional, Union
 
 from attr import define, field  # type: ignore
 from pydantic import BaseModel, Field
@@ -216,6 +218,34 @@ class User(DataclassBase):
 
 
 @define
+class TemplateFieldDefinition(DataclassBase):
+    vip_object_type: Optional[str] = field(default=None, metadata={FIELD_NAME: "vipObjectType"})
+    vip_type: Optional[str] = field(default=None, metadata={FIELD_NAME: "vipType"})
+    vip_variable_name: Optional[str] = field(default=None, metadata={FIELD_NAME: "vipVariableName"})
+    vip_primary_key: Optional[List[str]] = field(default=None, metadata={FIELD_NAME: "vipPrimaryKey"})
+    vip_value: Optional[Union[str, int, List[Dict[str, Union[TemplateFieldDefinition, List[str]]]]]] = field(
+        default=None, metadata={FIELD_NAME: "vipValue"}
+    )
+
+
+@define
+class TemplateField(DataclassBase):
+    name: str
+    definition: Optional[TemplateFieldDefinition] = field(default=None)
+    template_dicts: Optional[TemplateField] = field(default=None)
+
+    @definition.validator  # type: ignore
+    def definition_is_valid(self, attribute, value):
+        if value is not None:
+            assert self.template_dicts is None  # if definition is provided, cannot have template_dicts at the same time
+
+    @template_dicts.validator  # type: ignore
+    def template_dicts_is_valid(self, attribute, value):
+        if value is not None:
+            assert self.definition is None  # if template_dicts is provided, cannot have definition at the same time
+
+
+@define
 class TemplateInfo(DataclassBase):
     last_updated_by: str = field(metadata={FIELD_NAME: "lastUpdatedBy"})
     resource_group: str = field(metadata={FIELD_NAME: "resourceGroup"})
@@ -229,9 +259,10 @@ class TemplateInfo(DataclassBase):
 
 @define
 class FeatureTemplateInfo(TemplateInfo):
-    template_type: str = field(metadata={FIELD_NAME: "templateType"})
-    device_type: List[str] = field(metadata={FIELD_NAME: "deviceType"})
-    version: str = field(metadata={FIELD_NAME: "templateMinVersion"})
+    template_type: str = field(kw_only=True, metadata={FIELD_NAME: "templateType"})
+    device_type: List[str] = field(kw_only=True, metadata={FIELD_NAME: "deviceType"})
+    version: str = field(kw_only=True, metadata={FIELD_NAME: "templateMinVersion"})
+    template_definiton: Optional[TemplateField] = field(default=None, metadata={FIELD_NAME: "templateDefinition"})
 
 
 @define
