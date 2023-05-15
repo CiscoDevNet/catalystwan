@@ -4,53 +4,17 @@ import logging
 from typing import TYPE_CHECKING, List, Optional, cast
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
-
+from vmngclient.utils.operation_status import OperationStatus
+from time import sleep
+from vmngclient.exceptions import TaskValidationError
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
-from pydantic import BaseModel, Field
+from vmngclient.primitives.task_status_api import SubTaskData, TaskResult, TaskData, TasksData
 
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 
 logger = logging.getLogger(__name__)
-
-
-class SubTaskData(BaseModel):
-    status: str
-    status_id: str = Field(alias="statusId")
-    action: str
-    activity: List[str]
-    current_activity: str = Field(alias="currentActivity")
-    action_config: Optional[str] = Field(alias="actionConfig")
-    order: Optional[int]
-    uuid: Optional[str]
-    hostname: Optional[str] = Field(alias="host-name")
-    site_id: Optional[str] = Field(alias="site-id")
-
-
-class TaskResult(BaseModel):
-    result: bool
-    sub_tasks_data: List[SubTaskData]
-
-
-class RunningTaskData(BaseModel):
-    details_url: str = Field(alias="detailsURL")
-    user_session_username: str = Field(alias="userSessionUserName")
-    rid: int = Field(alias="@rid")
-    tenant_name: str = Field("tenantName")
-    process_id: str = Field(alias="processId")
-    name: str
-    tenant_id: str = Field(alias="tenantId")
-    user_session_ip: str = Field(alias="userSessionIP")
-    action: str
-    start_time: int = Field(alias="startTime")
-    end_time: int = Field(alias="endTime")
-    status: str
-
-
-class TasksData(BaseModel):
-    running_tasks: List[RunningTaskData] = Field(alias="runningTasks")
-
 
 class TasksAPI:
     """
@@ -87,10 +51,25 @@ class TasksAPI:
         Returns:
             List[SubTaskData]: List of all sub-tusks
         """
+        self.__validate_task()
         task_data = self.session.get_data(self.url)
         return [SubTaskData.parse_obj(subtask_data) for subtask_data in task_data]
-
-
+    
+    def __validate_task(self) -> bool:
+        WAIT_SECONDS = 10
+        REPEATS_NUMBER = 2
+        for _ in range(REPEATS_NUMBER):
+            json = self.session.get_json(self.url)
+            task_data = TaskData.parse_obj(json)
+            if task_data.validation.status == OperationStatus.VALIDATION_SUCCESS:
+                return True
+            logger.warning(
+                f"Task not validated properly yet, sleep {WAIT_SECONDS} seconds until next call")
+            sleep(WAIT_SECONDS)
+        
+        raise TaskValidationError(
+            f"After {REPEATS_NUMBER} task API calls, proper task validation status has not been received")
+        
 class Task:
     """
     API class for getting data about task/sub-tasks

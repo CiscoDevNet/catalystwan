@@ -6,6 +6,7 @@ from vmngclient.primitives.client import ClientPrimitives
 from vmngclient.primitives.tenant_backup_restore import TenantBackupRestorePrimitives
 from vmngclient.primitives.tenant_management import TenantManagementPrimitives
 from vmngclient.primitives.tenant_migration import TenantMigrationPrimitives
+from vmngclient.primitives.task_status_api import TasksPrimitives
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -17,3 +18,4 @@ class APIPrimitiveContainter:
         self.tenant_management = TenantManagementPrimitives(session)
         self.tenant_backup_restore = TenantBackupRestorePrimitives(session)
         self.tenant_migration = TenantMigrationPrimitives(session)
+        self.task_status = TasksPrimitives(session)
