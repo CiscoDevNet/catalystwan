@@ -96,6 +96,7 @@ class TaskNotRegisteredError(vManageClientError):
 
     pass
 
+
 class TaskValidationError(vManageClientError):
     """Raised if task has not been validated"""
 
