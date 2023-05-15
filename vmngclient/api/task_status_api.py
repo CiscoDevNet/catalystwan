@@ -1,75 +1,22 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, List, Optional, cast
+from time import sleep
+from typing import TYPE_CHECKING, List, cast
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
-from vmngclient.utils.operation_status import OperationStatus
-from time import sleep
+
 from vmngclient.exceptions import TaskValidationError
+
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
-from vmngclient.primitives.task_status_api import SubTaskData, TaskResult, TaskData, TasksData
-
+from vmngclient.primitives.task_status_api import SubTaskData, TaskData, TaskResult, TasksPrimitives
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 
 logger = logging.getLogger(__name__)
 
-class TasksAPI:
-    """
-    API class for getting data about tasks
-    """
 
-    def __init__(self, session: vManageSession, task_id: str):
-        self.session = session
-        self.task_id = task_id
-        self.url = f"/dataservice/device/action/status/{self.task_id}"
-
-    def get_all_tasks(self) -> TasksData:
-        """
-        Get list of active tasks id's in vmanage
-
-        Args:
-            session (vManageSession): session
-
-        Returns:
-        TasksData: Data about all tasks in vmanage
-        """
-        url = "dataservice/device/action/status/tasks"
-        json = self.session.get_json(url)
-        return TasksData.parse_obj(json)
-
-    def get_task_data(self) -> List[SubTaskData]:
-        """
-        Get data about all sub-tasks in task
-
-        Args:
-            delay_seconds (int, optional): If vmanage doesn't get data about task, after this time will asks again.
-            Defaults to 5.
-
-        Returns:
-            List[SubTaskData]: List of all sub-tusks
-        """
-        self.__validate_task()
-        task_data = self.session.get_data(self.url)
-        return [SubTaskData.parse_obj(subtask_data) for subtask_data in task_data]
-    
-    def __validate_task(self) -> bool:
-        WAIT_SECONDS = 10
-        REPEATS_NUMBER = 2
-        for _ in range(REPEATS_NUMBER):
-            json = self.session.get_json(self.url)
-            task_data = TaskData.parse_obj(json)
-            if task_data.validation.status == OperationStatus.VALIDATION_SUCCESS:
-                return True
-            logger.warning(
-                f"Task not validated properly yet, sleep {WAIT_SECONDS} seconds until next call")
-            sleep(WAIT_SECONDS)
-        
-        raise TaskValidationError(
-            f"After {REPEATS_NUMBER} task API calls, proper task validation status has not been received")
-        
 class Task:
     """
     API class for getting data about task/sub-tasks
@@ -80,6 +27,22 @@ class Task:
         self.task_id = task_id
         self.url = f"/dataservice/device/action/status/{self.task_id}"
         self.task_data: List[SubTaskData]
+
+    def __validate_task(self) -> bool:
+        WAIT_SECONDS = 10
+        REPEATS_NUMBER = 2
+        for _ in range(REPEATS_NUMBER):
+            json = self.session.get_json(self.url)
+            task_data = TaskData.parse_obj(json)
+            print(task_data)
+            if task_data.validation.status == OperationStatus.VALIDATION_SUCCESS:
+                return True
+            logger.warning(f"Task not validated properly yet, sleep {WAIT_SECONDS} seconds until next call")
+            sleep(WAIT_SECONDS)
+
+        raise TaskValidationError(
+            f"After {REPEATS_NUMBER} task API calls, proper task validation status has not been received"
+        )
 
     def wait_for_completed(
         self,
@@ -188,7 +151,8 @@ class Task:
                 List[SubTaskData]
             """
 
-            self.task_data = TasksAPI(self.session, self.task_id).get_task_data()
+            self.__validate_task()
+            self.task_data = TasksPrimitives(self.session).get_task_data(self.task_id).data
             sub_task_statuses = [task.status for task in self.task_data]
             sub_task_statuses_id = [task.status_id for task in self.task_data]
             sub_task_activities = [task.activity for task in self.task_data]

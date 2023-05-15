@@ -1,8 +1,10 @@
-from typing import List
+from typing import List, Optional
+
+from pydantic import BaseModel, Field
+
 from vmngclient.primitives import APIPrimitiveBase
 from vmngclient.utils.operation_status import OperationStatus
-from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, List, Optional, cast
+
 
 class SubTaskData(BaseModel):
     status: str
@@ -55,6 +57,7 @@ class Validation(BaseModel):
     status: OperationStatus = Field(alias="status")
     order: int = Field(alias="order")
 
+
 class Summary(BaseModel):
     action: str = Field(alias="action")
     name: str = Field(alias="name")
@@ -68,12 +71,14 @@ class Summary(BaseModel):
     status: str = Field(alias="status")
     count: dict = Field(alias="count")
 
+
 class TaskData(BaseModel):
     data: List[SubTaskData]
     validation: Validation
     summary: Summary
     is_cancel_enabled: bool = Field(alias="isCancelEnabled")
     is_parallel_execution_enabled: bool = Field(alias="isParallelExecutionEnabled")
+
 
 class TasksData(BaseModel):
     running_tasks: List[RunningTaskData] = Field(alias="runningTasks")
@@ -96,7 +101,7 @@ class TasksPrimitives(APIPrimitiveBase):
             List[SubTaskData]: List of all sub-tusks
         """
         url = f"/dataservice/device/action/status/{task_id}"
-        task_data = self.session.get(url)
+        task_data = self.session.get_json(url)
         return TaskData.parse_obj(task_data)
 
     def get_all_tasks(self) -> TasksData:
