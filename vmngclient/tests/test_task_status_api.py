@@ -1,7 +1,8 @@
 import unittest
 from unittest.mock import patch
 
-from vmngclient.api.task_status_api import RunningTaskData, SubTaskData, Task, TaskResult, TasksAPI, TasksData
+from vmngclient.api.task_status_api import SubTaskData, TaskResult
+from vmngclient.primitives.task_status_api import RunningTaskData, TasksData, TasksPrimitives
 
 
 class TestTaskStatusApi(unittest.TestCase):
@@ -85,29 +86,11 @@ class TestTaskStatusApi(unittest.TestCase):
         }
 
     @patch("vmngclient.session.vManageSession")
-    def test_wait_for_completed_success(self, mock_session):
-        # Prepare mock data
-        mock_session.get_data.return_value = self.action_data
-
-        # Assert
-        answer = Task(mock_session, "mock_action_id").wait_for_completed(3000, 5)
-        self.assertEqual(answer, self.task_result)
-
-    @patch("vmngclient.session.vManageSession")
-    def test_wait_for_completed_status_out_of_range(self, mock_session):
-        # Prepare mock data
-        mock_session.get_data.return_value = self.action_data_time_out
-
-        # Assert
-        answer = Task(mock_session, "mock_action_id").wait_for_completed(1, 1).result
-        self.assertEqual(answer, False)
-
-    @patch("vmngclient.session.vManageSession")
     def test_get_all_tasks(self, mock_session):
         # Arrange
         mock_session.get_json.return_value = self.running_task_data_json
 
         # Act
-        answer = TasksAPI(mock_session, "").get_all_tasks()
+        answer = TasksPrimitives(mock_session).get_all_tasks()
         # Assert
         self.assertEqual(answer, TasksData.parse_obj(self.running_task_data_json))
