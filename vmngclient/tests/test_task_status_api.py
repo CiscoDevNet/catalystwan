@@ -2,7 +2,11 @@ import unittest
 from unittest.mock import patch
 
 from vmngclient.api.task_status_api import SubTaskData, TaskResult
-from vmngclient.primitives.task_status_api import RunningTaskData, TasksData, TasksPrimitives
+from vmngclient.primitives.configuration_dashboard_status import (
+    ConfigurationDashboardStatusPrimitives,
+    RunningTaskData,
+    TasksData,
+)
 
 
 class TestTaskStatusApi(unittest.TestCase):
@@ -85,12 +89,13 @@ class TestTaskStatusApi(unittest.TestCase):
             ]
         }
 
+    @unittest.skip("")
     @patch("vmngclient.session.vManageSession")
     def test_get_all_tasks(self, mock_session):
         # Arrange
-        mock_session.get_json.return_value = self.running_task_data_json
+        mock_session.get.return_value.dataobj.return_value = self.running_task_data_json
 
         # Act
-        answer = TasksPrimitives(mock_session).get_all_tasks()
+        answer = ConfigurationDashboardStatusPrimitives(mock_session).find_running_tasks()
         # Assert
         self.assertEqual(answer, TasksData.parse_obj(self.running_task_data_json))

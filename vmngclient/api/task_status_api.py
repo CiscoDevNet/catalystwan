@@ -11,7 +11,12 @@ from vmngclient.exceptions import TaskValidationError
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
-from vmngclient.primitives.task_status_api import SubTaskData, TaskData, TaskResult, TasksPrimitives
+from vmngclient.primitives.configuration_dashboard_status import (
+    ConfigurationDashboardStatusPrimitives,
+    SubTaskData,
+    TaskData,
+    TaskResult,
+)
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 
 logger = logging.getLogger(__name__)
@@ -28,21 +33,21 @@ class Task:
         self.url = f"/dataservice/device/action/status/{self.task_id}"
         self.task_data: List[SubTaskData]
 
-    def __validate_task(self) -> bool:
+    def __validate_task(self):
         WAIT_SECONDS = 10
         REPEATS_NUMBER = 2
         for _ in range(REPEATS_NUMBER):
             json = self.session.get_json(self.url)
             task_data = TaskData.parse_obj(json)
-            print(task_data)
-            if task_data.validation.status == OperationStatus.VALIDATION_SUCCESS:
-                return True
+            if task_data.validation.status in (OperationStatus.VALIDATION_SUCCESS, OperationStatus.SUCCESS):
+                return None
+            elif task_data.validation.status in (OperationStatus.FAILURE, OperationStatus.VALIDATION_FAILURE):
+                raise TaskValidationError(
+                    f"Task status validation failed, validation status is:{task_data.validation.status}"
+                )
+
             logger.warning(f"Task not validated properly yet, sleep {WAIT_SECONDS} seconds until next call")
             sleep(WAIT_SECONDS)
-
-        raise TaskValidationError(
-            f"After {REPEATS_NUMBER} task API calls, proper task validation status has not been received"
-        )
 
     def wait_for_completed(
         self,
@@ -151,8 +156,7 @@ class Task:
                 List[SubTaskData]
             """
 
-            self.__validate_task()
-            self.task_data = TasksPrimitives(self.session).get_task_data(self.task_id).data
+            self.task_data = ConfigurationDashboardStatusPrimitives(self.session).find_status(self.task_id).data
             sub_task_statuses = [task.status for task in self.task_data]
             sub_task_statuses_id = [task.status_id for task in self.task_data]
             sub_task_activities = [task.activity for task in self.task_data]
@@ -162,6 +166,7 @@ class Task:
             )
             return self.task_data
 
+        self.__validate_task()
         wait_for_action_finish()
         result = all([sub_task.status in success_statuses for sub_task in self.task_data])
         if result:
