@@ -14,7 +14,6 @@ if TYPE_CHECKING:
 from vmngclient.primitives.configuration_dashboard_status import (
     ConfigurationDashboardStatusPrimitives,
     SubTaskData,
-    TaskData,
     TaskResult,
 )
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
@@ -37,8 +36,7 @@ class Task:
         WAIT_SECONDS = 10
         REPEATS_NUMBER = 2
         for _ in range(REPEATS_NUMBER):
-            json = self.session.get_json(self.url)
-            task_data = TaskData.parse_obj(json)
+            task_data = ConfigurationDashboardStatusPrimitives(self.session).find_status(self.task_id)
             if task_data.validation.status in (OperationStatus.VALIDATION_SUCCESS, OperationStatus.SUCCESS):
                 return None
             elif task_data.validation.status in (OperationStatus.FAILURE, OperationStatus.VALIDATION_FAILURE):
