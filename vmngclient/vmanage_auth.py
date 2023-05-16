@@ -133,6 +133,6 @@ class vManageAuth(AuthBase):
         msg = (
             f"Authenticating: {self.username} {response.request.method} {response.request.url} <{response.status_code}>"
         )
-        if include_reponse_text:
+        if include_reponse_text and response.text:
             msg += f" response.text: {response.text}"
         return msg
