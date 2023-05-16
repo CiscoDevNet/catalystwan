@@ -1,8 +1,7 @@
 from enum import Enum
 
+from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
 from vmngclient.dataclasses import AlarmData
-
-from .cisco_aaa_model import CiscoAAAModel
 
 
 class FeatureTemplateType(Enum):

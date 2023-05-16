@@ -6,7 +6,7 @@ from vmngclient.exceptions import TemplateTypeError
 T = TypeVar("T")
 
 
-def chose_model(type_value: Union[str, FeatureTemplateType]) -> Type[T]:
+def choose_model(type_value: Union[str, FeatureTemplateType]) -> Type[T]:  # Is FeatureTemplate better?
     """Chooses correct model based on provided type
 
     With provided type of feature template searches supported by vmngclient models

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List
@@ -7,6 +8,7 @@ from typing import TYPE_CHECKING, Any, Dict, List
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
 from pydantic import BaseModel
 
+from vmngclient.api.templates.feature_template_field import FeatureTemplateField
 from vmngclient.utils.device_model import DeviceModel
 
 if TYPE_CHECKING:
@@ -65,26 +67,21 @@ class FeatureTemplate(BaseModel, ABC):
         template_definition_as_dict = json.loads(template_info.template_definiton)
 
         # 2
-        endpoint = f"/dataservice/template/feature/types/definition/{template.template_type}/{template.version}"
+        endpoint = (
+            f"/dataservice/template/feature/types/definition/{template_info.template_type}/{template_info.version}"
+        )
         schema = session.get(url=endpoint).json()
         fr_template_fields = [
             FeatureTemplateField(**field) for field in schema["fields"]
         ]  # TODO add dataclass for this list, to include also name, xmlPath, namespace etc.
-        template_fields = {field.key: field for field in fr_template_fields}
+        template_fields_as_dict = {field.key: field for field in fr_template_fields}
 
         # 3
-        # Based on template_info.template_type we can predict which model is needed
-        # First idea is to gather all template types in form of: template_type_as_string : OurModelClassNameToImport and based on the template_info.template_type get proper class
-        from vmngclient.api.templates.models.cisco_aaa_model import (
-            CiscoAAAModel,  # , RadiusGroup, RadiusServer, User, DomainStripping
-        )
+        from vmngclient.utils.feature_template import choose_model
+
+        feature_template_model = choose_model(type_value=template_info.template_type)
 
         # 4
-        # fr_template_fields contain all fields with data paths
-        """
-        Iterate over all keys in requested Model
-        If there is field with
-        """
         # for name, field in CiscoAAAModel.__fields__.items():
         #     # t = field.type_
 
@@ -105,7 +102,7 @@ class FeatureTemplate(BaseModel, ABC):
         #             print(f"Nested")
         dict_with_all_values_from_template_definition = {}
 
-        our_template = CiscoAAAModel(**dict_with_all_values_from_template_definition)
+        our_template = feature_template_model(**dict_with_all_values_from_template_definition)
 
         return our_template
 
