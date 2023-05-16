@@ -90,7 +90,7 @@ class vManageAuth(AuthBase):
             verify=self.verify,
             headers=headers,
         )
-        self.logger.debug(self._auth_request_debug(response))
+        self.logger.debug(self._auth_request_debug(response, include_reponse_text=True))
         if response.text != "":
             raise InvalidCredentialsError(self.username, self.password)
         return response.cookies
@@ -129,7 +129,10 @@ class vManageAuth(AuthBase):
         return prepared_request
 
     @with_proc_info_header
-    def _auth_request_debug(self, response: Response) -> str:
-        return (
+    def _auth_request_debug(self, response: Response, include_reponse_text: bool = False) -> str:
+        msg = (
             f"Authenticating: {self.username} {response.request.method} {response.request.url} <{response.status_code}>"
         )
+        if include_reponse_text:
+            msg += f" response.txt: {response.text}"
+        return msg
