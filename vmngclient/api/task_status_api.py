@@ -32,10 +32,9 @@ class Task:
         self.url = f"/dataservice/device/action/status/{self.task_id}"
         self.task_data: List[SubTaskData]
 
-    def __validate_if_failure(self):
-        WAIT_SECONDS = 5
-        logger.info(f"Waiting {WAIT_SECONDS} seconds for the database to set up.")
-        sleep(WAIT_SECONDS)
+    def __validate_if_failure(self, wait_seconds: int = 5):
+        logger.info(f"Waiting {wait_seconds} seconds for the database to set up.")
+        sleep(wait_seconds)
         task_data = ConfigurationDashboardStatusPrimitives(self.session).find_status(self.task_id)
         if task_data.validation.status in (OperationStatus.FAILURE, OperationStatus.VALIDATION_FAILURE):
             raise TaskValidationError(
@@ -46,6 +45,7 @@ class Task:
         self,
         timeout_seconds: int = 300,
         interval_seconds: int = 5,
+        wait_seconds: int = 5,
         success_statuses: List[OperationStatus] = [
             OperationStatus.SUCCESS,
         ],
@@ -85,6 +85,7 @@ class Task:
 
             timeout_seconds (int): After this time, function will stop requesting action status
             interval_seconds (int): interval between action status requests
+            wait_seconds (int): After this time, task validation call will be send
             delay_seconds (int): if Vmanage didn't report task status, after this time api call would be repeated
             success_statuses (Union[List[OperationStatus], str]): list of positive sub-tasks statuses
             success_statuses_ids (Union[List[OperationStatus], str]): list of positive sub-tasks statuses id's
@@ -159,7 +160,7 @@ class Task:
             )
             return self.task_data
 
-        self.__validate_if_failure()
+        self.__validate_if_failure(wait_seconds)
         wait_for_action_finish()
         result = all([sub_task.status in success_statuses for sub_task in self.task_data])
         if result:
