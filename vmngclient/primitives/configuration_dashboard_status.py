@@ -85,7 +85,7 @@ class TasksData(BaseModel):
 
 
 class ConfigurationDashboardStatusPrimitives(APIPrimitiveBase):
-    def find_status(self, task_id) -> TaskData:
+    def find_status(self, task_id: str) -> TaskData:
         url = f"/device/action/status/{task_id}"
         return self.get(url).dataobj(TaskData, None)
 
