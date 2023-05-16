@@ -18,4 +18,4 @@ class APIPrimitiveContainter:
         self.tenant_management = TenantManagementPrimitives(session)
         self.tenant_backup_restore = TenantBackupRestorePrimitives(session)
         self.tenant_migration = TenantMigrationPrimitives(session)
-        self.task_status = ConfigurationDashboardStatusPrimitives(session)
+        self.configuration_dashboard_status_primitives = ConfigurationDashboardStatusPrimitives(session)
