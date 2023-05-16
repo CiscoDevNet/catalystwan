@@ -3,7 +3,7 @@ from unittest import TestCase, mock
 
 from requests import Request
 
-from vmngclient.vmanage_auth import InvalidCredentialsError, vManageAuth
+from vmngclient.vmanage_auth import UnauthorizedAccessError, vManageAuth
 
 
 class MockResponse:
@@ -75,7 +75,7 @@ class TestvManageAuth(TestCase):
         }
         auth = vManageAuth(self.base_url, username, self.password)
         # Act
-        with self.assertRaises(InvalidCredentialsError):
+        with self.assertRaises(UnauthorizedAccessError):
             auth.get_cookie()
 
         # Assert

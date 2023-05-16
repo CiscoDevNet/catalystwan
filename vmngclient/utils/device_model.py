@@ -71,6 +71,7 @@ class DeviceModel(Enum):
 
     # C8300
     VEDGE_C8300_2N2S_6T = "vedge-C8300-2N2S-6T"
+    VEDGE_C8300_1N1S_6T = "vedge-C8300-1N1S-6T"
 
     # ISRv
     VEDGE_ISRV = "vedge-ISRv"
