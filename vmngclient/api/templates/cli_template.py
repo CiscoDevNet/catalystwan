@@ -54,7 +54,8 @@ class CLITemplate:
         Returns:
             CiscoConfParse: A working configuration on the machine.
         """
-        endpoint = f"/dataservice/template/config/running/{device.uuid}"
+        encoded_uuid = device.uuid.replace("/", "%2F")
+        endpoint = f"/dataservice/template/config/running/{encoded_uuid}"
         config = session.get_json(endpoint)
         self.config = CiscoConfParse(config["config"].splitlines())
         logger.debug(f"Template loaded from {device.hostname}.")
