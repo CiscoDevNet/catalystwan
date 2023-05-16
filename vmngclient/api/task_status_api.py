@@ -32,20 +32,15 @@ class Task:
         self.url = f"/dataservice/device/action/status/{self.task_id}"
         self.task_data: List[SubTaskData]
 
-    def __validate_task(self):
-        WAIT_SECONDS = 10
-        REPEATS_NUMBER = 2
-        for _ in range(REPEATS_NUMBER):
-            task_data = ConfigurationDashboardStatusPrimitives(self.session).find_status(self.task_id)
-            if task_data.validation.status in (OperationStatus.VALIDATION_SUCCESS, OperationStatus.SUCCESS):
-                return None
-            elif task_data.validation.status in (OperationStatus.FAILURE, OperationStatus.VALIDATION_FAILURE):
-                raise TaskValidationError(
-                    f"Task status validation failed, validation status is:{task_data.validation.status}"
-                )
-
-            logger.warning(f"Task not validated properly yet, sleep {WAIT_SECONDS} seconds until next call")
-            sleep(WAIT_SECONDS)
+    def __validate_if_failure(self):
+        WAIT_SECONDS = 5
+        logger.info(f"Waiting {WAIT_SECONDS} seconds for the database to set up.")
+        sleep(WAIT_SECONDS)
+        task_data = ConfigurationDashboardStatusPrimitives(self.session).find_status(self.task_id)
+        if task_data.validation.status in (OperationStatus.FAILURE, OperationStatus.VALIDATION_FAILURE):
+            raise TaskValidationError(
+                f"Task status validation failed, validation status is:{task_data.validation.status}"
+            )
 
     def wait_for_completed(
         self,
@@ -164,7 +159,7 @@ class Task:
             )
             return self.task_data
 
-        self.__validate_task()
+        self.__validate_if_failure()
         wait_for_action_finish()
         result = all([sub_task.status in success_statuses for sub_task in self.task_data])
         if result:
