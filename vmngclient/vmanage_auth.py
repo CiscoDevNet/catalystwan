@@ -73,7 +73,7 @@ class vManageAuth(AuthBase):
         If a user is un-authenticated, the response body contains a html login page with tag in it.
 
         Raises:
-            InvalidCredentialsError: _description_
+            UnauthorizedAccessError: _description_
 
         Returns:
             RequestsCookieJar: _description_
