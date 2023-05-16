@@ -70,5 +70,8 @@ class DeviceModel(Enum):
     VEDGE_C1111_8PLTELA = "vedge-C1111-8PLTELA"
     VEDGE_C1111_8PLTEEA = "vedge-C1111-8PLTEEA"
 
+    # C8300
+    VEDGE_C8300_2N2S_6T = "vedge-C8300-2N2S-6T" 
+
     # ISRv
     VEDGE_ISRV = "vedge-ISRv"
