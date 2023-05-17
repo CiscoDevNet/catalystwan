@@ -359,7 +359,7 @@ class TemplatesAPI:
         return response
 
     @overload
-    def create(self, template: FeatureTemplate) -> str:
+    def create(self, template: FeatureTemplate, debug=False) -> str:
         ...
 
     @overload
@@ -492,7 +492,7 @@ class TemplatesAPI:
             name=template.name,
             description=template.description,
             template_type=template.type,
-            device_types=["omp-vsmart"],  # TODO
+            device_types=[device_model.value for device_model in template.device_models],
             definition={},
         )  # type: ignore
 
