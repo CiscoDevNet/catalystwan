@@ -1,4 +1,4 @@
-from typing import Optional, Type, TypeVar, Union
+from typing import Optional, Type, TypeVar, Union, Dict
 
 from vmngclient.api.templates.models.supported import FeatureTemplateType, supported_models
 from vmngclient.exceptions import TemplateTypeError
@@ -30,22 +30,38 @@ def choose_model(type_value: Union[str, FeatureTemplateType]) -> Type[T]:  # Is 
 
 
 def find_template_values(
-    data: dict,
-    final_list: list = [],
-    target_key: str = "vipType",
-    target_key_for_value: str = "vipValue",
+    template_definition: dict,
+    fields_list: list = [],
     parent_key: Optional[str] = None,
-):
-    for key, value in data.items():
-        if key == target_key and value != "ignore":
-            final_list.append((parent_key, data[target_key_for_value]))
+    target_key: str = "vipType",
+    target_key_value_to_ignore: str = "ignore",
+    target_key_for_template_value: str = "vipValue",
+) -> Dict[str, Union[str, list]]:
+    """Based on provided template definition generates a dictionary with template fields and values
+
+    Args:
+        template_definition: template definition provided as dict
+        fields_list: list containing tuples of fields and corresponding values
+        parent_key: parent key provided to keep track of fields, defaults to None
+        target_key: name of the key specifying if field is used in template, defaults to 'vipType'
+        target_key_value_to_ignore: value of the target key indicating
+            that field is not used in template, defaults to 'ignore'
+        target_key_for_template_value: name of the key specifying value of field used in template,
+            defaults to 'vipValue'
+
+    Returns:
+        templated_values: dictionary containing template fields as key and values assigned to them
+    """
+    for key, value in template_definition.items():
+        if key == target_key and value != target_key_value_to_ignore:
+            fields_list.append((parent_key, template_definition[target_key_for_template_value]))
         elif isinstance(value, dict):
-            find_template_values(value, final_list, target_key, target_key_for_value, key)
-        elif isinstance(value, list) and key == target_key_for_value:
+            find_template_values(value, fields_list, key)
+        elif isinstance(value, list) and key == target_key_for_template_value:
             for item in value:
                 if isinstance(item, dict):
-                    final_list.append((parent_key, [find_template_values(item, [])]))
-    result = {}
-    for key, value in final_list:
-        result[key] = value
-    return result
+                    fields_list.append((parent_key, [find_template_values(item, [])]))
+    templated_values = {}
+    for key, value in fields_list:
+        templated_values[key] = value
+    return templated_values
