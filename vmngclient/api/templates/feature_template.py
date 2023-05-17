@@ -73,16 +73,3 @@ class FeatureTemplate(BaseModel, ABC):
         return feature_template_model(
             name=template_info.name, description=template_info.description, **values_from_template_definition
         )
-
-
-def get_datamodel_value():
-    pass
-
-
-def feed_datamodel_with_values(datamodel: BaseModel, values: Dict):
-    pass
-
-
-def get_value_from_datapath(datapath: List[str]) -> Any:
-    if not datapath:
-        return
