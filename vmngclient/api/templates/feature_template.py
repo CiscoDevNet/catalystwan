@@ -77,7 +77,7 @@ class FeatureTemplate(BaseModel, ABC):
         template_fields_as_dict = {field.key: field for field in fr_template_fields}
 
         # 3
-        from vmngclient.utils.feature_template import choose_model
+        from vmngclient.utils.feature_template import choose_model, find_template_values
 
         feature_template_model = choose_model(type_value=template_info.template_type)
 
@@ -100,7 +100,11 @@ class FeatureTemplate(BaseModel, ABC):
         #         print(f"        {data_path}")
         #         if template_definition_as_dict.get(name)['vipObjectType'] == 'tree':
         #             print(f"Nested")
-        dict_with_all_values_from_template_definition = {}
+        dict_with_all_values_from_template_definition = find_template_values(template_definition_as_dict)
+
+        dict_with_all_values_from_template_definition["name"] = name
+        dict_with_all_values_from_template_definition["description"] = template_info.description
+        dict_with_all_values_from_template_definition["device_models"] = []
 
         our_template = feature_template_model(**dict_with_all_values_from_template_definition)
 
