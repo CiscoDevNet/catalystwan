@@ -32,7 +32,7 @@ class Task:
         self.url = f"/dataservice/device/action/status/{self.task_id}"
         self.task_data: List[SubTaskData]
 
-    def __validate_if_failure(self, validation_timeout_seconds: int = 5):
+    def __check_validation_status(self, validation_timeout_seconds: int = 5):
         logger.info(f"Waiting {validation_timeout_seconds} seconds for the database to set up.")
         sleep(validation_timeout_seconds)
         task_data = ConfigurationDashboardStatusPrimitives(self.session).find_status(self.task_id)
@@ -160,7 +160,7 @@ class Task:
             )
             return self.task_data
 
-        self.__validate_if_failure(validation_timeout_seconds)
+        self.__check_validation_status(validation_timeout_seconds)
         wait_for_action_finish()
         result = all([sub_task.status in success_statuses for sub_task in self.task_data])
         if result:
