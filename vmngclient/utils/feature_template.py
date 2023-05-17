@@ -1,12 +1,10 @@
-from typing import Optional, Type, TypeVar, Union, Dict
+from typing import Callable, Dict, Optional, Union
 
 from vmngclient.api.templates.models.supported import FeatureTemplateType, supported_models
 from vmngclient.exceptions import TemplateTypeError
 
-T = TypeVar("T")
 
-
-def choose_model(type_value: Union[str, FeatureTemplateType]) -> Type[T]:  # Is FeatureTemplate better?
+def choose_model(type_value: Union[str, FeatureTemplateType]) -> Callable:
     """Chooses correct model based on provided type
 
     With provided type of feature template searches supported by vmngclient models
