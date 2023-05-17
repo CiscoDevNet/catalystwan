@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, List, cast
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from vmngclient.utils.device_model import DeviceModel
 
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class FeatureTemplate(BaseModel, ABC):
     name: str
     description: str
-    device_models: List[DeviceModel] = Field(default=[])
+    device_models: List[DeviceModel] = []
 
     def generate_payload(self, session: vManageSession) -> str:
         env = Environment(
