@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TYPE_CHECKING, List, cast
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
 from pydantic import BaseModel, Field
@@ -64,7 +64,7 @@ class FeatureTemplate(BaseModel, ABC):
             session.api.templates._get_feature_templates(summary=False).filter(name=name).single_or_default()
         )
 
-        template_definition_as_dict = json.loads(str(template_info.template_definiton))
+        template_definition_as_dict = json.loads(cast(str, template_info.template_definiton))
 
         feature_template_model = choose_model(type_value=template_info.template_type)
 
