@@ -41,7 +41,7 @@ class RadiusGroup(BaseModel):
     server: List[RadiusServer] = []
 
 
-class DomainStripping(Enum):
+class DomainStripping(str, Enum):
     YES = "yes"
     NO = "no"
     RIGHT_TO_LEFT = "right-to-left"
