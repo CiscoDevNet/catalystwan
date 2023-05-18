@@ -21,6 +21,7 @@ users = [
     User(name="user", password="rnd", secret="dnr", privilege="14"),
 ]
 
+
 cisco_aaa = CiscoAAAModel(
     name="iuo",
     description="zyx",
