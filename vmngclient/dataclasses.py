@@ -232,6 +232,7 @@ class FeatureTemplateInfo(TemplateInfo):
     template_type: str = field(metadata={FIELD_NAME: "templateType"})
     device_type: List[str] = field(metadata={FIELD_NAME: "deviceType"})
     version: str = field(metadata={FIELD_NAME: "templateMinVersion"})
+    resource_group: Optional[str] = field(default="", metadata={FIELD_NAME: "resourceGroup"})  # type: ignore
 
 
 @define
@@ -403,7 +404,7 @@ class Certificate(DataclassBase):
 @define
 class Vbond(DataclassBase):
     vbond_address: str = field(metadata={FIELD_NAME: "domainIp"})
-    vbond_port: int = field(metadata={FIELD_NAME: "port"})
+    vbond_port: str = field(metadata={FIELD_NAME: "port"})
 
 
 @define(frozen=True)

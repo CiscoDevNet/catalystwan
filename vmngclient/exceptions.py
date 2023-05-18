@@ -102,6 +102,12 @@ class TaskNotRegisteredError(vManageClientError):
     pass
 
 
+class TaskValidationError(vManageClientError):
+    """Raised if task has not been validated"""
+
+    pass
+
+
 class MultiplePersonalityError(vManageClientError):
     """Raised if Device DataSequnce contains devices with multiples personalities"""
 
