@@ -403,7 +403,7 @@ class Certificate(DataclassBase):
 @define
 class Vbond(DataclassBase):
     vbond_address: str = field(metadata={FIELD_NAME: "domainIp"})
-    vbond_port: int = field(metadata={FIELD_NAME: "port"})
+    vbond_port: str = field(metadata={FIELD_NAME: "port"})
 
 
 @define(frozen=True)
