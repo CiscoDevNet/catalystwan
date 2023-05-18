@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vmngclient"
-version = "0.9.0"
+version = "0.9.3"
 description = "Universal vManage API"
 authors = ["kagorski <kagorski@cisco.com>"]
 readme = "README.md"

@@ -328,7 +328,7 @@ class vManageSession(vManageResponseAdapter):
             Tenant UUID.
         """
         tenants = self.primitives.tenant_management.get_all_tenants()
-        tenant = tenants.filter(sub_domain=self.subdomain).single_or_default()
+        tenant = tenants.filter(subdomain=self.subdomain).single_or_default()
 
         if not tenant:
             raise TenantSubdomainNotFound(f"Tenant with sub-domain: {self.subdomain} not found")
