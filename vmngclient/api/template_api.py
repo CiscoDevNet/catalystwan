@@ -20,6 +20,7 @@ from vmngclient.api.templates.feature_template_payload import FeatureTemplatePay
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
 from vmngclient.api.templates.models.omp_vsmart_model import OMPvSmart
 from vmngclient.api.templates.models.security_vsmart_model import SecurityvSmart
+from vmngclient.api.templates.models.system_vsmart_model import SystemVsmart
 from vmngclient.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, FeatureTemplatesTypes, TemplateInfo
 from vmngclient.exceptions import AlreadyExistsError, AttachedError, TemplateNotFoundError
 from vmngclient.response import vManageResponse
@@ -462,6 +463,7 @@ class TemplatesAPI:
             CiscoAAAModel,
             OMPvSmart,
             SecurityvSmart,
+            SystemVsmart,
         )
 
         return isinstance(template, ported_templates)

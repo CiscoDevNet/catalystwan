@@ -232,6 +232,7 @@ class FeatureTemplateInfo(TemplateInfo):
     template_type: str = field(metadata={FIELD_NAME: "templateType"})
     device_type: List[str] = field(metadata={FIELD_NAME: "deviceType"})
     version: str = field(metadata={FIELD_NAME: "templateMinVersion"})
+    resource_group: Optional[str] = field(default="", metadata={FIELD_NAME: "resourceGroup"})  # type: ignore
 
 
 @define
