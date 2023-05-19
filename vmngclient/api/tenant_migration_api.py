@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional, overload
 
@@ -8,6 +9,7 @@ from packaging.version import Version  # type: ignore
 
 from vmngclient.api.task_status_api import Task, TaskResult
 from vmngclient.model.tenant import Tenant
+from vmngclient.primitives.tenant_migration import ImportInfo, MigrationTokenQueryParams
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -17,6 +19,12 @@ def _get_file_name_from_export_task_result(task_result: TaskResult) -> str:
     filepath = re.search("""file location: (.*)""", task_result.sub_tasks_data[0].activity[-1])
     assert filepath, "File location not found."
     return Path(filepath.group(1)).name
+
+
+class ImportTask(Task):
+    def __init__(self, session: vManageSession, import_info: ImportInfo):
+        super().__init__(session, import_info.process_id)
+        self.import_info = import_info
 
 
 class TenantMigrationAPI:
@@ -72,60 +80,51 @@ class TenantMigrationAPI:
             remote_filename (str): path to exported tenant migration file on vManage
         """
         tenant_data = self.session.primitives.tenant_migration.download_tenant_data(remote_filename)
-        open(download_path, "wb").write(tenant_data)
+        with open(download_path, "wb") as file:
+            file.write(tenant_data)
 
-    @overload
-    def collect(
-        self,
-        download_path: Path,
-        timeout: int = 300,
-        *,
-        desc: str,
-        name: str,
-        subdomain: str,
-        org_name: str,
-        wan_edge_forecast: Optional[int],
-    ):
-        """Exports the single-tenant deployment and configuration data from a Cisco vManage instance then
-        waits for export to complete and downloads tenant data to a local file system.
-
-        Args:
-            download_path (Path): full download path containing a filename eg.: Path("/home/user/tenant-export.tar.gz")
-            timeout (int): timeout for wait until export task is completed in seconds
-            desc (str): A description of the tenant. Up to 256 alphanumeric characters.
-            name (str): Unique name for the tenant in the multitenant deployment.
-            subdomain (str): Fully qualified sub-domain name of the tenant.
-            org_name (str): Name of the tenant organization. The organization name is case-sensitive.
-            wan_edge_forecast (int): Forecasted number of WAN Edges for given tenant.
-        """
-        ...
-
-    @overload
-    def collect(self, download_path: Path, timeout: int = 300, *, tenant: Tenant):
-        """Exports the single-tenant deployment and configuration data from a Cisco vManage instance then
-        waits for export to complete and downloads tenant data to a local file system.
-
-        Args:
-            download_path (Path): full download path containing a filename eg.: Path("/home/user/tenant-export.tar.gz")
-            timeout (int): timeout for wait until export task is completed in seconds
-            tenant (Tenant): Tenant object containig required fields: desc, name, subdomain, org_name
-        """
-        ...
-
-    def collect(self, download_path: Path, timeout: int = 300, **kwargs):
-        export_task = self.export_tenant(**kwargs)
-        export_result = export_task.wait_for_completed(timeout_seconds=timeout)
-        remote_filename = _get_file_name_from_export_task_result(export_result)
-        return self.download(download_path, remote_filename)
-
-    def import_tenant(self, path: Path) -> Task:
+    def import_tenant(self, import_file: Path) -> ImportTask:
         """Imports the single-tenant deployment and configuration data into multi-tenant vManage instance.
 
         Args:
-            path (Path): full path to previously exported single-tenant data file
+            import_file (Path): full path to previously exported single-tenant data file
 
         Returns:
-            Task: object representing initiated import process
+            ImportTask: object representing initiated import process
         """
-        process_id = self.session.primitives.tenant_migration.import_tenant_data(open(path, "rb")).process_id
+        import_info = self.session.primitives.tenant_migration.import_tenant_data(open(import_file, "rb"))
+        return ImportTask(self.session, import_info)
+
+    def store_token(self, migration_id: str, download_path: Path):
+        params = MigrationTokenQueryParams(migrationId=migration_id)
+        token = self.session.primitives.tenant_migration.get_migration_token(params)
+        with open(download_path, "w") as file:
+            file.write(token)
+
+    def migrate_network(self, token_file: Path) -> Task:
+        with open(token_file, "r") as file:
+            token = file.read()
+        process_id = self.session.primitives.tenant_migration.migrate_network(token).process_id
         return Task(self.session, process_id)
+
+
+def st_to_mt(st_session: vManageSession, mt_session: vManageSession, workdir: Path, tenant: Tenant):
+    st_api = TenantMigrationAPI(st_session)
+    mt_api = TenantMigrationAPI(mt_session)
+    timestamp = datetime.now().strftime("%Y-%m-%d-%H%M")
+    migration_desc = f"{tenant.name}-{st_session.server_name}-{timestamp}"
+    export_path = workdir / f"{migration_desc}.tar.gz"
+    token_path = workdir / f"{migration_desc}.token"
+
+    export_task = st_api.export_tenant(tenant=tenant)
+    export_result = export_task.wait_for_completed()
+    remote_filename = _get_file_name_from_export_task_result(export_result)
+    st_api.download(export_path, remote_filename)
+
+    import_task = mt_api.import_tenant(export_path)
+    import_task.wait_for_completed()
+    migration_id = import_task.import_info.migration_token_query_params.migration_id
+    mt_api.store_token(migration_id, token_path)
+
+    migrate_task = st_api.migrate_network(token_path)
+    migrate_task.wait_for_completed()
