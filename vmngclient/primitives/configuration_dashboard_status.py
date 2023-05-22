@@ -28,7 +28,7 @@ class RunningTaskData(BaseModel):
     details_url: str = Field(alias="detailsURL")
     user_session_username: str = Field(alias="userSessionUserName")
     rid: int = Field(alias="@rid")
-    tenant_name: str = Field("tenantName")
+    tenant_name: Optional[str] = Field("tenantName")
     process_id: str = Field(alias="processId")
     name: str
     tenant_id: str = Field(alias="tenantId")
