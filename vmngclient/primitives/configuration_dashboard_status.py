@@ -11,7 +11,7 @@ class SubTaskData(BaseModel):
     status_id: str = Field(alias="statusId")
     action: str
     activity: List[str]
-    current_activity: str = Field(alias="currentActivity")
+    current_activity: Optional[str] = Field(alias="currentActivity")
     action_config: Optional[str] = Field(alias="actionConfig")
     order: Optional[int]
     uuid: Optional[str]
@@ -74,10 +74,10 @@ class Summary(BaseModel):
 
 class TaskData(BaseModel):
     data: List[SubTaskData]
-    validation: Validation
-    summary: Summary
-    is_cancel_enabled: bool = Field(alias="isCancelEnabled")
-    is_parallel_execution_enabled: bool = Field(alias="isParallelExecutionEnabled")
+    validation: Optional[Validation]
+    summary: Optional[Summary]
+    is_cancel_enabled: Optional[bool] = Field(alias="isCancelEnabled")
+    is_parallel_execution_enabled: Optional[bool] = Field(alias="isParallelExecutionEnabled")
 
 
 class TasksData(BaseModel):
