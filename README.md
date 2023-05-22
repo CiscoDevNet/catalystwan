@@ -76,9 +76,30 @@ install_task.wait_for_completed()
 
 <details>
     <summary> <b>Get alarms</b> <i>(click to expand)</i></summary>
+To get all alarms:
 
 ```python
 alarms = session.api.alarms.get()
+```
+
+To get all not viewed alarms:
+
+```python
+not_viewed_alarms= session.api.alarms.get().filter(viewed=False)
+```
+
+To get all alarms from past `n` hours:
+
+```python
+n = 24
+alarms_from_n_hours = session.api.alarms.get(from_time=n)
+```
+
+To get all critical alarms from past `n` hours:
+
+```python
+n = 48
+critical_alarms = session.api.alarms.get(from_time=n).filter(severity=Severity.CRITICAL)
 ```
 
 </details>
