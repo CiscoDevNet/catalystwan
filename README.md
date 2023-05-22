@@ -85,7 +85,7 @@ alarms = session.api.alarms.get()
 To get all not viewed alarms:
 
 ```python
-not_viewed_alarms= session.api.alarms.get().filter(viewed=False)
+not_viewed_alarms = session.api.alarms.get().filter(viewed=False)
 ```
 
 To get all alarms from past `n` hours:
