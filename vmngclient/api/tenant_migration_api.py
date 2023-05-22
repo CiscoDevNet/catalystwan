@@ -63,7 +63,6 @@ class TenantMigrationAPI:
             desc (str): A description of the tenant. Up to 256 alphanumeric characters.
             name (str): Unique name for the tenant in the multitenant deployment.
             subdomain (str): Fully qualified sub-domain name of the tenant.
-            tenant (Tenant): Tenant object containig required fields: desc, name, subdomain, org_name
             org_name (str): Name of the tenant organization. The organization name is case-sensitive.
             wan_edge_forecast (int): Forecasted number of WAN Edges for given tenant.
         Returns:
@@ -128,8 +127,8 @@ class TenantMigrationAPI:
 
 @overload
 def st_to_mt(
-    st_session: vManageSession,
-    mt_session: vManageSession,
+    st_api: TenantMigrationAPI,
+    mt_api: TenantMigrationAPI,
     workdir: Path,
     *,
     desc: str,
@@ -142,11 +141,11 @@ def st_to_mt(
 
 
 @overload
-def st_to_mt(st_session: vManageSession, mt_session: vManageSession, workdir: Path, *, tenant: Tenant):
+def st_to_mt(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Path, *, tenant: Tenant):
     ...
 
 
-def st_to_mt(st_session: vManageSession, mt_session: vManageSession, workdir: Path, **kwargs):
+def st_to_mt(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Path, **kwargs):
     """Performs single-tenant migration to multi-tenant environment procedure according to:
     https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/system-interface/vedge-20-x/systems-interfaces-book/sdwan-multitenancy.html#concept_sjj_jmm_z4b
     1. Export the single-tenant deployment and configuration data from a Cisco vManage instance controlling the overlay.
@@ -156,21 +155,19 @@ def st_to_mt(st_session: vManageSession, mt_session: vManageSession, workdir: Pa
     5. On the single-tenant Cisco vManage instance, initiate the migration of the overlay to the multitenant deployment.
 
     Args:
-        st_session (vManageSession): session to migrated single-tenant vManage instance
-        mt_session (vManageSession): session to target multi-tenant vManage instance
-        tenant (Tenant): Tenant object containig required fields: desc, name, subdomain, org_name
+        st_api (TenantMigrationAPI): TenantMigrationAPI created with session to migrated single-tenant vManage instance
+        mt_api (TenantMigrationAPI): TenantMigrationAPI created with session to target multi-tenant vManage instance
         workdir (Path): directory to store migration artifacts (token and export file)
+        tenant (Tenant): Tenant object containig required fields: desc, name, subdomain, org_name
         desc (str): A description of the tenant. Up to 256 alphanumeric characters.
         name (str): Unique name for the tenant in the multitenant deployment.
         subdomain (str): Fully qualified sub-domain name of the tenant.
         org_name (str): Name of the tenant organization. The organization name is case-sensitive.
         wan_edge_forecast (int): Forecasted number of WAN Edges for given tenant.
     """
-    st_api = TenantMigrationAPI(st_session)
-    mt_api = TenantMigrationAPI(mt_session)
     tenant = st_api.__create_tenant(**kwargs)
     migration_timestamp = datetime.now().strftime("%Y-%m-%d-%H%M")
-    migration_file_prefix = f"{tenant.name}-{st_session.server_name}-{migration_timestamp}"
+    migration_file_prefix = f"{tenant.name}-{st_api.session.server_name}-{migration_timestamp}"
     export_path = workdir / f"{migration_file_prefix}.tar.gz"
     token_path = workdir / f"{migration_file_prefix}.token"
 
@@ -190,6 +187,7 @@ def st_to_mt(st_session: vManageSession, mt_session: vManageSession, workdir: Pa
     migration_id = import_task.import_info.migration_token_query_params.migration_id
     mt_api.store_token(migration_id, token_path)
 
-    logger.info(f"5/5 Initiating network migration: {migration_id}, using token file: {token_path}")
+    logger.info(f"5/5 Initiating network migration: {migration_id}, using token file: {token_path} ...")
     migrate_task = st_api.migrate_network(token_path)
     migrate_task.wait_for_completed()
+    logger.info(f"5/5 {tenant.name} migration completed successfully!")
