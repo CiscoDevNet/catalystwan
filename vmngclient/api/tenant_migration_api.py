@@ -36,43 +36,40 @@ class TenantMigrationAPI:
     def __init__(self, session: vManageSession):
         self.session = session
 
+    def __create_tenant(self, tenant_parameters: dict) -> Tenant:
+        tenant = tenant_parameters.get("tenant", None)
+        if tenant is None:
+            tenant = Tenant.parse_obj(**tenant_parameters)
+        if self.session.api_version < Version("20.6"):
+            tenant.wan_edge_forecast = None
+        return tenant
+
     @overload
     def export_tenant(
         self, *, desc: str, name: str, subdomain: str, org_name: str, wan_edge_forecast: Optional[int]
     ) -> Task:
-        """Exports the single-tenant deployment and configuration data from a Cisco vManage instance.
-        Should be executed on migrated single-tenant system.
-
-        Args:
-            desc (str): A description of the tenant. Up to 256 alphanumeric characters.
-            name (str): Unique name for the tenant in the multitenant deployment.
-            subdomain (str): Fully qualified sub-domain name of the tenant.
-            org_name (str): Name of the tenant organization. The organization name is case-sensitive.
-            wan_edge_forecast (int): Forecasted number of WAN Edges for given tenant.
-        Returns:
-            Task: object representing initiated export process
-        """
         ...
 
     @overload
     def export_tenant(self, *, tenant: Tenant) -> Task:
+        ...
+
+    def export_tenant(self, **kwargs) -> Task:
         """Exports the single-tenant deployment and configuration data from a Cisco vManage instance.
         Should be executed on migrated single-tenant system.
 
         Args:
             tenant (Tenant): Tenant object containig required fields: desc, name, subdomain, org_name
-
+            desc (str): A description of the tenant. Up to 256 alphanumeric characters.
+            name (str): Unique name for the tenant in the multitenant deployment.
+            subdomain (str): Fully qualified sub-domain name of the tenant.
+            tenant (Tenant): Tenant object containig required fields: desc, name, subdomain, org_name
+            org_name (str): Name of the tenant organization. The organization name is case-sensitive.
+            wan_edge_forecast (int): Forecasted number of WAN Edges for given tenant.
         Returns:
             Task: object representing initiated export process
         """
-        ...
-
-    def export_tenant(self, **kwargs) -> Task:
-        tenant = kwargs.get("tenant", None)
-        if tenant is None:
-            tenant = Tenant.parse_obj(**kwargs)
-        if self.session.api_version < Version("20.6"):
-            tenant.wan_edge_forecast = None
+        tenant = self.__create_tenant(**kwargs)
         process_id = self.session.primitives.tenant_migration.export_tenant_data(tenant).process_id
         return Task(self.session, process_id)
 
@@ -129,7 +126,27 @@ class TenantMigrationAPI:
         return Task(self.session, process_id)
 
 
+@overload
+def st_to_mt(
+    st_session: vManageSession,
+    mt_session: vManageSession,
+    workdir: Path,
+    *,
+    desc: str,
+    name: str,
+    subdomain: str,
+    org_name: str,
+    wan_edge_forecast: Optional[int],
+):
+    ...
+
+
+@overload
 def st_to_mt(st_session: vManageSession, mt_session: vManageSession, workdir: Path, *, tenant: Tenant):
+    ...
+
+
+def st_to_mt(st_session: vManageSession, mt_session: vManageSession, workdir: Path, **kwargs):
     """Performs single-tenant migration to multi-tenant environment procedure according to:
     https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/system-interface/vedge-20-x/systems-interfaces-book/sdwan-multitenancy.html#concept_sjj_jmm_z4b
     1. Export the single-tenant deployment and configuration data from a Cisco vManage instance controlling the overlay.
@@ -141,11 +158,17 @@ def st_to_mt(st_session: vManageSession, mt_session: vManageSession, workdir: Pa
     Args:
         st_session (vManageSession): session to migrated single-tenant vManage instance
         mt_session (vManageSession): session to target multi-tenant vManage instance
-        workdir (Path): directory to store migration artifacts (token and export file)
         tenant (Tenant): Tenant object containig required fields: desc, name, subdomain, org_name
+        workdir (Path): directory to store migration artifacts (token and export file)
+        desc (str): A description of the tenant. Up to 256 alphanumeric characters.
+        name (str): Unique name for the tenant in the multitenant deployment.
+        subdomain (str): Fully qualified sub-domain name of the tenant.
+        org_name (str): Name of the tenant organization. The organization name is case-sensitive.
+        wan_edge_forecast (int): Forecasted number of WAN Edges for given tenant.
     """
     st_api = TenantMigrationAPI(st_session)
     mt_api = TenantMigrationAPI(mt_session)
+    tenant = st_api.__create_tenant(**kwargs)
     migration_timestamp = datetime.now().strftime("%Y-%m-%d-%H%M")
     migration_file_prefix = f"{tenant.name}-{st_session.server_name}-{migration_timestamp}"
     export_path = workdir / f"{migration_file_prefix}.tar.gz"
