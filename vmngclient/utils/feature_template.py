@@ -29,7 +29,7 @@ def choose_model(type_value: Union[str, FeatureTemplateType]) -> Callable:
 
 def find_template_values(
     template_definition: dict,
-    fields_list: list = [],
+    templated_values: dict = {},
     parent_key: Optional[str] = None,
     target_key: str = "vipType",
     target_key_value_to_ignore: str = "ignore",
@@ -39,7 +39,8 @@ def find_template_values(
 
     Args:
         template_definition: template definition provided as dict
-        fields_list: list containing tuples of fields and corresponding values
+        templated_values: dictionary, empty at the beginning and filed out with names of fields as keys
+            and values of those fields as values
         parent_key: parent key provided to keep track of fields, defaults to None
         target_key: name of the key specifying if field is used in template, defaults to 'vipType'
         target_key_value_to_ignore: value of the target key indicating
@@ -48,18 +49,15 @@ def find_template_values(
             defaults to 'vipValue'
 
     Returns:
-        templated_values: dictionary containing template fields as key and values assigned to them
+        templated_values: dictionary containing template fields as key and values assigned to those fields as values
     """
     for key, value in template_definition.items():
         if key == target_key and value != target_key_value_to_ignore:
-            fields_list.append((parent_key, template_definition[target_key_for_template_value]))
-        elif isinstance(value, dict):
-            find_template_values(value, fields_list, key)
-        elif isinstance(value, list) and key == target_key_for_template_value:
+            templated_values[parent_key] = template_definition[target_key_for_template_value]
+        elif isinstance(value, dict) and value != target_key_value_to_ignore:
+            find_template_values(value, templated_values, key)
+        elif isinstance(value, list) and key == target_key_for_template_value and value != target_key_value_to_ignore:
+            templated_values[parent_key] = []
             for item in value:
-                if isinstance(item, dict):
-                    fields_list.append((parent_key, [find_template_values(item, [])]))
-    templated_values = {}
-    for key, value in fields_list:
-        templated_values[key] = value
+                templated_values[parent_key].append(find_template_values(item, {}))
     return templated_values
