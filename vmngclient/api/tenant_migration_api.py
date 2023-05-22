@@ -36,10 +36,10 @@ class TenantMigrationAPI:
     def __init__(self, session: vManageSession):
         self.session = session
 
-    def __create_tenant(self, tenant_parameters: dict) -> Tenant:
-        tenant = tenant_parameters.get("tenant", None)
+    def _create_tenant(self, **kwargs) -> Tenant:
+        tenant = kwargs.get("tenant", None)
         if tenant is None:
-            tenant = Tenant.parse_obj(**tenant_parameters)
+            tenant = Tenant.parse_obj(kwargs)
         if self.session.api_version < Version("20.6"):
             tenant.wan_edge_forecast = None
         return tenant
@@ -68,7 +68,7 @@ class TenantMigrationAPI:
         Returns:
             Task: object representing initiated export process
         """
-        tenant = self.__create_tenant(**kwargs)
+        tenant = self._create_tenant(**kwargs)
         process_id = self.session.primitives.tenant_migration.export_tenant_data(tenant).process_id
         return Task(self.session, process_id)
 
@@ -165,7 +165,7 @@ def st_to_mt(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Pa
         org_name (str): Name of the tenant organization. The organization name is case-sensitive.
         wan_edge_forecast (int): Forecasted number of WAN Edges for given tenant.
     """
-    tenant = st_api.__create_tenant(**kwargs)
+    tenant = st_api._create_tenant(**kwargs)
     migration_timestamp = datetime.now().strftime("%Y-%m-%d-%H%M")
     migration_file_prefix = f"{tenant.name}-{st_api.session.server_name}-{migration_timestamp}"
     export_path = workdir / f"{migration_file_prefix}.tar.gz"

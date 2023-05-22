@@ -44,3 +44,6 @@ class Tenant(BaseModel):
     mt_edge_count: Optional[int] = Field(alias="mtEdgeCount")
     tenant_vpn_map: Optional[List[TenantVPNMap]] = Field(alias="tenantVPNmap")
     tenant_provider_vpn_count: Optional[int] = Field(alias="tenantProviderVPNCount")
+
+    class Config:
+        allow_population_by_field_name = True
