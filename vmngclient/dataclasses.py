@@ -44,11 +44,11 @@ class DeviceAdminTech(DataclassBase):
     token_id: Optional[str] = field(default=None, metadata={FIELD_NAME: "requestTokenId"})
 
 
-@define(frozen=True, field_transformer=convert_attributes)
+@define  # (frozen=True, field_transformer=convert_attributes)
 class AlarmData(DataclassBase):
+    severity: Severity = field(converter=Severity, default=None)
     component: Optional[str] = field(default=None)
     active: Optional[bool] = field(default=None)
-    severity: Optional[Severity] = field(converter=Severity, default=None)
     severity_number: Optional[int] = field(default=None)
     name: Optional[str] = field(default=None, metadata={FIELD_NAME: "type"})
     system_ip: Optional[str] = field(default=None, metadata={FIELD_NAME: "system-ip"})
@@ -94,11 +94,10 @@ class AlarmData(DataclassBase):
             Severity.MAJOR: PrintColors.RED,
             Severity.MEDIUM: PrintColors.YELLOW,
             Severity.MINOR: PrintColors.NONE,
-            "N/A": PrintColors.NONE,
+            Severity.UNKNOWN: PrintColors.NONE,
         }
-        severity = self.severity if self.severity is not None else "N/A"
 
-        return f"{color[severity].value}{severity}{PrintColors.NONE.value}"
+        return f"{color[self.severity].value}{self.severity}{PrintColors.NONE.value}"
 
     def format_datetime(self, time: int) -> str:
         if time is None:
