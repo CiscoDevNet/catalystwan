@@ -147,13 +147,13 @@ tenant = Tenant.parse_obj({
 Method below performs multi-step migration procedure according to [Migrate Single-Tenant Cisco SD-WAN Overlay to Multitenant Cisco SD-WAN Deployment](https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/system-interface/vedge-20-x/systems-interfaces-book/sdwan-multitenancy.html#concept_sjj_jmm_z4b)
 
 ```python
-st_to_mt(st_api, mt_api, Path.cwd(), tenant=tenant)
+from pathlib import Path
+st_to_mt(st_api, mt_api, workdir=Path.cwd(), tenant=tenant)
 ```
 
 Each step of the procedure can be executed independently using api methods: `export_tenant`, `download`, `import_tenant`, `store_token`, `migrate_network`
 
 ```python
-from pathlib import Path
 tenant_file = Path("~/tenant.tar.gz")
 token_file = Path("~/tenant-token.txt")
 # export
