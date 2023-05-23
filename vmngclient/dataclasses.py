@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from vmngclient.exceptions import RetrieveIntervalOutOfRange
 from vmngclient.utils.alarm_status import Severity
 from vmngclient.utils.certificate_status import ValidityPeriod
+from vmngclient.utils.colors import PrintColors
 from vmngclient.utils.creation_tools import FIELD_NAME, asdict, convert_attributes
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
@@ -48,6 +49,7 @@ class AlarmData(DataclassBase):
     component: Optional[str] = field(default=None)
     active: Optional[bool] = field(default=None)
     severity: Optional[Severity] = field(converter=Severity, default=None)
+    severity_number: Optional[int] = field(default=None)
     name: Optional[str] = field(default=None, metadata={FIELD_NAME: "type"})
     system_ip: Optional[str] = field(default=None, metadata={FIELD_NAME: "system-ip"})
     hostname: Optional[str] = field(default=None, metadata={FIELD_NAME: "host-name"})
@@ -56,6 +58,20 @@ class AlarmData(DataclassBase):
     interface_name: Optional[str] = field(default=None, metadata={FIELD_NAME: "if-name"})
     vpn_id: Optional[str] = field(default=None, metadata={FIELD_NAME: "vpn-id"})
     viewed: Optional[bool] = field(default=None, metadata={FIELD_NAME: "acknowledged"})
+    message: Optional[str] = field(default=None)
+    values: Optional[list] = field(default=None)
+    values_short_display: Optional[list] = field(default=None)
+    event_name: Optional[str] = field(default=None, metadata={FIELD_NAME: "eventname"})
+    rule_name: Optional[str] = field(default=None, metadata={FIELD_NAME: "rulename"})
+    entry_time: Optional[int] = field(default=None)
+    receive_time: Optional[int] = field(default=None)
+    rule_name_display: Optional[str] = field(default=None)
+    uuid: Optional[str] = field(default=None)
+    possible_causes: Optional[List[str]] = field(default=None)
+    consumed_events: Optional[list] = field(default=None)
+    devices: Optional[list] = field(default=None)
+    tenant: Optional[str] = field(default=None)
+    id: Optional[str] = field(default=None)
 
     def issubset(self, other: "AlarmData") -> bool:
         field_keys = {field_key for field_key in self.__annotations__ if getattr(self, field_key)}
@@ -71,6 +87,29 @@ class AlarmData(DataclassBase):
                 data[field_key] = attr
 
         return AlarmData(**data)
+
+    def alarm_severity_print(self) -> str:
+        if self.severity == Severity.CRITICAL:
+            color = PrintColors.RED_BACKGROUND
+        elif self.severity == Severity.MAJOR:
+            color = PrintColors.RED
+        elif self.severity == Severity.MEDIUM:
+            color = PrintColors.YELLOW
+        elif self.severity == Severity.MINOR:
+            color = PrintColors.NONE
+        return f"{color.value}{self.severity}{PrintColors.NONE.value}"
+
+    def __str__(self):
+        result = (
+            f"{self.__class__.__name__}:\n    "
+            f"{self.message}\n    "
+            f"{self.alarm_severity_print()}\n    "
+            f"Alarm received {dt.datetime.fromtimestamp(self.receive_time / 1e3)} "
+            f"(entry time: {dt.datetime.fromtimestamp(self.entry_time / 1e3)}).\n    "
+            f"Device {self.hostname} (system ip: {self.system_ip}).\n    "
+            f"Alarm type: {self.name}."
+        )
+        return result
 
 
 @define
