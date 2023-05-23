@@ -129,6 +129,8 @@ Preparation:
 
 ```python
 from vmngclient.api.tenant_migration_api import TenantMigrationAPI, st_to_mt
+from vmngclient.model.tenant import Tenant
+from vmngclient.session import create_vManageSession
 # create sessions to both systems
 st_session = create_vManageSession(**single_tenant_login)
 mt_session = create_vManageSession(**multi_tenant_provider_login)
