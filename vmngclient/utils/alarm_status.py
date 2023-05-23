@@ -6,6 +6,7 @@ class Severity(Enum):
     MEDIUM = "Medium"
     MAJOR = "Major"
     CRITICAL = "Critical"
+    UNKNOWN = None
 
 
 class Viewed(Enum):
