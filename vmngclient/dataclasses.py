@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import List, Optional, cast
+from typing import List, Optional
 
 from attr import define, field  # type: ignore
 from pydantic import BaseModel, Field
@@ -94,8 +94,11 @@ class AlarmData(DataclassBase):
             Severity.MAJOR: PrintColors.RED,
             Severity.MEDIUM: PrintColors.YELLOW,
             Severity.MINOR: PrintColors.NONE,
+            "N/A": PrintColors.NONE,
         }
-        return f"{color[cast(Severity, self.severity)].value}{self.severity}{PrintColors.NONE.value}"
+        severity = self.severity if self.severity is not None else "N/A"
+
+        return f"{color[severity].value}{severity}{PrintColors.NONE.value}"
 
     def format_datetime(self, time: int) -> str:
         if time is None:
