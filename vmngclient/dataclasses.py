@@ -90,10 +90,10 @@ class AlarmData(DataclassBase):
 
     def alarm_severity_print(self) -> str:
         color = {
-            Severity.CRITICAL: PrintColors.RED_BACKGROUND,
-            Severity.MAJOR: PrintColors.RED,
-            Severity.MEDIUM: PrintColors.YELLOW,
-            Severity.MINOR: PrintColors.NONE,
+            Severity.CRITICAL: PrintColors.RED,
+            Severity.MAJOR: PrintColors.YELLOW,
+            Severity.MEDIUM: PrintColors.BLUE,
+            Severity.MINOR: PrintColors.GREEN,
             Severity.UNKNOWN: PrintColors.NONE,
         }
 
