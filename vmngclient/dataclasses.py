@@ -44,7 +44,7 @@ class DeviceAdminTech(DataclassBase):
     token_id: Optional[str] = field(default=None, metadata={FIELD_NAME: "requestTokenId"})
 
 
-@define  # (frozen=True, field_transformer=convert_attributes)
+@define(frozen=True, field_transformer=convert_attributes)
 class AlarmData(DataclassBase):
     severity: Severity = field(converter=Severity, default=None)
     component: Optional[str] = field(default=None)
