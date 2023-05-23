@@ -89,15 +89,13 @@ class AlarmData(DataclassBase):
         return AlarmData(**data)
 
     def alarm_severity_print(self) -> str:
-        if self.severity == Severity.CRITICAL:
-            color = PrintColors.RED_BACKGROUND
-        elif self.severity == Severity.MAJOR:
-            color = PrintColors.RED
-        elif self.severity == Severity.MEDIUM:
-            color = PrintColors.YELLOW
-        elif self.severity == Severity.MINOR:
-            color = PrintColors.NONE
-        return f"{color.value}{self.severity}{PrintColors.NONE.value}"
+        color = {
+            Severity.CRITICAL: PrintColors.RED_BACKGROUND,
+            Severity.MAJOR: PrintColors.RED,
+            Severity.MEDIUM: PrintColors.YELLOW,
+            Severity.MINOR: PrintColors.NONE,
+        }
+        return f"{color[self.severity].value}{self.severity}{PrintColors.NONE.value}"
 
     def format_datetime(self, time: int) -> str:
         if time is None:
