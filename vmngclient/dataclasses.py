@@ -99,13 +99,18 @@ class AlarmData(DataclassBase):
             color = PrintColors.NONE
         return f"{color.value}{self.severity}{PrintColors.NONE.value}"
 
+    def format_datetime(self, time: int) -> str:
+        if time is None:
+            return "N/A"
+        return dt.datetime.fromtimestamp(time / 1e3).strftime("%H:%M:%S %Y-%m-%d")
+
     def __str__(self):
         result = (
             f"{self.__class__.__name__}:\n    "
             f"{self.message}\n    "
             f"{self.alarm_severity_print()}\n    "
-            f"Alarm received {dt.datetime.fromtimestamp(self.receive_time / 1e3)} "
-            f"(entry time: {dt.datetime.fromtimestamp(self.entry_time / 1e3)}).\n    "
+            f"Alarm received at {self.format_datetime(self.receive_time)} "
+            f"(entry time: {self.format_datetime(self.entry_time)}).\n    "
             f"Device {self.hostname} (system ip: {self.system_ip}).\n    "
             f"Alarm type: {self.name}."
         )
