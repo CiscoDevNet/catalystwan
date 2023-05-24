@@ -9,9 +9,9 @@ from vmngclient.utils.operation_status import OperationStatus
 class SubTaskData(BaseModel):
     status: str
     status_id: str = Field(alias="statusId")
-    action: str
+    action: Optional[str]
     activity: List[str]
-    current_activity: str = Field(alias="currentActivity")
+    current_activity: Optional[str] = Field(alias="currentActivity")
     action_config: Optional[str] = Field(alias="actionConfig")
     order: Optional[int]
     uuid: Optional[str]
@@ -25,59 +25,59 @@ class TaskResult(BaseModel):
 
 
 class RunningTaskData(BaseModel):
-    details_url: str = Field(alias="detailsURL")
-    user_session_username: str = Field(alias="userSessionUserName")
-    rid: int = Field(alias="@rid")
-    tenant_name: str = Field("tenantName")
-    process_id: str = Field(alias="processId")
-    name: str
-    tenant_id: str = Field(alias="tenantId")
-    user_session_ip: str = Field(alias="userSessionIP")
-    action: str
-    start_time: int = Field(alias="startTime")
-    end_time: int = Field(alias="endTime")
-    status: str
+    details_url: Optional[str] = Field(alias="detailsURL")
+    user_session_username: Optional[str] = Field(alias="userSessionUserName")
+    rid: Optional[int] = Field(alias="@rid")
+    tenant_name: Optional[str] = Field("tenantName")
+    process_id: Optional[str] = Field(alias="processId")
+    name: Optional[str]
+    tenant_id: Optional[str] = Field(alias="tenantId")
+    user_session_ip: Optional[str] = Field(alias="userSessionIP")
+    action: Optional[str]
+    start_time: Optional[int] = Field(alias="startTime")
+    end_time: Optional[int] = Field(alias="endTime")
+    status: Optional[str]
 
 
 class Validation(BaseModel):
-    status_type: str = Field(alias="statusType")
-    activity: List[str] = Field(alias="activity")
-    vmanage_ip: str = Field(alias="vmanageIP")
-    system_ip: str = Field(alias="system-ip")
-    device_id: str = Field(alias="deviceID")
-    uuid: str = Field(alias="uuid")
-    rid: int = Field(alias="@rid")
+    status_type: Optional[str] = Field(alias="statusType")
+    activity: Optional[List[str]] = Field(alias="activity")
+    vmanage_ip: Optional[str] = Field(alias="vmanageIP")
+    system_ip: Optional[str] = Field(alias="system-ip")
+    device_id: Optional[str] = Field(alias="deviceID")
+    uuid: Optional[str] = Field(alias="uuid")
+    rid: Optional[int] = Field(alias="@rid")
     status_id: str = Field(alias="statusId")
-    process_id: str = Field(alias="processId")
-    action_config: str = Field(alias="actionConfig")
-    current_activity: str = Field(alias="currentActivity")
-    action: str = Field(alias="action")
-    start_time: int = Field(alias="startTime")
-    request_status: str = Field(alias="requestStatus")
+    process_id: Optional[str] = Field(alias="processId")
+    action_config: Optional[str] = Field(alias="actionConfig")
+    current_activity: Optional[str] = Field(alias="currentActivity")
+    action: Optional[str] = Field(alias="action")
+    start_time: Optional[int] = Field(alias="startTime")
+    request_status: Optional[str] = Field(alias="requestStatus")
     status: OperationStatus = Field(alias="status")
-    order: int = Field(alias="order")
+    order: Optional[int] = Field(alias="order")
 
 
 class Summary(BaseModel):
-    action: str = Field(alias="action")
-    name: str = Field(alias="name")
-    details_url: str = Field(alias="detailsURL")
-    start_time: str = Field(alias="startTime")
-    end_time: str = Field(alias="endTime")
-    user_session_user_name: str = Field(alias="userSessionUserName")
-    user_session_ip: str = Field(alias="userSessionIP")
-    tenant_name: str = Field(alias="tenantName")
-    total: int = Field(alias="total")
-    status: str = Field(alias="status")
-    count: dict = Field(alias="count")
+    action: Optional[str] = Field(alias="action")
+    name: Optional[str] = Field(alias="name")
+    details_url: Optional[str] = Field(alias="detailsURL")
+    start_time: Optional[str] = Field(alias="startTime")
+    end_time: Optional[str] = Field(alias="endTime")
+    user_session_user_name: Optional[str] = Field(alias="userSessionUserName")
+    user_session_ip: Optional[str] = Field(alias="userSessionIP")
+    tenant_name: Optional[str] = Field(alias="tenantName")
+    total: Optional[int] = Field(alias="total")
+    status: Optional[str] = Field(alias="status")
+    count: Optional[dict] = Field(alias="count")
 
 
 class TaskData(BaseModel):
     data: List[SubTaskData]
-    validation: Validation
-    summary: Summary
-    is_cancel_enabled: bool = Field(alias="isCancelEnabled")
-    is_parallel_execution_enabled: bool = Field(alias="isParallelExecutionEnabled")
+    validation: Optional[Validation]
+    summary: Optional[Summary]
+    is_cancel_enabled: Optional[bool] = Field(alias="isCancelEnabled")
+    is_parallel_execution_enabled: Optional[bool] = Field(alias="isParallelExecutionEnabled")
 
 
 class TasksData(BaseModel):
