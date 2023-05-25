@@ -23,7 +23,7 @@ def with_proc_info_header(method: Callable[..., str]) -> Callable[..., str]:
         header = f"{multiprocessing.current_process()}"
         if frame_summary := get_first_external_stack_frame(extract_stack()):
             fname, line_no, function, _ = frame_summary
-            header += "%s:%d %s(...)" % (fname, line_no, function)
+            header += " %s:%d %s(...)" % (fname, line_no, function)
         header += "\n"
         return header + wrapped
 
