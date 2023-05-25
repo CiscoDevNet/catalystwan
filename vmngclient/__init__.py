@@ -40,6 +40,8 @@ def get_first_external_stack_frame(stack: StackSummary) -> Optional[FrameSummary
     for index, frame in enumerate(stack):
         if is_file_in_package(frame.filename):
             break
+    if index == 0:
+        return None
     return stack[index - 1]
 
 
