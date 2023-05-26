@@ -56,7 +56,11 @@ def find_template_values(
             templated_values[parent_key] = template_definition[target_key_for_template_value]
         elif isinstance(value, dict) and value != target_key_value_to_ignore:
             find_template_values(value, templated_values, key)
-        elif isinstance(value, list) and key == target_key_for_template_value and value != target_key_value_to_ignore:
+        elif (
+            isinstance(value, list)
+            and key == target_key_for_template_value
+            and template_definition.get(target_key) != target_key_value_to_ignore
+        ):
             templated_values[parent_key] = []
             for item in value:
                 templated_values[parent_key].append(find_template_values(item, {}))
