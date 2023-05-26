@@ -76,8 +76,6 @@ class TestFeatureTemplate(TestCase):
         feature_template_from_get = FeatureTemplate.get(session=mock_session, name=template.name)
 
         # Assert
-        print(feature_template_from_get)
-        print(f"\n\n{cisco_aaa}")
         self.assertEqual(feature_template_from_get, cisco_aaa)
 
 
