@@ -7,7 +7,7 @@ from importlib.machinery import PathFinder
 from os import environ
 from pathlib import Path
 from traceback import FrameSummary, StackSummary, extract_stack
-from typing import Callable, Final, List
+from typing import Callable, Final, List, Optional
 
 import urllib3
 
@@ -20,22 +20,28 @@ def with_proc_info_header(method: Callable[..., str]) -> Callable[..., str]:
     @wraps(method)
     def wrapper(*args, **kwargs) -> str:
         wrapped = method(*args, **kwargs)
-        fname, line_no, function, _ = get_first_external_stack_frame(extract_stack())
-        external_caller_info = "%s:%d %s(...)" % (fname, line_no, function)
-        header = f"{multiprocessing.current_process()} {external_caller_info}\n"
+        header = f"{multiprocessing.current_process()}"
+        if frame_summary := get_first_external_stack_frame(extract_stack()):
+            fname, line_no, function, _ = frame_summary
+            header += " %s:%d %s(...)" % (fname, line_no, function)
+        header += "\n"
         return header + wrapped
 
     return wrapper
 
 
-def get_first_external_stack_frame(stack: StackSummary) -> FrameSummary:
+def get_first_external_stack_frame(stack: StackSummary) -> Optional[FrameSummary]:
     """
     Get the first python frame
     on the stack before entering vmngclient module
     """
+    if len(stack) < 1:
+        return None
     for index, frame in enumerate(stack):
         if is_file_in_package(frame.filename):
             break
+    if index == 0:
+        return None
     return stack[index - 1]
 
 
