@@ -114,7 +114,8 @@ class Task:
             Returns:
                 bool: False if condition is met
             """
-
+            if not task_data:
+                return True
             task_statuses_success = [task.status in success_statuses for task in task_data]
             task_statuses_failure = [task.status in failure_statuses for task in task_data]
             task_statuses_id_success = [task.status_id in success_statuses_ids for task in task_data]
