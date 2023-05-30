@@ -4,9 +4,7 @@ import logging
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, overload
-
-from packaging.version import Version  # type: ignore
+from typing import TYPE_CHECKING
 
 from vmngclient.api.task_status_api import Task, TaskResult
 from vmngclient.model.tenant import Tenant
@@ -36,39 +34,16 @@ class TenantMigrationAPI:
     def __init__(self, session: vManageSession):
         self.session = session
 
-    def _create_tenant(self, **kwargs) -> Tenant:
-        tenant = kwargs.get("tenant", None)
-        if tenant is None:
-            tenant = Tenant.parse_obj(kwargs)
-        if self.session.api_version < Version("20.6"):
-            tenant.wan_edge_forecast = None
-        return tenant
-
-    @overload
-    def export_tenant(
-        self, *, desc: str, name: str, subdomain: str, org_name: str, wan_edge_forecast: Optional[int]
-    ) -> Task:
-        ...
-
-    @overload
-    def export_tenant(self, *, tenant: Tenant) -> Task:
-        ...
-
-    def export_tenant(self, **kwargs) -> Task:
+    def export_tenant(self, tenant: Tenant) -> Task:
         """Exports the single-tenant deployment and configuration data from a Cisco vManage instance.
         Should be executed on migrated single-tenant system.
 
         Args:
             tenant (Tenant): Tenant object containig required fields: desc, name, subdomain, org_name
-            desc (str): A description of the tenant. Up to 256 alphanumeric characters.
-            name (str): Unique name for the tenant in the multitenant deployment.
-            subdomain (str): Fully qualified sub-domain name of the tenant.
-            org_name (str): Name of the tenant organization. The organization name is case-sensitive.
-            wan_edge_forecast (int): Forecasted number of WAN Edges for given tenant.
+
         Returns:
             Task: object representing initiated export process
         """
-        tenant = self._create_tenant(**kwargs)
         process_id = self.session.primitives.tenant_migration.export_tenant_data(tenant).process_id
         return Task(self.session, process_id)
 
@@ -125,27 +100,7 @@ class TenantMigrationAPI:
         return Task(self.session, process_id)
 
 
-@overload
-def st_to_mt(
-    st_api: TenantMigrationAPI,
-    mt_api: TenantMigrationAPI,
-    workdir: Path,
-    *,
-    desc: str,
-    name: str,
-    subdomain: str,
-    org_name: str,
-    wan_edge_forecast: Optional[int],
-):
-    ...
-
-
-@overload
-def st_to_mt(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Path, *, tenant: Tenant):
-    ...
-
-
-def st_to_mt(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Path, **kwargs):
+def st_to_mt(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Path, tenant: Tenant):
     """Performs single-tenant migration to multi-tenant environment procedure according to:
     https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/system-interface/vedge-20-x/systems-interfaces-book/sdwan-multitenancy.html#concept_sjj_jmm_z4b
     1. Export the single-tenant deployment and configuration data from a Cisco vManage instance controlling the overlay.
@@ -159,13 +114,7 @@ def st_to_mt(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Pa
         mt_api (TenantMigrationAPI): TenantMigrationAPI created with session to target multi-tenant vManage instance
         workdir (Path): directory to store migration artifacts (token and export file)
         tenant (Tenant): Tenant object containig required fields: desc, name, subdomain, org_name
-        desc (str): A description of the tenant. Up to 256 alphanumeric characters.
-        name (str): Unique name for the tenant in the multitenant deployment.
-        subdomain (str): Fully qualified sub-domain name of the tenant.
-        org_name (str): Name of the tenant organization. The organization name is case-sensitive.
-        wan_edge_forecast (int): Forecasted number of WAN Edges for given tenant.
     """
-    tenant = st_api._create_tenant(**kwargs)
     migration_timestamp = datetime.now().strftime("%Y-%m-%d-%H%M")
     migration_file_prefix = f"{tenant.name}-{st_api.session.server_name}-{migration_timestamp}"
     export_path = workdir / f"{migration_file_prefix}.tar.gz"

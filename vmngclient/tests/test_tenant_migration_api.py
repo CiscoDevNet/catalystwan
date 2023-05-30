@@ -18,18 +18,7 @@ class TestTenantMigrationAPI(unittest.TestCase):
         self.session.api_version = Version("20.6")
         self.api = TenantMigrationAPI(self.session)
 
-    def test_export_tenant_with_kwargs(self):
-        tenant_kwargs = {
-            "desc": "Test Tenant",
-            "name": "test_tenant",
-            "subdomain": "test_subdomain",
-            "org_name": "test_org",
-            "wan_edge_forecast": 10,
-        }
-        task = self.api.export_tenant(**tenant_kwargs)
-        self.assertIsInstance(task, Task)
-
-    def test_export_tenant_with_tenant_object(self):
+    def test_export_tenant(self):
         tenant = Tenant(desc="Test Tenant", name="test_tenant", subdomain="test_subdomain", org_name="test_org")
         task = self.api.export_tenant(tenant=tenant)
         self.assertIsInstance(task, Task)
