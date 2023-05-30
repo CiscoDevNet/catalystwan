@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from time import sleep
 from typing import TYPE_CHECKING, List, cast
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
@@ -14,6 +13,7 @@ if TYPE_CHECKING:
 from vmngclient.primitives.configuration_dashboard_status import (
     ConfigurationDashboardStatusPrimitives,
     SubTaskData,
+    TaskData,
     TaskResult,
 )
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
@@ -32,20 +32,16 @@ class Task:
         self.url = f"/dataservice/device/action/status/{self.task_id}"
         self.task_data: List[SubTaskData]
 
-    def __check_validation_status(self, validation_timeout_seconds: int = 5):
-        logger.info(f"Waiting {validation_timeout_seconds} seconds for the database to set up.")
-        sleep(validation_timeout_seconds)
-        task_data = ConfigurationDashboardStatusPrimitives(self.session).find_status(self.task_id)
-        if task_data.validation.status in (OperationStatus.FAILURE, OperationStatus.VALIDATION_FAILURE):
-            raise TaskValidationError(
-                f"Task status validation failed, validation status is:{task_data.validation.status}"
-            )
+    def __check_validation_status(self, task: TaskData):
+        if not task.validation:
+            return None
+        if task.validation.status in (OperationStatus.FAILURE, OperationStatus.VALIDATION_FAILURE):
+            raise TaskValidationError(f"Task status validation failed, validation status is:{task.validation.status}")
 
     def wait_for_completed(
         self,
         timeout_seconds: int = 300,
         interval_seconds: int = 5,
-        validation_timeout_seconds: int = 5,
         success_statuses: List[OperationStatus] = [
             OperationStatus.SUCCESS,
         ],
@@ -118,7 +114,8 @@ class Task:
             Returns:
                 bool: False if condition is met
             """
-
+            if not task_data:
+                return True
             task_statuses_success = [task.status in success_statuses for task in task_data]
             task_statuses_failure = [task.status in failure_statuses for task in task_data]
             task_statuses_id_success = [task.status_id in success_statuses_ids for task in task_data]
@@ -149,8 +146,9 @@ class Task:
             Returns:
                 List[SubTaskData]
             """
-
-            self.task_data = ConfigurationDashboardStatusPrimitives(self.session).find_status(self.task_id).data
+            task = ConfigurationDashboardStatusPrimitives(self.session).find_status(self.task_id)
+            self.__check_validation_status(task)
+            self.task_data = task.data
             sub_task_statuses = [task.status for task in self.task_data]
             sub_task_statuses_id = [task.status_id for task in self.task_data]
             sub_task_activities = [task.activity for task in self.task_data]
@@ -160,7 +158,6 @@ class Task:
             )
             return self.task_data
 
-        self.__check_validation_status(validation_timeout_seconds)
         wait_for_action_finish()
         result = all([sub_task.status in success_statuses for sub_task in self.task_data])
         if result:
