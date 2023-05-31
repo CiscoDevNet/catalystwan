@@ -73,7 +73,7 @@ class Summary(BaseModel):
 
 
 class TaskData(BaseModel):
-    data: List[SubTaskData]
+    data: List[SubTaskData] = Field(default=[])
     validation: Optional[Validation]
     summary: Optional[Summary]
     is_cancel_enabled: Optional[bool] = Field(alias="isCancelEnabled")
