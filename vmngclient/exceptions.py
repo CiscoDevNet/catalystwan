@@ -1,3 +1,6 @@
+from requests import Response
+
+
 class vManageClientError(Exception):
     """Superclass of all vmngclient exception types."""
 
@@ -81,8 +84,10 @@ class AuthenticationError(vManageClientError):
     pass
 
 
-class CookieNotValidError(vManageClientError):
-    pass
+class CookieNotValidError(Exception):
+    def __init__(self, response: Response):
+        self.response = response
+        self.message = "Session cookie is not valid."
 
 
 class EmptyTaskResponseError(vManageClientError):
