@@ -1,101 +1,186 @@
 import unittest
 from unittest.mock import patch
 
-from vmngclient.api.task_status_api import SubTaskData, TaskResult
-from vmngclient.primitives.configuration_dashboard_status import (
-    ConfigurationDashboardStatusPrimitives,
-    RunningTaskData,
-    TasksData,
-)
+from vmngclient.api.task_status_api import Task
+from vmngclient.primitives.configuration_dashboard_status import ConfigurationDashboardStatusPrimitives, TaskData
 
 
 class TestTaskStatusApi(unittest.TestCase):
-    def setUp(self):
-        sub_tasks_data = SubTaskData.parse_obj(
-            {
-                "status": "Success",
-                "statusId": "success",
-                "action": "",
-                "activity": [],
-                "currentActivity": "",
-                "actionConfig": "",
-                "order": 1,
-                "uuid": "",
-                "host-name": "",
-                "site-id": "",
-            }
-        )
-        self.task_result = TaskResult(result=True, sub_tasks_data=[sub_tasks_data])
-        self.action_data = [
-            {
-                "status": "Success",
-                "statusId": "success",
-                "activity": [],
-                "action": "",
-                "currentActivity": "",
-                "actionConfig": "",
-                "order": 1,
-                "uuid": "",
-                "host-name": "",
-                "site-id": "",
-            }
-        ]
-        self.action_data_time_out = [
-            {
-                "status": "Other_status",
-                "statusId": "other_status",
-                "activity": [],
-                "action": "",
-                "currentActivity": "",
-                "actionConfig": "",
-                "order": 1,
-                "uuid": "",
-                "host-name": "",
-                "site-id": "",
-            }
-        ]
-        self.running_task_data = RunningTaskData.parse_obj(
-            {
-                "detailsURL": "http://example.com",
-                "userSessionUserName": "John",
-                "@rid": 123,
-                "tenantName": "",
-                "processId": "processId_1",
-                "name": "Some process",
-                "tenantId": "456",
-                "userSessionIP": "127.0.0.1",
-                "action": "run",
-                "startTime": 1649145600,
-                "endTime": 1649174400,
-                "status": "completed",
-            }
-        )
-        self.running_task_data_json = {
-            "runningTasks": [
+    @patch("vmngclient.session.vManageSession")
+    def setUp(self, mock_session):
+        self.task = Task(mock_session, "task_id")
+        self.success_response = {
+            "data": [
                 {
-                    "detailsURL": "http://example.com",
-                    "userSessionUserName": "John",
-                    "@rid": 123,
-                    "tenantName": "",
-                    "processId": "processId_1",
-                    "name": "Some process",
-                    "tenantId": "456",
-                    "userSessionIP": "127.0.0.1",
-                    "action": "run",
-                    "startTime": 1649145600,
-                    "endTime": 1649174400,
-                    "status": "completed",
+                    "local-system-ip": "local_ip",
+                    "statusType": "reboot",
+                    "activity": [],
+                    "system-ip": "system_ip",
+                    "site-id": "siteid",
+                    "uuid": "dev-uuid",
+                    "@rid": 1211,
+                    "personality": "vedge",
+                    "processId": "processid",
+                    "actionConfig": "",
+                    "device-type": "vedge",
+                    "action": "reboot",
+                    "startTime": 1685440088317,
+                    "reachability": "reachable",
+                    "order": 0,
+                    "vmanageIP": "vmanage_ip",
+                    "host-name": "vm1",
+                    "version": "vmanage-version",
+                    "deviceID": "deviceid",
+                    "statusId": "success",
+                    "currentActivity": "Done - Reboot",
+                    "deviceModel": "vedge-cloud",
+                    "validity": "valid",
+                    "requestStatus": "received",
+                    "status": "Success",
                 }
-            ]
+            ],
+            "validation": {
+                "statusType": "reboot",
+                "activity": [],
+                "vmanageIP": "vmanage-ip",
+                "system-ip": "Validation",
+                "deviceID": "Validation",
+                "uuid": "Validation",
+                "@rid": 747,
+                "statusId": "validation_success",
+                "processId": "reboot-9fc30834-cc46-47c5-83c4-0b837cf84f1a",
+                "actionConfig": "{}",
+                "currentActivity": "Done - Validation",
+                "action": "reboot",
+                "startTime": 1685440057748,
+                "requestStatus": "received",
+                "status": "Validation success",
+                "order": 0,
+            },
+            "summary": {
+                "action": "reboot",
+                "name": "Reboot",
+                "detailsURL": "/dataservice/device/action/status",
+                "startTime": "1685440057829",
+                "endTime": "1685440179295",
+                "userSessionUserName": "admin",
+                "userSessionIP": "10.0.1.1",
+                "tenantName": "DefaultTenant",
+                "total": 1,
+                "status": "done",
+                "count": {"Success": 1},
+            },
+            "isCancelEnabled": True,
+            "isParallelExecutionEnabled": True,
+        }
+        self.empty_data = {
+            "data": [],
+            "validation": {
+                "statusType": "reboot",
+                "activity": [],
+                "vmanageIP": "vmanage-ip",
+                "system-ip": "Validation",
+                "deviceID": "Validation",
+                "uuid": "Validation",
+                "@rid": 747,
+                "statusId": "validation_success",
+                "processId": "reboot-9fc30834-cc46-47c5-83c4-0b837cf84f1a",
+                "actionConfig": "{}",
+                "currentActivity": "Done - Validation",
+                "action": "reboot",
+                "startTime": 1685440057748,
+                "requestStatus": "received",
+                "status": "Validation success",
+                "order": 0,
+            },
+            "summary": {
+                "action": "reboot",
+                "name": "Reboot",
+                "detailsURL": "/dataservice/device/action/status",
+                "startTime": "1685440057829",
+                "endTime": "1685440179295",
+                "userSessionUserName": "admin",
+                "userSessionIP": "user-session-ip",
+                "tenantName": "DefaultTenant",
+                "total": 1,
+                "status": "done",
+                "count": {"Success": 1},
+            },
+            "isCancelEnabled": True,
+            "isParallelExecutionEnabled": True,
+        }
+        self.no_data = {
+            "validation": {
+                "statusType": "reboot",
+                "activity": [],
+                "vmanageIP": "ip",
+                "system-ip": "Validation",
+                "deviceID": "Validation",
+                "uuid": "Validation",
+                "@rid": 747,
+                "statusId": "validation_success",
+                "processId": "reboot-9fc30834-cc46-47c5-83c4-0b837cf84f1a",
+                "actionConfig": "{}",
+                "currentActivity": "Done - Validation",
+                "action": "reboot",
+                "startTime": 1685440057748,
+                "requestStatus": "received",
+                "status": "Validation success",
+                "order": 0,
+            },
+            "summary": {
+                "action": "reboot",
+                "name": "Reboot",
+                "detailsURL": "/dataservice/device/action/status",
+                "startTime": "1685440057829",
+                "endTime": "1685440179295",
+                "userSessionUserName": "admin",
+                "userSessionIP": "ip",
+                "tenantName": "DefaultTenant",
+                "total": 1,
+                "status": "done",
+                "count": {"Success": 1},
+            },
+            "isCancelEnabled": True,
+            "isParallelExecutionEnabled": True,
         }
 
-    @unittest.skip("")
-    @patch("vmngclient.session.vManageSession")
-    def test_get_all_tasks(self, mock_session):
+    @patch.object(Task, "_Task__check_validation_status")
+    @patch.object(ConfigurationDashboardStatusPrimitives, "find_status")
+    def test_wait_for_completed_success(self, mock_task, mock_validation):
         # Arrange
-        mock_session.get.return_value.dataobj.return_value = self.running_task_data_json
+        mock_task.return_value = TaskData.parse_obj(self.success_response)
 
         # Act
-        answer = ConfigurationDashboardStatusPrimitives(mock_session).find_running_tasks()
+        answer = self.task.wait_for_completed(interval_seconds=1).result
+
         # Assert
-        self.assertEqual(answer, TasksData.parse_obj(self.running_task_data_json))
+        self.assertEqual(answer, True)
+
+    @patch.object(Task, "_Task__check_validation_status")
+    @patch.object(ConfigurationDashboardStatusPrimitives, "find_status")
+    def test_wait_for_completed_empty_data(self, mock_task, mock_validation):
+        # Data is empty, and then response is success
+
+        # Arrange
+        mock_task.side_effect = [TaskData.parse_obj(self.empty_data), TaskData.parse_obj(self.success_response)]
+
+        # Act
+        answer = self.task.wait_for_completed(timeout_seconds=2, interval_seconds=1).result
+
+        # Assert
+        self.assertEqual(answer, True)
+
+    @patch.object(Task, "_Task__check_validation_status")
+    @patch.object(ConfigurationDashboardStatusPrimitives, "find_status")
+    def test_wait_for_completed_no_data(self, mock_task, mock_validation):
+        # No data in first call, and then response is success
+
+        # Arrange
+        mock_task.side_effect = [TaskData.parse_obj(self.no_data), TaskData.parse_obj(self.success_response)]
+
+        # Act
+        answer = self.task.wait_for_completed(timeout_seconds=2, interval_seconds=1).result
+
+        # Assert
+        self.assertEqual(answer, True)
