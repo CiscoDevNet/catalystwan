@@ -105,8 +105,8 @@ class TenantManagementPrimitives(APIPrimitiveBase):
         ...
 
     @View({ProviderView, ProviderAsTenantView})
-    def get_all_tenant_statuses(self):
-        self.get("/tenantstatus").dataseq(TenantStatus)
+    def get_all_tenant_statuses(self) -> DataSequence[TenantStatus]:
+        return self.get("/tenantstatus").dataseq(TenantStatus)
 
     @View({ProviderView, ProviderAsTenantView})
     def get_all_tenants(self) -> DataSequence[Tenant]:
@@ -141,5 +141,5 @@ class TenantManagementPrimitives(APIPrimitiveBase):
         ...
 
     @View({ProviderView})
-    def vsession_id(self, tenant_id: str):
+    def vsession_id(self, tenant_id: str) -> vSessionId:
         return self.post(f"/tenant/{tenant_id}/vsessionid").dataobj(vSessionId, None)
