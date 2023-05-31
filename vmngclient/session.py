@@ -135,7 +135,7 @@ def create_vManageSession(
     return session
 
 
-class vManageResponseAdapter(Session, APIPrimitiveClient):
+class vManageResponseAdapter(Session):
     def request(self, method, url, *args, **kwargs) -> vManageResponse:
         return vManageResponse(super().request(method, url, *args, **kwargs))
 
@@ -152,7 +152,7 @@ class vManageResponseAdapter(Session, APIPrimitiveClient):
         return vManageResponse(super().delete(url, *args, **kwargs))
 
 
-class vManageSession(vManageResponseAdapter):
+class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
     """Base class for API sessions for vManage client.
 
     Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
