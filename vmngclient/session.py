@@ -366,7 +366,7 @@ class vManageSession(vManageResponseAdapter):
         return self._session_type
 
     @property
-    def platform_version(self) -> Version:
+    def platform_version(self) -> Optional[Version]:
         return self._platform_version
 
     @platform_version.setter
