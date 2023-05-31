@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Optional
 
-from vmngclient.dataclasses import Device, TenantInfo, TierInfo
+from vmngclient.api.task_status_api import Task
+from vmngclient.dataclasses import Device
+from vmngclient.model.tenant import Tenant
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -10,11 +12,11 @@ if TYPE_CHECKING:
 from vmngclient.typed_list import DataSequence
 
 
-class TenantsAPI:
+class TenantManagementAPI:
     def __init__(self, session: vManageSession):
         self.session = session
 
-    def get_tenants(self, device_id: Optional[Device] = None) -> DataSequence[TenantInfo]:
+    def get_tenants(self, device_id: Optional[Device] = None) -> DataSequence[Tenant]:
         """Lists all the tenants on the vManage.
 
         In a multitenant vManage system, this API is only avaiable in the Provider view.
@@ -29,13 +31,8 @@ class TenantsAPI:
         if device_id:
             raise NotImplementedError()
 
-        response = self.session.get("/dataservice/tenant")
-        tenants = response.dataseq(TenantInfo)
+        return self.session.primitives.tenant_management.get_all_tenants()
 
-        return tenants
-
-    def get_tiers(self) -> DataSequence[TierInfo]:
-        response = self.session.get(url="dataservice/device/tier")
-        tiers = response.dataseq(TierInfo)
-
-        return tiers
+    def create_tenants(self, tenants: List[Tenant]) -> Task:
+        task_id = self.session.primitives.tenant_management.create_tenant_async_bulk(tenants).id
+        return Task(self.session, task_id)

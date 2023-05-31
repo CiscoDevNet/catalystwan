@@ -355,19 +355,6 @@ class CloudOnRampForSaasMode(DataclassBase):
 
 
 @define(frozen=True)
-class TenantInfo(DataclassBase):
-    """Endpoint(s): /dataservice/tenant"""
-
-    name: str
-    organization_name: str = field(metadata={FIELD_NAME: "orgName"})
-    sub_domain: str = field(metadata={FIELD_NAME: "subDomain"})
-    id: str = field(metadata={FIELD_NAME: "tenantId"})
-    description: Optional[str] = field(default=None, metadata={FIELD_NAME: "desc"})
-    state: Optional[str] = field(default=None)
-    flake_id: Optional[int] = field(default=None, metadata={FIELD_NAME: "flakeId"})
-
-
-@define(frozen=True)
 class TLOC:
     color: str
     encapsulation: str
