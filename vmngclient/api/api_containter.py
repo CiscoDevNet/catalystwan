@@ -17,6 +17,7 @@ from vmngclient.api.speedtest_api import SpeedtestAPI
 from vmngclient.api.template_api import TemplatesAPI
 from vmngclient.api.tenant_api import TenantsAPI
 from vmngclient.api.tenant_backup_restore_api import TenantBackupRestoreAPI
+from vmngclient.api.tenant_migration_api import TenantMigrationAPI
 from vmngclient.api.versions_utils import RepositoryAPI
 
 if TYPE_CHECKING:
@@ -37,6 +38,7 @@ class APIContainter:
         self.speedtest = SpeedtestAPI(session)
         self.templates = TemplatesAPI(session)
         self.tenant_backup = TenantBackupRestoreAPI(session)
+        self.tenant_migration = TenantMigrationAPI(session)
         self.repository = RepositoryAPI(session)
         self.resource_pool = ResourcePoolAPI(session)
         self.software = SoftwareActionAPI(session)
