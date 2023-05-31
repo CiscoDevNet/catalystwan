@@ -3,7 +3,7 @@ from typing import Dict, List
 from pydantic import BaseModel, Field
 
 from vmngclient.model.tenant import Tenant
-from vmngclient.primitives import APIPrimitiveBase, Versions, View
+from vmngclient.primitives import APIPrimitiveBase, versions, view
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.session_type import ProviderAsTenantView, ProviderView
 
@@ -74,55 +74,55 @@ class vSessionId(BaseModel):
 
 
 class TenantManagementPrimitives(APIPrimitiveBase):
-    @View({ProviderView})
+    @view({ProviderView})
     def create_tenant(self, tenant: Tenant) -> Tenant:
-        response = self.post("/tenant", payload=tenant)
+        response = self._post("/tenant", payload=tenant)
         return response.dataobj(Tenant, None)
 
-    @View({ProviderView})
+    @view({ProviderView})
     def create_tenant_async(self, tenant: Tenant) -> TenantTaskId:
-        response = self.post("/tenant/async", payload=tenant)
+        response = self._post("/tenant/async", payload=tenant)
         return response.dataobj(TenantTaskId, None)
 
-    @Versions(">=20.4")
-    @View({ProviderView})
+    @versions(">=20.4")
+    @view({ProviderView})
     def create_tenant_async_bulk(self, tenants: List[Tenant]) -> TenantTaskId:
-        response = self.post("/tenant/bulk/async", payload=tenants)
+        response = self._post("/tenant/bulk/async", payload=tenants)
         return response.dataobj(TenantTaskId, None)
 
-    @View({ProviderView})
+    @view({ProviderView})
     def delete_tenant(self, delete_request: TenantDeleteRequest, tenant_id: str):
-        self.post(f"/tenant/{tenant_id}/delete", payload=delete_request)
+        self._post(f"/tenant/{tenant_id}/delete", payload=delete_request)
 
-    @Versions(">=20.4")
-    @View({ProviderView})
+    @versions(">=20.4")
+    @view({ProviderView})
     def delete_tenant_async_bulk(self, delete_request: TenantBulkDeleteRequest) -> TenantTaskId:
-        response = self.delete("/tenant/bulk/async", payload=delete_request)
+        response = self._delete("/tenant/bulk/async", payload=delete_request)
         return response.dataobj(TenantTaskId, None)
 
     def force_status_collection(self):
         # POST /tenantstatus/force
         ...
 
-    @View({ProviderView, ProviderAsTenantView})
+    @view({ProviderView, ProviderAsTenantView})
     def get_all_tenant_statuses(self):
-        self.get("/tenantstatus").dataseq(TenantStatus)
+        self._get("/tenantstatus").dataseq(TenantStatus)
 
-    @View({ProviderView, ProviderAsTenantView})
+    @view({ProviderView, ProviderAsTenantView})
     def get_all_tenants(self) -> DataSequence[Tenant]:
-        return self.get("/tenant").dataseq(Tenant)
+        return self._get("/tenant").dataseq(Tenant)
 
-    @View({ProviderView, ProviderAsTenantView})
+    @view({ProviderView, ProviderAsTenantView})
     def get_tenant(self, tenant_id: str) -> Tenant:
-        return self.get(f"/tenant/{tenant_id}").dataobj(Tenant, None)
+        return self._get(f"/tenant/{tenant_id}").dataobj(Tenant, None)
 
-    @View({ProviderView})
+    @view({ProviderView})
     def get_tenant_hosting_capacity_on_vsmarts(self) -> DataSequence[vSmartTenantCapacity]:
-        return self.get("/tenant/vsmart/capacity").dataseq(vSmartTenantCapacity)
+        return self._get("/tenant/vsmart/capacity").dataseq(vSmartTenantCapacity)
 
-    @View({ProviderView, ProviderAsTenantView})
+    @view({ProviderView, ProviderAsTenantView})
     def get_tenant_vsmart_mapping(self) -> vSmartTenantMap:
-        return self.get("/tenant/vsmart").dataobj(vSmartTenantMap, None)
+        return self._get("/tenant/vsmart").dataobj(vSmartTenantMap, None)
 
     def switch_tenant(self):
         # POST /tenant/{tenantId}/switch
@@ -140,6 +140,6 @@ class TenantManagementPrimitives(APIPrimitiveBase):
         # PUT /tenant/{tenantId}/vsmart
         ...
 
-    @View({ProviderView})
+    @view({ProviderView})
     def vsession_id(self, tenant_id: str):
-        return self.post(f"/tenant/{tenant_id}/vsessionid").dataobj(vSessionId, None)
+        return self._post(f"/tenant/{tenant_id}/vsessionid").dataobj(vSessionId, None)

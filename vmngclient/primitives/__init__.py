@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import TYPE_CHECKING, Final, Iterable, Mapping, Optional, Sequence, Set, TypedDict, Union
+from typing import TYPE_CHECKING, Final, Iterable, Mapping, Optional, Protocol, Sequence, Set, TypedDict, Union
 
 from packaging.specifiers import SpecifierSet  # type: ignore
 from packaging.version import Version  # type: ignore
@@ -14,7 +14,7 @@ from vmngclient.utils.creation_tools import AttrsInstance, asdict
 
 if TYPE_CHECKING:
     from vmngclient.response import vManageResponse
-    from vmngclient.session import SessionType, vManageSession
+    from vmngclient.session import SessionType
 
 
 BASE_PATH: Final[str] = "/dataservice"
@@ -61,35 +61,48 @@ def _prepare_sequence_payload(payload: Iterable[Union[BaseModel, AttrsInstance]]
     return PreparedPayload(data=data, headers={"content-type": "application/json"})
 
 
-class APIPrimitiveBase:
-    def __init__(self, session: vManageSession):
-        self.session = session
-        self.basepath = BASE_PATH
-
-    def request(self, method: str, url: str, payload: Optional[PayloadType] = None, **kwargs) -> vManageResponse:
-        if payload is not None:
-            kwargs.update(prepare_payload(payload))
-        return self.session.request(method, self.basepath + url, **kwargs)
-
-    def get(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> vManageResponse:
-        return self.request("GET", url, payload, **kwargs)
-
-    def put(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> vManageResponse:
-        return self.request("PUT", url, payload, **kwargs)
-
-    def post(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> vManageResponse:
-        return self.request("POST", url, payload, **kwargs)
-
-    def delete(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> vManageResponse:
-        return self.request("DELETE", url, payload, **kwargs)
+class APIPrimitiveClient(Protocol):
+    def request(self, method: str, url: str, **kwargs) -> vManageResponse:
+        ...
 
     @property
-    def version(self) -> Optional[Version]:
-        return self.session.api_version
+    def api_version(self) -> Optional[Version]:
+        ...
 
     @property
     def session_type(self) -> Optional[SessionType]:
-        return self.session.session_type
+        ...
+
+
+class APIPrimitiveBase:
+    def __init__(self, client: APIPrimitiveClient):
+        self._client = client
+        self.basepath = BASE_PATH
+
+    def _request(self, method: str, url: str, payload: Optional[PayloadType] = None, **kwargs) -> vManageResponse:
+        if payload is not None:
+            kwargs.update(prepare_payload(payload))
+        return self._client.request(method, self.basepath + url, **kwargs)
+
+    def _get(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> vManageResponse:
+        return self._request("GET", url, payload, **kwargs)
+
+    def _put(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> vManageResponse:
+        return self._request("PUT", url, payload, **kwargs)
+
+    def _post(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> vManageResponse:
+        return self._request("POST", url, payload, **kwargs)
+
+    def _delete(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> vManageResponse:
+        return self._request("DELETE", url, payload, **kwargs)
+
+    @property
+    def _api_version(self) -> Optional[Version]:
+        return self._client.api_version
+
+    @property
+    def _session_type(self) -> Optional[SessionType]:
+        return self._client.session_type
 
 
 class Versions:
@@ -106,8 +119,8 @@ class Versions:
         def wrapper(*args, **kwargs):
             api = args[0]
             if not isinstance(api, APIPrimitiveBase):
-                raise TypeError("Only APIPrimitiveBase instance methods can be annotated with @Versions decorator")
-            current = api.version
+                raise TypeError("Only APIPrimitiveBase instance methods can be annotated with @versions decorator")
+            current = api._api_version
             supported = self.supported_versions
             if current and current not in supported:
                 if self.raises:
@@ -135,8 +148,8 @@ class View:
         def wrapper(*args, **kwargs):
             api = args[0]
             if not isinstance(api, APIPrimitiveBase):
-                raise TypeError("Only APIPrimitiveBase instance methods can be annotated with @Versions decorator")
-            current = api.session_type
+                raise TypeError("Only APIPrimitiveBase instance methods can be annotated with @view decorator")
+            current = api._session_type
             allowed = self.allowed_session_types
             if current and current not in allowed:
                 if self.raises:
@@ -148,3 +161,7 @@ class View:
             return func(*args, **kwargs)
 
         return wrapper
+
+
+versions = Versions
+view = View
