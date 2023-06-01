@@ -24,7 +24,7 @@ class ServerInfo(BaseModel):
     vsession_id: Optional[str] = Field(alias="VSessionId")
     is_saml_user: Optional[bool] = Field(alias="isSamlUser")
     is_rbac_vpn_user: Optional[bool] = Field(alias="isRbacVpnUser")
-    vpns: List[Any]
+    vpns: List[Any] = []
     csrf_token: Optional[str] = Field(alias="CSRFToken")
     provider_domain: Optional[str] = Field(alias="providerDomain")
     tenant_id: Optional[str] = Field(alias="tenantId")
@@ -36,7 +36,7 @@ class ServerInfo(BaseModel):
     locale: Optional[str]
     roles: List[str] = []
     external_user: Optional[bool] = Field(alias="externalUser")
-    platform_version: VersionField = Field(alias="platformVersion")
+    platform_version: Optional[VersionField] = Field(alias="platformVersion")
     general_template: Optional[bool] = Field(alias="generalTemplate")
     disable_full_config_push: Optional[bool] = Field(alias="disableFullConfigPush")
     enable_server_events: Optional[bool] = Field(alias="enableServerEvents")

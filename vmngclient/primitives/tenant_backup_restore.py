@@ -1,5 +1,13 @@
+from typing import List
+
+from pydantic import BaseModel
+
 from vmngclient.primitives import APIPrimitiveBase, View
 from vmngclient.utils.session_type import ProviderAsTenantView, TenantView
+
+
+class BackupFiles(BaseModel):
+    backup_files: List[str]
 
 
 class TenantBackupRestorePrimitives(APIPrimitiveBase):
@@ -24,6 +32,5 @@ class TenantBackupRestorePrimitives(APIPrimitiveBase):
         ...
 
     @View({ProviderAsTenantView, TenantView})
-    def list_tenant_backup(self):
-        # GET /tenantbackup/list
-        ...
+    def list_tenant_backup(self) -> BackupFiles:
+        return self.get("/tenantbackup/list").dataobj(BackupFiles, None)
