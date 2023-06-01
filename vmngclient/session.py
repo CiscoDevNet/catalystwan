@@ -252,7 +252,8 @@ class vManageSession(vManageResponseAdapter):
         """
         PROTOCOL = "https"
         url = urlparse(self.url)
-        base_url = urlunparse((PROTOCOL, url.netloc, url.path, None, None, None))
+        netlock = url.netloc or url.path
+        base_url = urlunparse((PROTOCOL, netlock, "", None, None, None))
         if self.port:
             return f"{base_url}:{self.port}"
         return base_url
