@@ -5,7 +5,7 @@ import time
 from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse, urlunparse
 
 from packaging.version import Version  # type: ignore
 from requests import PreparedRequest, Request, Response, Session, head
@@ -250,9 +250,12 @@ class vManageSession(vManageResponseAdapter):
         Returns:
             str: Base url shared for every request.
         """
+        PROTOCOL = "https"
+        url = urlparse(self.url)
+        base_url = urlunparse((PROTOCOL, url.netloc, url.path, None, None, None))
         if self.port:
-            return f"https://{self.url}:{self.port}"
-        return f"https://{self.url}"
+            return f"{base_url}:{self.port}"
+        return base_url
 
     def about(self) -> AboutInfo:
         return self.primitives.client.about()
