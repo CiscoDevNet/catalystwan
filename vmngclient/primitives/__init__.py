@@ -90,14 +90,14 @@ class APIPrimitiveClient(Protocol):
 class APIPrimitiveBase:
     def __init__(self, client: APIPrimitiveClient):
         self._client = client
-        self.basepath = BASE_PATH
+        self._basepath = BASE_PATH
 
     def _request(
         self, method: str, url: str, payload: Optional[PayloadType] = None, **kwargs
     ) -> APIPRimitiveClientResponse:
         if payload is not None:
             kwargs.update(prepare_payload(payload))
-        return self._client.request(method, self.basepath + url, **kwargs)
+        return self._client.request(method, self._basepath + url, **kwargs)
 
     def _get(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
         return self._request("GET", url, payload, **kwargs)
