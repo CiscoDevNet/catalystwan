@@ -24,8 +24,9 @@ class TestSession(unittest.TestCase):
 
     @parameterized.expand(
         [
+            (None, "www.example.com", "https://www.example.com"),
             (123, "example.com", "https://example.com:123"),
-            (123, "http://example.com", "https://example.com:123"),
+            (123, "http://example.com", "http://example.com:123"),
             (123, "https://example.com", "https://example.com:123"),
             (None, "https://example.com", "https://example.com"),
         ]

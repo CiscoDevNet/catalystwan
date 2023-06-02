@@ -250,10 +250,10 @@ class vManageSession(vManageResponseAdapter):
         Returns:
             str: Base url shared for every request.
         """
-        PROTOCOL = "https"
         url = urlparse(self.url)
         netlock = url.netloc or url.path
-        base_url = urlunparse((PROTOCOL, netlock, "", None, None, None))
+        scheme = url.scheme or "https"
+        base_url = urlunparse((scheme, netlock, "", None, None, None))
         if self.port:
             return f"{base_url}:{self.port}"
         return base_url
