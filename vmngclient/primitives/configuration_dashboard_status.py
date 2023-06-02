@@ -87,8 +87,8 @@ class TasksData(BaseModel):
 class ConfigurationDashboardStatusPrimitives(APIPrimitiveBase):
     def find_status(self, task_id: str) -> TaskData:
         url = f"/device/action/status/{task_id}"
-        return self.get(url).dataobj(TaskData, None)
+        return self._get(url).dataobj(TaskData, None)
 
     def find_running_tasks(self) -> TasksData:
         url = "/device/action/status/tasks"
-        return self.get(url).dataobj(TasksData, None)
+        return self._get(url).dataobj(TasksData, None)

@@ -9,8 +9,9 @@ from pydantic import BaseModel
 
 from vmngclient.dataclasses import DataclassBase  # type: ignore
 from vmngclient.exceptions import APIRequestPayloadTypeError, APIVersionError, APIViewError
-from vmngclient.primitives import APIPrimitiveBase, Versions, View
+from vmngclient.primitives import APIPrimitiveBase
 from vmngclient.primitives import logger as primitives_logger
+from vmngclient.primitives import versions, view
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.session_type import ProviderAsTenantView, ProviderView, TenantView
@@ -52,19 +53,19 @@ class TestAPIPrimitives(unittest.TestCase):
         self.datasequence_payload = DataSequence(AttrsModelExample, self.list_attrs_payload)
 
     def test_get(self):
-        self.primitive.get("/get_endpoint/1")
+        self.primitive._get("/get_endpoint/1")
         self.session_mock.request.assert_called_once_with("GET", "/dataservice/get_endpoint/1")
 
     def test_post(self):
-        self.primitive.post("/post_endpoint/2")
+        self.primitive._post("/post_endpoint/2")
         self.session_mock.request.assert_called_once_with("POST", "/dataservice/post_endpoint/2")
 
     def test_put(self):
-        self.primitive.put("/put_endpoint/3")
+        self.primitive._put("/put_endpoint/3")
         self.session_mock.request.assert_called_once_with("PUT", "/dataservice/put_endpoint/3")
 
     def test_delete(self):
-        self.primitive.delete("/delete_endpoint/4")
+        self.primitive._delete("/delete_endpoint/4")
         self.session_mock.request.assert_called_once_with("DELETE", "/dataservice/delete_endpoint/4")
 
     @parameterized.expand(
@@ -76,7 +77,7 @@ class TestAPIPrimitives(unittest.TestCase):
     )
     def test_versions_decorator_passes(self, supported_versions, current_version):
         class ExampleAPI(APIPrimitiveBase):
-            @Versions(supported_versions=supported_versions, raises=True)
+            @versions(supported_versions=supported_versions, raises=True)
             def versions_decorated_method(self):
                 pass
 
@@ -93,7 +94,7 @@ class TestAPIPrimitives(unittest.TestCase):
     )
     def test_versions_decorator_raises(self, supported_versions, current_version):
         class ExampleAPI(APIPrimitiveBase):
-            @Versions(supported_versions=supported_versions, raises=True)
+            @versions(supported_versions=supported_versions, raises=True)
             def versions_decorated_method(self):
                 pass
 
@@ -107,7 +108,7 @@ class TestAPIPrimitives(unittest.TestCase):
         current_version = "1.7"
 
         class ExampleAPI(APIPrimitiveBase):
-            @Versions(supported_versions=supported_versions, raises=False)
+            @versions(supported_versions=supported_versions, raises=False)
             def versions_decorated_method(self):
                 pass
 
@@ -127,7 +128,7 @@ class TestAPIPrimitives(unittest.TestCase):
     )
     def test_view_decorator_passes(self, allowed_sessions, current_session):
         class ExampleAPI(APIPrimitiveBase):
-            @View(allowed_session_types=allowed_sessions, raises=True)
+            @view(allowed_session_types=allowed_sessions, raises=True)
             def versions_decorated_method(self):
                 pass
 
@@ -144,7 +145,7 @@ class TestAPIPrimitives(unittest.TestCase):
     )
     def test_view_decorator_raises(self, allowed_sessions, current_session):
         class ExampleAPI(APIPrimitiveBase):
-            @View(allowed_session_types=allowed_sessions, raises=True)
+            @view(allowed_session_types=allowed_sessions, raises=True)
             def versions_decorated_method(self):
                 pass
 
@@ -158,7 +159,7 @@ class TestAPIPrimitives(unittest.TestCase):
         current_session = ProviderView
 
         class ExampleAPI(APIPrimitiveBase):
-            @View(allowed_session_types=allowed_sessions)
+            @view(allowed_session_types=allowed_sessions)
             def versions_decorated_method(self):
                 pass
 
@@ -171,25 +172,25 @@ class TestAPIPrimitives(unittest.TestCase):
             assert str(current_session) in log.output[0]
 
     def test_attrs_payload(self):
-        self.primitive.get("/1", payload=self.attrs_payload)
+        self.primitive._get("/1", payload=self.attrs_payload)
         _, kwargs = self.session_mock.request.call_args
         assert json.loads(kwargs.get("data")) == self.dict_payload
 
     def test_basemodel_payload(self):
-        self.primitive.get("/2", payload=self.basemodel_payload)
+        self.primitive._get("/2", payload=self.basemodel_payload)
         _, kwargs = self.session_mock.request.call_args
         assert json.loads(kwargs.get("data")) == self.dict_payload
 
     def test_datasequence_payload(self):
-        self.primitive.get("/3", payload=self.datasequence_payload)
+        self.primitive._get("/3", payload=self.datasequence_payload)
         _, kwargs = self.session_mock.request.call_args
         assert json.loads(kwargs.get("data")) == self.list_dict_payload
 
     def test_list_payload(self):
-        self.primitive.get("/4", payload=self.list_attrs_payload)
+        self.primitive._get("/4", payload=self.list_attrs_payload)
         _, kwargs = self.session_mock.request.call_args
         assert json.loads(kwargs.get("data")) == self.list_dict_payload
 
     def test_unexpected_payload(self):
         with self.assertRaises(APIRequestPayloadTypeError):
-            self.primitive.get("/5", payload=[1, 2, 3])
+            self.primitive._get("/5", payload=[1, 2, 3])

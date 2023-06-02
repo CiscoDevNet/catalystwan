@@ -101,8 +101,8 @@ Start reading our code, and you'll get the hang of it.
 
   class TenantManagementPrimitives(APIPrimitiveBase):
 
-    @Versions(">=20.4")
-    @View({ProviderView})
+    @versions(">=20.4")
+    @view({ProviderView})
     def delete_tenant_async_bulk(self, delete_request: TenantBulkDeleteRequest) -> TenantTaskId:
         response = self.delete("/tenant/bulk/async", payload=delete_request)
         return response.dataobj(TenantTaskId, None)
@@ -117,7 +117,7 @@ Start reading our code, and you'll get the hang of it.
   If common data-model is being reused by more than one primitive class it should be moved to `vmngclient/model` folder with appropriate module name.
 
 1. Check that endpoints you want to utilize in your API already defined in `vmngclient/primitives`.
-2. If endpoint not present, create new file with endpoint including data-model and methods with `@View` and `@Version` decorators when needed.
+2. If endpoint not present, create new file with endpoint including data-model and methods with `@view` and `@versions` decorators when needed.
 3. Implement higher level API in `vmngclient/api` using created primitives.
 
 Thanks,\
