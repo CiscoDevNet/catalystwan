@@ -22,6 +22,7 @@ from vmngclient.exceptions import (
     TenantSubdomainNotFound,
     vManageClientError,
 )
+from vmngclient.primitives import APIPrimitiveClient
 from vmngclient.primitives.client import AboutInfo, ServerInfo
 from vmngclient.primitives.primitive_container import APIPrimitiveContainter
 from vmngclient.response import ErrorInfo, response_history_debug, vManageResponse
@@ -151,7 +152,7 @@ class vManageResponseAdapter(Session):
         return vManageResponse(super().delete(url, *args, **kwargs))
 
 
-class vManageSession(vManageResponseAdapter):
+class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
     """Base class for API sessions for vManage client.
 
     Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
@@ -199,7 +200,7 @@ class vManageSession(vManageResponseAdapter):
 
         self.api = APIContainter(self)
         self.primitives = APIPrimitiveContainter(self)
-        self._platform_version: Version
+        self._platform_version: Optional[Version] = None
         self._api_version: Version
 
     def request(self, method, url, *args, **kwargs) -> vManageResponse:
@@ -367,7 +368,7 @@ class vManageSession(vManageResponseAdapter):
         return self._session_type
 
     @property
-    def platform_version(self) -> Version:
+    def platform_version(self) -> Optional[Version]:
         return self._platform_version
 
     @platform_version.setter
