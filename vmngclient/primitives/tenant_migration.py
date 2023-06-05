@@ -36,21 +36,21 @@ class MigrationInfo(BaseModel):
 
 class TenantMigrationPrimitives(APIPrimitiveBase):
     def download_tenant_data(self, path: str = "default.tar.gz") -> bytes:
-        return self.get(f"/tenantmigration/download/{path}").content
+        return self._get(f"/tenantmigration/download/{path}").content
 
     def export_tenant_data(self, tenant: Tenant) -> ExportInfo:
-        response = self.post("/tenantmigration/export", payload=tenant)
+        response = self._post("/tenantmigration/export", payload=tenant)
         return response.dataobj(ExportInfo, None)
 
     def get_migration_token(self, params: MigrationTokenQueryParams) -> str:
-        return self.get("/tenantmigration/migrationToken", params=params.dict(by_alias=True)).text
+        return self._get("/tenantmigration/migrationToken", params=params.dict(by_alias=True)).text
 
     def import_tenant_data(self, data: BinaryIO) -> ImportInfo:
-        response = self.post("/tenantmigration/import", files={"file": (Path(data.name).name, data)})
+        response = self._post("/tenantmigration/import", files={"file": (Path(data.name).name, data)})
         return response.dataobj(ImportInfo, None)
 
     def migrate_network(self, migration_token: str) -> MigrationInfo:
-        response = self.post("/tenantmigration/networkMigration", data=migration_token)
+        response = self._post("/tenantmigration/networkMigration", data=migration_token)
         return response.dataobj(MigrationInfo, None)
 
     def retrigger_network_migration(self):

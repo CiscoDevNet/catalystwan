@@ -58,7 +58,7 @@ class AboutInfo(BaseModel):
 
 class ClientPrimitives(APIPrimitiveBase):
     def server(self) -> ServerInfo:
-        return self.get("/client/server").dataobj(ServerInfo)
+        return self._get("/client/server").dataobj(ServerInfo)
 
     def about(self) -> AboutInfo:
-        return self.get("/client/about").dataobj(AboutInfo)
+        return self._get("/client/about").dataobj(AboutInfo)
