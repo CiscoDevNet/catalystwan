@@ -24,15 +24,19 @@ class TestSession(unittest.TestCase):
 
     @parameterized.expand(
         [
-            (123, "https://example.com:123"),
-            (None, "https://example.com"),
+            (None, "http://example.com:666", "http://example.com:666"),
+            (None, "www.example.com", "https://www.example.com"),
+            (123, "example.com", "https://example.com:123"),
+            (123, "http://example.com", "http://example.com:123"),
+            (123, "https://example.com", "https://example.com:123"),
+            (None, "https://example.com", "https://example.com"),
         ]
     )
-    def test_base_url(self, port: Optional[int], base_url: str):
+    def test_base_url(self, port: Optional[int], user_url: str, expected_url: str):
         # Arrange, Act
-        session = vManageSession(self.url, self.username, self.password, port=port)
+        session = vManageSession(user_url, self.username, self.password, port=port)
         # Assert
-        self.assertEqual(session.base_url, base_url)
+        self.assertEqual(session.base_url, expected_url)
 
     def test_session_repr(self):
         # Arrange, Act
