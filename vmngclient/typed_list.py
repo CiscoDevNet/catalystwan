@@ -5,7 +5,7 @@ from typing import Any, Generic, Iterable, MutableSequence, Type, TypeVar, overl
 from pydantic import BaseModel
 
 from vmngclient.exceptions import InvalidOperationError
-from vmngclient.utils.creation_tools import AttrsInstance
+from vmngclient.utils.creation_tools import AttrsInstance, asdict
 
 T = TypeVar("T")
 D = TypeVar("D")
@@ -158,6 +158,16 @@ class DataSequence(TypedList[T], Generic[T]):
 
     def __repr__(self) -> str:
         return f"DataSequence({self._type.__name__}, {repr(self.data)})"
+
+    def __str__(self) -> str:
+        pretty_message = ""
+        for element in self:
+            pretty_message += (
+                f"\n{element.__class__.__name__}(\n"
+                + "\n".join(f"    {attr[0]}: {attr[1]}," for attr in asdict(element).items())  # type: ignore
+                + "\n)"
+            )
+        return pretty_message
 
     @overload
     def single_or_default(self) -> T:
