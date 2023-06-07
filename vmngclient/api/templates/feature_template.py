@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import json
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, cast
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
 from pydantic import BaseModel
@@ -45,3 +46,30 @@ class FeatureTemplate(BaseModel, ABC):
     @property
     def type(self) -> str:
         raise NotImplementedError()
+
+    @classmethod
+    def get(cls, session: vManageSession, name: str) -> FeatureTemplate:
+        """Gets feature template model corresponding to existing feature template based on provided name
+
+        Args:
+            session: vManageSession
+            name: name of the existing feature template
+
+        Returns:
+            FeatureTemplate: filed out feature template model
+        """
+        from vmngclient.utils.feature_template import choose_model, find_template_values
+
+        template_info = (
+            session.api.templates._get_feature_templates(summary=False).filter(name=name).single_or_default()
+        )
+
+        template_definition_as_dict = json.loads(cast(str, template_info.template_definiton))
+
+        feature_template_model = choose_model(type_value=template_info.template_type)
+
+        values_from_template_definition = find_template_values(template_definition_as_dict)
+
+        return feature_template_model(
+            name=template_info.name, description=template_info.description, **values_from_template_definition
+        )
