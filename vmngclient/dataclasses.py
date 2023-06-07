@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import Dict, List, Optional, Union
+from typing import List, Optional
 
 from attr import define, field  # type: ignore
 from pydantic import BaseModel, Field
@@ -259,34 +259,6 @@ class User(DataclassBase):
     locale: Optional[str] = field(default=None)
     description: Optional[str] = field(default=None)
     resource_group: Optional[str] = field(default=None, metadata={FIELD_NAME: "resGroupName"})
-
-
-@define
-class TemplateFieldDefinition(DataclassBase):
-    vip_object_type: Optional[str] = field(default=None, metadata={FIELD_NAME: "vipObjectType"})
-    vip_type: Optional[str] = field(default=None, metadata={FIELD_NAME: "vipType"})
-    vip_variable_name: Optional[str] = field(default=None, metadata={FIELD_NAME: "vipVariableName"})
-    vip_primary_key: Optional[List[str]] = field(default=None, metadata={FIELD_NAME: "vipPrimaryKey"})
-    vip_value: Optional[Union[str, int, List[Dict[str, Union[TemplateFieldDefinition, List[str]]]]]] = field(
-        default=None, metadata={FIELD_NAME: "vipValue"}
-    )
-
-
-@define
-class TemplateField(DataclassBase):
-    name: str
-    definition: Optional[TemplateFieldDefinition] = field(default=None)
-    template_dicts: Optional[TemplateField] = field(default=None)
-
-    @definition.validator  # type: ignore
-    def definition_is_valid(self, attribute, value):
-        if value is not None:
-            assert self.template_dicts is None  # if definition is provided, cannot have template_dicts at the same time
-
-    @template_dicts.validator  # type: ignore
-    def template_dicts_is_valid(self, attribute, value):
-        if value is not None:
-            assert self.definition is None  # if template_dicts is provided, cannot have definition at the same time
 
 
 @define
