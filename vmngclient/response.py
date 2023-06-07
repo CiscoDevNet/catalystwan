@@ -1,3 +1,4 @@
+import re
 from functools import wraps
 from pprint import pformat
 from typing import Any, Callable, Optional, Sequence, Type, TypeVar, Union, cast
@@ -8,10 +9,12 @@ from requests.exceptions import JSONDecodeError
 
 from vmngclient import with_proc_info_header
 from vmngclient.exceptions import CookieNotValidError
+from vmngclient.primitives import APIPRimitiveClientResponse
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 
 T = TypeVar("T")
+PRINTABLE_CONTENT = re.compile(r"(text\/.+)|(application\/(json|html|xhtml|xml|x-www-form-urlencoded))", re.IGNORECASE)
 
 
 class ErrorInfo(BaseModel):
@@ -47,6 +50,9 @@ def response_debug(response: Optional[Response], request: Union[Request, Prepare
         "body": getattr(_request, "body", None),
         "json": getattr(_request, "json", None),
     }
+    if content_type := {k.lower(): v for k, v in _request.headers.items()}.get("content-type"):
+        if not re.search(PRINTABLE_CONTENT, content_type):
+            del request_debug["body"]
     debug_dict["request"] = {k: v for k, v in request_debug.items() if v is not None}
     if response is not None:
         response_debug = {
@@ -106,13 +112,14 @@ class JsonPayload:
             self.headers = json.get("headers", None)
 
 
-class vManageResponse(Response):
+class vManageResponse(Response, APIPRimitiveClientResponse):
     """Extends Response object with methods specific to vManage"""
 
     def __init__(self, response: Response):
-        if response.headers.get("set-cookie"):
-            raise CookieNotValidError("Session cookie is not valid.")
         self.__dict__.update(response.__dict__)
+        if cookies := response.headers.get("set-cookie", ""):
+            if "JSESSIONID=" in cookies:
+                raise CookieNotValidError(response)
         try:
             self.payload = JsonPayload(response.json())
         except JSONDecodeError:

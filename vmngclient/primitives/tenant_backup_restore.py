@@ -1,29 +1,36 @@
-from vmngclient.primitives import APIPrimitiveBase, View
+from typing import List
+
+from pydantic import BaseModel
+
+from vmngclient.primitives import APIPrimitiveBase, view
 from vmngclient.utils.session_type import ProviderAsTenantView, TenantView
 
 
+class BackupFiles(BaseModel):
+    backup_files: List[str]
+
+
 class TenantBackupRestorePrimitives(APIPrimitiveBase):
-    @View({ProviderAsTenantView})
+    @view({ProviderAsTenantView})
     def delete_tenant_backup(self):
         # DELETE /tenantbackup/delete
         ...
 
-    @View({ProviderAsTenantView, TenantView})
+    @view({ProviderAsTenantView, TenantView})
     def download_existing_backup_file(self):
         # GET /tenantbackup/download/{path}
         ...
 
-    @View({ProviderAsTenantView, TenantView})
+    @view({ProviderAsTenantView, TenantView})
     def export_tenant_backup(self):
         # GET /tenantbackup/export
         ...
 
-    @View({ProviderAsTenantView})
+    @view({ProviderAsTenantView})
     def import_tenant_backup(self):
         # POST /tenantbackup/import
         ...
 
-    @View({ProviderAsTenantView, TenantView})
-    def list_tenant_backup(self):
-        # GET /tenantbackup/list
-        ...
+    @view({ProviderAsTenantView, TenantView})
+    def list_tenant_backup(self) -> BackupFiles:
+        return self._get("/tenantbackup/list").dataobj(BackupFiles, None)

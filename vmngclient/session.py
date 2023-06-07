@@ -5,7 +5,7 @@ import time
 from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse, urlunparse
 
 from packaging.version import Version  # type: ignore
 from requests import PreparedRequest, Request, Response, Session, head
@@ -22,6 +22,7 @@ from vmngclient.exceptions import (
     TenantSubdomainNotFound,
     vManageClientError,
 )
+from vmngclient.primitives import APIPrimitiveClient
 from vmngclient.primitives.client import AboutInfo, ServerInfo
 from vmngclient.primitives.primitive_container import APIPrimitiveContainter
 from vmngclient.response import ErrorInfo, response_history_debug, vManageResponse
@@ -151,7 +152,7 @@ class vManageResponseAdapter(Session):
         return vManageResponse(super().delete(url, *args, **kwargs))
 
 
-class vManageSession(vManageResponseAdapter):
+class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
     """Base class for API sessions for vManage client.
 
     Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
@@ -199,7 +200,7 @@ class vManageSession(vManageResponseAdapter):
 
         self.api = APIContainter(self)
         self.primitives = APIPrimitiveContainter(self)
-        self._platform_version: Version
+        self._platform_version: Optional[Version] = None
         self._api_version: Version
 
     def request(self, method, url, *args, **kwargs) -> vManageResponse:
@@ -212,6 +213,7 @@ class vManageSession(vManageResponseAdapter):
             self.logger.error(exception)
             raise
         except CookieNotValidError as exception:
+            self.logger.debug(self.response_trace(exception.response, None))
             if self.enable_relogin and not self.__second_relogin_try:
                 self.logger.warning(f"Loging to session again. Reason: '{str(exception)}'")
                 self.auth = vManageAuth(self.base_url, self.username, self.password, verify=False)
@@ -249,9 +251,13 @@ class vManageSession(vManageResponseAdapter):
         Returns:
             str: Base url shared for every request.
         """
+        url = urlparse(self.url)
+        netloc: str = url.netloc or url.path
+        scheme: str = url.scheme or "https"
+        base_url = urlunparse((scheme, netloc, "", None, None, None))
         if self.port:
-            return f"https://{self.url}:{self.port}"
-        return f"https://{self.url}"
+            return f"{base_url}:{self.port}"
+        return base_url
 
     def about(self) -> AboutInfo:
         return self.primitives.client.about()
@@ -366,7 +372,7 @@ class vManageSession(vManageResponseAdapter):
         return self._session_type
 
     @property
-    def platform_version(self) -> Version:
+    def platform_version(self) -> Optional[Version]:
         return self._platform_version
 
     @platform_version.setter
