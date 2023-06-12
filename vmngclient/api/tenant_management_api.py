@@ -22,7 +22,7 @@ from vmngclient.typed_list import DataSequence
 class TenantManagementAPI:
     def __init__(self, session: vManageSession):
         self.session = session
-        self.primitives = TenantManagementPrimitives(session)
+        self._primitives = TenantManagementPrimitives(session)
 
     def get_all(self, device_id: Optional[Device] = None) -> DataSequence[Tenant]:
         """Lists all the tenants on the vManage.
@@ -32,7 +32,7 @@ class TenantManagementAPI:
         Returns:
             DataSequence[TenantInfo]: List-like object containing tenant information
         """
-        return self.primitives.get_all_tenants()
+        return self._primitives.get_all_tenants()
 
     def create(self, tenants: List[Tenant]) -> Task:
         """Creates tenants on vManage
@@ -43,10 +43,10 @@ class TenantManagementAPI:
         Returns:
             Task: Object representing tenant creation process
         """
-        task_id = self.primitives.create_tenant_async_bulk(tenants).id
+        task_id = self._primitives.create_tenant_async_bulk(tenants).id
         return Task(self.session, task_id)
 
-    def delete(self, tenant_id_list: List[str], password: Optional[str]) -> Task:
+    def delete(self, tenant_id_list: List[str], password: Optional[str] = None) -> Task:
         """Deletes tenants on vManage
 
         Args:
@@ -59,7 +59,7 @@ class TenantManagementAPI:
         if password is None:
             password = self.session.password
         delete_request = TenantBulkDeleteRequest(tenantIdList=tenant_id_list, password=password)
-        task_id = self.primitives.delete_tenant_async_bulk(delete_request).id
+        task_id = self._primitives.delete_tenant_async_bulk(delete_request).id
         return Task(self.session, task_id)
 
     def get_statuses(self) -> DataSequence[TenantStatus]:
@@ -68,7 +68,7 @@ class TenantManagementAPI:
         Returns:
             DataSequence[TenantStatus]: List-like object containing tenants statuses
         """
-        return self.primitives.get_all_tenant_statuses()
+        return self._primitives.get_all_tenant_statuses()
 
     def get_hosting_capacity_on_vsmarts(self) -> DataSequence[vSmartTenantCapacity]:
         """Gets tenant hosting capacity on vSmarts
@@ -76,7 +76,7 @@ class TenantManagementAPI:
         Returns:
             DataSequence[vSmartTenantCapacity]: List-like object containing tenant capacity information for each vSmart
         """
-        return self.primitives.get_tenant_hosting_capacity_on_vsmarts()
+        return self._primitives.get_tenant_hosting_capacity_on_vsmarts()
 
     def get_vsmart_mapping(self) -> vSmartTenantMap:
         """Gets vSmart to tenant mapping
@@ -84,7 +84,7 @@ class TenantManagementAPI:
         Returns:
             vSmartTenantMap: Contains vSmart to tenant mapping
         """
-        return self.primitives.get_tenant_vsmart_mapping()
+        return self._primitives.get_tenant_vsmart_mapping()
 
     def vsession_id(self, tenant_id: str) -> str:
         """Gets VSessionId for given tenant
@@ -95,4 +95,4 @@ class TenantManagementAPI:
         Returns:
             str: Contains VSessionId for given tenant
         """
-        return self.primitives.vsession_id(tenant_id).vsessionid
+        return self._primitives.vsession_id(tenant_id).vsessionid
