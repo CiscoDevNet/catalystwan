@@ -13,6 +13,15 @@ if TYPE_CHECKING:
 
 
 class LogsAPI:
+    """Class for get and save audit log file
+
+    Usage example:
+        #Create session
+        session = create_vManageSession(...)
+        #Get auditlogs
+        session.api.logs.get_auditlogs()
+    """
+
     def __init__(self, session: vManageSession) -> None:
         self.session = session
 

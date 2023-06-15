@@ -11,6 +11,15 @@ from vmngclient.typed_list import DataSequence
 
 
 class TenantsAPI:
+    """API methods to get tenant data
+
+    Usage example:
+        #Create session
+        session = create_vManageSession(...)
+        #Get all tenants
+        all_tenants = session.api.tenants.get_tenants()
+    """
+
     def __init__(self, session: vManageSession):
         self.session = session
 
