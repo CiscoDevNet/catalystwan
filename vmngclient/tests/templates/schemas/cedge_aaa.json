@@ -1,0 +1,1185 @@
+{
+    "name": "cedge_aaa",
+    "xmlPath": [],
+    "xmlRootTag": "aaa",
+    "nameSpace": "http: //viptela.com/cedge_aaa",
+    "fields": [
+        {
+            "key": "authentication_group",
+            "description": "Authentication Param",
+            "details": "Authentication configurations parameters",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "boolean",
+                "default": "false"
+            },
+            "dataPath": [
+                "authentication",
+                "dot1x",
+                "default"
+            ],
+            "objectType": "object"
+        },
+        {
+            "key": "accounting_group",
+            "description": "Accounting Param",
+            "details": "Accounting configurations parameters",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "boolean",
+                "default": "false"
+            },
+            "dataPath": [
+                "accounting",
+                "dot1x",
+                "default",
+                "start-stop"
+            ],
+            "objectType": "object"
+        },
+        {
+            "key": "server-auth-order",
+            "description": "ServerGroups priority order",
+            "details": "ServerGroups priority order",
+            "optionType": [
+                "constant"
+            ],
+            "defaultOption": "constant",
+            "dataType": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 220,
+                "default": "local"
+            },
+            "dataPath": [],
+            "objectType": "object"
+        },
+        {
+            "key": "user",
+            "description": "User Configuration",
+            "details": "Create local login account",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataPath": [],
+            "objectType": "tree",
+            "primaryKeys": [
+                "name"
+            ],
+            "children": [
+                {
+                    "key": "name",
+                    "description": "Name",
+                    "details": "Set the username",
+                    "optionType": [
+                        "constant",
+                        "variable"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "password",
+                    "description": "Password",
+                    "details": "Set the user password",
+                    "optionType": [
+                        "constant"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "passphrase",
+                        "maxLength": 32
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "secret",
+                    "description": "Password",
+                    "details": "Set the user scrypt password/hash",
+                    "optionType": [
+                        "constant"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "passphrase",
+                        "maxLength": 32
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "privilege",
+                    "description": "Privilege Level 1 OR 15",
+                    "details": "Set Privilege Level for this user",
+                    "optionType": [
+                        "constant",
+                        "variable",
+                        "ignore"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "enum",
+                        "values": [
+                            {
+                                "key": "1",
+                                "value": "1"
+                            },
+                            {
+                                "key": "15",
+                                "value": "15"
+                            }
+                        ],
+                        "default": "15"
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "pubkey-chain",
+                    "description": "SSH pubkey",
+                    "details": "List of RSA public-keys per user",
+                    "maxElements": 2,
+                    "optionType": [
+                        "constant",
+                        "variable",
+                        "ignore"
+                    ],
+                    "defaultOption": "ignore",
+                    "dataPath": [],
+                    "objectType": "tree",
+                    "primaryKeys": [
+                        "key-string"
+                    ],
+                    "children": [
+                        {
+                            "key": "key-string",
+                            "description": "key-string",
+                            "details": "Set the RSA key string",
+                            "optionType": [
+                                "constant"
+                            ],
+                            "defaultOption": "constant",
+                            "dataType": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 1024
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        },
+                        {
+                            "key": "key-type",
+                            "description": "key-type",
+                            "details": "Only RSA is supported",
+                            "optionType": [
+                                "constant",
+                                "variable",
+                                "ignore"
+                            ],
+                            "defaultOption": "ignore",
+                            "dataType": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "radius",
+            "description": "Radius ServerGroup",
+            "details": "Configure the Radius serverGroup",
+            "maxElements": 3,
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataPath": [],
+            "objectType": "tree",
+            "primaryKeys": [
+                "group-name"
+            ],
+            "children": [
+                {
+                    "key": "group-name",
+                    "description": "Name of this Radius server Group",
+                    "details": "Set Radius server Group Name",
+                    "optionType": [
+                        "constant"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 32
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "vpn",
+                    "description": "VPN ID",
+                    "details": "Set VPN in which Radius server is located",
+                    "optionType": [
+                        "constant",
+                        "ignore"
+                    ],
+                    "defaultOption": "ignore",
+                    "dataType": {
+                        "type": "number",
+                        "min": 0,
+                        "max": 65530,
+                        "default": 0
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "source-interface",
+                    "description": "Source Interface",
+                    "details": "Set interface to use to reach Radius server",
+                    "optionType": [
+                        "constant",
+                        "variable",
+                        "ignore"
+                    ],
+                    "defaultOption": "ignore",
+                    "dataType": {
+                        "type": "string",
+                        "maxLength": 32
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "server",
+                    "description": "Radius Server",
+                    "details": "Configure the Radius server",
+                    "maxElements": 8,
+                    "optionType": [
+                        "constant"
+                    ],
+                    "defaultOption": "constant",
+                    "dataPath": [],
+                    "objectType": "tree",
+                    "primaryKeys": [
+                        "address"
+                    ],
+                    "children": [
+                        {
+                            "key": "address",
+                            "description": "Address",
+                            "details": "Set IP address of Radius server",
+                            "optionType": [
+                                "constant"
+                            ],
+                            "defaultOption": "constant",
+                            "dataType": {
+                                "type": "ip"
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        },
+                        {
+                            "key": "auth-port",
+                            "description": "Authentication Port",
+                            "details": "Set Authentication port to use to connect to Radius server",
+                            "optionType": [
+                                "constant",
+                                "variable",
+                                "ignore"
+                            ],
+                            "defaultOption": "ignore",
+                            "dataType": {
+                                "type": "number",
+                                "min": 1,
+                                "max": 65534,
+                                "default": 1812
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        },
+                        {
+                            "key": "acct-port",
+                            "description": "Accounting Port",
+                            "details": "Set Accounting port to use to connect to Radius server",
+                            "optionType": [
+                                "constant",
+                                "variable",
+                                "ignore"
+                            ],
+                            "defaultOption": "ignore",
+                            "dataType": {
+                                "type": "number",
+                                "min": 1,
+                                "max": 65534,
+                                "default": 1813
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        },
+                        {
+                            "key": "timeout",
+                            "description": "Timeout",
+                            "details": "Configure how long to wait for replies from the Radius server",
+                            "optionType": [
+                                "constant",
+                                "variable",
+                                "ignore"
+                            ],
+                            "defaultOption": "ignore",
+                            "dataType": {
+                                "type": "number",
+                                "min": 1,
+                                "max": 1000,
+                                "default": 5
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        },
+                        {
+                            "key": "retransmit",
+                            "description": "Retransmit Count",
+                            "details": "Configure how many times to contact this Radius server",
+                            "optionType": [
+                                "constant",
+                                "variable",
+                                "ignore"
+                            ],
+                            "defaultOption": "ignore",
+                            "dataType": {
+                                "type": "number",
+                                "min": 1,
+                                "max": 100,
+                                "default": 3
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        },
+                        {
+                            "key": "key",
+                            "description": "Key",
+                            "details": "Set the Radius server shared key",
+                            "optionType": [
+                                "constant"
+                            ],
+                            "defaultOption": "constant",
+                            "dataType": {
+                                "type": "restrictedPassphrase",
+                                "minLength": 1,
+                                "maxLength": 256
+                            },
+                            "dataPath": [],
+                            "objectType": "object",
+                            "vipNeedsEncryption": "true"
+                        },
+                        {
+                            "key": "secret-key",
+                            "description": "Secret Key",
+                            "details": "Set the Radius server shared type 7 encrypted key",
+                            "optionType": [
+                                "constant",
+                                "variable",
+                                "ignore"
+                            ],
+                            "defaultOption": "ignore",
+                            "dataType": {
+                                "type": "restrictedPassphrase",
+                                "minLength": 1,
+                                "maxLength": 150
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        },
+                        {
+                            "key": "key-enum",
+                            "description": "Enum for the encryption type 6 or 7",
+                            "details": "Type of encyption. To be used for type 6",
+                            "optionType": [
+                                "constant",
+                                "ignore"
+                            ],
+                            "defaultOption": "ignore",
+                            "dataType": {
+                                "type": "enum",
+                                "values": [
+                                    {
+                                        "key": "6",
+                                        "value": "6"
+                                    },
+                                    {
+                                        "key": "7",
+                                        "value": "7"
+                                    }
+                                ]
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        },
+                        {
+                            "key": "key-type",
+                            "description": "Key Type",
+                            "details": "key type",
+                            "optionType": [
+                                "constant",
+                                "variable",
+                                "ignore"
+                            ],
+                            "defaultOption": "ignore",
+                            "dataType": {
+                                "type": "radioButtonList",
+                                "values": [
+                                    {
+                                        "label": "Key",
+                                        "value": "key"
+                                    },
+                                    {
+                                        "label": "PAC Key",
+                                        "value": "pac"
+                                    }
+                                ],
+                                "default": "key"
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "radius-client",
+            "description": "Radius client",
+            "details": "Specify a RADIUS client",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataPath": [
+                "radius-dynamic-author"
+            ],
+            "objectType": "tree",
+            "primaryKeys": [
+                "ip"
+            ],
+            "children": [
+                {
+                    "key": "ip",
+                    "description": "Client IP",
+                    "details": "Client IP",
+                    "optionType": [
+                        "constant",
+                        "variable"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "ip"
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "vpn",
+                    "description": "VPN Configuration",
+                    "details": "VPN configuration",
+                    "optionType": [
+                        "constant",
+                        "variable",
+                        "ignore"
+                    ],
+                    "defaultOption": "ignore",
+                    "dataPath": [],
+                    "objectType": "tree",
+                    "primaryKeys": [
+                        "name"
+                    ],
+                    "children": [
+                        {
+                            "key": "name",
+                            "description": "VPN ID",
+                            "details": "VPN ID",
+                            "optionType": [
+                                "constant",
+                                "variable"
+                            ],
+                            "defaultOption": "constant",
+                            "dataType": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        },
+                        {
+                            "key": "server-key",
+                            "description": "Server Key Password",
+                            "details": "Specify a RADIUS client server-key",
+                            "optionType": [
+                                "constant",
+                                "variable",
+                                "ignore"
+                            ],
+                            "defaultOption": "ignore",
+                            "dataType": {
+                                "type": "restrictedPassphrase"
+                            },
+                            "dataPath": [],
+                            "objectType": "object",
+                            "vipNeedsEncryption": "true"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "rda-server-key",
+            "description": "Server Key Password",
+            "details": "Specify a radius dynamic author server-key",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "restrictedPassphrase"
+            },
+            "dataPath": [
+                "radius-dynamic-author"
+            ],
+            "objectType": "object",
+            "vipNeedsEncryption": "true"
+        },
+        {
+            "key": "domain-stripping",
+            "description": "Domain Stripping",
+            "details": "Domain Stripping",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "radioButtonList",
+                "values": [
+                    {
+                        "label": "Yes",
+                        "value": "yes"
+                    },
+                    {
+                        "label": "No",
+                        "value": "no"
+                    },
+                    {
+                        "label": "Right to Left",
+                        "value": "right-to-left"
+                    }
+                ],
+                "default": "no"
+            },
+            "dataPath": [
+                "radius-dynamic-author"
+            ],
+            "objectType": "object"
+        },
+        {
+            "key": "auth-type",
+            "description": "Authentication Type",
+            "details": "Authentication Type",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "radioButtonList",
+                "values": [
+                    {
+                        "label": "Yes",
+                        "value": "any"
+                    },
+                    {
+                        "label": "All",
+                        "value": "all"
+                    },
+                    {
+                        "label": "Session Key",
+                        "value": "session-key"
+                    }
+                ],
+                "default": "any"
+            },
+            "dataPath": [
+                "radius-dynamic-author"
+            ],
+            "objectType": "object"
+        },
+        {
+            "key": "port",
+            "description": "Port",
+            "details": "Specify Radius Dynamic Author Port",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "number",
+                "min": 0,
+                "max": 65535,
+                "default": 1700
+            },
+            "dataPath": [
+                "radius-dynamic-author"
+            ],
+            "objectType": "object"
+        },
+        {
+            "key": "cts-auth-list",
+            "description": "CTS Authorization List",
+            "details": "CTS Authorization List",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+            },
+            "dataPath": [
+                "radius-trustsec"
+            ],
+            "objectType": "object"
+        },
+        {
+            "key": "radius-trustsec-group",
+            "description": "RADIUS group",
+            "details": "RADIUS trustsec group",
+            "optionType": [
+                "constant",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "enum",
+                "values": []
+            },
+            "dataPath": [
+                "radius-trustsec"
+            ],
+            "objectType": "object"
+        },
+        {
+            "key": "tacacs",
+            "description": "TACACS ServerGroup",
+            "details": "Configure the TACACS serverGroup",
+            "maxElements": 3,
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataPath": [],
+            "objectType": "tree",
+            "primaryKeys": [
+                "group-name"
+            ],
+            "children": [
+                {
+                    "key": "group-name",
+                    "description": "Name of this TACACS server Group",
+                    "details": "Set TACACS server Group Name",
+                    "optionType": [
+                        "constant"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 32
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "vpn",
+                    "description": "VPN ID",
+                    "details": "Set VPN in which TACACS server is located",
+                    "optionType": [
+                        "constant",
+                        "variable",
+                        "ignore"
+                    ],
+                    "defaultOption": "ignore",
+                    "dataType": {
+                        "type": "number",
+                        "min": 0,
+                        "max": 65530,
+                        "default": 0
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "source-interface",
+                    "description": "Source Interface",
+                    "details": "Set interface to use to reach TACACS server",
+                    "optionType": [
+                        "constant",
+                        "variable",
+                        "ignore"
+                    ],
+                    "defaultOption": "ignore",
+                    "dataType": {
+                        "type": "string",
+                        "maxLength": 32
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "server",
+                    "description": "TACACS Server",
+                    "details": "Configure the TACACS server",
+                    "maxElements": 8,
+                    "optionType": [
+                        "constant"
+                    ],
+                    "defaultOption": "constant",
+                    "dataPath": [],
+                    "objectType": "tree",
+                    "primaryKeys": [
+                        "address"
+                    ],
+                    "children": [
+                        {
+                            "key": "address",
+                            "description": "Address",
+                            "details": "Set IP address of TACACS server",
+                            "optionType": [
+                                "constant"
+                            ],
+                            "defaultOption": "constant",
+                            "dataType": {
+                                "type": "ip"
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        },
+                        {
+                            "key": "port",
+                            "description": "Port",
+                            "details": "TACACS Port",
+                            "optionType": [
+                                "constant",
+                                "variable",
+                                "ignore"
+                            ],
+                            "defaultOption": "ignore",
+                            "dataType": {
+                                "type": "number",
+                                "min": 1,
+                                "max": 65535,
+                                "default": 49
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        },
+                        {
+                            "key": "timeout",
+                            "description": "Timeout",
+                            "details": "Configure how long to wait for replies from the TACACS server",
+                            "optionType": [
+                                "constant",
+                                "variable",
+                                "ignore"
+                            ],
+                            "defaultOption": "ignore",
+                            "dataType": {
+                                "type": "number",
+                                "min": 1,
+                                "max": 1000,
+                                "default": 5
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        },
+                        {
+                            "key": "key",
+                            "description": "Key",
+                            "details": "Set the TACACS server shared key",
+                            "optionType": [
+                                "constant"
+                            ],
+                            "defaultOption": "constant",
+                            "dataType": {
+                                "type": "restrictedPassphrase",
+                                "minLength": 1,
+                                "maxLength": 256
+                            },
+                            "dataPath": [],
+                            "objectType": "object",
+                            "objectStatus": "deprecated",
+                            "vipNeedsEncryption": "true"
+                        },
+                        {
+                            "key": "secret-key",
+                            "description": "Secret Key",
+                            "details": "Set the TACACS server shared type 7 encrypted key",
+                            "optionType": [
+                                "constant",
+                                "variable"
+                            ],
+                            "defaultOption": "constant",
+                            "dataType": {
+                                "type": "restrictedPassphrase",
+                                "minLength": 1,
+                                "maxLength": 150
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        },
+                        {
+                            "key": "key-enum",
+                            "description": "Enum for the encryption type 6 or 7",
+                            "details": "Type of encyption. To be used for type 6",
+                            "optionType": [
+                                "constant",
+                                "ignore"
+                            ],
+                            "defaultOption": "ignore",
+                            "dataType": {
+                                "type": "enum",
+                                "values": [
+                                    {
+                                        "key": "6",
+                                        "value": "6"
+                                    },
+                                    {
+                                        "key": "7",
+                                        "value": "7"
+                                    }
+                                ]
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "accounting-rule",
+            "description": "New Accounting Rule",
+            "details": "Configure the accounting rules",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataPath": [
+                "accounting"
+            ],
+            "objectType": "tree",
+            "primaryKeys": [
+                "rule-id"
+            ],
+            "children": [
+                {
+                    "key": "rule-id",
+                    "description": "Accounting Rule ID",
+                    "details": "Configure Accounting Rule ID",
+                    "optionType": [
+                        "constant"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "string",
+                        "maxLength": 32
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "method",
+                    "description": "Method",
+                    "details": "Configure Accounting Method",
+                    "optionType": [
+                        "constant"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "enum",
+                        "values": [
+                            {
+                                "key": "commands",
+                                "value": "Commands"
+                            },
+                            {
+                                "key": "exec",
+                                "value": "Exec"
+                            },
+                            {
+                                "key": "network",
+                                "value": "Network"
+                            },
+                            {
+                                "key": "system",
+                                "value": "System"
+                            }
+                        ]
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "level",
+                    "description": "Privilege Level 1 OR 15",
+                    "details": "Privilege level when method is commands",
+                    "optionType": [
+                        "constant",
+                        "ignore"
+                    ],
+                    "defaultOption": "ignore",
+                    "dataType": {
+                        "type": "enum",
+                        "values": [
+                            {
+                                "key": "1",
+                                "value": "1"
+                            },
+                            {
+                                "key": "15",
+                                "value": "15"
+                            }
+                        ]
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "start-stop",
+                    "description": "Enable Start-Stop",
+                    "details": "Record start and stop without waiting",
+                    "optionType": [
+                        "constant",
+                        "variable"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "boolean",
+                        "default": "true"
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "group",
+                    "description": "Group(s)",
+                    "details": "Use Server-group",
+                    "optionType": [
+                        "constant"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "stringList",
+                        "values": [],
+                        "max": 4
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                }
+            ]
+        },
+        {
+            "key": "authorization-console",
+            "description": "Console",
+            "details": "For enabling console authorization",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "boolean",
+                "default": "false"
+            },
+            "dataPath": [
+                "authorization"
+            ],
+            "objectType": "object"
+        },
+        {
+            "key": "authorization-config-commands",
+            "description": "Config Commands",
+            "details": "For configuration mode commands.",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "boolean",
+                "default": "false"
+            },
+            "dataPath": [
+                "authorization"
+            ],
+            "objectType": "object"
+        },
+        {
+            "key": "authorization-rule",
+            "description": "New Authorization Rule",
+            "details": "Configure the Authorization Rules",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataPath": [
+                "authorization"
+            ],
+            "objectType": "tree",
+            "primaryKeys": [
+                "rule-id"
+            ],
+            "children": [
+                {
+                    "key": "rule-id",
+                    "description": "Authorization Rule ID",
+                    "details": "Configure Authorization Rule ID",
+                    "optionType": [
+                        "constant"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "string",
+                        "maxLength": 32
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "method",
+                    "description": "Method",
+                    "details": "Method",
+                    "optionType": [
+                        "constant"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "enum",
+                        "values": [
+                            {
+                                "key": "commands",
+                                "value": "Commands"
+                            }
+                        ]
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "level",
+                    "description": "Privilege Level 1 or 15",
+                    "details": "Privilege level when method is commands",
+                    "optionType": [
+                        "constant"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "enum",
+                        "values": [
+                            {
+                                "key": "1",
+                                "value": "1"
+                            },
+                            {
+                                "key": "15",
+                                "value": "15"
+                            }
+                        ]
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "group",
+                    "description": "Group(s)",
+                    "details": "Use Server-group",
+                    "optionType": [
+                        "constant"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "stringList",
+                        "values": [
+                            {
+                                "key": "local",
+                                "value": "local"
+                            }
+                        ],
+                        "max": 4
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "if-authenticated",
+                    "description": "Authenticated",
+                    "details": "Succeed if user has authenticated",
+                    "optionType": [
+                        "constant"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "boolean",
+                        "default": "false"
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                }
+            ]
+        }
+    ]
+}
