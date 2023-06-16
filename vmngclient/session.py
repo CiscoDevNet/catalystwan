@@ -15,8 +15,6 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fi
 
 from vmngclient.api.api_containter import APIContainter
 from vmngclient.exceptions import (
-    AuthenticationError,
-    CookieNotValidError,
     InvalidOperationError,
     SessionNotCreatedError,
     TenantSubdomainNotFound,
@@ -191,13 +189,11 @@ class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
         self.server_name: Optional[str] = None
         self.logger = logging.getLogger(__name__)
         self.enable_relogin: bool = True
-        self.__second_relogin_try: bool = False
         self.response_trace: Callable[
             [Optional[Response], Union[Request, PreparedRequest, None]], str
         ] = response_history_debug
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
-
         self.api = APIContainter(self)
         self.primitives = APIPrimitiveContainter(self)
         self._platform_version: Optional[Version] = None
@@ -212,19 +208,11 @@ class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
             self.logger.debug(self.response_trace(exception.response, exception.request))
             self.logger.error(exception)
             raise
-        except CookieNotValidError as exception:
-            self.logger.debug(self.response_trace(exception.response, None))
-            if self.enable_relogin and not self.__second_relogin_try:
-                self.logger.warning(f"Loging to session again. Reason: '{str(exception)}'")
-                self.auth = vManageAuth(self.base_url, self.username, self.password, verify=False)
-                self.__second_relogin_try = True
-                return self.request(method, url, *args, **kwargs)
-            elif self.enable_relogin and self.__second_relogin_try:
-                raise AuthenticationError("Session is not properly logged in and relogin failed.")
-            else:
-                raise AuthenticationError("Session is not properly logged in and relogin is not enabled.")
 
-        self.__second_relogin_try = False
+        if self.enable_relogin and self.__is_jsession_updated(response):
+            self.logger.warning("Logging to session again. Reason: JSESSIONID cookie updated by response")
+            self.auth = vManageAuth(self.base_url, self.username, self.password, verify=False)
+            return self.request(method, url, *args, **kwargs)
 
         if response.request.url and "passwordReset.html" in response.request.url:
             raise InvalidOperationError("Password must be changed to use this session.")
@@ -358,6 +346,12 @@ class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
     def __prepare_session(self, verify: bool, auth: Optional[AuthBase]) -> None:
         self.auth = auth
         self.verify = verify
+
+    def __is_jsession_updated(self, response: vManageResponse) -> bool:
+        if jsessionid := response.cookies.get("JSESSIONID") and isinstance(self.auth, vManageAuth):
+            if jsessionid != self.auth.set_cookie.get("JSESSIONID"):
+                return True
+        return False
 
     def check_vmanage_server_connection(self) -> bool:
         try:
