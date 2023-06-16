@@ -348,7 +348,7 @@ class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
         self.verify = verify
 
     def __is_jsession_updated(self, response: vManageResponse) -> bool:
-        if jsessionid := response.cookies.get("JSESSIONID") and isinstance(self.auth, vManageAuth):
+        if (jsessionid := response.cookies.get("JSESSIONID")) and isinstance(self.auth, vManageAuth):
             if jsessionid != self.auth.set_cookie.get("JSESSIONID"):
                 return True
         return False
