@@ -30,7 +30,7 @@ class DashboardAPI:
         #Create session
         session = create_vManageSession(...)
         #Get information about devices health
-        all_admintechs = session.api.dashboard.get_devices_health()
+        health = session.api.dashboard.get_devices_health()
     """
 
     def __init__(self, session: vManageSession):
