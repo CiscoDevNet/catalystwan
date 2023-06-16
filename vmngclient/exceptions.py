@@ -1,6 +1,3 @@
-from requests import Response
-
-
 class vManageClientError(Exception):
     """Superclass of all vmngclient exception types."""
 
@@ -78,16 +75,6 @@ class APIRequestPayloadTypeError(vManageClientError):
 
     def __init__(self, item):
         self.message = f"Unsupported payload type: {type(item)} for vManage request"
-
-
-class AuthenticationError(vManageClientError):
-    pass
-
-
-class CookieNotValidError(Exception):
-    def __init__(self, response: Response):
-        self.response = response
-        self.message = "Session cookie is not valid."
 
 
 class EmptyTaskResponseError(vManageClientError):
