@@ -49,7 +49,7 @@ class FeatureTemplate(BaseModel, ABC):
         raise NotImplementedError()
     
     @root_validator(pre=True)
-    def haha(cls, values):
+    def remove_device_variables(cls, values):
         cls._device_specific_variables = {}
         for value in values:
             if isinstance(values[value], DeviceVariable):
