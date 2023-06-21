@@ -61,7 +61,7 @@ class vManageAuth(AuthBase):
         self.password = password
         self.verify = verify  # TODO Handle `True` parameter
         self.expiration_time: Optional[int] = None  # Unlimited
-        self.set_cookie: Optional[RequestsCookieJar] = None
+        self.set_cookie = RequestsCookieJar()
         self.token: str = ""
         self.logger = logging.getLogger(__name__)
 
