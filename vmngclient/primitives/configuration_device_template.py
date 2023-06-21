@@ -14,7 +14,7 @@ class FeatureToCLIPayload(BaseModel):
     template_id: str = Field(alias="templateId")
 
 
-class TemplatesPrimitives(APIPrimitiveBase):
+class ConfigurationDeviceTemplatePrimitives(APIPrimitiveBase):
     @view({ProviderView})
     def get_device_configuration_preview(self, payload: FeatureToCLIPayload) -> str:
         response = self._post("/template/device/config/config/", payload=payload).text
