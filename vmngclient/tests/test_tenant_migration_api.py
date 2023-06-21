@@ -3,8 +3,6 @@ import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from packaging.version import Version  # type: ignore
-
 from vmngclient.api.task_status_api import Task
 from vmngclient.api.tenant_migration_api import ImportTask, TenantMigrationAPI
 from vmngclient.model.tenant import Tenant
@@ -15,7 +13,6 @@ class TestTenantMigrationAPI(unittest.TestCase):
     @patch("vmngclient.session.vManageSession")
     def setUp(self, session_mock):
         self.session = session_mock
-        self.session.api_version = Version("20.6")
         self.api = TenantMigrationAPI(self.session)
 
     def test_export_tenant(self):

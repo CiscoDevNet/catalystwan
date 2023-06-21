@@ -123,6 +123,44 @@ status = UsersAPI(session).delete_user(username="new_user")
 </details>
 
 <details>
+    <summary> <b>Tenant management</b> <i>(click to expand)</i></summary>
+
+```python
+api = session.api.tenant_management
+# create tenants
+tenants = [
+    Tenant(
+        name="tenant1",
+        orgName="CiscoDevNet",
+        subDomain="alpha.bravo.net",
+        desc="This is tenant for unit tests",
+        edgeConnectorEnable=True,
+        edgeConnectorSystemIp="172.16.255.81",
+        edgeConnectorTunnelInterfaceName="GigabitEthernet1",
+        wanEdgeForecast=1,
+    )
+]
+create_task = api.create(tenants)
+create_task.wait_for_completed()
+# list all tenants
+tenants_data = api.get_all()
+# pick tenant from list by name
+tenant = tenants_data.filter(name="tenant1").single_or_default()
+# get selected tenant id
+tenant_id = tenant.tenant_id
+# get vsession id of selected tenant
+vsessionid = api.vsession_id(tenant_id)
+# delete tenant by ids
+delete_task = api.delete([tenant_id])
+delete_task.wait_for_completed()
+# others
+api.get_hosting_capacity_on_vsmarts()
+api.get_statuses()
+api.get_vsmart_mapping()
+```
+</details>
+
+<details>
     <summary> <b>Tenant migration</b> <i>(click to expand)</i></summary>
 Preparation:
 

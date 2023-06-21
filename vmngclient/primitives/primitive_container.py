@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from vmngclient.primitives.client import ClientPrimitives
 from vmngclient.primitives.configuration_dashboard_status import ConfigurationDashboardStatusPrimitives
+from vmngclient.primitives.monitoring_device_details import MonitoringDeviceDetailsPrimitives
 from vmngclient.primitives.tenant_backup_restore import TenantBackupRestorePrimitives
 from vmngclient.primitives.tenant_management import TenantManagementPrimitives
 from vmngclient.primitives.tenant_migration import TenantMigrationPrimitives
@@ -19,3 +20,4 @@ class APIPrimitiveContainter:
         self.tenant_backup_restore = TenantBackupRestorePrimitives(session)
         self.tenant_migration = TenantMigrationPrimitives(session)
         self.configuration_dashboard_status = ConfigurationDashboardStatusPrimitives(session)
+        self.monitoring_device_details = MonitoringDeviceDetailsPrimitives(session)
