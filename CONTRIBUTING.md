@@ -87,25 +87,25 @@ Start reading our code, and you'll get the hang of it.
   Example:
 
   ```python
-  from pydantic import BaseModel
+  from pydantic import BaseModel, Field
   from typing import List
-  from vmngclient.primitives import APIPrimitiveBase, Versions, View
+  from vmngclient.primitives import APIPrimitiveBase, versions, view
   from vmngclient.utils.session_type import ProviderView
 
   class TenantBulkDeleteRequest(BaseModel):
-    password: str
-    tenant_id_list: List[str] = Field(alias="tenantIdList")
+      password: str
+      tenant_id_list: List[str] = Field(alias="tenantIdList")
 
   class TenantTaskId(BaseModel):
-    id: str
+      id: str
 
   class TenantManagementPrimitives(APIPrimitiveBase):
 
-    @versions(">=20.4")
-    @view({ProviderView})
-    def delete_tenant_async_bulk(self, delete_request: TenantBulkDeleteRequest) -> TenantTaskId:
-        response = self.delete("/tenant/bulk/async", payload=delete_request)
-        return response.dataobj(TenantTaskId, None)
+      @versions(">=20.4")
+      @view({ProviderView})
+      def delete_tenant_async_bulk(self, delete_request: TenantBulkDeleteRequest) -> TenantTaskId:
+          response = self.delete("/tenant/bulk/async", payload=delete_request)
+          return response.dataobj(TenantTaskId, None)
   ```
 
   Definitions can be found in: `vmngclient/primitives` directory.
