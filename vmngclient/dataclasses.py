@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime as dt
 from typing import List, Optional
 
@@ -273,9 +275,10 @@ class TemplateInfo(DataclassBase):
 
 @define
 class FeatureTemplateInfo(TemplateInfo):
-    template_type: str = field(metadata={FIELD_NAME: "templateType"})
-    device_type: List[str] = field(metadata={FIELD_NAME: "deviceType"})
-    version: str = field(metadata={FIELD_NAME: "templateMinVersion"})
+    template_type: str = field(kw_only=True, metadata={FIELD_NAME: "templateType"})
+    device_type: List[str] = field(kw_only=True, metadata={FIELD_NAME: "deviceType"})
+    version: str = field(kw_only=True, metadata={FIELD_NAME: "templateMinVersion"})
+    template_definiton: Optional[str] = field(default=None, metadata={FIELD_NAME: "templateDefinition"})
     resource_group: Optional[str] = field(default="", metadata={FIELD_NAME: "resourceGroup"})  # type: ignore
 
 
@@ -352,19 +355,6 @@ class CloudOnRampForSaasMode(DataclassBase):
     """
 
     mode: str = field(metadata={FIELD_NAME: "mode"})
-
-
-@define(frozen=True)
-class TenantInfo(DataclassBase):
-    """Endpoint(s): /dataservice/tenant"""
-
-    name: str
-    organization_name: str = field(metadata={FIELD_NAME: "orgName"})
-    sub_domain: str = field(metadata={FIELD_NAME: "subDomain"})
-    id: str = field(metadata={FIELD_NAME: "tenantId"})
-    description: Optional[str] = field(default=None, metadata={FIELD_NAME: "desc"})
-    state: Optional[str] = field(default=None)
-    flake_id: Optional[int] = field(default=None, metadata={FIELD_NAME: "flakeId"})
 
 
 @define(frozen=True)

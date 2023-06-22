@@ -5,6 +5,7 @@ import logging
 from enum import Enum
 from typing import TYPE_CHECKING, Any, Optional, Type, overload
 
+from ciscoconfparse import CiscoConfParse  # type: ignore
 from requests.exceptions import HTTPError
 
 from vmngclient.api.task_status_api import Task
@@ -22,7 +23,8 @@ from vmngclient.api.templates.models.omp_vsmart_model import OMPvSmart
 from vmngclient.api.templates.models.security_vsmart_model import SecurityvSmart
 from vmngclient.api.templates.models.system_vsmart_model import SystemVsmart
 from vmngclient.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, FeatureTemplatesTypes, TemplateInfo
-from vmngclient.exceptions import AlreadyExistsError, AttachedError, TemplateNotFoundError
+from vmngclient.exceptions import AttachedError, TemplateNotFoundError
+from vmngclient.primitives.configuration_device_template import FeatureToCLIPayload
 from vmngclient.response import vManageResponse
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.device_model import DeviceModel
@@ -378,9 +380,9 @@ class TemplatesAPI:
         template_id: Optional[str] = None  # type: ignore
         template_type = None
 
-        exists = self.get(template).filter(name=template.name)
-        if exists:
-            raise AlreadyExistsError(f"Template with name [{template.name}] already exists.")
+        # exists = self.get(template).filter(name=template.name)
+        # if exists:
+        #     raise AlreadyExistsError(f"Template with name [{template.name}] already exists.")
 
         if isinstance(template, FeatureTemplate):
             if self.is_created_by_generator(template):
@@ -607,3 +609,8 @@ class TemplatesAPI:
             return True
         logger.warning(f"Failed to edit tempate: {name} of device: {device.hostname}.")
         return False
+
+    def get_device_configuration_preview(self, payload: FeatureToCLIPayload) -> CiscoConfParse:
+        text_config = self.session.primitives.configuration_device_template.get_device_configuration_preview(payload)
+
+        return CiscoConfParse(text_config.splitlines())

@@ -15,8 +15,8 @@ from vmngclient.api.resource_pool_api import ResourcePoolAPI
 from vmngclient.api.software_action_api import SoftwareActionAPI
 from vmngclient.api.speedtest_api import SpeedtestAPI
 from vmngclient.api.template_api import TemplatesAPI
-from vmngclient.api.tenant_api import TenantsAPI
 from vmngclient.api.tenant_backup_restore_api import TenantBackupRestoreAPI
+from vmngclient.api.tenant_management_api import TenantManagementAPI
 from vmngclient.api.tenant_migration_api import TenantMigrationAPI
 from vmngclient.api.versions_utils import RepositoryAPI
 
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 class APIContainter:
     def __init__(self, session: vManageSession):
-        self.tenants = TenantsAPI(session)
+        self.tenant_management = TenantManagementAPI(session)
         self.admin_tech = AdminTechAPI(session)
         self.alarms = AlarmsAPI(session)
         self.dashboard = DashboardAPI(session)
