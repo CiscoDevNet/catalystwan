@@ -507,9 +507,14 @@ class TemplatesAPI:
         for i, field in enumerate(fr_template_fields):
             pointer = payload.definition
 
-            value = template.dict(by_alias=True).get(field.key, None)
+            # TODO How to discover Device specific variable
+            if field.key in template._device_specific_variables:
+                value = template._device_specific_variables[field.key]
+            else:
+                value = template.dict(by_alias=True).get(field.key, None)
+
             if isinstance(value, bool):
-                value = str(value).lower()
+                value = str(value).lower()  # type: ignore
 
             for path in field.dataPath:
                 pointer = pointer[path]
