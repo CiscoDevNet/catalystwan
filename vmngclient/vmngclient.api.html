@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>vmngclient.api package &#8212; vmngclient 0.10.2 documentation</title>
+    <title>vmngclient.api package &#8212; vmngclient 0.11.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="vmngclient.html" title="vManage-client package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">vmngclient 0.10.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">vmngclient 0.11.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >vManage-client</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="vmngclient.html" accesskey="U">vManage-client package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">vmngclient.api package</a></li> 
@@ -67,6 +67,13 @@
 <dd><p>logged in API client session</p>
 </dd></dl>
 
+<dl class="simple">
+<dt>Usage example:</dt><dd><p># Create session
+session = create_vManageSession(…)
+# Get admintech data for all devices
+all_admintechs = session.api.admin_tech.get_all()</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="vmngclient.api.admin_tech_api.AdminTechAPI.delete">
 <span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Response</span></span></span><a class="headerlink" href="#vmngclient.api.admin_tech_api.AdminTechAPI.delete" title="Permalink to this definition">¶</a></dt>
@@ -249,6 +256,13 @@
 <dd><p>logged in API admin session</p>
 </dd></dl>
 
+<dl class="simple">
+<dt>Example usage:</dt><dd><p># Create session
+session = create_vManageSession(…)
+# Get health status
+health_status = session.api.cluster_management.get_cluster_management_health_status()</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="vmngclient.api.administration.ClusterManagementAPI.get_cluster_management_health_status">
 <span class="sig-name descname"><span class="pre">get_cluster_management_health_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.administration.ClusterManagementAPI.get_cluster_management_health_status" title="Permalink to this definition">¶</a></dt>
@@ -277,6 +291,20 @@
 <dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.administration.</span></span><span class="sig-name descname"><span class="pre">UsersAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for user managment.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.session">
+<span class="sig-name descname"><span class="pre">session</span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.session" title="Permalink to this definition">¶</a></dt>
+<dd><p>logged in API client session</p>
+</dd></dl>
+
+<dl class="simple">
+<dt>Usage example:</dt><dd><p># Create session
+session = create_vManageSession(…)
+# Get information about all users
+all_users = session.api.users.get_all_users()</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.create">
 <span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.User" title="vmngclient.dataclasses.User"><span class="pre">User</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.create" title="Permalink to this definition">¶</a></dt>
@@ -542,10 +570,16 @@ it will not poll any further.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.device_action_api.</span></span><span class="sig-name descname"><span class="pre">DecommissionAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.device_action_api.DecommissionAction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#vmngclient.api.device_action_api.DeviceActionAPI" title="vmngclient.api.device_action_api.DeviceActionAPI"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceActionAPI</span></code></a></p>
 <p>API method to decommission Device</p>
+<p>Usage example:
+# Create session and chose device
+session = create_vManageSession(…)
+device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
+# Decommission device
+DecommissionAction(session, device).execute()</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="vmngclient.api.device_action_api.DecommissionAction.execute">
 <span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.device_action_api.DecommissionAction.execute" title="Permalink to this definition">¶</a></dt>
-<dd><p>validate device</p>
+<dd><p>Decommission device.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -589,6 +623,12 @@ it will not poll any further.</p>
 <dd class="field-even"><p><strong>Exception when reboot was not successful.</strong> – </p>
 </dd>
 </dl>
+<p>Usage example:
+# Create session and chose device
+session = create_vManageSession(…)
+device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
+# Restart device
+RebootAction(session, device).execute()</p>
 </dd></dl>
 
 <dl class="py method">
@@ -603,6 +643,12 @@ it will not poll any further.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.device_action_api.</span></span><span class="sig-name descname"><span class="pre">ValidateAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.Device" title="vmngclient.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.device_action_api.ValidateAction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#vmngclient.api.device_action_api.DeviceActionAPI" title="vmngclient.api.device_action_api.DeviceActionAPI"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceActionAPI</span></code></a></p>
 <p>API method to perform validate Device</p>
+<p>Usage example:
+# Create session and chose device
+session = create_vManageSession(…)
+device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
+# Validate device
+ValidateAction(session, device).execute()</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="vmngclient.api.device_action_api.ValidateAction.execute">
 <span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">valid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.device_action_api.ValidateAction.execute" title="Permalink to this definition">¶</a></dt>
@@ -623,6 +669,14 @@ it will not poll any further.</p>
 <dt class="sig sig-object py" id="vmngclient.api.logs_api.LogsAPI">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.logs_api.</span></span><span class="sig-name descname"><span class="pre">LogsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.logs_api.LogsAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for get and save audit log file</p>
+<dl class="simple">
+<dt>Usage example:</dt><dd><p># Create session
+session = create_vManageSession(…)
+# Get auditlogs
+session.api.logs.get_auditlogs()</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="vmngclient.api.logs_api.LogsAPI.get_auditlogs">
 <span class="sig-name descname"><span class="pre">get_auditlogs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hours</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#vmngclient.api.logs_api.LogsAPI.get_auditlogs" title="Permalink to this definition">¶</a></dt>
@@ -649,6 +703,14 @@ it will not poll any further.</p>
 </dl>
 </dd></dl>
 
+<dl class="simple">
+<dt>Usage example:</dt><dd><p># Create session and chose device
+session = create_vManageSession(…)
+device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
+# Gets OMP peers for a device
+omp_peers = session.api.omp.get_omp_peers(device.id)</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="vmngclient.api.omp_api.OmpAPI.get_advertised_routes">
 <span class="sig-name descname"><span class="pre">get_advertised_routes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.OmpAdvertisedRouteData" title="vmngclient.dataclasses.OmpAdvertisedRouteData"><span class="pre">OmpAdvertisedRouteData</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.omp_api.OmpAPI.get_advertised_routes" title="Permalink to this definition">¶</a></dt>
@@ -993,7 +1055,7 @@ speedtest = session.api.speedtest.speedtest(devices[0], devices[1])</p>
         <li class="right" >
           <a href="vmngclient.html" title="vManage-client package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">vmngclient 0.10.2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">vmngclient 0.11.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >vManage-client</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="vmngclient.html" >vManage-client package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">vmngclient.api package</a></li> 
