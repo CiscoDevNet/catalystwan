@@ -59,6 +59,13 @@ class RebootAction(DeviceActionAPI):
 
         Raises:
             Exception when reboot was not successful.
+
+        Usage example:
+        # Create session and chose device
+        session = create_vManageSession(...)
+        device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
+        # Restart device
+        RebootAction(session, device).execute()
         """
         controllers = (Personality.VBOND, Personality.VSMART)
         device_type = "controller" if self.dev.personality in controllers else self.dev.personality.value
@@ -111,6 +118,13 @@ class RebootAction(DeviceActionAPI):
 class ValidateAction(DeviceActionAPI):  # TODO check
     """
     API method to perform validate Device
+
+    Usage example:
+    # Create session and chose device
+    session = create_vManageSession(...)
+    device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
+    # Validate device
+    ValidateAction(session, device).execute()
     """
 
     def execute(self, valid: bool = True):
@@ -157,11 +171,18 @@ class ValidateAction(DeviceActionAPI):  # TODO check
 class DecommissionAction(DeviceActionAPI):
     """
     API method to decommission Device
+
+    Usage example:
+    # Create session and chose device
+    session = create_vManageSession(...)
+    device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
+    # Decommission device
+    DecommissionAction(session, device).execute()
     """
 
     def execute(self):
         """
-        validate device
+        Decommission device.
         """
         url = f"/dataservice/system/device/decommission/{self.dev.uuid}"
         response = self.session.put(url)

@@ -28,6 +28,18 @@ logger = logging.getLogger(__name__)
 
 
 class UsersAPI:
+    """Class for user managment.
+
+    Attributes:
+        session: logged in API client session
+
+    Usage example:
+        # Create session
+        session = create_vManageSession(...)
+        # Get information about all users
+        all_users = session.api.users.get_all_users()
+    """
+
     def __init__(self, session: vManageSession) -> None:
         self.session = session
 
@@ -70,6 +82,12 @@ class ClusterManagementAPI:
 
     Attributes:
         session: logged in API admin session
+
+    Example usage:
+        # Create session
+        session = create_vManageSession(...)
+        # Get health status
+        health_status = session.api.cluster_management.get_cluster_management_health_status()
     """
 
     def __init__(self, session: vManageSession) -> None:
