@@ -40,9 +40,9 @@ class AdminTechAPI:
         session: logged in API client session
 
     Usage example:
-        #Create session
+        # Create session
         session = create_vManageSession(...)
-        #Get admintech data for all devices
+        # Get admintech data for all devices
         all_admintechs = session.api.admin_tech.get_all()
     """
 

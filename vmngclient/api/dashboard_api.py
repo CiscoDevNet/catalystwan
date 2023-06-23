@@ -27,9 +27,9 @@ class DashboardAPI:
         session (vManageSession): logged in API client session
 
     Usage example:
-        #Create session
+        # Create session
         session = create_vManageSession(...)
-        #Get information about tenant status
+        # Get information about tenant status
         tenant_status = session.api.dashboard.get_tenant_status()
     """
 

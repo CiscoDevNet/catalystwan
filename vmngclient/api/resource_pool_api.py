@@ -18,9 +18,9 @@ class ResourcePoolAPI:
     Attributes:
         session: logged in API client session
     Usage example:
-        #Create session
+        # Create session
         session = create_vManageSession(...)
-        #Create device vpn
+        # Create device vpn
         resource_poold_data = session.api.resource_pool.create()
     """
 

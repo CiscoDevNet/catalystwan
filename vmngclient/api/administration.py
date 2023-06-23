@@ -34,9 +34,9 @@ class UsersAPI:
         session: logged in API client session
 
     Usage example:
-        #Create session
+        # Create session
         session = create_vManageSession(...)
-        #Get information about all users
+        # Get information about all users
         all_users = session.api.users.get_all_users()
     """
 
@@ -84,9 +84,9 @@ class ClusterManagementAPI:
         session: logged in API admin session
 
     Example usage:
-        #Create session
+        # Create session
         session = create_vManageSession(...)
-        #Get health status
+        # Get health status
         health_status = session.api.cluster_management.get_cluster_management_health_status()
     """
 

@@ -16,9 +16,9 @@ class LogsAPI:
     """Class for get and save audit log file
 
     Usage example:
-        #Create session
+        # Create session
         session = create_vManageSession(...)
-        #Get auditlogs
+        # Get auditlogs
         session.api.logs.get_auditlogs()
     """
 

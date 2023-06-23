@@ -61,10 +61,10 @@ class RebootAction(DeviceActionAPI):
             Exception when reboot was not successful.
 
         Usage example:
-        #Create session and chose device
+        # Create session and chose device
         session = create_vManageSession(...)
         device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
-        #Restart device
+        # Restart device
         RebootAction(session, device).execute()
         """
         controllers = (Personality.VBOND, Personality.VSMART)
@@ -120,10 +120,10 @@ class ValidateAction(DeviceActionAPI):  # TODO check
     API method to perform validate Device
 
     Usage example:
-    #Create session and chose device
+    # Create session and chose device
     session = create_vManageSession(...)
     device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
-    #Validate device
+    # Validate device
     ValidateAction(session, device).execute()
     """
 
@@ -173,10 +173,10 @@ class DecommissionAction(DeviceActionAPI):
     API method to decommission Device
 
     Usage example:
-    #Create session and chose device
+    # Create session and chose device
     session = create_vManageSession(...)
     device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
-    #Decommission device
+    # Decommission device
     DecommissionAction(session, device).execute()
     """
 
