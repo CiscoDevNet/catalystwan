@@ -104,20 +104,71 @@ critical_alarms = session.api.alarms.get(from_time=n).filter(severity=Severity.C
 </details>
 
 <details>
-    <summary> <b>User operations</b> <i>(click to expand)</i></summary>
+    <summary> <b>Users</b> <i>(click to expand)</i></summary>
 
 ```python
-from vmngclient.api.administration import User, UsersAPI
-
 # Get all users
-all_users = UsersAPI(session).get_all_users()
+session.api.users.get()
 
 # Create a user
-new_user = User(username="new_user", password="new_user", group=["netadmin"], description="new user")
-status = UsersAPI(session).create_user(new_user)
+new_user = User(userName="new_user", password="new_user", group=["netadmin"], description="new user")
+session.api.users.create(new_user)
+
+# Update user data
+new_user_update = UserUpdateRequest(userName="new_user", group=["netadmin", "netops"], locale="en_US", description="updated-new_user-description")
+session.api.update(new_user_update)
+
+# Update user password
+session.api.update_password("new_user", "n3W-P4s$w0rd")
+
+# Reset user
+session.api.reset("new_user")
 
 # Delete a user
-status = UsersAPI(session).delete_user(username="new_user")
+session.api.users.delete(username="new_user")
+
+# Get current session user authentication type and role
+session.api.users.get_auth_type()
+session.api.users.get_role()
+```
+
+</details>
+
+<details>
+    <summary> <b>User Groups</b> <i>(click to expand)</i></summary>
+
+```python
+# Get all user groups
+session.api.user_groups.get()
+
+# Create an user group
+group = UserGroup("new_user_group", [])
+group.enable_read({"Audit Log", "Alarms"})
+group.enable_read_and_write({"Device Inventory"})
+session.api.user_groups.create(group)
+
+# Update user group
+group.disable({"Alarms"})
+session.api.user_groups.update(group)
+
+# Delete user group
+session.api.user_groups.delete(group.group_name)
+```
+
+</details>
+
+</details>
+
+<details>
+    <summary> <b>Sessions</b> <i>(click to expand)</i></summary>
+
+```python
+# Get all active sessions
+active_sessions = session.api.sessions.get()
+
+# Invalidate sessions for given user
+new_user_sessions = active_sessions.filter(raw_username="new_user")
+session.api.sessions.invalidate(new_user_sessions)
 ```
 
 </details>
