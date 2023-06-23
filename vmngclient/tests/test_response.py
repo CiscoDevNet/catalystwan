@@ -59,7 +59,8 @@ class TestResponse(unittest.TestCase):
     @patch("requests.Response")
     def setUp(self, response_mock) -> None:
         self.response_mock = response_mock
-        self.response_mock.headers = {"set-cookie": None}
+        self.response_mock.headers = {"set-cookie": ""}
+        self.response_mock.cookies = {}
         self.response_mock.status_code = 200
 
     @parameterized.expand(PARSE_DATASEQ_TEST_DATA)
