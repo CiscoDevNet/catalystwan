@@ -4,7 +4,7 @@ import logging
 from http import HTTPStatus
 from typing import TYPE_CHECKING, List, Union, cast, overload
 
-from requests import HTTPError, Response
+from requests import Response
 
 from vmngclient.dataclasses import (
     Certificate,
@@ -14,10 +14,21 @@ from vmngclient.dataclasses import (
     Password,
     ServiceConfigurationData,
     SoftwareInstallTimeout,
-    User,
     Vbond,
 )
-from vmngclient.exceptions import AlreadyExistsError, InvalidOperationError
+from vmngclient.exceptions import InvalidOperationError
+from vmngclient.primitives.administration_user_and_group import (
+    ActiveSession,
+    AdministrationUserAndGroupPrimitives,
+    InvalidateSessionMessage,
+    SessionsDeleteRequest,
+    User,
+    UserAuthType,
+    UserGroup,
+    UserResetRequest,
+    UserRole,
+    UserUpdateRequest,
+)
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import asdict, create_dataclass
 
@@ -42,39 +53,65 @@ class UsersAPI:
 
     def __init__(self, session: vManageSession) -> None:
         self.session = session
+        self._primitives = AdministrationUserAndGroupPrimitives(session)
 
     def get(self) -> DataSequence[User]:
-        endpoint = "/dataservice/admin/user"
-        users = self.session.get(endpoint)
+        return self._primitives.find_users()
 
-        return users.dataseq(User)
+    def get_role(self) -> UserRole:
+        return self._primitives.find_user_role()
 
-    def get_all_users(self) -> List[User]:
-        url_path = "/dataservice/admin/user"
-        users = self.session.get_data(url_path)
-        logger.debug(f"List of users: {users}")
-        return [create_dataclass(User, user) for user in users]
+    def get_auth_type(self) -> UserAuthType:
+        return self._primitives.find_user_auth_type()
 
-    def exists(self, username: str) -> bool:
-        return username in [user.username for user in self.get_all_users()]
+    def create(self, user: User):
+        self._primitives.create_user(user=user)
 
-    def create(self, user: User) -> bool:
-        if self.exists(user.username):
-            raise AlreadyExistsError(f"User {user.username} already exists.")
-        url_path = "/dataservice/admin/user"
-        data = asdict(user)  # type: ignore
+    def update(self, user_update_request: UserUpdateRequest):
+        self._primitives.update_user(username=user_update_request.username, user_update_request=user_update_request)
 
-        try:
-            response = self.session.post(url=url_path, json=data)
-        except HTTPError:
-            logger.error(response.json)
+    def update_password(self, username: str, new_password: str):
+        update_user_request = UserUpdateRequest(
+            userName=username, password=new_password, currentUserPassword=self.session.password
+        )  # type: ignore
+        self._primitives.update_password(username=username, update_user_request=update_user_request)
 
-        return True if response.status_code == 200 else False
+    def reset(self, username: str):
+        self._primitives.reset_user(user_reset_request=UserResetRequest(userName=username))
 
-    def delete_user(self, username: str) -> bool:
-        url_path = f"/dataservice/admin/user/{username}"
-        response = self.session.delete(url_path)
-        return True if response.status_code == 200 else False
+    def delete(self, username: str):
+        self._primitives.delete_user(username=username)
+
+
+class UserGroupsAPI:
+    def __init__(self, session: vManageSession):
+        self.session = session
+        self._primitives = AdministrationUserAndGroupPrimitives(session)
+
+    def get(self) -> DataSequence[UserGroup]:
+        return self._primitives.find_user_groups()
+
+    def create(self, user_group: UserGroup):
+        self._primitives.create_user_group(user_group=user_group)
+
+    def update(self, user_group: UserGroup):
+        self._primitives.update_user_group(group_name=user_group.group_name, user_group=user_group)
+
+    def delete(self, group_name: str):
+        self._primitives.delete_user_group(group_name=group_name)
+
+
+class SessionsAPI:
+    def __init__(self, session: vManageSession):
+        self.session = session
+        self._primitives = AdministrationUserAndGroupPrimitives(session)
+
+    def get(self) -> DataSequence[ActiveSession]:
+        return self._primitives.get_active_sessions()
+
+    def invalidate(self, sessions: List[ActiveSession]) -> InvalidateSessionMessage:
+        sessions_delete_request = SessionsDeleteRequest.from_active_session_list(sessions)
+        return self._primitives.remove_sessions(sessions_delete_request=sessions_delete_request)
 
 
 class ClusterManagementAPI:
