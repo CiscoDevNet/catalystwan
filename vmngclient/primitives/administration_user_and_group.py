@@ -26,7 +26,7 @@ class UserUpdateRequest(BaseModel):
     group: Optional[List[str]]
     locale: Optional[str]
     description: Optional[str]
-    resource_group: Optional[str]
+    resource_group: Optional[str] = Field(alias="resGroupName")
 
 
 class UserRole(BaseModel):
@@ -164,8 +164,8 @@ class AdministrationUserAndGroupPrimitives(APIPrimitiveBase):
         # PUT /admin/vpngroup/{id}
         ...
 
-    def find_user_auth_type(self):
-        return self._get("/admin/user/userAuthType")
+    def find_user_auth_type(self) -> UserAuthType:
+        return self._get("/admin/user/userAuthType").dataobj(UserAuthType, None)
 
     def find_user_groups(self) -> DataSequence[UserGroup]:
         return self._get("/admin/usergroup").dataseq(UserGroup)

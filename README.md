@@ -115,7 +115,7 @@ new_user = User(userName="new_user", password="new_user", group=["netadmin"], de
 session.api.users.create(new_user)
 
 # Update user data
-new_user_update = UserUpdateRequest(userName="new_user", group=["netadmin", "netops"], locale="en_US", description="updated-new_user-description")
+new_user_update = UserUpdateRequest(userName="new_user", group=["netadmin", "netops"], locale="en_US", description="updated-new_user-description", resGroupName="global")
 session.api.update(new_user_update)
 
 # Update user password

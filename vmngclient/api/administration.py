@@ -23,7 +23,6 @@ from vmngclient.primitives.administration_user_and_group import (
     InvalidateSessionMessage,
     SessionsDeleteRequest,
     User,
-    UserAuthType,
     UserGroup,
     UserResetRequest,
     UserRole,
@@ -48,7 +47,7 @@ class UsersAPI:
         # Create session
         session = create_vManageSession(...)
         # Get information about all users
-        all_users = session.api.users.get_all_users()
+        all_users = session.api.users.get()
     """
 
     def __init__(self, session: vManageSession) -> None:
@@ -61,8 +60,8 @@ class UsersAPI:
     def get_role(self) -> UserRole:
         return self._primitives.find_user_role()
 
-    def get_auth_type(self) -> UserAuthType:
-        return self._primitives.find_user_auth_type()
+    def get_auth_type(self) -> str:
+        return self._primitives.find_user_auth_type().user_auth_type
 
     def create(self, user: User):
         self._primitives.create_user(user=user)

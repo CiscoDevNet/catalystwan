@@ -20,6 +20,7 @@ from vmngclient.exceptions import (
     TenantSubdomainNotFound,
     vManageClientError,
 )
+from vmngclient.model.tenant import Tenant
 from vmngclient.primitives import APIPrimitiveClient
 from vmngclient.primitives.client import AboutInfo, ServerInfo
 from vmngclient.primitives.primitive_container import APIPrimitiveContainter
@@ -321,11 +322,11 @@ class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
         Returns:
             Tenant UUID.
         """
-        tenants = self.primitives.tenant_management.get_all_tenants()
+        tenants = self.get("dataservice/tenant").dataseq(Tenant)
         tenant = tenants.filter(subdomain=self.subdomain).single_or_default()
 
-        if not tenant:
-            raise TenantSubdomainNotFound(f"Tenant with sub-domain: {self.subdomain} not found")
+        if not tenant or not tenant.tenant_id:
+            raise TenantSubdomainNotFound(f"Tenant ID for sub-domain: {self.subdomain} not found")
 
         return tenant.tenant_id
 
