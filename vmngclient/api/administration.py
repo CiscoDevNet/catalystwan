@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 
 
 class UsersAPI:
-    """Class for user managment.
+    """Class implementing methods for user managment.
 
     Attributes:
         session: logged in API client session
@@ -55,30 +55,71 @@ class UsersAPI:
         self._primitives = AdministrationUserAndGroupPrimitives(session)
 
     def get(self) -> DataSequence[User]:
+        """List all users
+
+        Returns:
+            DataSequence[User]: List-like object representing users
+        """
         return self._primitives.find_users()
 
     def get_role(self) -> UserRole:
+        """Get currently logged user role
+
+        Returns:
+            UserRole: Currently logged user role information
+        """
         return self._primitives.find_user_role()
 
     def get_auth_type(self) -> str:
+        """Get currently logged user authentication type
+
+        Returns:
+            str: Currently logged user authentication type
+        """
         return self._primitives.find_user_auth_type().user_auth_type
 
     def create(self, user: User):
+        """Creates a new user
+
+        Args:
+            user (User): Definition of new user to be created
+        """
         self._primitives.create_user(user=user)
 
     def update(self, user_update_request: UserUpdateRequest):
+        """Updates existing user
+
+        Args:
+            user_update_request (UserUpdateRequest): User attributes to be updated
+        """
         self._primitives.update_user(username=user_update_request.username, user_update_request=user_update_request)
 
     def update_password(self, username: str, new_password: str):
+        """Updates exisiting user password
+
+        Args:
+            username (str): Name of the user
+            new_password (str): New password for given user
+        """
         update_user_request = UserUpdateRequest(
             userName=username, password=new_password, currentUserPassword=self.session.password
         )  # type: ignore
         self._primitives.update_password(username=username, update_user_request=update_user_request)
 
     def reset(self, username: str):
+        """Resets given user (unlocks blocked user eg. after number of unsuccessfull login attempts)
+
+        Args:
+            username (str): Name of the user to be unlocked
+        """
         self._primitives.reset_user(user_reset_request=UserResetRequest(userName=username))
 
     def delete(self, username: str):
+        """Deletes given user
+
+        Args:
+            username (str): Name of the user to be deleted
+        """
         self._primitives.delete_user(username=username)
 
 
@@ -88,15 +129,35 @@ class UserGroupsAPI:
         self._primitives = AdministrationUserAndGroupPrimitives(session)
 
     def get(self) -> DataSequence[UserGroup]:
+        """List all user groups
+
+        Returns:
+            DataSequence[UserGroup]: List-like object representing user groups
+        """
         return self._primitives.find_user_groups()
 
     def create(self, user_group: UserGroup):
+        """Creates a new user group
+
+        Args:
+            user_group (UserGroup): Definition of user group to be created
+        """
         self._primitives.create_user_group(user_group=user_group)
 
     def update(self, user_group: UserGroup):
+        """Updates existing user group
+
+        Args:
+            user_group (UserGroup): User group attributes to be updated
+        """
         self._primitives.update_user_group(group_name=user_group.group_name, user_group=user_group)
 
     def delete(self, group_name: str):
+        """Deletes given user group
+
+        Args:
+            group_name (str): Name of the user group to be deleted
+        """
         self._primitives.delete_user_group(group_name=group_name)
 
 
@@ -106,9 +167,22 @@ class SessionsAPI:
         self._primitives = AdministrationUserAndGroupPrimitives(session)
 
     def get(self) -> DataSequence[ActiveSession]:
+        """List all active sessions
+
+        Returns:
+            DataSequence[ActiveSession]: List-like object representing active user sessions
+        """
         return self._primitives.get_active_sessions()
 
     def invalidate(self, sessions: List[ActiveSession]) -> InvalidateSessionMessage:
+        """Invalidates given sessions
+
+        Args:
+            sessions (List[ActiveSession]): List of active sessions
+
+        Returns:
+            InvalidateSessionMessage: Information about invalidation result
+        """
         sessions_delete_request = SessionsDeleteRequest.from_active_session_list(sessions)
         return self._primitives.remove_sessions(sessions_delete_request=sessions_delete_request)
 
