@@ -123,6 +123,27 @@ class ProfilePasswordUpdateRequest(BaseModel):
     newpassword: str
 
 
+class ResourceGroup(BaseModel):
+    id: Optional[str]
+    name: str
+    desc: str
+    site_ids: List[int] = Field(alias="siteIds")
+    device_ips: Optional[List[str]] = Field(alias="deviceIPs")
+    mgmt_sytem_ips_map: Optional[Dict[str, str]] = Field(alias="mgmtSytemIpsMap")
+    uuid_sytem_ips_map: Optional[Dict[str, str]] = Field(alias="uuidSytemIpsMap")
+
+
+class ResourceGroupUpdateRequest(BaseModel):
+    id: str
+    name: str
+    desc: str
+    site_ids: List[int] = Field(alias="siteIds")
+
+
+class ResourceGroupSwitchRequest(BaseModel):
+    resource_group_name: str = Field(alias="resourceGroupName")
+
+
 class AdministrationUserAndGroupPrimitives(APIPrimitiveBase):
     def create_colo_group(self):
         # POST /admin/cologroup
@@ -198,25 +219,25 @@ class AdministrationUserAndGroupPrimitives(APIPrimitiveBase):
     def reset_user(self, user_reset_request: UserResetRequest):
         self._post("/admin/user/reset", payload=user_reset_request)
 
-    def resource_group(self):
+    def find_resource_groups(self) -> DataSequence[ResourceGroup]:
         # GET /admin/resourcegroup
-        ...
+        return self._get("/admin/resourcegroup").dataseq(ResourceGroup, None)
 
-    def resource_group1(self):
+    def switch_resource_group(self, resource_group_switch_request: ResourceGroupSwitchRequest):
         # POST /admin/resourcegroup/switch
-        ...
+        self._post("/admin/resourcegroup/switch", payload=resource_group_switch_request)
 
-    def resource_group2(self):
+    def update_resource_group(self, group_id: str, resource_group_update_request: ResourceGroupUpdateRequest):
         # PUT /admin/resourcegroup/{groupId}
-        ...
+        self._put(f"/admin/resourcegroup/{group_id}", payload=resource_group_update_request)
 
-    def resource_group3(self):
+    def delete_resource_group(self, group_id: str):
         # DELETE /admin/resourcegroup/{groupId}
-        ...
+        self._delete(f"/admin/resourcegroup/{group_id}", json={})
 
-    def resource_group4(self):
+    def create_resource_group(self, resource_group: ResourceGroup):
         # POST /admin/resourcegroup
-        ...
+        self._post("/admin/resourcegroup", payload=resource_group)
 
     def resource_group_name(self):
         # GET /admin/user/resourceGroupName

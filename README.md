@@ -110,24 +110,24 @@ critical_alarms = session.api.alarms.get(from_time=n).filter(severity=Severity.C
 # Get all users
 session.api.users.get()
 
-# Create a user
+# Create user
 new_user = User(userName="new_user", password="new_user", group=["netadmin"], description="new user")
 session.api.users.create(new_user)
 
 # Update user data
 new_user_update = UserUpdateRequest(userName="new_user", group=["netadmin", "netops"], locale="en_US", description="updated-new_user-description", resGroupName="global")
-session.api.update(new_user_update)
+session.api.users.update(new_user_update)
 
 # Update user password
-session.api.update_password("new_user", "n3W-P4s$w0rd")
+session.api.users.update_password("new_user", "n3W-P4s$w0rd")
 
 # Reset user
-session.api.reset("new_user")
+session.api.users.reset("new_user")
 
-# Delete a user
-session.api.users.delete(username="new_user")
+# Delete user
+session.api.users.delete("new_user")
 
-# Get current session user authentication type and role
+# Get current user authentication type and role
 session.api.users.get_auth_type()
 session.api.users.get_role()
 ```
@@ -141,7 +141,7 @@ session.api.users.get_role()
 # Get all user groups
 session.api.user_groups.get()
 
-# Create an user group
+# Create user group
 group = UserGroup("new_user_group", [])
 group.enable_read({"Audit Log", "Alarms"})
 group.enable_read_and_write({"Device Inventory"})
@@ -169,6 +169,39 @@ active_sessions = session.api.sessions.get()
 # Invalidate sessions for given user
 new_user_sessions = active_sessions.filter(raw_username="new_user")
 session.api.sessions.invalidate(new_user_sessions)
+```
+
+</details>
+
+<details>
+    <summary> <b>Resource Groups</b> <i>(click to expand)</i></summary>
+
+```python
+# get resource groups
+session.api.resource_groups.get()
+
+# create resource group
+new_resource_group = ResourceGroup(
+    name="new_resource_group",
+    desc="Custom Resource Group #1",
+    siteIds=[]
+)
+session.api.resource_groups.create(new_resource_group)
+
+# update resource group
+resource_group = session.api.resource_groups.get().filter(name="new_resource_group").single_or_default()
+updated_resource_group = ResourceGroupUpdateRequest(
+    id=resource_group.id,
+    name=resource_group.name,
+    desc="Custom Resource Group #1 with updated description and site ids",
+    siteIds=[200]
+)
+
+# switch to resource group view
+session.api.resource_groups.switch("new_resource_group")
+
+# delete resource group
+session.api.resource_groups.delete(resource_group.id)
 ```
 
 </details>

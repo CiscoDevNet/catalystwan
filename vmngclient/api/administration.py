@@ -21,6 +21,9 @@ from vmngclient.primitives.administration_user_and_group import (
     ActiveSession,
     AdministrationUserAndGroupPrimitives,
     InvalidateSessionMessage,
+    ResourceGroup,
+    ResourceGroupSwitchRequest,
+    ResourceGroupUpdateRequest,
     SessionsDeleteRequest,
     User,
     UserGroup,
@@ -124,6 +127,8 @@ class UsersAPI:
 
 
 class UserGroupsAPI:
+    """Class implementing methods for user group management."""
+
     def __init__(self, session: vManageSession):
         self.session = session
         self._primitives = AdministrationUserAndGroupPrimitives(session)
@@ -161,7 +166,61 @@ class UserGroupsAPI:
         self._primitives.delete_user_group(group_name=group_name)
 
 
+class ResourceGroupsAPI:
+    """Class implementing methods for resource groups management."""
+
+    def __init__(self, session: vManageSession):
+        self.session = session
+        self._primitives = AdministrationUserAndGroupPrimitives(session)
+
+    def get(self) -> DataSequence[ResourceGroup]:
+        """List all resource groups
+
+        Returns:
+            DataSequence[ResourceGroup]: List-like object containing user groups information
+        """
+        return self._primitives.find_resource_groups()
+
+    def create(self, resource_group: ResourceGroup):
+        """Creates a new resource group
+
+        Args:
+            resource_group (ResourceGroup): Definition of new resource group to be created
+        """
+        self._primitives.create_resource_group(resource_group=resource_group)
+
+    def update(self, resource_group_update_request: ResourceGroupUpdateRequest):
+        """Updates existing resource group
+
+        Args:
+            resource_group_update_request (ResourceGroupUpdateRequest): Object containing existing
+            resource group id and attributes to be updated
+        """
+        self._primitives.update_resource_group(
+            group_id=resource_group_update_request.id, resource_group_update_request=resource_group_update_request
+        )
+
+    def switch(self, resource_group_name: str):
+        """Switch to view only a specific resource group (for global admin only)
+
+        Args:
+            resource_group_name (str): Name of resource group to switch view
+        """
+        switch_request = ResourceGroupSwitchRequest(resourceGroupName=resource_group_name)
+        self._primitives.switch_resource_group(resource_group_switch_request=switch_request)
+
+    def delete(self, resource_group_id: str):
+        """Deletes a given resource group
+
+        Args:
+            resource_group_id (str): Resource group id
+        """
+        self._primitives.delete_resource_group(group_id=resource_group_id)
+
+
 class SessionsAPI:
+    """Class implementing methods for vmanage sessions management."""
+
     def __init__(self, session: vManageSession):
         self.session = session
         self._primitives = AdministrationUserAndGroupPrimitives(session)

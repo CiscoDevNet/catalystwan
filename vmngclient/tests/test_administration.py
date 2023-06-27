@@ -5,7 +5,13 @@ from unittest.mock import MagicMock, patch
 from attr.exceptions import NotAnAttrsClassError
 from parameterized import parameterized  # type: ignore
 
-from vmngclient.api.administration import AdministrationSettingsAPI, ClusterManagementAPI, UserGroupsAPI, UsersAPI
+from vmngclient.api.administration import (
+    AdministrationSettingsAPI,
+    ClusterManagementAPI,
+    ResourceGroupsAPI,
+    UserGroupsAPI,
+    UsersAPI,
+)
 from vmngclient.dataclasses import (
     Certificate,
     CloudConnectorData,
@@ -18,6 +24,9 @@ from vmngclient.dataclasses import (
 )
 from vmngclient.exceptions import InvalidOperationError
 from vmngclient.primitives.administration_user_and_group import (
+    ResourceGroup,
+    ResourceGroupSwitchRequest,
+    ResourceGroupUpdateRequest,
     User,
     UserAuthType,
     UserGroup,
@@ -186,6 +195,73 @@ class TestUserGroupsAPI(unittest.TestCase):
         self.api.delete(group_name=group_name)
         # Assert
         self.api._primitives.delete_user_group.assert_called_once_with(group_name=group_name)
+
+
+class TestResourceGroupsAPI(unittest.TestCase):
+    @patch("vmngclient.session.vManageSession")
+    def setUp(self, session_mock):
+        self.session = session_mock
+        self.session.api_version = None
+        self.session.session_type = None
+        self.session.password = "P4s$w0rD"
+        self.api = ResourceGroupsAPI(self.session)
+        self.api._primitives = MagicMock()
+
+    def test_get(self):
+        # Arrange
+        expected_resource_groups = [
+            ResourceGroup(
+                id="0:RESGROUP:14567:XD$eD", name="new_resource_group1", desc="New Resource Group #1", siteIds=[200]
+            )
+        ]
+        self.api._primitives.find_resource_groups = MagicMock(return_value=expected_resource_groups)
+        # Act
+        observed_resource_groups = self.api.get()
+        # Assert
+        self.api._primitives.find_resource_groups.assert_called_once()
+        assert expected_resource_groups == observed_resource_groups
+
+    def test_create(self):
+        # Arrange
+        resource_group = ResourceGroup(name="new_resource_group3", desc="New Resource Group #3", siteIds=[200])
+        self.api._primitives.create_resource_group = MagicMock()
+        # Act
+        self.api.create(resource_group=resource_group)
+        # Assert
+        self.api._primitives.create_resource_group.assert_called_once_with(resource_group=resource_group)
+
+    def test_update(self):
+        # Arrange
+        resource_group_update = ResourceGroupUpdateRequest(
+            id="0:RESGROUP:14567:XD$eD", name="new_resource_group1", desc="New Resource Group #1", siteIds=[101, 102]
+        )
+        self.api._primitives.update_resource_group = MagicMock()
+        # Act
+        self.api.update(resource_group_update_request=resource_group_update)
+        # Assert
+        self.api._primitives.update_resource_group.assert_called_once_with(
+            group_id=resource_group_update.id, resource_group_update_request=resource_group_update
+        )
+
+    def test_switch(self):
+        # Arrange
+        resource_group_name = "new_resource_group1"
+        self.api._primitives.switch_resource_group = MagicMock()
+        # Act
+        self.api.switch(resource_group_name="new_resource_group1")
+        # Assert
+        self.api._primitives.switch_resource_group.assert_called_once_with(
+            resource_group_switch_request=ResourceGroupSwitchRequest(resourceGroupName=resource_group_name)
+        )
+
+    def test_delete(self):
+        # Arrange
+        resource_group_id = "0:RESGROUP:14567:XD$eD"
+        self.api._primitives.delete_resource_group = MagicMock()
+        # Act
+        self.api.delete(resource_group_id=resource_group_id)
+        # Assert
+        self.api._primitives.delete_resource_group.assert_called_once_with(group_id=resource_group_id)
 
 
 class TestClusterManagementAPI(unittest.TestCase):
