@@ -288,10 +288,170 @@ health_status = session.api.cluster_management.get_cluster_management_health_sta
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.administration.ResourceGroupsAPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.administration.</span></span><span class="sig-name descname"><span class="pre">ResourceGroupsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.ResourceGroupsAPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class implementing methods for resource groups management.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.ResourceGroupsAPI.create">
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ResourceGroup</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.ResourceGroupsAPI.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new resource group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>resource_group</strong> (<em>ResourceGroup</em>) – Definition of new resource group to be created</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.ResourceGroupsAPI.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_group_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.ResourceGroupsAPI.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a given resource group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>resource_group_id</strong> (<em>str</em>) – Resource group id</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.ResourceGroupsAPI.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">ResourceGroup</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.administration.ResourceGroupsAPI.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all resource groups</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List-like object containing user groups information</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataSequence[ResourceGroup]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.ResourceGroupsAPI.switch">
+<span class="sig-name descname"><span class="pre">switch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_group_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.ResourceGroupsAPI.switch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Switch to view only a specific resource group (for global admin only)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>resource_group_name</strong> (<em>str</em>) – Name of resource group to switch view</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.ResourceGroupsAPI.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_group_update_request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ResourceGroupUpdateRequest</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.ResourceGroupsAPI.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates existing resource group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource_group_update_request</strong> (<em>ResourceGroupUpdateRequest</em>) – Object containing existing</p></li>
+<li><p><strong>updated</strong> (<em>resource group id and attributes to be</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.administration.SessionsAPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.administration.</span></span><span class="sig-name descname"><span class="pre">SessionsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.SessionsAPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class implementing methods for vmanage sessions management.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.SessionsAPI.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">ActiveSession</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.administration.SessionsAPI.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all active sessions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List-like object representing active user sessions</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataSequence[ActiveSession]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.SessionsAPI.invalidate">
+<span class="sig-name descname"><span class="pre">invalidate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sessions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ActiveSession</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">InvalidateSessionMessage</span></span></span><a class="headerlink" href="#vmngclient.api.administration.SessionsAPI.invalidate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invalidates given sessions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sessions</strong> (<em>List</em><em>[</em><em>ActiveSession</em><em>]</em>) – List of active sessions</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Information about invalidation result</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>InvalidateSessionMessage</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UserGroupsAPI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.administration.</span></span><span class="sig-name descname"><span class="pre">UserGroupsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.UserGroupsAPI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class implementing methods for user group management.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UserGroupsAPI.create">
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">UserGroup</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.UserGroupsAPI.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new user group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user_group</strong> (<em>UserGroup</em>) – Definition of user group to be created</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UserGroupsAPI.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.UserGroupsAPI.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes given user group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>group_name</strong> (<em>str</em>) – Name of the user group to be deleted</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UserGroupsAPI.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">UserGroup</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.administration.UserGroupsAPI.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all user groups</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List-like object representing user groups</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataSequence[UserGroup]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UserGroupsAPI.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">UserGroup</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.UserGroupsAPI.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates existing user group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user_group</strong> (<em>UserGroup</em>) – User group attributes to be updated</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.api.administration.</span></span><span class="sig-name descname"><span class="pre">UsersAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.session.vManageSession" title="vmngclient.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class for user managment.</p>
+<p>Class implementing methods for user managment.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.session">
 <span class="sig-name descname"><span class="pre">session</span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.session" title="Permalink to this definition">¶</a></dt>
@@ -302,33 +462,108 @@ health_status = session.api.cluster_management.get_cluster_management_health_sta
 <dt>Usage example:</dt><dd><p># Create session
 session = create_vManageSession(…)
 # Get information about all users
-all_users = session.api.users.get_all_users()</p>
+all_users = session.api.users.get()</p>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.create">
-<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.User" title="vmngclient.dataclasses.User"><span class="pre">User</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.create" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">User</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user</strong> (<a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.User" title="vmngclient.dataclasses.User"><em>User</em></a>) – Definition of new user to be created</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.delete_user">
-<span class="sig-name descname"><span class="pre">delete_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.delete_user" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.exists">
-<span class="sig-name descname"><span class="pre">exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.exists" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes given user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>username</strong> (<em>str</em>) – Name of the user to be deleted</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataSequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.User" title="vmngclient.dataclasses.User"><span class="pre">User</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.get" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataSequence</span><span class="p"><span class="pre">[</span></span><span class="pre">User</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all users</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List-like object representing users</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataSequence[<a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.User" title="vmngclient.dataclasses.User">User</a>]</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.get_all_users">
-<span class="sig-name descname"><span class="pre">get_all_users</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="vmngclient.html#vmngclient.dataclasses.User" title="vmngclient.dataclasses.User"><span class="pre">User</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.get_all_users" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.get_auth_type">
+<span class="sig-name descname"><span class="pre">get_auth_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.get_auth_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get currently logged user authentication type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Currently logged user authentication type</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.get_role">
+<span class="sig-name descname"><span class="pre">get_role</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">UserRole</span></span></span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.get_role" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get currently logged user role</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Currently logged user role information</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>UserRole</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets given user (unlocks blocked user eg. after number of unsuccessfull login attempts)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>username</strong> (<em>str</em>) – Name of the user to be unlocked</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_update_request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">UserUpdateRequest</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates existing user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user_update_request</strong> (<em>UserUpdateRequest</em>) – User attributes to be updated</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vmngclient.api.administration.UsersAPI.update_password">
+<span class="sig-name descname"><span class="pre">update_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.api.administration.UsersAPI.update_password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates exisiting user password</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>username</strong> (<em>str</em>) – Name of the user</p></li>
+<li><p><strong>new_password</strong> (<em>str</em>) – New password for given user</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
