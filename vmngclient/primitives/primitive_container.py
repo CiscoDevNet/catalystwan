@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from vmngclient.primitives.administration_user_and_group import AdministrationUserAndGroupPrimitives
 from vmngclient.primitives.client import ClientPrimitives
 from vmngclient.primitives.configuration_dashboard_status import ConfigurationDashboardStatusPrimitives
 from vmngclient.primitives.configuration_device_template import ConfigurationDeviceTemplatePrimitives
@@ -23,3 +24,4 @@ class APIPrimitiveContainter:
         self.tenant_migration = TenantMigrationPrimitives(session)
         self.configuration_dashboard_status = ConfigurationDashboardStatusPrimitives(session)
         self.monitoring_device_details = MonitoringDeviceDetailsPrimitives(session)
+        self.administration_user_and_group = AdministrationUserAndGroupPrimitives(session)
