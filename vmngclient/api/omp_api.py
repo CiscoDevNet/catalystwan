@@ -22,6 +22,13 @@ class OmpAPI:
 
     Attributes:
         session (vManageSession): logged in API client session
+
+    Usage example:
+        # Create session and chose device
+        session = create_vManageSession(...)
+        device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
+        # Gets OMP peers for a device
+        omp_peers = session.api.omp.get_omp_peers(device.id)
     """
 
     def __init__(self, session: vManageSession) -> None:
