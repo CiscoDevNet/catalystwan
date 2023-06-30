@@ -58,6 +58,9 @@ class TenantManagementAPITest(unittest.TestCase):
         task = self.api.create(tenants)
         self.assertIsInstance(task, Task)
 
+    def test_update(self):
+        pass
+
     def test_delete(self):
         tenant_id_list = ["1"]
         password = "password"

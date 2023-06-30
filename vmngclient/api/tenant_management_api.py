@@ -3,12 +3,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Optional
 
 from vmngclient.api.task_status_api import Task
-from vmngclient.dataclasses import Device
 from vmngclient.model.tenant import Tenant
 from vmngclient.primitives.tenant_management import (
     TenantBulkDeleteRequest,
     TenantManagementPrimitives,
     TenantStatus,
+    TenantUpdateRequest,
+    vSmartPlacementUpdateRequest,
     vSmartTenantCapacity,
     vSmartTenantMap,
 )
@@ -24,7 +25,7 @@ class TenantManagementAPI:
         self.session = session
         self._primitives = TenantManagementPrimitives(session)
 
-    def get_all(self, device_id: Optional[Device] = None) -> DataSequence[Tenant]:
+    def get(self) -> DataSequence[Tenant]:
         """Lists all the tenants on the vManage.
 
         In a multitenant vManage system, this API is only avaiable in the Provider view.
@@ -45,6 +46,19 @@ class TenantManagementAPI:
         """
         task_id = self._primitives.create_tenant_async_bulk(tenants).id
         return Task(self.session, task_id)
+
+    def update(self, tenant_update_request: TenantUpdateRequest) -> Tenant:
+        """Updates Tenant on vManage
+
+        Args:
+            tenant_update_request (TenantUpdateRequest): Tenant attributes to be updated (must contain tenantId)
+
+        Returns:
+            Tenant: Updated tenant data
+        """
+        return self._primitives.update_tenant(
+            tenant_id=tenant_update_request.tenant_id, tenant_update_request=tenant_update_request
+        )
 
     def delete(self, tenant_id_list: List[str], password: Optional[str] = None) -> Task:
         """Deletes tenants on vManage
@@ -77,6 +91,21 @@ class TenantManagementAPI:
             DataSequence[vSmartTenantCapacity]: List-like object containing tenant capacity information for each vSmart
         """
         return self._primitives.get_tenant_hosting_capacity_on_vsmarts()
+
+    def update_vsmart_placement(self, tenant_id: str, src_vsmart_uuid: str, dst_vsmart_uuid: str):
+        """Updates vSmart placement
+
+        Args:
+            tenant_id (str): Tenant ID
+            src_vsmart_uuid (str): Source vSmart uuid
+            dst_vsmart_uuid (str): Destination vSmart uuid
+        """
+        self._primitives.update_tenant_vsmart_placement(
+            tenant_id=tenant_id,
+            vsmart_placement_update_request=vSmartPlacementUpdateRequest(
+                srcvSmartUuid=src_vsmart_uuid, destvSmartUuid=dst_vsmart_uuid
+            ),
+        )
 
     def get_vsmart_mapping(self) -> vSmartTenantMap:
         """Gets vSmart to tenant mapping

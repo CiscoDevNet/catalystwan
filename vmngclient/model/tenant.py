@@ -20,6 +20,7 @@ class TenantVPNMap(BaseModel):
 
 class Tenant(BaseModel):
     name: str
+    desc: str
     org_name: str = Field(alias="orgName")
     subdomain: str = Field(alias="subDomain")
     flake_id: Optional[int] = Field(alias="flakeId")
@@ -39,7 +40,6 @@ class Tenant(BaseModel):
     sp_metadata: Optional[str] = Field(alias="spMetadata")
     state: Optional[str]
     wan_edge_present: Optional[int] = Field(alias="wanEdgePresent")
-    desc: Optional[str]
     mt_edge: Optional[List[MTEdge]] = Field(alias="mtEdge")
     mt_edge_count: Optional[int] = Field(alias="mtEdgeCount")
     tenant_vpn_map: Optional[List[TenantVPNMap]] = Field(alias="tenantVPNmap")
