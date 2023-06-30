@@ -71,5 +71,8 @@ class FeatureTemplate(BaseModel, ABC):
         values_from_template_definition = find_template_values(template_definition_as_dict)
 
         return feature_template_model(
-            name=template_info.name, description=template_info.description, **values_from_template_definition
+            name=template_info.name,
+            description=template_info.description,
+            device_models=[DeviceModel(model) for model in template_info.device_type],
+            **values_from_template_definition,
         )

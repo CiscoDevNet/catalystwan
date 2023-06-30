@@ -28,7 +28,7 @@ users = [
 cisco_aaa = CiscoAAAModel(
     name="iuo",
     description="zyx",
-    device_models=[],
+    device_models=["vedge-C8000V"],
     user=users,
     authentication_group=True,
     accounting_group=False,
@@ -57,7 +57,7 @@ class TestFeatureTemplate(TestCase):
             "description": "zyx",
             "last_updated_on": 1111111111111,
             "template_type": "cedge_aaa",
-            "device_type": "vedge-C8000V",
+            "device_type": ["vedge-C8000V"],
             "version": "15.0.0",
             "template_definiton": f"{json.dumps(self.definition)}",
         }
