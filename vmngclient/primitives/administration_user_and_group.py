@@ -1,9 +1,10 @@
+# mypy: disable-error-code="empty-body"
 from datetime import datetime
 from typing import Dict, List, Optional, Set
 
 from pydantic import BaseModel, Field
 
-from vmngclient.primitives import APIPrimitiveBase
+from vmngclient.primitives import APIPrimitiveBase, get, request
 from vmngclient.typed_list import DataSequence
 
 
@@ -185,11 +186,13 @@ class AdministrationUserAndGroupPrimitives(APIPrimitiveBase):
         # PUT /admin/vpngroup/{id}
         ...
 
+    @request(get, "/admin/user/userAuthType")
     def find_user_auth_type(self) -> UserAuthType:
-        return self._get("/admin/user/userAuthType").dataobj(UserAuthType, None)
+        ...
 
+    @request(get, "/admin/usergroup", "data")
     def find_user_groups(self) -> DataSequence[UserGroup]:
-        return self._get("/admin/usergroup").dataseq(UserGroup)
+        ...
 
     def find_user_groups_as_key_value(self):
         # GET /admin/usergroup/keyvalue

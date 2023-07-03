@@ -2,7 +2,26 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Final, Iterable, Mapping, Optional, Protocol, Sequence, Set, Type, TypedDict, TypeVar, Union
+from dataclasses import dataclass
+from inspect import Signature, isclass, signature
+
+# from pydoc import locate
+from typing import (
+    BinaryIO,
+    Final,
+    Iterable,
+    Mapping,
+    Optional,
+    Protocol,
+    Sequence,
+    Set,
+    Type,
+    TypedDict,
+    TypeVar,
+    Union,
+    get_args,
+    get_origin,
+)
 
 from packaging.specifiers import SpecifierSet  # type: ignore
 from packaging.version import Version  # type: ignore
@@ -16,7 +35,14 @@ from vmngclient.utils.session_type import SessionType
 BASE_PATH: Final[str] = "/dataservice"
 T = TypeVar("T")
 logger = logging.getLogger(__name__)
-PayloadType = Union[DataSequence, Sequence[Union[AttrsInstance, BaseModel]], AttrsInstance, BaseModel]
+ModelPayloadType = Union[AttrsInstance, BaseModel, Sequence[AttrsInstance], Sequence[BaseModel]]
+PayloadType = Union[None, str, bytes, dict, BinaryIO, ModelPayloadType]
+
+
+@dataclass
+class PayloadTypeSpecifier:
+    is_dataseq: bool
+    t: type
 
 
 class PreparedPayload(TypedDict):
@@ -24,7 +50,7 @@ class PreparedPayload(TypedDict):
     headers: Mapping[str, str]
 
 
-def prepare_payload(payload: PayloadType) -> PreparedPayload:
+def prepare_payload(payload: ModelPayloadType) -> PreparedPayload:
     if isinstance(payload, BaseModel):
         return _prepare_basemodel_payload(payload)
     if isinstance(payload, AttrsInstance):
@@ -93,22 +119,22 @@ class APIPrimitiveBase:
         self._basepath = BASE_PATH
 
     def _request(
-        self, method: str, url: str, payload: Optional[PayloadType] = None, **kwargs
+        self, method: str, url: str, payload: Optional[ModelPayloadType] = None, **kwargs
     ) -> APIPRimitiveClientResponse:
         if payload is not None:
             kwargs.update(prepare_payload(payload))
         return self._client.request(method, self._basepath + url, **kwargs)
 
-    def _get(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
+    def _get(self, url: str, payload: Optional[ModelPayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
         return self._request("GET", url, payload, **kwargs)
 
-    def _put(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
+    def _put(self, url: str, payload: Optional[ModelPayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
         return self._request("PUT", url, payload, **kwargs)
 
-    def _post(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
+    def _post(self, url: str, payload: Optional[ModelPayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
         return self._request("POST", url, payload, **kwargs)
 
-    def _delete(self, url: str, payload: Optional[PayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
+    def _delete(self, url: str, payload: Optional[ModelPayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
         return self._request("DELETE", url, payload, **kwargs)
 
     @property
@@ -120,7 +146,7 @@ class APIPrimitiveBase:
         return self._client.session_type
 
 
-class Versions:
+class VersionsDecorator:
     """
     Decorator to annotate api primitives methods with supported versions.
     Logs warning or raises exception when incompatibility found.
@@ -149,7 +175,7 @@ class Versions:
         return wrapper
 
 
-class View:
+class ViewDecorator:
     """
     Decorator to annotate api primitives methods with session type (view) restriction
     Logs warning or raises exception when incompatibility found.
@@ -178,5 +204,43 @@ class View:
         return wrapper
 
 
-versions = Versions
-view = View
+class RequestDecorator:
+    def __init__(self, method: str, url: str, resp_json_key: Optional[str] = None, **kwargs):
+        self.method = method
+        self.url = url
+        self.resp_json_key = resp_json_key
+
+    def get_return_type(self, sig: Signature) -> PayloadTypeSpecifier:
+        reta = sig.return_annotation
+        if isclass(reta):
+            return PayloadTypeSpecifier(is_dataseq=False, t=reta)
+        elif (type_origin := get_origin(reta)) and type_origin == DataSequence:
+            if (type_args := get_args(reta)) and isclass(type_args[0]):
+                return PayloadTypeSpecifier(is_dataseq=True, t=type_args[0])
+            raise TypeError(f"Methods annotaded with @requests should only return: {PayloadType} but {reta} found")
+        else:
+            raise TypeError(f"Methods annotaded with @requests should only return: {PayloadType} but {reta} found")
+
+    def get_payload_type(self, sig: Signature) -> type:
+        return str
+
+    def __call__(self, func):
+        def wrapper(*args, **kwargs):
+            api = args[0]
+            if not isinstance(api, APIPrimitiveBase):
+                raise TypeError("Only APIPrimitiveBase instance methods can be annotated with @request decorator")
+            func_signature = signature(func)
+            return_type_spec = self.get_return_type(func_signature)
+            print(return_type_spec)
+            breakpoint()
+
+        return wrapper
+
+
+versions = VersionsDecorator
+view = ViewDecorator
+request = RequestDecorator
+get = "GET"
+post = "POST"
+put = "PUT"
+delete = "DELETE"
