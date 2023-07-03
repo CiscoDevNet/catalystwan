@@ -3,6 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 from vmngclient.primitives import APIPrimitiveBase
+from vmngclient.typed_list import DataSequence
 
 
 class TLOC(BaseModel):
@@ -111,8 +112,8 @@ class MonitoringDeviceDetailsPrimitives(APIPrimitiveBase):
         #  GET /device/queues
         ...
 
-    def get_tiers(self):
-        return self.get("/device/tier").dataseq(Tier)
+    def get_tiers(self) -> DataSequence[Tier]:
+        return self._get("/device/tier").dataseq(Tier)
 
     def get_unconfigured(self):
         #  GET /device/unconfigured
