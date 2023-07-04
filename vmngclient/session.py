@@ -350,13 +350,20 @@ class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
         else:
             return self.get("/logout")
 
-    def __enter__(self):
-        return self
+    def close(self) -> None:
+        """Closes the vManageSession.
 
-    def __exit__(self, *exc):
+        This method is overrided from requests.Session.
+        Firstly it cleans up any resources associated with vManage.
+        Then it closes all adapters and as such the session.
+
+        Note: It is generally recommended to use the session as a context manager
+        using the `with` statement, which ensures that the session is properly
+        closed and resources are cleaned up even in case of exceptions.
+        """
         self.enable_relogin = False
         self.logout()
-        super().__exit__()
+        super().close()
 
     def __prepare_session(self, verify: bool, auth: Optional[AuthBase]) -> None:
         self.auth = auth
