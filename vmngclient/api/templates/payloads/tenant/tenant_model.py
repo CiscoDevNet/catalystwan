@@ -33,7 +33,7 @@ class TenantModel(FeatureTemplate):
 
         for tenant in self.tenants:
             tier_info = tier_infos.filter(name=tenant.tier_name).single_or_default()
-            tenant_info = tenant_infos.filter(organization_name=tenant.organization_name).single_or_default()
+            tenant_info = tenant_infos.filter(org_name=tenant.organization_name).single_or_default()
             # TODO Very, very ugly way...
             tenant.__dict__["tier"] = tier_info
             tenant.__dict__["info"] = tenant_info
