@@ -79,8 +79,7 @@ def create_vManageSession(
         logger: logger for logging API requests
 
     Returns:
-        Session object
-
+        vManageSession: Configured Session to perform tasks on vManage.
     """
     session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
@@ -131,6 +130,7 @@ def create_vManageSession(
     session.logger.info(
         f"Logged to vManage({session.platform_version}) as {username}. The session type is {session.session_type}"
     )
+
     return session
 
 
@@ -343,6 +343,20 @@ class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
         url_path = f"/dataservice/tenant/{tenant_id}/vsessionid"
         response = self.post(url_path)
         return response.json()["VSessionId"]
+
+    def logout(self) -> vManageResponse:
+        if self.api_version >= Version("20.12"):
+            return self.post("/logout")
+        else:
+            return self.get("/logout")
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        super().__exit__()
+        self.enable_relogin = False
+        self.logout()
 
     def __prepare_session(self, verify: bool, auth: Optional[AuthBase]) -> None:
         self.auth = auth
