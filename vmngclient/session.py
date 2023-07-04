@@ -354,9 +354,9 @@ class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
         return self
 
     def __exit__(self, *exc):
-        super().__exit__()
         self.enable_relogin = False
         self.logout()
+        super().__exit__()
 
     def __prepare_session(self, verify: bool, auth: Optional[AuthBase]) -> None:
         self.auth = auth
