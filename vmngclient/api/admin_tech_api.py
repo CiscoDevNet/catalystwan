@@ -38,6 +38,12 @@ class AdminTechAPI:
 
     Attributes:
         session: logged in API client session
+
+    Usage example:
+        # Create session
+        session = create_vManageSession(...)
+        # Get admintech data for all devices
+        all_admintechs = session.api.admin_tech.get_all()
     """
 
     def __init__(self, session: vManageSession) -> None:

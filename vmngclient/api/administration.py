@@ -4,7 +4,7 @@ import logging
 from http import HTTPStatus
 from typing import TYPE_CHECKING, List, Union, cast, overload
 
-from requests import HTTPError, Response
+from requests import Response
 
 from vmngclient.dataclasses import (
     Certificate,
@@ -14,10 +14,23 @@ from vmngclient.dataclasses import (
     Password,
     ServiceConfigurationData,
     SoftwareInstallTimeout,
-    User,
     Vbond,
 )
-from vmngclient.exceptions import AlreadyExistsError, InvalidOperationError
+from vmngclient.exceptions import InvalidOperationError
+from vmngclient.primitives.administration_user_and_group import (
+    ActiveSession,
+    AdministrationUserAndGroupPrimitives,
+    InvalidateSessionMessage,
+    ResourceGroup,
+    ResourceGroupSwitchRequest,
+    ResourceGroupUpdateRequest,
+    SessionsDeleteRequest,
+    User,
+    UserGroup,
+    UserResetRequest,
+    UserRole,
+    UserUpdateRequest,
+)
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import asdict, create_dataclass
 
@@ -28,41 +41,209 @@ logger = logging.getLogger(__name__)
 
 
 class UsersAPI:
+    """Class implementing methods for user managment.
+
+    Attributes:
+        session: logged in API client session
+
+    Usage example:
+        # Create session
+        session = create_vManageSession(...)
+        # Get information about all users
+        all_users = session.api.users.get()
+    """
+
     def __init__(self, session: vManageSession) -> None:
         self.session = session
+        self._primitives = AdministrationUserAndGroupPrimitives(session)
 
     def get(self) -> DataSequence[User]:
-        endpoint = "/dataservice/admin/user"
-        users = self.session.get(endpoint)
+        """List all users
 
-        return users.dataseq(User)
+        Returns:
+            DataSequence[User]: List-like object representing users
+        """
+        return self._primitives.find_users()
 
-    def get_all_users(self) -> List[User]:
-        url_path = "/dataservice/admin/user"
-        users = self.session.get_data(url_path)
-        logger.debug(f"List of users: {users}")
-        return [create_dataclass(User, user) for user in users]
+    def get_role(self) -> UserRole:
+        """Get currently logged user role
 
-    def exists(self, username: str) -> bool:
-        return username in [user.username for user in self.get_all_users()]
+        Returns:
+            UserRole: Currently logged user role information
+        """
+        return self._primitives.find_user_role()
 
-    def create(self, user: User) -> bool:
-        if self.exists(user.username):
-            raise AlreadyExistsError(f"User {user.username} already exists.")
-        url_path = "/dataservice/admin/user"
-        data = asdict(user)  # type: ignore
+    def get_auth_type(self) -> str:
+        """Get currently logged user authentication type
 
-        try:
-            response = self.session.post(url=url_path, json=data)
-        except HTTPError:
-            logger.error(response.json)
+        Returns:
+            str: Currently logged user authentication type
+        """
+        return self._primitives.find_user_auth_type().user_auth_type
 
-        return True if response.status_code == 200 else False
+    def create(self, user: User):
+        """Creates a new user
 
-    def delete_user(self, username: str) -> bool:
-        url_path = f"/dataservice/admin/user/{username}"
-        response = self.session.delete(url_path)
-        return True if response.status_code == 200 else False
+        Args:
+            user (User): Definition of new user to be created
+        """
+        self._primitives.create_user(user=user)
+
+    def update(self, user_update_request: UserUpdateRequest):
+        """Updates existing user
+
+        Args:
+            user_update_request (UserUpdateRequest): User attributes to be updated
+        """
+        self._primitives.update_user(username=user_update_request.username, user_update_request=user_update_request)
+
+    def update_password(self, username: str, new_password: str):
+        """Updates exisiting user password
+
+        Args:
+            username (str): Name of the user
+            new_password (str): New password for given user
+        """
+        update_user_request = UserUpdateRequest(
+            userName=username, password=new_password, currentUserPassword=self.session.password
+        )  # type: ignore
+        self._primitives.update_password(username=username, update_user_request=update_user_request)
+
+    def reset(self, username: str):
+        """Resets given user (unlocks blocked user eg. after number of unsuccessfull login attempts)
+
+        Args:
+            username (str): Name of the user to be unlocked
+        """
+        self._primitives.reset_user(user_reset_request=UserResetRequest(userName=username))
+
+    def delete(self, username: str):
+        """Deletes given user
+
+        Args:
+            username (str): Name of the user to be deleted
+        """
+        self._primitives.delete_user(username=username)
+
+
+class UserGroupsAPI:
+    """Class implementing methods for user group management."""
+
+    def __init__(self, session: vManageSession):
+        self.session = session
+        self._primitives = AdministrationUserAndGroupPrimitives(session)
+
+    def get(self) -> DataSequence[UserGroup]:
+        """List all user groups
+
+        Returns:
+            DataSequence[UserGroup]: List-like object representing user groups
+        """
+        return self._primitives.find_user_groups()
+
+    def create(self, user_group: UserGroup):
+        """Creates a new user group
+
+        Args:
+            user_group (UserGroup): Definition of user group to be created
+        """
+        self._primitives.create_user_group(user_group=user_group)
+
+    def update(self, user_group: UserGroup):
+        """Updates existing user group
+
+        Args:
+            user_group (UserGroup): User group attributes to be updated
+        """
+        self._primitives.update_user_group(group_name=user_group.group_name, user_group=user_group)
+
+    def delete(self, group_name: str):
+        """Deletes given user group
+
+        Args:
+            group_name (str): Name of the user group to be deleted
+        """
+        self._primitives.delete_user_group(group_name=group_name)
+
+
+class ResourceGroupsAPI:
+    """Class implementing methods for resource groups management."""
+
+    def __init__(self, session: vManageSession):
+        self.session = session
+        self._primitives = AdministrationUserAndGroupPrimitives(session)
+
+    def get(self) -> DataSequence[ResourceGroup]:
+        """List all resource groups
+
+        Returns:
+            DataSequence[ResourceGroup]: List-like object containing user groups information
+        """
+        return self._primitives.find_resource_groups()
+
+    def create(self, resource_group: ResourceGroup):
+        """Creates a new resource group
+
+        Args:
+            resource_group (ResourceGroup): Definition of new resource group to be created
+        """
+        self._primitives.create_resource_group(resource_group=resource_group)
+
+    def update(self, resource_group_update_request: ResourceGroupUpdateRequest):
+        """Updates existing resource group
+
+        Args:
+            resource_group_update_request (ResourceGroupUpdateRequest): Object containing existing
+            resource group id and attributes to be updated
+        """
+        self._primitives.update_resource_group(
+            group_id=resource_group_update_request.id, resource_group_update_request=resource_group_update_request
+        )
+
+    def switch(self, resource_group_name: str):
+        """Switch to view only a specific resource group (for global admin only)
+
+        Args:
+            resource_group_name (str): Name of resource group to switch view
+        """
+        switch_request = ResourceGroupSwitchRequest(resourceGroupName=resource_group_name)
+        self._primitives.switch_resource_group(resource_group_switch_request=switch_request)
+
+    def delete(self, resource_group_id: str):
+        """Deletes a given resource group
+
+        Args:
+            resource_group_id (str): Resource group id
+        """
+        self._primitives.delete_resource_group(group_id=resource_group_id)
+
+
+class SessionsAPI:
+    """Class implementing methods for vmanage sessions management."""
+
+    def __init__(self, session: vManageSession):
+        self.session = session
+        self._primitives = AdministrationUserAndGroupPrimitives(session)
+
+    def get(self) -> DataSequence[ActiveSession]:
+        """List all active sessions
+
+        Returns:
+            DataSequence[ActiveSession]: List-like object representing active user sessions
+        """
+        return self._primitives.get_active_sessions()
+
+    def invalidate(self, sessions: List[ActiveSession]) -> InvalidateSessionMessage:
+        """Invalidates given sessions
+
+        Args:
+            sessions (List[ActiveSession]): List of active sessions
+
+        Returns:
+            InvalidateSessionMessage: Information about invalidation result
+        """
+        sessions_delete_request = SessionsDeleteRequest.from_active_session_list(sessions)
+        return self._primitives.remove_sessions(sessions_delete_request=sessions_delete_request)
 
 
 class ClusterManagementAPI:
@@ -70,6 +251,12 @@ class ClusterManagementAPI:
 
     Attributes:
         session: logged in API admin session
+
+    Example usage:
+        # Create session
+        session = create_vManageSession(...)
+        # Get health status
+        health_status = session.api.cluster_management.get_cluster_management_health_status()
     """
 
     def __init__(self, session: vManageSession) -> None:

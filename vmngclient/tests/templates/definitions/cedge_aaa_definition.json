@@ -2,7 +2,7 @@
     "templateName": "iuo",
     "templateDescription": "zyx",
     "templateType": "cedge_aaa",
-    "deviceType": [],
+    "deviceType": ["vedge-C8000V"],
     "factoryDefault": false,
     "templateMinVersion": "15.0.0",
     "templateDefinition": {

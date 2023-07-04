@@ -1,22 +1,40 @@
 # type: ignore
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from attr.exceptions import NotAnAttrsClassError
 from parameterized import parameterized  # type: ignore
 
-from vmngclient.api.administration import AdministrationSettingsAPI, ClusterManagementAPI, UsersAPI
+from vmngclient.api.administration import (
+    AdministrationSettingsAPI,
+    ClusterManagementAPI,
+    ResourceGroupsAPI,
+    UserGroupsAPI,
+    UsersAPI,
+)
 from vmngclient.dataclasses import (
     Certificate,
     CloudConnectorData,
     CloudServicesSettings,
+    Connection,
     Organization,
     Password,
     ServiceConfigurationData,
-    User,
     Vbond,
 )
-from vmngclient.exceptions import AlreadyExistsError, InvalidOperationError
+from vmngclient.exceptions import InvalidOperationError
+from vmngclient.primitives.administration_user_and_group import (
+    ResourceGroup,
+    ResourceGroupSwitchRequest,
+    ResourceGroupUpdateRequest,
+    User,
+    UserAuthType,
+    UserGroup,
+    UserGroupTask,
+    UserResetRequest,
+    UserRole,
+    UserUpdateRequest,
+)
 from vmngclient.utils.certificate_status import ValidityPeriod
 from vmngclient.utils.creation_tools import create_dataclass
 
@@ -27,84 +45,223 @@ organization_dataclass = Organization("My org name", 1)
 
 
 class TestUsersAPI(unittest.TestCase):
-    def setUp(self) -> None:
-        self.users = [
-            {"userName": "admin", "locale": "en_US", "group": []},
-            {
-                "userName": "demo_user",
-                "password": "qwer",
-                "description": "Demo User",
-                "resGroupName": "group1",
-                "locale": "en_US",
-                "group": ["basic"],
-            },
+    @patch("vmngclient.session.vManageSession")
+    def setUp(self, session_mock):
+        self.session = session_mock
+        self.session.api_version = None
+        self.session.session_type = None
+        self.session.password = "P4s$w0rD"
+        self.api = UsersAPI(self.session)
+        self.api._primitives = MagicMock()
+
+    def test_get(self):
+        # Arrange
+        expected_users = [User(userName="new_user", password="new_user", group=["netadmin"], description="new user")]
+        self.api._primitives.find_users = MagicMock(return_value=expected_users)
+        # Act
+        observed_users = self.api.get()
+        self.api._primitives.find_users.assert_called_once()
+        assert expected_users == observed_users
+
+    def test_get_role(self):
+        # Arrange
+        expected_user_role = UserRole(isAdmin=True)
+        self.api._primitives.find_user_role = MagicMock(return_value=expected_user_role)
+        # Act
+        observed_user_role = self.api.get_role()
+        # Assert
+        self.api._primitives.find_user_role.assert_called_once()
+        assert expected_user_role == observed_user_role
+
+    def test_get_auth_type(self):
+        # Arrange
+        expected_auth_type = "local"
+        self.api._primitives.find_user_auth_type = MagicMock(return_value=UserAuthType(userAuthType=expected_auth_type))
+        # Act
+        observed_auth_type = self.api.get_auth_type()
+        # Assert
+        self.api._primitives.find_user_auth_type.assert_called_once()
+        assert expected_auth_type == observed_auth_type
+
+    def test_create(self):
+        # Arrange
+        user = User(userName="new_user", password="new_user", group=["netadmin"], description="new user")
+        self.api._primitives.create_user = MagicMock()
+        # Act
+        self.api.create(user=user)
+        # Assert
+        self.api._primitives.create_user.assert_called_once_with(user=user)
+
+    def test_update(self):
+        # Arrange
+        user_update = UserUpdateRequest(
+            userName="new_user", password="new_user", group=["netadmin"], description="new user", resGroupName="global"
+        )
+        self.api._primitives.update_user = MagicMock()
+        # Act
+        self.api.update(user_update_request=user_update)
+        # Assert
+        self.api._primitives.update_user.assert_called_once_with(
+            username=user_update.username, user_update_request=user_update
+        )
+
+    def test_update_password(self):
+        # Arrange
+        username = "new_user"
+        new_password = "PaSsWoRd"
+        self.api._primitives.update_password = MagicMock()
+        # Act
+        self.api.update_password(username=username, new_password=new_password)
+        # Assert
+        self.api._primitives.update_password.assert_called_once_with(
+            username=username,
+            update_user_request=UserUpdateRequest(
+                userName=username, password=new_password, currentUserPassword=self.session.password
+            ),
+        )
+
+    def test_reset(self):
+        # Arrange
+        username = "new_user"
+        self.api._primitives.reset_user = MagicMock()
+        # Act
+        self.api.reset(username=username)
+        # Assert
+        self.api._primitives.reset_user(user_reset_request=UserResetRequest(userName=username))
+
+    def test_delete(self):
+        # Arrange
+        username = "new_user"
+        self.api._primitives.delete_user = MagicMock()
+        # Act
+        self.api.delete(username=username)
+        # Assert
+        self.api._primitives.delete_user.assert_called_once_with(username=username)
+
+
+class TestUserGroupsAPI(unittest.TestCase):
+    @patch("vmngclient.session.vManageSession")
+    def setUp(self, session_mock):
+        self.session = session_mock
+        self.session.api_version = None
+        self.session.session_type = None
+        self.session.password = "P4s$w0rD"
+        self.api = UserGroupsAPI(self.session)
+        self.api._primitives = MagicMock()
+
+    def test_get(self):
+        # Arrange
+        expected_user_groups = [
+            UserGroup(
+                groupName="new_group", tasks=[UserGroupTask(enabled=True, feature="Alarms", read=True, write=False)]
+            )
         ]
-        self.user_dataclass = [create_dataclass(User, user) for user in self.users]
-
-    @patch("vmngclient.session.vManageSession")
-    def test_get_all_users(self, mock_session):
-        # Arrange
-        mock_session.get_data.return_value = self.users
+        self.api._primitives.find_user_groups = MagicMock(return_value=expected_user_groups)
         # Act
-        answer = UsersAPI(mock_session).get_all_users()
+        observed_user_groups = self.api.get()
         # Assert
-        self.assertEqual(answer, self.user_dataclass)
+        self.api._primitives.find_user_groups.assert_called_once()
+        assert expected_user_groups == observed_user_groups
 
-    @patch("vmngclient.session.vManageSession")
-    def test_exists_true(self, mock_session):
+    def test_create(self):
         # Arrange
-        mock_session.get_data.return_value = self.users
+        user_group = UserGroup(
+            groupName="new_group", tasks=[UserGroupTask(enabled=True, feature="Alarms", read=True, write=False)]
+        )
+        self.api._primitives.create_user_group = MagicMock()
         # Act
-        answer = UsersAPI(mock_session).exists("demo_user")
+        self.api.create(user_group=user_group)
         # Assert
-        self.assertTrue(answer)
+        self.api._primitives.create_user_group.assert_called_once_with(user_group=user_group)
 
-    @patch("vmngclient.session.vManageSession")
-    def test_exists_false(self, mock_session):
+    def test_update(self):
         # Arrange
-        mock_session.get_data.return_value = self.users
+        user_group = UserGroup(
+            groupName="new_group", tasks=[UserGroupTask(enabled=True, feature="Alarms", read=True, write=False)]
+        )
+        self.api._primitives.update_user_group = MagicMock()
         # Act
-        answer = UsersAPI(mock_session).exists("no_user")
+        self.api.update(user_group=user_group)
         # Assert
-        self.assertFalse(answer)
+        self.api._primitives.update_user_group.assert_called_once_with(
+            group_name=user_group.group_name, user_group=user_group
+        )
 
-    @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.vManageSession")
-    @patch("requests.Response")
-    def test_create_user(self, status_code, expected_outcome, mock_response, mock_session):
+    def test_delete(self):
         # Arrange
-        mock_session.get_data.return_value = [self.users[1]]
-        mock_session.post.return_value = mock_response
-        mock_response.status_code = status_code
+        group_name = "new_group"
+        self.api._primitives.delete_user_group = MagicMock()
         # Act
-        answer = UsersAPI(mock_session).create(self.user_dataclass[0])
+        self.api.delete(group_name=group_name)
         # Assert
-        self.assertEqual(answer, expected_outcome)
+        self.api._primitives.delete_user_group.assert_called_once_with(group_name=group_name)
 
+
+class TestResourceGroupsAPI(unittest.TestCase):
     @patch("vmngclient.session.vManageSession")
-    def test_create_user_existing(self, mock_session):
+    def setUp(self, session_mock):
+        self.session = session_mock
+        self.session.api_version = None
+        self.session.session_type = None
+        self.session.password = "P4s$w0rD"
+        self.api = ResourceGroupsAPI(self.session)
+        self.api._primitives = MagicMock()
+
+    def test_get(self):
         # Arrange
-        mock_session.get_data.return_value = self.users
-
+        expected_resource_groups = [
+            ResourceGroup(
+                id="0:RESGROUP:14567:XD$eD", name="new_resource_group1", desc="New Resource Group #1", siteIds=[200]
+            )
+        ]
+        self.api._primitives.find_resource_groups = MagicMock(return_value=expected_resource_groups)
         # Act
-        def answer():
-            UsersAPI(mock_session).create(self.user_dataclass[0])
-
+        observed_resource_groups = self.api.get()
         # Assert
-        self.assertRaises(AlreadyExistsError, answer)
+        self.api._primitives.find_resource_groups.assert_called_once()
+        assert expected_resource_groups == observed_resource_groups
 
-    @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.vManageSession")
-    @patch("requests.Response")
-    def test_delete_user(self, status_code, expected_outcome, mock_response, mock_session):
+    def test_create(self):
         # Arrange
-        mock_session.get_data.return_value = self.users
-        mock_session.delete.return_value = mock_response
-        mock_response.status_code = status_code
+        resource_group = ResourceGroup(name="new_resource_group3", desc="New Resource Group #3", siteIds=[200])
+        self.api._primitives.create_resource_group = MagicMock()
         # Act
-        answer = UsersAPI(mock_session).delete_user("admin")
+        self.api.create(resource_group=resource_group)
         # Assert
-        self.assertEqual(answer, expected_outcome)
+        self.api._primitives.create_resource_group.assert_called_once_with(resource_group=resource_group)
+
+    def test_update(self):
+        # Arrange
+        resource_group_update = ResourceGroupUpdateRequest(
+            id="0:RESGROUP:14567:XD$eD", name="new_resource_group1", desc="New Resource Group #1", siteIds=[101, 102]
+        )
+        self.api._primitives.update_resource_group = MagicMock()
+        # Act
+        self.api.update(resource_group_update_request=resource_group_update)
+        # Assert
+        self.api._primitives.update_resource_group.assert_called_once_with(
+            group_id=resource_group_update.id, resource_group_update_request=resource_group_update
+        )
+
+    def test_switch(self):
+        # Arrange
+        resource_group_name = "new_resource_group1"
+        self.api._primitives.switch_resource_group = MagicMock()
+        # Act
+        self.api.switch(resource_group_name="new_resource_group1")
+        # Assert
+        self.api._primitives.switch_resource_group.assert_called_once_with(
+            resource_group_switch_request=ResourceGroupSwitchRequest(resourceGroupName=resource_group_name)
+        )
+
+    def test_delete(self):
+        # Arrange
+        resource_group_id = "0:RESGROUP:14567:XD$eD"
+        self.api._primitives.delete_resource_group = MagicMock()
+        # Act
+        self.api.delete(resource_group_id=resource_group_id)
+        # Assert
+        self.api._primitives.delete_resource_group.assert_called_once_with(group_id=resource_group_id)
 
 
 class TestClusterManagementAPI(unittest.TestCase):
@@ -278,7 +435,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         # Arrange
         mock_session.post.return_value = mock_response
         mock_response.status_code = 200
-        random_dataclass = User("name", ["group_1"])
+        random_dataclass = Connection("random state", "random peer", "127.0.0.1")
 
         # Act
         def answer():
