@@ -316,6 +316,14 @@ except vManageBadRequestError as error:
 # code = 'USER0006'
 ```
 
+## Endpoint Coverage
+All URIs are relative to */dataservice*
+
+HTTP request | Supported Version | Tenancy Mode | Class | Method | Payload Type | Return Type
+------------ | ------------- | ------------- | ------------- | ------------- | ------------- | -------------
+**POST** /admin/user | | | *AdministrationUserAndGroupPrimitives* | [**create_user**](vmngclient/primitives/administration_user_and_group.py#L158) | | [**User**](vmngclient/primitives/administration_user_and_group.py#L11) |
+**POST** /tenant/bulk/async | >=20.4 | Provider |*TenantManagementPrimitives* | [**create_tenant_async_bulk**](/vmngclient/primitives/tenant_management.py#L91) | List[[**Tenant**](vmngclient/api/templates/payloads/tenant/tenant_model.py#L14)] | [**TenantTaskId**](vmngclient/primitives/tenant_management.py#L21) |
+
 ## [Contributing, bug reporting and feature requests](https://github.com/CiscoDevNet/vManage-client/blob/main/CONTRIBUTING.md)
 
 ## Seeking support
