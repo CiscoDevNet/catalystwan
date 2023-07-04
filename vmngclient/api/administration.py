@@ -107,7 +107,7 @@ class UsersAPI:
         update_user_request = UserUpdateRequest(
             userName=username, password=new_password, currentUserPassword=self.session.password
         )  # type: ignore
-        self._primitives.update_password(username=username, update_user_request=update_user_request)
+        self._primitives.update_password(username=username, payload=update_user_request)
 
     def reset(self, username: str):
         """Resets given user (unlocks blocked user eg. after number of unsuccessfull login attempts)

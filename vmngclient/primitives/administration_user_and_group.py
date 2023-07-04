@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Set
 
 from pydantic import BaseModel, Field
 
-from vmngclient.primitives import APIPrimitiveBase, get, request
+from vmngclient.primitives import APIPrimitiveBase, get, post, put, request
 from vmngclient.typed_list import DataSequence
 
 
@@ -154,11 +154,13 @@ class AdministrationUserAndGroupPrimitives(APIPrimitiveBase):
         # GET /admin/usergroup/definition
         ...
 
-    def create_user(self, user: User):
-        self._post("/admin/user", payload=user)
+    @request(post, "/admin/user")
+    def create_user(self, payload: User):
+        ...
 
-    def create_user_group(self, user_group: UserGroup):
-        self._post("/admin/usergroup", payload=user_group)
+    @request(post, "/admin/usergroup")
+    def create_user_group(self, payload: UserGroup):
+        ...
 
     def create_vpn_group(self):
         # POST /admin/vpngroup
@@ -222,9 +224,9 @@ class AdministrationUserAndGroupPrimitives(APIPrimitiveBase):
     def reset_user(self, user_reset_request: UserResetRequest):
         self._post("/admin/user/reset", payload=user_reset_request)
 
+    @request(get, "/admin/resourcegroup")
     def find_resource_groups(self) -> DataSequence[ResourceGroup]:
-        # GET /admin/resourcegroup
-        return self._get("/admin/resourcegroup").dataseq(ResourceGroup, None)
+        ...
 
     def switch_resource_group(self, resource_group_switch_request: ResourceGroupSwitchRequest):
         # POST /admin/resourcegroup/switch
@@ -250,8 +252,9 @@ class AdministrationUserAndGroupPrimitives(APIPrimitiveBase):
         # POST /admin/user/admin/password
         ...
 
-    def update_password(self, username: str, update_user_request: UserUpdateRequest):
-        self._put(f"/admin/user/password/{username}", payload=update_user_request)
+    @request(put, "/admin/user/password/{username}")
+    def update_password(self, username: str, payload: UserUpdateRequest):
+        ...
 
     def update_profile_locale(self):
         # PUT /admin/user/profile/locale

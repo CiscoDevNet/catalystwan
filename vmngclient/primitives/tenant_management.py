@@ -1,9 +1,10 @@
+# mypy: disable-error-code="empty-body"
 from typing import Dict, List
 
 from pydantic import BaseModel, Field
 
 from vmngclient.model.tenant import Tenant
-from vmngclient.primitives import APIPrimitiveBase, versions, view
+from vmngclient.primitives import APIPrimitiveBase, post, request, versions, view
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.session_type import ProviderAsTenantView, ProviderView
 
@@ -86,9 +87,9 @@ class TenantManagementPrimitives(APIPrimitiveBase):
 
     @versions(">=20.4")
     @view({ProviderView})
-    def create_tenant_async_bulk(self, tenants: List[Tenant]) -> TenantTaskId:
-        response = self._post("/tenant/bulk/async", payload=tenants)
-        return response.dataobj(TenantTaskId, None)
+    @request(post, "/tenant/bulk/async")
+    def create_tenant_async_bulk(self, payload: List[Tenant]) -> TenantTaskId:
+        ...
 
     @view({ProviderView})
     def delete_tenant(self, delete_request: TenantDeleteRequest, tenant_id: str):

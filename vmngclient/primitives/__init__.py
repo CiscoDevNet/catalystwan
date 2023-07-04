@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import dataclass
-from inspect import Signature, isclass, signature
+from inspect import Signature, _empty, isclass, signature
+from string import Formatter
 
 # from pydoc import locate
 from typing import (
+    Any,
     BinaryIO,
     Final,
     Iterable,
@@ -15,6 +16,7 @@ from typing import (
     Protocol,
     Sequence,
     Set,
+    Tuple,
     Type,
     TypedDict,
     TypeVar,
@@ -27,6 +29,7 @@ from packaging.specifiers import SpecifierSet  # type: ignore
 from packaging.version import Version  # type: ignore
 from pydantic import BaseModel
 
+from vmngclient.dataclasses import DataclassBase
 from vmngclient.exceptions import APIRequestPayloadTypeError, APIVersionError, APIViewError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import AttrsInstance, asdict
@@ -37,12 +40,6 @@ T = TypeVar("T")
 logger = logging.getLogger(__name__)
 ModelPayloadType = Union[AttrsInstance, BaseModel, Sequence[AttrsInstance], Sequence[BaseModel]]
 PayloadType = Union[None, str, bytes, dict, BinaryIO, ModelPayloadType]
-
-
-@dataclass
-class PayloadTypeSpecifier:
-    is_dataseq: bool
-    t: type
 
 
 class PreparedPayload(TypedDict):
@@ -97,6 +94,9 @@ class APIPRimitiveClientResponse(Protocol):
         ...
 
     def dataseq(self, cls: Type[T], sourcekey: Optional[str] = "data") -> DataSequence[T]:
+        ...
+
+    def json(self) -> dict:
         ...
 
 
@@ -209,30 +209,79 @@ class RequestDecorator:
         self.method = method
         self.url = url
         self.resp_json_key = resp_json_key
+        self.allowed_return_type = Union[
+            bytes, str, dict, BinaryIO, BaseModel, DataclassBase, DataSequence[BaseModel], DataSequence[DataclassBase]
+        ]
 
-    def get_return_type(self, sig: Signature) -> PayloadTypeSpecifier:
-        reta = sig.return_annotation
-        if isclass(reta):
-            return PayloadTypeSpecifier(is_dataseq=False, t=reta)
-        elif (type_origin := get_origin(reta)) and type_origin == DataSequence:
-            if (type_args := get_args(reta)) and isclass(type_args[0]):
-                return PayloadTypeSpecifier(is_dataseq=True, t=type_args[0])
-            raise TypeError(f"Methods annotaded with @requests should only return: {PayloadType} but {reta} found")
+    def specify_return_type(self, sig: Signature) -> Tuple[bool, bool, type]:
+        """Specifies return type to be used when parsing a reponse based on method signature annotations
+
+        Args:
+            sig (Signature): wrapped method signature
+
+        Raises:
+            TypeError: when signature contains unexpected return annotation
+
+        Returns:
+            Tuple[bool, bool, type]: Specification (returns anyting?, is datasequence?, return type)
+        """
+        annotation = sig.return_annotation
+        if isclass(annotation):
+            if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModel, DataclassBase)):
+                return (True, False, annotation)
+            elif annotation == _empty:
+                return (False, False, annotation)
+            raise TypeError(f"Expected: {self.allowed_return_type} but return type {annotation}")
+        elif (type_origin := get_origin(annotation)) and isclass(type_origin) and issubclass(type_origin, DataSequence):
+            if (
+                (type_args := get_args(annotation))
+                and (len(type_args) == 1)
+                and isclass(type_args[0])
+                and issubclass(type_args[0], (BaseModel, DataclassBase))
+            ):
+                return (True, True, type_args[0])
+            raise TypeError(f"Expected: {self.allowed_return_type} but return type {annotation}")
         else:
-            raise TypeError(f"Methods annotaded with @requests should only return: {PayloadType} but {reta} found")
+            raise TypeError(f"Expected: {self.allowed_return_type} but return type {annotation}")
 
-    def get_payload_type(self, sig: Signature) -> type:
-        return str
+    def format_url(self, **kwargs) -> dict[str, Any]:
+        """Formats url from keyword argumets given wrapped function
+
+        Returns:
+            dict[str, Any]: keyword arguments without fields consumed during parsing
+        """
+        formatter = Formatter()
+        field_names = {item[1] for item in formatter.parse(self.url) if item[1] is not None}
+        fields = {key: kwargs[key] for key in field_names}
+        self.url.format(**fields)
+        return {key: kwargs[key] for key in kwargs.keys() if key not in field_names}
 
     def __call__(self, func):
+        self.returns, self.returns_dataseq, self.return_type = self.specify_return_type(signature(func))
+
         def wrapper(*args, **kwargs):
             api = args[0]
             if not isinstance(api, APIPrimitiveBase):
                 raise TypeError("Only APIPrimitiveBase instance methods can be annotated with @request decorator")
-            func_signature = signature(func)
-            return_type_spec = self.get_return_type(func_signature)
-            print(return_type_spec)
-            breakpoint()
+            request_kwargs = self.format_url(**kwargs)
+            if self.returns:
+                if issubclass(self.return_type, (BaseModel, DataclassBase)):
+                    if self.returns_dataseq:
+                        return api._request(self.method, self.url, **request_kwargs).dataseq(
+                            self.return_type, self.resp_json_key
+                        )
+                    else:
+                        return api._request(self.method, self.url, **request_kwargs).dataobj(
+                            self.return_type, self.resp_json_key
+                        )
+                elif issubclass(self.return_type, str):
+                    return api._request(self.method, self.url, **request_kwargs).text
+                elif issubclass(self.return_type, bytes):
+                    return api._request(self.method, self.url, **request_kwargs).content
+                elif issubclass(self.return_type, dict):
+                    return api._request(self.method, self.url, **request_kwargs).json()
+            else:
+                api._request(self.method, self.url, **request_kwargs)
 
         return wrapper
 
