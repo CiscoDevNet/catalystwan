@@ -70,6 +70,17 @@ class TenantUpdateRequest(BaseModel):
 
     @classmethod
     def from_tenant(cls, tenant: Tenant) -> "TenantUpdateRequest":
+        """Creates payload for tenant update from existing tenant data obtained by GET
+
+        Args:
+            tenant (Tenant): Tenant to be updated
+
+        Raises:
+            TypeError: When provided tenant is missing ID
+
+        Returns:
+            TenantUpdateRequest: Tenant attributes suitable for PUT request
+        """
         if not tenant.tenant_id:
             raise TypeError("tenantId required for update request")
         return TenantUpdateRequest(
