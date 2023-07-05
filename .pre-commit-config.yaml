@@ -57,8 +57,8 @@ repos:
 
   - repo: local
     hooks:
-    -   id: endpoint_md
-        name: endpoint_md
-        entry: python endpoint_registry.py
+    -   id: endpoints-md
+        name: endpoints-md
+        entry: python endpoints.py
         language: system
         types: [python]

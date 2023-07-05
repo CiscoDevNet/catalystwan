@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Set
 
 from pydantic import BaseModel, Field
 
-from vmngclient.primitives import APIPrimitiveBase, get, post, put, request
+from vmngclient.primitives import APIPrimitiveBase, delete, get, post, put, request
 from vmngclient.typed_list import DataSequence
 
 
@@ -173,8 +173,9 @@ class AdministrationUserAndGroupPrimitives(APIPrimitiveBase):
     def delete_user(self, username: str):
         self._delete(f"/admin/user/{username}")
 
+    @request(delete, "/admin/usergroup/{group_name}")
     def delete_user_group(self, group_name: str):
-        self._delete(f"/admin/usergroup/{group_name}")
+        ...
 
     def delete_vpn_group(self):
         # DELETE /admin/vpngroup/{id}

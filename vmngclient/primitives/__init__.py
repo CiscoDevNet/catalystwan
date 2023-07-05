@@ -168,7 +168,7 @@ class APIPrimitiveBase:
         return self._client.session_type
 
 
-class VersionsDecorator:
+class versions:
     """
     Decorator to annotate api primitives methods with supported versions.
     Logs warning or raises exception when incompatibility found.
@@ -203,7 +203,7 @@ class VersionsDecorator:
         return wrapper
 
 
-class ViewDecorator:
+class view:
     """
     Decorator to annotate api primitives methods with session type (view) restriction
     Logs warning or raises exception when incompatibility found.
@@ -236,7 +236,7 @@ class ViewDecorator:
         return wrapper
 
 
-class RequestDecorator:
+class request:
     meta_lookup: Dict[Any, APIPrimitivesRequestMeta] = {}
 
     def __init__(self, http_method: str, url: str, resp_json_key: Optional[str] = None, **kwargs):
@@ -314,17 +314,25 @@ class RequestDecorator:
         else:
             raise APIPrimitiveError(f"Expected: {PayloadType} but found payload {annotation}")
 
-    def format_url(self, **kwargs) -> dict[str, Any]:
-        """Formats url from keyword argumets given wrapped function
+    def format_url(self, *args, **kwargs) -> dict[str, Any]:
+        """Formats url from argumets given wrapped function
 
         Returns:
             dict[str, Any]: keyword arguments without fields consumed during parsing
         """
+        breakpoint()
         formatter = Formatter()
+        stripped_kwargs = dict(kwargs)
+        fields = {}
         field_names = {item[1] for item in formatter.parse(self.url) if item[1] is not None}
-        fields = {key: kwargs[key] for key in field_names}
+        for key in field_names:
+            if key in kwargs.keys():
+                fields[key] = kwargs[key]
+                del stripped_kwargs[key]
+            else:
+                raise APIPrimitiveError(f"field name: {key} found in url but not in provided kwargs: {kwargs.keys()}")
         self.url.format(**fields)
-        return {key: kwargs[key] for key in kwargs.keys() if key not in field_names}
+        return stripped_kwargs
 
     def __call__(self, func):
         sig = signature(func)
@@ -340,7 +348,7 @@ class RequestDecorator:
                 raise APIPrimitiveError(
                     "Only APIPrimitiveBase instance methods can be annotated with @request decorator"
                 )
-            request_kwargs = self.format_url(**kwargs)
+            request_kwargs = self.format_url(*args, **kwargs)
             if self.return_spec.present:
                 if issubclass(self.return_spec.payload_type, (BaseModel, DataclassBase)):
                     if self.return_spec.sequence_type == DataSequence:
@@ -363,9 +371,6 @@ class RequestDecorator:
         return wrapper
 
 
-versions = VersionsDecorator
-view = ViewDecorator
-request = RequestDecorator
 get = "GET"
 post = "POST"
 put = "PUT"
