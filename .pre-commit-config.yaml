@@ -54,3 +54,11 @@ repos:
           "flake8-quotes==3.3.2"
         ]
         args: ["--max-line-length", "120", "--inline-quotes", "double"]
+
+  - repo: local
+    hooks:
+    -   id: endpoint_md
+        name: endpoint_md
+        entry: python endpoint_registry.py
+        language: system
+        types: [python]
