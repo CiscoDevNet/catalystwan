@@ -1,4 +1,6 @@
 # Grabs API meta data collected while decorating API methods and bakes into serializable registry
+# TODO: versions and tenancy modes not showing up in markdown
+# TODO: fix handling of args and kwargs in primitive methods definitions (payload needs to be last arg or kwarg only)
 from dataclasses import dataclass
 from inspect import getsourcefile, getsourcelines
 from pathlib import Path, PurePath
@@ -124,7 +126,7 @@ class EndpointRegistry(MarkdownRenderer):
 
     def md(self) -> str:
         data = sorted(self.items)
-        info = f"All URIs are relative to */{self.base_path}*\n"
+        info = f"All URIs are relative to *{self.base_path}*\n"
         table_header = (
             "HTTP request | Supported Versions | Method | Payload Type | Return Type | Tenancy Mode\n"
             "------------ | ------------------ | ------ | ------------ | ----------- | ------------\n"
@@ -142,4 +144,5 @@ if __name__ == "__main__":
         meta_lookup=request.meta_lookup, versions_lookup=versions.meta_lookup, tenancy_modes_lookup=view.meta_lookup
     )
     with open("ENDPOINTS.md", "w") as f:
+        f.write("**THIS FILE IS AUTO-GENERATED DO NOT EDIT**\n\n")
         f.write(endpoint_registry.md())

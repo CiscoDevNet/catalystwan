@@ -1,4 +1,6 @@
-All URIs are relative to *//dataservice*
+**THIS FILE IS AUTO-GENERATED DO NOT EDIT**
+
+All URIs are relative to */dataservice*
 HTTP request | Supported Versions | Method | Payload Type | Return Type | Tenancy Mode
 ------------ | ------------------ | ------ | ------------ | ----------- | ------------
 POST /admin/user||[**AdministrationUserAndGroupPrimitives.create_user**](vmngclient/primitives/administration_user_and_group.py#L157)|[**User**](vmngclient/primitives/administration_user_and_group.py#L11)||

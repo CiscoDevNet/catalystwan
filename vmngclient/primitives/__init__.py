@@ -5,8 +5,6 @@ import logging
 from dataclasses import dataclass
 from inspect import Signature, _empty, isclass, signature
 from string import Formatter
-
-# from pydoc import locate
 from typing import (
     Any,
     BinaryIO,
@@ -237,6 +235,14 @@ class view:
 
 
 class request:
+    """Decorator to annotate api primitives methods with HTTP method, URL and optionally json key from which
+    modelled data will be parsed (usually "data", but defaults to whole json payload).
+    Additional kwargs can be injected which will be passed to request method (eg. custom headers)
+
+    Raises:
+        APIPrimitiveError: when definition contains unsupported types in annotations
+    """
+
     meta_lookup: Dict[Any, APIPrimitivesRequestMeta] = {}
 
     def __init__(self, http_method: str, url: str, resp_json_key: Optional[str] = None, **kwargs):
