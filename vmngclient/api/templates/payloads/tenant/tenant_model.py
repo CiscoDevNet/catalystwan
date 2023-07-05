@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, List
+from typing import TYPE_CHECKING, ClassVar, List, Optional
 
 from pydantic import BaseModel
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
+from vmngclient.model.tenant import Tenant as TenantInfo
+from vmngclient.primitives.monitoring_device_details import Tier as TierInfo
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -16,6 +18,8 @@ class Tenant(BaseModel):
 
     organization_name: str
     tier_name: str
+    tenant_info: Optional[TenantInfo]
+    tier_info: Optional[TierInfo]
 
 
 class TenantModel(FeatureTemplate):
@@ -32,10 +36,7 @@ class TenantModel(FeatureTemplate):
         tier_infos = session.primitives.monitoring_device_details.get_tiers()
 
         for tenant in self.tenants:
-            tier_info = tier_infos.filter(name=tenant.tier_name).single_or_default()
-            tenant_info = tenant_infos.filter(organization_name=tenant.organization_name).single_or_default()
-            # TODO Very, very ugly way...
-            tenant.__dict__["tier"] = tier_info
-            tenant.__dict__["info"] = tenant_info
+            tenant.tier_info = tier_infos.filter(name=tenant.tier_name).single_or_default()
+            tenant.tenant_info = tenant_infos.filter(org_name=tenant.organization_name).single_or_default()
 
         return super().generate_payload(session)

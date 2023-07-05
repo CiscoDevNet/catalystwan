@@ -8,8 +8,10 @@ from vmngclient.primitives.tenant_management import (
     ControlStatus,
     SiteHealth,
     TenantStatus,
+    TenantUpdateRequest,
     vEdgeHealth,
     vSessionId,
+    vSmartPlacementUpdateRequest,
     vSmartStatus,
     vSmartTenantCapacity,
     vSmartTenantMap,
@@ -25,7 +27,7 @@ class TenantManagementAPITest(unittest.TestCase):
         self.session.session_type = None
         self.api = TenantManagementAPI(self.session)
 
-    def test_get_all(self):
+    def test_get(self):
         expected_tenants = [
             Tenant(
                 name="tenant1",
@@ -39,7 +41,7 @@ class TenantManagementAPITest(unittest.TestCase):
             )
         ]
         self.api._primitives.get_all_tenants = MagicMock(return_value=expected_tenants)
-        observed_tenants = self.api.get_all()
+        observed_tenants = self.api.get()
         assert expected_tenants == observed_tenants
 
     def test_create(self):
@@ -57,6 +59,40 @@ class TenantManagementAPITest(unittest.TestCase):
         ]
         task = self.api.create(tenants)
         self.assertIsInstance(task, Task)
+
+    def test_update(self):
+        # Arrange
+        tenant_update_request = TenantUpdateRequest(
+            tenantId="apo605#",
+            subDomain="doamin.tenant.net",
+            desc="Tenant1 description",
+            wanEdgeForecast=1,
+            edgeConnectorEnable=False,
+        )
+        self.api._primitives.update_tenant = MagicMock()
+        # Act
+        self.api.update(tenant_update_request=tenant_update_request)
+        # Assert
+        self.api._primitives.update_tenant.assert_called_once_with(
+            tenant_id=tenant_update_request.tenant_id, tenant_update_request=tenant_update_request
+        )
+
+    def test_update_vsmart_placement(self):
+        # Arrange
+        src_uuid = "123190GDS*!"
+        dst_uuid = "!_0ac%$asfDS"
+        tenant_id = "apo605#"
+        vsmart_placement_update = vSmartPlacementUpdateRequest(
+            srcvSmartUuid=src_uuid,
+            destvSmartUuid=dst_uuid,
+        )
+        self.api._primitives.update_tenant_vsmart_placement = MagicMock()
+        # Act
+        self.api.update_vsmart_placement(tenant_id=tenant_id, src_vsmart_uuid=src_uuid, dst_vsmart_uuid=dst_uuid)
+        # Assert
+        self.api._primitives.update_tenant_vsmart_placement.assert_called_once_with(
+            tenant_id=tenant_id, vsmart_placement_update_request=vsmart_placement_update
+        )
 
     def test_delete(self):
         tenant_id_list = ["1"]
@@ -98,6 +134,7 @@ class TenantManagementAPITest(unittest.TestCase):
                     Tenant(
                         name="tenant1",
                         orgName="Tenant1-organization",
+                        desc="Tenant1 description",
                         subDomain="tenant1.organization.org",
                         flakeId=9987,
                     )
