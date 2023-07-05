@@ -25,12 +25,13 @@ from typing import (
     get_origin,
 )
 
+from attr import dataclass
 from packaging.specifiers import SpecifierSet  # type: ignore
 from packaging.version import Version  # type: ignore
 from pydantic import BaseModel
 
 from vmngclient.dataclasses import DataclassBase
-from vmngclient.exceptions import APIRequestPayloadTypeError, APIVersionError, APIViewError
+from vmngclient.exceptions import APIPrimitiveError, APIVersionError, APIViewError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import AttrsInstance, asdict
 from vmngclient.utils.session_type import SessionType
@@ -40,6 +41,47 @@ T = TypeVar("T")
 logger = logging.getLogger(__name__)
 ModelPayloadType = Union[AttrsInstance, BaseModel, Sequence[AttrsInstance], Sequence[BaseModel]]
 PayloadType = Union[None, str, bytes, dict, BinaryIO, ModelPayloadType]
+
+
+@dataclass(kw_only=True)
+class EndpointMeta:
+    http_method: str
+    url: str
+    versions: Optional[SpecifierSet] = None
+    tenancy_mode: Optional[Set[SessionType]] = None
+    primitive_class: type
+    primitive_method: Any
+    payload_type: type
+    payload_collection_type: Optional[type]
+    return_type: type
+    return_collection_type: Optional[type]
+
+
+class EndpointMetaRegistry:
+    def __init__(self):
+        self.items: dict[Any, EndpointMeta] = {}
+        self.versions_cache: dict[Any, SpecifierSet] = {}
+        self.tenancy_mode_cache: dict[Any, Set[SessionType]] = {}
+
+    def register(self, func, meta: EndpointMeta):
+        if self.items.get(func):
+            raise APIPrimitiveError(f"{func} already registered")
+        # if version, tenancy annotations was added before required data
+        meta.versions = self.versions_cache.pop(func, None)
+        meta.tenancy_mode = self.tenancy_mode_cache.pop(func, None)
+        self.items[func] = meta
+
+    def update_versions(self, func, versions: SpecifierSet):
+        if item := self.items.get(func):
+            item.versions = versions
+        else:
+            self.versions_cache[func] = versions
+
+    def update_tenacy_mode(self, func, tenancy_mode: Set[SessionType]):
+        if item := self.items.get(func):
+            item.tenancy_mode = tenancy_mode
+        else:
+            self.tenancy_mode_cache[func] = tenancy_mode
 
 
 class PreparedPayload(TypedDict):
@@ -55,7 +97,7 @@ def prepare_payload(payload: ModelPayloadType) -> PreparedPayload:
     if isinstance(payload, (DataSequence, Sequence)):
         return _prepare_sequence_payload(payload)
     else:
-        raise APIRequestPayloadTypeError(payload)
+        raise APIPrimitiveError(payload)
 
 
 def _prepare_basemodel_payload(payload: BaseModel) -> PreparedPayload:
@@ -76,7 +118,7 @@ def _prepare_sequence_payload(payload: Iterable[Union[BaseModel, AttrsInstance]]
         elif isinstance(item, AttrsInstance):
             items.append(asdict(item))
         else:
-            raise APIRequestPayloadTypeError(payload)
+            raise APIPrimitiveError(payload)
     data = json.dumps(items)
     return PreparedPayload(data=data, headers={"content-type": "application/json"})
 
@@ -146,6 +188,9 @@ class APIPrimitiveBase:
         return self._client.session_type
 
 
+endpoints = EndpointMetaRegistry()
+
+
 class VersionsDecorator:
     """
     Decorator to annotate api primitives methods with supported versions.
@@ -157,10 +202,14 @@ class VersionsDecorator:
         self.raises = raises
 
     def __call__(self, func):
+        endpoints.update_versions(func, self.supported_versions)
+
         def wrapper(*args, **kwargs):
             api = args[0]
             if not isinstance(api, APIPrimitiveBase):
-                raise TypeError("Only APIPrimitiveBase instance methods can be annotated with @versions decorator")
+                raise APIPrimitiveError(
+                    "Only APIPrimitiveBase instance methods can be annotated with @versions decorator"
+                )
             current = api._api_version
             supported = self.supported_versions
             if current and current not in supported:
@@ -186,10 +235,12 @@ class ViewDecorator:
         self.raises = raises
 
     def __call__(self, func):
+        endpoints.update_tenacy_mode(func, self.allowed_session_types)
+
         def wrapper(*args, **kwargs):
             api = args[0]
             if not isinstance(api, APIPrimitiveBase):
-                raise TypeError("Only APIPrimitiveBase instance methods can be annotated with @view decorator")
+                raise APIPrimitiveError("Only APIPrimitiveBase instance methods can be annotated with @view decorator")
             current = api._session_type
             allowed = self.allowed_session_types
             if current and current not in allowed:
@@ -220,7 +271,7 @@ class RequestDecorator:
             sig (Signature): wrapped method signature
 
         Raises:
-            TypeError: when signature contains unexpected return annotation
+            APIPrimitiveError: when signature contains unexpected return annotation
 
         Returns:
             Tuple[bool, bool, type]: Specification (returns anyting?, is datasequence?, return type)
@@ -231,7 +282,7 @@ class RequestDecorator:
                 return (True, False, annotation)
             elif annotation == _empty:
                 return (False, False, annotation)
-            raise TypeError(f"Expected: {self.allowed_return_type} but return type {annotation}")
+            raise APIPrimitiveError(f"Expected: {self.allowed_return_type} but return type {annotation}")
         elif (type_origin := get_origin(annotation)) and isclass(type_origin) and issubclass(type_origin, DataSequence):
             if (
                 (type_args := get_args(annotation))
@@ -240,9 +291,9 @@ class RequestDecorator:
                 and issubclass(type_args[0], (BaseModel, DataclassBase))
             ):
                 return (True, True, type_args[0])
-            raise TypeError(f"Expected: {self.allowed_return_type} but return type {annotation}")
+            raise APIPrimitiveError(f"Expected: {self.allowed_return_type} but return type {annotation}")
         else:
-            raise TypeError(f"Expected: {self.allowed_return_type} but return type {annotation}")
+            raise APIPrimitiveError(f"Expected: {self.allowed_return_type} but return type {annotation}")
 
     def format_url(self, **kwargs) -> dict[str, Any]:
         """Formats url from keyword argumets given wrapped function
@@ -258,11 +309,26 @@ class RequestDecorator:
 
     def __call__(self, func):
         self.returns, self.returns_dataseq, self.return_type = self.specify_return_type(signature(func))
+        endpoints.register(
+            func,
+            EndpointMeta(
+                http_method=self.method,
+                url=self.url,
+                primitive_class=func.__class__,
+                primitive_method=func,
+                payload_type=None,  # TODO
+                payload_collection_type=None,  # TODO
+                return_type=self.return_type,
+                return_collection_type=DataSequence if self.returns_dataseq else None,
+            ),
+        )
 
         def wrapper(*args, **kwargs):
             api = args[0]
             if not isinstance(api, APIPrimitiveBase):
-                raise TypeError("Only APIPrimitiveBase instance methods can be annotated with @request decorator")
+                raise APIPrimitiveError(
+                    "Only APIPrimitiveBase instance methods can be annotated with @request decorator"
+                )
             request_kwargs = self.format_url(**kwargs)
             if self.returns:
                 if issubclass(self.return_type, (BaseModel, DataclassBase)):

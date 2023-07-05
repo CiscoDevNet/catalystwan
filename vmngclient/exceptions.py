@@ -109,3 +109,9 @@ class TenantSubdomainNotFound(vManageClientError):
     """Raised when given subdomain does not exist"""
 
     pass
+
+
+class APIPrimitiveError(vManageClientError):
+    """Raised when there is a problem with primitive definition"""
+
+    pass
