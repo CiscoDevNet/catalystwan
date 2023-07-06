@@ -170,8 +170,9 @@ class AdministrationUserAndGroupPrimitives(APIPrimitiveBase):
         # DELETE /admin/cologroup/{id}
         ...
 
+    @request(delete, "/admin/user/{username}")
     def delete_user(self, username: str):
-        self._delete(f"/admin/user/{username}")
+        ...
 
     @request(delete, "/admin/usergroup/{group_name}")
     def delete_user_group(self, group_name: str):
@@ -201,14 +202,17 @@ class AdministrationUserAndGroupPrimitives(APIPrimitiveBase):
         # GET /admin/usergroup/keyvalue
         ...
 
+    @request(get, "/admin/user/role")
     def find_user_role(self) -> UserRole:
-        return self._get("/admin/user/role").dataobj(UserRole, None)
+        ...
 
+    @request(get, "/admin/user", "data")
     def find_users(self) -> DataSequence[User]:
-        return self._get("/admin/user").dataseq(User)
+        ...
 
+    @request(get, "/admin/user/activeSessions", "data")
     def get_active_sessions(self) -> DataSequence[ActiveSession]:
-        return self._get("/admin/user/activeSessions").dataseq(ActiveSession)
+        ...
 
     def get_colo_groups(self):
         # GET /admin/cologroup
@@ -218,32 +222,33 @@ class AdministrationUserAndGroupPrimitives(APIPrimitiveBase):
         # GET /admin/vpngroup
         ...
 
-    def remove_sessions(self, sessions_delete_request: SessionsDeleteRequest) -> InvalidateSessionMessage:
-        response = self._delete("/admin/user/removeSessions", payload=sessions_delete_request)
-        return response.dataobj(InvalidateSessionMessage)
+    @request(delete, "/admin/user/removeSessions", "data")
+    def remove_sessions(self, payload: SessionsDeleteRequest) -> InvalidateSessionMessage:
+        ...
 
-    def reset_user(self, user_reset_request: UserResetRequest):
-        self._post("/admin/user/reset", payload=user_reset_request)
+    @request(post, "/admin/user/reset")
+    def reset_user(self, payload: UserResetRequest):
+        ...
 
     @request(get, "/admin/resourcegroup")
     def find_resource_groups(self) -> DataSequence[ResourceGroup]:
         ...
 
-    def switch_resource_group(self, resource_group_switch_request: ResourceGroupSwitchRequest):
-        # POST /admin/resourcegroup/switch
-        self._post("/admin/resourcegroup/switch", payload=resource_group_switch_request)
+    @request(post, "/admin/resourcegroup/switch")
+    def switch_resource_group(self, payload: ResourceGroupSwitchRequest):
+        ...
 
-    def update_resource_group(self, group_id: str, resource_group_update_request: ResourceGroupUpdateRequest):
-        # PUT /admin/resourcegroup/{groupId}
-        self._put(f"/admin/resourcegroup/{group_id}", payload=resource_group_update_request)
+    @request(put, "/admin/resourcegroup/{group_id}")
+    def update_resource_group(self, group_id: str, payload: ResourceGroupUpdateRequest):
+        ...
 
+    @request(put, "/admin/resourcegroup/{group_id}", json={})
     def delete_resource_group(self, group_id: str):
-        # DELETE /admin/resourcegroup/{groupId}
-        self._delete(f"/admin/resourcegroup/{group_id}", json={})
+        ...
 
+    @request(post, "/admin/resourcegroup")
     def create_resource_group(self, resource_group: ResourceGroup):
-        # POST /admin/resourcegroup
-        self._post("/admin/resourcegroup", payload=resource_group)
+        ...
 
     def resource_group_name(self):
         # GET /admin/user/resourceGroupName
@@ -261,14 +266,17 @@ class AdministrationUserAndGroupPrimitives(APIPrimitiveBase):
         # PUT /admin/user/profile/locale
         ...
 
-    def update_profile_password(self, profile_password_update_request: ProfilePasswordUpdateRequest):
-        self._put("/admin/user/profile/password", payload=profile_password_update_request)
+    @request(put, "/admin/user/profile/password")
+    def update_profile_password(self, payload: ProfilePasswordUpdateRequest):
+        ...
 
-    def update_user(self, username: str, user_update_request: UserUpdateRequest):
-        self._put(f"/admin/user/{username}", payload=user_update_request)
+    @request(put, "/admin/user/{username}")
+    def update_user(self, username: str, payload: UserUpdateRequest):
+        ...
 
-    def update_user_group(self, group_name: str, user_group: UserGroup):
-        self._put(f"/admin/usergroup/{group_name}", payload=user_group)
+    @request(put, "/admin/usergroup/{group_name}")
+    def update_user_group(self, group_name: str, payload: UserGroup):
+        ...
 
     def validate_password(self):
         # POST /admin/user/password/validate

@@ -87,7 +87,7 @@ class UsersAPI:
         Args:
             user (User): Definition of new user to be created
         """
-        self._primitives.create_user(user=user)
+        self._primitives.create_user(user)
 
     def update(self, user_update_request: UserUpdateRequest):
         """Updates existing user
@@ -95,7 +95,7 @@ class UsersAPI:
         Args:
             user_update_request (UserUpdateRequest): User attributes to be updated
         """
-        self._primitives.update_user(username=user_update_request.username, user_update_request=user_update_request)
+        self._primitives.update_user(user_update_request.username, user_update_request)
 
     def update_password(self, username: str, new_password: str):
         """Updates exisiting user password
@@ -104,10 +104,10 @@ class UsersAPI:
             username (str): Name of the user
             new_password (str): New password for given user
         """
-        update_user_request = UserUpdateRequest(
+        update_password_request = UserUpdateRequest(
             userName=username, password=new_password, currentUserPassword=self.session.password
         )  # type: ignore
-        self._primitives.update_password(username=username, payload=update_user_request)
+        self._primitives.update_password(username, update_password_request)
 
     def reset(self, username: str):
         """Resets given user (unlocks blocked user eg. after number of unsuccessfull login attempts)
@@ -115,7 +115,7 @@ class UsersAPI:
         Args:
             username (str): Name of the user to be unlocked
         """
-        self._primitives.reset_user(user_reset_request=UserResetRequest(userName=username))
+        self._primitives.reset_user(UserResetRequest(userName=username))
 
     def delete(self, username: str):
         """Deletes given user
@@ -123,7 +123,7 @@ class UsersAPI:
         Args:
             username (str): Name of the user to be deleted
         """
-        self._primitives.delete_user(username=username)
+        self._primitives.delete_user(username)
 
 
 class UserGroupsAPI:
@@ -147,7 +147,7 @@ class UserGroupsAPI:
         Args:
             user_group (UserGroup): Definition of user group to be created
         """
-        self._primitives.create_user_group(user_group=user_group)
+        self._primitives.create_user_group(user_group)
 
     def update(self, user_group: UserGroup):
         """Updates existing user group
@@ -155,7 +155,7 @@ class UserGroupsAPI:
         Args:
             user_group (UserGroup): User group attributes to be updated
         """
-        self._primitives.update_user_group(group_name=user_group.group_name, user_group=user_group)
+        self._primitives.update_user_group(user_group.group_name, user_group)
 
     def delete(self, group_name: str):
         """Deletes given user group
@@ -163,7 +163,7 @@ class UserGroupsAPI:
         Args:
             group_name (str): Name of the user group to be deleted
         """
-        self._primitives.delete_user_group(group_name=group_name)
+        self._primitives.delete_user_group(group_name)
 
 
 class ResourceGroupsAPI:
@@ -187,7 +187,7 @@ class ResourceGroupsAPI:
         Args:
             resource_group (ResourceGroup): Definition of new resource group to be created
         """
-        self._primitives.create_resource_group(resource_group=resource_group)
+        self._primitives.create_resource_group(resource_group)
 
     def update(self, resource_group_update_request: ResourceGroupUpdateRequest):
         """Updates existing resource group
@@ -196,9 +196,7 @@ class ResourceGroupsAPI:
             resource_group_update_request (ResourceGroupUpdateRequest): Object containing existing
             resource group id and attributes to be updated
         """
-        self._primitives.update_resource_group(
-            group_id=resource_group_update_request.id, resource_group_update_request=resource_group_update_request
-        )
+        self._primitives.update_resource_group(resource_group_update_request.id, resource_group_update_request)
 
     def switch(self, resource_group_name: str):
         """Switch to view only a specific resource group (for global admin only)
@@ -207,7 +205,7 @@ class ResourceGroupsAPI:
             resource_group_name (str): Name of resource group to switch view
         """
         switch_request = ResourceGroupSwitchRequest(resourceGroupName=resource_group_name)
-        self._primitives.switch_resource_group(resource_group_switch_request=switch_request)
+        self._primitives.switch_resource_group(switch_request)
 
     def delete(self, resource_group_id: str):
         """Deletes a given resource group
@@ -215,7 +213,7 @@ class ResourceGroupsAPI:
         Args:
             resource_group_id (str): Resource group id
         """
-        self._primitives.delete_resource_group(group_id=resource_group_id)
+        self._primitives.delete_resource_group(resource_group_id)
 
 
 class SessionsAPI:

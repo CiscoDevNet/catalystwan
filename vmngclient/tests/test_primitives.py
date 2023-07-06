@@ -200,7 +200,7 @@ class TestAPIPrimitives(unittest.TestCase):
 
     def test_unexpected_payload(self):
         with self.assertRaises(APIRequestPayloadTypeError):
-            self.primitive._get("/5", payload=[1, 2, 3])
+            self.primitive._get("/5", payload={1, 2, 3})
 
     def test_request_decorator_positional_arguments(self):
         class TestAPI(APIPrimitiveBase):

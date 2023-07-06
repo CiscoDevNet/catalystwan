@@ -30,7 +30,7 @@ from packaging.version import Version  # type: ignore
 from pydantic import BaseModel
 
 from vmngclient.dataclasses import DataclassBase
-from vmngclient.exceptions import APIPrimitiveError, APIVersionError, APIViewError
+from vmngclient.exceptions import APIPrimitiveError, APIRequestPayloadTypeError, APIVersionError, APIViewError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import AttrsInstance, asdict
 from vmngclient.utils.session_type import SessionType
@@ -76,7 +76,7 @@ def prepare_payload(payload: ModelPayloadType) -> PreparedPayload:
     if isinstance(payload, (DataSequence, Sequence)):
         return _prepare_sequence_payload(payload)
     else:
-        raise APIPrimitiveError(payload)
+        raise APIRequestPayloadTypeError(payload)
 
 
 def _prepare_basemodel_payload(payload: BaseModel) -> PreparedPayload:
@@ -104,7 +104,7 @@ def _prepare_sequence_payload(payload: Iterable[Union[BaseModel, AttrsInstance]]
 
 class APIPRimitiveClientResponse(Protocol):
     """
-    Interface to response object. Based on "requests" library
+    Interface to response object. Fits "requests.Response"
     but set of methods is minimal to allow easy migration to another client if needed
     """
 
@@ -130,7 +130,7 @@ class APIPrimitiveClient(Protocol):
     """
     Interface to client object.
     We only need a request function and few vmanage session properties fetched during runtime
-    Matched to fit "requests" library but migration to other client is possible.
+    Matched to fit "requests.Session" but migration to other client is possible.
     At his point not very clean as injection of custom kwargs is possible (and sometimes used)
     """
 

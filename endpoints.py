@@ -145,4 +145,4 @@ if __name__ == "__main__":
     )
     with open("ENDPOINTS.md", "w") as f:
         f.write("**THIS FILE IS AUTO-GENERATED DO NOT EDIT**\n\n")
-        f.write(endpoint_registry.md())
+        f.write(endpoint_registry.md() + "\n")
