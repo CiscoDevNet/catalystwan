@@ -1,5 +1,5 @@
 # mypy: disable-error-code="empty-body"
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -58,6 +58,46 @@ class TenantStatus(BaseModel):
     site_health: SiteHealth = Field(alias="siteHealth")
     vedge_health: vEdgeHealth = Field(alias="vEdgeHealth")
     vsmart_status: vSmartStatus = Field(alias="vSmartStatus")
+
+
+class TenantUpdateRequest(BaseModel):
+    tenant_id: str = Field(alias="tenantId")
+    subdomain: str = Field(alias="subDomain")
+    desc: str
+    wan_edge_forecast: Optional[int] = Field(alias="wanEdgeForecast")
+    edge_connector_enable: Optional[bool] = Field(alias="edgeConnectorEnable")
+    edge_connector_system_ip: Optional[str] = Field(alias="edgeConnectorSystemIp")
+    edge_connector_tunnel_interface_name: Optional[str] = Field(alias="edgeConnectorTunnelInterfaceName")
+
+    @classmethod
+    def from_tenant(cls, tenant: Tenant) -> "TenantUpdateRequest":
+        """Creates payload for tenant update from existing tenant data obtained by GET
+
+        Args:
+            tenant (Tenant): Tenant to be updated
+
+        Raises:
+            TypeError: When provided tenant is missing ID
+
+        Returns:
+            TenantUpdateRequest: Tenant attributes suitable for PUT request
+        """
+        if not tenant.tenant_id:
+            raise TypeError("tenantId required for update request")
+        return TenantUpdateRequest(
+            tenantId=tenant.tenant_id,
+            desc=tenant.desc,
+            subDomain=tenant.subdomain,
+            wanEdgeForecast=tenant.wan_edge_forecast,
+            edgeConnectorEnable=tenant.edge_connector_enable,
+            edgeConnectorSystemIp=tenant.edge_connector_system_ip,
+            edgeConnectorTunnelInterfaceName=tenant.edge_connector_tunnel_interface_name,
+        )
+
+
+class vSmartPlacementUpdateRequest(BaseModel):
+    src_vsmart_uuid: str = Field(alias="srcvSmartUuid")
+    dest_vsmart_uuid: str = Field(alias="destvSmartUuid")
 
 
 class vSmartTenantCapacity(BaseModel):
@@ -133,13 +173,15 @@ class TenantManagementPrimitives(APIPrimitiveBase):
         # POST /tenant/vsmart-mt/migrate
         ...
 
-    def update_tenant(self):
-        # PUT /tenant/{tenantId}
-        ...
+    @view({ProviderView})
+    def update_tenant(self, tenant_id: str, tenant_update_request: TenantUpdateRequest) -> Tenant:
+        return self._put(f"/tenant/{tenant_id}", payload=tenant_update_request).dataobj(Tenant, None)
 
-    def update_tenant_vsmart_placement(self):
-        # PUT /tenant/{tenantId}/vsmart
-        ...
+    @view({ProviderView})
+    def update_tenant_vsmart_placement(
+        self, tenant_id: str, vsmart_placement_update_request: vSmartPlacementUpdateRequest
+    ):
+        self._put(f"/tenant/{tenant_id}/vsmart", payload=vsmart_placement_update_request)
 
     @view({ProviderView})
     def vsession_id(self, tenant_id: str) -> vSessionId:

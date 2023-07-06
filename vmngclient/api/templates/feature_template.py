@@ -3,11 +3,12 @@ from __future__ import annotations
 import json
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, List, cast
+from typing import TYPE_CHECKING, Dict, List, cast
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
-from pydantic import BaseModel
+from pydantic import BaseModel, root_validator
 
+from vmngclient.api.templates.device_variable import DeviceVariable
 from vmngclient.utils.device_model import DeviceModel
 
 if TYPE_CHECKING:
@@ -18,6 +19,7 @@ class FeatureTemplate(BaseModel, ABC):
     name: str
     description: str
     device_models: List[DeviceModel] = []
+    _device_specific_variables: Dict[str, DeviceVariable]
 
     def generate_payload(self, session: vManageSession) -> str:
         env = Environment(
@@ -46,6 +48,18 @@ class FeatureTemplate(BaseModel, ABC):
     @property
     def type(self) -> str:
         raise NotImplementedError()
+
+    @root_validator(pre=True)
+    def remove_device_variables(cls, values):
+        cls._device_specific_variables = {}
+        for value in values:
+            if isinstance(values[value], DeviceVariable):
+                cls._device_specific_variables[value] = values[value]
+
+        for var in cls._device_specific_variables:
+            del values[var]
+
+        return values
 
     @classmethod
     def get(cls, session: vManageSession, name: str) -> FeatureTemplate:
