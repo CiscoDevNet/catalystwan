@@ -11,3 +11,5 @@ GET /admin/usergroup||[**AdministrationUserAndGroupPrimitives.find_user_groups**
 GET /admin/resourcegroup||[**AdministrationUserAndGroupPrimitives.find_resource_groups**](vmngclient/primitives/administration_user_and_group.py#L228)||DataSequence[[**ResourceGroup**](vmngclient/primitives/administration_user_and_group.py#L127)]|
 PUT /admin/user/password/{username}||[**AdministrationUserAndGroupPrimitives.update_password**](vmngclient/primitives/administration_user_and_group.py#L256)|[**UserUpdateRequest**](vmngclient/primitives/administration_user_and_group.py#L20)||
 POST /tenant/bulk/async||[**TenantManagementPrimitives.create_tenant_async_bulk**](vmngclient/primitives/tenant_management.py#L88)|[**Tenant**](vmngclient/model/tenant.py#L21)|[**TenantTaskId**](vmngclient/primitives/tenant_management.py#L21)|
+GET /client/server||[**ClientPrimitives.server**](vmngclient/primitives/client.py#L61)||[**ServerInfo**](vmngclient/primitives/client.py#L21)|
+GET /client/about||[**ClientPrimitives.about**](vmngclient/primitives/client.py#L65)||[**AboutInfo**](vmngclient/primitives/client.py#L49)|

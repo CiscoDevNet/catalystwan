@@ -16,6 +16,7 @@ from typing import (
     Protocol,
     Sequence,
     Set,
+    Tuple,
     Type,
     TypedDict,
     TypeVar,
@@ -102,6 +103,11 @@ def _prepare_sequence_payload(payload: Iterable[Union[BaseModel, AttrsInstance]]
 
 
 class APIPRimitiveClientResponse(Protocol):
+    """
+    Interface to response object. Based on "requests" library
+    but set of methods is minimal to allow easy migration to another client if needed
+    """
+
     @property
     def text(self) -> str:
         ...
@@ -110,10 +116,10 @@ class APIPRimitiveClientResponse(Protocol):
     def content(self) -> bytes:
         ...
 
-    def dataobj(self, cls: Type[T], sourcekey: Optional[str] = "data") -> T:
+    def dataobj(self, cls: Type[T], sourcekey: Optional[str]) -> T:
         ...
 
-    def dataseq(self, cls: Type[T], sourcekey: Optional[str] = "data") -> DataSequence[T]:
+    def dataseq(self, cls: Type[T], sourcekey: Optional[str]) -> DataSequence[T]:
         ...
 
     def json(self) -> dict:
@@ -121,6 +127,13 @@ class APIPRimitiveClientResponse(Protocol):
 
 
 class APIPrimitiveClient(Protocol):
+    """
+    Interface to client object.
+    We only need a request function and few vmanage session properties fetched during runtime
+    Matched to fit "requests" library but migration to other client is possible.
+    At his point not very clean as injection of custom kwargs is possible (and sometimes used)
+    """
+
     def request(self, method: str, url: str, **kwargs) -> APIPRimitiveClientResponse:
         ...
 
@@ -134,6 +147,12 @@ class APIPrimitiveClient(Protocol):
 
 
 class APIPrimitiveBase:
+    """
+    Class to be used as base for all API primitives.
+    Injects BASE_PATH url prefix as it is common for all known vManage API endpoints
+    Introduces special keyword 'payload' in request call and serializes model to json.
+    """
+
     def __init__(self, client: APIPrimitiveClient):
         self._client = client
         self._basepath = BASE_PATH
@@ -145,6 +164,7 @@ class APIPrimitiveBase:
             kwargs.update(prepare_payload(payload))
         return self._client.request(method, self._basepath + url, **kwargs)
 
+    # TODO remove (not needed after all primitives are decorated with @request decorator which uses only _request)
     def _get(self, url: str, payload: Optional[ModelPayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
         return self._request("GET", url, payload, **kwargs)
 
@@ -240,21 +260,27 @@ class request:
     Additional kwargs can be injected which will be passed to request method (eg. custom headers)
 
     Raises:
-        APIPrimitiveError: when definition contains unsupported types in annotations
+        APIPrimitiveError: when decorated method has unsupported parameters or response type
     """
 
     meta_lookup: Dict[Any, APIPrimitivesRequestMeta] = {}
 
     def __init__(self, http_method: str, url: str, resp_json_key: Optional[str] = None, **kwargs):
         self.http_method = http_method
+        formatter = Formatter()
+        url_field_names = {item[1] for item in formatter.parse(url) if item[1] is not None}
+        if "payload" in url_field_names:
+            APIPrimitiveError(f"Field name: 'payload' is not allowed in url: {url}")
         self.url = url
+        self.url_field_names = url_field_names
         self.resp_json_key = resp_json_key
         self.return_spec = TypeSpecifier(False)
         self.payload_spec = TypeSpecifier(False)
+        self.kwargs = kwargs
 
     @staticmethod
     def specify_return_type(sig: Signature) -> TypeSpecifier:
-        """Specifies return type based on method signature annotations.
+        """Specifies return type based on decorated method signature annotations.
         Does basic checking of annotated types, not accurate but can detect problems early.
 
         Args:
@@ -287,8 +313,8 @@ class request:
 
     @staticmethod
     def specify_payload_type(sig: Signature) -> TypeSpecifier:
-        """Specifies payload type based on method signature annotations.
-        Does basic checking of annotated types, not accurate but can detect problems early.
+        """Specifies payload type based on decorated method signature annotations.
+        Does basic checking of annotated types for 'payload' parameter, not accurate but can detect problems early.
 
         Args:
             sig (Signature): wrapped method signature
@@ -320,59 +346,57 @@ class request:
         else:
             raise APIPrimitiveError(f"Expected: {PayloadType} but found payload {annotation}")
 
-    def format_url(self, *args, **kwargs) -> dict[str, Any]:
-        """Formats url from argumets given wrapped function
+    def check_params(self, sig: Signature, url_field_names: Set[str]):
+        """Checks params in decorated method definition"""
+        pass
 
-        Returns:
-            dict[str, Any]: keyword arguments without fields consumed during parsing
+    def merge_args(self, positional_args: Tuple, keyword_args: Dict[str, Any]) -> Dict[str, Any]:
+        """Merges decorated method args and kwargs into one dictionary
+        This is needed to identify all decorated method arguments by name inside wrapper body
+        We can learn positional arguments names from signature.
+
+        Returns: Dict[str, Any]: all passed args as keyword arguments (including "self")
         """
-        breakpoint()
-        formatter = Formatter()
-        stripped_kwargs = dict(kwargs)
-        fields = {}
-        field_names = {item[1] for item in formatter.parse(self.url) if item[1] is not None}
-        for key in field_names:
-            if key in kwargs.keys():
-                fields[key] = kwargs[key]
-                del stripped_kwargs[key]
-            else:
-                raise APIPrimitiveError(f"field name: {key} found in url but not in provided kwargs: {kwargs.keys()}")
-        self.url.format(**fields)
-        return stripped_kwargs
+        positional_args_names = [key for key in self.sig.parameters.keys()]
+        all_args_dict = dict(zip(positional_args_names, positional_args))
+        all_args_dict.update(keyword_args)
+        return all_args_dict
 
     def __call__(self, func):
-        sig = signature(func)
-        self.return_spec = self.specify_return_type(sig)
-        self.payload_spec = self.specify_payload_type(sig)
+        self.sig = signature(func)
+        self.return_spec = self.specify_return_type(self.sig)
+        self.payload_spec = self.specify_payload_type(self.sig)
         self.meta_lookup[func] = APIPrimitivesRequestMeta(
             http_request=f"{self.http_method} {self.url}", payload_spec=self.payload_spec, return_spec=self.return_spec
         )
 
         def wrapper(*args, **kwargs):
-            api = args[0]
-            if not isinstance(api, APIPrimitiveBase):
+            _self = args[0]
+            if not isinstance(_self, APIPrimitiveBase):
                 raise APIPrimitiveError(
                     "Only APIPrimitiveBase instance methods can be annotated with @request decorator"
                 )
-            request_kwargs = self.format_url(*args, **kwargs)
+            _kwargs = self.merge_args(args, kwargs)
+            print(_kwargs)
+            self.url.format(**_kwargs)
             if self.return_spec.present:
                 if issubclass(self.return_spec.payload_type, (BaseModel, DataclassBase)):
                     if self.return_spec.sequence_type == DataSequence:
-                        return api._request(self.http_method, self.url, **request_kwargs).dataseq(
+                        return _self._request(self.http_method, self.url, **self.kwargs).dataseq(
                             self.return_spec.payload_type, self.resp_json_key
                         )
                     else:
-                        return api._request(self.http_method, self.url, **request_kwargs).dataobj(
+                        return _self._request(self.http_method, self.url, **self.kwargs).dataobj(
                             self.return_spec.payload_type, self.resp_json_key
                         )
                 elif issubclass(self.return_spec.payload_type, str):
-                    return api._request(self.http_method, self.url, **request_kwargs).text
+                    return _self._request(self.http_method, self.url, **self.kwargs).text
                 elif issubclass(self.return_spec.payload_type, bytes):
-                    return api._request(self.http_method, self.url, **request_kwargs).content
+                    return _self._request(self.http_method, self.url, **self.kwargs).content
                 elif issubclass(self.return_spec.payload_type, dict):
-                    return api._request(self.http_method, self.url, **request_kwargs).json()
+                    return _self._request(self.http_method, self.url, **self.kwargs).json()
             else:
-                api._request(self.http_method, self.url, **request_kwargs)
+                _self._request(self.http_method, self.url, **self.kwargs)
 
         return wrapper
 

@@ -11,7 +11,7 @@ from vmngclient.dataclasses import DataclassBase  # type: ignore
 from vmngclient.exceptions import APIRequestPayloadTypeError, APIVersionError, APIViewError
 from vmngclient.primitives import APIPrimitiveBase
 from vmngclient.primitives import logger as primitives_logger
-from vmngclient.primitives import versions, view
+from vmngclient.primitives import request, versions, view
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.session_type import ProviderAsTenantView, ProviderView, TenantView
@@ -30,6 +30,11 @@ class BaseModelExample(BaseModel):
     size: int
     capacity: float
     active: bool
+
+
+class BaseModelExample2(BaseModel):
+    example: BaseModelExample
+    size: int
 
 
 class TestAPIPrimitives(unittest.TestCase):
@@ -194,3 +199,13 @@ class TestAPIPrimitives(unittest.TestCase):
     def test_unexpected_payload(self):
         with self.assertRaises(APIRequestPayloadTypeError):
             self.primitive._get("/5", payload=[1, 2, 3])
+
+    def test_request_decorator_positional_arguments(self):
+        class TestAPI(APIPrimitiveBase):
+            @request("GET", "/v1/data/{id}")
+            def get_data(self, id, payload: BaseModelExample):  # type: ignore [empty-body]
+                ...
+
+        api = TestAPI(self.session_mock)
+        api.get_data("ID123", self.basemodel_payload)
+        api.get_data(payload=self.basemodel_payload)
