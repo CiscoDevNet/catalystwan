@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 from vmngclient.dataclasses import DataclassBase  # type: ignore
 from vmngclient.exceptions import APIRequestPayloadTypeError, APIVersionError, APIViewError
-from vmngclient.primitives import APIPrimitiveBase
+from vmngclient.primitives import BASE_PATH, APIPrimitiveBase
 from vmngclient.primitives import logger as primitives_logger
 from vmngclient.primitives import request, versions, view
 from vmngclient.typed_list import DataSequence
@@ -39,7 +39,8 @@ class BaseModelExample2(BaseModel):
 
 class TestAPIPrimitives(unittest.TestCase):
     @patch("vmngclient.session.vManageSession")
-    def setUp(self, session_mock) -> None:
+    def setUp(self, session_mock):
+        self.base_path = BASE_PATH
         self.session_mock = session_mock
         self.session_mock.request = MagicMock()
         self.session_mock.api_version = None
@@ -51,6 +52,7 @@ class TestAPIPrimitives(unittest.TestCase):
             "capacity": 1.7,
             "active": True,
         }
+        self.json_payload = json.dumps(self.dict_payload)
         self.attrs_payload = create_dataclass(AttrsModelExample, self.dict_payload)
         self.basemodel_payload = BaseModelExample.parse_obj(self.dict_payload)
         self.list_dict_payload = [self.dict_payload] * 2
@@ -203,9 +205,14 @@ class TestAPIPrimitives(unittest.TestCase):
     def test_request_decorator_positional_arguments(self):
         class TestAPI(APIPrimitiveBase):
             @request("GET", "/v1/data/{id}")
-            def get_data(self, id, payload: BaseModelExample):  # type: ignore [empty-body]
+            def get_data(self, id: str, payload: BaseModelExample):  # type: ignore [empty-body]
                 ...
 
         api = TestAPI(self.session_mock)
         api.get_data("ID123", self.basemodel_payload)
-        api.get_data(payload=self.basemodel_payload)
+        self.session_mock.request.assert_called_once_with(
+            "GET",
+            self.base_path + "/v1/data/ID123",
+            data=self.json_payload,
+            headers={"content-type": "application/json"},
+        )

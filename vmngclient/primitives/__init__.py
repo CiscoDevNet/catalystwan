@@ -355,11 +355,12 @@ class request:
         This is needed to identify all decorated method arguments by name inside wrapper body
         We can learn positional arguments names from signature.
 
-        Returns: Dict[str, Any]: all passed args as keyword arguments (including "self")
+        Returns: Dict[str, Any]: all passed args as keyword arguments (excluding "self")
         """
         positional_args_names = [key for key in self.sig.parameters.keys()]
         all_args_dict = dict(zip(positional_args_names, positional_args))
         all_args_dict.update(keyword_args)
+        all_args_dict.pop("self", None)
         return all_args_dict
 
     def __call__(self, func):
@@ -377,26 +378,28 @@ class request:
                     "Only APIPrimitiveBase instance methods can be annotated with @request decorator"
                 )
             _kwargs = self.merge_args(args, kwargs)
-            print(_kwargs)
-            self.url.format(**_kwargs)
+            payload = _kwargs.get("payload")
+            if self.payload_spec.present and _kwargs.get("payload") is None:
+                raise TypeError("Missing required argument 'payload'")
+            self.url = self.url.format(**_kwargs)
             if self.return_spec.present:
                 if issubclass(self.return_spec.payload_type, (BaseModel, DataclassBase)):
                     if self.return_spec.sequence_type == DataSequence:
-                        return _self._request(self.http_method, self.url, **self.kwargs).dataseq(
+                        return _self._request(self.http_method, self.url, payload=payload, **self.kwargs).dataseq(
                             self.return_spec.payload_type, self.resp_json_key
                         )
                     else:
-                        return _self._request(self.http_method, self.url, **self.kwargs).dataobj(
+                        return _self._request(self.http_method, self.url, payload=payload, **self.kwargs).dataobj(
                             self.return_spec.payload_type, self.resp_json_key
                         )
                 elif issubclass(self.return_spec.payload_type, str):
-                    return _self._request(self.http_method, self.url, **self.kwargs).text
+                    return _self._request(self.http_method, self.url, payload=payload, **self.kwargs).text
                 elif issubclass(self.return_spec.payload_type, bytes):
-                    return _self._request(self.http_method, self.url, **self.kwargs).content
+                    return _self._request(self.http_method, self.url, payload=payload, **self.kwargs).content
                 elif issubclass(self.return_spec.payload_type, dict):
-                    return _self._request(self.http_method, self.url, **self.kwargs).json()
+                    return _self._request(self.http_method, self.url, payload=payload, **self.kwargs).json()
             else:
-                _self._request(self.http_method, self.url, **self.kwargs)
+                _self._request(self.http_method, self.url, payload=payload, **self.kwargs)
 
         return wrapper
 
