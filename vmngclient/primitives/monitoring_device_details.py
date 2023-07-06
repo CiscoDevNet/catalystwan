@@ -1,8 +1,9 @@
+# mypy: disable-error-code="empty-body"
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-from vmngclient.primitives import APIPrimitiveBase
+from vmngclient.primitives import APIPrimitiveBase, get, request
 from vmngclient.typed_list import DataSequence
 
 
@@ -112,8 +113,9 @@ class MonitoringDeviceDetailsPrimitives(APIPrimitiveBase):
         #  GET /device/queues
         ...
 
+    @request(get, "/device/tier", "data")
     def get_tiers(self) -> DataSequence[Tier]:
-        return self._get("/device/tier").dataseq(Tier)
+        ...
 
     def get_unconfigured(self):
         #  GET /device/unconfigured

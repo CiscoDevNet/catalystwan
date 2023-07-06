@@ -1,3 +1,4 @@
+# mypy: disable-error-code="empty-body"
 from pathlib import Path
 from typing import BinaryIO
 from urllib.parse import parse_qsl, urlsplit
@@ -5,7 +6,7 @@ from urllib.parse import parse_qsl, urlsplit
 from pydantic import BaseModel, Field
 
 from vmngclient.model.tenant import Tenant
-from vmngclient.primitives import APIPrimitiveBase
+from vmngclient.primitives import APIPrimitiveBase, get, post, request
 
 
 class MigrationTokenQueryParams(BaseModel):
@@ -35,23 +36,26 @@ class MigrationInfo(BaseModel):
 
 
 class TenantMigrationPrimitives(APIPrimitiveBase):
+    @request(get, "/tenantmigration/download/{path}")
     def download_tenant_data(self, path: str = "default.tar.gz") -> bytes:
-        return self._get(f"/tenantmigration/download/{path}").content
+        ...
 
+    @request(post, "/tenantmigration/export")
     def export_tenant_data(self, tenant: Tenant) -> ExportInfo:
-        response = self._post("/tenantmigration/export", payload=tenant)
-        return response.dataobj(ExportInfo, None)
+        ...
 
     def get_migration_token(self, params: MigrationTokenQueryParams) -> str:
+        # TODO impement dynamic params handling in request decorator
         return self._get("/tenantmigration/migrationToken", params=params.dict(by_alias=True)).text
 
     def import_tenant_data(self, data: BinaryIO) -> ImportInfo:
+        # TODO implement dedicated payload types for files upload in request decorator
         response = self._post("/tenantmigration/import", files={"file": (Path(data.name).name, data)})
         return response.dataobj(ImportInfo, None)
 
-    def migrate_network(self, migration_token: str) -> MigrationInfo:
-        response = self._post("/tenantmigration/networkMigration", data=migration_token)
-        return response.dataobj(MigrationInfo, None)
+    @request(post, "/tenantmigration/networkMigration")
+    def migrate_network(self, payload: str) -> MigrationInfo:
+        ...
 
     def retrigger_network_migration(self):
         # GET /tenantmigration/networkMigration

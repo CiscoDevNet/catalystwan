@@ -1,8 +1,9 @@
+# mypy: disable-error-code="empty-body"
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-from vmngclient.primitives import APIPrimitiveBase
+from vmngclient.primitives import APIPrimitiveBase, get, request
 from vmngclient.utils.operation_status import OperationStatus
 
 
@@ -85,10 +86,10 @@ class TasksData(BaseModel):
 
 
 class ConfigurationDashboardStatusPrimitives(APIPrimitiveBase):
+    @request(get, "/device/action/status/{task_id}")
     def find_status(self, task_id: str) -> TaskData:
-        url = f"/device/action/status/{task_id}"
-        return self._get(url).dataobj(TaskData, None)
+        ...
 
+    @request(get, "/device/action/status/tasks")
     def find_running_tasks(self) -> TasksData:
-        url = "/device/action/status/tasks"
-        return self._get(url).dataobj(TasksData, None)
+        ...

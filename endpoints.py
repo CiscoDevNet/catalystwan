@@ -25,8 +25,8 @@ class MarkdownRenderer(Protocol):
 @dataclass
 class CodeLink(MarkdownRenderer):
     link_text: str
-    sourcefile: str
-    lineno: int
+    sourcefile: Optional[str]
+    lineno: Optional[int]
 
     @staticmethod
     def from_func(func) -> "CodeLink":
@@ -42,7 +42,9 @@ class CodeLink(MarkdownRenderer):
         return self.link_text < other.link_text
 
     def md(self) -> str:
-        return f"[**{self.link_text}**]({self.sourcefile}#L{self.lineno})"
+        if self.sourcefile:
+            return f"[**{self.link_text}**]({self.sourcefile}#L{self.lineno})"
+        return self.link_text
 
 
 @dataclass
@@ -53,7 +55,9 @@ class CompositeTypeLink(CodeLink, MarkdownRenderer):
     def from_type_specifier(typespec: TypeSpecifier) -> Optional["CompositeTypeLink"]:
         if typespec.present:
             if payloadtype := typespec.payload_type:
-                if sourcefile := getsourcefile(payloadtype):
+                if payloadtype.__module__ == "builtins":
+                    return CompositeTypeLink(payloadtype.__name__, None, None, None)
+                elif sourcefile := getsourcefile(payloadtype):
                     seqtype = getattr(typespec.sequence_type, "__name__", None)
                     return CompositeTypeLink(
                         link_text=payloadtype.__name__,

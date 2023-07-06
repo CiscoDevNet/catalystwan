@@ -1,8 +1,9 @@
+# mypy: disable-error-code="empty-body"
 from typing import Dict
 
 from pydantic import BaseModel, Field
 
-from vmngclient.primitives import APIPrimitiveBase, view
+from vmngclient.primitives import APIPrimitiveBase, post, request, view
 from vmngclient.utils.session_type import ProviderView
 
 
@@ -16,6 +17,6 @@ class FeatureToCLIPayload(BaseModel):
 
 class ConfigurationDeviceTemplatePrimitives(APIPrimitiveBase):
     @view({ProviderView})
+    @request(post, "/template/device/config/config/")
     def get_device_configuration_preview(self, payload: FeatureToCLIPayload) -> str:
-        response = self._post("/template/device/config/config/", payload=payload).text
-        return response
+        ...
