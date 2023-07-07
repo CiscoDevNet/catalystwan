@@ -17,11 +17,11 @@ if TYPE_CHECKING:
 
 class APIPrimitiveContainter:
     def __init__(self, session: vManageSession):
-        self.client = ClientPrimitives(session)
-        self.configuration_device_template = ConfigurationDeviceTemplatePrimitives(session)
-        self.tenant_management = TenantManagementPrimitives(session)
-        self.tenant_backup_restore = TenantBackupRestorePrimitives(session)
-        self.tenant_migration = TenantMigrationPrimitives(session)
-        self.configuration_dashboard_status = ConfigurationDashboardStatusPrimitives(session)
-        self.monitoring_device_details = MonitoringDeviceDetailsPrimitives(session)
         self.administration_user_and_group = AdministrationUserAndGroupPrimitives(session)
+        self.client = ClientPrimitives(session)
+        self.configuration_dashboard_status = ConfigurationDashboardStatusPrimitives(session)
+        self.configuration_device_template = ConfigurationDeviceTemplatePrimitives(session)
+        self.monitoring_device_details = MonitoringDeviceDetailsPrimitives(session)
+        self.tenant_backup_restore = TenantBackupRestorePrimitives(session)
+        self.tenant_management = TenantManagementPrimitives(session)
+        self.tenant_migration = TenantMigrationPrimitives(session)

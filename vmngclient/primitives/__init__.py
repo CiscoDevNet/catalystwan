@@ -8,6 +8,7 @@ from string import Formatter
 from typing import (
     Any,
     BinaryIO,
+    ClassVar,
     Dict,
     Final,
     Iterable,
@@ -64,42 +65,10 @@ class APIPrimitivesRequestMeta:
 
 
 class PreparedPayload(TypedDict):
+    """Holds data prepared for sending in request"""
+
     data: Union[str, bytes]
     headers: Mapping[str, str]
-
-
-def prepare_payload(payload: ModelPayloadType) -> PreparedPayload:
-    if isinstance(payload, BaseModel):
-        return _prepare_basemodel_payload(payload)
-    if isinstance(payload, AttrsInstance):
-        return _prepare_attrs_payload(payload)
-    if isinstance(payload, (DataSequence, Sequence)):
-        return _prepare_sequence_payload(payload)
-    else:
-        raise APIRequestPayloadTypeError(payload)
-
-
-def _prepare_basemodel_payload(payload: BaseModel) -> PreparedPayload:
-    return PreparedPayload(
-        data=payload.json(exclude_none=True, by_alias=True), headers={"content-type": "application/json"}
-    )
-
-
-def _prepare_attrs_payload(payload: AttrsInstance) -> PreparedPayload:
-    return PreparedPayload(data=json.dumps(asdict(payload)), headers={"content-type": "application/json"})
-
-
-def _prepare_sequence_payload(payload: Iterable[Union[BaseModel, AttrsInstance]]) -> PreparedPayload:
-    items = []
-    for item in payload:
-        if isinstance(item, BaseModel):
-            items.append(item.dict(exclude_none=True, by_alias=True))
-        elif isinstance(item, AttrsInstance):
-            items.append(asdict(item))
-        else:
-            raise APIPrimitiveError(payload)
-    data = json.dumps(items)
-    return PreparedPayload(data=data, headers={"content-type": "application/json"})
 
 
 class APIPRimitiveClientResponse(Protocol):
@@ -129,7 +98,7 @@ class APIPRimitiveClientResponse(Protocol):
 class APIPrimitiveClient(Protocol):
     """
     Interface to client object.
-    We only need a request function and few vmanage session properties fetched during runtime
+    We only need a 'request' function and few vmanage session properties obtained from server.
     Matched to fit "requests.Session" but migration to other client is possible.
     At his point not very clean as injection of custom kwargs is possible (and sometimes used)
     """
@@ -149,9 +118,47 @@ class APIPrimitiveClient(Protocol):
 class APIPrimitiveBase:
     """
     Class to be used as base for all API primitives.
-    Injects BASE_PATH url prefix as it is common for all known vManage API endpoints
-    Introduces special keyword 'payload' in request call and serializes model to json.
+    Injects BASE_PATH url prefix as it is common for all known vManage API endpoints.
+    Introduces special keyword argument 'payload' in request call and serializes model to json.
     """
+
+    @classmethod
+    def _prepare_payload(cls, payload: ModelPayloadType) -> PreparedPayload:
+        """Helper method to prepare data for sending based on type"""
+        if isinstance(payload, BaseModel):
+            return cls._prepare_basemodel_payload(payload)
+        if isinstance(payload, AttrsInstance):
+            return cls._prepare_attrs_payload(payload)
+        if isinstance(payload, (DataSequence, Sequence)):
+            return cls._prepare_sequence_payload(payload)
+        else:
+            raise APIRequestPayloadTypeError(payload)
+
+    @classmethod
+    def _prepare_basemodel_payload(cls, payload: BaseModel) -> PreparedPayload:
+        """Helper method to prepare BaseModel instance for sending"""
+        return PreparedPayload(
+            data=payload.json(exclude_none=True, by_alias=True), headers={"content-type": "application/json"}
+        )
+
+    @classmethod
+    def _prepare_attrs_payload(cls, payload: AttrsInstance) -> PreparedPayload:
+        """Helper method to prepare AttrsInstance for sending"""
+        return PreparedPayload(data=json.dumps(asdict(payload)), headers={"content-type": "application/json"})
+
+    @classmethod
+    def _prepare_sequence_payload(cls, payload: Iterable[Union[BaseModel, AttrsInstance]]) -> PreparedPayload:
+        """Helper method to prepare sequences for sending"""
+        items = []
+        for item in payload:
+            if isinstance(item, BaseModel):
+                items.append(item.dict(exclude_none=True, by_alias=True))
+            elif isinstance(item, AttrsInstance):
+                items.append(asdict(item))
+            else:
+                raise APIPrimitiveError(payload)
+        data = json.dumps(items)
+        return PreparedPayload(data=data, headers={"content-type": "application/json"})
 
     def __init__(self, client: APIPrimitiveClient):
         self._client = client
@@ -161,19 +168,22 @@ class APIPrimitiveBase:
         self, method: str, url: str, payload: Optional[ModelPayloadType] = None, **kwargs
     ) -> APIPRimitiveClientResponse:
         if payload is not None:
-            kwargs.update(prepare_payload(payload))
+            kwargs.update(self._prepare_payload(payload))
         return self._client.request(method, self._basepath + url, **kwargs)
 
     # TODO remove (not needed after all primitives are decorated with @request decorator which uses only _request)
     def _get(self, url: str, payload: Optional[ModelPayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
         return self._request("GET", url, payload, **kwargs)
 
+    # TODO remove (not needed after all primitives are decorated with @request decorator which uses only _request)
     def _put(self, url: str, payload: Optional[ModelPayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
         return self._request("PUT", url, payload, **kwargs)
 
+    # TODO remove (not needed after all primitives are decorated with @request decorator which uses only _request)
     def _post(self, url: str, payload: Optional[ModelPayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
         return self._request("POST", url, payload, **kwargs)
 
+    # TODO remove (not needed after all primitives are decorated with @request decorator which uses only _request)
     def _delete(self, url: str, payload: Optional[ModelPayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
         return self._request("DELETE", url, payload, **kwargs)
 
@@ -189,10 +199,10 @@ class APIPrimitiveBase:
 class versions:
     """
     Decorator to annotate api primitives methods with supported versions.
-    Logs warning or raises exception when incompatibility found.
+    Logs warning or raises exception when incompatibility found during runtime.
     """
 
-    meta_lookup: Dict[Any, SpecifierSet] = {}
+    meta_lookup: ClassVar[Dict[Any, SpecifierSet]] = {}  # maps decorated method instance to it's supported verisions
 
     def __init__(self, supported_versions: str, raises: bool = False):
         self.supported_versions = SpecifierSet(supported_versions)
@@ -202,11 +212,8 @@ class versions:
         self.meta_lookup[func] = self.supported_versions
 
         def wrapper(*args, **kwargs):
+            """Executes each time decorated method is called"""
             api = args[0]
-            if not isinstance(api, APIPrimitiveBase):
-                raise APIPrimitiveError(
-                    "Only APIPrimitiveBase instance methods can be annotated with @versions decorator"
-                )
             current = api._api_version
             supported = self.supported_versions
             if current and current not in supported:
@@ -224,10 +231,10 @@ class versions:
 class view:
     """
     Decorator to annotate api primitives methods with session type (view) restriction
-    Logs warning or raises exception when incompatibility found.
+    Logs warning or raises exception when incompatibility found during runtime.
     """
 
-    meta_lookup: Dict[Any, Set[SessionType]] = {}
+    meta_lookup: ClassVar[Dict[Any, Set[SessionType]]] = {}  # maps decorated method instance to it's allowed sessions
 
     def __init__(self, allowed_session_types: Set[SessionType], raises: bool = False):
         self.allowed_session_types = allowed_session_types
@@ -237,9 +244,8 @@ class view:
         self.meta_lookup[func] = self.allowed_session_types
 
         def wrapper(*args, **kwargs):
+            """Executes each time decorated method is called"""
             api = args[0]
-            if not isinstance(api, APIPrimitiveBase):
-                raise APIPrimitiveError("Only APIPrimitiveBase instance methods can be annotated with @view decorator")
             current = api._session_type
             allowed = self.allowed_session_types
             if current and current not in allowed:
@@ -263,7 +269,9 @@ class request:
         APIPrimitiveError: when decorated method has unsupported parameters or response type
     """
 
-    meta_lookup: Dict[Any, APIPrimitivesRequestMeta] = {}
+    meta_lookup: ClassVar[
+        Dict[Any, APIPrimitivesRequestMeta]
+    ] = {}  # maps decorated method instance to it's meta information
 
     def __init__(self, http_method: str, url: str, resp_json_key: Optional[str] = None, **kwargs):
         self.http_method = http_method
@@ -281,7 +289,7 @@ class request:
     @staticmethod
     def specify_return_type(sig: Signature) -> TypeSpecifier:
         """Specifies return type based on decorated method signature annotations.
-        Does basic checking of annotated types, not accurate but can detect problems early.
+        Does basic checking of annotated types so problems can be detected early.
 
         Args:
             sig (Signature): wrapped method signature
@@ -314,7 +322,7 @@ class request:
     @staticmethod
     def specify_payload_type(sig: Signature) -> TypeSpecifier:
         """Specifies payload type based on decorated method signature annotations.
-        Does basic checking of annotated types for 'payload' parameter, not accurate but can detect problems early.
+        Does basic checking of annotated types for 'payload' so problems can be detected early.
 
         Args:
             sig (Signature): wrapped method signature
@@ -348,17 +356,17 @@ class request:
 
     def check_params(self, sig: Signature, url_field_names: Set[str]):
         """Checks params in decorated method definition"""
-        pass
+        pass  # TODO eg.: arg names matches field names in url string
 
     def merge_args(self, positional_args: Tuple, keyword_args: Dict[str, Any]) -> Dict[str, Any]:
-        """Merges decorated method args and kwargs into one dictionary
-        This is needed to identify all decorated method arguments by name inside wrapper body
-        We can learn positional arguments names from signature.
+        """Merges decorated method args and kwargs into one dictionary.
+        This is needed to identify all decorated method arguments by name inside wrapper body.
+        We can learn all arguments names from signature.
 
         Returns: Dict[str, Any]: all passed args as keyword arguments (excluding "self")
         """
-        positional_args_names = [key for key in self.sig.parameters.keys()]
-        all_args_dict = dict(zip(positional_args_names, positional_args))
+        all_args_names = [key for key in self.sig.parameters.keys()]
+        all_args_dict = dict(zip(all_args_names, positional_args))
         all_args_dict.update(keyword_args)
         all_args_dict.pop("self", None)
         return all_args_dict
@@ -372,14 +380,11 @@ class request:
         )
 
         def wrapper(*args, **kwargs):
+            """Executes each time decorated method is called"""
             _self = args[0]
-            if not isinstance(_self, APIPrimitiveBase):
-                raise APIPrimitiveError(
-                    "Only APIPrimitiveBase instance methods can be annotated with @request decorator"
-                )
             _kwargs = self.merge_args(args, kwargs)
             payload = _kwargs.get("payload")
-            if self.payload_spec.present and _kwargs.get("payload") is None:
+            if self.payload_spec.present and payload is None:
                 raise TypeError("Missing required argument 'payload'")
             self.url = self.url.format(**_kwargs)
             if self.return_spec.present:

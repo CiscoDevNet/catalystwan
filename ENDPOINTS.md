@@ -23,10 +23,13 @@ PUT /admin/user/password/{username}||[**AdministrationUserAndGroupPrimitives.upd
 PUT /admin/user/profile/password||[**AdministrationUserAndGroupPrimitives.update_profile_password**](vmngclient/primitives/administration_user_and_group.py#L269)|[**ProfilePasswordUpdateRequest**](vmngclient/primitives/administration_user_and_group.py#L122)||
 PUT /admin/user/{username}||[**AdministrationUserAndGroupPrimitives.update_user**](vmngclient/primitives/administration_user_and_group.py#L273)|[**UserUpdateRequest**](vmngclient/primitives/administration_user_and_group.py#L20)||
 PUT /admin/usergroup/{group_name}||[**AdministrationUserAndGroupPrimitives.update_user_group**](vmngclient/primitives/administration_user_and_group.py#L277)|[**UserGroup**](vmngclient/primitives/administration_user_and_group.py#L48)||
+GET /client/server||[**ClientPrimitives.server**](vmngclient/primitives/client.py#L61)||[**ServerInfo**](vmngclient/primitives/client.py#L21)|
+GET /client/about||[**ClientPrimitives.about**](vmngclient/primitives/client.py#L65)||[**AboutInfo**](vmngclient/primitives/client.py#L49)|
 GET /device/action/status/{task_id}||[**ConfigurationDashboardStatusPrimitives.find_status**](vmngclient/primitives/configuration_dashboard_status.py#L89)||[**TaskData**](vmngclient/primitives/configuration_dashboard_status.py#L76)|
 GET /device/action/status/tasks||[**ConfigurationDashboardStatusPrimitives.find_running_tasks**](vmngclient/primitives/configuration_dashboard_status.py#L93)||[**TasksData**](vmngclient/primitives/configuration_dashboard_status.py#L84)|
-GET /device/tier||[**MonitoringDeviceDetailsPrimitives.get_tiers**](vmngclient/primitives/monitoring_device_details.py#L116)||DataSequence[[**Tier**](vmngclient/primitives/monitoring_device_details.py#L15)]|
 POST /template/device/config/config/||[**ConfigurationDeviceTemplatePrimitives.get_device_configuration_preview**](vmngclient/primitives/configuration_device_template.py#L19)|[**FeatureToCLIPayload**](vmngclient/primitives/configuration_device_template.py#L10)|str|
+GET /device/tier||[**MonitoringDeviceDetailsPrimitives.get_tiers**](vmngclient/primitives/monitoring_device_details.py#L116)||DataSequence[[**Tier**](vmngclient/primitives/monitoring_device_details.py#L15)]|
+GET /tenantbackup/list||[**TenantBackupRestorePrimitives.list_tenant_backup**](vmngclient/primitives/tenant_backup_restore.py#L35)||[**BackupFiles**](vmngclient/primitives/tenant_backup_restore.py#L10)|
 POST /tenant||[**TenantManagementPrimitives.create_tenant**](vmngclient/primitives/tenant_management.py#L118)||[**Tenant**](vmngclient/model/tenant.py#L21)|
 POST /tenant/async||[**TenantManagementPrimitives.create_tenant_async**](vmngclient/primitives/tenant_management.py#L123)||[**TenantTaskId**](vmngclient/primitives/tenant_management.py#L21)|
 POST /tenant/bulk/async||[**TenantManagementPrimitives.create_tenant_async_bulk**](vmngclient/primitives/tenant_management.py#L128)|[**Tenant**](vmngclient/model/tenant.py#L21)|[**TenantTaskId**](vmngclient/primitives/tenant_management.py#L21)|
@@ -43,6 +46,3 @@ POST /tenant/{tenant_id}/vsessionid||[**TenantManagementPrimitives.vsession_id**
 GET /tenantmigration/download/{path}||[**TenantMigrationPrimitives.download_tenant_data**](vmngclient/primitives/tenant_migration.py#L39)||bytes|
 POST /tenantmigration/export||[**TenantMigrationPrimitives.export_tenant_data**](vmngclient/primitives/tenant_migration.py#L43)||[**ExportInfo**](vmngclient/primitives/tenant_migration.py#L16)|
 POST /tenantmigration/networkMigration||[**TenantMigrationPrimitives.migrate_network**](vmngclient/primitives/tenant_migration.py#L56)|str|[**MigrationInfo**](vmngclient/primitives/tenant_migration.py#L34)|
-GET /client/server||[**ClientPrimitives.server**](vmngclient/primitives/client.py#L61)||[**ServerInfo**](vmngclient/primitives/client.py#L21)|
-GET /client/about||[**ClientPrimitives.about**](vmngclient/primitives/client.py#L65)||[**AboutInfo**](vmngclient/primitives/client.py#L49)|
-GET /tenantbackup/list||[**TenantBackupRestorePrimitives.list_tenant_backup**](vmngclient/primitives/tenant_backup_restore.py#L35)||[**BackupFiles**](vmngclient/primitives/tenant_backup_restore.py#L10)|

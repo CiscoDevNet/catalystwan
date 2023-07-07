@@ -1,6 +1,5 @@
 # Grabs API meta data collected while decorating API methods and bakes into serializable registry
 # TODO: versions and tenancy modes not showing up in markdown
-# TODO: fix handling of args and kwargs in primitive methods definitions (payload needs to be last arg or kwarg only)
 from dataclasses import dataclass
 from inspect import getsourcefile, getsourcelines
 from pathlib import Path, PurePath
@@ -129,24 +128,28 @@ class EndpointRegistry(MarkdownRenderer):
             self.items.append(Endpoint.from_meta(func, meta=meta, versions=versions, tenancy_modes=tenancy_modes))
 
     def md(self) -> str:
-        data = sorted(self.items)
         info = f"All URIs are relative to *{self.base_path}*\n"
         table_header = (
             "HTTP request | Supported Versions | Method | Payload Type | Return Type | Tenancy Mode\n"
             "------------ | ------------------ | ------ | ------------ | ----------- | ------------\n"
         )
-        table_content = "\n".join([item.md() for item in data])
-        return info + table_header + table_content
+        self.items.sort()
+        table_content = "\n".join([item.md() for item in self.items])
+        return info + table_header + table_content + "\n"
 
 
 if __name__ == "__main__":
-    from vmngclient.session import (  # noqa: E261, F401 this is needed so decorators can evaluate meta
-        create_vManageSession,
-    )
+    from unittest.mock import MagicMock
+
+    from vmngclient.primitives.primitive_container import APIPrimitiveContainter
+
+    # this instantiates api primitive classes triggering method decorators
+    # API primitives not attached to container will be not documented !
+    _ = APIPrimitiveContainter(MagicMock())
 
     endpoint_registry = EndpointRegistry(
         meta_lookup=request.meta_lookup, versions_lookup=versions.meta_lookup, tenancy_modes_lookup=view.meta_lookup
     )
     with open("ENDPOINTS.md", "w") as f:
         f.write("**THIS FILE IS AUTO-GENERATED DO NOT EDIT**\n\n")
-        f.write(endpoint_registry.md() + "\n")
+        f.write(endpoint_registry.md())
