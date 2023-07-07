@@ -241,7 +241,7 @@ class SessionsAPI:
             InvalidateSessionMessage: Information about invalidation result
         """
         sessions_delete_request = SessionsDeleteRequest.from_active_session_list(sessions)
-        return self._primitives.remove_sessions(sessions_delete_request=sessions_delete_request)
+        return self._primitives.remove_sessions(sessions_delete_request)
 
 
 class ClusterManagementAPI:

@@ -242,12 +242,12 @@ class AdministrationUserAndGroupPrimitives(APIPrimitiveBase):
     def update_resource_group(self, group_id: str, payload: ResourceGroupUpdateRequest):
         ...
 
-    @request(put, "/admin/resourcegroup/{group_id}", json={})
+    @request(delete, "/admin/resourcegroup/{group_id}", json={})
     def delete_resource_group(self, group_id: str):
         ...
 
     @request(post, "/admin/resourcegroup")
-    def create_resource_group(self, resource_group: ResourceGroup):
+    def create_resource_group(self, payload: ResourceGroup):
         ...
 
     def resource_group_name(self):

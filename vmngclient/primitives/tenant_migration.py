@@ -46,11 +46,11 @@ class TenantMigrationPrimitives(APIPrimitiveBase):
 
     def get_migration_token(self, params: MigrationTokenQueryParams) -> str:
         # TODO impement dynamic params handling in request decorator
-        return self._get("/tenantmigration/migrationToken", params=params.dict(by_alias=True)).text
+        return self._request(get, "/tenantmigration/migrationToken", params=params.dict(by_alias=True)).text
 
     def import_tenant_data(self, data: BinaryIO) -> ImportInfo:
         # TODO implement dedicated payload types for files upload in request decorator
-        response = self._post("/tenantmigration/import", files={"file": (Path(data.name).name, data)})
+        response = self._request(post, "/tenantmigration/import", files={"file": (Path(data.name).name, data)})
         return response.dataobj(ImportInfo, None)
 
     @request(post, "/tenantmigration/networkMigration")
