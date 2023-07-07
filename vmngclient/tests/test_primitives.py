@@ -1,5 +1,6 @@
 import json
 import unittest
+from typing import List
 from unittest.mock import MagicMock, patch
 
 from attr import define  # type: ignore
@@ -8,7 +9,7 @@ from parameterized import parameterized  # type: ignore
 from pydantic import BaseModel
 
 from vmngclient.dataclasses import DataclassBase  # type: ignore
-from vmngclient.exceptions import APIRequestPayloadTypeError, APIVersionError, APIViewError
+from vmngclient.exceptions import APIPrimitiveError, APIRequestPayloadTypeError, APIVersionError, APIViewError
 from vmngclient.primitives import BASE_PATH, APIPrimitiveBase
 from vmngclient.primitives import logger as primitives_logger
 from vmngclient.primitives import request, versions, view
@@ -37,6 +38,11 @@ class BaseModelExample2(BaseModel):
     size: int
 
 
+class ParamsExample(BaseModel):
+    name: str
+    color: str
+
+
 class TestAPIPrimitives(unittest.TestCase):
     @patch("vmngclient.session.vManageSession")
     def setUp(self, session_mock):
@@ -57,6 +63,11 @@ class TestAPIPrimitives(unittest.TestCase):
         self.basemodel_payload = BaseModelExample.parse_obj(self.dict_payload)
         self.list_dict_payload = [self.dict_payload] * 2
         self.list_attrs_payload = [self.attrs_payload] * 2
+        self.dict_params = {
+            "name": "purple",
+            "color": "haze",
+        }
+        self.basemodel_params = ParamsExample.parse_obj(self.dict_params)
         self.datasequence_payload = DataSequence(AttrsModelExample, self.list_attrs_payload)
 
     @parameterized.expand(
@@ -186,17 +197,70 @@ class TestAPIPrimitives(unittest.TestCase):
         with self.assertRaises(APIRequestPayloadTypeError):
             self.primitive._request("GET", "/5", payload={1, 2, 3})
 
-    def test_request_decorator_positional_arguments(self):
+    def test_request_decorator_unsupported_payload(self):
+        with self.assertRaises(APIPrimitiveError):
+
+            class TestAPI(APIPrimitiveBase):
+                @request("GET", "/v1/data/{id}")
+                def get_data(self, id: str, payload: List[str]):  # type: ignore [empty-body]
+                    ...
+
+    def test_request_decorator_call_with_positional_arguments(self):
+        # Arrange
         class TestAPI(APIPrimitiveBase):
             @request("GET", "/v1/data/{id}")
             def get_data(self, id: str, payload: BaseModelExample):  # type: ignore [empty-body]
                 ...
 
         api = TestAPI(self.session_mock)
+        # Act
         api.get_data("ID123", self.basemodel_payload)
+        # Assert
         self.session_mock.request.assert_called_once_with(
             "GET",
             self.base_path + "/v1/data/ID123",
             data=self.json_payload,
             headers={"content-type": "application/json"},
+        )
+
+    def test_request_decorator_call_with_mixed_positional_arguments(self):
+        # Arrange
+        class TestAPI(APIPrimitiveBase):
+            @request("GET", "/v2/{category}/items")
+            def get_data(
+                self, payload: BaseModelExample, category: str, params: ParamsExample
+            ):  # type: ignore [empty-body]
+                ...
+
+        api = TestAPI(self.session_mock)
+        # Act
+        api.get_data(self.basemodel_payload, "clothes", self.basemodel_params)
+        # Assert
+        self.session_mock.request.assert_called_once_with(
+            "GET",
+            self.base_path + "/v2/clothes/items",
+            data=self.json_payload,
+            headers={"content-type": "application/json"},
+            params=self.basemodel_params,
+        )
+
+    def test_request_decorator_call_with_keyword_arguments(self):
+        # Arrange
+        class TestAPI(APIPrimitiveBase):
+            @request("GET", "/v2/{category}/items")
+            def get_data(
+                self, payload: BaseModelExample, category: str, params: ParamsExample
+            ):  # type: ignore [empty-body]
+                ...
+
+        api = TestAPI(self.session_mock)
+        # Act
+        api.get_data(category="clothes", params=self.basemodel_params, payload=self.basemodel_payload)
+        # Assert
+        self.session_mock.request.assert_called_once_with(
+            "GET",
+            self.base_path + "/v2/clothes/items",
+            data=self.json_payload,
+            headers={"content-type": "application/json"},
+            params=self.basemodel_params,
         )
