@@ -1,3 +1,31 @@
+"""This modules defines APIPrimitiveBase class which is used to define
+vManage API endpoint handlers in declarative way.
+Just create a sub-class and define endpoints using using included decorators: request, view, versions.
+Method decorated with @request has no body, as decorator constructs and sends request.
+>>> from vmngclient.primitives import APIPrimitiveBase, versions, view, request, delete
+>>> from vmngclient.utils.session_type import ProviderView
+>>>
+>>>
+>>> class TenantBulkDeleteRequest(BaseModel):
+>>>     password: str
+>>>     tenant_id_list: List[str] = Field(alias="tenantIdList")
+>>>
+>>>
+>>> class TenantTaskId(BaseModel):
+>>>     id: str
+>>>
+>>>
+>>> class TenantManagementAPI(APIPrimitiveBase):
+>>>     @versions(">=20.4")
+>>>     @view({ProviderView})
+>>>     @request(delete, "/tenant/bulk/async")
+>>>     def delete_tenant_async_bulk(self, payload: TenantBulkDeleteRequest) -> TenantTaskId:
+>>>         ...
+>>>
+To send request instantiate API with logged vManageSession:
+>>> api = TenantManagementAPI(session)
+>>> api.delete_tenant_async_bulk(TenantBulkDeleteRequest(password="p4s$w0rD", tenantIdList=["TNT00005"]))
+"""
 from __future__ import annotations
 
 import json
@@ -119,7 +147,7 @@ class APIPrimitiveBase:
     """
     Class to be used as base for all API primitives.
     Injects BASE_PATH url prefix as it is common for all known vManage API endpoints.
-    Introduces special keyword argument 'payload' in request call and serializes model to json.
+    Introduces special keyword argument 'payload' in request call and handles sending of such object.
     """
 
     @classmethod
@@ -167,25 +195,11 @@ class APIPrimitiveBase:
     def _request(
         self, method: str, url: str, payload: Optional[ModelPayloadType] = None, **kwargs
     ) -> APIPRimitiveClientResponse:
+        """Prepares and sends request using client protocol"""
+        print(locals())
         if payload is not None:
             kwargs.update(self._prepare_payload(payload))
         return self._client.request(method, self._basepath + url, **kwargs)
-
-    # TODO remove (not needed after all primitives are decorated with @request decorator which uses only _request)
-    def _get(self, url: str, payload: Optional[ModelPayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
-        return self._request("GET", url, payload, **kwargs)
-
-    # TODO remove (not needed after all primitives are decorated with @request decorator which uses only _request)
-    def _put(self, url: str, payload: Optional[ModelPayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
-        return self._request("PUT", url, payload, **kwargs)
-
-    # TODO remove (not needed after all primitives are decorated with @request decorator which uses only _request)
-    def _post(self, url: str, payload: Optional[ModelPayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
-        return self._request("POST", url, payload, **kwargs)
-
-    # TODO remove (not needed after all primitives are decorated with @request decorator which uses only _request)
-    def _delete(self, url: str, payload: Optional[ModelPayloadType] = None, **kwargs) -> APIPRimitiveClientResponse:
-        return self._request("DELETE", url, payload, **kwargs)
 
     @property
     def _api_version(self) -> Optional[Version]:
@@ -196,7 +210,16 @@ class APIPrimitiveBase:
         return self._client.session_type
 
 
-class versions:
+class APIPrimitiveDecorator:
+    @classmethod
+    def get_check_instance(cls, _self, *args, **kwargs) -> APIPrimitiveBase:
+        """Gets wrapped function instance (first argument)"""
+        if not isinstance(_self, APIPrimitiveBase):
+            raise APIPrimitiveError("Only APIPrimitiveBase instance methods can be annotated with @{cls} decorator")
+        return _self
+
+
+class versions(APIPrimitiveDecorator):
     """
     Decorator to annotate api primitives methods with supported versions.
     Logs warning or raises exception when incompatibility found during runtime.
@@ -213,8 +236,8 @@ class versions:
 
         def wrapper(*args, **kwargs):
             """Executes each time decorated method is called"""
-            api = args[0]
-            current = api._api_version
+            _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIPrimitiveBase instance
+            current = _self._api_version
             supported = self.supported_versions
             if current and current not in supported:
                 if self.raises:
@@ -228,7 +251,7 @@ class versions:
         return wrapper
 
 
-class view:
+class view(APIPrimitiveDecorator):
     """
     Decorator to annotate api primitives methods with session type (view) restriction
     Logs warning or raises exception when incompatibility found during runtime.
@@ -245,8 +268,8 @@ class view:
 
         def wrapper(*args, **kwargs):
             """Executes each time decorated method is called"""
-            api = args[0]
-            current = api._session_type
+            _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIPrimitiveBase instance
+            current = _self._session_type
             allowed = self.allowed_session_types
             if current and current not in allowed:
                 if self.raises:
@@ -260,8 +283,9 @@ class view:
         return wrapper
 
 
-class request:
-    """Decorator to annotate api primitives methods with HTTP method, URL and optionally json key from which
+class request(APIPrimitiveDecorator):
+    """
+    Decorator to annotate api primitives methods with HTTP method, URL and optionally json key from which
     modelled data will be parsed (usually "data", but defaults to whole json payload).
     Additional kwargs can be injected which will be passed to request method (eg. custom headers)
 
@@ -381,30 +405,25 @@ class request:
 
         def wrapper(*args, **kwargs):
             """Executes each time decorated method is called"""
-            _self = args[0]
+            _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIPrimitiveBase instance
             _kwargs = self.merge_args(args, kwargs)
             payload = _kwargs.get("payload")
             if self.payload_spec.present and payload is None:
                 raise TypeError("Missing required argument 'payload'")
             self.url = self.url.format(**_kwargs)
+            response = _self._request(self.http_method, self.url, payload=payload, **self.kwargs)
             if self.return_spec.present:
                 if issubclass(self.return_spec.payload_type, (BaseModel, DataclassBase)):
                     if self.return_spec.sequence_type == DataSequence:
-                        return _self._request(self.http_method, self.url, payload=payload, **self.kwargs).dataseq(
-                            self.return_spec.payload_type, self.resp_json_key
-                        )
+                        return response.dataseq(self.return_spec.payload_type, self.resp_json_key)
                     else:
-                        return _self._request(self.http_method, self.url, payload=payload, **self.kwargs).dataobj(
-                            self.return_spec.payload_type, self.resp_json_key
-                        )
+                        return response.dataobj(self.return_spec.payload_type, self.resp_json_key)
                 elif issubclass(self.return_spec.payload_type, str):
-                    return _self._request(self.http_method, self.url, payload=payload, **self.kwargs).text
+                    return response.text
                 elif issubclass(self.return_spec.payload_type, bytes):
-                    return _self._request(self.http_method, self.url, payload=payload, **self.kwargs).content
+                    return response.content
                 elif issubclass(self.return_spec.payload_type, dict):
-                    return _self._request(self.http_method, self.url, payload=payload, **self.kwargs).json()
-            else:
-                _self._request(self.http_method, self.url, payload=payload, **self.kwargs)
+                    return response.json()
 
         return wrapper
 

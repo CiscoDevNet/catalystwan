@@ -59,22 +59,6 @@ class TestAPIPrimitives(unittest.TestCase):
         self.list_attrs_payload = [self.attrs_payload] * 2
         self.datasequence_payload = DataSequence(AttrsModelExample, self.list_attrs_payload)
 
-    def test_get(self):
-        self.primitive._get("/get_endpoint/1")
-        self.session_mock.request.assert_called_once_with("GET", "/dataservice/get_endpoint/1")
-
-    def test_post(self):
-        self.primitive._post("/post_endpoint/2")
-        self.session_mock.request.assert_called_once_with("POST", "/dataservice/post_endpoint/2")
-
-    def test_put(self):
-        self.primitive._put("/put_endpoint/3")
-        self.session_mock.request.assert_called_once_with("PUT", "/dataservice/put_endpoint/3")
-
-    def test_delete(self):
-        self.primitive._delete("/delete_endpoint/4")
-        self.session_mock.request.assert_called_once_with("DELETE", "/dataservice/delete_endpoint/4")
-
     @parameterized.expand(
         [
             ("<2.0", "1.9.9"),
@@ -179,28 +163,28 @@ class TestAPIPrimitives(unittest.TestCase):
             assert str(current_session) in log.output[0]
 
     def test_attrs_payload(self):
-        self.primitive._get("/1", payload=self.attrs_payload)
+        self.primitive._request("GET", "/1", payload=self.attrs_payload)
         _, kwargs = self.session_mock.request.call_args
         assert json.loads(kwargs.get("data")) == self.dict_payload
 
     def test_basemodel_payload(self):
-        self.primitive._get("/2", payload=self.basemodel_payload)
+        self.primitive._request("GET", "/2", payload=self.basemodel_payload)
         _, kwargs = self.session_mock.request.call_args
         assert json.loads(kwargs.get("data")) == self.dict_payload
 
     def test_datasequence_payload(self):
-        self.primitive._get("/3", payload=self.datasequence_payload)
+        self.primitive._request("GET", "/3", payload=self.datasequence_payload)
         _, kwargs = self.session_mock.request.call_args
         assert json.loads(kwargs.get("data")) == self.list_dict_payload
 
     def test_list_payload(self):
-        self.primitive._get("/4", payload=self.list_attrs_payload)
+        self.primitive._request("GET", "/4", payload=self.list_attrs_payload)
         _, kwargs = self.session_mock.request.call_args
         assert json.loads(kwargs.get("data")) == self.list_dict_payload
 
     def test_unexpected_payload(self):
         with self.assertRaises(APIRequestPayloadTypeError):
-            self.primitive._get("/5", payload={1, 2, 3})
+            self.primitive._request("GET", "/5", payload={1, 2, 3})
 
     def test_request_decorator_positional_arguments(self):
         class TestAPI(APIPrimitiveBase):
