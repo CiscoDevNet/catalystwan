@@ -134,7 +134,6 @@ class EndpointRegistry(MarkdownRenderer):
             "------------ | ------------------ | ------ | ------------ | ----------- | ------------\n"
         )
         # sorting insures that generated markdown will be exact same each time same set of methods are documented
-        # (no infinite loop in pre-commit)
         self.items.sort()
         table_content = "\n".join([item.md() for item in self.items])
         return info + table_header + table_content + "\n"

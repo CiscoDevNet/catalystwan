@@ -30,8 +30,8 @@ GET /device/action/status/tasks||[**ConfigurationDashboardStatusPrimitives.find_
 POST /template/device/config/config/||[**ConfigurationDeviceTemplatePrimitives.get_device_configuration_preview**](vmngclient/primitives/configuration_device_template.py#L19)|[**FeatureToCLIPayload**](vmngclient/primitives/configuration_device_template.py#L10)|str|
 GET /device/tier||[**MonitoringDeviceDetailsPrimitives.get_tiers**](vmngclient/primitives/monitoring_device_details.py#L116)||DataSequence[[**Tier**](vmngclient/primitives/monitoring_device_details.py#L15)]|
 GET /tenantbackup/list||[**TenantBackupRestorePrimitives.list_tenant_backup**](vmngclient/primitives/tenant_backup_restore.py#L35)||[**BackupFiles**](vmngclient/primitives/tenant_backup_restore.py#L10)|
-POST /tenant||[**TenantManagementPrimitives.create_tenant**](vmngclient/primitives/tenant_management.py#L118)||[**Tenant**](vmngclient/model/tenant.py#L21)|
-POST /tenant/async||[**TenantManagementPrimitives.create_tenant_async**](vmngclient/primitives/tenant_management.py#L123)||[**TenantTaskId**](vmngclient/primitives/tenant_management.py#L21)|
+POST /tenant||[**TenantManagementPrimitives.create_tenant**](vmngclient/primitives/tenant_management.py#L118)|[**Tenant**](vmngclient/model/tenant.py#L21)|[**Tenant**](vmngclient/model/tenant.py#L21)|
+POST /tenant/async||[**TenantManagementPrimitives.create_tenant_async**](vmngclient/primitives/tenant_management.py#L123)|[**Tenant**](vmngclient/model/tenant.py#L21)|[**TenantTaskId**](vmngclient/primitives/tenant_management.py#L21)|
 POST /tenant/bulk/async||[**TenantManagementPrimitives.create_tenant_async_bulk**](vmngclient/primitives/tenant_management.py#L128)|[**Tenant**](vmngclient/model/tenant.py#L21)|[**TenantTaskId**](vmngclient/primitives/tenant_management.py#L21)|
 DELETE /tenant/{tenant_id}/delete||[**TenantManagementPrimitives.delete_tenant**](vmngclient/primitives/tenant_management.py#L134)|[**TenantDeleteRequest**](vmngclient/primitives/tenant_management.py#L12)||
 DELETE /tenant/bulk/async||[**TenantManagementPrimitives.delete_tenant_async_bulk**](vmngclient/primitives/tenant_management.py#L139)|[**TenantBulkDeleteRequest**](vmngclient/primitives/tenant_management.py#L16)|[**TenantTaskId**](vmngclient/primitives/tenant_management.py#L21)|
@@ -44,5 +44,6 @@ PUT /tenant/{tenant_id}||[**TenantManagementPrimitives.update_tenant**](vmngclie
 PUT /tenant/{tenant_id}/vsmart||[**TenantManagementPrimitives.update_tenant_vsmart_placement**](vmngclient/primitives/tenant_management.py#L187)|[**vSmartPlacementUpdateRequest**](vmngclient/primitives/tenant_management.py#L98)||
 POST /tenant/{tenant_id}/vsessionid||[**TenantManagementPrimitives.vsession_id**](vmngclient/primitives/tenant_management.py#L192)||[**vSessionId**](vmngclient/primitives/tenant_management.py#L113)|
 GET /tenantmigration/download/{path}||[**TenantMigrationPrimitives.download_tenant_data**](vmngclient/primitives/tenant_migration.py#L39)||bytes|
-POST /tenantmigration/export||[**TenantMigrationPrimitives.export_tenant_data**](vmngclient/primitives/tenant_migration.py#L43)||[**ExportInfo**](vmngclient/primitives/tenant_migration.py#L16)|
+POST /tenantmigration/export||[**TenantMigrationPrimitives.export_tenant_data**](vmngclient/primitives/tenant_migration.py#L43)|[**Tenant**](vmngclient/model/tenant.py#L21)|[**ExportInfo**](vmngclient/primitives/tenant_migration.py#L16)|
+GET /tenantmigration/migrationToken||[**TenantMigrationPrimitives.get_migration_token**](vmngclient/primitives/tenant_migration.py#L47)||str|
 POST /tenantmigration/networkMigration||[**TenantMigrationPrimitives.migrate_network**](vmngclient/primitives/tenant_migration.py#L56)|str|[**MigrationInfo**](vmngclient/primitives/tenant_migration.py#L34)|

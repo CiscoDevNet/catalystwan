@@ -117,12 +117,12 @@ class vSessionId(BaseModel):
 class TenantManagementPrimitives(APIPrimitiveBase):
     @view({ProviderView})
     @request(post, "/tenant")
-    def create_tenant(self, tenant: Tenant) -> Tenant:
+    def create_tenant(self, payload: Tenant) -> Tenant:
         ...
 
     @view({ProviderView})
     @request(post, "/tenant/async")
-    def create_tenant_async(self, tenant: Tenant) -> TenantTaskId:
+    def create_tenant_async(self, payload: Tenant) -> TenantTaskId:
         ...
 
     @versions(">=20.4")

@@ -31,7 +31,7 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import dataclass
-from inspect import Signature, _empty, isclass, signature
+from inspect import _empty, isclass, signature
 from string import Formatter
 from typing import (
     Any,
@@ -72,6 +72,7 @@ PayloadType = Union[str, bytes, dict, BinaryIO, ModelPayloadType]
 ReturnType = Union[
     bytes, str, dict, BinaryIO, BaseModel, DataclassBase, DataSequence[BaseModel], DataSequence[DataclassBase]
 ]
+RequestParamsType = Union[Dict[str, str], BaseModel]
 
 
 @dataclass
@@ -188,18 +189,33 @@ class APIPrimitiveBase:
         data = json.dumps(items)
         return PreparedPayload(data=data, headers={"content-type": "application/json"})
 
+    @classmethod
+    def _prepare_params(cls, params: RequestParamsType) -> Dict[str, Any]:
+        """Helper method to prepare params for sending"""
+        if isinstance(params, BaseModel):
+            return params.dict(exclude_none=True, by_alias=True)
+        return params
+
     def __init__(self, client: APIPrimitiveClient):
         self._client = client
         self._basepath = BASE_PATH
 
     def _request(
-        self, method: str, url: str, payload: Optional[ModelPayloadType] = None, **kwargs
+        self,
+        method: str,
+        url: str,
+        payload: Optional[ModelPayloadType] = None,
+        params: Optional[RequestParamsType] = None,
+        **kwargs,
     ) -> APIPRimitiveClientResponse:
         """Prepares and sends request using client protocol"""
         print(locals())
+        _kwargs = dict(kwargs)
         if payload is not None:
-            kwargs.update(self._prepare_payload(payload))
-        return self._client.request(method, self._basepath + url, **kwargs)
+            _kwargs.update(self._prepare_payload(payload))
+        if params is not None:
+            _kwargs.update({"params": self._prepare_params(params)})
+        return self._client.request(method, self._basepath + url, **_kwargs)
 
     @property
     def _api_version(self) -> Optional[Version]:
@@ -289,10 +305,26 @@ class request(APIPrimitiveDecorator):
     modelled data will be parsed (usually "data", but defaults to whole json payload).
     Additional kwargs can be injected which will be passed to request method (eg. custom headers)
 
+    Decorated method parameters and return type annotations are checked:
+
+        Parameters:
+
+            "payload": argument with that name is used to send data in request
+            supports types defined in: vmngclient.primitives.PayloadType
+
+            "params": argument with that name is used to generate url query string
+            supports types defined in: vmngclient.primitives.RequestParamsType
+
+            other parameter must be strings and are used to format url string
+
+        Return Type:
+            supports types defined in: vmngclient.primitives.ReturnType
+
     Raises:
         APIPrimitiveError: when decorated method has unsupported parameters or response type
     """
 
+    forbidden_url_field_names = {"self", "payload", "params"}
     meta_lookup: ClassVar[
         Dict[Any, APIPrimitivesRequestMeta]
     ] = {}  # maps decorated method instance to it's meta information
@@ -301,8 +333,8 @@ class request(APIPrimitiveDecorator):
         self.http_method = http_method
         formatter = Formatter()
         url_field_names = {item[1] for item in formatter.parse(url) if item[1] is not None}
-        if "payload" in url_field_names:
-            APIPrimitiveError(f"Field name: 'payload' is not allowed in url: {url}")
+        if self.forbidden_url_field_names & url_field_names:
+            APIPrimitiveError(f"One of forbidden fields names: {self.forbidden_url_field_names} found in url: {url}")
         self.url = url
         self.url_field_names = url_field_names
         self.resp_json_key = resp_json_key
@@ -310,13 +342,9 @@ class request(APIPrimitiveDecorator):
         self.payload_spec = TypeSpecifier(False)
         self.kwargs = kwargs
 
-    @staticmethod
-    def specify_return_type(sig: Signature) -> TypeSpecifier:
+    def specify_return_type(self) -> TypeSpecifier:
         """Specifies return type based on decorated method signature annotations.
         Does basic checking of annotated types so problems can be detected early.
-
-        Args:
-            sig (Signature): wrapped method signature
 
         Raises:
             APIPrimitiveError: when signature contains unexpected return annotation
@@ -324,7 +352,7 @@ class request(APIPrimitiveDecorator):
         Returns:
             TypeSpecifier: Specification of return type
         """
-        annotation = sig.return_annotation
+        annotation = self.sig.return_annotation
         if isclass(annotation):
             if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModel, DataclassBase)):
                 return TypeSpecifier(True, None, annotation)
@@ -343,13 +371,9 @@ class request(APIPrimitiveDecorator):
         else:
             raise APIPrimitiveError(f"Expected: {ReturnType} but return type {annotation}")
 
-    @staticmethod
-    def specify_payload_type(sig: Signature) -> TypeSpecifier:
+    def specify_payload_type(self) -> TypeSpecifier:
         """Specifies payload type based on decorated method signature annotations.
         Does basic checking of annotated types for 'payload' so problems can be detected early.
-
-        Args:
-            sig (Signature): wrapped method signature
 
         Raises:
             APIPrimitiveError: when signature contains unexpected payload annotation
@@ -357,7 +381,7 @@ class request(APIPrimitiveDecorator):
         Returns:
             TypeSpecifier: Specification of payload type
         """
-        payload_param = sig.parameters.get("payload")
+        payload_param = self.sig.parameters.get("payload")
         if not payload_param:
             return TypeSpecifier(False)
         annotation = payload_param.annotation
@@ -365,7 +389,7 @@ class request(APIPrimitiveDecorator):
             if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModel, DataclassBase)):
                 return TypeSpecifier(True, None, annotation)
             else:
-                raise APIPrimitiveError(f"payload param must be annotated with supported type: {PayloadType}")
+                raise APIPrimitiveError(f"'payload' param must be annotated with supported type: {PayloadType}")
         elif (type_origin := get_origin(annotation)) and isclass(type_origin) and issubclass(type_origin, Sequence):
             if (
                 (type_args := get_args(annotation))
@@ -378,9 +402,39 @@ class request(APIPrimitiveDecorator):
         else:
             raise APIPrimitiveError(f"Expected: {PayloadType} but found payload {annotation}")
 
-    def check_params(self, sig: Signature, url_field_names: Set[str]):
-        """Checks params in decorated method definition"""
-        pass  # TODO eg.: arg names matches field names in url string
+    def check_params(self):
+        """Checks params in decorated method definition
+
+        Raises:
+            APIPrimitiveError: when decorated params not matching specification
+        """
+        parameters = self.sig.parameters
+
+        if params_param := parameters.get("params"):
+            if not (isclass(params_param.annotation) and issubclass(params_param.annotation, (BaseModel, Dict))):
+                raise APIPrimitiveError(f"'params' param must be annotated with supported type: {RequestParamsType}")
+
+        general_purpose_arg_names = {
+            key for key in self.sig.parameters.keys() if key not in self.forbidden_url_field_names
+        }
+        if missing := self.url_field_names.difference(general_purpose_arg_names):
+            raise APIPrimitiveError(f"Missing parameters: {missing} to format url: {self.url}")
+
+        for parameter in [parameters.get(name) for name in self.url_field_names]:
+            if not (isclass(parameter.annotation) and parameter.annotation == str):
+                raise APIPrimitiveError(
+                    f"Parameter {parameter} used for url formatting must have 'str' type annotation"
+                )
+
+        no_purpose_params = {
+            parameters.get(name) for name in general_purpose_arg_names.difference(self.url_field_names)
+        }
+        if no_purpose_params:
+            raise APIPrimitiveError(
+                f"Parameters {no_purpose_params} are not used as "
+                "request payload, request params nor to format url string!"
+                "remove unused parameter or fix by changing argument to purposeful name 'payload' or 'params'"
+            )
 
     def merge_args(self, positional_args: Tuple, keyword_args: Dict[str, Any]) -> Dict[str, Any]:
         """Merges decorated method args and kwargs into one dictionary.
@@ -397,8 +451,9 @@ class request(APIPrimitiveDecorator):
 
     def __call__(self, func):
         self.sig = signature(func)
-        self.return_spec = self.specify_return_type(self.sig)
-        self.payload_spec = self.specify_payload_type(self.sig)
+        self.return_spec = self.specify_return_type()
+        self.payload_spec = self.specify_payload_type()
+        self.check_params()
         self.meta_lookup[func] = APIPrimitivesRequestMeta(
             http_request=f"{self.http_method} {self.url}", payload_spec=self.payload_spec, return_spec=self.return_spec
         )
@@ -408,10 +463,11 @@ class request(APIPrimitiveDecorator):
             _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIPrimitiveBase instance
             _kwargs = self.merge_args(args, kwargs)
             payload = _kwargs.get("payload")
+            params = _kwargs.get("params")
             if self.payload_spec.present and payload is None:
                 raise TypeError("Missing required argument 'payload'")
             self.url = self.url.format(**_kwargs)
-            response = _self._request(self.http_method, self.url, payload=payload, **self.kwargs)
+            response = _self._request(self.http_method, self.url, payload=payload, params=params, **self.kwargs)
             if self.return_spec.present:
                 if issubclass(self.return_spec.payload_type, (BaseModel, DataclassBase)):
                     if self.return_spec.sequence_type == DataSequence:

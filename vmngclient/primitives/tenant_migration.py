@@ -41,12 +41,12 @@ class TenantMigrationPrimitives(APIPrimitiveBase):
         ...
 
     @request(post, "/tenantmigration/export")
-    def export_tenant_data(self, tenant: Tenant) -> ExportInfo:
+    def export_tenant_data(self, payload: Tenant) -> ExportInfo:
         ...
 
+    @request(get, "/tenantmigration/migrationToken")
     def get_migration_token(self, params: MigrationTokenQueryParams) -> str:
-        # TODO impement dynamic params handling in request decorator
-        return self._request(get, "/tenantmigration/migrationToken", params=params.dict(by_alias=True)).text
+        ...
 
     def import_tenant_data(self, data: BinaryIO) -> ImportInfo:
         # TODO implement dedicated payload types for files upload in request decorator
