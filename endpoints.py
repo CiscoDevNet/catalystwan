@@ -57,7 +57,9 @@ class CompositeTypeLink(CodeLink, MarkdownRenderer):
                 if payloadtype.__module__ == "builtins":
                     return CompositeTypeLink(payloadtype.__name__, None, None, None)
                 elif sourcefile := getsourcefile(payloadtype):
-                    seqtype = getattr(typespec.sequence_type, "__name__", None)
+                    seqtype = getattr(typespec.sequence_type, "__name__", None) or getattr(
+                        typespec.sequence_type, "_name", None
+                    )
                     return CompositeTypeLink(
                         link_text=payloadtype.__name__,
                         sourcefile=relative(sourcefile),
