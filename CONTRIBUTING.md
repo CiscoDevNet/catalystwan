@@ -89,7 +89,7 @@ Start reading our code, and you'll get the hang of it.
   ```python
   from pydantic import BaseModel, Field
   from typing import List
-  from vmngclient.primitives import APIPrimitiveBase, versions, view
+  from vmngclient.primitives import APIPrimitiveBase, versions, view, delete
   from vmngclient.utils.session_type import ProviderView
 
   class TenantBulkDeleteRequest(BaseModel):
@@ -103,12 +103,14 @@ Start reading our code, and you'll get the hang of it.
 
       @versions(">=20.4")
       @view({ProviderView})
+      @request(delete, "/tenant/bulk/async")
       def delete_tenant_async_bulk(self, delete_request: TenantBulkDeleteRequest) -> TenantTaskId:
-          response = self.delete("/tenant/bulk/async", payload=delete_request)
-          return response.dataobj(TenantTaskId, None)
+          ...
   ```
 
-  Definitions can be found in: `vmngclient/primitives` directory.
+  Please note that when using `@request` decorator method must have no body. Request will be built automatically and return value based on defined type will be provided.
+
+  API Primitives Definitions can be found in: `vmngclient/primitives` directory.
 
   The organization of items **strictly** follows an OpenAPI spec: https://developer.cisco.com/docs/sdwan/#!sd-wan-vmanage-v20-9
 
@@ -116,8 +118,12 @@ Start reading our code, and you'll get the hang of it.
 
   If common data-model is being reused by more than one primitive class it should be moved to `vmngclient/model` folder with appropriate module name.
 
+  Dedicated pre-commit step will automatically check corectness and add documentation for endpoints with `@request` decorator.
+
+  Custom payload types are allowed (eg. for sending various types of files) please check example: [**SoftwarePackageUpdatePayload**](vmngclient/utils/upgrades_helper.py#L68)
+
 1. Check that endpoints you want to utilize in your API already defined in `vmngclient/primitives`.
-2. If endpoint not present, create new file with endpoint including data-model and methods with `@view` and `@versions` decorators when needed.
+2. If endpoint not present, create new file with endpoint including data-model and methods with `@request`, `@view` and `@versions` decorators when needed.
 3. Implement higher level API in `vmngclient/api` using created primitives.
 
 Thanks,\

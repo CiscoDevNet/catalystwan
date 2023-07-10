@@ -325,10 +325,11 @@ class request(APIPrimitiveDecorator):
         Parameters:
 
             "payload": argument with that name is used to send data in request
-            supports types defined in: vmngclient.primitives.PayloadType
+            usually it is user defined subclass of: pydantic.BaseModel
+            other types are also supported please check: vmngclient.primitives.PayloadType
 
             "params": argument with that name is used to generate url query string
-            supports types defined in: vmngclient.primitives.RequestParamsType
+            supports Dict[str, str] and pydantic.BaseModel
 
             other parameter must be strings and are used to format url string
 
