@@ -104,7 +104,7 @@ Start reading our code, and you'll get the hang of it.
       @versions(">=20.4")
       @view({ProviderView})
       @request(delete, "/tenant/bulk/async")
-      def delete_tenant_async_bulk(self, delete_request: TenantBulkDeleteRequest) -> TenantTaskId:
+      def delete_tenant_async_bulk(self, payload: TenantBulkDeleteRequest) -> TenantTaskId:
           ...
   ```
 
