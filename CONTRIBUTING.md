@@ -89,7 +89,7 @@ Start reading our code, and you'll get the hang of it.
   ```python
   from pydantic import BaseModel, Field
   from typing import List
-  from vmngclient.primitives import APIPrimitiveBase, versions, view, delete
+  from vmngclient.primitives import APIPrimitiveBase, request, versions, view, delete
   from vmngclient.utils.session_type import ProviderView
 
   class TenantBulkDeleteRequest(BaseModel):
