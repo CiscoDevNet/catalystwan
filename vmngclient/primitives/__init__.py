@@ -30,8 +30,9 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from inspect import _empty, isclass, signature
+from io import BufferedReader
 from string import Formatter
 from typing import (
     Any,
@@ -47,11 +48,11 @@ from typing import (
     Set,
     Tuple,
     Type,
-    TypedDict,
     TypeVar,
     Union,
     get_args,
     get_origin,
+    runtime_checkable,
 )
 
 from packaging.specifiers import SpecifierSet  # type: ignore
@@ -61,14 +62,23 @@ from pydantic import BaseModel
 from vmngclient.dataclasses import DataclassBase
 from vmngclient.exceptions import APIPrimitiveError, APIRequestPayloadTypeError, APIVersionError, APIViewError
 from vmngclient.typed_list import DataSequence
-from vmngclient.utils.creation_tools import AttrsInstance, asdict
+from vmngclient.utils.creation_tools import AttrsInstance
+from vmngclient.utils.creation_tools import asdict as attrs_asdict
 from vmngclient.utils.session_type import SessionType
 
 BASE_PATH: Final[str] = "/dataservice"
 T = TypeVar("T")
 logger = logging.getLogger(__name__)
+
+
+@runtime_checkable
+class CustomPayloadType(Protocol):
+    def prepared(self) -> PreparedPayload:
+        ...
+
+
 ModelPayloadType = Union[AttrsInstance, BaseModel, Sequence[AttrsInstance], Sequence[BaseModel]]
-PayloadType = Union[str, bytes, dict, BinaryIO, ModelPayloadType]
+PayloadType = Union[str, bytes, dict, BinaryIO, ModelPayloadType, CustomPayloadType]
 ReturnType = Union[
     bytes, str, dict, BinaryIO, BaseModel, DataclassBase, DataSequence[BaseModel], DataSequence[DataclassBase]
 ]
@@ -93,11 +103,13 @@ class APIPrimitivesRequestMeta:
     return_spec: TypeSpecifier
 
 
-class PreparedPayload(TypedDict):
+@dataclass
+class PreparedPayload:
     """Holds data prepared for sending in request"""
 
     data: Union[str, bytes]
-    headers: Mapping[str, str]
+    headers: Mapping[str, Any]
+    files: Optional[Dict[str, Tuple[str, BufferedReader]]] = None
 
 
 class APIPRimitiveClientResponse(Protocol):
@@ -160,6 +172,8 @@ class APIPrimitiveBase:
             return cls._prepare_attrs_payload(payload)
         if isinstance(payload, (DataSequence, Sequence)):
             return cls._prepare_sequence_payload(payload)
+        if isinstance(payload, CustomPayloadType):
+            return payload.prepared()
         else:
             raise APIRequestPayloadTypeError(payload)
 
@@ -173,7 +187,7 @@ class APIPrimitiveBase:
     @classmethod
     def _prepare_attrs_payload(cls, payload: AttrsInstance) -> PreparedPayload:
         """Helper method to prepare AttrsInstance for sending"""
-        return PreparedPayload(data=json.dumps(asdict(payload)), headers={"content-type": "application/json"})
+        return PreparedPayload(data=json.dumps(attrs_asdict(payload)), headers={"content-type": "application/json"})
 
     @classmethod
     def _prepare_sequence_payload(cls, payload: Iterable[Union[BaseModel, AttrsInstance]]) -> PreparedPayload:
@@ -183,7 +197,7 @@ class APIPrimitiveBase:
             if isinstance(item, BaseModel):
                 items.append(item.dict(exclude_none=True, by_alias=True))
             elif isinstance(item, AttrsInstance):
-                items.append(asdict(item))
+                items.append(attrs_asdict(item))
             else:
                 raise APIPrimitiveError(payload)
         data = json.dumps(items)
@@ -212,7 +226,8 @@ class APIPrimitiveBase:
         print(locals())
         _kwargs = dict(kwargs)
         if payload is not None:
-            _kwargs.update(self._prepare_payload(payload))
+            _kwargs.update(asdict(self._prepare_payload(payload)))
+            _kwargs.pop("files", None)
         if params is not None:
             _kwargs.update({"params": self._prepare_params(params)})
         return self._client.request(method, self._basepath + url, **_kwargs)
@@ -386,7 +401,7 @@ class request(APIPrimitiveDecorator):
             return TypeSpecifier(False)
         annotation = payload_param.annotation
         if isclass(annotation):
-            if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModel, DataclassBase)):
+            if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModel, DataclassBase, CustomPayloadType)):
                 return TypeSpecifier(True, None, annotation)
             else:
                 raise APIPrimitiveError(f"'payload' param must be annotated with supported type: {PayloadType}")
