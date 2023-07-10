@@ -72,8 +72,7 @@ class SoftwarePackageUpdatePayload(CustomPayloadType):
         )
         callback = self._create_callback(encoder)
         monitor = MultipartEncoderMonitor(encoder, callback)
-        self.data = monitor
-        self.headers = {"content-type": monitor.content_type}
+        self.payload = PreparedPayload(data=monitor, headers={"content-type": monitor.content_type})
 
     def _create_callback(self, encoder: MultipartEncoder):
         bar = ProgressBar(expected_size=encoder._calculate_length(), filled_char="=")
@@ -84,4 +83,4 @@ class SoftwarePackageUpdatePayload(CustomPayloadType):
         return callback
 
     def prepared(self) -> PreparedPayload:
-        return PreparedPayload(data=self.data, headers=self.headers)
+        return self.payload

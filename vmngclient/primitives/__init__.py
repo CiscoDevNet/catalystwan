@@ -78,16 +78,14 @@ class CustomPayloadType(Protocol):
 
 
 ModelPayloadType = Union[AttrsInstance, BaseModel, Sequence[AttrsInstance], Sequence[BaseModel]]
-PayloadType = Union[str, bytes, dict, BinaryIO, ModelPayloadType, CustomPayloadType]
-ReturnType = Union[
-    bytes, str, dict, BinaryIO, BaseModel, DataclassBase, DataSequence[BaseModel], DataSequence[DataclassBase]
-]
+PayloadType = Union[str, bytes, dict, ModelPayloadType, CustomPayloadType]
+ReturnType = Union[bytes, str, dict, BaseModel, DataclassBase, DataSequence[BaseModel], DataSequence[DataclassBase]]
 RequestParamsType = Union[Dict[str, str], BaseModel]
 
 
 @dataclass
 class TypeSpecifier:
-    """Holds type information extracted from signature. Common for payload and return values"""
+    """Holds type information extracted from signature. Common for payload and return values. Used for documentation"""
 
     present: bool
     sequence_type: Optional[type] = None
@@ -96,19 +94,19 @@ class TypeSpecifier:
 
 @dataclass
 class APIPrimitivesRequestMeta:
-    """Holds data for APIPrimitive methods exctracted during decorating"""
+    """Holds data for APIPrimitive methods exctracted during decorating. Used for documentation"""
 
     http_request: str
     payload_spec: TypeSpecifier
     return_spec: TypeSpecifier
 
 
-@dataclass
+@dataclass(frozen=True)
 class PreparedPayload:
     """Holds data prepared for sending in request"""
 
-    data: Union[str, bytes]
-    headers: Mapping[str, Any]
+    data: Union[str, bytes, None] = None
+    headers: Optional[Mapping[str, Any]] = None
     files: Optional[Dict[str, Tuple[str, BufferedReader]]] = None
 
 
@@ -164,15 +162,19 @@ class APIPrimitiveBase:
     """
 
     @classmethod
-    def _prepare_payload(cls, payload: ModelPayloadType) -> PreparedPayload:
+    def _prepare_payload(cls, payload: PayloadType) -> PreparedPayload:
         """Helper method to prepare data for sending based on type"""
-        if isinstance(payload, BaseModel):
+        if isinstance(payload, (str, bytes)):
+            return PreparedPayload(data=payload)
+        elif isinstance(payload, dict):
+            return PreparedPayload(data=json.dumps(payload), headers={"content-type": "application/json"})
+        elif isinstance(payload, BaseModel):
             return cls._prepare_basemodel_payload(payload)
-        if isinstance(payload, AttrsInstance):
+        elif isinstance(payload, AttrsInstance):
             return cls._prepare_attrs_payload(payload)
-        if isinstance(payload, (DataSequence, Sequence)):
+        elif isinstance(payload, Sequence) and not isinstance(payload, (str, bytes)):
             return cls._prepare_sequence_payload(payload)
-        if isinstance(payload, CustomPayloadType):
+        elif isinstance(payload, CustomPayloadType):
             return payload.prepared()
         else:
             raise APIRequestPayloadTypeError(payload)
@@ -198,8 +200,6 @@ class APIPrimitiveBase:
                 items.append(item.dict(exclude_none=True, by_alias=True))
             elif isinstance(item, AttrsInstance):
                 items.append(attrs_asdict(item))
-            else:
-                raise APIPrimitiveError(payload)
         data = json.dumps(items)
         return PreparedPayload(data=data, headers={"content-type": "application/json"})
 
@@ -223,11 +223,11 @@ class APIPrimitiveBase:
         **kwargs,
     ) -> APIPRimitiveClientResponse:
         """Prepares and sends request using client protocol"""
-        print(locals())
         _kwargs = dict(kwargs)
         if payload is not None:
-            _kwargs.update(asdict(self._prepare_payload(payload)))
-            _kwargs.pop("files", None)
+            _kwargs.update(
+                asdict(self._prepare_payload(payload), dict_factory=lambda x: {k: v for (k, v) in x if v is not None})
+            )  # optional fields set to None will not be inserted to _kwargs
         if params is not None:
             _kwargs.update({"params": self._prepare_params(params)})
         return self._client.request(method, self._basepath + url, **_kwargs)
@@ -479,8 +479,6 @@ class request(APIPrimitiveDecorator):
             _kwargs = self.merge_args(args, kwargs)
             payload = _kwargs.get("payload")
             params = _kwargs.get("params")
-            if self.payload_spec.present and payload is None:
-                raise TypeError("Missing required argument 'payload'")
             self.url = self.url.format(**_kwargs)
             response = _self._request(self.http_method, self.url, payload=payload, params=params, **self.kwargs)
             if self.return_spec.present:
