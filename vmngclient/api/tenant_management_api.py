@@ -3,8 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Optional
 
 from vmngclient.api.task_status_api import Task
-from vmngclient.model.tenant import Tenant
-from vmngclient.primitives.tenant_management import (
+from vmngclient.endpoints.tenant_management import (
     TenantBulkDeleteRequest,
     TenantManagementPrimitives,
     TenantStatus,
@@ -13,6 +12,7 @@ from vmngclient.primitives.tenant_management import (
     vSmartTenantCapacity,
     vSmartTenantMap,
 )
+from vmngclient.model.tenant import Tenant
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession

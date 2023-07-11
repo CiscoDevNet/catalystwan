@@ -16,8 +16,7 @@ from vmngclient.dataclasses import (
     SoftwareInstallTimeout,
     Vbond,
 )
-from vmngclient.exceptions import InvalidOperationError
-from vmngclient.primitives.administration_user_and_group import (
+from vmngclient.endpoints.administration_user_and_group import (
     ActiveSession,
     AdministrationUserAndGroupPrimitives,
     InvalidateSessionMessage,
@@ -31,6 +30,7 @@ from vmngclient.primitives.administration_user_and_group import (
     UserRole,
     UserUpdateRequest,
 )
+from vmngclient.exceptions import InvalidOperationError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import asdict, create_dataclass
 

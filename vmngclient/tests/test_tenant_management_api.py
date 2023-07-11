@@ -3,8 +3,7 @@ from unittest.mock import MagicMock, patch
 
 from vmngclient.api.task_status_api import Task
 from vmngclient.api.tenant_management_api import TenantManagementAPI
-from vmngclient.model.tenant import Tenant
-from vmngclient.primitives.tenant_management import (
+from vmngclient.endpoints.tenant_management import (
     ControlStatus,
     SiteHealth,
     TenantStatus,
@@ -16,6 +15,7 @@ from vmngclient.primitives.tenant_management import (
     vSmartTenantCapacity,
     vSmartTenantMap,
 )
+from vmngclient.model.tenant import Tenant
 from vmngclient.typed_list import DataSequence
 
 

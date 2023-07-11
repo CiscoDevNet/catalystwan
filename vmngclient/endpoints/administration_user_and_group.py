@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Set
 
 from pydantic import BaseModel, Field
 
-from vmngclient.primitives import APIPrimitiveBase, delete, get, post, put, request
+from vmngclient.endpoints import APIPrimitiveBase, delete, get, post, put, request
 from vmngclient.typed_list import DataSequence
 
 

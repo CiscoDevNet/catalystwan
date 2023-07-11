@@ -3,8 +3,8 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
+from vmngclient.endpoints import APIPrimitiveBase, delete, get, post, put, request, versions, view
 from vmngclient.model.tenant import Tenant
-from vmngclient.primitives import APIPrimitiveBase, delete, get, post, put, request, versions, view
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.session_type import ProviderAsTenantView, ProviderView
 

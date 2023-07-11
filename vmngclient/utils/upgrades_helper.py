@@ -6,8 +6,8 @@ from clint.textui.progress import Bar as ProgressBar  # type: ignore
 from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
 
 from vmngclient.dataclasses import Device
+from vmngclient.endpoints import CustomPayloadType, PreparedPayload
 from vmngclient.exceptions import MultiplePersonalityError
-from vmngclient.primitives import CustomPayloadType, PreparedPayload
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.personality import Personality
 

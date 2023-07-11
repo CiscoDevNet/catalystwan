@@ -3,7 +3,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from vmngclient.primitives import APIPrimitiveBase, get, request, view
+from vmngclient.endpoints import APIPrimitiveBase, get, request, view
 from vmngclient.utils.session_type import ProviderAsTenantView, TenantView
 
 

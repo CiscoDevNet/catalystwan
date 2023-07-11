@@ -9,7 +9,7 @@ from requests.cookies import RequestsCookieJar
 from requests.exceptions import JSONDecodeError
 
 from vmngclient import with_proc_info_header
-from vmngclient.primitives import APIPRimitiveClientResponse
+from vmngclient.endpoints import APIPRimitiveClientResponse
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 

@@ -5,8 +5,8 @@ from urllib.parse import parse_qsl, urlsplit
 
 from pydantic import BaseModel, Field
 
+from vmngclient.endpoints import APIPrimitiveBase, get, post, request
 from vmngclient.model.tenant import Tenant
-from vmngclient.primitives import APIPrimitiveBase, get, post, request
 
 
 class MigrationTokenQueryParams(BaseModel):

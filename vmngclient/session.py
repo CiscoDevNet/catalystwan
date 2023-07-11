@@ -14,6 +14,9 @@ from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.api.api_containter import APIContainter
+from vmngclient.endpoints import APIPrimitiveClient
+from vmngclient.endpoints.client import AboutInfo, ServerInfo
+from vmngclient.endpoints.primitive_container import APIPrimitiveContainter
 from vmngclient.exceptions import (
     InvalidOperationError,
     SessionNotCreatedError,
@@ -21,9 +24,6 @@ from vmngclient.exceptions import (
     vManageClientError,
 )
 from vmngclient.model.tenant import Tenant
-from vmngclient.primitives import APIPrimitiveClient
-from vmngclient.primitives.client import AboutInfo, ServerInfo
-from vmngclient.primitives.primitive_container import APIPrimitiveContainter
 from vmngclient.response import ErrorInfo, response_history_debug, vManageResponse
 from vmngclient.utils.session_type import SessionType
 from vmngclient.vmanage_auth import vManageAuth

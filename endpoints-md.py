@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Protocol, Set
 
 from packaging.specifiers import SpecifierSet  # type: ignore
 
-from vmngclient.primitives import BASE_PATH, APIPrimitivesRequestMeta, TypeSpecifier, request, versions, view
+from vmngclient.endpoints import BASE_PATH, APIPrimitivesRequestMeta, TypeSpecifier, request, versions, view
 from vmngclient.utils.session_type import SessionType  # type: ignore
 
 
@@ -144,7 +144,7 @@ class EndpointRegistry(MarkdownRenderer):
 if __name__ == "__main__":
     from unittest.mock import MagicMock
 
-    from vmngclient.primitives.primitive_container import APIPrimitiveContainter
+    from vmngclient.endpoints.primitive_container import APIPrimitiveContainter
 
     # this instantiates api primitive classes triggering method decorators
     # API primitives not attached to container will be not documented !

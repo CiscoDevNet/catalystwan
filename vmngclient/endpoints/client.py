@@ -5,7 +5,7 @@ from typing import Any, List, Optional
 from packaging.version import Version  # type: ignore
 from pydantic import BaseModel, Field
 
-from vmngclient.primitives import APIPrimitiveBase, get, request
+from vmngclient.endpoints import APIPrimitiveBase, get, request
 
 
 class VersionField(Version):

@@ -2,8 +2,8 @@ import unittest
 from unittest.mock import patch
 
 from vmngclient.api.task_status_api import Task
+from vmngclient.endpoints.configuration_dashboard_status import ConfigurationDashboardStatusPrimitives, TaskData
 from vmngclient.exceptions import TaskValidationError
-from vmngclient.primitives.configuration_dashboard_status import ConfigurationDashboardStatusPrimitives, TaskData
 
 
 class TestTaskStatusApi(unittest.TestCase):

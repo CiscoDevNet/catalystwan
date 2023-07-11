@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING, ClassVar, List, Optional
 from pydantic import BaseModel
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
+from vmngclient.endpoints.monitoring_device_details import Tier as TierInfo
 from vmngclient.model.tenant import Tenant as TenantInfo
-from vmngclient.primitives.monitoring_device_details import Tier as TierInfo
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession

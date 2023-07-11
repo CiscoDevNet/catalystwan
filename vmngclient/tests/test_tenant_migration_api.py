@@ -5,8 +5,8 @@ from unittest.mock import MagicMock, patch
 
 from vmngclient.api.task_status_api import Task
 from vmngclient.api.tenant_migration_api import ImportTask, TenantMigrationAPI
+from vmngclient.endpoints.tenant_migration import ImportInfo, MigrationInfo
 from vmngclient.model.tenant import Tenant
-from vmngclient.primitives.tenant_migration import ImportInfo, MigrationInfo
 
 
 class TestTenantMigrationAPI(unittest.TestCase):

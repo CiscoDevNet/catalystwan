@@ -3,7 +3,7 @@ from typing import Dict
 
 from pydantic import BaseModel, Field
 
-from vmngclient.primitives import APIPrimitiveBase, post, request, view
+from vmngclient.endpoints import APIPrimitiveBase, post, request, view
 from vmngclient.utils.session_type import ProviderView
 
 

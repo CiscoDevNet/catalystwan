@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-from vmngclient.primitives import APIPrimitiveBase, get, request
+from vmngclient.endpoints import APIPrimitiveBase, get, request
 from vmngclient.typed_list import DataSequence
 
 

@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from vmngclient.api.task_status_api import Task, TaskResult
+from vmngclient.endpoints.tenant_migration import ImportInfo, MigrationTokenQueryParams
 from vmngclient.model.tenant import Tenant
-from vmngclient.primitives.tenant_migration import ImportInfo, MigrationTokenQueryParams
 
 logger = logging.getLogger(__name__)
 

@@ -10,10 +10,10 @@ from parameterized import parameterized  # type: ignore
 from pydantic import BaseModel
 
 from vmngclient.dataclasses import DataclassBase  # type: ignore
+from vmngclient.endpoints import BASE_PATH, APIPrimitiveBase, CustomPayloadType, PreparedPayload
+from vmngclient.endpoints import logger as primitives_logger
+from vmngclient.endpoints import request, versions, view
 from vmngclient.exceptions import APIPrimitiveError, APIRequestPayloadTypeError, APIVersionError, APIViewError
-from vmngclient.primitives import BASE_PATH, APIPrimitiveBase, CustomPayloadType, PreparedPayload
-from vmngclient.primitives import logger as primitives_logger
-from vmngclient.primitives import request, versions, view
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.session_type import ProviderAsTenantView, ProviderView, TenantView

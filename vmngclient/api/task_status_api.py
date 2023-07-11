@@ -10,7 +10,7 @@ from vmngclient.exceptions import TaskValidationError
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
-from vmngclient.primitives.configuration_dashboard_status import (
+from vmngclient.endpoints.configuration_dashboard_status import (
     ConfigurationDashboardStatusPrimitives,
     SubTaskData,
     TaskData,

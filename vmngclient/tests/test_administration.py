@@ -22,8 +22,7 @@ from vmngclient.dataclasses import (
     ServiceConfigurationData,
     Vbond,
 )
-from vmngclient.exceptions import InvalidOperationError
-from vmngclient.primitives.administration_user_and_group import (
+from vmngclient.endpoints.administration_user_and_group import (
     ResourceGroup,
     ResourceGroupSwitchRequest,
     ResourceGroupUpdateRequest,
@@ -35,6 +34,7 @@ from vmngclient.primitives.administration_user_and_group import (
     UserRole,
     UserUpdateRequest,
 )
+from vmngclient.exceptions import InvalidOperationError
 from vmngclient.utils.certificate_status import ValidityPeriod
 from vmngclient.utils.creation_tools import create_dataclass
 
