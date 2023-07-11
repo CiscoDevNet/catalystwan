@@ -146,8 +146,8 @@ if __name__ == "__main__":
 
     from vmngclient.endpoints.endpoints_container import APIEndpointContainter
 
-    # this instantiates api primitive classes triggering method decorators
-    # API primitives not attached to container will be not documented !
+    # this instantiates APIEndpoints classes triggering method decorators
+    # endpoints not attached to container will be not documented !
     _ = APIEndpointContainter(MagicMock())
 
     endpoint_registry = EndpointRegistry(

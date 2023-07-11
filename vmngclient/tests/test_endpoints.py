@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 from vmngclient.dataclasses import DataclassBase  # type: ignore
 from vmngclient.endpoints import BASE_PATH, APIEndpoints, CustomPayloadType, PreparedPayload
-from vmngclient.endpoints import logger as primitives_logger
+from vmngclient.endpoints import logger as endpoints_logger
 from vmngclient.endpoints import request, versions, view
 from vmngclient.exceptions import APIEndpointError, APIRequestPayloadTypeError, APIVersionError, APIViewError
 from vmngclient.typed_list import DataSequence
@@ -53,14 +53,14 @@ class CustomTypeExample(CustomPayloadType):
         return self.payload
 
 
-class TestAPIPrimitives(unittest.TestCase):
+class TestAPIEndpoints(unittest.TestCase):
     def setUp(self):
         self.base_path = BASE_PATH
         self.session_mock = MagicMock()
         self.session_mock.request = MagicMock(return_value=MagicMock())
         self.session_mock.api_version = None
         self.session_mock.session_type = None
-        self.primitive = APIEndpoints(self.session_mock)
+        self.endpoints = APIEndpoints(self.session_mock)
         self.dict_payload = {
             "id": "XYZ-189",
             "size": 100,
@@ -127,7 +127,7 @@ class TestAPIPrimitives(unittest.TestCase):
 
         self.session_mock.api_version = Version(current_version)
         api = ExampleAPI(self.session_mock)
-        with self.assertLogs(primitives_logger, level="WARNING") as log:
+        with self.assertLogs(endpoints_logger, level="WARNING") as log:
             api.versions_decorated_method()
             assert supported_versions in log.output[0]
             assert current_version in log.output[0]
@@ -178,34 +178,34 @@ class TestAPIPrimitives(unittest.TestCase):
 
         self.session_mock.session_type = current_session
         api = ExampleAPI(self.session_mock)
-        with self.assertLogs(primitives_logger, level="WARNING") as log:
+        with self.assertLogs(endpoints_logger, level="WARNING") as log:
             api.versions_decorated_method()
             for allowed in allowed_sessions:
                 assert str(allowed) in log.output[0]
             assert str(current_session) in log.output[0]
 
     def test_attrs_payload(self):
-        self.primitive._request("GET", f"/{__name__}", payload=self.attrs_payload)
+        self.endpoints._request("GET", f"/{__name__}", payload=self.attrs_payload)
         _, kwargs = self.session_mock.request.call_args
         assert json.loads(kwargs.get("data")) == self.dict_payload
 
     def test_basemodel_payload(self):
-        self.primitive._request("GET", f"/{__name__}", payload=self.basemodel_payload)
+        self.endpoints._request("GET", f"/{__name__}", payload=self.basemodel_payload)
         _, kwargs = self.session_mock.request.call_args
         assert json.loads(kwargs.get("data")) == self.dict_payload
 
     def test_attrs_sequence_payload(self):
-        self.primitive._request("GET", f"/{__name__}", payload=self.attrs_sequence_payload)
+        self.endpoints._request("GET", f"/{__name__}", payload=self.attrs_sequence_payload)
         _, kwargs = self.session_mock.request.call_args
         assert json.loads(kwargs.get("data")) == self.list_dict_payload
 
     def test_basemodel_sequence_payload(self):
-        self.primitive._request("GET", f"/{__name__}", payload=self.basemodel_sequence_payload)
+        self.endpoints._request("GET", f"/{__name__}", payload=self.basemodel_sequence_payload)
         _, kwargs = self.session_mock.request.call_args
         assert json.loads(kwargs.get("data")) == self.list_dict_payload
 
     def test_custom_payload(self):
-        self.primitive._request("POST", f"/{__name__}", payload=self.custom_payload)
+        self.endpoints._request("POST", f"/{__name__}", payload=self.custom_payload)
         _, kwargs = self.session_mock.request.call_args
         prepared = self.custom_payload.prepared()
         assert kwargs.get("data") == prepared.data
@@ -214,33 +214,33 @@ class TestAPIPrimitives(unittest.TestCase):
         assert kwargs.get("files")["file"][1].read() == prepared.files["file"][1].read()
 
     def test_dict_payload(self):
-        self.primitive._request("POST", f"/{__name__}", payload=self.dict_payload)
+        self.endpoints._request("POST", f"/{__name__}", payload=self.dict_payload)
         _, kwargs = self.session_mock.request.call_args
         assert kwargs.get("data") == self.json_payload
 
     def test_str_payload(self):
         str_payload = "This is string payload!"
-        self.primitive._request("POST", f"/{__name__}", payload=str_payload)
+        self.endpoints._request("POST", f"/{__name__}", payload=str_payload)
         _, kwargs = self.session_mock.request.call_args
         assert kwargs.get("data") == str_payload
 
     def test_bytes_payload(self):
         bytes_payload = b"\xEFtest\x00"
-        self.primitive._request("POST", f"/{__name__}", payload=bytes_payload)
+        self.endpoints._request("POST", f"/{__name__}", payload=bytes_payload)
         _, kwargs = self.session_mock.request.call_args
         assert kwargs.get("data") == bytes_payload
 
     def test_unexpected_payload(self):
         with self.assertRaises(APIRequestPayloadTypeError):
-            self.primitive._request("GET", f"/{__name__}", payload={1, 2, 3})
+            self.endpoints._request("GET", f"/{__name__}", payload={1, 2, 3})
 
     def test_dict_params(self):
-        self.primitive._request("POST", f"/{__name__}", params=self.dict_params)
+        self.endpoints._request("POST", f"/{__name__}", params=self.dict_params)
         _, kwargs = self.session_mock.request.call_args
         assert kwargs.get("params") == self.dict_params
 
     def test_basemodel_params(self):
-        self.primitive._request("POST", f"/{__name__}", params=self.basemodel_params)
+        self.endpoints._request("POST", f"/{__name__}", params=self.basemodel_params)
         _, kwargs = self.session_mock.request.call_args
         assert kwargs.get("params") == self.dict_params
 
