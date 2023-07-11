@@ -43,7 +43,15 @@ These steps will help you to automate feature template creation. We'll explain w
 	ported_templates = (..., OMPvSmart)
 	```
 
-4. We can try to create our first template with default values.
+4. (This step is temporary) Find `available_models` definition in 'supported' and add your new template class.
+	```python
+	available_models = {
+		(...)
+		'omp_vsmart': OMPvSmart
+	}
+	```
+
+5. We can try to create our first template with default values.
    ```python
 	omp_vsmart = OMPvSmart(
 		name="my_first_template",
@@ -57,10 +65,10 @@ These steps will help you to automate feature template creation. We'll explain w
 
 	`Template my_first_template (FeatureTemplate) was created successfully (7e56acdd-640e-45dc-9335-87abc697995f).`
 
-5. We can check whether our template is created sucessfully in vManage manually. If there is an error, please create an issue with error and try go to the 6th step.
+6. We can check whether our template is created sucessfully in vManage manually. If there is an error, please create an issue with error and try go to the 7th step.
    
 ### Custimize Feature Template fields.
-6. Run below code with already created session and changed corresponding variables.
+7. Run below code with already created session and changed corresponding variables.
 
     ```python
     # TODO: Use 2nd layer.
@@ -77,8 +85,8 @@ These steps will help you to automate feature template creation. We'll explain w
         f.write(json.dumps(schema, indent=4))
     ```
 
-7. Open `response_{template_type}.json` file.
-8. Find `fields` key. The value should be list of dictionaries. Get every possible key in the dictionary and fill our class with every possible key. You can find the code in `vmngclient\api\templates\models\omp_vsmart_model.py` file.
+8. Open `response_{template_type}.json` file.
+9. Find `fields` key. The value should be list of dictionaries. Get every possible key in the dictionary and fill our class with every possible key. You can find the code in `vmngclient\api\templates\models\omp_vsmart_model.py` file.
 
 TODO:
 - Nested fields
