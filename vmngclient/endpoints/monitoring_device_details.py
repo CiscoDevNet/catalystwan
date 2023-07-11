@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIPrimitiveBase, get, request
+from vmngclient.endpoints import APIEndpoints, get, request
 from vmngclient.typed_list import DataSequence
 
 
@@ -32,7 +32,7 @@ class Tier(BaseModel):
     nat_session_limit: Optional[int] = Field(alias="natSessionLimit")
 
 
-class MonitoringDeviceDetailsPrimitives(APIPrimitiveBase):
+class MonitoringDeviceDetails(APIEndpoints):
     def add_tier(self):
         #  POST /device/tier
         ...

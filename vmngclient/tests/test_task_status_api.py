@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 
 from vmngclient.api.task_status_api import Task
-from vmngclient.endpoints.configuration_dashboard_status import ConfigurationDashboardStatusPrimitives, TaskData
+from vmngclient.endpoints.configuration_dashboard_status import ConfigurationDashboardStatus, TaskData
 from vmngclient.exceptions import TaskValidationError
 
 
@@ -228,7 +228,7 @@ class TestTaskStatusApi(unittest.TestCase):
         }
 
     @patch.object(Task, "_Task__check_validation_status")
-    @patch.object(ConfigurationDashboardStatusPrimitives, "find_status")
+    @patch.object(ConfigurationDashboardStatus, "find_status")
     def test_wait_for_completed_success(self, mock_task_response, mock_validation):
         # Arrange
         mock_task_response.return_value = TaskData.parse_obj(self.success_response)
@@ -240,7 +240,7 @@ class TestTaskStatusApi(unittest.TestCase):
         self.assertEqual(answer, True)
 
     @patch.object(Task, "_Task__check_validation_status")
-    @patch.object(ConfigurationDashboardStatusPrimitives, "find_status")
+    @patch.object(ConfigurationDashboardStatus, "find_status")
     def test_wait_for_completed_empty_data(self, mock_task_response, mock_validation):
         # Data is empty, and then response is success
 
@@ -257,7 +257,7 @@ class TestTaskStatusApi(unittest.TestCase):
         self.assertEqual(answer, True)
 
     @patch.object(Task, "_Task__check_validation_status")
-    @patch.object(ConfigurationDashboardStatusPrimitives, "find_status")
+    @patch.object(ConfigurationDashboardStatus, "find_status")
     def test_wait_for_completed_no_data(self, mock_task_response, mock_validation):
         # No data in first call, and then response is success
 
@@ -270,7 +270,7 @@ class TestTaskStatusApi(unittest.TestCase):
         # Assert
         self.assertEqual(answer, True)
 
-    @patch.object(ConfigurationDashboardStatusPrimitives, "find_status")
+    @patch.object(ConfigurationDashboardStatus, "find_status")
     def test_wait_for_completed_no_validation_field(self, mock_task_response_response):
         # Arrange
         mock_task_response_response.return_value = TaskData.parse_obj(self.no_validation)
@@ -281,7 +281,7 @@ class TestTaskStatusApi(unittest.TestCase):
         # Assert
         self.assertEqual(answer, True)
 
-    @patch.object(ConfigurationDashboardStatusPrimitives, "find_status")
+    @patch.object(ConfigurationDashboardStatus, "find_status")
     def test_wait_for_completed_raise_TaskValidationError(self, mock_task_response_response):
         # Arrange
         mock_task_response_response.return_value = TaskData.parse_obj(self.validation_failure)

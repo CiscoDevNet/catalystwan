@@ -32,8 +32,8 @@ class TenantModel(FeatureTemplate):
     tenants: List[Tenant] = []
 
     def generate_payload(self, session: vManageSession) -> str:
-        tenant_infos = session.primitives.tenant_management.get_all_tenants()
-        tier_infos = session.primitives.monitoring_device_details.get_tiers()
+        tenant_infos = session.endpoints.tenant_management.get_all_tenants()
+        tier_infos = session.endpoints.monitoring_device_details.get_tiers()
 
         for tenant in self.tenants:
             tenant.tier_info = tier_infos.filter(name=tenant.tier_name).single_or_default()

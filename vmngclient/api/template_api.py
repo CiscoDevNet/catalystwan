@@ -611,6 +611,6 @@ class TemplatesAPI:
         return False
 
     def get_device_configuration_preview(self, payload: FeatureToCLIPayload) -> CiscoConfParse:
-        text_config = self.session.primitives.configuration_device_template.get_device_configuration_preview(payload)
+        text_config = self.session.endpoints.configuration_device_template.get_device_configuration_preview(payload)
 
         return CiscoConfParse(text_config.splitlines())

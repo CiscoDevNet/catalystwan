@@ -3,7 +3,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from vmngclient.endpoints import APIPrimitiveBase, get, request, view
+from vmngclient.endpoints import APIEndpoints, get, request, view
 from vmngclient.utils.session_type import ProviderAsTenantView, TenantView
 
 
@@ -11,7 +11,7 @@ class BackupFiles(BaseModel):
     backup_files: List[str]
 
 
-class TenantBackupRestorePrimitives(APIPrimitiveBase):
+class TenantBackupRestore(APIEndpoints):
     @view({ProviderAsTenantView})
     def delete_tenant_backup(self):
         # DELETE /tenantbackup/delete

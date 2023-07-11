@@ -10,10 +10,10 @@ from parameterized import parameterized  # type: ignore
 from pydantic import BaseModel
 
 from vmngclient.dataclasses import DataclassBase  # type: ignore
-from vmngclient.endpoints import BASE_PATH, APIPrimitiveBase, CustomPayloadType, PreparedPayload
+from vmngclient.endpoints import BASE_PATH, APIEndpoints, CustomPayloadType, PreparedPayload
 from vmngclient.endpoints import logger as primitives_logger
 from vmngclient.endpoints import request, versions, view
-from vmngclient.exceptions import APIPrimitiveError, APIRequestPayloadTypeError, APIVersionError, APIViewError
+from vmngclient.exceptions import APIEndpointError, APIRequestPayloadTypeError, APIVersionError, APIViewError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.session_type import ProviderAsTenantView, ProviderView, TenantView
@@ -60,7 +60,7 @@ class TestAPIPrimitives(unittest.TestCase):
         self.session_mock.request = MagicMock(return_value=MagicMock())
         self.session_mock.api_version = None
         self.session_mock.session_type = None
-        self.primitive = APIPrimitiveBase(self.session_mock)
+        self.primitive = APIEndpoints(self.session_mock)
         self.dict_payload = {
             "id": "XYZ-189",
             "size": 100,
@@ -89,7 +89,7 @@ class TestAPIPrimitives(unittest.TestCase):
         ]
     )
     def test_versions_decorator_passes(self, supported_versions, current_version):
-        class ExampleAPI(APIPrimitiveBase):
+        class ExampleAPI(APIEndpoints):
             @versions(supported_versions=supported_versions, raises=True)
             def versions_decorated_method(self):
                 pass
@@ -106,7 +106,7 @@ class TestAPIPrimitives(unittest.TestCase):
         ]
     )
     def test_versions_decorator_raises(self, supported_versions, current_version):
-        class ExampleAPI(APIPrimitiveBase):
+        class ExampleAPI(APIEndpoints):
             @versions(supported_versions=supported_versions, raises=True)
             def versions_decorated_method(self):
                 pass
@@ -120,7 +120,7 @@ class TestAPIPrimitives(unittest.TestCase):
         supported_versions = "<1.6"
         current_version = "1.7"
 
-        class ExampleAPI(APIPrimitiveBase):
+        class ExampleAPI(APIEndpoints):
             @versions(supported_versions=supported_versions, raises=False)
             def versions_decorated_method(self):
                 pass
@@ -140,7 +140,7 @@ class TestAPIPrimitives(unittest.TestCase):
         ]
     )
     def test_view_decorator_passes(self, allowed_sessions, current_session):
-        class ExampleAPI(APIPrimitiveBase):
+        class ExampleAPI(APIEndpoints):
             @view(allowed_session_types=allowed_sessions, raises=True)
             def versions_decorated_method(self):
                 pass
@@ -157,7 +157,7 @@ class TestAPIPrimitives(unittest.TestCase):
         ]
     )
     def test_view_decorator_raises(self, allowed_sessions, current_session):
-        class ExampleAPI(APIPrimitiveBase):
+        class ExampleAPI(APIEndpoints):
             @view(allowed_session_types=allowed_sessions, raises=True)
             def versions_decorated_method(self):
                 pass
@@ -171,7 +171,7 @@ class TestAPIPrimitives(unittest.TestCase):
         allowed_sessions = {ProviderAsTenantView, TenantView}
         current_session = ProviderView
 
-        class ExampleAPI(APIPrimitiveBase):
+        class ExampleAPI(APIEndpoints):
             @view(allowed_session_types=allowed_sessions)
             def versions_decorated_method(self):
                 pass
@@ -245,89 +245,89 @@ class TestAPIPrimitives(unittest.TestCase):
         assert kwargs.get("params") == self.dict_params
 
     def test_request_decorator_forbidden_url_field_name(self):
-        with self.assertRaises(APIPrimitiveError):
+        with self.assertRaises(APIEndpointError):
 
-            class TestAPI(APIPrimitiveBase):
+            class TestAPI(APIEndpoints):
                 @request("GET", "/v1/data/{payload}")
                 def get_data(self, payload: str):  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_unsupported_return_type(self):
-        with self.assertRaises(APIPrimitiveError):
+        with self.assertRaises(APIEndpointError):
 
-            class TestAPI(APIPrimitiveBase):
+            class TestAPI(APIEndpoints):
                 @request("GET", "/v1/data/")
                 def get_data(self) -> DataSequence:  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_unsupported_datasequence_return_type(self):
-        with self.assertRaises(APIPrimitiveError):
+        with self.assertRaises(APIEndpointError):
 
-            class TestAPI(APIPrimitiveBase):
+            class TestAPI(APIEndpoints):
                 @request("GET", "/v1/data/")
                 def get_data(self) -> DataSequence[str]:  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_unsupported_composite_return_type(self):
-        with self.assertRaises(APIPrimitiveError):
+        with self.assertRaises(APIEndpointError):
 
-            class TestAPI(APIPrimitiveBase):
+            class TestAPI(APIEndpoints):
                 @request("GET", "/v1/data")
                 def get_data(self) -> List[BaseModelExample]:  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_unsupported_payload_type(self):
-        with self.assertRaises(APIPrimitiveError):
+        with self.assertRaises(APIEndpointError):
 
-            class TestAPI(APIPrimitiveBase):
+            class TestAPI(APIEndpoints):
                 @request("POST", "/v1/data")
                 def get_data(self, payload: DataSequence):  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_unsupported_payload_sequence_type(self):
-        with self.assertRaises(APIPrimitiveError):
+        with self.assertRaises(APIEndpointError):
 
-            class TestAPI(APIPrimitiveBase):
+            class TestAPI(APIEndpoints):
                 @request("POST", "/v1/data")
                 def get_data(self, payload: List[str]):  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_unsupported_payload_composite_type(self):
-        with self.assertRaises(APIPrimitiveError):
+        with self.assertRaises(APIEndpointError):
 
-            class TestAPI(APIPrimitiveBase):
+            class TestAPI(APIEndpoints):
                 @request("POST", "/v1/data")
                 def get_data(self, payload: Dict[str, BaseModelExample]):  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_not_annotated_params(self):
-        with self.assertRaises(APIPrimitiveError):
+        with self.assertRaises(APIEndpointError):
 
-            class TestAPI(APIPrimitiveBase):
+            class TestAPI(APIEndpoints):
                 @request("POST", "/v1/data")
                 def get_data(self, params):  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_not_supprted_param_type(self):
-        with self.assertRaises(APIPrimitiveError):
+        with self.assertRaises(APIEndpointError):
 
-            class TestAPI(APIPrimitiveBase):
+            class TestAPI(APIEndpoints):
                 @request("POST", "/v1/data")
                 def get_data(self, params: List[str]):  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_not_annotated_url_field_arguments(self):
-        with self.assertRaises(APIPrimitiveError):
+        with self.assertRaises(APIEndpointError):
 
-            class TestAPI(APIPrimitiveBase):
+            class TestAPI(APIEndpoints):
                 @request("POST", "/v1/data/{id}")
                 def get_data(self, id):  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_bogus_params(self):
-        with self.assertRaises(APIPrimitiveError):
+        with self.assertRaises(APIEndpointError):
 
-            class TestAPI(APIPrimitiveBase):
+            class TestAPI(APIEndpoints):
                 @request("POST", "/v1/data/{id}")
                 def get_data(self, id: str, payload: BaseModelExample, bogus: str):  # type: ignore [empty-body]
                     ...
@@ -339,12 +339,12 @@ class TestAPIPrimitives(unittest.TestCase):
                 ...
 
         api = TestAPI()
-        with self.assertRaises(APIPrimitiveError):
+        with self.assertRaises(APIEndpointError):
             api.get_data()
 
     def test_request_decorator_call_with_positional_arguments(self):
         # Arrange
-        class TestAPI(APIPrimitiveBase):
+        class TestAPI(APIEndpoints):
             @request("GET", "/v1/data/{id}")
             def get_data(self, id: str, payload: BaseModelExample):  # type: ignore [empty-body]
                 ...
@@ -362,7 +362,7 @@ class TestAPIPrimitives(unittest.TestCase):
 
     def test_request_decorator_call_with_mixed_positional_arguments(self):
         # Arrange
-        class TestAPI(APIPrimitiveBase):
+        class TestAPI(APIEndpoints):
             @request("GET", "/v2/{category}/items")
             def get_data(
                 self, payload: BaseModelExample, category: str, params: ParamsExample
@@ -383,7 +383,7 @@ class TestAPIPrimitives(unittest.TestCase):
 
     def test_request_decorator_call_with_keyword_arguments(self):
         # Arrange
-        class TestAPI(APIPrimitiveBase):
+        class TestAPI(APIEndpoints):
             @request("GET", "/v2/{category}/items")
             def get_data(
                 self, payload: BaseModelExample, category: str, params: ParamsExample
@@ -404,7 +404,7 @@ class TestAPIPrimitives(unittest.TestCase):
 
     def test_request_decorator_call_and_return_model(self):
         # Arrange
-        class TestAPI(APIPrimitiveBase):
+        class TestAPI(APIEndpoints):
             @request("GET", "/v1/items")
             def get_data(self) -> BaseModelExample:  # type: ignore [empty-body]
                 ...
@@ -419,7 +419,7 @@ class TestAPIPrimitives(unittest.TestCase):
 
     def test_request_decorator_call_and_return_model_datasequece(self):
         # Arrange
-        class TestAPI(APIPrimitiveBase):
+        class TestAPI(APIEndpoints):
             @request("GET", "/v1/items")
             def get_data(self) -> DataSequence[BaseModelExample]:  # type: ignore [empty-body]
                 ...
@@ -436,7 +436,7 @@ class TestAPIPrimitives(unittest.TestCase):
         # Arrange
         expected = "This is String!"
 
-        class TestAPI(APIPrimitiveBase):
+        class TestAPI(APIEndpoints):
             @request("GET", "/v1/items")
             def get_data(self) -> str:  # type: ignore [empty-body]
                 ...
@@ -452,7 +452,7 @@ class TestAPIPrimitives(unittest.TestCase):
         # Arrange
         expected = b"\xFFThis is String!"
 
-        class TestAPI(APIPrimitiveBase):
+        class TestAPI(APIEndpoints):
             @request("GET", "/v1/items")
             def get_data(self) -> bytes:  # type: ignore [empty-body]
                 ...
@@ -466,7 +466,7 @@ class TestAPIPrimitives(unittest.TestCase):
 
     def test_request_decorator_call_and_return_dict(self):
         # Arrange
-        class TestAPI(APIPrimitiveBase):
+        class TestAPI(APIEndpoints):
             @request("GET", "/v1/items")
             def get_data(self) -> dict:  # type: ignore [empty-body]
                 ...

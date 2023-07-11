@@ -111,7 +111,7 @@ class TenantSubdomainNotFound(vManageClientError):
     pass
 
 
-class APIPrimitiveError(vManageClientError):
-    """Raised when there is a problem with primitive definition"""
+class APIEndpointError(vManageClientError):
+    """Raised when there is a problem with endpoint definition"""
 
     pass

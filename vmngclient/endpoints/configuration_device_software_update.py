@@ -1,8 +1,8 @@
-from vmngclient.endpoints import APIPrimitiveBase, post, request
+from vmngclient.endpoints import APIEndpoints, post, request
 from vmngclient.utils.upgrades_helper import SoftwarePackageUpdatePayload
 
 
-class ConfigurationDeviceSoftwareUpdatePrimitives(APIPrimitiveBase):
+class ConfigurationDeviceSoftwareUpdate(APIEndpoints):
     def download_package_file(self):
         # GET /device/action/software/package/{fileName}
         ...

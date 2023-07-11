@@ -1,8 +1,8 @@
-"""This modules defines APIPrimitiveBase class which is used to define
+"""This modules defines APIEndpoints class which is used to define
 vManage API endpoint handlers in declarative way.
 Just create a sub-class and define endpoints using using included decorators: request, view, versions.
 Method decorated with @request has no body, as decorator constructs and sends request.
->>> from vmngclient.primitives import APIPrimitiveBase, versions, view, request, delete
+>>> from vmngclient.endpoints import APIEndpoints, versions, view, request, delete
 >>> from vmngclient.utils.session_type import ProviderView
 >>>
 >>>
@@ -15,7 +15,7 @@ Method decorated with @request has no body, as decorator constructs and sends re
 >>>     id: str
 >>>
 >>>
->>> class TenantManagementAPI(APIPrimitiveBase):
+>>> class TenantManagementAPI(APIEndpoints):
 >>>     @versions(">=20.4")
 >>>     @view({ProviderView})
 >>>     @request(delete, "/tenant/bulk/async")
@@ -60,7 +60,7 @@ from packaging.version import Version  # type: ignore
 from pydantic import BaseModel
 
 from vmngclient.dataclasses import DataclassBase
-from vmngclient.exceptions import APIPrimitiveError, APIRequestPayloadTypeError, APIVersionError, APIViewError
+from vmngclient.exceptions import APIEndpointError, APIRequestPayloadTypeError, APIVersionError, APIViewError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import AttrsInstance
 from vmngclient.utils.creation_tools import asdict as attrs_asdict
@@ -93,8 +93,8 @@ class TypeSpecifier:
 
 
 @dataclass
-class APIPrimitivesRequestMeta:
-    """Holds data for APIPrimitive methods exctracted during decorating. Used for documentation"""
+class APIEndpointRequestMeta:
+    """Holds data for endpoints exctracted during decorating. Used for documentation"""
 
     http_request: str
     payload_spec: TypeSpecifier
@@ -110,7 +110,7 @@ class PreparedPayload:
     files: Optional[Dict[str, Tuple[str, BufferedReader]]] = None
 
 
-class APIPRimitiveClientResponse(Protocol):
+class APIEndpointClientResponse(Protocol):
     """
     Interface to response object. Fits "requests.Response"
     but set of methods is minimal to allow easy migration to another client if needed
@@ -134,7 +134,7 @@ class APIPRimitiveClientResponse(Protocol):
         ...
 
 
-class APIPrimitiveClient(Protocol):
+class APIEndpointClient(Protocol):
     """
     Interface to client object.
     We only need a 'request' function and few vmanage session properties obtained from server.
@@ -142,7 +142,7 @@ class APIPrimitiveClient(Protocol):
     At his point not very clean as injection of custom kwargs is possible (and sometimes used)
     """
 
-    def request(self, method: str, url: str, **kwargs) -> APIPRimitiveClientResponse:
+    def request(self, method: str, url: str, **kwargs) -> APIEndpointClientResponse:
         ...
 
     @property
@@ -154,9 +154,9 @@ class APIPrimitiveClient(Protocol):
         ...
 
 
-class APIPrimitiveBase:
+class APIEndpoints:
     """
-    Class to be used as base for all API primitives.
+    Class to be used as base for all API endpoints.
     Injects BASE_PATH url prefix as it is common for all known vManage API endpoints.
     Introduces special keyword argument 'payload' in request call and handles sending of such object.
     """
@@ -210,7 +210,7 @@ class APIPrimitiveBase:
             return params.dict(exclude_none=True, by_alias=True)
         return params
 
-    def __init__(self, client: APIPrimitiveClient):
+    def __init__(self, client: APIEndpointClient):
         self._client = client
         self._basepath = BASE_PATH
 
@@ -221,7 +221,7 @@ class APIPrimitiveBase:
         payload: Optional[ModelPayloadType] = None,
         params: Optional[RequestParamsType] = None,
         **kwargs,
-    ) -> APIPRimitiveClientResponse:
+    ) -> APIEndpointClientResponse:
         """Prepares and sends request using client protocol"""
         _kwargs = dict(kwargs)
         if payload is not None:
@@ -241,18 +241,18 @@ class APIPrimitiveBase:
         return self._client.session_type
 
 
-class APIPrimitiveDecorator:
+class APIEndpointsDecorator:
     @classmethod
-    def get_check_instance(cls, _self, *args, **kwargs) -> APIPrimitiveBase:
+    def get_check_instance(cls, _self, *args, **kwargs) -> APIEndpoints:
         """Gets wrapped function instance (first argument)"""
-        if not isinstance(_self, APIPrimitiveBase):
-            raise APIPrimitiveError("Only APIPrimitiveBase instance methods can be annotated with @{cls} decorator")
+        if not isinstance(_self, APIEndpoints):
+            raise APIEndpointError("Only APIEndpointsDecorator instance methods can be annotated with @{cls} decorator")
         return _self
 
 
-class versions(APIPrimitiveDecorator):
+class versions(APIEndpointsDecorator):
     """
-    Decorator to annotate api primitives methods with supported versions.
+    Decorator to annotate endpoints with supported versions.
     Logs warning or raises exception when incompatibility found during runtime.
     """
 
@@ -267,7 +267,7 @@ class versions(APIPrimitiveDecorator):
 
         def wrapper(*args, **kwargs):
             """Executes each time decorated method is called"""
-            _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIPrimitiveBase instance
+            _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIEndpoints instance
             current = _self._api_version
             supported = self.supported_versions
             if current and current not in supported:
@@ -282,9 +282,9 @@ class versions(APIPrimitiveDecorator):
         return wrapper
 
 
-class view(APIPrimitiveDecorator):
+class view(APIEndpointsDecorator):
     """
-    Decorator to annotate api primitives methods with session type (view) restriction
+    Decorator to annotate endpoints with session type (view) restriction
     Logs warning or raises exception when incompatibility found during runtime.
     """
 
@@ -299,7 +299,7 @@ class view(APIPrimitiveDecorator):
 
         def wrapper(*args, **kwargs):
             """Executes each time decorated method is called"""
-            _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIPrimitiveBase instance
+            _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIEndpoints instance
             current = _self._session_type
             allowed = self.allowed_session_types
             if current and current not in allowed:
@@ -314,9 +314,9 @@ class view(APIPrimitiveDecorator):
         return wrapper
 
 
-class request(APIPrimitiveDecorator):
+class request(APIEndpointsDecorator):
     """
-    Decorator to annotate api primitives methods with HTTP method, URL and optionally json key from which
+    Decorator to annotate endpoints with HTTP method, URL and optionally json key from which
     modelled data will be parsed (usually "data", but defaults to whole json payload).
     Additional kwargs can be injected which will be passed to request method (eg. custom headers)
 
@@ -326,23 +326,24 @@ class request(APIPrimitiveDecorator):
 
             "payload": argument with that name is used to send data in request
             usually it is user defined subclass of: pydantic.BaseModel
-            other types are also supported please check: vmngclient.primitives.PayloadType
+            other types are also supported please check: vmngclient.endpoints.PayloadType
 
             "params": argument with that name is used to generate url query string
             supports Dict[str, str] and pydantic.BaseModel
 
-            other parameter must be strings and are used to format url string
+            other parameter must be strings and are used to format url.
 
         Return Type:
-            supports types defined in: vmngclient.primitives.ReturnType
+
+            supports types defined in: vmngclient.endpoints.ReturnType
 
     Raises:
-        APIPrimitiveError: when decorated method has unsupported parameters or response type
+        APIEndpointError: when decorated method has unsupported parameters or response type
     """
 
     forbidden_url_field_names = {"self", "payload", "params"}
     meta_lookup: ClassVar[
-        Dict[Any, APIPrimitivesRequestMeta]
+        Dict[Any, APIEndpointRequestMeta]
     ] = {}  # maps decorated method instance to it's meta information
 
     def __init__(self, http_method: str, url: str, resp_json_key: Optional[str] = None, **kwargs):
@@ -350,7 +351,7 @@ class request(APIPrimitiveDecorator):
         formatter = Formatter()
         url_field_names = {item[1] for item in formatter.parse(url) if item[1] is not None}
         if self.forbidden_url_field_names & url_field_names:
-            APIPrimitiveError(f"One of forbidden fields names: {self.forbidden_url_field_names} found in url: {url}")
+            APIEndpointError(f"One of forbidden fields names: {self.forbidden_url_field_names} found in url: {url}")
         self.url = url
         self.url_field_names = url_field_names
         self.resp_json_key = resp_json_key
@@ -363,7 +364,7 @@ class request(APIPrimitiveDecorator):
         Does basic checking of annotated types so problems can be detected early.
 
         Raises:
-            APIPrimitiveError: when signature contains unexpected return annotation
+            APIEndpointError: when signature contains unexpected return annotation
 
         Returns:
             TypeSpecifier: Specification of return type
@@ -374,7 +375,7 @@ class request(APIPrimitiveDecorator):
                 return TypeSpecifier(True, None, annotation)
             elif annotation == _empty:
                 return TypeSpecifier(False)
-            raise APIPrimitiveError(f"Expected: {ReturnType} but return type {annotation}")
+            raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
         elif (type_origin := get_origin(annotation)) and isclass(type_origin) and issubclass(type_origin, DataSequence):
             if (
                 (type_args := get_args(annotation))
@@ -383,16 +384,16 @@ class request(APIPrimitiveDecorator):
                 and issubclass(type_args[0], (BaseModel, DataclassBase))
             ):
                 return TypeSpecifier(True, DataSequence, type_args[0])
-            raise APIPrimitiveError(f"Expected: {ReturnType} but return type {annotation}")
+            raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
         else:
-            raise APIPrimitiveError(f"Expected: {ReturnType} but return type {annotation}")
+            raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
 
     def specify_payload_type(self) -> TypeSpecifier:
         """Specifies payload type based on decorated method signature annotations.
         Does basic checking of annotated types for 'payload' so problems can be detected early.
 
         Raises:
-            APIPrimitiveError: when signature contains unexpected payload annotation
+            APIEndpointError: when signature contains unexpected payload annotation
 
         Returns:
             TypeSpecifier: Specification of payload type
@@ -405,7 +406,7 @@ class request(APIPrimitiveDecorator):
             if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModel, DataclassBase, CustomPayloadType)):
                 return TypeSpecifier(True, None, annotation)
             else:
-                raise APIPrimitiveError(f"'payload' param must be annotated with supported type: {PayloadType}")
+                raise APIEndpointError(f"'payload' param must be annotated with supported type: {PayloadType}")
         elif (type_origin := get_origin(annotation)) and isclass(type_origin) and issubclass(type_origin, Sequence):
             if (
                 (type_args := get_args(annotation))
@@ -414,39 +415,37 @@ class request(APIPrimitiveDecorator):
                 and issubclass(type_args[0], (BaseModel, DataclassBase))
             ):
                 return TypeSpecifier(True, annotation, type_args[0])
-            raise APIPrimitiveError(f"Expected: {PayloadType} but found payload {annotation}")
+            raise APIEndpointError(f"Expected: {PayloadType} but found payload {annotation}")
         else:
-            raise APIPrimitiveError(f"Expected: {PayloadType} but found payload {annotation}")
+            raise APIEndpointError(f"Expected: {PayloadType} but found payload {annotation}")
 
     def check_params(self):
         """Checks params in decorated method definition
 
         Raises:
-            APIPrimitiveError: when decorated params not matching specification
+            APIEndpointError: when decorated params not matching specification
         """
         parameters = self.sig.parameters
 
         if params_param := parameters.get("params"):
             if not (isclass(params_param.annotation) and issubclass(params_param.annotation, (BaseModel, Dict))):
-                raise APIPrimitiveError(f"'params' param must be annotated with supported type: {RequestParamsType}")
+                raise APIEndpointError(f"'params' param must be annotated with supported type: {RequestParamsType}")
 
         general_purpose_arg_names = {
             key for key in self.sig.parameters.keys() if key not in self.forbidden_url_field_names
         }
         if missing := self.url_field_names.difference(general_purpose_arg_names):
-            raise APIPrimitiveError(f"Missing parameters: {missing} to format url: {self.url}")
+            raise APIEndpointError(f"Missing parameters: {missing} to format url: {self.url}")
 
         for parameter in [parameters.get(name) for name in self.url_field_names]:
             if not (isclass(parameter.annotation) and parameter.annotation == str):
-                raise APIPrimitiveError(
-                    f"Parameter {parameter} used for url formatting must have 'str' type annotation"
-                )
+                raise APIEndpointError(f"Parameter {parameter} used for url formatting must have 'str' type annotation")
 
         no_purpose_params = {
             parameters.get(name) for name in general_purpose_arg_names.difference(self.url_field_names)
         }
         if no_purpose_params:
-            raise APIPrimitiveError(
+            raise APIEndpointError(
                 f"Parameters {no_purpose_params} are not used as "
                 "request payload, request params nor to format url string!"
                 "remove unused parameter or fix by changing argument to purposeful name 'payload' or 'params'"
@@ -470,13 +469,13 @@ class request(APIPrimitiveDecorator):
         self.return_spec = self.specify_return_type()
         self.payload_spec = self.specify_payload_type()
         self.check_params()
-        self.meta_lookup[func] = APIPrimitivesRequestMeta(
+        self.meta_lookup[func] = APIEndpointRequestMeta(
             http_request=f"{self.http_method} {self.url}", payload_spec=self.payload_spec, return_spec=self.return_spec
         )
 
         def wrapper(*args, **kwargs):
             """Executes each time decorated method is called"""
-            _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIPrimitiveBase instance
+            _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIEndpoints instance
             _kwargs = self.merge_args(args, kwargs)
             payload = _kwargs.get("payload")
             params = _kwargs.get("params")

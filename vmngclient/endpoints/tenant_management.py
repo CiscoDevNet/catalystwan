@@ -3,7 +3,7 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIPrimitiveBase, delete, get, post, put, request, versions, view
+from vmngclient.endpoints import APIEndpoints, delete, get, post, put, request, versions, view
 from vmngclient.model.tenant import Tenant
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.session_type import ProviderAsTenantView, ProviderView
@@ -114,7 +114,7 @@ class vSessionId(BaseModel):
     vsessionid: str = Field(alias="VSessionId")
 
 
-class TenantManagementPrimitives(APIPrimitiveBase):
+class TenantManagement(APIEndpoints):
     @view({ProviderView})
     @request(post, "/tenant")
     def create_tenant(self, payload: Tenant) -> Tenant:

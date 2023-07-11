@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Set
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIPrimitiveBase, delete, get, post, put, request
+from vmngclient.endpoints import APIEndpoints, delete, get, post, put, request
 from vmngclient.typed_list import DataSequence
 
 
@@ -145,7 +145,7 @@ class ResourceGroupSwitchRequest(BaseModel):
     resource_group_name: str = Field(alias="resourceGroupName")
 
 
-class AdministrationUserAndGroupPrimitives(APIPrimitiveBase):
+class AdministrationUserAndGroup(APIEndpoints):
     def create_colo_group(self):
         # POST /admin/cologroup
         ...

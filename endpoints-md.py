@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Protocol, Set
 
 from packaging.specifiers import SpecifierSet  # type: ignore
 
-from vmngclient.endpoints import BASE_PATH, APIPrimitivesRequestMeta, TypeSpecifier, request, versions, view
+from vmngclient.endpoints import BASE_PATH, APIEndpointRequestMeta, TypeSpecifier, request, versions, view
 from vmngclient.utils.session_type import SessionType  # type: ignore
 
 
@@ -86,7 +86,7 @@ class Endpoint(MarkdownRenderer):
     @staticmethod
     def from_meta(
         func,
-        meta: APIPrimitivesRequestMeta,
+        meta: APIEndpointRequestMeta,
         versions: Optional[SpecifierSet],
         tenancy_modes: Optional[Set[SessionType]],
     ) -> "Endpoint":
@@ -118,7 +118,7 @@ class Endpoint(MarkdownRenderer):
 class EndpointRegistry(MarkdownRenderer):
     def __init__(
         self,
-        meta_lookup: Dict[Any, APIPrimitivesRequestMeta],
+        meta_lookup: Dict[Any, APIEndpointRequestMeta],
         versions_lookup: Dict[Any, SpecifierSet],
         tenancy_modes_lookup: Dict[Any, Set[SessionType]],
     ):
@@ -144,11 +144,11 @@ class EndpointRegistry(MarkdownRenderer):
 if __name__ == "__main__":
     from unittest.mock import MagicMock
 
-    from vmngclient.endpoints.primitive_container import APIPrimitiveContainter
+    from vmngclient.endpoints.endpoints_container import APIEndpointContainter
 
     # this instantiates api primitive classes triggering method decorators
     # API primitives not attached to container will be not documented !
-    _ = APIPrimitiveContainter(MagicMock())
+    _ = APIEndpointContainter(MagicMock())
 
     endpoint_registry = EndpointRegistry(
         meta_lookup=request.meta_lookup, versions_lookup=versions.meta_lookup, tenancy_modes_lookup=view.meta_lookup

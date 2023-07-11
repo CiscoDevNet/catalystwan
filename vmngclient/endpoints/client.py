@@ -5,7 +5,7 @@ from typing import Any, List, Optional
 from packaging.version import Version  # type: ignore
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIPrimitiveBase, get, request
+from vmngclient.endpoints import APIEndpoints, get, request
 
 
 class VersionField(Version):
@@ -57,7 +57,7 @@ class AboutInfo(BaseModel):
     logo: Optional[str]
 
 
-class ClientPrimitives(APIPrimitiveBase):
+class Client(APIEndpoints):
     @request(get, "/client/server", "data")
     def server(self) -> ServerInfo:
         ...

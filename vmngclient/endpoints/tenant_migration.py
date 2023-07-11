@@ -5,7 +5,7 @@ from urllib.parse import parse_qsl, urlsplit
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIPrimitiveBase, get, post, request
+from vmngclient.endpoints import APIEndpoints, get, post, request
 from vmngclient.model.tenant import Tenant
 
 
@@ -35,7 +35,7 @@ class MigrationInfo(BaseModel):
     process_id: str = Field(alias="processId")
 
 
-class TenantMigrationPrimitives(APIPrimitiveBase):
+class TenantMigration(APIEndpoints):
     @request(get, "/tenantmigration/download/{path}")
     def download_tenant_data(self, path: str = "default.tar.gz") -> bytes:
         ...

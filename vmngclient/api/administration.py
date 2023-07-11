@@ -18,7 +18,7 @@ from vmngclient.dataclasses import (
 )
 from vmngclient.endpoints.administration_user_and_group import (
     ActiveSession,
-    AdministrationUserAndGroupPrimitives,
+    AdministrationUserAndGroup,
     InvalidateSessionMessage,
     ResourceGroup,
     ResourceGroupSwitchRequest,
@@ -55,7 +55,7 @@ class UsersAPI:
 
     def __init__(self, session: vManageSession) -> None:
         self.session = session
-        self._primitives = AdministrationUserAndGroupPrimitives(session)
+        self._endpoints = AdministrationUserAndGroup(session)
 
     def get(self) -> DataSequence[User]:
         """List all users
@@ -63,7 +63,7 @@ class UsersAPI:
         Returns:
             DataSequence[User]: List-like object representing users
         """
-        return self._primitives.find_users()
+        return self._endpoints.find_users()
 
     def get_role(self) -> UserRole:
         """Get currently logged user role
@@ -71,7 +71,7 @@ class UsersAPI:
         Returns:
             UserRole: Currently logged user role information
         """
-        return self._primitives.find_user_role()
+        return self._endpoints.find_user_role()
 
     def get_auth_type(self) -> str:
         """Get currently logged user authentication type
@@ -79,7 +79,7 @@ class UsersAPI:
         Returns:
             str: Currently logged user authentication type
         """
-        return self._primitives.find_user_auth_type().user_auth_type
+        return self._endpoints.find_user_auth_type().user_auth_type
 
     def create(self, user: User):
         """Creates a new user
@@ -87,7 +87,7 @@ class UsersAPI:
         Args:
             user (User): Definition of new user to be created
         """
-        self._primitives.create_user(user)
+        self._endpoints.create_user(user)
 
     def update(self, user_update_request: UserUpdateRequest):
         """Updates existing user
@@ -95,7 +95,7 @@ class UsersAPI:
         Args:
             user_update_request (UserUpdateRequest): User attributes to be updated
         """
-        self._primitives.update_user(user_update_request.username, user_update_request)
+        self._endpoints.update_user(user_update_request.username, user_update_request)
 
     def update_password(self, username: str, new_password: str):
         """Updates exisiting user password
@@ -107,7 +107,7 @@ class UsersAPI:
         update_password_request = UserUpdateRequest(
             userName=username, password=new_password, currentUserPassword=self.session.password
         )  # type: ignore
-        self._primitives.update_password(username, update_password_request)
+        self._endpoints.update_password(username, update_password_request)
 
     def reset(self, username: str):
         """Resets given user (unlocks blocked user eg. after number of unsuccessfull login attempts)
@@ -115,7 +115,7 @@ class UsersAPI:
         Args:
             username (str): Name of the user to be unlocked
         """
-        self._primitives.reset_user(UserResetRequest(userName=username))
+        self._endpoints.reset_user(UserResetRequest(userName=username))
 
     def delete(self, username: str):
         """Deletes given user
@@ -123,7 +123,7 @@ class UsersAPI:
         Args:
             username (str): Name of the user to be deleted
         """
-        self._primitives.delete_user(username)
+        self._endpoints.delete_user(username)
 
 
 class UserGroupsAPI:
@@ -131,7 +131,7 @@ class UserGroupsAPI:
 
     def __init__(self, session: vManageSession):
         self.session = session
-        self._primitives = AdministrationUserAndGroupPrimitives(session)
+        self._endpoints = AdministrationUserAndGroup(session)
 
     def get(self) -> DataSequence[UserGroup]:
         """List all user groups
@@ -139,7 +139,7 @@ class UserGroupsAPI:
         Returns:
             DataSequence[UserGroup]: List-like object representing user groups
         """
-        return self._primitives.find_user_groups()
+        return self._endpoints.find_user_groups()
 
     def create(self, user_group: UserGroup):
         """Creates a new user group
@@ -147,7 +147,7 @@ class UserGroupsAPI:
         Args:
             user_group (UserGroup): Definition of user group to be created
         """
-        self._primitives.create_user_group(user_group)
+        self._endpoints.create_user_group(user_group)
 
     def update(self, user_group: UserGroup):
         """Updates existing user group
@@ -155,7 +155,7 @@ class UserGroupsAPI:
         Args:
             user_group (UserGroup): User group attributes to be updated
         """
-        self._primitives.update_user_group(user_group.group_name, user_group)
+        self._endpoints.update_user_group(user_group.group_name, user_group)
 
     def delete(self, group_name: str):
         """Deletes given user group
@@ -163,7 +163,7 @@ class UserGroupsAPI:
         Args:
             group_name (str): Name of the user group to be deleted
         """
-        self._primitives.delete_user_group(group_name)
+        self._endpoints.delete_user_group(group_name)
 
 
 class ResourceGroupsAPI:
@@ -171,7 +171,7 @@ class ResourceGroupsAPI:
 
     def __init__(self, session: vManageSession):
         self.session = session
-        self._primitives = AdministrationUserAndGroupPrimitives(session)
+        self._endpoints = AdministrationUserAndGroup(session)
 
     def get(self) -> DataSequence[ResourceGroup]:
         """List all resource groups
@@ -179,7 +179,7 @@ class ResourceGroupsAPI:
         Returns:
             DataSequence[ResourceGroup]: List-like object containing user groups information
         """
-        return self._primitives.find_resource_groups()
+        return self._endpoints.find_resource_groups()
 
     def create(self, resource_group: ResourceGroup):
         """Creates a new resource group
@@ -187,7 +187,7 @@ class ResourceGroupsAPI:
         Args:
             resource_group (ResourceGroup): Definition of new resource group to be created
         """
-        self._primitives.create_resource_group(resource_group)
+        self._endpoints.create_resource_group(resource_group)
 
     def update(self, resource_group_update_request: ResourceGroupUpdateRequest):
         """Updates existing resource group
@@ -196,7 +196,7 @@ class ResourceGroupsAPI:
             resource_group_update_request (ResourceGroupUpdateRequest): Object containing existing
             resource group id and attributes to be updated
         """
-        self._primitives.update_resource_group(resource_group_update_request.id, resource_group_update_request)
+        self._endpoints.update_resource_group(resource_group_update_request.id, resource_group_update_request)
 
     def switch(self, resource_group_name: str):
         """Switch to view only a specific resource group (for global admin only)
@@ -205,7 +205,7 @@ class ResourceGroupsAPI:
             resource_group_name (str): Name of resource group to switch view
         """
         switch_request = ResourceGroupSwitchRequest(resourceGroupName=resource_group_name)
-        self._primitives.switch_resource_group(switch_request)
+        self._endpoints.switch_resource_group(switch_request)
 
     def delete(self, resource_group_id: str):
         """Deletes a given resource group
@@ -213,7 +213,7 @@ class ResourceGroupsAPI:
         Args:
             resource_group_id (str): Resource group id
         """
-        self._primitives.delete_resource_group(resource_group_id)
+        self._endpoints.delete_resource_group(resource_group_id)
 
 
 class SessionsAPI:
@@ -221,7 +221,7 @@ class SessionsAPI:
 
     def __init__(self, session: vManageSession):
         self.session = session
-        self._primitives = AdministrationUserAndGroupPrimitives(session)
+        self._endpoints = AdministrationUserAndGroup(session)
 
     def get(self) -> DataSequence[ActiveSession]:
         """List all active sessions
@@ -229,7 +229,7 @@ class SessionsAPI:
         Returns:
             DataSequence[ActiveSession]: List-like object representing active user sessions
         """
-        return self._primitives.get_active_sessions()
+        return self._endpoints.get_active_sessions()
 
     def invalidate(self, sessions: List[ActiveSession]) -> InvalidateSessionMessage:
         """Invalidates given sessions
@@ -241,7 +241,7 @@ class SessionsAPI:
             InvalidateSessionMessage: Information about invalidation result
         """
         sessions_delete_request = SessionsDeleteRequest.from_active_session_list(sessions)
-        return self._primitives.remove_sessions(sessions_delete_request)
+        return self._endpoints.remove_sessions(sessions_delete_request)
 
 
 class ClusterManagementAPI:

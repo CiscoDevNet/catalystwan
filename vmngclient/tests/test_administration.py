@@ -52,66 +52,66 @@ class TestUsersAPI(unittest.TestCase):
         self.session.session_type = None
         self.session.password = "P4s$w0rD"
         self.api = UsersAPI(self.session)
-        self.api._primitives = MagicMock()
+        self.api._endpoints = MagicMock()
 
     def test_get(self):
         # Arrange
         expected_users = [User(userName="new_user", password="new_user", group=["netadmin"], description="new user")]
-        self.api._primitives.find_users = MagicMock(return_value=expected_users)
+        self.api._endpoints.find_users = MagicMock(return_value=expected_users)
         # Act
         observed_users = self.api.get()
-        self.api._primitives.find_users.assert_called_once()
+        self.api._endpoints.find_users.assert_called_once()
         assert expected_users == observed_users
 
     def test_get_role(self):
         # Arrange
         expected_user_role = UserRole(isAdmin=True)
-        self.api._primitives.find_user_role = MagicMock(return_value=expected_user_role)
+        self.api._endpoints.find_user_role = MagicMock(return_value=expected_user_role)
         # Act
         observed_user_role = self.api.get_role()
         # Assert
-        self.api._primitives.find_user_role.assert_called_once()
+        self.api._endpoints.find_user_role.assert_called_once()
         assert expected_user_role == observed_user_role
 
     def test_get_auth_type(self):
         # Arrange
         expected_auth_type = "local"
-        self.api._primitives.find_user_auth_type = MagicMock(return_value=UserAuthType(userAuthType=expected_auth_type))
+        self.api._endpoints.find_user_auth_type = MagicMock(return_value=UserAuthType(userAuthType=expected_auth_type))
         # Act
         observed_auth_type = self.api.get_auth_type()
         # Assert
-        self.api._primitives.find_user_auth_type.assert_called_once()
+        self.api._endpoints.find_user_auth_type.assert_called_once()
         assert expected_auth_type == observed_auth_type
 
     def test_create(self):
         # Arrange
         user = User(userName="new_user", password="new_user", group=["netadmin"], description="new user")
-        self.api._primitives.create_user = MagicMock()
+        self.api._endpoints.create_user = MagicMock()
         # Act
         self.api.create(user)
         # Assert
-        self.api._primitives.create_user.assert_called_once_with(user)
+        self.api._endpoints.create_user.assert_called_once_with(user)
 
     def test_update(self):
         # Arrange
         user_update = UserUpdateRequest(
             userName="new_user", password="new_user", group=["netadmin"], description="new user", resGroupName="global"
         )
-        self.api._primitives.update_user = MagicMock()
+        self.api._endpoints.update_user = MagicMock()
         # Act
         self.api.update(user_update)
         # Assert
-        self.api._primitives.update_user.assert_called_once_with(user_update.username, user_update)
+        self.api._endpoints.update_user.assert_called_once_with(user_update.username, user_update)
 
     def test_update_password(self):
         # Arrange
         username = "new_user"
         new_password = "PaSsWoRd"
-        self.api._primitives.update_password = MagicMock()
+        self.api._endpoints.update_password = MagicMock()
         # Act
         self.api.update_password(username, new_password)
         # Assert
-        self.api._primitives.update_password.assert_called_once_with(
+        self.api._endpoints.update_password.assert_called_once_with(
             username,
             UserUpdateRequest(userName=username, password=new_password, currentUserPassword=self.session.password),
         )
@@ -120,20 +120,20 @@ class TestUsersAPI(unittest.TestCase):
         # Arrange
         username = "new_user"
         user_reset_request = UserResetRequest(userName=username)
-        self.api._primitives.reset_user = MagicMock()
+        self.api._endpoints.reset_user = MagicMock()
         # Act
         self.api.reset(username)
         # Assert
-        self.api._primitives.reset_user.assert_called_once_with(user_reset_request)
+        self.api._endpoints.reset_user.assert_called_once_with(user_reset_request)
 
     def test_delete(self):
         # Arrange
         username = "new_user"
-        self.api._primitives.delete_user = MagicMock()
+        self.api._endpoints.delete_user = MagicMock()
         # Act
         self.api.delete(username)
         # Assert
-        self.api._primitives.delete_user.assert_called_once_with(username)
+        self.api._endpoints.delete_user.assert_called_once_with(username)
 
 
 class TestUserGroupsAPI(unittest.TestCase):
@@ -144,7 +144,7 @@ class TestUserGroupsAPI(unittest.TestCase):
         self.session.session_type = None
         self.session.password = "P4s$w0rD"
         self.api = UserGroupsAPI(self.session)
-        self.api._primitives = MagicMock()
+        self.api._endpoints = MagicMock()
 
     def test_get(self):
         # Arrange
@@ -153,11 +153,11 @@ class TestUserGroupsAPI(unittest.TestCase):
                 groupName="new_group", tasks=[UserGroupTask(enabled=True, feature="Alarms", read=True, write=False)]
             )
         ]
-        self.api._primitives.find_user_groups = MagicMock(return_value=expected_user_groups)
+        self.api._endpoints.find_user_groups = MagicMock(return_value=expected_user_groups)
         # Act
         observed_user_groups = self.api.get()
         # Assert
-        self.api._primitives.find_user_groups.assert_called_once()
+        self.api._endpoints.find_user_groups.assert_called_once()
         assert expected_user_groups == observed_user_groups
 
     def test_create(self):
@@ -165,31 +165,31 @@ class TestUserGroupsAPI(unittest.TestCase):
         user_group = UserGroup(
             groupName="new_group", tasks=[UserGroupTask(enabled=True, feature="Alarms", read=True, write=False)]
         )
-        self.api._primitives.create_user_group = MagicMock()
+        self.api._endpoints.create_user_group = MagicMock()
         # Act
         self.api.create(user_group)
         # Assert
-        self.api._primitives.create_user_group.assert_called_once_with(user_group)
+        self.api._endpoints.create_user_group.assert_called_once_with(user_group)
 
     def test_update(self):
         # Arrange
         user_group = UserGroup(
             groupName="new_group", tasks=[UserGroupTask(enabled=True, feature="Alarms", read=True, write=False)]
         )
-        self.api._primitives.update_user_group = MagicMock()
+        self.api._endpoints.update_user_group = MagicMock()
         # Act
         self.api.update(user_group)
         # Assert
-        self.api._primitives.update_user_group.assert_called_once_with(user_group.group_name, user_group)
+        self.api._endpoints.update_user_group.assert_called_once_with(user_group.group_name, user_group)
 
     def test_delete(self):
         # Arrange
         group_name = "new_group"
-        self.api._primitives.delete_user_group = MagicMock()
+        self.api._endpoints.delete_user_group = MagicMock()
         # Act
         self.api.delete(group_name)
         # Assert
-        self.api._primitives.delete_user_group.assert_called_once_with(group_name)
+        self.api._endpoints.delete_user_group.assert_called_once_with(group_name)
 
 
 class TestResourceGroupsAPI(unittest.TestCase):
@@ -200,7 +200,7 @@ class TestResourceGroupsAPI(unittest.TestCase):
         self.session.session_type = None
         self.session.password = "P4s$w0rD"
         self.api = ResourceGroupsAPI(self.session)
-        self.api._primitives = MagicMock()
+        self.api._endpoints = MagicMock()
 
     def test_get(self):
         # Arrange
@@ -209,54 +209,54 @@ class TestResourceGroupsAPI(unittest.TestCase):
                 id="0:RESGROUP:14567:XD$eD", name="new_resource_group1", desc="New Resource Group #1", siteIds=[200]
             )
         ]
-        self.api._primitives.find_resource_groups = MagicMock(return_value=expected_resource_groups)
+        self.api._endpoints.find_resource_groups = MagicMock(return_value=expected_resource_groups)
         # Act
         observed_resource_groups = self.api.get()
         # Assert
-        self.api._primitives.find_resource_groups.assert_called_once()
+        self.api._endpoints.find_resource_groups.assert_called_once()
         assert expected_resource_groups == observed_resource_groups
 
     def test_create(self):
         # Arrange
         resource_group = ResourceGroup(name="new_resource_group3", desc="New Resource Group #3", siteIds=[200])
-        self.api._primitives.create_resource_group = MagicMock()
+        self.api._endpoints.create_resource_group = MagicMock()
         # Act
         self.api.create(resource_group)
         # Assert
-        self.api._primitives.create_resource_group.assert_called_once_with(resource_group)
+        self.api._endpoints.create_resource_group.assert_called_once_with(resource_group)
 
     def test_update(self):
         # Arrange
         resource_group_update = ResourceGroupUpdateRequest(
             id="0:RESGROUP:14567:XD$eD", name="new_resource_group1", desc="New Resource Group #1", siteIds=[101, 102]
         )
-        self.api._primitives.update_resource_group = MagicMock()
+        self.api._endpoints.update_resource_group = MagicMock()
         # Act
         self.api.update(resource_group_update)
         # Assert
-        self.api._primitives.update_resource_group.assert_called_once_with(
+        self.api._endpoints.update_resource_group.assert_called_once_with(
             resource_group_update.id, resource_group_update
         )
 
     def test_switch(self):
         # Arrange
         resource_group_name = "new_resource_group1"
-        self.api._primitives.switch_resource_group = MagicMock()
+        self.api._endpoints.switch_resource_group = MagicMock()
         # Act
         self.api.switch(resource_group_name)
         # Assert
-        self.api._primitives.switch_resource_group.assert_called_once_with(
+        self.api._endpoints.switch_resource_group.assert_called_once_with(
             ResourceGroupSwitchRequest(resourceGroupName=resource_group_name)
         )
 
     def test_delete(self):
         # Arrange
         resource_group_id = "0:RESGROUP:14567:XD$eD"
-        self.api._primitives.delete_resource_group = MagicMock()
+        self.api._endpoints.delete_resource_group = MagicMock()
         # Act
         self.api.delete(resource_group_id)
         # Assert
-        self.api._primitives.delete_resource_group.assert_called_once_with(resource_group_id)
+        self.api._endpoints.delete_resource_group.assert_called_once_with(resource_group_id)
 
 
 class TestClusterManagementAPI(unittest.TestCase):

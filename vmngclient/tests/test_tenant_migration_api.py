@@ -24,7 +24,7 @@ class TestTenantMigrationAPI(unittest.TestCase):
         content = b"\xFFtest_data"
         with tempfile.TemporaryDirectory() as tmpdir:
             download_path = Path(tmpdir) / "test.tar.gz"
-            self.session.primitives.tenant_migration.download_tenant_data = MagicMock(return_value=content)
+            self.session.endpoints.tenant_migration.download_tenant_data = MagicMock(return_value=content)
             self.api.download(download_path)
             assert open(download_path, "rb").read() == content
 
@@ -34,7 +34,7 @@ class TestTenantMigrationAPI(unittest.TestCase):
             import_file = Path(tmpdir) / "tenant.tar.gz"
             with open(import_file, "wb") as f:
                 f.write(b"\xFEtest_data")
-            self.session.primitives.tenant_migration.import_tenant_data = MagicMock(
+            self.session.endpoints.tenant_migration.import_tenant_data = MagicMock(
                 return_value=ImportInfo(
                     processId="123",
                     migrationTokenURL=(
@@ -52,7 +52,7 @@ class TestTenantMigrationAPI(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             download_path = Path(tmpdir) / "token.txt"
             migration_id = "123"
-            self.session.primitives.tenant_migration.get_migration_token = MagicMock(return_value=token_data)
+            self.session.endpoints.tenant_migration.get_migration_token = MagicMock(return_value=token_data)
             self.api.store_token(migration_id, download_path)
             assert open(download_path, "r").read() == token_data
 
@@ -61,7 +61,7 @@ class TestTenantMigrationAPI(unittest.TestCase):
             token_file = Path(tmpdir) / "token_file.txt"
             with open(token_file, "wb") as f:
                 f.write(b"token_text")
-            self.api.session.primitives.tenant_migration.migrate_network = MagicMock(
+            self.api.session.endpoints.tenant_migration.migrate_network = MagicMock(
                 return_value=MigrationInfo(processId="123")
             )
             task = self.api.migrate_network(token_file)
