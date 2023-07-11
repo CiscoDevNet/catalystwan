@@ -65,7 +65,7 @@ These steps will help you to automate feature template creation. We'll explain w
 
 	`Template my_first_template (FeatureTemplate) was created successfully (7e56acdd-640e-45dc-9335-87abc697995f).`
 
-6. We can check whether our template is created sucessfully in vManage manually. If there is an error, please create an issue with error and try go to the 6th step.
+6. We can check whether our template is created sucessfully in vManage manually. If there is an error, please create an issue with error and try go to the 7th step.
    
 ### Custimize Feature Template fields.
 7. Run below code with already created session and changed corresponding variables.
