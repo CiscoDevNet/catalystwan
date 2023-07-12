@@ -345,11 +345,15 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
         response = self.post(url_path)
         return response.json()["VSessionId"]
 
-    def logout(self) -> vManageResponse:
-        if self.api_version >= Version("20.12"):
-            return self.post("/logout")
+    def logout(self) -> Optional[vManageResponse]:
+        if version := self.api_version:
+            if version >= Version("20.12"):
+                return self.post("/logout")
+            else:
+                return self.get("/logout")
         else:
-            return self.get("/logout")
+            self.logger.error("Cannot perform logout operation without known api_version.")
+            return None
 
     def close(self) -> None:
         """Closes the vManageSession.
