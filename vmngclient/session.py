@@ -7,7 +7,8 @@ from pathlib import Path
 from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
 from urllib.parse import urljoin, urlparse, urlunparse
 
-from packaging.version import Version  # type: ignore
+from packaging.version import InvalidVersion, Version  # type: ignore
+from packaging.version import parse as parse_version
 from requests import PreparedRequest, Request, Response, Session, head
 from requests.auth import AuthBase
 from requests.exceptions import ConnectionError, HTTPError, RequestException
@@ -197,8 +198,8 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
         self.__prepare_session(verify, auth)
         self.api = APIContainter(self)
         self.endpoints = APIEndpointContainter(self)
-        self._platform_version: Optional[Version] = None
-        self._api_version: Version
+        self._platform_version: str = ""
+        self._api_version: Optional[Version] = None
 
     def request(self, method, url, *args, **kwargs) -> vManageResponse:
         full_url = self.get_full_url(url)
@@ -388,13 +389,22 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
         return self._session_type
 
     @property
-    def platform_version(self) -> Optional[Version]:
+    def platform_version(self) -> str:
         return self._platform_version
 
     @platform_version.setter
-    def platform_version(self, version: Version):
+    def platform_version(self, version: str):
         self._platform_version = version
-        self._api_version = Version(f"{version.major}.{version.minor}")
+
+        try:
+            parsed_version = parse_version(version)
+            self._api_version = Version(f"{parsed_version.major}.{parsed_version.minor}")
+        except InvalidVersion:
+            try:
+                parsed_version = parse_version(".".join(version.split(".")[:2]))
+                self._api_version = Version(f"{parsed_version.major}.{parsed_version.minor}")
+            except InvalidVersion:
+                self.logger.warning(f"vManage-client was not able to recognize API version from: {version}")
 
     @property
     def api_version(self) -> Version:
