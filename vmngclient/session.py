@@ -14,6 +14,9 @@ from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.api.api_containter import APIContainter
+from vmngclient.endpoints import APIEndpointClient
+from vmngclient.endpoints.client import AboutInfo, ServerInfo
+from vmngclient.endpoints.endpoints_container import APIEndpointContainter
 from vmngclient.exceptions import (
     InvalidOperationError,
     SessionNotCreatedError,
@@ -21,9 +24,6 @@ from vmngclient.exceptions import (
     vManageClientError,
 )
 from vmngclient.model.tenant import Tenant
-from vmngclient.primitives import APIPrimitiveClient
-from vmngclient.primitives.client import AboutInfo, ServerInfo
-from vmngclient.primitives.primitive_container import APIPrimitiveContainter
 from vmngclient.response import ErrorInfo, response_history_debug, vManageResponse
 from vmngclient.utils.session_type import SessionType
 from vmngclient.vmanage_auth import vManageAuth
@@ -151,7 +151,7 @@ class vManageResponseAdapter(Session):
         return vManageResponse(super().delete(url, *args, **kwargs))
 
 
-class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
+class vManageSession(vManageResponseAdapter, APIEndpointClient):
     """Base class for API sessions for vManage client.
 
     Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
@@ -196,7 +196,7 @@ class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
         self.api = APIContainter(self)
-        self.primitives = APIPrimitiveContainter(self)
+        self.endpoints = APIEndpointContainter(self)
         self._platform_version: Optional[Version] = None
         self._api_version: Version
 
@@ -249,10 +249,10 @@ class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
         return base_url
 
     def about(self) -> AboutInfo:
-        return self.primitives.client.about()
+        return self.endpoints.client.about()
 
     def server(self) -> ServerInfo:
-        server_info = self.primitives.client.server()
+        server_info = self.endpoints.client.server()
         self.platform_version = server_info.platform_version
         return server_info
 

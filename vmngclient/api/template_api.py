@@ -24,8 +24,8 @@ from vmngclient.api.templates.models.omp_vsmart_model import OMPvSmart
 from vmngclient.api.templates.models.security_vsmart_model import SecurityvSmart
 from vmngclient.api.templates.models.system_vsmart_model import SystemVsmart
 from vmngclient.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, FeatureTemplatesTypes, TemplateInfo
+from vmngclient.endpoints.configuration_device_template import FeatureToCLIPayload
 from vmngclient.exceptions import AttachedError, TemplateNotFoundError
-from vmngclient.primitives.configuration_device_template import FeatureToCLIPayload
 from vmngclient.response import vManageResponse
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.device_model import DeviceModel
@@ -613,6 +613,6 @@ class TemplatesAPI:
         return False
 
     def get_device_configuration_preview(self, payload: FeatureToCLIPayload) -> CiscoConfParse:
-        text_config = self.session.primitives.configuration_device_template.get_device_configuration_preview(payload)
+        text_config = self.session.endpoints.configuration_device_template.get_device_configuration_preview(payload)
 
         return CiscoConfParse(text_config.splitlines())

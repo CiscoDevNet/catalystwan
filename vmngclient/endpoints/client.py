@@ -1,10 +1,11 @@
+# mypy: disable-error-code="empty-body"
 from datetime import datetime
 from typing import Any, List, Optional
 
 from packaging.version import Version  # type: ignore
 from pydantic import BaseModel, Field
 
-from vmngclient.primitives import APIPrimitiveBase
+from vmngclient.endpoints import APIEndpoints, get, request
 
 
 class VersionField(Version):
@@ -56,9 +57,11 @@ class AboutInfo(BaseModel):
     logo: Optional[str]
 
 
-class ClientPrimitives(APIPrimitiveBase):
+class Client(APIEndpoints):
+    @request(get, "/client/server", "data")
     def server(self) -> ServerInfo:
-        return self._get("/client/server").dataobj(ServerInfo)
+        ...
 
+    @request(get, "/client/about", "data")
     def about(self) -> AboutInfo:
-        return self._get("/client/about").dataobj(AboutInfo)
+        ...

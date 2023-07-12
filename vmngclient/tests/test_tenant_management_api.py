@@ -3,8 +3,7 @@ from unittest.mock import MagicMock, patch
 
 from vmngclient.api.task_status_api import Task
 from vmngclient.api.tenant_management_api import TenantManagementAPI
-from vmngclient.model.tenant import Tenant
-from vmngclient.primitives.tenant_management import (
+from vmngclient.endpoints.tenant_management import (
     ControlStatus,
     SiteHealth,
     TenantStatus,
@@ -16,6 +15,7 @@ from vmngclient.primitives.tenant_management import (
     vSmartTenantCapacity,
     vSmartTenantMap,
 )
+from vmngclient.model.tenant import Tenant
 from vmngclient.typed_list import DataSequence
 
 
@@ -40,7 +40,7 @@ class TenantManagementAPITest(unittest.TestCase):
                 wanEdgeForecast=1,
             )
         ]
-        self.api._primitives.get_all_tenants = MagicMock(return_value=expected_tenants)
+        self.api._endpoints.get_all_tenants = MagicMock(return_value=expected_tenants)
         observed_tenants = self.api.get()
         assert expected_tenants == observed_tenants
 
@@ -69,11 +69,11 @@ class TenantManagementAPITest(unittest.TestCase):
             wanEdgeForecast=1,
             edgeConnectorEnable=False,
         )
-        self.api._primitives.update_tenant = MagicMock()
+        self.api._endpoints.update_tenant = MagicMock()
         # Act
         self.api.update(tenant_update_request=tenant_update_request)
         # Assert
-        self.api._primitives.update_tenant.assert_called_once_with(
+        self.api._endpoints.update_tenant.assert_called_once_with(
             tenant_id=tenant_update_request.tenant_id, tenant_update_request=tenant_update_request
         )
 
@@ -86,11 +86,11 @@ class TenantManagementAPITest(unittest.TestCase):
             srcvSmartUuid=src_uuid,
             destvSmartUuid=dst_uuid,
         )
-        self.api._primitives.update_tenant_vsmart_placement = MagicMock()
+        self.api._endpoints.update_tenant_vsmart_placement = MagicMock()
         # Act
         self.api.update_vsmart_placement(tenant_id=tenant_id, src_vsmart_uuid=src_uuid, dst_vsmart_uuid=dst_uuid)
         # Assert
-        self.api._primitives.update_tenant_vsmart_placement.assert_called_once_with(
+        self.api._endpoints.update_tenant_vsmart_placement.assert_called_once_with(
             tenant_id=tenant_id, vsmart_placement_update_request=vsmart_placement_update
         )
 
@@ -116,14 +116,14 @@ class TenantManagementAPITest(unittest.TestCase):
             vSmartStatus=vSmartStatus(up=1, down=0),
         )
         expected_statuses = DataSequence(TenantStatus, [tenant_status])
-        self.api._primitives.get_all_tenant_statuses = MagicMock(return_value=expected_statuses)
+        self.api._endpoints.get_all_tenant_statuses = MagicMock(return_value=expected_statuses)
         observed_statuses = self.api.get_statuses()
         assert expected_statuses == observed_statuses
 
     def test_get_hosting_capacity_on_vsmarts(self):
         capacity = vSmartTenantCapacity(vSmartUuid="ABCD-1234", totalTenantCapacity=12, currentTenantCount=5)
         expected_capacities = DataSequence(vSmartTenantCapacity, [capacity])
-        self.api._primitives.get_tenant_hosting_capacity_on_vsmarts = MagicMock(return_value=expected_capacities)
+        self.api._endpoints.get_tenant_hosting_capacity_on_vsmarts = MagicMock(return_value=expected_capacities)
         observed_capacities = self.api.get_hosting_capacity_on_vsmarts()
         assert expected_capacities == observed_capacities
 
@@ -141,12 +141,12 @@ class TenantManagementAPITest(unittest.TestCase):
                 ]
             }
         )
-        self.api._primitives.get_tenant_vsmart_mapping = MagicMock(return_value=expected_mapping)
+        self.api._endpoints.get_tenant_vsmart_mapping = MagicMock(return_value=expected_mapping)
         observed_mapping = self.api.get_vsmart_mapping()
         assert expected_mapping == observed_mapping
 
     def test_vsession_id(self):
         expected_vsession_id = "567-DEF"
-        self.api._primitives.vsession_id = MagicMock(return_value=vSessionId(VSessionId=expected_vsession_id))
+        self.api._endpoints.vsession_id = MagicMock(return_value=vSessionId(VSessionId=expected_vsession_id))
         observed_vsession_id = self.api.vsession_id("1")
         assert expected_vsession_id == observed_vsession_id

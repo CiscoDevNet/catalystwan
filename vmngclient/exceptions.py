@@ -109,3 +109,9 @@ class TenantSubdomainNotFound(vManageClientError):
     """Raised when given subdomain does not exist"""
 
     pass
+
+
+class APIEndpointError(vManageClientError):
+    """Raised when there is a problem with endpoint definition"""
+
+    pass
