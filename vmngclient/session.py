@@ -407,7 +407,7 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
                 self.logger.warning(f"vManage-client was not able to recognize API version from: {version}")
 
     @property
-    def api_version(self) -> Version:
+    def api_version(self) -> Optional[Version]:
         return self._api_version
 
     def __str__(self) -> str:
