@@ -22,7 +22,6 @@ clint = "^0.5.1"
 requests-toolbelt = "^0.10.1"
 packaging = "^23.0"
 pydantic = "^1.10.7"
-urllib3 = "1.26.15"
 
 
 [tool.poetry.dev-dependencies]
