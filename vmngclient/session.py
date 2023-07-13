@@ -7,8 +7,7 @@ from pathlib import Path
 from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
 from urllib.parse import urljoin, urlparse, urlunparse
 
-from packaging.version import InvalidVersion, Version  # type: ignore
-from packaging.version import parse as parse_version
+from packaging.version import Version  # type: ignore
 from requests import PreparedRequest, Request, Response, Session, head
 from requests.auth import AuthBase
 from requests.exceptions import ConnectionError, HTTPError, RequestException
@@ -27,6 +26,7 @@ from vmngclient.exceptions import (
 from vmngclient.model.tenant import Tenant
 from vmngclient.response import ErrorInfo, response_history_debug, vManageResponse
 from vmngclient.utils.session_type import SessionType
+from vmngclient.version import NullVersion, parse_api_version
 from vmngclient.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
@@ -199,7 +199,7 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
         self.api = APIContainter(self)
         self.endpoints = APIEndpointContainter(self)
         self._platform_version: str = ""
-        self._api_version: Optional[Version] = None
+        self._api_version: Version
 
     def request(self, method, url, *args, **kwargs) -> vManageResponse:
         full_url = self.get_full_url(url)
@@ -346,14 +346,11 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
         return response.json()["VSessionId"]
 
     def logout(self) -> Optional[vManageResponse]:
-        if version := self.api_version:
-            if version >= Version("20.12"):
-                return self.post("/logout")
-            else:
-                return self.get("/logout")
-        else:
-            self.logger.error("Cannot perform logout operation without known api_version.")
+        if version := isinstance(self.api_version, NullVersion):
+            self.logger.warning("Cannot perform logout operation without known api_version.")
             return None
+        else:
+            return self.post("/logout") if version >= Version("20.12") else self.get("/logout")
 
     def close(self) -> None:
         """Closes the vManageSession.
@@ -399,19 +396,10 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
     @platform_version.setter
     def platform_version(self, version: str):
         self._platform_version = version
-
-        try:
-            parsed_version = parse_version(version)
-            self._api_version = Version(f"{parsed_version.major}.{parsed_version.minor}")
-        except InvalidVersion:
-            try:
-                parsed_version = parse_version(".".join(version.split(".")[:2]))
-                self._api_version = Version(f"{parsed_version.major}.{parsed_version.minor}")
-            except InvalidVersion:
-                self.logger.warning(f"vManage-client was not able to recognize API version from: {version}")
+        self._api_version = parse_api_version(version)
 
     @property
-    def api_version(self) -> Optional[Version]:
+    def api_version(self) -> Version:
         return self._api_version
 
     def __str__(self) -> str:
