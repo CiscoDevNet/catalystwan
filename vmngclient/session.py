@@ -346,7 +346,7 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
         return response.json()["VSessionId"]
 
     def logout(self) -> Optional[vManageResponse]:
-        if isinstance((version := self.api_version), NullVersion)
+        if isinstance((version := self.api_version), NullVersion):
             self.logger.warning("Cannot perform logout operation without known api_version.")
             return None
         else:
