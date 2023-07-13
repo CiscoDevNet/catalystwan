@@ -26,6 +26,7 @@ from vmngclient.exceptions import (
 from vmngclient.model.tenant import Tenant
 from vmngclient.response import ErrorInfo, response_history_debug, vManageResponse
 from vmngclient.utils.session_type import SessionType
+from vmngclient.version import NullVersion, parse_api_version
 from vmngclient.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
@@ -197,7 +198,7 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
         self.__prepare_session(verify, auth)
         self.api = APIContainter(self)
         self.endpoints = APIEndpointContainter(self)
-        self._platform_version: Optional[Version] = None
+        self._platform_version: str = ""
         self._api_version: Version
 
     def request(self, method, url, *args, **kwargs) -> vManageResponse:
@@ -344,11 +345,12 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
         response = self.post(url_path)
         return response.json()["VSessionId"]
 
-    def logout(self) -> vManageResponse:
-        if self.api_version >= Version("20.12"):
-            return self.post("/logout")
+    def logout(self) -> Optional[vManageResponse]:
+        if isinstance((version := self.api_version), NullVersion):
+            self.logger.warning("Cannot perform logout operation without known api_version.")
+            return None
         else:
-            return self.get("/logout")
+            return self.post("/logout") if version >= Version("20.12") else self.get("/logout")
 
     def close(self) -> None:
         """Closes the vManageSession.
@@ -388,13 +390,13 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
         return self._session_type
 
     @property
-    def platform_version(self) -> Optional[Version]:
+    def platform_version(self) -> str:
         return self._platform_version
 
     @platform_version.setter
-    def platform_version(self, version: Version):
+    def platform_version(self, version: str):
         self._platform_version = version
-        self._api_version = Version(f"{version.major}.{version.minor}")
+        self._api_version = parse_api_version(version)
 
     @property
     def api_version(self) -> Version:

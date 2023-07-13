@@ -37,7 +37,7 @@ class ServerInfo(BaseModel):
     locale: Optional[str]
     roles: List[str] = []
     external_user: Optional[bool] = Field(alias="externalUser")
-    platform_version: Optional[VersionField] = Field(alias="platformVersion")
+    platform_version: str = Field(default="", alias="platformVersion")
     general_template: Optional[bool] = Field(alias="generalTemplate")
     disable_full_config_push: Optional[bool] = Field(alias="disableFullConfigPush")
     enable_server_events: Optional[bool] = Field(alias="enableServerEvents")
@@ -48,7 +48,7 @@ class ServerInfo(BaseModel):
 
 class AboutInfo(BaseModel):
     title: Optional[str]
-    version: VersionField
+    version: str = Field(default="")
     application_version: Optional[str] = Field(alias="applicationVersion")
     application_server: Optional[str] = Field(alias="applicationServer")
     copyright: Optional[str]
