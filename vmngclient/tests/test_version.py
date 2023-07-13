@@ -73,6 +73,7 @@ class TestVersion(unittest.TestCase):
 
         # Assert
         self.assertTrue(isinstance(parsed_version, NullVersion))
+        self.assertFalse(isinstance(Version("20.11"), NullVersion))
 
 
 if __name__ == "__main__":
