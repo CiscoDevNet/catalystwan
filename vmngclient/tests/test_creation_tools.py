@@ -1,4 +1,5 @@
 # type: ignore
+import datetime
 import json
 import unittest
 from typing import Optional
@@ -6,8 +7,8 @@ from typing import Optional
 from attrs import define, field
 from parameterized import parameterized
 
-from vmngclient.dataclasses import TLOC, Device, PacketSetup, TacacsServer, TenantTacacsServer
-from vmngclient.utils.creation_tools import FIELD_NAME, asdict
+from vmngclient.dataclasses import TLOC, DataclassBase, Device, PacketSetup, TacacsServer, TenantTacacsServer
+from vmngclient.utils.creation_tools import FIELD_NAME, asdict, convert_attributes, create_dataclass
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
 
@@ -126,6 +127,23 @@ class TestCreationTools(unittest.TestCase):
         # Assert
         print(output)
         self.assertEqual(output, serialized_obj)
+
+    def test_convert_attributes(self):
+        # Arrange
+        @define(field_transformer=convert_attributes)
+        class ConvertibleData(DataclassBase):
+            date_time_1: datetime.datetime = field(metadata={FIELD_NAME: "fromUnixEpochTimestamp"})
+            date_time_2: datetime.datetime = field(metadata={FIELD_NAME: "fromString"})
+
+        conv_data_dict = {
+            "fromUnixEpochTimestamp": 1689324694991,
+            "fromString": "2023-07-14T07:11:09+00:00",
+        }
+        # Act
+        conv_data = create_dataclass(ConvertibleData, conv_data_dict)
+        # Assert
+        assert type(conv_data.date_time_1) == datetime.datetime
+        assert type(conv_data.date_time_2) == datetime.datetime
 
 
 if __name__ == "__main__":
