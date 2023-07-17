@@ -480,7 +480,9 @@ class request(APIEndpointsDecorator):
             payload = _kwargs.get("payload")
             params = _kwargs.get("params")
             self.formatted_url = self.url.format(**_kwargs)
-            response = _self._request(self.http_method, self.formatted_url, payload=payload, params=params, **self.kwargs)
+            response = _self._request(
+                self.http_method, self.formatted_url, payload=payload, params=params, **self.kwargs
+            )
             if self.return_spec.present:
                 if issubclass(self.return_spec.payload_type, (BaseModel, DataclassBase)):
                     if self.return_spec.sequence_type == DataSequence:
