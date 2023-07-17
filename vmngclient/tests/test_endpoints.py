@@ -489,7 +489,7 @@ class TestAPIEndpoints(unittest.TestCase):
                 ...
 
         api = TestAPI(self.session_mock)
-        for url_field in ["clothes", "food"]:
+        for category in ["clothes", "food"]:
             for dict_payload in [
                 {"id": "id1", "size": 100, "capacity": 1.7, "active": True},
                 {"id": "id2", "size": 120, "capacity": 1.9, "active": False},
@@ -500,11 +500,11 @@ class TestAPIEndpoints(unittest.TestCase):
                 ]:
                     # Act
                     payload = BaseModelExample.parse_obj(dict_payload)
-                    api.get_data(category=url_field, params=params, payload=payload)
+                    api.get_data(category=category, params=params, payload=payload)
                     # Assert
                     self.session_mock.request.assert_called_once_with(
                         "GET",
-                        self.base_path + f"/v2/{url_field}/items",
+                        self.base_path + f"/v2/{category}/items",
                         data=json.dumps(dict_payload),
                         headers={"content-type": "application/json"},
                         params=params,
