@@ -478,3 +478,35 @@ class TestAPIEndpoints(unittest.TestCase):
         # Assert
         self.session_mock.request.return_value.json.assert_called_once()
         assert retval == self.dict_payload
+
+    def test_no_mutable_state_when_calling_endpoint(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            @request("GET", "/v2/{category}/items")
+            def get_data(
+                self, payload: BaseModelExample, category: str, params: ParamsExample
+            ):  # type: ignore [empty-body]
+                ...
+
+        api = TestAPI(self.session_mock)
+        for category in ["clothes", "food"]:
+            for dict_payload in [
+                {"id": "id1", "size": 100, "capacity": 1.7, "active": True},
+                {"id": "id2", "size": 120, "capacity": 1.9, "active": False},
+            ]:
+                for params in [
+                    ParamsExample(name="submarine", color="yellow"),
+                    ParamsExample(name="oyster", color="blue"),
+                ]:
+                    # Act
+                    payload = BaseModelExample.parse_obj(dict_payload)
+                    api.get_data(category=category, params=params, payload=payload)
+                    # Assert
+                    self.session_mock.request.assert_called_once_with(
+                        "GET",
+                        self.base_path + f"/v2/{category}/items",
+                        data=json.dumps(dict_payload),
+                        headers={"content-type": "application/json"},
+                        params=params,
+                    )
+                    self.session_mock.reset_mock()

@@ -479,8 +479,8 @@ class request(APIEndpointsDecorator):
             _kwargs = self.merge_args(args, kwargs)
             payload = _kwargs.get("payload")
             params = _kwargs.get("params")
-            self.url = self.url.format(**_kwargs)
-            response = _self._request(self.http_method, self.url, payload=payload, params=params, **self.kwargs)
+            formatted_url = self.url.format(**_kwargs)
+            response = _self._request(self.http_method, formatted_url, payload=payload, params=params, **self.kwargs)
             if self.return_spec.present:
                 if issubclass(self.return_spec.payload_type, (BaseModel, DataclassBase)):
                     if self.return_spec.sequence_type == DataSequence:
