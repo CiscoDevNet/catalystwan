@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional, Union
 
+from vmngclient.api.templates.device_variable import DeviceVariable
 from vmngclient.api.templates.models.supported import available_models
 from vmngclient.exceptions import TemplateTypeError
 
@@ -35,6 +36,7 @@ def find_template_values(
     target_key: str = "vipType",
     target_key_value_to_ignore: str = "ignore",
     target_key_for_template_value: str = "vipValue",
+    device_specific_variables: Optional[Dict[str, DeviceVariable]] = None,
 ) -> Dict[str, Union[str, list]]:
     """Based on provided template definition generates a dictionary with template fields and values
 
@@ -54,9 +56,12 @@ def find_template_values(
     """
     for key, value in template_definition.items():
         if key == target_key and value != target_key_value_to_ignore:
-            templated_values[parent_key] = template_definition[target_key_for_template_value]
+            if value == "variableName" and device_specific_variables and parent_key:
+                device_specific_variables[parent_key] = DeviceVariable(name=template_definition["vipVariableName"])
+            else:
+                templated_values[parent_key] = template_definition[target_key_for_template_value]
         elif isinstance(value, dict) and value != target_key_value_to_ignore:
-            find_template_values(value, templated_values, key)
+            find_template_values(value, templated_values, key, device_specific_variables=device_specific_variables)
         elif (
             isinstance(value, list)
             and key == target_key_for_template_value
@@ -64,5 +69,7 @@ def find_template_values(
         ):
             templated_values[parent_key] = []
             for item in value:
-                templated_values[parent_key].append(find_template_values(item, {}))
+                templated_values[parent_key].append(
+                    find_template_values(item, {}, device_specific_variables=device_specific_variables)
+                )
     return templated_values
