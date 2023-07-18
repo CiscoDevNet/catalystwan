@@ -20,6 +20,7 @@ class OMPvSmart(FeatureTemplate):
     eor_timer: Optional[int] = Field(default=None, alias="eor-timer")
     holdtime: Optional[int] = Field(default=None, alias="holdtime")
     affinity_group_preference: Optional[bool] = Field(default=None, alias="affinity-group-preference")
+    advertisement_interval: Optional[int] = Field(default=None, alias="advertisement-interval")
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "omp-vsmart"
