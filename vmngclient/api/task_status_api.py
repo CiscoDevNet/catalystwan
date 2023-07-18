@@ -10,8 +10,8 @@ from vmngclient.exceptions import TaskValidationError
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
-from vmngclient.primitives.configuration_dashboard_status import (
-    ConfigurationDashboardStatusPrimitives,
+from vmngclient.endpoints.configuration_dashboard_status import (
+    ConfigurationDashboardStatus,
     SubTaskData,
     TaskData,
     TaskResult,
@@ -146,7 +146,7 @@ class Task:
             Returns:
                 List[SubTaskData]
             """
-            task = ConfigurationDashboardStatusPrimitives(self.session).find_status(self.task_id)
+            task = ConfigurationDashboardStatus(self.session).find_status(self.task_id)
             self.__check_validation_status(task)
             self.task_data = task.data
             sub_task_statuses = [task.status for task in self.task_data]

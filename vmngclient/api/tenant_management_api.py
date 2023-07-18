@@ -3,16 +3,16 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Optional
 
 from vmngclient.api.task_status_api import Task
-from vmngclient.model.tenant import Tenant
-from vmngclient.primitives.tenant_management import (
+from vmngclient.endpoints.tenant_management import (
     TenantBulkDeleteRequest,
-    TenantManagementPrimitives,
+    TenantManagement,
     TenantStatus,
     TenantUpdateRequest,
     vSmartPlacementUpdateRequest,
     vSmartTenantCapacity,
     vSmartTenantMap,
 )
+from vmngclient.model.tenant import Tenant
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -23,7 +23,7 @@ from vmngclient.typed_list import DataSequence
 class TenantManagementAPI:
     def __init__(self, session: vManageSession):
         self.session = session
-        self._primitives = TenantManagementPrimitives(session)
+        self._endpoints = TenantManagement(session)
 
     def get(self) -> DataSequence[Tenant]:
         """Lists all the tenants on the vManage.
@@ -33,7 +33,7 @@ class TenantManagementAPI:
         Returns:
             DataSequence[TenantInfo]: List-like object containing tenant information
         """
-        return self._primitives.get_all_tenants()
+        return self._endpoints.get_all_tenants()
 
     def create(self, tenants: List[Tenant]) -> Task:
         """Creates tenants on vManage
@@ -44,7 +44,7 @@ class TenantManagementAPI:
         Returns:
             Task: Object representing tenant creation process
         """
-        task_id = self._primitives.create_tenant_async_bulk(tenants).id
+        task_id = self._endpoints.create_tenant_async_bulk(tenants).id
         return Task(self.session, task_id)
 
     def update(self, tenant_update_request: TenantUpdateRequest) -> Tenant:
@@ -56,7 +56,7 @@ class TenantManagementAPI:
         Returns:
             Tenant: Updated tenant data
         """
-        return self._primitives.update_tenant(
+        return self._endpoints.update_tenant(
             tenant_id=tenant_update_request.tenant_id, tenant_update_request=tenant_update_request
         )
 
@@ -73,7 +73,7 @@ class TenantManagementAPI:
         if password is None:
             password = self.session.password
         delete_request = TenantBulkDeleteRequest(tenantIdList=tenant_id_list, password=password)
-        task_id = self._primitives.delete_tenant_async_bulk(delete_request).id
+        task_id = self._endpoints.delete_tenant_async_bulk(delete_request).id
         return Task(self.session, task_id)
 
     def get_statuses(self) -> DataSequence[TenantStatus]:
@@ -82,7 +82,7 @@ class TenantManagementAPI:
         Returns:
             DataSequence[TenantStatus]: List-like object containing tenants statuses
         """
-        return self._primitives.get_all_tenant_statuses()
+        return self._endpoints.get_all_tenant_statuses()
 
     def get_hosting_capacity_on_vsmarts(self) -> DataSequence[vSmartTenantCapacity]:
         """Gets tenant hosting capacity on vSmarts
@@ -90,7 +90,7 @@ class TenantManagementAPI:
         Returns:
             DataSequence[vSmartTenantCapacity]: List-like object containing tenant capacity information for each vSmart
         """
-        return self._primitives.get_tenant_hosting_capacity_on_vsmarts()
+        return self._endpoints.get_tenant_hosting_capacity_on_vsmarts()
 
     def update_vsmart_placement(self, tenant_id: str, src_vsmart_uuid: str, dst_vsmart_uuid: str):
         """Updates vSmart placement
@@ -100,7 +100,7 @@ class TenantManagementAPI:
             src_vsmart_uuid (str): Source vSmart uuid
             dst_vsmart_uuid (str): Destination vSmart uuid
         """
-        self._primitives.update_tenant_vsmart_placement(
+        self._endpoints.update_tenant_vsmart_placement(
             tenant_id=tenant_id,
             vsmart_placement_update_request=vSmartPlacementUpdateRequest(
                 srcvSmartUuid=src_vsmart_uuid, destvSmartUuid=dst_vsmart_uuid
@@ -113,7 +113,7 @@ class TenantManagementAPI:
         Returns:
             vSmartTenantMap: Contains vSmart to tenant mapping
         """
-        return self._primitives.get_tenant_vsmart_mapping()
+        return self._endpoints.get_tenant_vsmart_mapping()
 
     def vsession_id(self, tenant_id: str) -> str:
         """Gets VSessionId for given tenant
@@ -124,4 +124,4 @@ class TenantManagementAPI:
         Returns:
             str: Contains VSessionId for given tenant
         """
-        return self._primitives.vsession_id(tenant_id).vsessionid
+        return self._endpoints.vsession_id(tenant_id).vsessionid

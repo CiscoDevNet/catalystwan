@@ -1,8 +1,9 @@
+# mypy: disable-error-code="empty-body"
 from typing import List
 
 from pydantic import BaseModel
 
-from vmngclient.primitives import APIPrimitiveBase, view
+from vmngclient.endpoints import APIEndpoints, get, request, view
 from vmngclient.utils.session_type import ProviderAsTenantView, TenantView
 
 
@@ -10,7 +11,7 @@ class BackupFiles(BaseModel):
     backup_files: List[str]
 
 
-class TenantBackupRestorePrimitives(APIPrimitiveBase):
+class TenantBackupRestore(APIEndpoints):
     @view({ProviderAsTenantView})
     def delete_tenant_backup(self):
         # DELETE /tenantbackup/delete
@@ -32,5 +33,6 @@ class TenantBackupRestorePrimitives(APIPrimitiveBase):
         ...
 
     @view({ProviderAsTenantView, TenantView})
+    @request(get, "/tenantbackup/list")
     def list_tenant_backup(self) -> BackupFiles:
-        return self._get("/tenantbackup/list").dataobj(BackupFiles, None)
+        ...

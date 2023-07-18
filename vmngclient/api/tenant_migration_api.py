@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from vmngclient.api.task_status_api import Task, TaskResult
+from vmngclient.endpoints.tenant_migration import ImportInfo, MigrationTokenQueryParams
 from vmngclient.model.tenant import Tenant
-from vmngclient.primitives.tenant_migration import ImportInfo, MigrationTokenQueryParams
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ class TenantMigrationAPI:
         Returns:
             Task: object representing initiated export process
         """
-        process_id = self.session.primitives.tenant_migration.export_tenant_data(tenant).process_id
+        process_id = self.session.endpoints.tenant_migration.export_tenant_data(tenant).process_id
         return Task(self.session, process_id)
 
     def download(self, download_path: Path, remote_filename: str = "default.tar.gz"):
@@ -55,7 +55,7 @@ class TenantMigrationAPI:
             download_path (Path): full download path containing a filename eg.: Path("/home/user/tenant-export.tar.gz")
             remote_filename (str): path to exported tenant migration file on vManage
         """
-        tenant_data = self.session.primitives.tenant_migration.download_tenant_data(remote_filename)
+        tenant_data = self.session.endpoints.tenant_migration.download_tenant_data(remote_filename)
         with open(download_path, "wb") as file:
             file.write(tenant_data)
 
@@ -69,7 +69,7 @@ class TenantMigrationAPI:
         Returns:
             ImportTask: object representing initiated import process
         """
-        import_info = self.session.primitives.tenant_migration.import_tenant_data(open(import_file, "rb"))
+        import_info = self.session.endpoints.tenant_migration.import_tenant_data(open(import_file, "rb"))
         return ImportTask(self.session, import_info)
 
     def store_token(self, migration_id: str, download_path: Path):
@@ -81,7 +81,7 @@ class TenantMigrationAPI:
             download_path (Path): full download path containing a filename eg.: Path("/home/user/import-token.txt")
         """
         params = MigrationTokenQueryParams(migrationId=migration_id)
-        token = self.session.primitives.tenant_migration.get_migration_token(params)
+        token = self.session.endpoints.tenant_migration.get_migration_token(params)
         with open(download_path, "w") as file:
             file.write(token)
 
@@ -96,7 +96,7 @@ class TenantMigrationAPI:
         """
         with open(token_file, "r") as file:
             token = file.read()
-        process_id = self.session.primitives.tenant_migration.migrate_network(token).process_id
+        process_id = self.session.endpoints.tenant_migration.migrate_network(token).process_id
         return Task(self.session, process_id)
 
 
