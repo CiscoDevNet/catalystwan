@@ -9,7 +9,7 @@ from requests.cookies import RequestsCookieJar
 from requests.exceptions import JSONDecodeError
 
 from vmngclient import with_proc_info_header
-from vmngclient.primitives import APIPRimitiveClientResponse
+from vmngclient.endpoints import APIEndpointClientResponse
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 
@@ -127,7 +127,7 @@ class JsonPayload:
             self.headers = json.get("headers", None)
 
 
-class vManageResponse(Response, APIPRimitiveClientResponse):
+class vManageResponse(Response, APIEndpointClientResponse):
     """Extends Response object with methods specific to vManage.
     Object is meant to be created from aready received requests.Response"""
 

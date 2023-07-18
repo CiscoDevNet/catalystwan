@@ -1,11 +1,12 @@
+# mypy: disable-error-code="empty-body"
 from pathlib import Path
 from typing import BinaryIO
 from urllib.parse import parse_qsl, urlsplit
 
 from pydantic import BaseModel, Field
 
+from vmngclient.endpoints import APIEndpoints, get, post, request
 from vmngclient.model.tenant import Tenant
-from vmngclient.primitives import APIPrimitiveBase
 
 
 class MigrationTokenQueryParams(BaseModel):
@@ -34,24 +35,27 @@ class MigrationInfo(BaseModel):
     process_id: str = Field(alias="processId")
 
 
-class TenantMigrationPrimitives(APIPrimitiveBase):
+class TenantMigration(APIEndpoints):
+    @request(get, "/tenantmigration/download/{path}")
     def download_tenant_data(self, path: str = "default.tar.gz") -> bytes:
-        return self._get(f"/tenantmigration/download/{path}").content
+        ...
 
-    def export_tenant_data(self, tenant: Tenant) -> ExportInfo:
-        response = self._post("/tenantmigration/export", payload=tenant)
-        return response.dataobj(ExportInfo, None)
+    @request(post, "/tenantmigration/export")
+    def export_tenant_data(self, payload: Tenant) -> ExportInfo:
+        ...
 
+    @request(get, "/tenantmigration/migrationToken")
     def get_migration_token(self, params: MigrationTokenQueryParams) -> str:
-        return self._get("/tenantmigration/migrationToken", params=params.dict(by_alias=True)).text
+        ...
 
     def import_tenant_data(self, data: BinaryIO) -> ImportInfo:
-        response = self._post("/tenantmigration/import", files={"file": (Path(data.name).name, data)})
+        # TODO implement dedicated payload types for files upload in request decorator
+        response = self._request(post, "/tenantmigration/import", files={"file": (Path(data.name).name, data)})
         return response.dataobj(ImportInfo, None)
 
-    def migrate_network(self, migration_token: str) -> MigrationInfo:
-        response = self._post("/tenantmigration/networkMigration", data=migration_token)
-        return response.dataobj(MigrationInfo, None)
+    @request(post, "/tenantmigration/networkMigration")
+    def migrate_network(self, payload: str) -> MigrationInfo:
+        ...
 
     def retrigger_network_migration(self):
         # GET /tenantmigration/networkMigration

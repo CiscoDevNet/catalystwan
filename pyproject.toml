@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vmngclient"
-version = "0.11.2"
+version = "0.12.2"
 description = "Universal vManage API"
 authors = ["kagorski <kagorski@cisco.com>"]
 readme = "README.md"
@@ -19,7 +19,7 @@ cattrs = "^22.2.0"
 Jinja2 = "^3.1.2"
 flake8-quotes = "^3.3.1"
 clint = "^0.5.1"
-requests-toolbelt = "^0.10.1"
+requests-toolbelt = "^1.0.0"
 packaging = "^23.0"
 pydantic = "^1.10.7"
 

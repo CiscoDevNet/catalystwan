@@ -14,6 +14,9 @@ from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.api.api_containter import APIContainter
+from vmngclient.endpoints import APIEndpointClient
+from vmngclient.endpoints.client import AboutInfo, ServerInfo
+from vmngclient.endpoints.endpoints_container import APIEndpointContainter
 from vmngclient.exceptions import (
     InvalidOperationError,
     SessionNotCreatedError,
@@ -21,11 +24,9 @@ from vmngclient.exceptions import (
     vManageClientError,
 )
 from vmngclient.model.tenant import Tenant
-from vmngclient.primitives import APIPrimitiveClient
-from vmngclient.primitives.client import AboutInfo, ServerInfo
-from vmngclient.primitives.primitive_container import APIPrimitiveContainter
 from vmngclient.response import ErrorInfo, response_history_debug, vManageResponse
 from vmngclient.utils.session_type import SessionType
+from vmngclient.version import NullVersion, parse_api_version
 from vmngclient.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
@@ -151,7 +152,7 @@ class vManageResponseAdapter(Session):
         return vManageResponse(super().delete(url, *args, **kwargs))
 
 
-class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
+class vManageSession(vManageResponseAdapter, APIEndpointClient):
     """Base class for API sessions for vManage client.
 
     Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
@@ -196,8 +197,8 @@ class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
         self.api = APIContainter(self)
-        self.primitives = APIPrimitiveContainter(self)
-        self._platform_version: Optional[Version] = None
+        self.endpoints = APIEndpointContainter(self)
+        self._platform_version: str = ""
         self._api_version: Version
 
     def request(self, method, url, *args, **kwargs) -> vManageResponse:
@@ -249,10 +250,10 @@ class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
         return base_url
 
     def about(self) -> AboutInfo:
-        return self.primitives.client.about()
+        return self.endpoints.client.about()
 
     def server(self) -> ServerInfo:
-        server_info = self.primitives.client.server()
+        server_info = self.endpoints.client.server()
         self.platform_version = server_info.platform_version
         return server_info
 
@@ -344,11 +345,12 @@ class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
         response = self.post(url_path)
         return response.json()["VSessionId"]
 
-    def logout(self) -> vManageResponse:
-        if self.api_version >= Version("20.12"):
-            return self.post("/logout")
+    def logout(self) -> Optional[vManageResponse]:
+        if isinstance((version := self.api_version), NullVersion):
+            self.logger.warning("Cannot perform logout operation without known api_version.")
+            return None
         else:
-            return self.get("/logout")
+            return self.post("/logout") if version >= Version("20.12") else self.get("/logout")
 
     def close(self) -> None:
         """Closes the vManageSession.
@@ -388,13 +390,13 @@ class vManageSession(vManageResponseAdapter, APIPrimitiveClient):
         return self._session_type
 
     @property
-    def platform_version(self) -> Optional[Version]:
+    def platform_version(self) -> str:
         return self._platform_version
 
     @platform_version.setter
-    def platform_version(self, version: Version):
+    def platform_version(self, version: str):
         self._platform_version = version
-        self._api_version = Version(f"{version.major}.{version.minor}")
+        self._api_version = parse_api_version(version)
 
     @property
     def api_version(self) -> Version:

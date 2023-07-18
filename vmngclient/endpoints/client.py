@@ -1,10 +1,11 @@
+# mypy: disable-error-code="empty-body"
 from datetime import datetime
 from typing import Any, List, Optional
 
 from packaging.version import Version  # type: ignore
 from pydantic import BaseModel, Field
 
-from vmngclient.primitives import APIPrimitiveBase
+from vmngclient.endpoints import APIEndpoints, get, request
 
 
 class VersionField(Version):
@@ -36,7 +37,7 @@ class ServerInfo(BaseModel):
     locale: Optional[str]
     roles: List[str] = []
     external_user: Optional[bool] = Field(alias="externalUser")
-    platform_version: Optional[VersionField] = Field(alias="platformVersion")
+    platform_version: str = Field(default="", alias="platformVersion")
     general_template: Optional[bool] = Field(alias="generalTemplate")
     disable_full_config_push: Optional[bool] = Field(alias="disableFullConfigPush")
     enable_server_events: Optional[bool] = Field(alias="enableServerEvents")
@@ -47,7 +48,7 @@ class ServerInfo(BaseModel):
 
 class AboutInfo(BaseModel):
     title: Optional[str]
-    version: VersionField
+    version: str = Field(default="")
     application_version: Optional[str] = Field(alias="applicationVersion")
     application_server: Optional[str] = Field(alias="applicationServer")
     copyright: Optional[str]
@@ -56,9 +57,11 @@ class AboutInfo(BaseModel):
     logo: Optional[str]
 
 
-class ClientPrimitives(APIPrimitiveBase):
+class Client(APIEndpoints):
+    @request(get, "/client/server", "data")
     def server(self) -> ServerInfo:
-        return self._get("/client/server").dataobj(ServerInfo)
+        ...
 
+    @request(get, "/client/about", "data")
     def about(self) -> AboutInfo:
-        return self._get("/client/about").dataobj(AboutInfo)
+        ...
