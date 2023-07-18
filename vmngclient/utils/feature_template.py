@@ -56,7 +56,7 @@ def find_template_values(
     """
     for key, value in template_definition.items():
         if key == target_key and value != target_key_value_to_ignore:
-            if value == "variableName" and device_specific_variables and parent_key:
+            if value == "variableName" and (device_specific_variables is not None) and parent_key:
                 device_specific_variables[parent_key] = DeviceVariable(name=template_definition["vipVariableName"])
             else:
                 templated_values[parent_key] = template_definition[target_key_for_template_value]
