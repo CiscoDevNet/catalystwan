@@ -48,7 +48,7 @@ class TestFeatureTemplate(TestCase):
             schema = json.load(f)
 
         with open(
-            Path(__file__).resolve().parents[0] / Path("definitions") / Path(CiscoAAAModel.type + "_definition.json")
+            Path(__file__).resolve().parents[0] / Path("definitions") / Path(f"{cisco_aaa.name}.json")
         ) as f:
             definition = json.load(f)
 
