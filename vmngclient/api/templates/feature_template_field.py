@@ -1,23 +1,38 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+from vmngclient.api.templates.device_variable import DeviceVariable
 
 
-class FeatureTemplateOptionType(Enum):
+class FeatureTemplateOptionType(str, Enum):
     CONSTANT = "constant"
     VARIABLE = "variable"
     IGNORE = "ignore"
     NOT_IGNORE = "notIgnore"
+    VARIABLE_NAME = "variableName"
 
 
-class FeatureTemplateObjectType(Enum):
+class FeatureTemplateObjectType(str, Enum):
     OBJECT = "object"
     TREE = "tree"
     LIST = "list"  # TODO Use comma(,) for multiple values
     NODE_ONLY = "node-only"  # No information about the value
+
+
+class VipVariable(BaseModel):
+    # class Config:
+    #     arbitrary_types_allowed = True
+    #     allow_population_by_field_name = True
+
+    value: Any = Field(alias="vipValue")
+    type: FeatureTemplateOptionType = Field(alias="vipType")
+    object_type: FeatureTemplateObjectType = Field(alias="vipObjectType")
+    device_specific_name: Optional[str] = Field(default=None, alias="vipVariableName")
+    primary_key: Optional[Any] = Field(default=None, alias="vipPrimaryKey")
 
 
 def get_path_dict(paths: List[List[str]]) -> dict:
@@ -73,26 +88,36 @@ class FeatureTemplateField(BaseModel):
 
         output["vipObjectType"] = self.objectType.value
 
-        if value:
-            output["vipType"] = FeatureTemplateOptionType.CONSTANT.value
-            if self.children:
-                children_output = []
+        if isinstance(value, DeviceVariable):
+            vip_variable = VipVariable(
+                vipValue="",
+                vipType=FeatureTemplateOptionType.VARIABLE_NAME,
+                vipObjectType=self.objectType,
+                vipVariableName=value.name,
+            )
 
-                for obj in value:  # obj is User
-                    child_payload = {}
-                    for child in self.children:
-                        child_payload.update(child.payload_scheme(obj[child.key]))
-                    children_output.append(child_payload)
-                output["vipValue"] = children_output
-            else:
-                output["vipValue"] = value
+            return {self.key: vip_variable.dict(by_alias=True, exclude_none=True)}
         else:
-            if "default" in self.dataType:
-                output["vipValue"] = self.dataType["default"] if value is None else value
-                output["vipType"] = self.defaultOption.value
+            if value:
+                output["vipType"] = FeatureTemplateOptionType.CONSTANT.value
+                if self.children:
+                    children_output = []
+
+                    for obj in value:  # obj is User
+                        child_payload = {}
+                        for child in self.children:
+                            child_payload.update(child.payload_scheme(obj[child.key]))
+                        children_output.append(child_payload)
+                    output["vipValue"] = children_output
+                else:
+                    output["vipValue"] = value
             else:
-                output["vipValue"] = []
-                output["vipType"] = FeatureTemplateOptionType.IGNORE.value
+                if "default" in self.dataType:
+                    output["vipValue"] = self.dataType["default"] if value is None else value
+                    output["vipType"] = self.defaultOption.value
+                else:
+                    output["vipValue"] = []
+                    output["vipType"] = FeatureTemplateOptionType.IGNORE.value
 
         # TODO
         # DataType to dataclass Model
