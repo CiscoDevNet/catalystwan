@@ -510,8 +510,8 @@ class TemplatesAPI:
             pointer = payload.definition
 
             # TODO How to discover Device specific variable
-            if field.key in template._device_specific_variables:
-                value = template._device_specific_variables[field.key]
+            if field.key in template.device_specific_variables:
+                value = template.device_specific_variables[field.key]
             else:
                 value = template.dict(by_alias=True).get(field.key, None)
 
