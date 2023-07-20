@@ -1,10 +1,10 @@
-name: Run unittests python 3.8
+name: Run unittests
 
 on:
   pull_request:
 
 jobs:
-  unittests_p38:
+  unittests:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -20,7 +20,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
+          python-version: 3.8
       - name: Set Up Poetry
         uses: abatilo/actions-poetry@v2
         with:
