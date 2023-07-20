@@ -1,10 +1,10 @@
-name: Run unittests
+name: Run unittests python 3.10
 
 on:
   pull_request:
 
 jobs:
-  unittests:
+  unittests_p310:
     runs-on: ubuntu-latest
     defaults:
       run:
