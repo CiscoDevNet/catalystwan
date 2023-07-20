@@ -115,7 +115,7 @@ class UsersAPI:
         Args:
             username (str): Name of the user to be unlocked
         """
-        self._endpoints.reset_user(UserResetRequest(userName=username))
+        self._endpoints.reset_user(UserResetRequest(username=username))
 
     def delete(self, username: str):
         """Deletes given user
@@ -204,7 +204,7 @@ class ResourceGroupsAPI:
         Args:
             resource_group_name (str): Name of resource group to switch view
         """
-        switch_request = ResourceGroupSwitchRequest(resourceGroupName=resource_group_name)
+        switch_request = ResourceGroupSwitchRequest(resource_group_name=resource_group_name)
         self._endpoints.switch_resource_group(switch_request)
 
     def delete(self, resource_group_id: str):

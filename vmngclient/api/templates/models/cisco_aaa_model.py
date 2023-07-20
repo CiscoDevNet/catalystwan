@@ -2,9 +2,8 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, Field
-
 from vmngclient.api.templates.feature_template import FeatureTemplate
+from vmngclient.utils.pydantic import BaseModel, Field
 
 
 class User(BaseModel):

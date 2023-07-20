@@ -180,7 +180,7 @@ class vManageResponse(Response, APIEndpointClientResponse):
             sequence = [cast(dict, data)]
 
         if issubclass(cls, BaseModel):
-            return DataSequence(cls, [cls.parse_obj(item) for item in sequence])  # type: ignore
+            return DataSequence(cls, [cls.model_validate(item) for item in sequence])  # type: ignore
         return DataSequence(cls, [create_dataclass(cls, item) for item in sequence])
 
     def dataobj(self, cls: Type[T], sourcekey: Optional[str] = "data") -> T:
@@ -199,7 +199,7 @@ class vManageResponse(Response, APIEndpointClientResponse):
             data = self.payload.json.get(sourcekey)
 
         if issubclass(cls, BaseModel):
-            return cls.parse_obj(data)  # type: ignore
+            return cls.model_valiadate(data)  # type: ignore
         return create_dataclass(cls, data)
 
     def get_error_info(self) -> ErrorInfo:

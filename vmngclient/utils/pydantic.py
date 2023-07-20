@@ -1,6 +1,6 @@
 """
-Module which updates pydantic BaseModel and Field
-Modified for endpoint payload usage to reduce boilerplate in model definitions
+Modified defaults for endpoint payload usage to reduce boilerplate in model definitions.
+Just import BaseModel, Field from here instead pydantic module directly
 """
 from functools import wraps
 from typing import Any
@@ -13,8 +13,9 @@ from pydantic_core import PydanticUndefined
 
 def common_field(func):
     """
-    Decorator for `pydantic.Field` function changes how `alias` argument works
-    alias is used only in serialization and validation and does not modify construcrtor signature
+    Decorator for `pydantic.Field` function.
+    `alias` keyword argument is replaced by `serialization_alias` and `validation_alias`
+    This way we can use non-aliased field name in constructor (together with populate_by_name)
     """
 
     @wraps(func)

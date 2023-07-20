@@ -2,7 +2,6 @@ import datetime as dt
 from typing import List, Optional
 
 from attr import define, field  # type: ignore
-from pydantic import BaseModel, Field
 
 from vmngclient.exceptions import RetrieveIntervalOutOfRange
 from vmngclient.utils.alarm_status import Severity
@@ -10,6 +9,7 @@ from vmngclient.utils.certificate_status import ValidityPeriod
 from vmngclient.utils.colors import PrintColors
 from vmngclient.utils.creation_tools import FIELD_NAME, asdict, convert_attributes
 from vmngclient.utils.personality import Personality
+from vmngclient.utils.pydantic import BaseModel, Field
 from vmngclient.utils.reachability import Reachability
 from vmngclient.utils.template_type import TemplateType
 
