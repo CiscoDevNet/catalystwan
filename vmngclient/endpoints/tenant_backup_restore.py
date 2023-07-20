@@ -1,9 +1,8 @@
 # mypy: disable-error-code="empty-body"
 from typing import List
 
-from pydantic import BaseModel
-
 from vmngclient.endpoints import APIEndpoints, get, request, view
+from vmngclient.utils.pydantic import BaseModel
 from vmngclient.utils.session_type import ProviderAsTenantView, TenantView
 
 

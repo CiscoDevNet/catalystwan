@@ -67,9 +67,9 @@ class TestAPIEndpoints(unittest.TestCase):
             "capacity": 1.7,
             "active": True,
         }
-        self.json_payload = json.dumps(self.dict_payload)
         self.attrs_payload = create_dataclass(AttrsModelExample, self.dict_payload)
-        self.basemodel_payload = BaseModelExample.parse_obj(self.dict_payload)
+        self.basemodel_payload = BaseModelExample.model_validate(self.dict_payload)
+        self.json_payload = self.basemodel_payload.model_dump_json(exclude_none=True, by_alias=True)
         self.custom_payload = CustomTypeExample()
         self.list_dict_payload = [self.dict_payload] * 2
         self.list_attrs_payload = [self.attrs_payload] * 2
@@ -77,7 +77,7 @@ class TestAPIEndpoints(unittest.TestCase):
             "name": "purple",
             "color": "haze",
         }
-        self.basemodel_params = ParamsExample.parse_obj(self.dict_params)
+        self.basemodel_params = ParamsExample.model_validate(self.dict_params)
         self.attrs_sequence_payload = DataSequence(AttrsModelExample, self.list_attrs_payload)
         self.basemodel_sequence_payload = [self.basemodel_payload] * 2
 
@@ -499,7 +499,7 @@ class TestAPIEndpoints(unittest.TestCase):
                     ParamsExample(name="oyster", color="blue"),
                 ]:
                     # Act
-                    payload = BaseModelExample.parse_obj(dict_payload)
+                    payload = BaseModelExample.model_validate(dict_payload)
                     api.get_data(category=category, params=params, payload=payload)
                     # Assert
                     self.session_mock.request.assert_called_once_with(

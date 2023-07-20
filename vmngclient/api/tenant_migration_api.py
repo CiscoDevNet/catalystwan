@@ -80,7 +80,7 @@ class TenantMigrationAPI:
             migration_id (str): migration identifier (it is obtained after import tenant task is finished)
             download_path (Path): full download path containing a filename eg.: Path("/home/user/import-token.txt")
         """
-        params = MigrationTokenQueryParams(migrationId=migration_id)
+        params = MigrationTokenQueryParams(migration_id=migration_id)
         token = self.session.endpoints.tenant_migration.get_migration_token(params)
         with open(download_path, "w") as file:
             file.write(token)

@@ -96,7 +96,7 @@ def create_vManageSession(
     try:
         server_info = session.server()
     except InvalidOperationError:
-        server_info = ServerInfo.parse_obj({})
+        server_info = ServerInfo.model_validate({})
 
     session.server_name = server_info.server
     session.on_session_create_hook()

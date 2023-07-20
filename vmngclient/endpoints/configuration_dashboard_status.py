@@ -1,10 +1,9 @@
 # mypy: disable-error-code="empty-body"
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
-
 from vmngclient.endpoints import APIEndpoints, get, request
 from vmngclient.utils.operation_status import OperationStatus
+from vmngclient.utils.pydantic import BaseModel, Field
 
 
 class SubTaskData(BaseModel):

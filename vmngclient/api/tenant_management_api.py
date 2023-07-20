@@ -72,7 +72,7 @@ class TenantManagementAPI:
         """
         if password is None:
             password = self.session.password
-        delete_request = TenantBulkDeleteRequest(tenantIdList=tenant_id_list, password=password)
+        delete_request = TenantBulkDeleteRequest(tenant_id_list=tenant_id_list, password=password)
         task_id = self._endpoints.delete_tenant_async_bulk(delete_request).id
         return Task(self.session, task_id)
 
@@ -103,7 +103,7 @@ class TenantManagementAPI:
         self._endpoints.update_tenant_vsmart_placement(
             tenant_id=tenant_id,
             vsmart_placement_update_request=vSmartPlacementUpdateRequest(
-                srcvSmartUuid=src_vsmart_uuid, destvSmartUuid=dst_vsmart_uuid
+                src_vsmart_uuid=src_vsmart_uuid, dest_vsmart_uuid=dst_vsmart_uuid
             ),
         )
 

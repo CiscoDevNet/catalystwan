@@ -3,9 +3,9 @@ from datetime import datetime
 from typing import Any, List, Optional
 
 from packaging.version import Version  # type: ignore
-from pydantic import BaseModel, Field
 
 from vmngclient.endpoints import APIEndpoints, get, request
+from vmngclient.utils.pydantic import BaseModel, Field
 
 
 class VersionField(Version):

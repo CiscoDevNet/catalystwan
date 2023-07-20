@@ -3,10 +3,9 @@ from pathlib import Path
 from typing import BinaryIO
 from urllib.parse import parse_qsl, urlsplit
 
-from pydantic import BaseModel, Field
-
 from vmngclient.endpoints import APIEndpoints, get, post, request
 from vmngclient.model.tenant import Tenant
+from vmngclient.utils.pydantic import BaseModel, Field
 
 
 class MigrationTokenQueryParams(BaseModel):
@@ -28,7 +27,7 @@ class ImportInfo(BaseModel):
     @property
     def migration_token_query_params(self) -> MigrationTokenQueryParams:
         query = self.migration_token_query
-        return MigrationTokenQueryParams.parse_obj(parse_qsl(query))
+        return MigrationTokenQueryParams.model_validate(parse_qsl(query))
 
 
 class MigrationInfo(BaseModel):

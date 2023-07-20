@@ -109,7 +109,7 @@ class SessionsDeleteRequest(BaseModel):
         sessions_delete_request = SessionsDeleteRequest(data=[])
         for session in sessions:
             sessions_delete_request.data.append(
-                ActiveSession(uuid=session.uuid, tenantId=session.tenant_id, rawId=session.raw_id)  # type: ignore
+                ActiveSession(uuid=session.uuid, tenant_id=session.tenant_id, raw_id=session.raw_id)
             )
         return sessions_delete_request
 

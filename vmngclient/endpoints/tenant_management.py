@@ -1,11 +1,10 @@
 # mypy: disable-error-code="empty-body"
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel, Field
-
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put, request, versions, view
 from vmngclient.model.tenant import Tenant
 from vmngclient.typed_list import DataSequence
+from vmngclient.utils.pydantic import BaseModel, Field
 from vmngclient.utils.session_type import ProviderAsTenantView, ProviderView
 
 
@@ -85,13 +84,13 @@ class TenantUpdateRequest(BaseModel):
         if not tenant.tenant_id:
             raise TypeError("tenantId required for update request")
         return TenantUpdateRequest(
-            tenantId=tenant.tenant_id,
+            tenant_id=tenant.tenant_id,
             desc=tenant.desc,
-            subDomain=tenant.subdomain,
-            wanEdgeForecast=tenant.wan_edge_forecast,
-            edgeConnectorEnable=tenant.edge_connector_enable,
-            edgeConnectorSystemIp=tenant.edge_connector_system_ip,
-            edgeConnectorTunnelInterfaceName=tenant.edge_connector_tunnel_interface_name,
+            subdomain=tenant.subdomain,
+            wan_edge_forecast=tenant.wan_edge_forecast,
+            edge_connector_enable=tenant.edge_connector_enable,
+            edge_connector_system_ip=tenant.edge_connector_system_ip,
+            edge_connector_tunnel_interface_name=tenant.edge_connector_tunnel_interface_name,
         )
 
 

@@ -31,12 +31,12 @@ class TenantManagementAPITest(unittest.TestCase):
         expected_tenants = [
             Tenant(
                 name="tenant1",
-                orgName="CiscoDevNet",
-                subDomain="alpha.bravo.net",
+                org_name="CiscoDevNet",
+                subdomain="alpha.bravo.net",
                 desc="This is tenant for unit tests",
-                edgeConnectorEnable=True,
-                edgeConnectorSystemIp="172.16.255.81",
-                edgeConnectorTunnelInterfaceName="GigabitEthernet1",
+                edge_connector_enable=True,
+                edge_connector_system_ip="172.16.255.81",
+                edge_connector_tunnel_interface_name="GigabitEthernet1",
                 wanEdgeForecast=1,
             )
         ]
@@ -48,12 +48,12 @@ class TenantManagementAPITest(unittest.TestCase):
         tenants = [
             Tenant(
                 name="tenant1",
-                orgName="CiscoDevNet",
-                subDomain="alpha.bravo.net",
+                org_name="CiscoDevNet",
+                subdomain="alpha.bravo.net",
                 desc="This is tenant for unit tests",
-                edgeConnectorEnable=True,
-                edgeConnectorSystemIp="172.16.255.81",
-                edgeConnectorTunnelInterfaceName="GigabitEthernet1",
+                edge_connector_enable=True,
+                edge_connector_system_ip="172.16.255.81",
+                edge_connector_tunnel_interface_name="GigabitEthernet1",
                 wanEdgeForecast=1,
             )
         ]
@@ -63,11 +63,11 @@ class TenantManagementAPITest(unittest.TestCase):
     def test_update(self):
         # Arrange
         tenant_update_request = TenantUpdateRequest(
-            tenantId="apo605#",
-            subDomain="doamin.tenant.net",
+            tenant_id="apo605#",
+            subdomain="doamin.tenant.net",
             desc="Tenant1 description",
-            wanEdgeForecast=1,
-            edgeConnectorEnable=False,
+            wan_edge_forecast=1,
+            edge_connector_enable=False,
         )
         self.api._endpoints.update_tenant = MagicMock()
         # Act
@@ -108,12 +108,12 @@ class TenantManagementAPITest(unittest.TestCase):
 
     def test_get_statuses(self):
         tenant_status = TenantStatus(
-            tenantId="tenant2",
-            tenantName="TeanantTwo",
-            controlStatus=ControlStatus(controlUp=1, controlDown=0, partial=1),
-            siteHealth=SiteHealth(fullConnectivity=2, partialConnectivity=1, noConnectivity=0),
-            vEdgeHealth=vEdgeHealth(normal=3, warning=1, error=0),
-            vSmartStatus=vSmartStatus(up=1, down=0),
+            tenant_id="tenant2",
+            tenant_name="TeanantTwo",
+            control_status=ControlStatus(controlUp=1, controlDown=0, partial=1),
+            site_health=SiteHealth(fullConnectivity=2, partialConnectivity=1, noConnectivity=0),
+            vedge_health=vEdgeHealth(normal=3, warning=1, error=0),
+            vsmart_status=vSmartStatus(up=1, down=0),
         )
         expected_statuses = DataSequence(TenantStatus, [tenant_status])
         self.api._endpoints.get_all_tenant_statuses = MagicMock(return_value=expected_statuses)
@@ -133,10 +133,10 @@ class TenantManagementAPITest(unittest.TestCase):
                 "vsmart1": [
                     Tenant(
                         name="tenant1",
-                        orgName="Tenant1-organization",
+                        org_name="Tenant1-organization",
                         desc="Tenant1 description",
-                        subDomain="tenant1.organization.org",
-                        flakeId=9987,
+                        subdomain="tenant1.organization.org",
+                        flake_id=9987,
                     )
                 ]
             }

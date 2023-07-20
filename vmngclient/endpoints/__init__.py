@@ -183,7 +183,7 @@ class APIEndpoints:
     def _prepare_basemodel_payload(cls, payload: BaseModel) -> PreparedPayload:
         """Helper method to prepare BaseModel instance for sending"""
         return PreparedPayload(
-            data=payload.json(exclude_none=True, by_alias=True), headers={"content-type": "application/json"}
+            data=payload.model_dump_json(exclude_none=True, by_alias=True), headers={"content-type": "application/json"}
         )
 
     @classmethod
@@ -207,7 +207,7 @@ class APIEndpoints:
     def _prepare_params(cls, params: RequestParamsType) -> Dict[str, Any]:
         """Helper method to prepare params for sending"""
         if isinstance(params, BaseModel):
-            return params.dict(exclude_none=True, by_alias=True)
+            return params.model_dump(exclude_none=True, by_alias=True)
         return params
 
     def __init__(self, client: APIEndpointClient):
