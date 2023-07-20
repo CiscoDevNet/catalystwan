@@ -2,10 +2,9 @@
 from datetime import datetime
 from typing import Dict, List, Optional, Set
 
-from pydantic import BaseModel, Field
-
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put, request
 from vmngclient.typed_list import DataSequence
+from vmngclient.utils.pydantic import BaseModel, Field
 
 
 class User(BaseModel):
