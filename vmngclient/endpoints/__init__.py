@@ -370,13 +370,7 @@ class request(APIEndpointsDecorator):
             TypeSpecifier: Specification of return type
         """
         annotation = self.sig.return_annotation
-        if isclass(annotation):
-            if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModel, DataclassBase)):
-                return TypeSpecifier(True, None, annotation)
-            elif annotation == _empty:
-                return TypeSpecifier(False)
-            raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
-        elif (type_origin := get_origin(annotation)) and isclass(type_origin) and issubclass(type_origin, DataSequence):
+        if (type_origin := get_origin(annotation)) and isclass(type_origin) and issubclass(type_origin, DataSequence):
             if (
                 (type_args := get_args(annotation))
                 and (len(type_args) == 1)
@@ -385,6 +379,15 @@ class request(APIEndpointsDecorator):
             ):
                 return TypeSpecifier(True, DataSequence, type_args[0])
             raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
+        elif isclass(annotation):
+            try:
+                if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModel, DataclassBase)):
+                    return TypeSpecifier(True, None, annotation)
+                elif annotation == _empty:
+                    return TypeSpecifier(False)
+                raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
+            except TypeError:
+                raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
         else:
             raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
 
