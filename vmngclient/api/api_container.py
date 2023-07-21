@@ -3,7 +3,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from vmngclient.api.admin_tech_api import AdminTechAPI
-from vmngclient.api.administration import ClusterManagementAPI, ResourceGroupsAPI, SessionsAPI, UserGroupsAPI, UsersAPI
+from vmngclient.api.administration import (
+    AdministrationSettingsAPI,
+    ClusterManagementAPI,
+    ResourceGroupsAPI,
+    SessionsAPI,
+    UserGroupsAPI,
+    UsersAPI,
+)
 from vmngclient.api.alarms_api import AlarmsAPI
 from vmngclient.api.basic_api import DevicesAPI, DeviceStateAPI
 from vmngclient.api.dashboard_api import DashboardAPI
@@ -24,10 +31,11 @@ if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
 
-class APIContainter:
+class APIContainer:
     def __init__(self, session: vManageSession):
         self.tenant_management = TenantManagementAPI(session)
         self.admin_tech = AdminTechAPI(session)
+        self.administration_settings = AdministrationSettingsAPI(session)
         self.alarms = AlarmsAPI(session)
         self.dashboard = DashboardAPI(session)
         self.devices = DevicesAPI(session)
