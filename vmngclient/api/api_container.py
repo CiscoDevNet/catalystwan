@@ -35,7 +35,7 @@ class APIContainer:
     def __init__(self, session: vManageSession):
         self.tenant_management = TenantManagementAPI(session)
         self.admin_tech = AdminTechAPI(session)
-        self.administration_settings = AdministrationSettingsAPI
+        self.administration_settings = AdministrationSettingsAPI(session)
         self.alarms = AlarmsAPI(session)
         self.dashboard = DashboardAPI(session)
         self.devices = DevicesAPI(session)
