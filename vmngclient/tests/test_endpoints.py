@@ -216,7 +216,7 @@ class TestAPIEndpoints(unittest.TestCase):
     def test_dict_payload(self):
         self.endpoints._request("POST", f"/{__name__}", payload=self.dict_payload)
         _, kwargs = self.session_mock.request.call_args
-        assert kwargs.get("data") == self.json_payload
+        assert json.loads(kwargs.get("data")) == json.loads(self.json_payload)
 
     def test_str_payload(self):
         str_payload = "This is string payload!"
@@ -378,7 +378,7 @@ class TestAPIEndpoints(unittest.TestCase):
             self.base_path + "/v2/clothes/items",
             data=self.json_payload,
             headers={"content-type": "application/json"},
-            params=self.basemodel_params,
+            params=self.dict_params,
         )
 
     def test_request_decorator_call_with_keyword_arguments(self):
@@ -399,7 +399,7 @@ class TestAPIEndpoints(unittest.TestCase):
             self.base_path + "/v2/clothes/items",
             data=self.json_payload,
             headers={"content-type": "application/json"},
-            params=self.basemodel_params,
+            params=self.dict_params,
         )
 
     def test_request_decorator_call_and_return_model(self):
@@ -494,19 +494,21 @@ class TestAPIEndpoints(unittest.TestCase):
                 {"id": "id1", "size": 100, "capacity": 1.7, "active": True},
                 {"id": "id2", "size": 120, "capacity": 1.9, "active": False},
             ]:
-                for params in [
-                    ParamsExample(name="submarine", color="yellow"),
-                    ParamsExample(name="oyster", color="blue"),
+                for dict_params in [
+                    {"name": "submarine", "color": "yellow"},
+                    {"name": "oyster", "color": "blue"},
                 ]:
-                    # Act
                     payload = BaseModelExample.model_validate(dict_payload)
+                    params = ParamsExample.model_validate(dict_params)
+                    json_payload = payload.model_dump_json(by_alias=True)
+                    # Act
                     api.get_data(category=category, params=params, payload=payload)
                     # Assert
                     self.session_mock.request.assert_called_once_with(
                         "GET",
                         self.base_path + f"/v2/{category}/items",
-                        data=json.dumps(dict_payload),
+                        data=json_payload,
                         headers={"content-type": "application/json"},
-                        params=params,
+                        params=dict_params,
                     )
                     self.session_mock.reset_mock()

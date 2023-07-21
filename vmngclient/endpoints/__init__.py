@@ -26,7 +26,6 @@ To send request instantiate API with logged vManageSession:
 >>> api = TenantManagementAPI(session)
 >>> api.delete_tenant_async_bulk(TenantBulkDeleteRequest(password="p4s$w0rD", tenantIdList=["TNT00005"]))
 """
-from __future__ import annotations
 
 import json
 import logging
@@ -73,7 +72,7 @@ logger = logging.getLogger(__name__)
 
 @runtime_checkable
 class CustomPayloadType(Protocol):
-    def prepared(self) -> PreparedPayload:
+    def prepared(self) -> "PreparedPayload":
         ...
 
 
@@ -197,7 +196,7 @@ class APIEndpoints:
         items = []
         for item in payload:
             if isinstance(item, BaseModel):
-                items.append(item.dict(exclude_none=True, by_alias=True))
+                items.append(item.model_dump(exclude_none=True, by_alias=True))
             elif isinstance(item, AttrsInstance):
                 items.append(attrs_asdict(item))
         data = json.dumps(items)

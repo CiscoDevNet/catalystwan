@@ -1,17 +1,19 @@
 """
-Modified defaults for endpoint payload usage to reduce boilerplate in model definitions.
+Modified defaults for endpoint payload models to reduce boilerplate in model definitions.
+Supports pydantic V2 only (and used to ease the migration from V1)
 Just import BaseModel, Field from here instead pydantic module directly
 """
 from functools import wraps
-from typing import Any
+from typing import Any, Callable, TypeVar
 
 from pydantic import BaseModel as _BaseModel
 from pydantic import ConfigDict
 from pydantic import Field as _Field
-from pydantic_core import PydanticUndefined
+
+F = TypeVar("F", bound=Callable)
 
 
-def common_field(func):
+def common_field(func: F) -> F:
     """
     Decorator for `pydantic.Field` function.
     `alias` keyword argument is replaced by `serialization_alias` and `validation_alias`
@@ -19,19 +21,18 @@ def common_field(func):
     """
 
     @wraps(func)
-    def wrapper(default: Any = PydanticUndefined, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         _kwargs = dict(kwargs)
         if (alias := _kwargs.pop("alias", None)) is not None:
             _kwargs["serialization_alias"] = alias
             _kwargs["validation_alias"] = alias
-        return func(default, **_kwargs)
+        return func(*args, **_kwargs)
 
-    return wrapper
+    return wrapper  # type: ignore
 
 
 Field = common_field(_Field)
 
 
 class BaseModel(_BaseModel):
-    __doc__ = _BaseModel.__doc__
     model_config = ConfigDict(populate_by_name=True)
