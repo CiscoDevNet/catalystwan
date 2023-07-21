@@ -3,7 +3,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from vmngclient.api.admin_tech_api import AdminTechAPI
-from vmngclient.api.administration import AdministrationSettingsAPI, ClusterManagementAPI, ResourceGroupsAPI, SessionsAPI, UserGroupsAPI, UsersAPI
+from vmngclient.api.administration import (
+    AdministrationSettingsAPI,
+    ClusterManagementAPI,
+    ResourceGroupsAPI,
+    SessionsAPI,
+    UserGroupsAPI,
+    UsersAPI,
+)
 from vmngclient.api.alarms_api import AlarmsAPI
 from vmngclient.api.basic_api import DevicesAPI, DeviceStateAPI
 from vmngclient.api.dashboard_api import DashboardAPI
