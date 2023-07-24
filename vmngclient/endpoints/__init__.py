@@ -66,7 +66,7 @@ from vmngclient.utils.creation_tools import asdict as attrs_asdict
 from vmngclient.utils.session_type import SessionType
 
 BASE_PATH: Final[str] = "/dataservice"
-T = TypeVar("T")
+T = TypeVar("T", DataclassBase, BaseModel)
 logger = logging.getLogger(__name__)
 
 

@@ -9,11 +9,11 @@ from vmngclient.utils.pydantic import BaseModel, Field
 
 class User(BaseModel):
     username: str = Field(alias="userName")
-    password: Optional[str]
+    password: Optional[str] = None
     group: List[str]
-    locale: Optional[str]
-    description: Optional[str]
-    resource_group: Optional[str] = Field(alias="resGroupName")
+    locale: Optional[str] = None
+    description: Optional[str] = None
+    resource_group: Optional[str] = Field(alias="resGroupName", default=None)
 
 
 class UserUpdateRequest(BaseModel):
@@ -21,12 +21,12 @@ class UserUpdateRequest(BaseModel):
     current_password: bool = Field(alias="currentPassword", default=False)
     show_password: bool = Field(alias="showPassword", default=False)
     show_confirm_password: bool = Field(alias="showConfirmPassword", default=False)
-    current_user_password: Optional[str] = Field(alias="currentUserPassword")
-    password: Optional[str]
-    group: Optional[List[str]]
-    locale: Optional[str]
-    description: Optional[str]
-    resource_group: Optional[str] = Field(alias="resGroupName")
+    current_user_password: Optional[str] = Field(alias="currentUserPassword", default=None)
+    password: Optional[str] = None
+    group: Optional[List[str]] = None
+    locale: Optional[str] = None
+    description: Optional[str] = None
+    resource_group: Optional[str] = Field(alias="resGroupName", default=None)
 
 
 class UserRole(BaseModel):
@@ -124,13 +124,13 @@ class ProfilePasswordUpdateRequest(BaseModel):
 
 
 class ResourceGroup(BaseModel):
-    id: Optional[str]
+    id: Optional[str] = None
     name: str
     desc: str
     site_ids: List[int] = Field(alias="siteIds")
-    device_ips: Optional[List[str]] = Field(alias="deviceIPs")
-    mgmt_sytem_ips_map: Optional[Dict[str, str]] = Field(alias="mgmtSytemIpsMap")
-    uuid_sytem_ips_map: Optional[Dict[str, str]] = Field(alias="uuidSytemIpsMap")
+    device_ips: Optional[List[str]] = Field(alias="deviceIPs", default=None)
+    mgmt_sytem_ips_map: Optional[Dict[str, str]] = Field(alias="mgmtSytemIpsMap", default=None)
+    uuid_sytem_ips_map: Optional[Dict[str, str]] = Field(alias="uuidSytemIpsMap", default=None)
 
 
 class ResourceGroupUpdateRequest(BaseModel):
