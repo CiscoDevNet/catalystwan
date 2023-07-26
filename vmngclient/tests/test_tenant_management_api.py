@@ -37,7 +37,7 @@ class TenantManagementAPITest(unittest.TestCase):
                 edge_connector_enable=True,
                 edge_connector_system_ip="172.16.255.81",
                 edge_connector_tunnel_interface_name="GigabitEthernet1",
-                wanEdgeForecast=1,
+                wane_edge_forecast=1,
             )
         ]
         self.api._endpoints.get_all_tenants = MagicMock(return_value=expected_tenants)
@@ -54,7 +54,7 @@ class TenantManagementAPITest(unittest.TestCase):
                 edge_connector_enable=True,
                 edge_connector_system_ip="172.16.255.81",
                 edge_connector_tunnel_interface_name="GigabitEthernet1",
-                wanEdgeForecast=1,
+                wane_edge_forecast=1,
             )
         ]
         task = self.api.create(tenants)

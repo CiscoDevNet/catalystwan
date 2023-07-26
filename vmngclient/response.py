@@ -9,12 +9,11 @@ from requests.cookies import RequestsCookieJar
 from requests.exceptions import JSONDecodeError
 
 from vmngclient import with_proc_info_header
-from vmngclient.dataclasses import DataclassBase
 from vmngclient.endpoints import APIEndpointClientResponse
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 
-T = TypeVar("T", DataclassBase, BaseModel)
+T = TypeVar("T")
 PRINTABLE_CONTENT = re.compile(r"(text\/.+)|(application\/(json|html|xhtml|xml|x-www-form-urlencoded))", re.IGNORECASE)
 
 
@@ -181,7 +180,7 @@ class vManageResponse(Response, APIEndpointClientResponse):
             sequence = [cast(dict, data)]
 
         if issubclass(cls, BaseModel):
-            return DataSequence(cls, [cls.model_validate(item) for item in sequence])
+            return DataSequence(cls, [cls.model_validate(item) for item in sequence])  # type: ignore
         return DataSequence(cls, [create_dataclass(cls, item) for item in sequence])
 
     def dataobj(self, cls: Type[T], sourcekey: Optional[str] = "data") -> T:
@@ -200,7 +199,7 @@ class vManageResponse(Response, APIEndpointClientResponse):
             data = self.payload.json.get(sourcekey)
 
         if issubclass(cls, BaseModel):
-            return cls.model_valiadate(data)
+            return cls.model_valiadate(data)  # type: ignore
         return create_dataclass(cls, data)
 
     def get_error_info(self) -> ErrorInfo:

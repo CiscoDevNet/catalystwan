@@ -50,7 +50,7 @@ class TenantMigration(APIEndpoints):
     def import_tenant_data(self, data: BinaryIO) -> ImportInfo:
         # TODO implement dedicated payload types for files upload in request decorator
         response = self._request(post, "/tenantmigration/import", files={"file": (Path(data.name).name, data)})
-        return response.dataobj(ImportInfo, None)
+        return response.dataobj(ImportInfo, None)  # type: ignore
 
     @request(post, "/tenantmigration/networkMigration")
     def migrate_network(self, payload: str) -> MigrationInfo:
