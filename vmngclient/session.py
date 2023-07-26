@@ -13,7 +13,7 @@ from requests.auth import AuthBase
 from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
-from vmngclient.api.api_containter import APIContainter
+from vmngclient.api.api_container import APIContainer
 from vmngclient.endpoints import APIEndpointClient
 from vmngclient.endpoints.client import AboutInfo, ServerInfo
 from vmngclient.endpoints.endpoints_container import APIEndpointContainter
@@ -196,7 +196,7 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
         ] = response_history_debug
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
-        self.api = APIContainter(self)
+        self.api = APIContainer(self)
         self.endpoints = APIEndpointContainter(self)
         self._platform_version: str = ""
         self._api_version: Version
