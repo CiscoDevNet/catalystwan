@@ -36,6 +36,10 @@ class Certificate(BaseModel):
     email: Optional[str] = Field(default=None)
 
 
+class VEdgeCloud(BaseModel):
+    certificateauthority: str
+
+
 class ConfigurationSettings(APIEndpoints):
     def create_analytics_data_file(self):
         # POST /settings/configuration/analytics/dca
@@ -79,6 +83,10 @@ class ConfigurationSettings(APIEndpoints):
 
     @request(get, "/settings/configuration/certificate", "data")
     def get_certificates(self) -> DataSequence[Certificate]:
+        ...
+
+    @request(get, "/settings/configuration/vedgecloud", "data")
+    def get_vedge_cloud(self) -> DataSequence[VEdgeCloud]:
         ...
 
     def get_google_map_key(self):
