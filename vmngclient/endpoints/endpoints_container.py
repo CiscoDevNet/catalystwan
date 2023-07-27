@@ -11,6 +11,7 @@ from vmngclient.endpoints.configuration_device_software_update import Configurat
 from vmngclient.endpoints.configuration_device_template import ConfigurationDeviceTemplate
 from vmngclient.endpoints.configuration_settings import ConfigurationSettings
 from vmngclient.endpoints.monitoring_device_details import MonitoringDeviceDetails
+from vmngclient.endpoints.monitoring_status import MonitoringStatus
 from vmngclient.endpoints.tenant_backup_restore import TenantBackupRestore
 from vmngclient.endpoints.tenant_management import TenantManagement
 from vmngclient.endpoints.tenant_migration import TenantMigration
@@ -30,6 +31,7 @@ class APIEndpointContainter:
         self.configuration_device_template = ConfigurationDeviceTemplate(session)
         self.configuration_settings = ConfigurationSettings(session)
         self.monitoring_device_details = MonitoringDeviceDetails(session)
+        self.monitoring_status = MonitoringStatus(session)
         self.tenant_backup_restore = TenantBackupRestore(session)
         self.tenant_management = TenantManagement(session)
         self.tenant_migration = TenantMigration(session)

@@ -50,6 +50,10 @@ class ProxyHTTPServer(BaseModel):
     proxy_port: str = Field(default="", alias="proxyPort")
 
 
+class ReverseProxy(BaseModel):
+    mode: str
+
+
 class ConfigurationSettings(APIEndpoints):
     def create_analytics_data_file(self):
         # POST /settings/configuration/analytics/dca
@@ -105,6 +109,10 @@ class ConfigurationSettings(APIEndpoints):
 
     @request(get, "/settings/configuration/proxyHttpServer", "data")
     def get_proxy_http_servers(self) -> DataSequence[ProxyHTTPServer]:
+        ...
+
+    @request(get, "/settings/configuration/reverseproxy", "data")
+    def get_reverse_proxies(self) -> DataSequence[ReverseProxy]:
         ...
 
     def get_google_map_key(self):
