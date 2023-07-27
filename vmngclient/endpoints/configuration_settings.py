@@ -40,6 +40,16 @@ class VEdgeCloud(BaseModel):
     certificateauthority: str
 
 
+class Banner(BaseModel):
+    mode: str
+
+
+class ProxyHTTPServer(BaseModel):
+    proxy: bool
+    proxy_ip: str = Field(default="", alias="proxyIp")
+    proxy_port: str = Field(default="", alias="proxyPort")
+
+
 class ConfigurationSettings(APIEndpoints):
     def create_analytics_data_file(self):
         # POST /settings/configuration/analytics/dca
@@ -87,6 +97,14 @@ class ConfigurationSettings(APIEndpoints):
 
     @request(get, "/settings/configuration/vedgecloud", "data")
     def get_vedge_cloud(self) -> DataSequence[VEdgeCloud]:
+        ...
+
+    @request(get, "/settings/configuration/banner", "data")
+    def get_banners(self) -> DataSequence[Banner]:
+        ...
+
+    @request(get, "/settings/configuration/proxyHttpServer", "data")
+    def get_proxy_http_servers(self) -> DataSequence[ProxyHTTPServer]:
         ...
 
     def get_google_map_key(self):
