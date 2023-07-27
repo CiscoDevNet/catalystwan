@@ -1,10 +1,16 @@
 # mypy: disable-error-code="empty-body"
+from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel, Field, IPvAnyAddress
 
 from vmngclient.endpoints import APIEndpoints, get, request
 from vmngclient.typed_list import DataSequence
+
+
+class Mode(str, Enum):
+    on = "on"
+    off = "off"
 
 
 class Organization(BaseModel):
@@ -41,7 +47,7 @@ class VEdgeCloud(BaseModel):
 
 
 class Banner(BaseModel):
-    mode: str
+    mode: Mode
 
 
 class ProxyHTTPServer(BaseModel):
@@ -51,7 +57,15 @@ class ProxyHTTPServer(BaseModel):
 
 
 class ReverseProxy(BaseModel):
-    mode: str
+    mode: Mode
+
+
+class CloudX(BaseModel):
+    mode: Mode
+
+
+class ManageEncryptedPassword(BaseModel):
+    manage_type8_password: bool = Field(alias="manageType8Password")
 
 
 class ConfigurationSettings(APIEndpoints):
@@ -113,6 +127,14 @@ class ConfigurationSettings(APIEndpoints):
 
     @request(get, "/settings/configuration/reverseproxy", "data")
     def get_reverse_proxies(self) -> DataSequence[ReverseProxy]:
+        ...
+
+    @request(get, "/settings/configuration/cloudx", "data")
+    def get_cloudx(self) -> DataSequence[CloudX]:
+        ...
+
+    @request(get, "/settings/configuration/manageEncryptedPassword", "data")
+    def get_manage_encrypted_password(self) -> DataSequence[ManageEncryptedPassword]:
         ...
 
     def get_google_map_key(self):
