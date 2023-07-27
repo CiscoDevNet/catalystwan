@@ -6,6 +6,7 @@ from vmngclient.endpoints.administration_user_and_group import AdministrationUse
 from vmngclient.endpoints.certificate_management_vmanage import CertificateManagementVManage
 from vmngclient.endpoints.client import Client
 from vmngclient.endpoints.configuration_dashboard_status import ConfigurationDashboardStatus
+from vmngclient.endpoints.configuration_device_actions import ConfigurationDeviceActions
 from vmngclient.endpoints.configuration_device_software_update import ConfigurationDeviceSoftwareUpdate
 from vmngclient.endpoints.configuration_device_template import ConfigurationDeviceTemplate
 from vmngclient.endpoints.configuration_settings import ConfigurationSettings
@@ -24,6 +25,7 @@ class APIEndpointContainter:
         self.certificate_management_vmanage = CertificateManagementVManage(session)
         self.client = Client(session)
         self.configuration_dashboard_status = ConfigurationDashboardStatus(session)
+        self.configuration_device_actions = ConfigurationDeviceActions(session)
         self.configuration_device_software_update = ConfigurationDeviceSoftwareUpdate(session)
         self.configuration_device_template = ConfigurationDeviceTemplate(session)
         self.configuration_settings = ConfigurationSettings(session)

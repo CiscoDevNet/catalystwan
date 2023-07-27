@@ -29,6 +29,7 @@ GET /client/server/ready||[**Client.server_ready**](vmngclient/endpoints/client.
 GET /client/about||[**Client.about**](vmngclient/endpoints/client.py#L73)||[**AboutInfo**](vmngclient/endpoints/client.py#L49)|
 GET /device/action/status/{task_id}||[**ConfigurationDashboardStatus.find_status**](vmngclient/endpoints/configuration_dashboard_status.py#L89)||[**TaskData**](vmngclient/endpoints/configuration_dashboard_status.py#L76)|
 GET /device/action/status/tasks||[**ConfigurationDashboardStatus.find_running_tasks**](vmngclient/endpoints/configuration_dashboard_status.py#L93)||[**TasksData**](vmngclient/endpoints/configuration_dashboard_status.py#L84)|
+GET /device/action/ztp/upgrade/setting||[**ConfigurationDeviceActions.get_ztp_upgrade_config_setting**](vmngclient/endpoints/configuration_device_actions.py#L74)||DataSequence[[**ZTPUpgradeSettings**](vmngclient/endpoints/configuration_device_actions.py#L10)]|
 POST /device/action/software/package||[**ConfigurationDeviceSoftwareUpdate.install_pkg**](vmngclient/endpoints/configuration_device_software_update.py#L22)|[**SoftwarePackageUpdatePayload**](vmngclient/utils/upgrades_helper.py#L68)||
 POST /template/device/config/config/||[**ConfigurationDeviceTemplate.get_device_configuration_preview**](vmngclient/endpoints/configuration_device_template.py#L19)|[**FeatureToCLIPayload**](vmngclient/endpoints/configuration_device_template.py#L10)|str|
 GET /settings/configuration/{setting_type}||[**ConfigurationSettings.get_configuration_by_setting_type**](vmngclient/endpoints/configuration_settings.py#L64)||dict|
