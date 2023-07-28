@@ -1,4 +1,5 @@
 # mypy: disable-error-code="empty-body"
+import datetime
 from enum import Enum
 from typing import Optional
 
@@ -8,7 +9,7 @@ from vmngclient.endpoints import APIEndpoints, get, request
 from vmngclient.typed_list import DataSequence
 
 
-class Mode(str, Enum):
+class ModeEnum(str, Enum):
     on = "on"
     off = "off"
 
@@ -47,7 +48,7 @@ class VEdgeCloud(BaseModel):
 
 
 class Banner(BaseModel):
-    mode: Mode
+    mode: ModeEnum
 
 
 class ProxyHTTPServer(BaseModel):
@@ -57,15 +58,25 @@ class ProxyHTTPServer(BaseModel):
 
 
 class ReverseProxy(BaseModel):
-    mode: Mode
+    mode: ModeEnum
 
 
 class CloudX(BaseModel):
-    mode: Mode
+    mode: ModeEnum
 
 
 class ManageEncryptedPassword(BaseModel):
     manage_type8_password: bool = Field(alias="manageType8Password")
+
+
+class CloudServices(BaseModel):
+    enabled: bool
+    vanalytics_enabled: bool = Field(alias="vanalyticsEnabled")
+    vmonitoring_enabled: bool = Field(alias="vmonitoringEnabled")
+    otp: Optional[str] = None
+    cloud_gateway_url: Optional[str] = Field(default=None, alias="cloudGatewayUrl")
+    vanalytics_enabled_time: Optional[datetime.datetime] = Field(default=None, alias="vanalyticsEnabledTime")
+    vmonitoring_enabled_time: Optional[datetime.datetime] = Field(default=None, alias="vmonitoringEnabledTime")
 
 
 class ConfigurationSettings(APIEndpoints):
@@ -135,6 +146,10 @@ class ConfigurationSettings(APIEndpoints):
 
     @request(get, "/settings/configuration/manageEncryptedPassword", "data")
     def get_manage_encrypted_password(self) -> DataSequence[ManageEncryptedPassword]:
+        ...
+
+    @request(get, "/settings/configuration/cloudservices", "data")
+    def get_cloudservices(self) -> DataSequence[CloudServices]:
         ...
 
     def get_google_map_key(self):
