@@ -79,6 +79,19 @@ class CloudServices(BaseModel):
     vmonitoring_enabled_time: Optional[datetime.datetime] = Field(default=None, alias="vmonitoringEnabledTime")
 
 
+class ClientSessionTimeout(BaseModel):
+    isEnabled: bool = Field(alias="isEnabled")
+    timeout: Optional[int] = Field(default=None, ge=10, description="timeout in minutes")
+
+
+class SessionLifeTime(BaseModel):
+    session_life_time: int = Field(alias="sessionLifeTime", ge=30, description="timeout in minutes")
+
+
+class ServerSessionTimeout(BaseModel):
+    server_session_timeout: int = Field(alias="serverSessionTimeout", ge=10, description="timeout in minutes")
+
+
 class ConfigurationSettings(APIEndpoints):
     def create_analytics_data_file(self):
         # POST /settings/configuration/analytics/dca
@@ -150,6 +163,18 @@ class ConfigurationSettings(APIEndpoints):
 
     @request(get, "/settings/configuration/cloudservices", "data")
     def get_cloudservices(self) -> DataSequence[CloudServices]:
+        ...
+
+    @request(get, "/settings/configuration/clientSessionTimeout", "data")
+    def get_client_session_timeout(self) -> DataSequence[ClientSessionTimeout]:
+        ...
+
+    @request(get, "/settings/configuration/sessionLifeTime", "data")
+    def get_session_life_time(self) -> DataSequence[SessionLifeTime]:
+        ...
+
+    @request(get, "/settings/configuration/serverSessionTimeout", "data")
+    def get_server_session_timeout(self) -> DataSequence[ServerSessionTimeout]:
         ...
 
     def get_google_map_key(self):
