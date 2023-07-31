@@ -86,7 +86,7 @@ class CloudServices(BaseModel):
 
 
 class ClientSessionTimeout(BaseModel):
-    isEnabled: Optional[bool] = Field(default=False, alias="isEnabled")
+    is_enabled: Optional[bool] = Field(default=False, alias="isEnabled")
     timeout: Optional[int] = Field(default=None, ge=10, description="timeout in minutes")
 
 
@@ -122,6 +122,13 @@ class DataCollectionOnNotification(BaseModel):
 
 class SDWANTelemetry(BaseModel):
     enabled: bool
+
+
+class StatsOperation(BaseModel):
+    stats_operation: str = Field(alias="statsOperation")
+    rid: int = Field(alias="@rid")
+    operation_interval: int = Field(alias="operationInterval", ge=1, description="interval in minutes")
+    default_interval: int = Field(alias="defaultInterval", ge=1, description="interval in minutes")
 
 
 class ConfigurationSettings(APIEndpoints):
@@ -227,6 +234,10 @@ class ConfigurationSettings(APIEndpoints):
 
     @request(get, "/settings/configuration/sdWanTelemetry", "data")
     def get_sdwan_telemetry(self) -> DataSequence[SDWANTelemetry]:
+        ...
+
+    @request(get, "/management/statsconfig")
+    def get_stats_config(self) -> DataSequence[StatsOperation]:
         ...
 
     def get_google_map_key(self):
