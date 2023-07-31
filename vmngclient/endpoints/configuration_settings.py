@@ -131,6 +131,18 @@ class StatsOperation(BaseModel):
     default_interval: int = Field(alias="defaultInterval", ge=1, description="interval in minutes")
 
 
+class MaintenanceWindow(BaseModel):
+    enabled: Optional[bool] = False
+    message: Optional[str] = ""
+    start: Optional[datetime.datetime] = Field(default=None, alias="epochStartTimeInMillis")
+    end: Optional[datetime.datetime] = Field(default=None, alias="epochEndTimeInMillis")
+
+
+class ElasticSearchDBSize(BaseModel):
+    index_name: str = Field(alias="indexName")
+    size_in_gb: int = Field(alias="sizeInGB")
+
+
 class ConfigurationSettings(APIEndpoints):
     def create_analytics_data_file(self):
         # POST /settings/configuration/analytics/dca
@@ -240,12 +252,20 @@ class ConfigurationSettings(APIEndpoints):
     def get_stats_config(self) -> DataSequence[StatsOperation]:
         ...
 
+    @request(get, "/settings/configuration/spMetadata")
+    def get_sp_metadata(self) -> str:
+        ...
+
+    @request(get, "/management/elasticsearch/index/size", "indexSize")
+    def get_elasticsearch_db_size(self) -> DataSequence[ElasticSearchDBSize]:
+        ...
+
     def get_google_map_key(self):
         # GET /settings/configuration/googleMapKey
         ...
 
-    def get_maintenance_window(self):
-        # GET /settings/configuration/maintenanceWindow
+    @request(get, "/settings/configuration/maintenanceWindow", "data")
+    def get_maintenance_window(self) -> DataSequence[MaintenanceWindow]:
         ...
 
     def get_session_timout(self):
