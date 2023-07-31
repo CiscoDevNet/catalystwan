@@ -8,7 +8,7 @@ from vmngclient.endpoints import APIEndpoints, get, request
 
 
 class CloudConnector(BaseModel):
-    cloud_enabled: bool = Field(alias="cloudEnabled")
+    cloud_enabled: Optional[bool] = Field(default=False, alias="cloudEnabled")
     client_id: Optional[str] = Field(default=None, alias="clientId")
     client_secret: Optional[str] = Field(default=None, alias="clientSecret")
     org_name: Optional[str] = Field(default=None, alias="orgName")

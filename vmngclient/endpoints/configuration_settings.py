@@ -37,7 +37,7 @@ class EmailNotificationSettings(BaseModel):
 
 class HardwareRootCA(BaseModel):
     hardware_certificate: Optional[str] = Field(default=None, alias="hardwareCertificate")
-    control_connection_up: Optional[bool] = Field(default=None, alias="controlConnectionUp")
+    control_connection_up: Optional[bool] = Field(default=False, alias="controlConnectionUp")
 
 
 class Certificate(BaseModel):
@@ -54,7 +54,7 @@ class VEdgeCloud(BaseModel):
 
 
 class Banner(BaseModel):
-    mode: Optional[ModeEnum] = None
+    mode: Optional[ModeEnum] = ModeEnum.off
 
 
 class ProxyHTTPServer(BaseModel):
@@ -64,21 +64,21 @@ class ProxyHTTPServer(BaseModel):
 
 
 class ReverseProxy(BaseModel):
-    mode: Optional[ModeEnum] = None
+    mode: Optional[ModeEnum] = ModeEnum.off
 
 
 class CloudX(BaseModel):
-    mode: Optional[ModeEnum] = None
+    mode: Optional[ModeEnum] = ModeEnum.off
 
 
 class ManageEncryptedPassword(BaseModel):
-    manage_type8_password: Optional[bool] = Field(default=None, alias="manageType8Password")
+    manage_type8_password: Optional[bool] = Field(default=False, alias="manageType8Password")
 
 
 class CloudServices(BaseModel):
-    enabled: Optional[bool] = None
-    vanalytics_enabled: Optional[bool] = Field(default=None, alias="vanalyticsEnabled")
-    vmonitoring_enabled: Optional[bool] = Field(default=None, alias="vmonitoringEnabled")
+    enabled: Optional[bool] = False
+    vanalytics_enabled: Optional[bool] = Field(default=False, alias="vanalyticsEnabled")
+    vmonitoring_enabled: Optional[bool] = Field(default=False, alias="vmonitoringEnabled")
     otp: Optional[str] = None
     cloud_gateway_url: Optional[str] = Field(default=None, alias="cloudGatewayUrl")
     vanalytics_enabled_time: Optional[datetime.datetime] = Field(default=None, alias="vanalyticsEnabledTime")
@@ -86,7 +86,7 @@ class CloudServices(BaseModel):
 
 
 class ClientSessionTimeout(BaseModel):
-    isEnabled: Optional[bool] = Field(default=None, alias="isEnabled")
+    isEnabled: Optional[bool] = Field(default=False, alias="isEnabled")
     timeout: Optional[int] = Field(default=None, ge=10, description="timeout in minutes")
 
 
