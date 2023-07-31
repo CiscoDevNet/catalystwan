@@ -27,6 +27,7 @@ GET /setting/configuration/webserver/certificate||[**CertificateManagementVManag
 GET /client/server||[**Client.server**](vmngclient/endpoints/client.py#L65)||[**ServerInfo**](vmngclient/endpoints/client.py#L21)|
 GET /client/server/ready||[**Client.server_ready**](vmngclient/endpoints/client.py#L69)||[**ServerReady**](vmngclient/endpoints/client.py#L60)|
 GET /client/about||[**Client.about**](vmngclient/endpoints/client.py#L73)||[**AboutInfo**](vmngclient/endpoints/client.py#L49)|
+GET /clusterManagement/tenancy/mode||[**ClusterManagement.get_tenancy_mode**](vmngclient/endpoints/cluster_management.py#L60)||[**TenancyMode**](vmngclient/endpoints/cluster_management.py#L16)|
 GET /device/action/status/{task_id}||[**ConfigurationDashboardStatus.find_status**](vmngclient/endpoints/configuration_dashboard_status.py#L89)||[**TaskData**](vmngclient/endpoints/configuration_dashboard_status.py#L76)|
 GET /device/action/status/tasks||[**ConfigurationDashboardStatus.find_running_tasks**](vmngclient/endpoints/configuration_dashboard_status.py#L93)||[**TasksData**](vmngclient/endpoints/configuration_dashboard_status.py#L84)|
 GET /device/action/ztp/upgrade/setting||[**ConfigurationDeviceActions.get_ztp_upgrade_config_setting**](vmngclient/endpoints/configuration_device_actions.py#L74)||DataSequence[[**ZTPUpgradeSettings**](vmngclient/endpoints/configuration_device_actions.py#L10)]|

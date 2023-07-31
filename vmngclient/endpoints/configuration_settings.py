@@ -27,17 +27,17 @@ class Organization(BaseModel):
 
 
 class Device(BaseModel):
-    domain_ip: IPvAnyAddress = Field(alias="domainIp")
+    domain_ip: str = Field(alias="domainIp")
     port: int = Field(ge=1, le=65536)
 
 
 class EmailNotificationSettings(BaseModel):
-    enabled: bool
+    enabled: Optional[bool] = False
 
 
 class HardwareRootCA(BaseModel):
-    hardware_certificate: str = Field(alias="hardwareCertificate")
-    control_connection_up: bool = Field(alias="controlConnectionUp")
+    hardware_certificate: Optional[str] = Field(default=None, alias="hardwareCertificate")
+    control_connection_up: Optional[bool] = Field(default=None, alias="controlConnectionUp")
 
 
 class Certificate(BaseModel):
@@ -50,11 +50,11 @@ class Certificate(BaseModel):
 
 
 class VEdgeCloud(BaseModel):
-    certificateauthority: str
+    certificateauthority: Optional[str] = None
 
 
 class Banner(BaseModel):
-    mode: ModeEnum
+    mode: Optional[ModeEnum] = None
 
 
 class ProxyHTTPServer(BaseModel):
@@ -64,21 +64,21 @@ class ProxyHTTPServer(BaseModel):
 
 
 class ReverseProxy(BaseModel):
-    mode: ModeEnum
+    mode: Optional[ModeEnum] = None
 
 
 class CloudX(BaseModel):
-    mode: ModeEnum
+    mode: Optional[ModeEnum] = None
 
 
 class ManageEncryptedPassword(BaseModel):
-    manage_type8_password: bool = Field(alias="manageType8Password")
+    manage_type8_password: Optional[bool] = Field(default=None, alias="manageType8Password")
 
 
 class CloudServices(BaseModel):
-    enabled: bool
-    vanalytics_enabled: bool = Field(alias="vanalyticsEnabled")
-    vmonitoring_enabled: bool = Field(alias="vmonitoringEnabled")
+    enabled: Optional[bool] = None
+    vanalytics_enabled: Optional[bool] = Field(default=None, alias="vanalyticsEnabled")
+    vmonitoring_enabled: Optional[bool] = Field(default=None, alias="vmonitoringEnabled")
     otp: Optional[str] = None
     cloud_gateway_url: Optional[str] = Field(default=None, alias="cloudGatewayUrl")
     vanalytics_enabled_time: Optional[datetime.datetime] = Field(default=None, alias="vanalyticsEnabledTime")
@@ -86,7 +86,7 @@ class CloudServices(BaseModel):
 
 
 class ClientSessionTimeout(BaseModel):
-    isEnabled: bool = Field(alias="isEnabled")
+    isEnabled: Optional[bool] = Field(default=None, alias="isEnabled")
     timeout: Optional[int] = Field(default=None, ge=10, description="timeout in minutes")
 
 
@@ -110,7 +110,7 @@ class PasswordPolicy(BaseModel):
 
 
 class VManageDataStream(BaseModel):
-    enable: bool
+    enable: Optional[bool] = False
     ip_type: Optional[DataStreamIPTypeEnum] = Field(default=None, alias="ipType")
     server_host_name: Union[IPvAnyAddress, DataStreamIPTypeEnum, None] = Field(default=None, alias="serverHostName")
     vpn: Optional[int] = Field(default=None, le=512)

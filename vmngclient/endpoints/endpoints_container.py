@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from vmngclient.endpoints.administration_user_and_group import AdministrationUserAndGroup
 from vmngclient.endpoints.certificate_management_vmanage import CertificateManagementVManage
 from vmngclient.endpoints.client import Client
+from vmngclient.endpoints.cluster_management import ClusterManagement
 from vmngclient.endpoints.configuration_dashboard_status import ConfigurationDashboardStatus
 from vmngclient.endpoints.configuration_device_actions import ConfigurationDeviceActions
 from vmngclient.endpoints.configuration_device_software_update import ConfigurationDeviceSoftwareUpdate
@@ -26,6 +27,7 @@ class APIEndpointContainter:
         self.administration_user_and_group = AdministrationUserAndGroup(session)
         self.certificate_management_vmanage = CertificateManagementVManage(session)
         self.client = Client(session)
+        self.cluster_management = ClusterManagement(session)
         self.configuration_dashboard_status = ConfigurationDashboardStatus(session)
         self.configuration_device_actions = ConfigurationDeviceActions(session)
         self.configuration_device_software_update = ConfigurationDeviceSoftwareUpdate(session)
