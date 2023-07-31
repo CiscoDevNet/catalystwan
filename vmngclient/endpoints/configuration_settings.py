@@ -143,6 +143,15 @@ class ElasticSearchDBSize(BaseModel):
     size_in_gb: int = Field(alias="sizeInGB")
 
 
+class GoogleMapKey(BaseModel):
+    key: str
+
+
+class SoftwareInstallTimeout(BaseModel):
+    download_timeout: int = Field(alias="downloadTimeoutInMin", ge=60)
+    activate_timeout: int = Field(alias="activateTimeoutInMin", ge=30)
+
+
 class ConfigurationSettings(APIEndpoints):
     def create_analytics_data_file(self):
         # POST /settings/configuration/analytics/dca
@@ -260,16 +269,16 @@ class ConfigurationSettings(APIEndpoints):
     def get_elasticsearch_db_size(self) -> DataSequence[ElasticSearchDBSize]:
         ...
 
-    def get_google_map_key(self):
-        # GET /settings/configuration/googleMapKey
+    @request(get, "/settings/configuration/googleMapKey", "data")
+    def get_google_map_key(self) -> DataSequence[GoogleMapKey]:
         ...
 
     @request(get, "/settings/configuration/maintenanceWindow", "data")
     def get_maintenance_window(self) -> DataSequence[MaintenanceWindow]:
         ...
 
-    def get_session_timout(self):
-        # GET /settings/clientSessionTimeout
+    @request(get, "/settings/configuration/softwareMaintenance", "data")
+    def get_software_install_timeout(self) -> DataSequence[SoftwareInstallTimeout]:
         ...
 
     def new_cert_configuration(self):
