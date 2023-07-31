@@ -1,7 +1,7 @@
 # mypy: disable-error-code="empty-body"
 import datetime
 from enum import Enum
-from typing import Optional
+from typing import Optional, Union
 
 from pydantic import BaseModel, Field, IPvAnyAddress
 
@@ -12,6 +12,12 @@ from vmngclient.typed_list import DataSequence
 class ModeEnum(str, Enum):
     on = "on"
     off = "off"
+
+
+class DataStreamIPTypeEnum(str, Enum):
+    system = "systemIp"
+    mgmt = "mgmtIp"
+    transport = "transportIp"
 
 
 class Organization(BaseModel):
@@ -90,6 +96,32 @@ class SessionLifeTime(BaseModel):
 
 class ServerSessionTimeout(BaseModel):
     server_session_timeout: int = Field(alias="serverSessionTimeout", ge=10, description="timeout in minutes")
+
+
+class MaxSessionsPerUser(BaseModel):
+    max_sessions_per_user: int = Field(alias="maxSessionsPerUser", ge=1)
+
+
+class PasswordPolicy(BaseModel):
+    password_policy: bool = Field(alias="passwordPolicy")
+    password_expiration_time: Optional[int] = Field(
+        default=False, alias="passwordExpirationTime", ge=1, description="timeout in days"
+    )
+
+
+class VManageDataStream(BaseModel):
+    enable: bool
+    ip_type: Optional[DataStreamIPTypeEnum] = Field(default=None, alias="ipType")
+    server_host_name: Union[IPvAnyAddress, DataStreamIPTypeEnum, None] = Field(default=None, alias="serverHostName")
+    vpn: Optional[int] = Field(default=None, le=512)
+
+
+class DataCollectionOnNotification(BaseModel):
+    enabled: bool
+
+
+class SDWANTelemetry(BaseModel):
+    enabled: bool
 
 
 class ConfigurationSettings(APIEndpoints):
@@ -177,16 +209,32 @@ class ConfigurationSettings(APIEndpoints):
     def get_server_session_timeout(self) -> DataSequence[ServerSessionTimeout]:
         ...
 
+    @request(get, "/settings/configuration/maxSessionsPerUser", "data")
+    def get_max_sessions_per_user(self) -> DataSequence[MaxSessionsPerUser]:
+        ...
+
+    @request(get, "/settings/configuration/passwordPolicy", "data")
+    def get_password_policy(self) -> DataSequence[PasswordPolicy]:
+        ...
+
+    @request(get, "/settings/configuration/vmanagedatastream", "data")
+    def get_vmanage_data_stream(self) -> DataSequence[VManageDataStream]:
+        ...
+
+    @request(get, "/settings/configuration/dataCollectionOnNotification", "data")
+    def get_data_collection_on_notification(self) -> DataSequence[DataCollectionOnNotification]:
+        ...
+
+    @request(get, "/settings/configuration/sdWanTelemetry", "data")
+    def get_sdwan_telemetry(self) -> DataSequence[SDWANTelemetry]:
+        ...
+
     def get_google_map_key(self):
         # GET /settings/configuration/googleMapKey
         ...
 
     def get_maintenance_window(self):
         # GET /settings/configuration/maintenanceWindow
-        ...
-
-    def get_password_policy(self):
-        # GET /settings/passwordPolicy
         ...
 
     def get_session_timout(self):
