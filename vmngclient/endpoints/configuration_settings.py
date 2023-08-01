@@ -152,6 +152,32 @@ class SoftwareInstallTimeout(BaseModel):
     activate_timeout: int = Field(alias="activateTimeoutInMin", ge=30)
 
 
+class IPSSignatureSettings(BaseModel):
+    is_enabled: Optional[bool] = Field(default=False, alias="isEnabled")
+    username: Optional[str] = None
+    update_interval: Optional[int] = Field(
+        default=None, alias="updateInterval", description="interval in minutes", ge=1, le=1440
+    )
+
+
+class SmartAccountCredentials(BaseModel):
+    username: Optional[str] = None
+    password: Optional[str] = None
+
+
+class PnPConnectSync(BaseModel):
+    mode: Optional[ModeEnum] = ModeEnum.off
+
+
+class ClaimDevice(BaseModel):
+    enabled: bool
+
+
+class WalkMe(BaseModel):
+    walkme: bool
+    walkme_analytics: bool = Field(alias="walkmeAnalytics")
+
+
 class ConfigurationSettings(APIEndpoints):
     def create_analytics_data_file(self):
         # POST /settings/configuration/analytics/dca
@@ -279,6 +305,26 @@ class ConfigurationSettings(APIEndpoints):
 
     @request(get, "/settings/configuration/softwareMaintenance", "data")
     def get_software_install_timeout(self) -> DataSequence[SoftwareInstallTimeout]:
+        ...
+
+    @request(get, "/settings/configuration/credentials", "data")
+    def get_ips_signature_settings(self) -> DataSequence[IPSSignatureSettings]:
+        ...
+
+    @request(get, "/settings/configuration/smartaccountcredentials", "data")
+    def get_smart_account_credentials(self) -> DataSequence[SmartAccountCredentials]:
+        ...
+
+    @request(get, "/settings/configuration/pnpConnectSync", "data")
+    def get_pnp_connect_sync(self) -> DataSequence[PnPConnectSync]:
+        ...
+
+    @request(get, "/settings/configuration/claimDevice", "data")
+    def get_claim_device(self) -> DataSequence[ClaimDevice]:
+        ...
+
+    @request(get, "/settings/configuration/walkme", "data")
+    def get_walkme(self) -> DataSequence[WalkMe]:
         ...
 
     def new_cert_configuration(self):
