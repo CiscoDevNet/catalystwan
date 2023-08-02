@@ -20,6 +20,12 @@ class DataStreamIPTypeEnum(str, Enum):
     transport = "transportIp"
 
 
+class PasswordPolicyEnum(str, Enum):
+    disabled = "disabled"
+    medium = "mediumSecurity"
+    high = "highSecurity"
+
+
 class Organization(BaseModel):
     domain_id: str = Field(alias="domain-id")
     org: str
@@ -103,7 +109,7 @@ class MaxSessionsPerUser(BaseModel):
 
 
 class PasswordPolicy(BaseModel):
-    password_policy: bool = Field(alias="passwordPolicy")
+    password_policy: Union[bool, PasswordPolicyEnum] = Field(alias="passwordPolicy")
     password_expiration_time: Optional[int] = Field(
         default=False, alias="passwordExpirationTime", ge=1, description="timeout in days"
     )
