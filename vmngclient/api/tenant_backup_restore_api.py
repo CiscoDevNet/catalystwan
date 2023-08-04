@@ -36,8 +36,8 @@ class TenantBackupRestoreAPI:
         provider_tenant_session = create_vManageSession(
             domain, admin, password, port, subdomain=tenant_domain)
 
-        tenant_backup_restore = Tenant_backup_restoreAPI(tenant_session)
-        provider_backup_restore = Tenant_backup_restoreAPI(provider_tenant_session)
+        tenant_backup_restore = TenantBackupRestoreAPI(tenant_session)
+        provider_backup_restore = TenantBackupRestoreAPI(provider_tenant_session)
 
         file_name = tenant_backup_restore.export()
         file_list = provider_backup_restore.list()
