@@ -438,10 +438,10 @@ class CiscoVPNModel(FeatureTemplate):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    vpn_id: int = Field(alias="vpn-id")
+    vpn_id: int = Field(alias="vpn-id", default=0)
     name: Optional[str]
-    tenant_vpn_id: int = Field(alias="tenant-vpn-id")
-    org_name: str = Field(alias="org-name")
+    tenant_vpn_id: Optional[int] = Field(alias="tenant-vpn-id")
+    org_name: Optional[str] = Field(alias="org-name")
     omp_admin_distance_ipv4: Optional[int] = Field(alias="omp-admin-distance-ipv4")
     omp_admin_distance_ipv6: Optional[int] = Field(alias="omp-admin-distance-ipv6")
     dns: Optional[List[Dns]]
