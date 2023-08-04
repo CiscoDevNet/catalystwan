@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -60,13 +60,13 @@ def get_path_dict(paths: List[List[str]]) -> dict:
 class FeatureTemplateField(BaseModel):
     # TODO aliases
     key: str
-    description: str
-    details: str
+    description: str = ""
+    details: str = ""
     optionType: List[FeatureTemplateOptionType]
     defaultOption: FeatureTemplateOptionType
     dataPath: List[str] = []
     objectType: FeatureTemplateObjectType
-    dataType: dict = {}
+    dataType: Union[dict, str] = {}
     primaryKeys: List[str] = []
     children: List[FeatureTemplateField] = []
 

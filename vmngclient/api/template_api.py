@@ -20,6 +20,8 @@ from vmngclient.api.templates.feature_template_field import FeatureTemplateField
 from vmngclient.api.templates.feature_template_payload import FeatureTemplatePayload
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
+from vmngclient.api.templates.models.cisco_snmp_model import CiscoSNMPModel
+from vmngclient.api.templates.models.cisco_vpn_model import CiscoVPNModel
 from vmngclient.api.templates.models.omp_vsmart_model import OMPvSmart
 from vmngclient.api.templates.models.security_vsmart_model import SecurityvSmart
 from vmngclient.api.templates.models.system_vsmart_model import SystemVsmart
@@ -468,6 +470,8 @@ class TemplatesAPI:
             OMPvSmart,
             SecurityvSmart,
             SystemVsmart,
+            CiscoSNMPModel,
+            CiscoVPNModel,
         )
 
         return isinstance(template, ported_templates)
@@ -515,7 +519,16 @@ class TemplatesAPI:
             if field.key in template.device_specific_variables:
                 value = template.device_specific_variables[field.key]
             else:
-                value = template.dict(by_alias=True).get(field.key, None)
+                for field_name, field_value in template.__fields__.items():
+                    if "vmanage_key" in field_value.field_info.extra:
+                        vmanage_key = field_value.field_info.extra.get("vmanage_key")
+                        if vmanage_key != field.key:
+                            break
+                        value = template.dict(by_alias=True).get(field_name, None)
+                        field_value.field_info.extra.pop("vmanage_key")
+                        break
+                    else:
+                        value = template.dict(by_alias=True).get(field_name, None)
 
             if isinstance(value, bool):
                 value = str(value).lower()  # type: ignore
