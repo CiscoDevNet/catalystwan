@@ -67,7 +67,7 @@ class Service(str, Enum):
 class ServiceRoute(BaseModel):
     prefix: str
     vpn: int
-    service: Service
+    service: Service = Service.SIG
 
 
 class NextHop(BaseModel):
