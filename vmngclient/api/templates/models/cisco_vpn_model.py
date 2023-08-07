@@ -14,7 +14,7 @@ class Role(str, Enum):
 
 class Dns(BaseModel):
     dns_addr: str = Field(alias="dns-addr")
-    role: Optional[Role] = Role.PRIMARY
+    role: Role = Role.PRIMARY
 
     class Config:
         allow_population_by_field_name = True
@@ -109,7 +109,7 @@ class Routev6(BaseModel):
     next_hop: Optional[List[NextHop]] = Field(alias="next-hop")
     null0: Optional[bool]
     vpn: Optional[int]
-    nat: Nat
+    nat: Optional[Nat]
 
     class Config:
         allow_population_by_field_name = True
@@ -439,7 +439,7 @@ class CiscoVPNModel(FeatureTemplate):
         allow_population_by_field_name = True
 
     vpn_id: int = Field(alias="vpn-id", default=0)
-    name: Optional[str]
+    vpn_name: Optional[str] = Field(vmanage_key="name")
     tenant_vpn_id: Optional[int] = Field(alias="tenant-vpn-id")
     org_name: Optional[str] = Field(alias="org-name")
     omp_admin_distance_ipv4: Optional[int] = Field(alias="omp-admin-distance-ipv4")

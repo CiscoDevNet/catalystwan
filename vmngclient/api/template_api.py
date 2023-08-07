@@ -512,13 +512,18 @@ class TemplatesAPI:
         for field in fr_template_fields:
             payload.definition.update(field.data_path(output={}))
 
+        # "name"
         for i, field in enumerate(fr_template_fields):
+            value = None
             pointer = payload.definition
 
             # TODO How to discover Device specific variable
             if field.key in template.device_specific_variables:
                 value = template.device_specific_variables[field.key]
             else:
+                # Iterate through every possible field, maybe refactor(?)
+                # Use data_path instead. data_path as tuple
+                # next(field_value.field_info.extra.get("vmanage_key") == field.key, template.__fields__.values())
                 for field_name, field_value in template.__fields__.items():
                     if "vmanage_key" in field_value.field_info.extra:
                         vmanage_key = field_value.field_info.extra.get("vmanage_key")
@@ -527,8 +532,10 @@ class TemplatesAPI:
                         value = template.dict(by_alias=True).get(field_name, None)
                         field_value.field_info.extra.pop("vmanage_key")
                         break
-                    else:
-                        value = template.dict(by_alias=True).get(field_name, None)
+                    
+                
+                if value is None:
+                    value = template.dict(by_alias=True).get(field.key, None)
 
             if isinstance(value, bool):
                 value = str(value).lower()  # type: ignore
