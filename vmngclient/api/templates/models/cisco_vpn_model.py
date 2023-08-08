@@ -20,11 +20,6 @@ class Dns(BaseModel):
         allow_population_by_field_name = True
 
 
-class Role(str, Enum):
-    PRIMARY = "primary"
-    SECONDARY = "secondary"
-
-
 class DnsIpv6(BaseModel):
     dns_addr: str = Field(alias="dns-addr")
     role: Optional[Role] = Role.PRIMARY
@@ -54,20 +49,20 @@ class Service(BaseModel):
     svc_type: SvcType = Field(alias="svc-type")
     address: List[str]
     interface: str
-    track_enable: Optional[bool] = Field(True, alias="track-enable")
+    track_enable: bool = Field(True, alias="track-enable")
 
     class Config:
         allow_population_by_field_name = True
 
 
-class Service(str, Enum):
+class ServiceRouteService(str, Enum):
     SIG = "sig"
 
 
 class ServiceRoute(BaseModel):
     prefix: str
     vpn: int
-    service: Service = Service.SIG
+    service: ServiceRouteService = ServiceRouteService.SIG
 
 
 class NextHop(BaseModel):
@@ -94,7 +89,7 @@ class Routev4(BaseModel):
         allow_population_by_field_name = True
 
 
-class NextHop(BaseModel):
+class NextHopv6(BaseModel):
     address: str
     distance: Optional[int] = 1
 
@@ -106,7 +101,7 @@ class Nat(str, Enum):
 
 class Routev6(BaseModel):
     prefix: str
-    next_hop: Optional[List[NextHop]] = Field(alias="next-hop")
+    next_hop: Optional[List[NextHopv6]] = Field(alias="next-hop")
     null0: Optional[bool]
     vpn: Optional[int]
     nat: Optional[Nat]
@@ -124,10 +119,10 @@ class GreRoute(BaseModel):
 class IpsecRoute(BaseModel):
     prefix: str
     vpn: int
-    interface: Optional[List[List]]
+    interface: Optional[List[str]]
 
 
-class Protocol(str, Enum):
+class AdvertiseProtocol(str, Enum):
     BGP = "bgp"
     OSPF = "ospf"
     OSPFV3 = "ospfv3"
@@ -140,7 +135,7 @@ class Protocol(str, Enum):
     ISIS = "isis"
 
 
-class ProtocolSubType(str, Enum):
+class AdvertiseProtocolSubType(str, Enum):
     EXTERNAL = "external"
 
 
@@ -159,16 +154,16 @@ class PrefixList(BaseModel):
 
 
 class Advertise(BaseModel):
-    protocol: Protocol
+    protocol: AdvertiseProtocol
     route_policy: Optional[str] = Field(alias="route-policy")
-    protocol_sub_type: Optional[List[ProtocolSubType]] = Field(alias="protocol-sub-type")
+    protocol_sub_type: Optional[List[AdvertiseProtocolSubType]] = Field(alias="protocol-sub-type")
     prefix_list: Optional[List[PrefixList]] = Field(alias="prefix-list")
 
     class Config:
         allow_population_by_field_name = True
 
 
-class Protocol(str, Enum):
+class Ipv6AdvertiseProtocol(str, Enum):
     BGP = "bgp"
     OSPF = "ospf"
     CONNECTED = "connected"
@@ -177,28 +172,14 @@ class Protocol(str, Enum):
     AGGREGATE = "aggregate"
 
 
-class ProtocolSubType(str, Enum):
+class Ipv6AdvertiseProtocolSubType(str, Enum):
     EXTERNAL = "external"
 
 
-class Region(str, Enum):
-    CORE = "core"
-    ACCESS = "access"
-
-
-class PrefixList(BaseModel):
-    prefix_entry: str = Field(alias="prefix-entry")
-    aggregate_only: Optional[bool] = Field(alias="aggregate-only")
-    region: Region
-
-    class Config:
-        allow_population_by_field_name = True
-
-
 class Ipv6Advertise(BaseModel):
-    protocol: Protocol
+    protocol: Ipv6AdvertiseProtocol
     route_policy: Optional[str] = Field(alias="route-policy")
-    protocol_sub_type: Optional[List[ProtocolSubType]] = Field(alias="protocol-sub-type")
+    protocol_sub_type: Optional[List[Ipv6AdvertiseProtocolSubType]] = Field(alias="protocol-sub-type")
     prefix_list: Optional[List[PrefixList]] = Field(alias="prefix-list")
 
     class Config:
@@ -232,21 +213,22 @@ class Direction(str, Enum):
     OUTSIDE = "outside"
 
 
+class Overload(str, Enum):
+    TRUE = "true"
+    FALSE = "false"
+
+
 class Natpool(BaseModel):
     name: int
     prefix_length: int = Field(alias="prefix-length")
     range_start: str = Field(alias="range-start")
     range_end: str = Field(alias="range-end")
-    overload: Optional[bool] = True
+    overload: Overload = Overload.TRUE
     direction: Direction
     tracker_id: Optional[int] = Field(alias="tracker-id")
 
     class Config:
         allow_population_by_field_name = True
-
-
-class PoolName(str, Enum):
-    pass
 
 
 class StaticNatDirection(str, Enum):
@@ -255,7 +237,7 @@ class StaticNatDirection(str, Enum):
 
 
 class Static(BaseModel):
-    pool_name: Optional[PoolName] = Field(alias="pool-name")
+    pool_name: Optional[int] = Field(alias="pool-name")
     source_ip: str = Field(alias="source-ip")
     translate_ip: str = Field(alias="translate-ip")
     static_nat_direction: StaticNatDirection = Field(alias="static-nat-direction")
@@ -263,11 +245,6 @@ class Static(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
-
-
-class StaticNatDirection(str, Enum):
-    INSIDE = "inside"
-    OUTSIDE = "outside"
 
 
 class SubnetStatic(BaseModel):
@@ -281,17 +258,13 @@ class SubnetStatic(BaseModel):
         allow_population_by_field_name = True
 
 
-class PoolName(str, Enum):
-    pass
-
-
 class Proto(str, Enum):
     TCP = "tcp"
     UDP = "udp"
 
 
 class PortForward(BaseModel):
-    pool_name: Optional[PoolName] = Field(alias="pool-name")
+    pool_name: Optional[int] = Field(alias="pool-name")
     source_port: int = Field(alias="source-port")
     translate_port: int = Field(alias="translate-port")
     source_ip: str = Field(alias="source-ip")
@@ -302,50 +275,42 @@ class PortForward(BaseModel):
         allow_population_by_field_name = True
 
 
-class Protocol(str, Enum):
+class RouteImportProtocol(str, Enum):
     STATIC = "static"
     CONNECTED = "connected"
     BGP = "bgp"
     OSPF = "ospf"
 
 
-class ProtocolSubType(str, Enum):
+class RouteImportProtocolSubType(str, Enum):
     EXTERNAL = "external"
 
 
-class RoutePolicy(str, Enum):
-    pass
-
-
-class Protocol(str, Enum):
+class RouteImportRedistributeProtocol(str, Enum):
     BGP = "bgp"
     EIGRP = "eigrp"
     OSPF = "ospf"
 
 
-class RoutePolicy(str, Enum):
-    pass
-
-
-class Redistribute(BaseModel):
-    protocol: Protocol
-    route_policy: Optional[RoutePolicy] = Field(alias="route-policy")
+class RouteImportRedistribute(BaseModel):
+    protocol: RouteImportRedistributeProtocol
+    route_policy: Optional[str] = Field(alias="route-policy")
 
     class Config:
         allow_population_by_field_name = True
 
 
 class RouteImport(BaseModel):
-    protocol: Protocol
-    protocol_sub_type: List[ProtocolSubType] = Field(alias="protocol-sub-type")
-    route_policy: Optional[RoutePolicy] = Field(alias="route-policy")
-    redistribute: Optional[List[Redistribute]]
+    protocol: RouteImportProtocol
+    protocol_sub_type: List[RouteImportProtocolSubType] = Field(alias="protocol-sub-type")
+    route_policy: Optional[str] = Field(alias="route-policy")
+    redistribute: Optional[List[RouteImportRedistribute]]
 
     class Config:
         allow_population_by_field_name = True
 
 
-class Protocol(str, Enum):
+class RouteImportFromProtocol(str, Enum):
     STATIC = "static"
     CONNECTED = "connected"
     BGP = "bgp"
@@ -353,27 +318,19 @@ class Protocol(str, Enum):
     EIGRP = "eigrp"
 
 
-class ProtocolSubType(str, Enum):
+class RouteImportFromProtocolSubType(str, Enum):
     EXTERNAL = "external"
 
 
-class RoutePolicy(str, Enum):
-    pass
-
-
-class Protocol(str, Enum):
+class RouteImportFromRedistributeProtocol(str, Enum):
     BGP = "bgp"
     EIGRP = "eigrp"
     OSPF = "ospf"
 
 
-class RoutePolicy(str, Enum):
-    pass
-
-
-class Redistribute(BaseModel):
-    protocol: Protocol
-    route_policy: Optional[RoutePolicy] = Field(alias="route-policy")
+class RouteImportFromRedistribute(BaseModel):
+    protocol: RouteImportFromRedistributeProtocol
+    route_policy: Optional[str] = Field(alias="route-policy")
 
     class Config:
         allow_population_by_field_name = True
@@ -381,16 +338,16 @@ class Redistribute(BaseModel):
 
 class RouteImportFrom(BaseModel):
     source_vpn: int = Field(alias="source-vpn")
-    protocol: Protocol
-    protocol_sub_type: List[ProtocolSubType] = Field(alias="protocol-sub-type")
-    route_policy: Optional[RoutePolicy] = Field(alias="route-policy")
-    redistribute: Optional[List[Redistribute]]
+    protocol: RouteImportFromProtocol
+    protocol_sub_type: List[RouteImportFromProtocolSubType] = Field(alias="protocol-sub-type")
+    route_policy: Optional[str] = Field(alias="route-policy")
+    redistribute: Optional[List[RouteImportFromRedistribute]]
 
     class Config:
         allow_population_by_field_name = True
 
 
-class Protocol(str, Enum):
+class RouteExportProtocol(str, Enum):
     STATIC = "static"
     CONNECTED = "connected"
     BGP = "bgp"
@@ -398,36 +355,28 @@ class Protocol(str, Enum):
     OSPF = "ospf"
 
 
-class ProtocolSubType(str, Enum):
+class RouteExportProtocolSubType(str, Enum):
     EXTERNAL = "external"
 
 
-class RoutePolicy(str, Enum):
-    pass
-
-
-class Protocol(str, Enum):
+class RouteExportRedistributeProtocol(str, Enum):
     BGP = "bgp"
     OSPF = "ospf"
 
 
-class RoutePolicy(str, Enum):
-    pass
-
-
-class Redistribute(BaseModel):
-    protocol: Protocol
-    route_policy: Optional[RoutePolicy] = Field(alias="route-policy")
+class RouteExportRedistribute(BaseModel):
+    protocol: RouteExportRedistributeProtocol
+    route_policy: Optional[str] = Field(alias="route-policy")
 
     class Config:
         allow_population_by_field_name = True
 
 
 class RouteExport(BaseModel):
-    protocol: Protocol
-    protocol_sub_type: List[ProtocolSubType] = Field(alias="protocol-sub-type")
-    route_policy: Optional[RoutePolicy] = Field(alias="route-policy")
-    redistribute: Optional[List[Redistribute]]
+    protocol: RouteExportProtocol
+    protocol_sub_type: List[RouteExportProtocolSubType] = Field(alias="protocol-sub-type")
+    route_policy: Optional[str] = Field(alias="route-policy")
+    redistribute: Optional[List[RouteExportRedistribute]]
 
     class Config:
         allow_population_by_field_name = True
