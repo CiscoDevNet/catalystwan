@@ -48,14 +48,14 @@ class TestFeatureTemplate(TestCase):
 
     @parameterized.expand([(template,) for template in map(models.__dict__.get, models.__all__)])
     @patch("vmngclient.session.vManageSession")
-    def test_get(self, template, mock_session):
+    def test_get(self, template: FeatureTemplate, mock_session):
         # Arrange
-        template: FeatureTemplate
         mock_session.api.templates._get_feature_templates.return_value = self.get_feature_templates_response
+
         # Act
         feature_template_from_get = FeatureTemplate.get(session=mock_session, name=template.name)
+
         # Assert
-        print(feature_template_from_get.device_specific_variables, template.device_specific_variables)
         self.assertEqual(feature_template_from_get, template)
 
 
