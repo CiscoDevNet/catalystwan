@@ -70,9 +70,13 @@ class FeatureTemplateField(BaseModel):
     primaryKeys: List[str] = []
     children: List[FeatureTemplateField] = []
 
-    def data_path(self, output):
+    def data_path(self, output, index=0):
+        child_len = len(self.children)
+
+        # while index < child_len:
+        #     self.children[index].data_path(output, index)
         for child in self.children:
-            child.data_path(output)
+            output.update(child.data_path(output))
         output.update(get_path_dict([t.dataPath for t in self.children]))
 
         return output
@@ -84,6 +88,8 @@ class FeatureTemplateField(BaseModel):
 
         for child in self.children:
             for path in child.dataPath:
+                if not output.get(path):
+                    output[path] = {}
                 output = output[path]
 
         output["vipObjectType"] = self.objectType.value

@@ -20,6 +20,7 @@ from vmngclient.api.templates.feature_template_field import FeatureTemplateField
 from vmngclient.api.templates.feature_template_payload import FeatureTemplatePayload
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
+from vmngclient.api.templates.models.cisco_vpn_interface_model import CiscoVpnInterfaceModel
 from vmngclient.api.templates.models.omp_vsmart_model import OMPvSmart
 from vmngclient.api.templates.models.security_vsmart_model import SecurityvSmart
 from vmngclient.api.templates.models.system_vsmart_model import SystemVsmart
@@ -468,6 +469,7 @@ class TemplatesAPI:
             OMPvSmart,
             SecurityvSmart,
             SystemVsmart,
+            CiscoVpnInterfaceModel
         )
 
         return isinstance(template, ported_templates)
@@ -521,7 +523,9 @@ class TemplatesAPI:
                 value = str(value).lower()  # type: ignore
 
             for path in field.dataPath:
-                pointer = pointer[path]
+                if not pointer.get(path):
+                    pointer[path] = {}
+                pointer = pointer[path] 
             pointer.update(field.payload_scheme(value, payload.definition))
 
         if debug:
