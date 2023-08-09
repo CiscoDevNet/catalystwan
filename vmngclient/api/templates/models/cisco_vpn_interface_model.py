@@ -266,7 +266,7 @@ class CiscoVpnInterfaceModel(FeatureTemplate):
         STRINGBOOL.FALSE, alias="auto-bandwidth-detect"
     )
     iperf_server: Optional[ipaddress.IPv4Address] = Field(alias="iperf-server")
-    nat: STRINGBOOL = STRINGBOOL.FALSE
+    nat: Optional[bool]
     nat_choice: NatChoice = Field(NatChoice.INTERFACE, alias="nat-choice")
     udp_timeout: int = Field(1, alias="udp-timeout")
     tcp_timeout: int = Field(60, alias="tcp-timeout")
@@ -289,18 +289,18 @@ class CiscoVpnInterfaceModel(FeatureTemplate):
         SecondaryRegion.OFF, alias="secondary-region"
     )
     tloc_encapsulation: Optional[List[Encapsulation]]
-    border: STRINGBOOL = STRINGBOOL.FALSE
+    border: Optional[STRINGBOOL]
     per_tunnel_qos: STRINGBOOL = Field(STRINGBOOL.FALSE, alias="per-tunnel-qos")
     per_tunnel_qos_aggregator: STRINGBOOL = Field(
         STRINGBOOL.FALSE, alias="per-tunnel-qos-aggregator"
     )
     mode: Optional[Mode]
-    tunnels_bandwidth: int = Field(50, alias="tunnels-bandwidth")
+    tunnels_bandwidth: Optional[int] = Field(alias="tunnels-bandwidth")
     group: Optional[List[int]]
-    value: Value = Value.DEFAULT
+    value: Optional[Value]
     max_control_connections: Optional[int] = Field(alias="max-control-connections")
-    control_connections: STRINGBOOL = Field(
-        STRINGBOOL.TRUE, alias="control-connections"
+    control_connections: Optional[STRINGBOOL] = Field(
+        alias="control-connections"
     )
     vbond_as_stun_server: STRINGBOOL = Field(
         STRINGBOOL.FALSE, alias="vbond-as-stun-server"

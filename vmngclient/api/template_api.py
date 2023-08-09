@@ -471,7 +471,7 @@ class TemplatesAPI:
             OMPvSmart,
             SecurityvSmart,
             SystemVsmart,
-            CiscoVpnInterfaceModel
+            CiscoVpnInterfaceModel,
             CiscoSNMPModel,
             CiscoVPNModel,
         )
