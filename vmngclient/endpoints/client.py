@@ -57,9 +57,17 @@ class AboutInfo(BaseModel):
     logo: Optional[str]
 
 
+class ServerReady(BaseModel):
+    is_server_ready: bool = Field(alias="isServerReady")
+
+
 class Client(APIEndpoints):
     @request(get, "/client/server", "data")
     def server(self) -> ServerInfo:
+        ...
+
+    @request(get, "/client/server/ready")
+    def server_ready(self) -> ServerReady:
         ...
 
     @request(get, "/client/about", "data")
