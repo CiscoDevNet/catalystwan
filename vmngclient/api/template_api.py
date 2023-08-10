@@ -16,9 +16,10 @@ from vmngclient.api.templates.device_template.device_template import (
     GeneralTemplate,
 )
 from vmngclient.api.templates.feature_template import FeatureTemplate
-from vmngclient.api.templates.feature_template_field import FeatureTemplateField, get_path_dict
+from vmngclient.api.templates.feature_template_field import FeatureTemplateField
 from vmngclient.api.templates.feature_template_payload import FeatureTemplatePayload
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
+from vmngclient.api.templates.models.cisco_bgp_model import CiscoBGPModel
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
 from vmngclient.api.templates.models.cisco_snmp_model import CiscoSNMPModel
 from vmngclient.api.templates.models.cisco_vpn_model import CiscoVPNModel
@@ -472,6 +473,7 @@ class TemplatesAPI:
             SystemVsmart,
             CiscoSNMPModel,
             CiscoVPNModel,
+            CiscoBGPModel,
         )
 
         return isinstance(template, ported_templates)
@@ -507,10 +509,10 @@ class TemplatesAPI:
         )  # type: ignore
 
         fr_template_fields = [FeatureTemplateField(**field) for field in schema["fields"]]  # TODO
-        payload.definition.update(get_path_dict([field.dataPath for field in fr_template_fields]))
+        # payload.definition.update(get_path_dict([field.dataPath for field in fr_template_fields]))
 
-        for field in fr_template_fields:
-            payload.definition.update(field.data_path(output={}))
+        # for field in fr_template_fields:
+        #     payload.definition.update(field.data_path(output={}))
 
         # "name"
         for i, field in enumerate(fr_template_fields):

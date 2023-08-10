@@ -92,7 +92,8 @@ class FeatureTemplateField(BaseModel):
                 if not output.get(path):
                     output[path] = {}
                 output = output[path]
-
+                # {"maximum-prefixes": {}}
+                # output = {"maximum-prefixes": output}
         output["vipObjectType"] = self.objectType.value
 
         if isinstance(value, DeviceVariable):
