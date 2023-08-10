@@ -54,13 +54,10 @@ class Service(BaseModel):
     class Config:
         allow_population_by_field_name = True
 
-<<<<<<< HEAD
-=======
     @validator("track_enable")
     def convert_to_string(cls, value):
         return str(value).lower()
 
->>>>>>> main
 
 class ServiceRouteService(str, Enum):
     SIG = "sig"
