@@ -241,17 +241,17 @@ class CiscoVpnInterfaceModel(FeatureTemplate):
     if_name: str = Field(alias="if-name")
     description: Optional[str]
     poe: Optional[STRINGBOOL]
-    ipv4_address: Optional[ipaddress.IPv4Interface] = Field(vmanage_key="address")
+    ipv4_address: Optional[str] = Field(vmanage_key="address")
     secondary_ipv4_address: Optional[List[SecondaryIPv4Address]] = Field(
         vmanage_key="secondary-address", alias="secondary-address"
     )
-    dhcp_ipv4_client: STRINGBOOL = Field(
-        STRINGBOOL.FALSE, vmanage_key="dhcp-client", alias="dhcp-client"
+    dhcp_ipv4_client: Optional[STRINGBOOL] = Field(
+         vmanage_key="dhcp-client", alias="dhcp-client"
     )
-    dhcp_distance: int = Field(1, alias="dhcp-distance")
+    dhcp_distance: Optional[int] = Field(alias="dhcp-distance")
     ipv6_address: Optional[ipaddress.IPv6Interface] = Field(vmanage_key="address")
-    dhcp_ipv6_client: STRINGBOOL = Field(
-        STRINGBOOL.FALSE, vmanage_key="dhcp-client", alias="dhcp-client"
+    dhcp_ipv6_client: Optional[STRINGBOOL] = Field(
+        vmanage_key="dhcp-client", alias="dhcp-client"
     )
     secondary_ipv6_address: Optional[List[SecondaryIPv6Address]] = Field(
         vmanage_key="secondary-address", alias="secondary-address"
@@ -262,17 +262,17 @@ class CiscoVpnInterfaceModel(FeatureTemplate):
     dhcp_helper: Optional[List[ipaddress.IPv4Address]] = Field(alias="dhcp-helper")
     dhcp_helper_v6: Optional[List[DhcpHelperV6]] = Field(alias="dhcp-helper-v6")
     tracker: Optional[List[str]]
-    auto_bandwidth_detect: STRINGBOOL = Field(
-        STRINGBOOL.FALSE, alias="auto-bandwidth-detect"
+    auto_bandwidth_detect: Optional[STRINGBOOL] = Field(
+        alias="auto-bandwidth-detect"
     )
     iperf_server: Optional[ipaddress.IPv4Address] = Field(alias="iperf-server")
     nat: Optional[bool]
-    nat_choice: NatChoice = Field(NatChoice.INTERFACE, alias="nat-choice")
-    udp_timeout: int = Field(1, alias="udp-timeout")
-    tcp_timeout: int = Field(60, alias="tcp-timeout")
+    nat_choice: Optional[NatChoice] = Field(alias="nat-choice")
+    udp_timeout: Optional[int] = Field(alias="udp-timeout")
+    tcp_timeout: Optional[int] = Field(alias="tcp-timeout")
     nat_range_start: Optional[ipaddress.IPv4Address] = Field(alias="range-start")
     nat_range_end: Optional[ipaddress.IPv4Address] = Field(alias="range-end")
-    overload: STRINGBOOL = STRINGBOOL.TRUE
+    overload: Optional[STRINGBOOL]
     loopback_interface: Optional[str] = Field(alias="loopback-interface")
     prefix_length: Optional[int] = Field(alias="prefix-length")
     enable: Optional[STRINGBOOL]
@@ -283,16 +283,16 @@ class CiscoVpnInterfaceModel(FeatureTemplate):
     static_port_forward: Optional[List[StaticPortForward]] = Field(
         alias="static-port-forward"
     )
-    enable_core_region: STRINGBOOL = Field(STRINGBOOL.FALSE, alias="enable-core-region")
-    core_region: CoreRegion = Field(CoreRegion.CORE, alias="core-region")
-    secondary_region: SecondaryRegion = Field(
-        SecondaryRegion.OFF, alias="secondary-region"
+    enable_core_region: Optional[STRINGBOOL] = Field(alias="enable-core-region")
+    core_region: Optional[CoreRegion] = Field(alias="core-region")
+    secondary_region: Optional[SecondaryRegion] = Field(
+        alias="secondary-region"
     )
     tloc_encapsulation: Optional[List[Encapsulation]]
     border: Optional[STRINGBOOL]
-    per_tunnel_qos: STRINGBOOL = Field(STRINGBOOL.FALSE, alias="per-tunnel-qos")
-    per_tunnel_qos_aggregator: STRINGBOOL = Field(
-        STRINGBOOL.FALSE, alias="per-tunnel-qos-aggregator"
+    per_tunnel_qos: Optional[STRINGBOOL] = Field(alias="per-tunnel-qos")
+    per_tunnel_qos_aggregator: Optional[STRINGBOOL] = Field(
+        alias="per-tunnel-qos-aggregator"
     )
     mode: Optional[Mode]
     tunnels_bandwidth: Optional[int] = Field(alias="tunnels-bandwidth")
@@ -302,65 +302,63 @@ class CiscoVpnInterfaceModel(FeatureTemplate):
     control_connections: Optional[STRINGBOOL] = Field(
         alias="control-connections"
     )
-    vbond_as_stun_server: STRINGBOOL = Field(
-        STRINGBOOL.FALSE, alias="vbond-as-stun-server"
+    vbond_as_stun_server: Optional[STRINGBOOL] = Field(
+        alias="vbond-as-stun-server"
     )
     exclude_controller_group_list: Optional[List[int]] = Field(
         alias="exclude-controller-group-list"
     )
-    vmanage_connection_preference: int = Field(5, alias="vmanage-connection-preference")
-    port_hop: STRINGBOOL = Field(STRINGBOOL.TRUE, alias="port-hop")
+    vmanage_connection_preference: Optional[int] = Field(alias="vmanage-connection-preference")
+    port_hop: Optional[STRINGBOOL] = Field(alias="port-hop")
     restrict: Optional[STRINGBOOL]
     dst_ip: Optional[ipaddress.IPv4Address] = Field(alias="dst-ip")
-    carrier: Carrier = Carrier.DEFAULT
-    nat_refresh_interval: int = Field(5, alias="nat-refresh-interval")
-    hello_interval: int = Field(1000, alias="hello-interval")
-    hello_tolerance: int = Field(12, alias="hello-tolerance")
+    carrier: Optional[Carrier]
+    nat_refresh_interval: Optional[int] = Field(alias="nat-refresh-interval")
+    hello_interval: Optional[int] = Field(alias="hello-interval")
+    hello_tolerance: Optional[int] = Field(alias="hello-tolerance")
     bind: Optional[str]
-    last_resort_circuit: STRINGBOOL = Field(
-        STRINGBOOL.FALSE, alias="last-resort-circuit"
+    last_resort_circuit: Optional[STRINGBOOL] = Field(
+        alias="last-resort-circuit"
     )
-    low_bandwidth_link: STRINGBOOL = Field(STRINGBOOL.FALSE, alias="low-bandwidth-link")
+    low_bandwidth_link: Optional[STRINGBOOL] = Field(alias="low-bandwidth-link")
     tunnel_tcp_mss_adjust: Optional[int] = Field(alias="tunnel-tcp-mss-adjust")
-    clear_dont_fragment: STRINGBOOL = Field(
-        STRINGBOOL.FALSE, alias="clear-dont-fragment"
+    clear_dont_fragment: Optional[STRINGBOOL] = Field(
+        alias="clear-dont-fragment"
     )
-    propagate_sgt: STRINGBOOL = Field(STRINGBOOL.FALSE, alias="propagate-sgt")
-    network_broadcast: STRINGBOOL = Field(STRINGBOOL.FALSE, alias="network-broadcast")
+    propagate_sgt: Optional[STRINGBOOL] = Field(alias="propagate-sgt")
+    network_broadcast: Optional[STRINGBOOL] = Field(alias="network-broadcast")
     all: Optional[STRINGBOOL]
     bgp: Optional[STRINGBOOL]
-    dhcp: STRINGBOOL = STRINGBOOL.TRUE
-    dns: STRINGBOOL = STRINGBOOL.TRUE
-    icmp: STRINGBOOL = STRINGBOOL.TRUE
+    dhcp: Optional[STRINGBOOL]
+    dns: Optional[STRINGBOOL]
+    icmp: Optional[STRINGBOOL]
     sshd: Optional[STRINGBOOL]
     netconf: Optional[STRINGBOOL]
     ntp: Optional[STRINGBOOL]
     ospf: Optional[STRINGBOOL]
     stun: Optional[STRINGBOOL]
     snmp: Optional[STRINGBOOL]
-    https: STRINGBOOL = STRINGBOOL.TRUE
+    https: Optional[STRINGBOOL]
     media_type: Optional[MediaType] = Field(alias="media-type")
-    intrf_mtu: int = Field(1500, alias="intrf-mtu")
-    mtu: int = 1500
+    intrf_mtu: Optional[int] = Field(alias="intrf-mtu")
+    mtu: Optional[int]
     tcp_mss_adjust: Optional[int] = Field(alias="tcp-mss-adjust")
     tloc_extension: Optional[str] = Field(alias="tloc-extension")
-    load_interval: int = Field(30, alias="load-interval")
+    load_interval: Optional[int] = Field(alias="load-interval")
     src_ip: Optional[ipaddress.IPv4Address] = Field(alias="src-ip")
     xconnect: Optional[str]
     mac_address: Optional[str] = Field(alias="mac-address")
     speed: Optional[Speed]
     duplex: Optional[Duplex]
-    shutdown: STRINGBOOL = STRINGBOOL.TRUE
-    arp_timeout: int = Field(1200, alias="arp-timeout")
+    shutdown: Optional[STRINGBOOL] = STRINGBOOL.FALSE
+    arp_timeout: Optional[int] = Field(alias="arp-timeout")
     autonegotiate: Optional[STRINGBOOL]
-    ip_directed_broadcast: STRINGBOOL = Field(
-        STRINGBOOL.FALSE, alias="ip-directed-broadcast"
+    ip_directed_broadcast: Optional[STRINGBOOL] = Field(alias="ip-directed-broadcast"
     )
-    icmp_redirect_disable: STRINGBOOL = Field(
-        STRINGBOOL.TRUE, alias="icmp-redirect-disable"
+    icmp_redirect_disable: Optional[STRINGBOOL] = Field(alias="icmp-redirect-disable"
     )
-    qos_adaptive: STRINGBOOL = Field(STRINGBOOL.FALSE, alias="qos-adaptive")
-    period: int = 15
+    qos_adaptive: Optional[STRINGBOOL] = Field(alias="qos-adaptive")
+    period: Optional[int]
     bandwidth_down: Optional[int] = Field(alias="bandwidth-down")
     dmin: Optional[int]
     dmax: Optional[int]
@@ -373,8 +371,7 @@ class CiscoVpnInterfaceModel(FeatureTemplate):
     service_provider: Optional[str] = Field(alias="service-provider")
     bandwidth_upstream: Optional[int] = Field(alias="bandwidth-upstream")
     bandwidth_downstream: Optional[int] = Field(alias="bandwidth-downstream")
-    block_non_source_ip: STRINGBOOL = Field(
-        STRINGBOOL.FALSE, alias="block-non-source-ip"
+    block_non_source_ip: Optional[STRINGBOOL] = Field(alias="block-non-source-ip"
     )
     rule_name: Optional[str] = Field(alias="rule-name")
     access_list_ipv6: Optional[List[AccessList]] = Field(
@@ -383,11 +380,10 @@ class CiscoVpnInterfaceModel(FeatureTemplate):
     ip: Optional[List[Ip]]
     vrrp: Optional[List[Vrrp]]
     ipv6_vrrp: Optional[List[Ipv6Vrrp]] = Field(alias="ipv6-vrrp")
-    enable_sgt_propagation: STRINGBOOL = Field(
-        STRINGBOOL.TRUE, vmanage_key="sgt", alias="sgt"
+    enable_sgt_propagation: Optional[STRINGBOOL] = Field(vmanage_key="sgt", alias="sgt"
     )
     sgt: Optional[int]
-    trusted: STRINGBOOL = STRINGBOOL.FALSE
+    trusted: Optional[STRINGBOOL]
     enable_sgt_authorization_and_forwarding: Optional[STRINGBOOL] = Field(
         vmanage_key="enable", alias="enable"
     )

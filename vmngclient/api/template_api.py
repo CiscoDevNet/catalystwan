@@ -509,12 +509,7 @@ class TemplatesAPI:
         )  # type: ignore
 
         fr_template_fields = [FeatureTemplateField(**field) for field in schema["fields"]]  # TODO
-        payload.definition.update(get_path_dict([field.dataPath for field in fr_template_fields]))
 
-        for field in fr_template_fields:
-            payload.definition.update(field.data_path(output={}))
-
-        # "name"
         for i, field in enumerate(fr_template_fields):
             value = None
             pointer = payload.definition
@@ -538,6 +533,9 @@ class TemplatesAPI:
                 
                 if value is None:
                     value = template.dict(by_alias=True).get(field.key, None)
+            
+            if template.type == "cisco_vpn_interface" and value is None:
+                continue            
 
             if isinstance(value, bool):
                 value = str(value).lower()  # type: ignore
@@ -545,7 +543,7 @@ class TemplatesAPI:
             for path in field.dataPath:
                 if not pointer.get(path):
                     pointer[path] = {}
-                pointer = pointer[path] 
+                pointer = pointer[path]
             pointer.update(field.payload_scheme(value, payload.definition))
 
         if debug:
