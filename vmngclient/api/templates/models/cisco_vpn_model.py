@@ -2,7 +2,7 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 
@@ -54,6 +54,13 @@ class Service(BaseModel):
     class Config:
         allow_population_by_field_name = True
 
+<<<<<<< HEAD
+=======
+    @validator("track_enable")
+    def convert_to_string(cls, value):
+        return str(value).lower()
+
+>>>>>>> main
 
 class ServiceRouteService(str, Enum):
     SIG = "sig"

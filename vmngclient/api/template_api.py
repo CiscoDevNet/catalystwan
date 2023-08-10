@@ -510,6 +510,7 @@ class TemplatesAPI:
 
         fr_template_fields = [FeatureTemplateField(**field) for field in schema["fields"]]  # TODO
 
+        # "name"
         for i, field in enumerate(fr_template_fields):
             value = None
             pointer = payload.definition
@@ -522,20 +523,19 @@ class TemplatesAPI:
                 # Use data_path instead. data_path as tuple
                 # next(field_value.field_info.extra.get("vmanage_key") == field.key, template.__fields__.values())
                 for field_name, field_value in template.__fields__.items():
-                    if "vmanage_key" in field_value.field_info.extra:
-                        vmanage_key = field_value.field_info.extra.get("vmanage_key")
+                    if "vmanage_key" in field_value.field_info.extra:  # type: ignore
+                        vmanage_key = field_value.field_info.extra.get("vmanage_key")  # type: ignore
                         if vmanage_key != field.key:
                             break
                         value = template.dict(by_alias=True).get(field_name, None)
-                        field_value.field_info.extra.pop("vmanage_key")
+                        field_value.field_info.extra.pop("vmanage_key")  # type: ignore
                         break
-                    
-                
+
                 if value is None:
                     value = template.dict(by_alias=True).get(field.key, None)
-            
+
             if template.type == "cisco_vpn_interface" and value is None:
-                continue            
+                continue                         
 
             if isinstance(value, bool):
                 value = str(value).lower()  # type: ignore

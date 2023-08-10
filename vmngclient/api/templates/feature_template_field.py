@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 from vmngclient.api.templates.device_variable import DeviceVariable
 
@@ -66,9 +66,15 @@ class FeatureTemplateField(BaseModel):
     defaultOption: FeatureTemplateOptionType
     dataPath: List[str] = []
     objectType: FeatureTemplateObjectType
-    dataType: Union[dict, str] = {}
+    dataType: Dict[str, Any] = {}
     primaryKeys: List[str] = []
     children: List[FeatureTemplateField] = []
+
+    @validator("dataType", pre=True)
+    def convert_data_type_to_dict(cls, value):
+        if isinstance(value, str):
+            return {"type": value}
+        return value
 
     def data_path(self, output):
         for child in self.children:
@@ -79,8 +85,7 @@ class FeatureTemplateField(BaseModel):
 
     # value must be JSON serializable, return JSON serializable dict
     def payload_scheme(self, value: Any = None, help=None) -> dict:
-        output = help if help else {}
-        output = {}
+        output: dict = {}
 
         for child in self.children:
             for path in child.dataPath:
