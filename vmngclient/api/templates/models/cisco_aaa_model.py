@@ -60,6 +60,9 @@ class TacacsServer(BaseModel):
 
 
 class TacacsGroup(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
     group_name: str = Field(alias="group-name")
     vpn: int = 0
     source_interface: Optional[str] = Field(alias="source-interface", default=None)
@@ -78,6 +81,7 @@ class CiscoAAAModel(FeatureTemplate):
     domain_stripping: Optional[DomainStripping] = Field(alias="domain-stripping", default=None)
     port: int = 1700
     tacacs: List[TacacsGroup] = []
+    server_auth_order: str = Field(alias="server-auth-order", default="local")
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cedge_aaa"

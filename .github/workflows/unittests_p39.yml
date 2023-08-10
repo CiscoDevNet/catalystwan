@@ -1,0 +1,31 @@
+name: Run unittests python 3.9
+
+on:
+  pull_request:
+
+jobs:
+  unittests_p39:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - if: ${{ env.ACT }}
+        name: Hack container for local development
+        run: |
+            curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      - name: Set Up Poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: 1.3.1
+      - name: Install dependencies
+        run: poetry install --sync -v
+      - name: Run Tests
+        run: poetry run pytest vmngclient/tests
