@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 from vmngclient.api.templates.device_variable import DeviceVariable
 
@@ -60,30 +60,37 @@ def get_path_dict(paths: List[List[str]]) -> dict:
 class FeatureTemplateField(BaseModel):
     # TODO aliases
     key: str
-    description: str
-    details: str
+    description: str = ""
+    details: str = ""
     optionType: List[FeatureTemplateOptionType]
     defaultOption: FeatureTemplateOptionType
     dataPath: List[str] = []
     objectType: FeatureTemplateObjectType
-    dataType: dict = {}
+    dataType: Dict[str, Any] = {}
     primaryKeys: List[str] = []
     children: List[FeatureTemplateField] = []
 
+    @validator("dataType", pre=True)
+    def convert_data_type_to_dict(cls, value):
+        if isinstance(value, str):
+            return {"type": value}
+        return value
+
     def data_path(self, output):
         for child in self.children:
-            child.data_path(output)
+            output.update(child.data_path(output))
         output.update(get_path_dict([t.dataPath for t in self.children]))
 
         return output
 
     # value must be JSON serializable, return JSON serializable dict
     def payload_scheme(self, value: Any = None, help=None) -> dict:
-        output = help if help else {}
-        output = {}
+        output: dict = {}
 
         for child in self.children:
             for path in child.dataPath:
+                if not output.get(path):
+                    output[path] = {}
                 output = output[path]
 
         output["vipObjectType"] = self.objectType.value
