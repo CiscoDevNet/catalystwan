@@ -127,8 +127,8 @@ class CiscoSystemModel(FeatureTemplate):
     #     "site-id": DeviceVariable(name="system_site_id")
     # }
 
-    timezone: Optional[Timezone] = Timezone.UTC
-    hostname: str = Field(default=DeviceVariable(name="system_host_name"), alias="host-name")
+    timezone: Optional[Timezone]
+    hostname: str = Field(default=DeviceVariable(name="system_host_name"), alias="host-name", validate_default=True)
     # TODO
     # description: Optional[str]
     location: Optional[str]
@@ -140,7 +140,7 @@ class CiscoSystemModel(FeatureTemplate):
     mobile_number: Optional[List[MobileNumber]] = Field(alias="mobile-number")
     device_groups: Optional[List[str]] = Field(alias="device-groups")
     controller_group_list: Optional[List[int]] = Field(alias="controller-group-list")
-    system_ip: str = Field(default=DeviceVariable(name="system_system_ip"), alias="system-ip")
+    system_ip: DeviceVariable = Field(default=DeviceVariable(name="system_system_ip"), alias="system-ip")
     overlay_id: Optional[int] = Field(1, alias="overlay-id")
     site_id: int = Field(default=DeviceVariable(name="system_site_id"), alias="site-id")
     site_type: Optional[List[SiteType]] = Field(alias="site-type")
@@ -151,9 +151,9 @@ class CiscoSystemModel(FeatureTemplate):
     track_interface_tag: Optional[int] = Field(alias="track-interface-tag")
     console_baud_rate: Optional[ConsoleBaudRate] = Field(alias="console-baud-rate")
     max_omp_sessions: Optional[int] = Field(alias="max-omp-sessions")
-    multi_tenant: bool = Field(default=DeviceVariable(name="system_site_id"), alias="multi-tenant")
+    multi_tenant: Optional[bool] = Field(alias="multi-tenant")
     track_default_gateway: Optional[bool] = Field(True, alias="track-default-gateway")
-    admin_tech_on_failure: Optional[bool] = Field(True, alias="admin-tech-on-failure")
+    admin_tech_on_failure: Optional[bool] = Field(alias="admin-tech-on-failure")
     idle_timeout: Optional[int] = Field(alias="idle-timeout")
     tracker: Optional[List[Tracker]]
     object_track: Optional[List[ObjectTrack]] = Field(alias="object-track")
