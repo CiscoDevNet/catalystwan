@@ -84,16 +84,12 @@ class FeatureTemplateField(BaseModel):
         return output
 
     # value must be JSON serializable, return JSON serializable dict
-    def payload_scheme(self, value: Any = None, help=None) -> dict:
+    def payload_scheme(self, value: Any = None, help=None, current_path=None) -> dict:
         output: dict = {}
+        rel_output: dict = {}
+        rel_output.update(get_path_dict([self.dataPath]))
+        # print(output)
 
-        for child in self.children:
-            for path in child.dataPath:
-                if not output.get(path):
-                    output[path] = {}
-                output = output[path]
-                # {"maximum-prefixes": {}}
-                # output = {"maximum-prefixes": output}
         output["vipObjectType"] = self.objectType.value
 
         if isinstance(value, DeviceVariable):
@@ -111,11 +107,20 @@ class FeatureTemplateField(BaseModel):
                 if self.children:
                     children_output = []
 
-                    for obj in value:  # obj is User
+                    for obj in value:  # obj is User, atomic value. Loop every child
                         child_payload = {}
-                        for child in self.children:
-                            child_payload.update(child.payload_scheme(obj[child.key]))
+                        for child in self.children:  # Child in schema
+                            # print(child.dataPath)
+                            if current_path is None:
+                                current_path = []
+                            child_payload.update(
+                                child.payload_scheme(
+                                    obj[child.key], help=output, current_path=self.dataPath + [self.key]
+                                )
+                            )
                         children_output.append(child_payload)
+                    # print("CHILDREN OUTPUT:")
+                    # print(children_output)
                     output["vipValue"] = children_output
                 else:
                     output["vipValue"] = value
@@ -134,5 +139,13 @@ class FeatureTemplateField(BaseModel):
         if self.primaryKeys:
             output["vipPrimaryKey"] = self.primaryKeys
 
-        real_output = {self.key: output}
-        return real_output
+        # real_output = {self.key: output}
+
+        pointer = rel_output
+
+        for path in self.dataPath:
+            pointer = pointer[path]
+
+        pointer[self.key] = output
+        # print(rel_output)
+        return rel_output

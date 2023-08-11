@@ -509,15 +509,17 @@ class TemplatesAPI:
         )  # type: ignore
 
         fr_template_fields = [FeatureTemplateField(**field) for field in schema["fields"]]  # TODO
+
         # payload.definition.update(get_path_dict([field.dataPath for field in fr_template_fields]))
+        # print([field.dataPath for field in fr_template_fields])
 
         # for field in fr_template_fields:
+        #     print(field.data_path(output={}))
         #     payload.definition.update(field.data_path(output={}))
 
         # "name"
         for i, field in enumerate(fr_template_fields):
             value = None
-            pointer = payload.definition
 
             # TODO How to discover Device specific variable
             if field.key in template.device_specific_variables:
@@ -531,21 +533,42 @@ class TemplatesAPI:
                         vmanage_key = field_value.field_info.extra.get("vmanage_key")  # type: ignore
                         if vmanage_key != field.key:
                             break
+
                         value = template.dict(by_alias=True).get(field_name, None)
                         field_value.field_info.extra.pop("vmanage_key")  # type: ignore
                         break
-
                 if value is None:
                     value = template.dict(by_alias=True).get(field.key, None)
 
             if isinstance(value, bool):
                 value = str(value).lower()  # type: ignore
 
-            for path in field.dataPath:
-                if not pointer.get(path):
-                    pointer[path] = {}
-                pointer = pointer[path]
-            pointer.update(field.payload_scheme(value, payload.definition))
+            # for path in field.dataPath:
+            #     if not pointer.get(path):
+            #         pointer[path] = {}
+            #     pointer = pointer[path]
+            # pointer.update(field.payload_scheme(value, payload.definition))
+
+            # Merge dictionaries
+
+            # TODO unittests
+            def merge(a, b, path=None):
+                if path is None:
+                    path = []
+                for key in b:
+                    if key in a:
+                        if isinstance(a[key], dict) and isinstance(b[key], dict):
+                            merge(a[key], b[key], path + [str(key)])
+                        elif a[key] == b[key]:
+                            pass  # same leaf value
+                        else:
+                            raise Exception(f"Conflict at {'.'.join(path + [str(key)])}")
+                    else:
+                        a[key] = b[key]
+                return a
+
+            payload.definition = merge(payload.definition, field.payload_scheme(value))
+            # print(mergeDictionary(payload.definition, field.payload_scheme(value)))
 
         if debug:
             with open(f"payload_{template.type}.json", "w") as f:
