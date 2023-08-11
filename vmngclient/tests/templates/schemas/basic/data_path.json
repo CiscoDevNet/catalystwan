@@ -1,0 +1,29 @@
+{
+    "name": "cisco_bgp",
+    "xmlPath": [],
+    "xmlRootTag": "router",
+    "parentPath": "</vpn-instance>",
+    "nameSpace": "http://viptela.com/vpn",
+    "fields": [
+        {
+            "key": "as-num",
+            "description": "AS Number",
+            "details": "Set autonomous system number <1..4294967295> or <XX.YY>",
+            "optionType": [
+                "constant",
+                "variable",
+				"ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "string"
+            },
+            "dataPath": [
+                "authentication",
+                "dot1x",
+                "default"
+            ],
+            "objectType": "object"
+        }
+	]
+}
