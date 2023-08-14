@@ -23,7 +23,7 @@ class FeatureTemplateObjectType(str, Enum):
     NODE_ONLY = "node-only"  # No information about the value
 
 
-class VipVariable(BaseModel):
+class VipVariable(BaseModel, frozen=True):
     # class Config:
     #     arbitrary_types_allowed = True
     #     allow_population_by_field_name = True
@@ -117,6 +117,15 @@ class FeatureTemplateField(BaseModel):
                         children_output.append(child_payload)
                     output["vipValue"] = children_output
                 else:
+                    if self.dataType.get("type") == "enum": # TODO BaseModel
+                        variables = [
+                            VipVariable(
+                                vipValue=e,
+                                vipType=FeatureTemplateOptionType.CONSTANT,
+                                vipObjectType=FeatureTemplateObjectType.OBJECT
+                            ) for e in value
+                        ]
+                        value = variables
                     output["vipValue"] = value
             else:
                 if "default" in self.dataType:

@@ -18,6 +18,7 @@ from vmngclient.api.templates.device_template.device_template import (
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.api.templates.feature_template_field import FeatureTemplateField, get_path_dict
 from vmngclient.api.templates.feature_template_payload import FeatureTemplatePayload
+from vmngclient.api.templates.models.aaa_model import AAAModel
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
 from vmngclient.api.templates.models.cisco_snmp_model import CiscoSNMPModel
@@ -472,6 +473,7 @@ class TemplatesAPI:
             SystemVsmart,
             CiscoSNMPModel,
             CiscoVPNModel,
+            AAAModel,
         )
 
         return isinstance(template, ported_templates)
@@ -543,11 +545,12 @@ class TemplatesAPI:
                 if not pointer.get(path):
                     pointer[path] = {}
                 pointer = pointer[path]
+            # print(field.payload_scheme(value, payload.definition))
             pointer.update(field.payload_scheme(value, payload.definition))
 
         if debug:
             with open(f"payload_{template.type}.json", "w") as f:
-                f.write(json.dumps(payload.dict(by_alias=True), indent=4))
+                f.write(json.dumps(payload.dict(by_alias=True, exclude_none=True), indent=4))
 
         return payload
 
