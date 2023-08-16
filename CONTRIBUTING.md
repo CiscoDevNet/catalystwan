@@ -76,47 +76,56 @@ Start reading our code, and you'll get the hang of it.
 
 ## Introducing new API
 
-  ### API Primitives:
-  vManage-client APIs should make requests only through API Primitives layer. This layer defines:
+  ### API Endpoints:
+  vManage-client APIs should make requests only through API Endpoints layer. This layer defines:
   * http method
   * endpoint url
-  * payload data-model (subtyping `vmngclient.dataclasses.DataclassBase` or `pydantic.BaseModel`)
+  * payload data-model (subtyping `vmngclient.dataclasses.DataclassBase` or `pydantic.BaseModel` and others)
+  * return type (subtyping `vmngclient.dataclasses.DataclassBase` or `pydantic.BaseModel` and others)
   * allowed sessions/views
   * supported versions
 
   Example:
 
   ```python
-  from pydantic import BaseModel
+  from pydantic import BaseModel, Field
   from typing import List
-  from vmngclient.primitives import APIPrimitiveBase, Versions, View
+  from vmngclient.endpoints import APIEndpoints, request, versions, view, delete
   from vmngclient.utils.session_type import ProviderView
 
   class TenantBulkDeleteRequest(BaseModel):
-    password: str
-    tenant_id_list: List[str] = Field(alias="tenantIdList")
+      password: str
+      tenant_id_list: List[str] = Field(alias="tenantIdList")
 
   class TenantTaskId(BaseModel):
-    id: str
+      id: str
 
-  class TenantManagementPrimitives(APIPrimitiveBase):
+  class TenantManagement(APIEndpoints):
 
-    @Versions(">=20.4")
-    @View({ProviderView})
-    def delete_tenant_async_bulk(self, delete_request: TenantBulkDeleteRequest) -> TenantTaskId:
-        response = self.delete("/tenant/bulk/async", payload=delete_request)
-        return response.dataobj(TenantTaskId, None)
+      @versions(">=20.4")
+      @view({ProviderView})
+      @request(delete, "/tenant/bulk/async")
+      def delete_tenant_async_bulk(self, payload: TenantBulkDeleteRequest) -> TenantTaskId:
+          ...
   ```
 
-  Definitions can be found in: `vmngclient/primitives` directory.
+  Please note that when using `@request` decorator method must have no body. Request will be built automatically and return value based on defined type will be provided.
+
+  API endpoints Definitions can be found in: `vmngclient/endpoints` directory.
 
   The organization of items **strictly** follows an OpenAPI spec: https://developer.cisco.com/docs/sdwan/#!sd-wan-vmanage-v20-9
 
   Auto generated python methods names can be found in: https://github.com/sbasan/vmanage-python-open-api/blob/main/README.md
 
-1. Check that endpoints you want to utilize in your API already defined in `vmngclient/primitives`.
-2. If endpoint not present, create new file with endpoint including data-model and methods with `@View` and `@Version` decorators when needed.
-3. Implement higher level API in `vmngclient/api` using created primitives.
+  If common data-model is being reused by more than one `APIEndpoints` class it should be moved to `vmngclient/model` folder with appropriate module name.
+
+  Dedicated pre-commit step will automatically check corectness and add documentation for endpoints with `@request` decorator.
+
+  Custom payload types are allowed (eg. for sending various types of files) please check example: [**SoftwarePackageUpdatePayload**](vmngclient/utils/upgrades_helper.py#L68)
+
+1. Check that endpoints you want to utilize in your API already defined in `vmngclient/endpoints`.
+2. If endpoint not present, create new file with endpoint including data-model and methods with `@request`, `@view` and `@versions` decorators when needed.
+3. Implement higher level API in `vmngclient/api` using created endpoints.
 
 Thanks,\
 vmngclient team

@@ -1,17 +1,20 @@
+import re
 from functools import wraps
 from pprint import pformat
-from typing import Any, Callable, Optional, Sequence, Type, TypeVar, Union, cast
+from typing import Any, Callable, Dict, Optional, Sequence, Type, TypeVar, Union, cast
 
 from pydantic import BaseModel
 from requests import PreparedRequest, Request, Response
+from requests.cookies import RequestsCookieJar
 from requests.exceptions import JSONDecodeError
 
 from vmngclient import with_proc_info_header
-from vmngclient.exceptions import CookieNotValidError
+from vmngclient.endpoints import APIEndpointClientResponse
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 
 T = TypeVar("T")
+PRINTABLE_CONTENT = re.compile(r"(text\/.+)|(application\/(json|html|xhtml|xml|x-www-form-urlencoded))", re.IGNORECASE)
 
 
 class ErrorInfo(BaseModel):
@@ -47,6 +50,9 @@ def response_debug(response: Optional[Response], request: Union[Request, Prepare
         "body": getattr(_request, "body", None),
         "json": getattr(_request, "json", None),
     }
+    if content_type := {k.lower(): v for k, v in _request.headers.items()}.get("content-type"):
+        if not re.search(PRINTABLE_CONTENT, content_type):
+            del request_debug["body"]
     debug_dict["request"] = {k: v for k, v in request_debug.items() if v is not None}
     if response is not None:
         response_debug = {
@@ -94,6 +100,21 @@ def response_history_debug(response: Optional[Response], request: Union[Request,
     return "\n".join(response_debugs)
 
 
+def parse_cookies_to_dict(cookies: str) -> Dict[str, str]:
+    """Utility method to parse cookie string into dict"""
+    result: Dict[str, str] = {}
+    for item in cookies.split(";"):
+        item = item.strip()
+        if not item:
+            continue
+        if "=" not in item:
+            result[item] = ""
+            continue
+        name, value = item.split("=", 1)
+        result[name] = value
+    return result
+
+
 class JsonPayload:
     def __init__(self, json: Any = None):
         self.json = json
@@ -106,17 +127,25 @@ class JsonPayload:
             self.headers = json.get("headers", None)
 
 
-class vManageResponse(Response):
-    """Extends Response object with methods specific to vManage"""
+class vManageResponse(Response, APIEndpointClientResponse):
+    """Extends Response object with methods specific to vManage.
+    Object is meant to be created from aready received requests.Response"""
 
     def __init__(self, response: Response):
-        if response.headers.get("set-cookie"):
-            raise CookieNotValidError("Session cookie is not valid.")
         self.__dict__.update(response.__dict__)
+        if not self.cookies.keys():
+            self.cookies = self.__parse_set_cookie_from_headers()
         try:
             self.payload = JsonPayload(response.json())
         except JSONDecodeError:
             self.payload = JsonPayload()
+
+    def __parse_set_cookie_from_headers(self) -> RequestsCookieJar:
+        """Parses "set-cookie" content from response headers"""
+        jar = RequestsCookieJar()
+        cookies_string = self.headers.get("set-cookie", "")
+        jar.update(parse_cookies_to_dict(cookies_string))
+        return jar
 
     def info(self, history: bool = False) -> str:
         """Returns human readable string containing Request-Response contents

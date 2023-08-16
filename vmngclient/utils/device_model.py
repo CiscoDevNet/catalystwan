@@ -2,7 +2,6 @@ from enum import Enum
 
 
 class DeviceModel(Enum):
-
     # controlers
     VSMART = "vsmart"
     VBOND = "vedge-cloud"
@@ -69,6 +68,13 @@ class DeviceModel(Enum):
     VEDGE_C1117_4PLTEEA = "vedge-C1117-4PLTEEA"
     VEDGE_C1111_8PLTELA = "vedge-C1111-8PLTELA"
     VEDGE_C1111_8PLTEEA = "vedge-C1111-8PLTEEA"
+    VEDGE_C1221_8PLTEP = "vedge-C1121-8PLTEP"
+    VEDGE_C1221X_8PLTEP = "vedge-C1121X-8PLTEP"
+
+    # C8300
+    VEDGE_C8300_2N2S_6T = "vedge-C8300-2N2S-6T"
+    VEDGE_C8300_1N1S_6T = "vedge-C8300-1N1S-6T"
+    VEDGE_C8300_1N1S_4T2X = "vedge-C8300-1N1S-4T2X"
 
     # ISRv
     VEDGE_ISRV = "vedge-ISRv"

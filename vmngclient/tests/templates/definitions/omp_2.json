@@ -1,0 +1,73 @@
+{
+    "templateName": "omp_2",
+    "templateDescription": "some changes",
+    "templateType": "omp-vsmart",
+    "deviceType": [
+        "vsmart"
+    ],
+    "templateMinVersion": "15.0.0",
+    "templateDefinition": {
+        "graceful-restart": {
+            "vipObjectType": "object",
+            "vipType": "constant",
+            "vipValue": "false",
+            "vipVariableName": "omp_graceful_restart"
+        },
+        "send-path-limit": {
+            "vipObjectType": "object",
+            "vipType": "ignore",
+            "vipValue": 4,
+            "vipVariableName": "omp_send_path_limit"
+        },
+        "send-backup-paths": {
+            "vipObjectType": "object",
+            "vipType": "constant",
+            "vipValue": "false",
+            "vipVariableName": "omp_send_backup_paths"
+        },
+        "discard-rejected": {
+            "vipObjectType": "object",
+            "vipType": "ignore",
+            "vipValue": "false",
+            "vipVariableName": "omp_discard_rejected"
+        },
+        "shutdown": {
+            "vipObjectType": "object",
+            "vipType": "constant",
+            "vipValue": "true",
+            "vipVariableName": "omp_shutdown"
+        },
+        "timers": {
+            "advertisement-interval": {
+                "vipObjectType": "object",
+                "vipType": "ignore",
+                "vipValue": 1,
+                "vipVariableName": "omp_advertisement_interval"
+            },
+            "graceful-restart-timer": {
+                "vipObjectType": "object",
+                "vipType": "ignore",
+                "vipValue": 43200,
+                "vipVariableName": "omp_graceful_restart_timer"
+            },
+            "holdtime": {
+                "vipObjectType": "object",
+                "vipType": "constant",
+                "vipValue": 30,
+                "vipVariableName": "omp_holdtime"
+            },
+            "eor-timer": {
+                "vipObjectType": "object",
+                "vipType": "ignore",
+                "vipValue": 300,
+                "vipVariableName": "omp_eor_timer"
+            }
+        },
+        "filter-route": {
+            "outbound": {
+                "affinity-group-preference": {}
+            }
+        }
+    },
+    "factoryDefault": false
+}

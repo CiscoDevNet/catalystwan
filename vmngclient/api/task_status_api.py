@@ -1,94 +1,24 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, List, Optional, cast
+from typing import TYPE_CHECKING, List, cast
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
+
+from vmngclient.exceptions import TaskValidationError
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
-from pydantic import BaseModel, Field
-
+from vmngclient.endpoints.configuration_dashboard_status import (
+    ConfigurationDashboardStatus,
+    SubTaskData,
+    TaskData,
+    TaskResult,
+)
 from vmngclient.utils.operation_status import OperationStatus, OperationStatusId
 
 logger = logging.getLogger(__name__)
-
-
-class SubTaskData(BaseModel):
-    status: str
-    status_id: str = Field(alias="statusId")
-    action: str
-    activity: List[str]
-    current_activity: str = Field(alias="currentActivity")
-    action_config: Optional[str] = Field(alias="actionConfig")
-    order: Optional[int]
-    uuid: Optional[str]
-    hostname: Optional[str] = Field(alias="host-name")
-    site_id: Optional[str] = Field(alias="site-id")
-
-
-class TaskResult(BaseModel):
-    result: bool
-    sub_tasks_data: List[SubTaskData]
-
-
-class RunningTaskData(BaseModel):
-    details_url: str = Field(alias="detailsURL")
-    user_session_username: str = Field(alias="userSessionUserName")
-    rid: int = Field(alias="@rid")
-    tenant_name: str = Field("tenantName")
-    process_id: str = Field(alias="processId")
-    name: str
-    tenant_id: str = Field(alias="tenantId")
-    user_session_ip: str = Field(alias="userSessionIP")
-    action: str
-    start_time: int = Field(alias="startTime")
-    end_time: int = Field(alias="endTime")
-    status: str
-
-
-class TasksData(BaseModel):
-    running_tasks: List[RunningTaskData] = Field(alias="runningTasks")
-
-
-class TasksAPI:
-    """
-    API class for getting data about tasks
-    """
-
-    def __init__(self, session: vManageSession, task_id: str):
-        self.session = session
-        self.task_id = task_id
-        self.url = f"/dataservice/device/action/status/{self.task_id}"
-
-    def get_all_tasks(self) -> TasksData:
-        """
-        Get list of active tasks id's in vmanage
-
-        Args:
-            session (vManageSession): session
-
-        Returns:
-        TasksData: Data about all tasks in vmanage
-        """
-        url = "dataservice/device/action/status/tasks"
-        json = self.session.get_json(url)
-        return TasksData.parse_obj(json)
-
-    def get_task_data(self) -> List[SubTaskData]:
-        """
-        Get data about all sub-tasks in task
-
-        Args:
-            delay_seconds (int, optional): If vmanage doesn't get data about task, after this time will asks again.
-            Defaults to 5.
-
-        Returns:
-            List[SubTaskData]: List of all sub-tusks
-        """
-        task_data = self.session.get_data(self.url)
-        return [SubTaskData.parse_obj(subtask_data) for subtask_data in task_data]
 
 
 class Task:
@@ -101,6 +31,12 @@ class Task:
         self.task_id = task_id
         self.url = f"/dataservice/device/action/status/{self.task_id}"
         self.task_data: List[SubTaskData]
+
+    def __check_validation_status(self, task: TaskData):
+        if not task.validation:
+            return None
+        if task.validation.status in (OperationStatus.FAILURE, OperationStatus.VALIDATION_FAILURE):
+            raise TaskValidationError(f"Task status validation failed, validation status is:{task.validation.status}")
 
     def wait_for_completed(
         self,
@@ -145,6 +81,7 @@ class Task:
 
             timeout_seconds (int): After this time, function will stop requesting action status
             interval_seconds (int): interval between action status requests
+            validation_timeout_seconds (int): After this time, task validation call will be send
             delay_seconds (int): if Vmanage didn't report task status, after this time api call would be repeated
             success_statuses (Union[List[OperationStatus], str]): list of positive sub-tasks statuses
             success_statuses_ids (Union[List[OperationStatus], str]): list of positive sub-tasks statuses id's
@@ -177,7 +114,8 @@ class Task:
             Returns:
                 bool: False if condition is met
             """
-
+            if not task_data:
+                return True
             task_statuses_success = [task.status in success_statuses for task in task_data]
             task_statuses_failure = [task.status in failure_statuses for task in task_data]
             task_statuses_id_success = [task.status_id in success_statuses_ids for task in task_data]
@@ -208,8 +146,9 @@ class Task:
             Returns:
                 List[SubTaskData]
             """
-
-            self.task_data = TasksAPI(self.session, self.task_id).get_task_data()
+            task = ConfigurationDashboardStatus(self.session).find_status(self.task_id)
+            self.__check_validation_status(task)
+            self.task_data = task.data
             sub_task_statuses = [task.status for task in self.task_data]
             sub_task_statuses_id = [task.status_id for task in self.task_data]
             sub_task_activities = [task.activity for task in self.task_data]

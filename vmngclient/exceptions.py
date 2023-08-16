@@ -77,14 +77,6 @@ class APIRequestPayloadTypeError(vManageClientError):
         self.message = f"Unsupported payload type: {type(item)} for vManage request"
 
 
-class AuthenticationError(vManageClientError):
-    pass
-
-
-class CookieNotValidError(vManageClientError):
-    pass
-
-
 class EmptyTaskResponseError(vManageClientError):
     """Raised if task is registred by vManage, but reponse content is empty"""
 
@@ -93,6 +85,12 @@ class EmptyTaskResponseError(vManageClientError):
 
 class TaskNotRegisteredError(vManageClientError):
     """Raised if task_id is generated, but it's not registere in vManage"""
+
+    pass
+
+
+class TaskValidationError(vManageClientError):
+    """Raised if task has not been validated"""
 
     pass
 
@@ -109,5 +107,11 @@ class SessionNotCreatedError(vManageClientError):
 
 class TenantSubdomainNotFound(vManageClientError):
     """Raised when given subdomain does not exist"""
+
+    pass
+
+
+class APIEndpointError(vManageClientError):
+    """Raised when there is a problem with endpoint definition"""
 
     pass

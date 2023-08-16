@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import json
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Dict, List, cast
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
-from pydantic import BaseModel
+from pydantic import BaseModel, root_validator
 
+from vmngclient.api.templates.device_variable import DeviceVariable
 from vmngclient.utils.device_model import DeviceModel
 
 if TYPE_CHECKING:
@@ -16,7 +18,8 @@ if TYPE_CHECKING:
 class FeatureTemplate(BaseModel, ABC):
     name: str
     description: str
-    device_models: List[DeviceModel]
+    device_models: List[DeviceModel] = []
+    device_specific_variables: Dict[str, DeviceVariable] = {}
 
     def generate_payload(self, session: vManageSession) -> str:
         env = Environment(
@@ -45,3 +48,54 @@ class FeatureTemplate(BaseModel, ABC):
     @property
     def type(self) -> str:
         raise NotImplementedError()
+
+    @root_validator(pre=True)
+    def remove_device_variables(cls, values):
+        if "device_specific_variables" not in values:
+            values["device_specific_variables"] = {}
+        to_delete = {}
+
+        for key, value in values.items():
+            if isinstance(value, DeviceVariable):
+                to_delete[key] = value
+                values["device_specific_variables"][cls.__fields__[key].alias] = DeviceVariable(name=value.name)
+
+        for var in to_delete:
+            if var in values:
+                del values[var]
+
+        return values
+
+    @classmethod
+    def get(cls, session: vManageSession, name: str) -> FeatureTemplate:
+        """Gets feature template model corresponding to existing feature template based on provided name
+
+        Args:
+            session: vManageSession
+            name: name of the existing feature template
+
+        Returns:
+            FeatureTemplate: filed out feature template model
+        """
+        from vmngclient.utils.feature_template import choose_model, find_template_values
+
+        template_info = (
+            session.api.templates._get_feature_templates(summary=False).filter(name=name).single_or_default()
+        )
+
+        template_definition_as_dict = json.loads(cast(str, template_info.template_definiton))
+
+        feature_template_model = choose_model(type_value=template_info.template_type)
+
+        device_specific_variables: Dict[str, DeviceVariable] = {}
+        values_from_template_definition = find_template_values(
+            template_definition_as_dict, device_specific_variables=device_specific_variables
+        )
+
+        return feature_template_model(
+            name=template_info.name,
+            description=template_info.description,
+            device_models=[DeviceModel(model) for model in template_info.device_type],
+            device_specific_variables=device_specific_variables,
+            **values_from_template_definition,
+        )

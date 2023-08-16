@@ -1,0 +1,268 @@
+{
+    "templateName": "iuo",
+    "templateDescription": "zyx",
+    "templateType": "cedge_aaa",
+    "deviceType": ["vedge-C8000V"],
+    "factoryDefault": false,
+    "templateMinVersion": "15.0.0",
+    "templateDefinition": {
+        "authentication": {
+            "dot1x": {
+                "default": {
+                    "authentication_group": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "true"
+                    }
+                }
+            }
+        },
+        "accounting": {
+            "dot1x": {
+                "default": {
+                    "start-stop": {
+                        "accounting_group": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "false"
+                        }
+                    }
+                }
+            },
+            "accounting-rule": {
+                "vipObjectType": "tree",
+                "vipValue": [],
+                "vipType": "ignore",
+                "vipPrimaryKey": [
+                    "rule-id"
+                ]
+            }
+        },
+        "radius-dynamic-author": {
+            "radius-client": {
+                "vipObjectType": "tree",
+                "vipValue": [],
+                "vipType": "ignore",
+                "vipPrimaryKey": [
+                    "ip"
+                ]
+            },
+            "rda-server-key": {
+                "vipObjectType": "object",
+                "vipValue": [],
+                "vipType": "ignore"
+            },
+            "domain-stripping": {
+                "vipObjectType": "object",
+                "vipType": "constant",
+                "vipValue": "no"
+            },
+            "auth-type": {
+                "vipObjectType": "object",
+                "vipValue": "any",
+                "vipType": "ignore"
+            },
+            "port": {
+                "vipObjectType": "object",
+                "vipType": "constant",
+                "vipValue": 1700
+            }
+        },
+        "radius-trustsec": {
+            "cts-auth-list": {
+                "vipObjectType": "object",
+                "vipValue": [],
+                "vipType": "ignore"
+            },
+            "radius-trustsec-group": {
+                "vipObjectType": "object",
+                "vipValue": [],
+                "vipType": "ignore"
+            }
+        },
+        "authorization": {
+            "authorization-console": {
+                "vipObjectType": "object",
+                "vipValue": "false",
+                "vipType": "ignore"
+            },
+            "authorization-config-commands": {
+                "vipObjectType": "object",
+                "vipValue": "false",
+                "vipType": "ignore"
+            },
+            "authorization-rule": {
+                "vipObjectType": "tree",
+                "vipValue": [],
+                "vipType": "ignore",
+                "vipPrimaryKey": [
+                    "rule-id"
+                ]
+            }
+        },
+        "server-auth-order": {
+            "vipObjectType": "object",
+            "vipValue": "local",
+            "vipType": "constant"
+        },
+        "user": {
+            "vipObjectType": "tree",
+            "vipType": "constant",
+            "vipValue": [
+                {
+                    "name": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "admin"
+                    },
+                    "password": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "str"
+                    },
+                    "secret": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "zyx"
+                    },
+                    "privilege": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "15"
+                    },
+                    "pubkey-chain": {
+                        "vipObjectType": "tree",
+                        "vipValue": [],
+                        "vipType": "ignore",
+                        "vipPrimaryKey": [
+                            "key-string"
+                        ]
+                    }
+                },
+                {
+                    "name": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "user"
+                    },
+                    "password": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "rnd"
+                    },
+                    "secret": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "dnr"
+                    },
+                    "privilege": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "14"
+                    },
+                    "pubkey-chain": {
+                        "vipObjectType": "tree",
+                        "vipValue": [],
+                        "vipType": "ignore",
+                        "vipPrimaryKey": [
+                            "key-string"
+                        ]
+                    }
+                }
+            ],
+            "vipPrimaryKey": [
+                "name"
+            ]
+        },
+        "radius": {
+            "vipObjectType": "tree",
+            "vipType": "constant",
+            "vipValue": [
+                {
+                    "group-name": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "xyz"
+                    },
+                    "vpn": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": 1
+                    },
+                    "source-interface": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "GIG11"
+                    },
+                    "server": {
+                        "vipObjectType": "tree",
+                        "vipType": "constant",
+                        "vipValue": [
+                            {
+                                "address": {
+                                    "vipObjectType": "object",
+                                    "vipType": "constant",
+                                    "vipValue": "1.1.1.1"
+                                },
+                                "auth-port": {
+                                    "vipObjectType": "object",
+                                    "vipType": "constant",
+                                    "vipValue": 1812
+                                },
+                                "acct-port": {
+                                    "vipObjectType": "object",
+                                    "vipType": "constant",
+                                    "vipValue": 1813
+                                },
+                                "timeout": {
+                                    "vipObjectType": "object",
+                                    "vipType": "constant",
+                                    "vipValue": 5
+                                },
+                                "retransmit": {
+                                    "vipObjectType": "object",
+                                    "vipType": "constant",
+                                    "vipValue": 3
+                                },
+                                "key": {
+                                    "vipObjectType": "object",
+                                    "vipType": "constant",
+                                    "vipValue": "21"
+                                },
+                                "secret-key": {
+                                    "vipObjectType": "object",
+                                    "vipValue": [],
+                                    "vipType": "ignore"
+                                },
+                                "key-enum": {
+                                    "vipObjectType": "object",
+                                    "vipValue": [],
+                                    "vipType": "ignore"
+                                },
+                                "key-type": {
+                                    "vipObjectType": "object",
+                                    "vipValue": "key",
+                                    "vipType": "ignore"
+                                }
+                            }
+                        ],
+                        "vipPrimaryKey": [
+                            "address"
+                        ]
+                    }
+                }
+            ],
+            "vipPrimaryKey": [
+                "group-name"
+            ]
+        },
+        "tacacs": {
+            "vipObjectType": "tree",
+            "vipValue": [],
+            "vipType": "ignore",
+            "vipPrimaryKey": [
+                "group-name"
+            ]
+        }
+    }
+}

@@ -1,10 +1,11 @@
+# mypy: disable-error-code="empty-body"
 from datetime import datetime
 from typing import Any, List, Optional
 
 from packaging.version import Version  # type: ignore
 from pydantic import BaseModel, Field
 
-from vmngclient.primitives import APIPrimitiveBase
+from vmngclient.endpoints import APIEndpoints, get, request
 
 
 class VersionField(Version):
@@ -24,7 +25,7 @@ class ServerInfo(BaseModel):
     vsession_id: Optional[str] = Field(alias="VSessionId")
     is_saml_user: Optional[bool] = Field(alias="isSamlUser")
     is_rbac_vpn_user: Optional[bool] = Field(alias="isRbacVpnUser")
-    vpns: List[Any]
+    vpns: List[Any] = []
     csrf_token: Optional[str] = Field(alias="CSRFToken")
     provider_domain: Optional[str] = Field(alias="providerDomain")
     tenant_id: Optional[str] = Field(alias="tenantId")
@@ -36,7 +37,7 @@ class ServerInfo(BaseModel):
     locale: Optional[str]
     roles: List[str] = []
     external_user: Optional[bool] = Field(alias="externalUser")
-    platform_version: VersionField = Field(alias="platformVersion")
+    platform_version: str = Field(default="", alias="platformVersion")
     general_template: Optional[bool] = Field(alias="generalTemplate")
     disable_full_config_push: Optional[bool] = Field(alias="disableFullConfigPush")
     enable_server_events: Optional[bool] = Field(alias="enableServerEvents")
@@ -47,7 +48,7 @@ class ServerInfo(BaseModel):
 
 class AboutInfo(BaseModel):
     title: Optional[str]
-    version: VersionField
+    version: str = Field(default="")
     application_version: Optional[str] = Field(alias="applicationVersion")
     application_server: Optional[str] = Field(alias="applicationServer")
     copyright: Optional[str]
@@ -56,9 +57,19 @@ class AboutInfo(BaseModel):
     logo: Optional[str]
 
 
-class ClientPrimitives(APIPrimitiveBase):
-    def server(self) -> ServerInfo:
-        return self.get("/client/server").dataobj(ServerInfo)
+class ServerReady(BaseModel):
+    is_server_ready: bool = Field(alias="isServerReady")
 
+
+class Client(APIEndpoints):
+    @request(get, "/client/server", "data")
+    def server(self) -> ServerInfo:
+        ...
+
+    @request(get, "/client/server/ready")
+    def server_ready(self) -> ServerReady:
+        ...
+
+    @request(get, "/client/about", "data")
     def about(self) -> AboutInfo:
-        return self.get("/client/about").dataobj(AboutInfo)
+        ...

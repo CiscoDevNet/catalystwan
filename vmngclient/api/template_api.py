@@ -5,6 +5,7 @@ import logging
 from enum import Enum
 from typing import TYPE_CHECKING, Any, Optional, Type, overload
 
+from ciscoconfparse import CiscoConfParse  # type: ignore
 from requests.exceptions import HTTPError
 
 from vmngclient.api.task_status_api import Task
@@ -18,8 +19,15 @@ from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.api.templates.feature_template_field import FeatureTemplateField, get_path_dict
 from vmngclient.api.templates.feature_template_payload import FeatureTemplatePayload
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
+from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
+from vmngclient.api.templates.models.cisco_snmp_model import CiscoSNMPModel
+from vmngclient.api.templates.models.cisco_vpn_model import CiscoVPNModel
+from vmngclient.api.templates.models.omp_vsmart_model import OMPvSmart
+from vmngclient.api.templates.models.security_vsmart_model import SecurityvSmart
+from vmngclient.api.templates.models.system_vsmart_model import SystemVsmart
 from vmngclient.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, FeatureTemplatesTypes, TemplateInfo
-from vmngclient.exceptions import AlreadyExistsError, AttachedError, TemplateNotFoundError
+from vmngclient.endpoints.configuration_device_template import FeatureToCLIPayload
+from vmngclient.exceptions import AttachedError, TemplateNotFoundError
 from vmngclient.response import vManageResponse
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.device_model import DeviceModel
@@ -367,7 +375,7 @@ class TemplatesAPI:
         return response
 
     @overload
-    def create(self, template: FeatureTemplate) -> str:
+    def create(self, template: FeatureTemplate, debug=False) -> str:
         ...
 
     @overload
@@ -385,9 +393,9 @@ class TemplatesAPI:
         template_id: Optional[str] = None  # type: ignore
         template_type = None
 
-        exists = self.get(template).filter(name=template.name)
-        if exists:
-            raise AlreadyExistsError(f"Template with name [{template.name}] already exists.")
+        # exists = self.get(template).filter(name=template.name)
+        # if exists:
+        #     raise AlreadyExistsError(f"Template with name [{template.name}] already exists.")
 
         if isinstance(template, FeatureTemplate):
             if self.is_created_by_generator(template):
@@ -476,7 +484,15 @@ class TemplatesAPI:
 
         Method will be deleted if every template's payload will be generated dynamically.
         """
-        ported_templates = (CiscoAAAModel,)
+        ported_templates = (
+            CiscoAAAModel,
+            CiscoNTPModel,
+            OMPvSmart,
+            SecurityvSmart,
+            SystemVsmart,
+            CiscoSNMPModel,
+            CiscoVPNModel,
+        )
 
         return isinstance(template, ported_templates)
 
@@ -495,7 +511,7 @@ class TemplatesAPI:
         payload = self.generate_feature_template_payload(template, schema, debug)
 
         endpoint = "/dataservice/template/feature"
-        response = self.session.post(endpoint, json=payload.dict(by_alias=True))
+        response = self.session.post(endpoint, json=payload.dict(by_alias=True, exclude_none=True))
 
         return response.json()["templateId"]
 
@@ -506,7 +522,7 @@ class TemplatesAPI:
             name=template.name,
             description=template.description,
             template_type=template.type,
-            device_types=["vedge-C8000V"],  # TODO
+            device_types=[device_model.value for device_model in template.device_models],
             definition={},
         )  # type: ignore
 
@@ -516,14 +532,36 @@ class TemplatesAPI:
         for field in fr_template_fields:
             payload.definition.update(field.data_path(output={}))
 
+        # "name"
         for i, field in enumerate(fr_template_fields):
+            value = None
             pointer = payload.definition
 
-            value = template.dict(by_alias=True).get(field.key, None)
+            # TODO How to discover Device specific variable
+            if field.key in template.device_specific_variables:
+                value = template.device_specific_variables[field.key]
+            else:
+                # Iterate through every possible field, maybe refactor(?)
+                # Use data_path instead. data_path as tuple
+                # next(field_value.field_info.extra.get("vmanage_key") == field.key, template.__fields__.values())
+                for field_name, field_value in template.__fields__.items():
+                    if "vmanage_key" in field_value.field_info.extra:  # type: ignore
+                        vmanage_key = field_value.field_info.extra.get("vmanage_key")  # type: ignore
+                        if vmanage_key != field.key:
+                            break
+                        value = template.dict(by_alias=True).get(field_name, None)
+                        field_value.field_info.extra.pop("vmanage_key")  # type: ignore
+                        break
+
+                if value is None:
+                    value = template.dict(by_alias=True).get(field.key, None)
+
             if isinstance(value, bool):
-                value = str(value).lower()
+                value = str(value).lower()  # type: ignore
 
             for path in field.dataPath:
+                if not pointer.get(path):
+                    pointer[path] = {}
                 pointer = pointer[path]
             pointer.update(field.payload_scheme(value, payload.definition))
 
@@ -614,3 +652,8 @@ class TemplatesAPI:
             return True
         logger.warning(f"Failed to edit tempate: {name} of device: {device.hostname}.")
         return False
+
+    def get_device_configuration_preview(self, payload: FeatureToCLIPayload) -> CiscoConfParse:
+        text_config = self.session.endpoints.configuration_device_template.get_device_configuration_preview(payload)
+
+        return CiscoConfParse(text_config.splitlines())

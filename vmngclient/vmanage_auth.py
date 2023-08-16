@@ -11,8 +11,8 @@ from vmngclient import with_proc_info_header
 from vmngclient.exceptions import vManageClientError
 
 
-class InvalidCredentialsError(vManageClientError):
-    """Exception raised for invalid credentials.
+class UnauthorizedAccessError(vManageClientError):
+    """Exception raised for wrong username/password or when user not authorized to access vManage.
 
     Attributes:
         username (str): vManage username.
@@ -24,7 +24,7 @@ class InvalidCredentialsError(vManageClientError):
         self,
         username: str,
         password: str,
-        message: str = "Username and/or password is incorrect. Please try again!",
+        message: str = "Wrong username/password or user not authorized to access vManage. Please try again!",
     ):
         self.username = username
         self.password = password
@@ -61,7 +61,7 @@ class vManageAuth(AuthBase):
         self.password = password
         self.verify = verify  # TODO Handle `True` parameter
         self.expiration_time: Optional[int] = None  # Unlimited
-        self.set_cookie: Optional[RequestsCookieJar] = None
+        self.set_cookie = RequestsCookieJar()
         self.token: str = ""
         self.logger = logging.getLogger(__name__)
 
@@ -73,7 +73,7 @@ class vManageAuth(AuthBase):
         If a user is un-authenticated, the response body contains a html login page with tag in it.
 
         Raises:
-            InvalidCredentialsError: _description_
+            UnauthorizedAccessError: _description_
 
         Returns:
             RequestsCookieJar: _description_
@@ -90,9 +90,9 @@ class vManageAuth(AuthBase):
             verify=self.verify,
             headers=headers,
         )
-        self.logger.debug(self._auth_request_debug(response))
+        self.logger.debug(self._auth_request_debug(response, include_reponse_text=True))
         if response.text != "":
-            raise InvalidCredentialsError(self.username, self.password)
+            raise UnauthorizedAccessError(self.username, self.password)
         return response.cookies
 
     def fetch_token(self, cookies: RequestsCookieJar) -> str:
@@ -129,7 +129,10 @@ class vManageAuth(AuthBase):
         return prepared_request
 
     @with_proc_info_header
-    def _auth_request_debug(self, response: Response) -> str:
-        return (
+    def _auth_request_debug(self, response: Response, include_reponse_text: bool = False) -> str:
+        msg = (
             f"Authenticating: {self.username} {response.request.method} {response.request.url} <{response.status_code}>"
         )
+        if include_reponse_text and response.text:
+            msg += f" response.text: {response.text}"
+        return msg

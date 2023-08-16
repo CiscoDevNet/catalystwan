@@ -8,6 +8,7 @@ class OperationStatus(Enum):
     SCHEDULED = "Scheduled"
     DONE_SCHEDULED = "Done - Scheduled"
     VALIDATION_SUCCESS = "Validation success"
+    VALIDATION_FAILURE = "Validation failure"
 
 
 class OperationStatusId(Enum):

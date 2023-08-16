@@ -4,7 +4,7 @@ import logging
 from pathlib import PurePath
 from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
-from attr import define, field  # type: ignore
+from attr import Factory, define, field  # type: ignore
 from clint.textui.progress import Bar as ProgressBar  # type: ignore
 from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
 
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 @define
 class DeviceSoftwareRepository(DataclassBase):
     installed_versions: List[str] = field(default=None)
-    available_versions: List[str] = field(default=None, metadata={FIELD_NAME: "availableVersions"})
+    available_versions: List[str] = field(default=Factory(list), metadata={FIELD_NAME: "availableVersions"})
     current_version: str = field(default=None, metadata={FIELD_NAME: "version"})
     default_version: str = field(default=None, metadata={FIELD_NAME: "defaultVersion"})
     device_id: str = field(default=None, metadata={FIELD_NAME: "uuid"})

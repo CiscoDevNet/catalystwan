@@ -5,7 +5,7 @@ import time
 from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse, urlunparse
 
 from packaging.version import Version  # type: ignore
 from requests import PreparedRequest, Request, Response, Session, head
@@ -13,19 +13,20 @@ from requests.auth import AuthBase
 from requests.exceptions import ConnectionError, HTTPError, RequestException
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
-from vmngclient.api.api_containter import APIContainter
+from vmngclient.api.api_container import APIContainer
+from vmngclient.endpoints import APIEndpointClient
+from vmngclient.endpoints.client import AboutInfo, ServerInfo
+from vmngclient.endpoints.endpoints_container import APIEndpointContainter
 from vmngclient.exceptions import (
-    AuthenticationError,
-    CookieNotValidError,
     InvalidOperationError,
     SessionNotCreatedError,
     TenantSubdomainNotFound,
     vManageClientError,
 )
-from vmngclient.primitives.client import AboutInfo, ServerInfo
-from vmngclient.primitives.primitive_container import APIPrimitiveContainter
+from vmngclient.model.tenant import Tenant
 from vmngclient.response import ErrorInfo, response_history_debug, vManageResponse
 from vmngclient.utils.session_type import SessionType
+from vmngclient.version import NullVersion, parse_api_version
 from vmngclient.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
@@ -79,8 +80,7 @@ def create_vManageSession(
         logger: logger for logging API requests
 
     Returns:
-        Session object
-
+        vManageSession: Configured Session to perform tasks on vManage.
     """
     session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
@@ -131,6 +131,7 @@ def create_vManageSession(
     session.logger.info(
         f"Logged to vManage({session.platform_version}) as {username}. The session type is {session.session_type}"
     )
+
     return session
 
 
@@ -151,7 +152,7 @@ class vManageResponseAdapter(Session):
         return vManageResponse(super().delete(url, *args, **kwargs))
 
 
-class vManageSession(vManageResponseAdapter):
+class vManageSession(vManageResponseAdapter, APIEndpointClient):
     """Base class for API sessions for vManage client.
 
     Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
@@ -190,16 +191,14 @@ class vManageSession(vManageResponseAdapter):
         self.server_name: Optional[str] = None
         self.logger = logging.getLogger(__name__)
         self.enable_relogin: bool = True
-        self.__second_relogin_try: bool = False
         self.response_trace: Callable[
             [Optional[Response], Union[Request, PreparedRequest, None]], str
         ] = response_history_debug
         super(vManageSession, self).__init__()
         self.__prepare_session(verify, auth)
-
-        self.api = APIContainter(self)
-        self.primitives = APIPrimitiveContainter(self)
-        self._platform_version: Version
+        self.api = APIContainer(self)
+        self.endpoints = APIEndpointContainter(self)
+        self._platform_version: str = ""
         self._api_version: Version
 
     def request(self, method, url, *args, **kwargs) -> vManageResponse:
@@ -211,18 +210,11 @@ class vManageSession(vManageResponseAdapter):
             self.logger.debug(self.response_trace(exception.response, exception.request))
             self.logger.error(exception)
             raise
-        except CookieNotValidError as exception:
-            if self.enable_relogin and not self.__second_relogin_try:
-                self.logger.warning(f"Loging to session again. Reason: '{str(exception)}'")
-                self.auth = vManageAuth(self.base_url, self.username, self.password, verify=False)
-                self.__second_relogin_try = True
-                return self.request(method, url, *args, **kwargs)
-            elif self.enable_relogin and self.__second_relogin_try:
-                raise AuthenticationError("Session is not properly logged in and relogin failed.")
-            else:
-                raise AuthenticationError("Session is not properly logged in and relogin is not enabled.")
 
-        self.__second_relogin_try = False
+        if self.enable_relogin and self.__is_jsession_updated(response):
+            self.logger.warning("Logging to session again. Reason: JSESSIONID cookie updated by response")
+            self.auth = vManageAuth(self.base_url, self.username, self.password, verify=False)
+            return self.request(method, url, *args, **kwargs)
 
         if response.request.url and "passwordReset.html" in response.request.url:
             raise InvalidOperationError("Password must be changed to use this session.")
@@ -249,15 +241,19 @@ class vManageSession(vManageResponseAdapter):
         Returns:
             str: Base url shared for every request.
         """
+        url = urlparse(self.url)
+        netloc: str = url.netloc or url.path
+        scheme: str = url.scheme or "https"
+        base_url = urlunparse((scheme, netloc, "", None, None, None))
         if self.port:
-            return f"https://{self.url}:{self.port}"
-        return f"https://{self.url}"
+            return f"{base_url}:{self.port}"
+        return base_url
 
     def about(self) -> AboutInfo:
-        return self.primitives.client.about()
+        return self.endpoints.client.about()
 
     def server(self) -> ServerInfo:
-        server_info = self.primitives.client.server()
+        server_info = self.endpoints.client.server()
         self.platform_version = server_info.platform_version
         return server_info
 
@@ -327,11 +323,11 @@ class vManageSession(vManageResponseAdapter):
         Returns:
             Tenant UUID.
         """
-        tenants = self.primitives.tenant_management.get_all_tenants()
-        tenant = tenants.filter(sub_domain=self.subdomain).single_or_default()
+        tenants = self.get("dataservice/tenant").dataseq(Tenant)
+        tenant = tenants.filter(subdomain=self.subdomain).single_or_default()
 
-        if not tenant:
-            raise TenantSubdomainNotFound(f"Tenant with sub-domain: {self.subdomain} not found")
+        if not tenant or not tenant.tenant_id:
+            raise TenantSubdomainNotFound(f"Tenant ID for sub-domain: {self.subdomain} not found")
 
         return tenant.tenant_id
 
@@ -349,9 +345,37 @@ class vManageSession(vManageResponseAdapter):
         response = self.post(url_path)
         return response.json()["VSessionId"]
 
+    def logout(self) -> Optional[vManageResponse]:
+        if isinstance((version := self.api_version), NullVersion):
+            self.logger.warning("Cannot perform logout operation without known api_version.")
+            return None
+        else:
+            return self.post("/logout") if version >= Version("20.12") else self.get("/logout")
+
+    def close(self) -> None:
+        """Closes the vManageSession.
+
+        This method is overrided from requests.Session.
+        Firstly it cleans up any resources associated with vManage.
+        Then it closes all adapters and as such the session.
+
+        Note: It is generally recommended to use the session as a context manager
+        using the `with` statement, which ensures that the session is properly
+        closed and resources are cleaned up even in case of exceptions.
+        """
+        self.enable_relogin = False
+        self.logout()
+        super().close()
+
     def __prepare_session(self, verify: bool, auth: Optional[AuthBase]) -> None:
         self.auth = auth
         self.verify = verify
+
+    def __is_jsession_updated(self, response: vManageResponse) -> bool:
+        if (jsessionid := response.cookies.get("JSESSIONID")) and isinstance(self.auth, vManageAuth):
+            if jsessionid != self.auth.set_cookie.get("JSESSIONID"):
+                return True
+        return False
 
     def check_vmanage_server_connection(self) -> bool:
         try:
@@ -366,13 +390,13 @@ class vManageSession(vManageResponseAdapter):
         return self._session_type
 
     @property
-    def platform_version(self) -> Version:
+    def platform_version(self) -> str:
         return self._platform_version
 
     @platform_version.setter
-    def platform_version(self, version: Version):
+    def platform_version(self, version: str):
         self._platform_version = version
-        self._api_version = Version(f"{version.major}.{version.minor}")
+        self._api_version = parse_api_version(version)
 
     @property
     def api_version(self) -> Version:
