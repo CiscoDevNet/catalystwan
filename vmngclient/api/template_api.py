@@ -353,9 +353,6 @@ class TemplatesAPI:
         raise NotImplementedError()
 
     def _edit_device_template(self, template: DeviceTemplate):
-        # template_id = self.session.api.templates.get(DeviceTemplate).filter(name=template.name).single_or_default()
-        # response = self.session.put(f"/dataservice/template/device/{template_id}")
-
         self._create_device_template(template, True)
 
     def _edit_feature_template(self, template: FeatureTemplate, data: FeatureTemplateInfo) -> vManageResponse:

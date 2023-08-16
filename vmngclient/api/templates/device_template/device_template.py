@@ -78,10 +78,8 @@ class DeviceTemplate(BaseModel):
     @classmethod
     def get(self, name: str, session: vManageSession) -> DeviceTemplate:
         device_template = session.api.templates.get(DeviceTemplate).filter(name=name).single_or_default()
-        # a = session.get("/dataservice/template/feature/").dataseq(FeatureTemplatePayload)
         resp = session.get(f"dataservice/template/device/object/{device_template.id}").json()
         return DeviceTemplate(**resp)
-        # dataservice/template/device/object/c4c97aa7-242a-4b83-8907-a0dfb3968cb7
 
     class Config:
         allow_population_by_field_name = True
