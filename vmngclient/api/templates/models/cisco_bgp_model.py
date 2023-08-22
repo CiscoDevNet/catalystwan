@@ -60,9 +60,8 @@ class AggregateAddress(BaseModel):
 
     @validator("as_set", "summary_only")
     def cast_to_str(cls, value):
-        if not value:
-            return
-        return str(value).lower()
+        if value is not None:
+            return str(value).lower()
 
 
 class Ipv6AggregateAddress(BaseModel):
@@ -117,9 +116,8 @@ class AddressFamily(BaseModel):
 
     @validator("originate", "filter")
     def cast_to_str(cls, value):
-        if not value:
-            return
-        return str(value).lower()
+        if value is not None:
+            return str(value).lower()
 
 
 class NeighborFamilyType(str, Enum):
@@ -185,9 +183,8 @@ class Neighbor(BaseModel):
         "as_override",
     )
     def cast_to_str(cls, value):
-        if not value:
-            return
-        return str(value).lower()
+        if value is not None:
+            return str(value).lower()
 
 
 class IPv6NeighborFamilyType(str, Enum):
@@ -238,9 +235,8 @@ class Ipv6Neighbor(BaseModel):
         "as_override",
     )
     def cast_to_str(cls, value):
-        if not value:
-            return
-        return str(value).lower()
+        if value is not None:
+            return str(value).lower()
 
 
 class CiscoBGPModel(FeatureTemplate):
@@ -275,6 +271,5 @@ class CiscoBGPModel(FeatureTemplate):
 
     @validator("shutdown")
     def cast_to_str(cls, value):
-        if not value:
-            return
-        return str(value).lower()
+        if value is not None:
+            return str(value).lower()
