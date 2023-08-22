@@ -1,0 +1,35 @@
+{
+    "user": {
+        "vipObjectType": "tree",
+        "vipType": "constant",
+        "vipValue": [
+            {
+                "name": {
+                    "vipObjectType": "object",
+                    "vipType": "constant",
+                    "vipValue": "user1"
+                },
+                "password": {
+                    "vipObjectType": "object",
+                    "vipType": "constant",
+                    "vipValue": "pass"
+                }
+            },
+            {
+                "name": {
+                    "vipObjectType": "object",
+                    "vipType": "constant",
+                    "vipValue": "user2"
+                },
+                "password": {
+                    "vipObjectType": "object",
+                    "vipType": "constant",
+                    "vipValue": "pass"
+                }
+            }
+        ],
+        "vipPrimaryKey": [
+            "name"
+        ]
+    }
+}
