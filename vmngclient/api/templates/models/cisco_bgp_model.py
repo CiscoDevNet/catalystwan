@@ -2,7 +2,7 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 
@@ -52,11 +52,17 @@ class AddressFamilyType(str, Enum):
 
 class AggregateAddress(BaseModel):
     prefix: str
-    as_set: Optional[bool] = Field(False, alias="as-set")
-    summary_only: Optional[bool] = Field(False, alias="summary-only")
+    as_set: Optional[bool] = Field(alias="as-set")
+    summary_only: Optional[bool] = Field(alias="summary-only")
 
     class Config:
         allow_population_by_field_name = True
+
+    @validator("as_set", "summary_only")
+    def cast_to_str(cls, value):
+        if not value:
+            return
+        return str(value).lower()
 
 
 class Ipv6AggregateAddress(BaseModel):
@@ -109,6 +115,12 @@ class AddressFamily(BaseModel):
     class Config:
         allow_population_by_field_name = True
 
+    @validator("originate", "filter")
+    def cast_to_str(cls, value):
+        if not value:
+            return
+        return str(value).lower()
+
 
 class NeighborFamilyType(str, Enum):
     IPV4_UNICAST = "ipv4-unicast"
@@ -147,7 +159,7 @@ class Neighbor(BaseModel):
     shutdown: Optional[bool]
     remote_as: int = Field(alias="remote-as")
     keepalive: Optional[int]
-    holdtime: Optional[str]
+    holdtime: Optional[int]
     if_name: Optional[str] = Field(alias="if-name")
     next_hop_self: Optional[bool] = Field(alias="next-hop-self")
     send_community: Optional[bool] = Field(alias="send-community")
@@ -162,6 +174,20 @@ class Neighbor(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
+
+    @validator(
+        "shutdown",
+        "next_hop_self",
+        "send_community",
+        "send_ext_community",
+        "send_label",
+        "send_label_explicit",
+        "as_override",
+    )
+    def cast_to_str(cls, value):
+        if not value:
+            return
+        return str(value).lower()
 
 
 class IPv6NeighborFamilyType(str, Enum):
@@ -186,7 +212,7 @@ class Ipv6Neighbor(BaseModel):
     shutdown: Optional[bool]
     remote_as: int = Field(alias="remote-as")
     keepalive: Optional[int]
-    holdtime: Optional[str]
+    holdtime: Optional[int]
     if_name: Optional[str] = Field(alias="if-name")
     next_hop_self: Optional[bool] = Field(False, alias="next-hop-self")
     send_community: Optional[bool] = Field(True, alias="send-community")
@@ -201,6 +227,20 @@ class Ipv6Neighbor(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
+
+    @validator(
+        "shutdown",
+        "next_hop_self",
+        "send_community",
+        "send_ext_community",
+        "send_label",
+        "send_label_explicit",
+        "as_override",
+    )
+    def cast_to_str(cls, value):
+        if not value:
+            return
+        return str(value).lower()
 
 
 class CiscoBGPModel(FeatureTemplate):
@@ -232,3 +272,9 @@ class CiscoBGPModel(FeatureTemplate):
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_bgp"
+
+    @validator("shutdown")
+    def cast_to_str(cls, value):
+        if not value:
+            return
+        return str(value).lower()
