@@ -88,7 +88,6 @@ class FeatureTemplateField(BaseModel):
         output: dict = {}
         rel_output: dict = {}
         rel_output.update(get_path_dict([self.dataPath]))
-        # print(output)
 
         output["vipObjectType"] = self.objectType.value
 
@@ -110,7 +109,6 @@ class FeatureTemplateField(BaseModel):
                     for obj in value:  # obj is User, atomic value. Loop every child
                         child_payload = {}
                         for child in self.children:  # Child in schema
-                            # print(child.dataPath)
                             if current_path is None:
                                 current_path = []
                             child_payload.update(
@@ -119,8 +117,6 @@ class FeatureTemplateField(BaseModel):
                                 )
                             )
                         children_output.append(child_payload)
-                    # print("CHILDREN OUTPUT:")
-                    # print(children_output)
                     output["vipValue"] = children_output
                 else:
                     output["vipValue"] = value
@@ -139,13 +135,10 @@ class FeatureTemplateField(BaseModel):
         if self.primaryKeys:
             output["vipPrimaryKey"] = self.primaryKeys
 
-        # real_output = {self.key: output}
-
         pointer = rel_output
 
         for path in self.dataPath:
             pointer = pointer[path]
 
         pointer[self.key] = output
-        # print(rel_output)
         return rel_output

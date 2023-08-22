@@ -12,28 +12,6 @@ from vmngclient.api.template_api import TemplatesAPI
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.session import vManageSession
 
-# users = [
-#     User(name="admin", password="str", secret="zyx", privilege="15"),
-#     User(name="user", password="rnd", secret="dnr", privilege="14"),
-# ]
-
-
-# cisco_aaa = CiscoAAAModel(
-#     name="iuo",
-#     description="zyx",
-#     device_models=["vedge-C8000V"],
-#     user=users,
-#     authentication_group=True,
-#     accounting_group=False,
-#     radius=[
-#         RadiusGroup(
-#             group_name="xyz", vpn=1, source_interface="GIG11", server=[RadiusServer(address="1.1.1.1", key="21")]
-#         )
-#     ],
-#     domain_stripping=DomainStripping.NO,
-# )
-
-
 # Take model
 # Generate payload
 # Compare payload with definition

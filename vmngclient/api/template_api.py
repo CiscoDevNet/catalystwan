@@ -530,13 +530,6 @@ class TemplatesAPI:
 
         fr_template_fields = [FeatureTemplateField(**field) for field in schema["fields"]]  # TODO
 
-        # payload.definition.update(get_path_dict([field.dataPath for field in fr_template_fields]))
-        # print([field.dataPath for field in fr_template_fields])
-
-        # for field in fr_template_fields:
-        #     print(field.data_path(output={}))
-        #     payload.definition.update(field.data_path(output={}))
-
         # "name"
         for i, field in enumerate(fr_template_fields):
             value = None
@@ -563,12 +556,6 @@ class TemplatesAPI:
             if isinstance(value, bool):
                 value = str(value).lower()  # type: ignore
 
-            # for path in field.dataPath:
-            #     if not pointer.get(path):
-            #         pointer[path] = {}
-            #     pointer = pointer[path]
-            # pointer.update(field.payload_scheme(value, payload.definition))
-
             # Merge dictionaries
 
             # TODO unittests
@@ -588,7 +575,6 @@ class TemplatesAPI:
                 return a
 
             payload.definition = merge(payload.definition, field.payload_scheme(value))
-            # print(mergeDictionary(payload.definition, field.payload_scheme(value)))
 
         if debug:
             with open(f"payload_{template.type}.json", "w") as f:
