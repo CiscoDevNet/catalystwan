@@ -3,13 +3,16 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel as PydanticBaseModel, Field, root_validator
 from vmngclient.api.templates.feature_template import FeatureTemplate
 
-
-class STRINGBOOL(str, Enum):
-    TRUE = "true"
-    FALSE = "false"
+class BaseModel(PydanticBaseModel):
+    @root_validator
+    def convert_bool_to_string_validator(cls, values):
+        for key, value in values.items():
+            if isinstance(value, bool):
+                values[key] = str(value).lower()
+        return values
 
 
 class SecondaryIPv4Address(BaseModel):
@@ -201,11 +204,11 @@ class Vrrp(BaseModel):
     grp_id: int = Field(alias="grp-id")
     priority: int = 100
     timer: int = 1000
-    track_omp: STRINGBOOL = Field(STRINGBOOL.FALSE, alias="track-omp")
+    track_omp: bool = Field(False, alias="track-omp")
     track_prefix_list: Optional[str] = Field(alias="track-prefix-list")
     address: Optional[ipaddress.IPv4Address]
     ipv4_secondary: Optional[List[Ipv4Secondary]] = Field(alias="ipv4-secondary")
-    tloc_change_pref: STRINGBOOL = Field(STRINGBOOL.FALSE, alias="tloc-change-pref")
+    tloc_change_pref: bool = Field(False, alias="tloc-change-pref")
     value: int
     tracking_object: Optional[List[TrackingObject]] = Field(alias="tracking-object")
 
@@ -225,7 +228,7 @@ class Ipv6Vrrp(BaseModel):
     grp_id: int = Field(alias="grp-id")
     priority: int = 100
     timer: int = 1000
-    track_omp: STRINGBOOL = Field(STRINGBOOL.FALSE, alias="track-omp")
+    track_omp: bool = Field(False, alias="track-omp")
     track_prefix_list: Optional[str] = Field(alias="track-prefix-list")
     ipv6: Optional[List[Ipv6]]
 
@@ -239,18 +242,18 @@ class CiscoVpnInterfaceModel(FeatureTemplate):
         allow_population_by_field_name = True
 
     if_name: str = Field(alias="if-name")
-    description: Optional[str]
-    poe: Optional[STRINGBOOL]
+    interface_description: Optional[str] = Field(vmanage_key="description")
+    poe: Optional[bool]
     ipv4_address: Optional[str] = Field(vmanage_key="address")
     secondary_ipv4_address: Optional[List[SecondaryIPv4Address]] = Field(
         vmanage_key="secondary-address", alias="secondary-address"
     )
-    dhcp_ipv4_client: Optional[STRINGBOOL] = Field(
+    dhcp_ipv4_client: Optional[bool] = Field(
          vmanage_key="dhcp-client", alias="dhcp-client"
     )
     dhcp_distance: Optional[int] = Field(alias="dhcp-distance")
     ipv6_address: Optional[ipaddress.IPv6Interface] = Field(vmanage_key="address")
-    dhcp_ipv6_client: Optional[STRINGBOOL] = Field(
+    dhcp_ipv6_client: Optional[bool] = Field(
         vmanage_key="dhcp-client", alias="dhcp-client"
     )
     secondary_ipv6_address: Optional[List[SecondaryIPv6Address]] = Field(
@@ -262,7 +265,7 @@ class CiscoVpnInterfaceModel(FeatureTemplate):
     dhcp_helper: Optional[List[ipaddress.IPv4Address]] = Field(alias="dhcp-helper")
     dhcp_helper_v6: Optional[List[DhcpHelperV6]] = Field(alias="dhcp-helper-v6")
     tracker: Optional[List[str]]
-    auto_bandwidth_detect: Optional[STRINGBOOL] = Field(
+    auto_bandwidth_detect: Optional[bool] = Field(
         alias="auto-bandwidth-detect"
     )
     iperf_server: Optional[ipaddress.IPv4Address] = Field(alias="iperf-server")
@@ -272,26 +275,26 @@ class CiscoVpnInterfaceModel(FeatureTemplate):
     tcp_timeout: Optional[int] = Field(alias="tcp-timeout")
     nat_range_start: Optional[ipaddress.IPv4Address] = Field(alias="range-start")
     nat_range_end: Optional[ipaddress.IPv4Address] = Field(alias="range-end")
-    overload: Optional[STRINGBOOL]
+    overload: Optional[bool]
     loopback_interface: Optional[str] = Field(alias="loopback-interface")
     prefix_length: Optional[int] = Field(alias="prefix-length")
-    enable: Optional[STRINGBOOL]
-    nat64: Optional[STRINGBOOL]
-    nat66: Optional[STRINGBOOL]
+    enable: Optional[bool]
+    nat64: Optional[bool]
+    nat66: Optional[bool]
     static_nat66: Optional[List[StaticNat66]] = Field(alias="static-nat66")
     static: Optional[List[Static]]
     static_port_forward: Optional[List[StaticPortForward]] = Field(
         alias="static-port-forward"
     )
-    enable_core_region: Optional[STRINGBOOL] = Field(alias="enable-core-region")
+    enable_core_region: Optional[bool] = Field(alias="enable-core-region")
     core_region: Optional[CoreRegion] = Field(alias="core-region")
     secondary_region: Optional[SecondaryRegion] = Field(
         alias="secondary-region"
     )
     tloc_encapsulation: Optional[List[Encapsulation]]
-    border: Optional[STRINGBOOL]
-    per_tunnel_qos: Optional[STRINGBOOL] = Field(alias="per-tunnel-qos")
-    per_tunnel_qos_aggregator: Optional[STRINGBOOL] = Field(
+    border: Optional[bool]
+    per_tunnel_qos: Optional[bool] = Field(alias="per-tunnel-qos")
+    per_tunnel_qos_aggregator: Optional[bool] = Field(
         alias="per-tunnel-qos-aggregator"
     )
     mode: Optional[Mode]
@@ -299,46 +302,46 @@ class CiscoVpnInterfaceModel(FeatureTemplate):
     group: Optional[List[int]]
     value: Optional[Value]
     max_control_connections: Optional[int] = Field(alias="max-control-connections")
-    control_connections: Optional[STRINGBOOL] = Field(
+    control_connections: Optional[bool] = Field(
         alias="control-connections"
     )
-    vbond_as_stun_server: Optional[STRINGBOOL] = Field(
+    vbond_as_stun_server: Optional[bool] = Field(
         alias="vbond-as-stun-server"
     )
     exclude_controller_group_list: Optional[List[int]] = Field(
         alias="exclude-controller-group-list"
     )
     vmanage_connection_preference: Optional[int] = Field(alias="vmanage-connection-preference")
-    port_hop: Optional[STRINGBOOL] = Field(alias="port-hop")
-    restrict: Optional[STRINGBOOL]
+    port_hop: Optional[bool] = Field(alias="port-hop")
+    restrict: Optional[bool]
     dst_ip: Optional[ipaddress.IPv4Address] = Field(alias="dst-ip")
     carrier: Optional[Carrier]
     nat_refresh_interval: Optional[int] = Field(alias="nat-refresh-interval")
     hello_interval: Optional[int] = Field(alias="hello-interval")
     hello_tolerance: Optional[int] = Field(alias="hello-tolerance")
     bind: Optional[str]
-    last_resort_circuit: Optional[STRINGBOOL] = Field(
+    last_resort_circuit: Optional[bool] = Field(
         alias="last-resort-circuit"
     )
-    low_bandwidth_link: Optional[STRINGBOOL] = Field(alias="low-bandwidth-link")
+    low_bandwidth_link: Optional[bool] = Field(alias="low-bandwidth-link")
     tunnel_tcp_mss_adjust: Optional[int] = Field(alias="tunnel-tcp-mss-adjust")
-    clear_dont_fragment: Optional[STRINGBOOL] = Field(
+    clear_dont_fragment: Optional[bool] = Field(
         alias="clear-dont-fragment"
     )
-    propagate_sgt: Optional[STRINGBOOL] = Field(alias="propagate-sgt")
-    network_broadcast: Optional[STRINGBOOL] = Field(alias="network-broadcast")
-    all: Optional[STRINGBOOL]
-    bgp: Optional[STRINGBOOL]
-    dhcp: Optional[STRINGBOOL]
-    dns: Optional[STRINGBOOL]
-    icmp: Optional[STRINGBOOL]
-    sshd: Optional[STRINGBOOL]
-    netconf: Optional[STRINGBOOL]
-    ntp: Optional[STRINGBOOL]
-    ospf: Optional[STRINGBOOL]
-    stun: Optional[STRINGBOOL]
-    snmp: Optional[STRINGBOOL]
-    https: Optional[STRINGBOOL]
+    propagate_sgt: Optional[bool] = Field(alias="propagate-sgt")
+    network_broadcast: Optional[bool] = Field(alias="network-broadcast")
+    all: Optional[bool]
+    bgp: Optional[bool]
+    dhcp: Optional[bool]
+    dns: Optional[bool]
+    icmp: Optional[bool]
+    sshd: Optional[bool]
+    netconf: Optional[bool]
+    ntp: Optional[bool]
+    ospf: Optional[bool]
+    stun: Optional[bool]
+    snmp: Optional[bool]
+    https: Optional[bool]
     media_type: Optional[MediaType] = Field(alias="media-type")
     intrf_mtu: Optional[int] = Field(alias="intrf-mtu")
     mtu: Optional[int]
@@ -350,14 +353,14 @@ class CiscoVpnInterfaceModel(FeatureTemplate):
     mac_address: Optional[str] = Field(alias="mac-address")
     speed: Optional[Speed]
     duplex: Optional[Duplex]
-    shutdown: Optional[STRINGBOOL] = STRINGBOOL.FALSE
+    shutdown: Optional[bool] = False
     arp_timeout: Optional[int] = Field(alias="arp-timeout")
-    autonegotiate: Optional[STRINGBOOL]
-    ip_directed_broadcast: Optional[STRINGBOOL] = Field(alias="ip-directed-broadcast"
+    autonegotiate: Optional[bool]
+    ip_directed_broadcast: Optional[bool] = Field(alias="ip-directed-broadcast"
     )
-    icmp_redirect_disable: Optional[STRINGBOOL] = Field(alias="icmp-redirect-disable"
+    icmp_redirect_disable: Optional[bool] = Field(alias="icmp-redirect-disable"
     )
-    qos_adaptive: Optional[STRINGBOOL] = Field(alias="qos-adaptive")
+    qos_adaptive: Optional[bool] = Field(alias="qos-adaptive")
     period: Optional[int]
     bandwidth_down: Optional[int] = Field(alias="bandwidth-down")
     dmin: Optional[int]
@@ -371,7 +374,7 @@ class CiscoVpnInterfaceModel(FeatureTemplate):
     service_provider: Optional[str] = Field(alias="service-provider")
     bandwidth_upstream: Optional[int] = Field(alias="bandwidth-upstream")
     bandwidth_downstream: Optional[int] = Field(alias="bandwidth-downstream")
-    block_non_source_ip: Optional[STRINGBOOL] = Field(alias="block-non-source-ip"
+    block_non_source_ip: Optional[bool] = Field(alias="block-non-source-ip"
     )
     rule_name: Optional[str] = Field(alias="rule-name")
     access_list_ipv6: Optional[List[AccessList]] = Field(
@@ -380,17 +383,18 @@ class CiscoVpnInterfaceModel(FeatureTemplate):
     ip: Optional[List[Ip]]
     vrrp: Optional[List[Vrrp]]
     ipv6_vrrp: Optional[List[Ipv6Vrrp]] = Field(alias="ipv6-vrrp")
-    enable_sgt_propagation: Optional[STRINGBOOL] = Field(vmanage_key="sgt", alias="sgt"
+    enable_sgt_propagation: Optional[bool] = Field(vmanage_key="sgt", alias="sgt"
     )
     sgt: Optional[int]
-    trusted: Optional[STRINGBOOL]
-    enable_sgt_authorization_and_forwarding: Optional[STRINGBOOL] = Field(
+    trusted: Optional[bool]
+    enable_sgt_authorization_and_forwarding: Optional[bool] = Field(
         vmanage_key="enable", alias="enable"
     )
-    enable_sgt_enforcement: Optional[STRINGBOOL] = Field(
+    enable_sgt_enforcement: Optional[bool] = Field(
         vmanage_key="enable", alias="enable"
     )
     enforcement_sgt: Optional[int] = Field(vmanage_key="sgt")
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_vpn_interface"
+
