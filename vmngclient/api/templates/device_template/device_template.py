@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Final, List
+from typing import TYPE_CHECKING, Final, List
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, Field, validator
+
+if TYPE_CHECKING:
+    from vmngclient.session import vManageSession
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +17,7 @@ class GeneralTemplate(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
-    name: str
+    name: str = ""
     subTemplates: List[GeneralTemplate] = []
 
     templateId: str = ""
@@ -38,11 +41,11 @@ class DeviceTemplate(BaseModel):
     >>> session.api.templates.create(device_template)
     """
 
-    name: str
-    description: str
-    general_templates: List[GeneralTemplate]
-    device_role: str = ""
-    device_type: str = ""
+    name: str = Field(alias="templateName")
+    description: str = Field(alias="templateName")
+    general_templates: List[GeneralTemplate] = Field(alias="generalTemplates")
+    device_role: str = Field(default="", alias="deviceRole")
+    device_type: str = Field(default="", alias="deviceType")
 
     def generate_payload(self) -> str:
         env = Environment(
@@ -71,6 +74,15 @@ class DeviceTemplate(BaseModel):
         return output
 
     payload_path: Final[Path] = Path(__file__).parent / "device_template_payload.json.j2"
+
+    @classmethod
+    def get(self, name: str, session: vManageSession) -> DeviceTemplate:
+        device_template = session.api.templates.get(DeviceTemplate).filter(name=name).single_or_default()
+        resp = session.get(f"dataservice/template/device/object/{device_template.id}").json()
+        return DeviceTemplate(**resp)
+
+    class Config:
+        allow_population_by_field_name = True
 
 
 class DeviceSpecificValue(BaseModel):

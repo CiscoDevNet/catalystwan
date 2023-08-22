@@ -1,0 +1,64 @@
+{
+    "user": {
+        "vipObjectType": "tree",
+        "vipType": "constant",
+        "vipValue": [
+            {
+                "name": {
+                    "vipObjectType": "object",
+                    "vipType": "constant",
+                    "vipValue": "user1"
+                },
+                "password": {
+                    "vipObjectType": "object",
+                    "vipType": "constant",
+                    "vipValue": "pass"
+                },
+                "pubkey-chain": {
+                    "vipObjectType": "tree",
+                    "vipValue": [
+                        {
+                            "key-string": {
+                                "vipObjectType": "object",
+                                "vipType": "constant",
+                                "vipValue": "*****"
+                            },
+                            "key-type": {
+                                "vipObjectType": "object",
+                                "vipType": "constant",
+                                "vipValue": "RSA"
+                            }
+                        }
+                    ],
+                    "vipType": "constant",
+                    "vipPrimaryKey": [
+                        "key-string"
+                    ]
+                }
+            },
+            {
+                "name": {
+                    "vipObjectType": "object",
+                    "vipType": "constant",
+                    "vipValue": "user2"
+                },
+                "password": {
+                    "vipObjectType": "object",
+                    "vipType": "constant",
+                    "vipValue": "pass"
+                },
+                "pubkey-chain": {
+                    "vipObjectType": "tree",
+                    "vipValue": [],
+                    "vipType": "ignore",
+                    "vipPrimaryKey": [
+                        "key-string"
+                    ]
+                }
+            }
+        ],
+        "vipPrimaryKey": [
+            "name"
+        ]
+    }
+}

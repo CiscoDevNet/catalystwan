@@ -2,6 +2,7 @@ from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
 from vmngclient.api.templates.models.cisco_vpn_interface_model import CiscoVpnInterfaceModel
 from vmngclient.api.templates.models.cisco_snmp_model import CiscoSNMPModel
+from vmngclient.api.templates.models.cisco_system import CiscoSystemModel
 from vmngclient.api.templates.models.cisco_vpn_model import CiscoVPNModel
 from vmngclient.api.templates.models.omp_vsmart_model import OMPvSmart
 from vmngclient.api.templates.models.security_vsmart_model import SecurityvSmart
@@ -16,4 +17,5 @@ available_models = {
     "cisco_vpn_interface": CiscoVpnInterfaceModel,
     "cisco_vpn": CiscoVPNModel,
     "cisco_snmp": CiscoSNMPModel,
+    "cisco_system": CiscoSystemModel,
 }

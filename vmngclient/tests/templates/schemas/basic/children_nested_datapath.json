@@ -1,0 +1,112 @@
+{
+    "name": "cisco_bgp",
+    "xmlPath": [],
+    "xmlRootTag": "router",
+    "parentPath": "</vpn-instance>",
+    "nameSpace": "http://viptela.com/vpn",
+    "fields": [
+        {
+            "key": "user",
+            "description": "User Configuration",
+            "details": "Create local login account",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataPath": [],
+            "objectType": "tree",
+            "primaryKeys": [
+                "name"
+            ],
+            "children": [
+                {
+                    "key": "name",
+                    "description": "Name",
+                    "details": "Set the username",
+                    "optionType": [
+                        "constant",
+                        "variable"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "password",
+                    "description": "Password",
+                    "details": "Set the user password",
+                    "optionType": [
+                        "constant"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "passphrase",
+                        "maxLength": 32
+                    },
+                    "dataPath": ["list"],
+                    "objectType": "object"
+                },
+                {
+                    "key": "pubkey-chain",
+                    "description": "SSH pubkey",
+                    "details": "List of RSA public-keys per user",
+                    "maxElements": 2,
+                    "optionType": [
+                        "constant",
+                        "variable",
+                        "ignore"
+                    ],
+                    "defaultOption": "ignore",
+                    "dataPath": [],
+                    "objectType": "tree",
+                    "primaryKeys": [
+                        "key-string"
+                    ],
+                    "children": [
+                        {
+                            "key": "key-string",
+                            "description": "key-string",
+                            "details": "Set the RSA key string",
+                            "optionType": [
+                                "constant"
+                            ],
+                            "defaultOption": "constant",
+                            "dataType": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 1024
+                            },
+                            "dataPath": [],
+                            "objectType": "object"
+                        },
+                        {
+                            "key": "key-type",
+                            "description": "key-type",
+                            "details": "Only RSA is supported",
+                            "optionType": [
+                                "constant",
+                                "variable",
+                                "ignore"
+                            ],
+                            "defaultOption": "ignore",
+                            "dataType": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32
+                            },
+                            "dataPath": ["type", "RSA"],
+                            "objectType": "object"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

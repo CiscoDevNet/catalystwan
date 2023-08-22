@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List
 
 from pydantic import BaseModel, Field
 
@@ -13,4 +13,4 @@ class FeatureTemplatePayload(BaseModel):
     device_types: List[str] = Field(alias="deviceType")  # Enum
     default: bool = Field(alias="factoryDefault", default=False)
     version: str = Field(alias="templateMinVersion", default="15.0.0")  # Enum
-    definition: dict = Field(alias="templateDefinition")
+    definition: Any = Field(alias="templateDefinition")

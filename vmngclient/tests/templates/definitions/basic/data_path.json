@@ -1,0 +1,13 @@
+{
+    "authentication": {
+        "dot1x": {
+            "default": {
+                "as-num": {
+                    "vipObjectType": "object",
+                    "vipValue": "12",
+                    "vipType": "constant"
+                }
+            }
+        }
+    }
+}
