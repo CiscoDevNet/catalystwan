@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Iterator, List, Union
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
 from vmngclient.dataclasses import BfdSessionData, Connection, Device, Reboot, WanInterface
+from vmngclient.exceptions import InvalidOperationError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.operation_status import OperationStatus
@@ -124,7 +125,7 @@ class DevicesAPI:
         if response.get("id"):
             action_id = response["id"]
         else:
-            raise FailedSend("Failed to push edges list certificates")
+            raise InvalidOperationError("Failed to push edges list certificates")
 
         return True if wait_for_state() else False
 
@@ -327,12 +328,6 @@ class DeviceStateAPI:
             return self.get_system_status(device_id).reachability
 
         return True if wait_for_state() else False
-
-
-class FailedSend(Exception):
-    """Used when a referenced item is not found"""
-
-    pass
 
 
 __all__ = ["Device"]
