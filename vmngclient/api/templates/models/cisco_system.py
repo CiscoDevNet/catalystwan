@@ -123,18 +123,11 @@ class CiscoSystemModel(FeatureTemplate):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    # device_specific_variables: Dict[str, DeviceVariable] = {
-    #     "site-id": DeviceVariable(name="system_site_id")
-    # }
-
     timezone: Optional[Timezone]
     hostname: str = Field(default=DeviceVariable(name="system_host_name"), alias="host-name", validate_default=True)
-    # TODO
-    # description: Optional[str]
     location: Optional[str]
     latitude: Optional[float]
     longitude: Optional[float]
-    # enable: Optional[bool]
     range: Optional[int] = 100
     enable: Optional[bool]
     mobile_number: Optional[List[MobileNumber]] = Field(alias="mobile-number")
@@ -157,8 +150,6 @@ class CiscoSystemModel(FeatureTemplate):
     idle_timeout: Optional[int] = Field(alias="idle-timeout")
     tracker: Optional[List[Tracker]]
     object_track: Optional[List[ObjectTrack]] = Field(alias="object-track")
-    # enable: Optional[bool]
-    # idle_timeout: Optional[int] = Field(10, alias="idle-timeout")
     region_id: Optional[int] = Field(alias="region-id")
     secondary_region: Optional[int] = Field(alias="secondary-region")
     role: Optional[Role]
