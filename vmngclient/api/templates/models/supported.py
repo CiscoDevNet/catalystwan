@@ -16,4 +16,5 @@ available_models = {
     "cisco_system": CiscoSystemModel,
     "cisco_vpn": CiscoVPNModel,
     "cisco_snmp": CiscoSNMPModel,
+    "cisco_system": CiscoSystemModel,
 }

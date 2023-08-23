@@ -16,9 +16,10 @@ from vmngclient.api.templates.device_template.device_template import (
     GeneralTemplate,
 )
 from vmngclient.api.templates.feature_template import FeatureTemplate
-from vmngclient.api.templates.feature_template_field import FeatureTemplateField, get_path_dict
+from vmngclient.api.templates.feature_template_field import FeatureTemplateField
 from vmngclient.api.templates.feature_template_payload import FeatureTemplatePayload
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
+from vmngclient.api.templates.models.cisco_bgp_model import CiscoBGPModel
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
 from vmngclient.api.templates.models.cisco_snmp_model import CiscoSNMPModel
 from vmngclient.api.templates.models.cisco_system import CiscoSystemModel
@@ -344,6 +345,10 @@ class TemplatesAPI:
     def edit(self, template: CLITemplate) -> Any:
         ...
 
+    @overload
+    def edit(self, template: DeviceTemplate) -> Any:
+        ...
+
     def edit(self, template):
         template_info = self.get(template).filter(name=template.name).single_or_default()
         if not template_info:
@@ -352,7 +357,13 @@ class TemplatesAPI:
         if isinstance(template, FeatureTemplate):
             return self._edit_feature_template(template, template_info)
 
+        if isinstance(template, DeviceTemplate):
+            return self._edit_device_template(template)
+
         raise NotImplementedError()
+
+    def _edit_device_template(self, template: DeviceTemplate):
+        self._create_device_template(template, True)
 
     def _edit_feature_template(self, template: FeatureTemplate, data: FeatureTemplateInfo) -> vManageResponse:
         if self.is_created_by_generator(template):
@@ -423,11 +434,12 @@ class TemplatesAPI:
 
         return template_id
 
-    def _create_device_template(self, device_template: DeviceTemplate) -> str:
+    def _create_device_template(self, device_template: DeviceTemplate, edit: bool = False) -> str:
         def get_general_template_info(
             name: str, fr_templates: DataSequence[FeatureTemplateInfo]
         ) -> FeatureTemplateInfo:
             _template = fr_templates.filter(name=name).single_or_default()
+
             if not _template:
                 raise TypeError(f"{name} does not exists. Device Template is invalid.")
 
@@ -440,23 +452,32 @@ class TemplatesAPI:
                 general_template.subTemplates = [
                     parse_general_template(_t, fr_templates) for _t in general_template.subTemplates
                 ]
-
-            info = get_general_template_info(general_template.name, fr_templates)
-            return GeneralTemplate(
-                name=general_template.name,
-                subTemplates=general_template.subTemplates,
-                templateId=info.id,
-                templateType=info.template_type,
-            )
+            if general_template.name:
+                info = get_general_template_info(general_template.name, fr_templates)
+                return GeneralTemplate(
+                    name=general_template.name,
+                    subTemplates=general_template.subTemplates,
+                    templateId=info.id,
+                    templateType=info.template_type,
+                )
+            else:
+                return general_template
 
         fr_templates = self.get(FeatureTemplate)  # type: ignore
         device_template.general_templates = list(
             map(lambda x: parse_general_template(x, fr_templates), device_template.general_templates)  # type: ignore
         )
 
-        endpoint = "/dataservice/template/device/feature/"
-        payload = json.loads(device_template.generate_payload())
-        response = self.session.post(endpoint, json=payload)
+        if edit:
+            template_id = (
+                self.session.api.templates.get(DeviceTemplate).filter(name=device_template.name).single_or_default().id
+            )
+            payload = json.loads(device_template.generate_payload())
+            response = self.session.put(f"/dataservice/template/device/{template_id}", json=payload)
+        else:
+            endpoint = "/dataservice/template/device/feature/"
+            payload = json.loads(device_template.generate_payload())
+            response = self.session.post(endpoint, json=payload)
 
         return response.text
 
@@ -474,6 +495,7 @@ class TemplatesAPI:
             CiscoSystemModel,
             CiscoSNMPModel,
             CiscoVPNModel,
+            CiscoBGPModel,
         )
 
         return isinstance(template, ported_templates)
@@ -509,15 +531,10 @@ class TemplatesAPI:
         )  # type: ignore
 
         fr_template_fields = [FeatureTemplateField(**field) for field in schema["fields"]]  # TODO
-        payload.definition.update(get_path_dict([field.dataPath for field in fr_template_fields]))
-
-        for field in fr_template_fields:
-            payload.definition.update(field.data_path(output={}))
 
         # "name"
         for i, field in enumerate(fr_template_fields):
             value = None
-            pointer = payload.definition
 
             # TODO How to discover Device specific variable
             if field.key in template.device_specific_variables:
@@ -531,21 +548,35 @@ class TemplatesAPI:
                         vmanage_key = field_value.field_info.extra.get("vmanage_key")  # type: ignore
                         if vmanage_key != field.key:
                             break
+
                         value = template.dict(by_alias=True).get(field_name, None)
                         field_value.field_info.extra.pop("vmanage_key")  # type: ignore
                         break
-
                 if value is None:
                     value = template.dict(by_alias=True).get(field.key, None)
 
             if isinstance(value, bool):
                 value = str(value).lower()  # type: ignore
 
-            for path in field.dataPath:
-                if not pointer.get(path):
-                    pointer[path] = {}
-                pointer = pointer[path]
-            pointer.update(field.payload_scheme(value, payload.definition))
+            # Merge dictionaries
+
+            # TODO unittests
+            def merge(a, b, path=None):
+                if path is None:
+                    path = []
+                for key in b:
+                    if key in a:
+                        if isinstance(a[key], dict) and isinstance(b[key], dict):
+                            merge(a[key], b[key], path + [str(key)])
+                        elif a[key] == b[key]:
+                            pass  # same leaf value
+                        else:
+                            raise Exception(f"Conflict at {'.'.join(path + [str(key)])}")
+                    else:
+                        a[key] = b[key]
+                return a
+
+            payload.definition = merge(payload.definition, field.payload_scheme(value))
 
         if debug:
             with open(f"payload_{template.type}.json", "w") as f:
