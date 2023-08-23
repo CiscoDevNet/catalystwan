@@ -82,7 +82,8 @@
         "site-id": {
             "vipObjectType": "object",
             "vipType": "variableName",
-            "vipValue": ""
+            "vipValue": "",
+            "vipVariableName": "system_site_id"
         },
         "overlay-id": {
             "vipObjectType": "object",
@@ -92,12 +93,14 @@
         "system-ip": {
             "vipObjectType": "object",
             "vipType": "variableName",
-            "vipValue": ""
+            "vipValue": "",
+            "vipVariableName": "system_system_ip"
         },
         "host-name": {
             "vipObjectType": "object",
             "vipType": "variableName",
-            "vipValue": ""
+            "vipValue": "",
+            "vipVariableName": "system_host_name"
         },
         "console-baud-rate": {
             "vipObjectType": "object",
