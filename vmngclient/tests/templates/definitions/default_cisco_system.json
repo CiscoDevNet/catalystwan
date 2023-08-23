@@ -1,0 +1,181 @@
+{
+    "templateName": "default_cisco_system",
+    "templateDescription": "default",
+    "templateType": "cisco_system",
+    "deviceType": [
+        "vedge-C8000V"
+    ],
+    "templateMinVersion": "15.0.0",
+    "templateDefinition": {
+        "clock": {
+            "timezone": {
+                "vipObjectType": "object",
+                "vipType": "ignore",
+                "vipValue": "UTC"
+            }
+        },
+        "gps-location": {
+            "latitude": {
+                "vipObjectType": "object",
+                "vipType": "ignore"
+            },
+            "longitude": {
+                "vipObjectType": "object",
+                "vipType": "ignore"
+            },
+            "geo-fencing": {
+                "enable": {
+                    "vipObjectType": "object",
+                    "vipType": "ignore",
+                    "vipValue": "false"
+                },
+                "range": {},
+                "sms": {
+                    "enable": {},
+                    "mobile-number": {
+                        "vipType": "ignore",
+                        "vipValue": []
+                    }
+                }
+            }
+        },
+        "location": {
+            "vipObjectType": "object",
+            "vipType": "ignore"
+        },
+        "track-transport": {
+            "vipObjectType": "object",
+            "vipType": "ignore",
+            "vipValue": "true"
+        },
+        "track-interface-tag": {
+            "vipObjectType": "object",
+            "vipType": "ignore"
+        },
+        "port-offset": {
+            "vipObjectType": "object",
+            "vipType": "ignore",
+            "vipValue": 0
+        },
+        "port-hop": {
+            "vipObjectType": "object",
+            "vipType": "ignore",
+            "vipValue": "true"
+        },
+        "control-session-pps": {
+            "vipObjectType": "object",
+            "vipType": "ignore",
+            "vipValue": 300
+        },
+        "description": {
+            "vipObjectType": "object",
+            "vipType": "ignore"
+        },
+        "device-groups": {
+            "vipObjectType": "list",
+            "vipType": "ignore"
+        },
+        "controller-group-list": {
+            "vipObjectType": "list",
+            "vipType": "ignore"
+        },
+        "site-id": {
+            "vipObjectType": "object",
+            "vipType": "variableName",
+            "vipValue": ""
+        },
+        "overlay-id": {
+            "vipObjectType": "object",
+            "vipType": "ignore",
+            "vipValue": 1
+        },
+        "system-ip": {
+            "vipObjectType": "object",
+            "vipType": "variableName",
+            "vipValue": ""
+        },
+        "host-name": {
+            "vipObjectType": "object",
+            "vipType": "variableName",
+            "vipValue": ""
+        },
+        "console-baud-rate": {
+            "vipObjectType": "object",
+            "vipType": "notIgnore",
+            "vipValue": "9600"
+        },
+        "max-omp-sessions": {
+            "vipObjectType": "object",
+            "vipType": "ignore"
+        },
+        "track-default-gateway": {
+            "vipObjectType": "object",
+            "vipType": "ignore",
+            "vipValue": "true"
+        },
+        "idle-timeout": {
+            "vipObjectType": "object",
+            "vipType": "ignore"
+        },
+        "admin-tech-on-failure": {
+            "vipObjectType": "object",
+            "vipType": "ignore",
+            "vipValue": "true"
+        },
+        "multi-tenant": {
+            "vipObjectType": "node-only",
+            "vipType": "notIgnore",
+            "vipValue": "false"
+        },
+        "on-demand": {
+            "enable": {
+                "vipObjectType": "object",
+                "vipType": "ignore",
+                "vipValue": "false"
+            },
+            "idle-timeout": {
+                "vipObjectType": "object",
+                "vipType": "ignore",
+                "vipValue": 10
+            }
+        },
+        "region-id": {},
+        "secondary-region": {},
+        "role": {},
+        "affinity-group": {
+            "affinity-group-number": {
+                "vipObjectType": "object",
+                "vipType": "ignore"
+            },
+            "preference": {
+                "vipObjectType": "list",
+                "vipType": "ignore"
+            }
+        },
+        "transport-gateway": {
+            "vipObjectType": "object",
+            "vipType": "ignore",
+            "vipValue": "false",
+            "vipVariableName": "system_transport_gateway"
+        },
+        "enable-mrf-migration": {},
+        "migration-bgp-community": {},
+        "tracker": {
+            "vipType": "ignore",
+            "vipValue": [],
+            "vipObjectType": "tree",
+            "vipPrimaryKey": [
+                "name"
+            ]
+        },
+        "object-track": {
+            "vipType": "ignore",
+            "vipValue": [],
+            "vipObjectType": "tree",
+            "vipPrimaryKey": [
+                "object-number"
+            ]
+        }
+    },
+    "factoryDefault": false
+}
