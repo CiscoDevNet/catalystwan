@@ -13,6 +13,7 @@ available_models = {
     "omp_vsmart": OMPvSmart,
     "security_vsmart": SecurityvSmart,
     "system_vsmart": SystemVsmart,
+    "cisco_system": CiscoSystemModel,
     "cisco_vpn": CiscoVPNModel,
     "cisco_snmp": CiscoSNMPModel,
     "cisco_system": CiscoSystemModel,

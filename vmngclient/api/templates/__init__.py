@@ -9,9 +9,10 @@ templates in vManage.
 
 # Device Template
 
+from vmngclient.api.templates.models.cisco_system import CiscoSystemModel
+
 # AAA Templates
 from vmngclient.api.templates.payloads.aaa.aaa_model import AAAModel
-from vmngclient.api.templates.payloads.cisco_system.cisco_system_model import CiscoSystemModel
 
 # Cisco VPN Templates
 from vmngclient.api.templates.payloads.cisco_vpn.cisco_vpn_model import (
