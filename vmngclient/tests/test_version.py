@@ -3,7 +3,7 @@ import unittest
 from packaging.version import Version  # type: ignore
 from parameterized import parameterized  # type: ignore
 
-from vmngclient.version import NullVersion, parse_api_version
+from vmngclient.version import NullVersion, parse_api_version, parse_vmanage_version
 
 
 class TestNullVersion(unittest.TestCase):
@@ -63,6 +63,23 @@ class TestVersion(unittest.TestCase):
     def test_parse_api_version(self, version: str, result: Version):
         # Arrange, Act
         parsed_version = parse_api_version(version)
+
+        # Assert
+        self.assertEqual(parsed_version, result)
+
+    @parameterized.expand(
+        [
+            ("1.0.0", Version("1.0.0")),
+            ("0", Version("0")),
+            ("20.12.0-914-xy", Version("20.12.0-914")),
+            ("abc-20.1.9", Version("20.1.9")),
+            ("smart-li-20.13.999-3077", Version("20.13.999-3077")),
+            ("random_string", NullVersion()),
+        ]
+    )
+    def test_parse_vmanage_version(self, version: str, result: Version):
+        # Arrange, Act
+        parsed_version = parse_vmanage_version(version)
 
         # Assert
         self.assertEqual(parsed_version, result)

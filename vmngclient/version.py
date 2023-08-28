@@ -1,3 +1,5 @@
+import re
+
 from packaging._structures import NegativeInfinity  # type: ignore
 from packaging.version import InvalidVersion, Version  # type: ignore
 
@@ -29,6 +31,43 @@ class NullVersion(Version):
         return "NullVersion"
 
 
+def parse_vmanage_version(version: str) -> Version:
+    """Parse vmanage version string which could contain custom prefixes and suffixes
+    Currently not conforming versions could be found in:
+    GET /client/server: '20.12.0-144-li'
+    GET /device/action/software/images?imageType=software: 'smart-li-20.13.999-3077'
+    Strategy is to iterate by removing potentially problematic part until version is parsed.
+    This is temporary solution until custom versioning scheme will be implemented.
+
+    >>> parse_vmanage_version('20.12.0-144-li')
+    <Version('20.12.0.post144')>
+    >>> parse_vmanage_version('li-20.13.999-3077')
+    <Version('20.13.999.post3077')>
+    >>> parse_vmanage_version('smart-li-20.13.999-3077')
+    <Version('20.13.999.post3077')>
+    >>> parse_vmanage_version('Not a version.')
+    <class 'vmngclient.version.NullVersion'>
+
+    Args:
+        version (str): The version string to parse.
+
+    Returns:
+        Version
+    """
+
+    def numeric_only(version: str) -> str:
+        if match := re.search(r"\d.*\d", version):
+            return str(match[0])
+        return ""
+
+    for candidate in [version, numeric_only(version)]:
+        try:
+            return Version(candidate)
+        except InvalidVersion:
+            continue
+    return NullVersion()
+
+
 def parse_api_version(version: str) -> Version:
     """Parse the given version string.
 
@@ -48,12 +87,7 @@ def parse_api_version(version: str) -> Version:
     Returns:
         Version: A Version with supported `major` and `minor` properties.
     """
-    try:
-        parsed_version = Version(version)
+    parsed_version = parse_vmanage_version(version)
+    if not isinstance(parsed_version, NullVersion):
         return Version(f"{parsed_version.major}.{parsed_version.minor}")
-    except InvalidVersion:
-        try:
-            parsed_version = Version(".".join(version.split(".")[:2]))
-            return Version(f"{parsed_version.major}.{parsed_version.minor}")
-        except InvalidVersion:
-            return NullVersion()
+    return NullVersion()
