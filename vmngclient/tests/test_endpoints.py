@@ -10,7 +10,7 @@ from parameterized import parameterized  # type: ignore
 from pydantic import BaseModel
 
 from vmngclient.dataclasses import DataclassBase  # type: ignore
-from vmngclient.endpoints import BASE_PATH, APIEndpoints, CustomPayloadType, PreparedPayload
+from vmngclient.endpoints import BASE_PATH, JSON, APIEndpoints, CustomPayloadType, PreparedPayload
 from vmngclient.endpoints import logger as endpoints_logger
 from vmngclient.endpoints import request, versions, view
 from vmngclient.exceptions import APIEndpointError, APIRequestPayloadTypeError, APIVersionError, APIViewError
@@ -218,6 +218,21 @@ class TestAPIEndpoints(unittest.TestCase):
         _, kwargs = self.session_mock.request.call_args
         assert kwargs.get("data") == self.json_payload
 
+    @parameterized.expand(
+        [
+            ("JStr", str),
+            (1, int),
+            (3.33, float),
+            (True, bool),
+            ({"a": {"b": [1.6]}}, dict),
+            ([1, 2, {"a": {"b": [1.6]}}], list),
+        ]
+    )
+    def test_forced_json_payload(self, payload, _):
+        self.endpoints._request("POST", f"/{__name__}", payload=payload, force_json_payload=True)
+        _, kwargs = self.session_mock.request.call_args
+        assert kwargs.get("data") == json.dumps(payload)
+
     def test_str_payload(self):
         str_payload = "This is string payload!"
         self.endpoints._request("POST", f"/{__name__}", payload=str_payload)
@@ -402,6 +417,25 @@ class TestAPIEndpoints(unittest.TestCase):
             params=self.basemodel_params,
         )
 
+    def test_request_decorator_call_with_json_payload(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            @request("GET", "/aaa/bbb/ccc")
+            def get_data(self, payload: JSON):  # type: ignore [empty-body]
+                ...
+
+        api = TestAPI(self.session_mock)
+        json_payload = {"a": {"b": [1.6]}}
+        # Act
+        api.get_data(payload=json_payload)
+        # Assert
+        self.session_mock.request.assert_called_once_with(
+            "GET",
+            self.base_path + "/aaa/bbb/ccc",
+            data=json.dumps(json_payload),
+            headers={"content-type": "application/json"},
+        )
+
     def test_request_decorator_call_and_return_model(self):
         # Arrange
         class TestAPI(APIEndpoints):
@@ -478,6 +512,32 @@ class TestAPIEndpoints(unittest.TestCase):
         # Assert
         self.session_mock.request.return_value.json.assert_called_once()
         assert retval == self.dict_payload
+
+    @parameterized.expand(
+        [
+            ("JStr", str),
+            (1, int),
+            (3.33, float),
+            (True, bool),
+            ({"a": {"b": [1.6]}}, dict),
+            ([1, 2, {"a": {"b": [1.6]}}], list),
+        ]
+    )
+    def test_request_decorator_call_and_return_json(self, json, jtype):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            @request("GET", "/v1/items")
+            def get_data(self) -> JSON:  # type: ignore [empty-body]
+                ...
+
+        self.session_mock.request.return_value.json = MagicMock(return_value=json)
+        api = TestAPI(self.session_mock)
+        # Act
+        retval = api.get_data()
+        # Assert
+        self.session_mock.request.return_value.json.assert_called_once()
+        assert retval == json
+        assert type(retval) == jtype
 
     def test_no_mutable_state_when_calling_endpoint(self):
         # Arrange
