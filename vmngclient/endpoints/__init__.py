@@ -41,6 +41,7 @@ from typing import (
     Dict,
     Final,
     Iterable,
+    List,
     Mapping,
     Optional,
     Protocol,
@@ -77,9 +78,12 @@ class CustomPayloadType(Protocol):
         ...
 
 
+JSON = Union[str, int, float, bool, None, Dict[str, "JSON"], List["JSON"]]
 ModelPayloadType = Union[AttrsInstance, BaseModel, Sequence[AttrsInstance], Sequence[BaseModel]]
-PayloadType = Union[str, bytes, dict, ModelPayloadType, CustomPayloadType]
-ReturnType = Union[bytes, str, dict, BaseModel, DataclassBase, DataSequence[BaseModel], DataSequence[DataclassBase]]
+PayloadType = Union[JSON, str, bytes, dict, ModelPayloadType, CustomPayloadType]
+ReturnType = Union[
+    JSON, bytes, str, dict, BaseModel, DataclassBase, DataSequence[BaseModel], DataSequence[DataclassBase]
+]
 RequestParamsType = Union[Dict[str, str], BaseModel]
 
 
@@ -90,6 +94,15 @@ class TypeSpecifier:
     present: bool
     sequence_type: Optional[type] = None
     payload_type: Optional[type] = None
+    is_json: bool = False  # JSON is treated specially as it is type-alias / <typing special form>
+
+    @classmethod
+    def not_present(cls) -> "TypeSpecifier":
+        return TypeSpecifier(present=False)
+
+    @classmethod
+    def json(cls) -> "TypeSpecifier":
+        return TypeSpecifier(present=True, is_json=True)
 
 
 @dataclass
@@ -162,18 +175,19 @@ class APIEndpoints:
     """
 
     @classmethod
-    def _prepare_payload(cls, payload: PayloadType) -> PreparedPayload:
+    def _prepare_payload(cls, payload: PayloadType, force_json: bool = False) -> PreparedPayload:
         """Helper method to prepare data for sending based on type"""
+        if force_json or isinstance(payload, dict):
+            return PreparedPayload(data=json.dumps(payload), headers={"content-type": "application/json"})
         if isinstance(payload, (str, bytes)):
             return PreparedPayload(data=payload)
-        elif isinstance(payload, dict):
-            return PreparedPayload(data=json.dumps(payload), headers={"content-type": "application/json"})
         elif isinstance(payload, BaseModel):
             return cls._prepare_basemodel_payload(payload)
         elif isinstance(payload, AttrsInstance):
             return cls._prepare_attrs_payload(payload)
         elif isinstance(payload, Sequence) and not isinstance(payload, (str, bytes)):
-            return cls._prepare_sequence_payload(payload)
+            return cls._prepare_sequence_payload(payload)  # type: ignore[arg-type]
+            # offender is List[JSON] which is also a Sequence can be ignored as long as force_json is passed correctly
         elif isinstance(payload, CustomPayloadType):
             return payload.prepared()
         else:
@@ -220,13 +234,17 @@ class APIEndpoints:
         url: str,
         payload: Optional[ModelPayloadType] = None,
         params: Optional[RequestParamsType] = None,
+        force_json_payload: bool = False,
         **kwargs,
     ) -> APIEndpointClientResponse:
         """Prepares and sends request using client protocol"""
         _kwargs = dict(kwargs)
         if payload is not None:
             _kwargs.update(
-                asdict(self._prepare_payload(payload), dict_factory=lambda x: {k: v for (k, v) in x if v is not None})
+                asdict(
+                    self._prepare_payload(payload, force_json_payload),
+                    dict_factory=lambda x: {k: v for (k, v) in x if v is not None},
+                )
             )  # optional fields set to None will not be inserted to _kwargs
         if params is not None:
             _kwargs.update({"params": self._prepare_params(params)})
@@ -355,8 +373,8 @@ class request(APIEndpointsDecorator):
         self.url = url
         self.url_field_names = url_field_names
         self.resp_json_key = resp_json_key
-        self.return_spec = TypeSpecifier(False)
-        self.payload_spec = TypeSpecifier(False)
+        self.return_spec = TypeSpecifier.not_present()
+        self.payload_spec = TypeSpecifier.not_present()
         self.kwargs = kwargs
 
     def specify_return_type(self) -> TypeSpecifier:
@@ -370,6 +388,8 @@ class request(APIEndpointsDecorator):
             TypeSpecifier: Specification of return type
         """
         annotation = self.sig.return_annotation
+        if annotation == JSON:
+            return TypeSpecifier.json()
         if (type_origin := get_origin(annotation)) and isclass(type_origin) and issubclass(type_origin, DataSequence):
             if (
                 (type_args := get_args(annotation))
@@ -384,7 +404,7 @@ class request(APIEndpointsDecorator):
                 if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModel, DataclassBase)):
                     return TypeSpecifier(True, None, annotation)
                 elif annotation == _empty:
-                    return TypeSpecifier(False)
+                    return TypeSpecifier.not_present()
                 raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
             except TypeError:
                 raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
@@ -403,8 +423,10 @@ class request(APIEndpointsDecorator):
         """
         payload_param = self.sig.parameters.get("payload")
         if not payload_param:
-            return TypeSpecifier(False)
+            return TypeSpecifier.not_present()
         annotation = payload_param.annotation
+        if annotation == JSON:
+            return TypeSpecifier.json()
         if isclass(annotation):
             if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModel, DataclassBase, CustomPayloadType)):
                 return TypeSpecifier(True, None, annotation)
@@ -483,8 +505,17 @@ class request(APIEndpointsDecorator):
             payload = _kwargs.get("payload")
             params = _kwargs.get("params")
             formatted_url = self.url.format(**_kwargs)
-            response = _self._request(self.http_method, formatted_url, payload=payload, params=params, **self.kwargs)
+            response = _self._request(
+                self.http_method,
+                formatted_url,
+                payload=payload,
+                force_json_payload=self.payload_spec.is_json,
+                params=params,
+                **self.kwargs,
+            )
             if self.return_spec.present:
+                if self.return_spec.is_json:
+                    return response.json()
                 if issubclass(self.return_spec.payload_type, (BaseModel, DataclassBase)):
                     if self.return_spec.sequence_type == DataSequence:
                         return response.dataseq(self.return_spec.payload_type, self.resp_json_key)
