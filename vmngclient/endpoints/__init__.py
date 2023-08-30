@@ -80,9 +80,9 @@ class CustomPayloadType(Protocol):
 
 JSON = Union[str, int, float, bool, None, Dict[str, "JSON"], List["JSON"]]
 ModelPayloadType = Union[AttrsInstance, BaseModel, Sequence[AttrsInstance], Sequence[BaseModel]]
-PayloadType = Union[JSON, str, bytes, dict, ModelPayloadType, CustomPayloadType]
+PayloadType = Union[None, JSON, str, bytes, dict, ModelPayloadType, CustomPayloadType]
 ReturnType = Union[
-    JSON, bytes, str, dict, BaseModel, DataclassBase, DataSequence[BaseModel], DataSequence[DataclassBase]
+    None, JSON, bytes, str, dict, BaseModel, DataclassBase, DataSequence[BaseModel], DataSequence[DataclassBase]
 ]
 RequestParamsType = Union[Dict[str, str], BaseModel]
 
@@ -95,6 +95,7 @@ class TypeSpecifier:
     sequence_type: Optional[type] = None
     payload_type: Optional[type] = None
     is_json: bool = False  # JSON is treated specially as it is type-alias / <typing special form>
+    is_optional: bool = False
 
     @classmethod
     def not_present(cls) -> "TypeSpecifier":
@@ -424,22 +425,41 @@ class request(APIEndpointsDecorator):
         payload_param = self.sig.parameters.get("payload")
         if not payload_param:
             return TypeSpecifier.not_present()
+
         annotation = payload_param.annotation
+        is_optional = False
+
+        # Check if JSON
         if annotation == JSON:
             return TypeSpecifier.json()
+
+        # Check if Optional (flag and replace original annotation with optional type if exactly one is present)
+        if type_origin := get_origin(annotation):
+            type_args = get_args(annotation)
+            if type_origin == Union and (type(None) in type_args):
+                optional_type_args = tuple(arg for arg in get_args(annotation) if not arg == type(None))  # noqa: E721
+                # flake suggest using isinstance(arg, type(None)) above, but it doesn't match NoneType
+                if len(optional_type_args) == 1:
+                    is_optional = True
+                    annotation = optional_type_args[0]
+
+        # Check if regular class
         if isclass(annotation):
             if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModel, DataclassBase, CustomPayloadType)):
-                return TypeSpecifier(True, None, annotation)
+                return TypeSpecifier(True, None, annotation, is_optional)
             else:
                 raise APIEndpointError(f"'payload' param must be annotated with supported type: {PayloadType}")
-        elif (type_origin := get_origin(annotation)) and isclass(type_origin) and issubclass(type_origin, Sequence):
-            if (
-                (type_args := get_args(annotation))
-                and (len(type_args) == 1)
-                and isclass(type_args[0])
-                and issubclass(type_args[0], (BaseModel, DataclassBase))
-            ):
-                return TypeSpecifier(True, annotation, type_args[0])
+
+        # Check if Sequence[PayloadModelType] like List or DataSequence
+        elif type_origin := get_origin(annotation):
+            if isclass(type_origin) and issubclass(type_origin, Sequence):
+                if (
+                    (type_args := get_args(annotation))
+                    and (len(type_args) == 1)
+                    and isclass(type_args[0])
+                    and issubclass(type_args[0], (BaseModel, DataclassBase))
+                ):
+                    return TypeSpecifier(True, annotation, type_args[0], is_optional)
             raise APIEndpointError(f"Expected: {PayloadType} but found payload {annotation}")
         else:
             raise APIEndpointError(f"Expected: {PayloadType} but found payload {annotation}")
