@@ -10,7 +10,7 @@ from parameterized import parameterized  # type: ignore
 from pydantic import BaseModel
 
 from vmngclient.dataclasses import DataclassBase  # type: ignore
-from vmngclient.endpoints import BASE_PATH, JSON, APIEndpoints, CustomPayloadType, PreparedPayload
+from vmngclient.endpoints import BASE_PATH, JSON, APIEndpoints, CustomPayloadType, PreparedPayload, TypeSpecifier
 from vmngclient.endpoints import logger as endpoints_logger
 from vmngclient.endpoints import request, versions, view
 from vmngclient.exceptions import APIEndpointError, APIRequestPayloadTypeError, APIVersionError, APIViewError
@@ -314,6 +314,34 @@ class TestAPIEndpoints(unittest.TestCase):
                 @request("POST", "/v1/data")
                 def get_data(self, payload: Dict[str, BaseModelExample]):  # type: ignore [empty-body]
                     ...
+
+    @parameterized.expand(
+        [
+            (BaseModelExample, False, TypeSpecifier(True, None, BaseModelExample, False, False)),
+            (List[BaseModelExample], False, TypeSpecifier(True, list, BaseModelExample, False, False)),
+            (Optional[BaseModelExample], False, TypeSpecifier(True, None, BaseModelExample, False, True)),
+            (Optional[List[BaseModelExample]], False, TypeSpecifier(True, list, BaseModelExample, False, True)),
+            (List[Optional[BaseModelExample]], True, None),
+            (JSON, False, TypeSpecifier(True, None, None, True, False)),
+            (str, False, TypeSpecifier(True, None, str, False, False)),
+            (bytes, False, TypeSpecifier(True, None, bytes, False, False)),
+            (None, True, None),
+        ]
+    )
+    def test_request_decorator_payload_spec(self, payload_type, raises, expected_payload_spec):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            def get_data(self, payload: payload_type):  # type: ignore [empty-body]
+                ...
+
+        decorator = request("POST", "/v1/data")
+        # Act / Assert
+        if raises:
+            with self.assertRaises(APIEndpointError):
+                decorator(TestAPI.get_data)
+        else:
+            decorator(TestAPI.get_data)
+            assert decorator.payload_spec == expected_payload_spec
 
     def test_request_decorator_not_annotated_params(self):
         with self.assertRaises(APIEndpointError):

@@ -446,7 +446,7 @@ class request(APIEndpointsDecorator):
         # Check if regular class
         if isclass(annotation):
             if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModel, DataclassBase, CustomPayloadType)):
-                return TypeSpecifier(True, None, annotation, is_optional)
+                return TypeSpecifier(True, None, annotation, False, is_optional)
             else:
                 raise APIEndpointError(f"'payload' param must be annotated with supported type: {PayloadType}")
 
@@ -459,7 +459,7 @@ class request(APIEndpointsDecorator):
                     and isclass(type_args[0])
                     and issubclass(type_args[0], (BaseModel, DataclassBase))
                 ):
-                    return TypeSpecifier(True, annotation, type_args[0], is_optional)
+                    return TypeSpecifier(True, type_origin, type_args[0], False, is_optional)
             raise APIEndpointError(f"Expected: {PayloadType} but found payload {annotation}")
         else:
             raise APIEndpointError(f"Expected: {PayloadType} but found payload {annotation}")
