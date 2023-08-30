@@ -539,6 +539,19 @@ class TestAPIEndpoints(unittest.TestCase):
         assert retval == json
         assert type(retval) == jtype
 
+    def test_request_decorator_call_raises_when_payload_has_no_resp_json_key(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            @request("GET", "/v1/items", "data")
+            def get_data(self) -> JSON:  # type: ignore [empty-body]
+                ...
+
+        self.session_mock.request.return_value.json = MagicMock(return_value=[1, 2, 3])
+        api = TestAPI(self.session_mock)
+        # Act / Assert
+        with self.assertRaises(TypeError):
+            api.get_data()
+
     def test_no_mutable_state_when_calling_endpoint(self):
         # Arrange
         class TestAPI(APIEndpoints):
