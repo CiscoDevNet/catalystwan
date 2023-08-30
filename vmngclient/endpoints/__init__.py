@@ -515,7 +515,13 @@ class request(APIEndpointsDecorator):
             )
             if self.return_spec.present:
                 if self.return_spec.is_json:
-                    return response.json()
+                    full_json = response.json()
+                    if self.resp_json_key is not None:
+                        if isinstance(full_json, dict):
+                            return full_json.get(self.resp_json_key)
+                        else:
+                            raise TypeError(f"Expected dictionary as json payload but found: {type(full_json)}")
+                    return full_json
                 if issubclass(self.return_spec.payload_type, (BaseModel, DataclassBase)):
                     if self.return_spec.sequence_type == DataSequence:
                         return response.dataseq(self.return_spec.payload_type, self.resp_json_key)
