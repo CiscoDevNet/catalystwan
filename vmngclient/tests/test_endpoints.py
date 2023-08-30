@@ -1,7 +1,7 @@
 import io
 import json
 import unittest
-from typing import Dict, List
+from typing import Dict, List, Optional, Union
 from unittest.mock import MagicMock
 
 from attr import define  # type: ignore
@@ -346,6 +346,23 @@ class TestAPIEndpoints(unittest.TestCase):
                 @request("POST", "/v1/data/{id}")
                 def get_data(self, id: str, payload: BaseModelExample, bogus: str):  # type: ignore [empty-body]
                     ...
+
+    def test_request_decorator_accepts_optional_payload(self):
+        # Arrange
+        class TestAPIOptional(APIEndpoints):
+            @request("GET", "/v1/data")
+            def get_data1(self, payload: Optional[BaseModelExample]):  # type: ignore [empty-body]
+                ...
+
+        class TestAPIUnion(APIEndpoints):
+            @request("GET", "/v2/data")
+            def get_data2(self, payload: Union[None, BaseModelExample]):  # type: ignore [empty-body]
+                ...
+
+        class TestAPIOptionalModelSequence(APIEndpoints):
+            @request("GET", "/v3/data")
+            def get_data3(self, payload: Optional[List[BaseModelExample]]):  # type: ignore [empty-body]
+                ...
 
     def test_request_decorator_call_from_unsuitable_base_class(self):
         class TestAPI:
