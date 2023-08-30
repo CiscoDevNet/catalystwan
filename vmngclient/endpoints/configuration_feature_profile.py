@@ -53,8 +53,9 @@ class GetFeatureProfilesPayload(BaseModel):
 
 class ConfigurationFeatureProfile(APIEndpoints):
     # TODO JSON return type
+    # TODO resp_json_key
     @versions(supported_versions=(">=20.9"), raises=False)
-    @request(get, "/v1/feature-profile/sdwan/system/aaa/schema")
+    @request(get, "/v1/feature-profile/sdwan/system/aaa/schema", resp_json_key="request")
     def get_sdwan_system_aaa_parcel_schema(self, params: SchemaTypeQuery) -> dict:
         ...
 
