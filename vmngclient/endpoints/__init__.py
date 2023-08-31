@@ -405,7 +405,7 @@ class request(APIEndpointsDecorator):
             return TypeSpecifier.none_type()
         if annotation == _empty:
             raise APIEndpointError(
-                "APIEndpoint methods decorated whit @request must specify return type, "
+                "APIEndpoint methods decorated with @request must specify return type, "
                 "use None annotation if function does not return any value"
             )
         if (type_origin := get_origin(annotation)) and isclass(type_origin) and issubclass(type_origin, DataSequence):

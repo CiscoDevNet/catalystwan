@@ -21,7 +21,6 @@ class ConfigurationDeviceSoftwareUpdate(APIEndpoints):
 
     @post("/device/action/software/package")
     def install_pkg(self, payload: SoftwarePackageUpdatePayload) -> None:
-        # POST /device/action/software/package
         ...
 
     def process_software_image(self):
