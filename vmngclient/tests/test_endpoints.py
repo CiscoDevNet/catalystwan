@@ -1,7 +1,7 @@
 import io
 import json
 import unittest
-from typing import Dict, List
+from typing import Dict, List, Optional, Union
 from unittest.mock import MagicMock
 
 from attr import define  # type: ignore
@@ -10,9 +10,18 @@ from parameterized import parameterized  # type: ignore
 from pydantic import BaseModel
 
 from vmngclient.dataclasses import DataclassBase  # type: ignore
-from vmngclient.endpoints import BASE_PATH, APIEndpoints, CustomPayloadType, PreparedPayload
+from vmngclient.endpoints import (
+    BASE_PATH,
+    JSON,
+    APIEndpoints,
+    CustomPayloadType,
+    PreparedPayload,
+    TypeSpecifier,
+    delete,
+    get,
+)
 from vmngclient.endpoints import logger as endpoints_logger
-from vmngclient.endpoints import request, versions, view
+from vmngclient.endpoints import post, put, request, versions, view
 from vmngclient.exceptions import APIEndpointError, APIRequestPayloadTypeError, APIVersionError, APIViewError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
@@ -218,6 +227,21 @@ class TestAPIEndpoints(unittest.TestCase):
         _, kwargs = self.session_mock.request.call_args
         assert kwargs.get("data") == self.json_payload
 
+    @parameterized.expand(
+        [
+            ("JStr", str),
+            (1, int),
+            (3.33, float),
+            (True, bool),
+            ({"a": {"b": [1.6]}}, dict),
+            ([1, 2, {"a": {"b": [1.6]}}], list),
+        ]
+    )
+    def test_forced_json_payload(self, payload, _):
+        self.endpoints._request("POST", f"/{__name__}", payload=payload, force_json_payload=True)
+        _, kwargs = self.session_mock.request.call_args
+        assert kwargs.get("data") == json.dumps(payload)
+
     def test_str_payload(self):
         str_payload = "This is string payload!"
         self.endpoints._request("POST", f"/{__name__}", payload=str_payload)
@@ -300,6 +324,34 @@ class TestAPIEndpoints(unittest.TestCase):
                 def get_data(self, payload: Dict[str, BaseModelExample]):  # type: ignore [empty-body]
                     ...
 
+    @parameterized.expand(
+        [
+            (BaseModelExample, False, TypeSpecifier(True, None, BaseModelExample, False, False)),
+            (List[BaseModelExample], False, TypeSpecifier(True, list, BaseModelExample, False, False)),
+            (Optional[BaseModelExample], False, TypeSpecifier(True, None, BaseModelExample, False, True)),
+            (Optional[List[BaseModelExample]], False, TypeSpecifier(True, list, BaseModelExample, False, True)),
+            (List[Optional[BaseModelExample]], True, None),
+            (JSON, False, TypeSpecifier(True, None, None, True, False)),
+            (str, False, TypeSpecifier(True, None, str, False, False)),
+            (bytes, False, TypeSpecifier(True, None, bytes, False, False)),
+            (None, True, None),
+        ]
+    )
+    def test_request_decorator_payload_spec(self, payload_type, raises, expected_payload_spec):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            def get_data(self, payload: payload_type):  # type: ignore [empty-body]
+                ...
+
+        decorator = request("POST", "/v1/data")
+        # Act / Assert
+        if raises:
+            with self.assertRaises(APIEndpointError):
+                decorator(TestAPI.get_data)
+        else:
+            decorator(TestAPI.get_data)
+            assert decorator.payload_spec == expected_payload_spec
+
     def test_request_decorator_not_annotated_params(self):
         with self.assertRaises(APIEndpointError):
 
@@ -331,6 +383,23 @@ class TestAPIEndpoints(unittest.TestCase):
                 @request("POST", "/v1/data/{id}")
                 def get_data(self, id: str, payload: BaseModelExample, bogus: str):  # type: ignore [empty-body]
                     ...
+
+    def test_request_decorator_accepts_optional_payload(self):
+        # Arrange
+        class TestAPIOptional(APIEndpoints):
+            @request("GET", "/v1/data")
+            def get_data1(self, payload: Optional[BaseModelExample]):  # type: ignore [empty-body]
+                ...
+
+        class TestAPIUnion(APIEndpoints):
+            @request("GET", "/v2/data")
+            def get_data2(self, payload: Union[None, BaseModelExample]):  # type: ignore [empty-body]
+                ...
+
+        class TestAPIOptionalModelSequence(APIEndpoints):
+            @request("GET", "/v3/data")
+            def get_data3(self, payload: Optional[List[BaseModelExample]]):  # type: ignore [empty-body]
+                ...
 
     def test_request_decorator_call_from_unsuitable_base_class(self):
         class TestAPI:
@@ -400,6 +469,41 @@ class TestAPIEndpoints(unittest.TestCase):
             data=self.json_payload,
             headers={"content-type": "application/json"},
             params=self.basemodel_params,
+        )
+
+    def test_request_decorator_call_with_json_payload(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            @request("GET", "/aaa/bbb/ccc")
+            def get_data(self, payload: JSON):  # type: ignore [empty-body]
+                ...
+
+        api = TestAPI(self.session_mock)
+        json_payload = {"a": {"b": [1.6]}}
+        # Act
+        api.get_data(payload=json_payload)
+        # Assert
+        self.session_mock.request.assert_called_once_with(
+            "GET",
+            self.base_path + "/aaa/bbb/ccc",
+            data=json.dumps(json_payload),
+            headers={"content-type": "application/json"},
+        )
+
+    def test_request_decorator_call_optional_model_payload(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            @request("PUT", "/v1/data/{id}")
+            def put_data(self, id: str, payload: Optional[BaseModelExample]):  # type: ignore [empty-body]
+                ...
+
+        api = TestAPI(self.session_mock)
+        # Act
+        api.put_data("ID123", None)
+        # Assert
+        self.session_mock.request.assert_called_once_with(
+            "PUT",
+            self.base_path + "/v1/data/ID123",
         )
 
     def test_request_decorator_call_and_return_model(self):
@@ -478,6 +582,89 @@ class TestAPIEndpoints(unittest.TestCase):
         # Assert
         self.session_mock.request.return_value.json.assert_called_once()
         assert retval == self.dict_payload
+
+    @parameterized.expand(
+        [
+            ("JStr", str),
+            (1, int),
+            (3.33, float),
+            (True, bool),
+            ({"a": {"b": [1.6]}}, dict),
+            ([1, 2, {"a": {"b": [1.6]}}], list),
+        ]
+    )
+    def test_request_decorator_call_and_return_json(self, json, jtype):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            @request("GET", "/v1/items")
+            def get_data(self) -> JSON:  # type: ignore [empty-body]
+                ...
+
+        self.session_mock.request.return_value.json = MagicMock(return_value=json)
+        api = TestAPI(self.session_mock)
+        # Act
+        retval = api.get_data()
+        # Assert
+        self.session_mock.request.return_value.json.assert_called_once()
+        assert retval == json
+        assert type(retval) == jtype
+
+    def test_request_decorator_call_raises_when_payload_has_no_resp_json_key(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            @request("GET", "/v1/items", "data")
+            def get_data(self) -> JSON:  # type: ignore [empty-body]
+                ...
+
+        self.session_mock.request.return_value.json = MagicMock(return_value=[1, 2, 3])
+        api = TestAPI(self.session_mock)
+        # Act / Assert
+        with self.assertRaises(TypeError):
+            api.get_data()
+
+    def test_get_decorator(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            def method(self):  # type: ignore [empty-body]
+                ...
+
+        decorator = get("/url/data")
+        # Act / Assert
+        decorator(TestAPI.method)
+        decorator.http_method = "GET"
+
+    def test_put_decorator(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            def method(self):  # type: ignore [empty-body]
+                ...
+
+        decorator = put("/url/data")
+        # Act / Assert
+        decorator(TestAPI.method)
+        decorator.http_method = "PUT"
+
+    def test_post_decorator(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            def method(self):  # type: ignore [empty-body]
+                ...
+
+        decorator = post("/url/data")
+        # Act / Assert
+        decorator(TestAPI.method)
+        decorator.http_method = "POST"
+
+    def test_delete_decorator(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            def method(self):  # type: ignore [empty-body]
+                ...
+
+        decorator = delete("/url/data")
+        # Act / Assert
+        decorator(TestAPI.method)
+        decorator.http_method = "DELETE"
 
     def test_no_mutable_state_when_calling_endpoint(self):
         # Arrange

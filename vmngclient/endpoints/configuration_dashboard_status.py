@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, get, request
+from vmngclient.endpoints import APIEndpoints, get
 from vmngclient.utils.operation_status import OperationStatus
 
 
@@ -86,10 +86,10 @@ class TasksData(BaseModel):
 
 
 class ConfigurationDashboardStatus(APIEndpoints):
-    @request(get, "/device/action/status/{task_id}")
+    @get("/device/action/status/{task_id}")
     def find_status(self, task_id: str) -> TaskData:
         ...
 
-    @request(get, "/device/action/status/tasks")
+    @get("/device/action/status/tasks")
     def find_running_tasks(self) -> TasksData:
         ...

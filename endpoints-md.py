@@ -4,16 +4,45 @@ from dataclasses import dataclass
 from inspect import getsourcefile, getsourcelines
 from pathlib import Path, PurePath
 from typing import Any, Dict, List, Optional, Protocol, Set
+from urllib.request import pathname2url
 
 from packaging.specifiers import SpecifierSet  # type: ignore
 
 from vmngclient.endpoints import BASE_PATH, APIEndpointRequestMeta, TypeSpecifier, request, versions, view
 from vmngclient.utils.session_type import SessionType  # type: ignore
 
+SOURCE_BASE_PATH = "https://github.com/CiscoDevNet/vManage-client/blob/main/"
+
 
 def relative(absolute: str) -> str:
     local = PurePath(Path.cwd())
     return str(PurePath(absolute).relative_to(local))
+
+
+def create_sourcefile_link(local: str) -> str:
+    return SOURCE_BASE_PATH + pathname2url(relative(local))
+
+
+def generate_origin_string(typespec: TypeSpecifier) -> str:
+    string = ""
+    depth = 0
+
+    def add_origin(origin: str):
+        nonlocal string, depth
+        string = string[:-depth] + f"{origin}[]" + string[-depth:]
+        depth = depth + 1
+
+    seqtype = getattr(typespec.sequence_type, "__name__", None) or getattr(typespec.sequence_type, "_name", None)
+
+    if typespec.is_optional:
+        add_origin("Optional")
+
+    if seqtype:
+        add_origin(str(seqtype))
+
+    string = string[:-depth] + "{}" + string[-depth:]
+
+    return string
 
 
 class MarkdownRenderer(Protocol):
@@ -32,7 +61,7 @@ class CodeLink(MarkdownRenderer):
         if sourcefile := getsourcefile(func):
             return CodeLink(
                 link_text=func.__qualname__,
-                sourcefile=relative(sourcefile),
+                sourcefile=create_sourcefile_link(sourcefile),
                 lineno=getsourcelines(func)[1],
             )
         raise Exception("Cannot locate source for {func}")
@@ -48,29 +77,36 @@ class CodeLink(MarkdownRenderer):
 
 @dataclass
 class CompositeTypeLink(CodeLink, MarkdownRenderer):
-    origin: Optional[str]
+    origin: str = "{}"
+
+    @staticmethod
+    def builtin(name: str) -> "CompositeTypeLink":
+        return CompositeTypeLink(link_text=name, sourcefile=None, lineno=None, origin="")
+
+    @staticmethod
+    def json() -> "CompositeTypeLink":
+        return CompositeTypeLink(link_text="JSON", sourcefile=None, lineno=None, origin="")
 
     @staticmethod
     def from_type_specifier(typespec: TypeSpecifier) -> Optional["CompositeTypeLink"]:
         if typespec.present:
+            if typespec.is_json:
+                return CompositeTypeLink.json()
             if payloadtype := typespec.payload_type:
                 if payloadtype.__module__ == "builtins":
-                    return CompositeTypeLink(payloadtype.__name__, None, None, None)
+                    return CompositeTypeLink.builtin(payloadtype.__name__)
                 elif sourcefile := getsourcefile(payloadtype):
-                    seqtype = getattr(typespec.sequence_type, "__name__", None) or getattr(
-                        typespec.sequence_type, "_name", None
-                    )
                     return CompositeTypeLink(
                         link_text=payloadtype.__name__,
-                        sourcefile=relative(sourcefile),
+                        sourcefile=create_sourcefile_link(sourcefile),
                         lineno=getsourcelines(payloadtype)[1],
-                        origin=seqtype,
+                        origin=generate_origin_string(typespec),
                     )
         return None
 
     def md(self) -> str:
         if self.origin:
-            return f"{self.origin}[[**{self.link_text}**]({self.sourcefile}#L{self.lineno})]"
+            return self.origin.format(f"[**{self.link_text}**]({self.sourcefile}#L{self.lineno})")
         return super().md()
 
 
@@ -85,7 +121,6 @@ class Endpoint(MarkdownRenderer):
 
     @staticmethod
     def from_meta(
-        func,
         meta: APIEndpointRequestMeta,
         versions: Optional[SpecifierSet],
         tenancy_modes: Optional[Set[SessionType]],
@@ -93,8 +128,8 @@ class Endpoint(MarkdownRenderer):
         return Endpoint(
             http_request=meta.http_request,
             supported_versions=str(versions) if versions else "",
-            supported_tenancy_modes=str(tenancy_modes) if tenancy_modes else "",
-            method=CodeLink.from_func(func),
+            supported_tenancy_modes=", ".join(sorted([tm.name for tm in tenancy_modes])) if tenancy_modes else "",
+            method=CodeLink.from_func(meta.func),
             payload_type=CompositeTypeLink.from_type_specifier(meta.payload_spec),
             return_type=CompositeTypeLink.from_type_specifier(meta.return_spec),
         )
@@ -124,10 +159,10 @@ class EndpointRegistry(MarkdownRenderer):
     ):
         self.items: List[Endpoint] = []
         self.base_path = BASE_PATH
-        for func, meta in meta_lookup.items():
-            versions = versions_lookup.get(func, None)
-            tenancy_modes = tenancy_modes_lookup.get(func, None)
-            self.items.append(Endpoint.from_meta(func, meta=meta, versions=versions, tenancy_modes=tenancy_modes))
+        for funcname, meta in meta_lookup.items():
+            versions = versions_lookup.get(funcname, None)
+            tenancy_modes = tenancy_modes_lookup.get(funcname, None)
+            self.items.append(Endpoint.from_meta(meta=meta, versions=versions, tenancy_modes=tenancy_modes))
 
     def md(self) -> str:
         info = f"All URIs are relative to *{self.base_path}*\n"
@@ -151,7 +186,9 @@ if __name__ == "__main__":
     _ = APIEndpointContainter(MagicMock())
 
     endpoint_registry = EndpointRegistry(
-        meta_lookup=request.meta_lookup, versions_lookup=versions.meta_lookup, tenancy_modes_lookup=view.meta_lookup
+        meta_lookup=request.request_lookup,
+        versions_lookup=versions.versions_lookup,
+        tenancy_modes_lookup=view.view_lookup,
     )
     with open("ENDPOINTS.md", "w") as f:
         f.write("**THIS FILE IS AUTO-GENERATED DO NOT EDIT**\n\n")

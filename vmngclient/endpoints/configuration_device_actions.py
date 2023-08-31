@@ -3,7 +3,7 @@
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, get, request
+from vmngclient.endpoints import APIEndpoints, get
 from vmngclient.typed_list import DataSequence
 
 
@@ -71,7 +71,7 @@ class ConfigurationDeviceActions(APIEndpoints):
         # GET /device/action/ztp/upgrade
         ...
 
-    @request(get, "/device/action/ztp/upgrade/setting", "data")
+    @get("/device/action/ztp/upgrade/setting", "data")
     def get_ztp_upgrade_config_setting(self) -> DataSequence[ZTPUpgradeSettings]:
         ...
 
