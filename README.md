@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/client-logo-gradient-192px.png" alt="vManage-client logo"/>
+</p>
+
 # vManage-client
 [![Python-Supported](https://img.shields.io/static/v1?label=Python&logo=Python&color=3776AB&message=3.8%20|%203.9%20|%203.10%20|%203.11)](https://www.python.org/)
 
