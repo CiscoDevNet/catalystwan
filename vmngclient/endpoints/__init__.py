@@ -273,12 +273,6 @@ class APIEndpointsDecorator:
             raise APIEndpointError("Only APIEndpointsDecorator instance methods can be annotated with @{cls} decorator")
         return _self
 
-    @staticmethod
-    def preserve_orig_func(wrapper, wrapped):
-        """Preserves original function which can can be used by wrappers by reading _ofunc attribute"""
-        wrapper._ofunc = getattr(wrapped, "_ofunc", wrapped)
-        return wrapper
-
 
 class versions(APIEndpointsDecorator):
     """
@@ -312,7 +306,8 @@ class versions(APIEndpointsDecorator):
                     )
             return func(*args, **kwargs)
 
-        return APIEndpointsDecorator.preserve_orig_func(wrapper, func)
+        wrapper._ofunc = _ofunc
+        return wrapper
 
 
 class view(APIEndpointsDecorator):
@@ -345,7 +340,8 @@ class view(APIEndpointsDecorator):
                     )
             return func(*args, **kwargs)
 
-        return APIEndpointsDecorator.preserve_orig_func(wrapper, func)
+        wrapper._ofunc = _ofunc
+        return wrapper
 
 
 class request(APIEndpointsDecorator):
@@ -579,7 +575,8 @@ class request(APIEndpointsDecorator):
                 elif issubclass(self.return_spec.payload_type, dict):
                     return response.json()
 
-        return APIEndpointsDecorator.preserve_orig_func(wrapper, func)
+        wrapper._ofunc = _ofunc
+        return wrapper
 
 
 class get(request):
