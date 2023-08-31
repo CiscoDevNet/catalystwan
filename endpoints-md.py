@@ -73,11 +73,21 @@ class CompositeTypeLink(CodeLink, MarkdownRenderer):
     origin: str = "{}"
 
     @staticmethod
+    def builtin(name: str) -> "CompositeTypeLink":
+        return CompositeTypeLink(link_text=name, sourcefile=None, lineno=None, origin="")
+
+    @staticmethod
+    def json() -> "CompositeTypeLink":
+        return CompositeTypeLink(link_text="JSON", sourcefile=None, lineno=None, origin="")
+
+    @staticmethod
     def from_type_specifier(typespec: TypeSpecifier) -> Optional["CompositeTypeLink"]:
         if typespec.present:
+            if typespec.is_json:
+                return CompositeTypeLink.json()
             if payloadtype := typespec.payload_type:
                 if payloadtype.__module__ == "builtins":
-                    return CompositeTypeLink(payloadtype.__name__, None, None, "")
+                    return CompositeTypeLink.builtin(payloadtype.__name__)
                 elif sourcefile := getsourcefile(payloadtype):
                     return CompositeTypeLink(
                         link_text=payloadtype.__name__,
