@@ -121,7 +121,6 @@ class Endpoint(MarkdownRenderer):
 
     @staticmethod
     def from_meta(
-        func,
         meta: APIEndpointRequestMeta,
         versions: Optional[SpecifierSet],
         tenancy_modes: Optional[Set[SessionType]],
@@ -129,8 +128,8 @@ class Endpoint(MarkdownRenderer):
         return Endpoint(
             http_request=meta.http_request,
             supported_versions=str(versions) if versions else "",
-            supported_tenancy_modes=str(tenancy_modes) if tenancy_modes else "",
-            method=CodeLink.from_func(func),
+            supported_tenancy_modes=", ".join(sorted([tm.name for tm in tenancy_modes])) if tenancy_modes else "",
+            method=CodeLink.from_func(meta.func),
             payload_type=CompositeTypeLink.from_type_specifier(meta.payload_spec),
             return_type=CompositeTypeLink.from_type_specifier(meta.return_spec),
         )
@@ -160,10 +159,10 @@ class EndpointRegistry(MarkdownRenderer):
     ):
         self.items: List[Endpoint] = []
         self.base_path = BASE_PATH
-        for func, meta in meta_lookup.items():
-            versions = versions_lookup.get(func, None)
-            tenancy_modes = tenancy_modes_lookup.get(func, None)
-            self.items.append(Endpoint.from_meta(func, meta=meta, versions=versions, tenancy_modes=tenancy_modes))
+        for funcname, meta in meta_lookup.items():
+            versions = versions_lookup.get(funcname, None)
+            tenancy_modes = tenancy_modes_lookup.get(funcname, None)
+            self.items.append(Endpoint.from_meta(meta=meta, versions=versions, tenancy_modes=tenancy_modes))
 
     def md(self) -> str:
         info = f"All URIs are relative to *{self.base_path}*\n"
@@ -187,7 +186,9 @@ if __name__ == "__main__":
     _ = APIEndpointContainter(MagicMock())
 
     endpoint_registry = EndpointRegistry(
-        meta_lookup=request.meta_lookup, versions_lookup=versions.meta_lookup, tenancy_modes_lookup=view.meta_lookup
+        meta_lookup=request.request_lookup,
+        versions_lookup=versions.versions_lookup,
+        tenancy_modes_lookup=view.view_lookup,
     )
     with open("ENDPOINTS.md", "w") as f:
         f.write("**THIS FILE IS AUTO-GENERATED DO NOT EDIT**\n\n")
