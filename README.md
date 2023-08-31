@@ -1,4 +1,7 @@
-# vManage-client
+<p align="center">
+  <img src="https://github.com/CiscoDevNet/vManage-client/assets/115291907/9fcc5597-31b4-48bc-8a43-183d4632d73a" alt="vManage-client logo"/>
+</p>
+
 [![Python-Supported](https://img.shields.io/static/v1?label=Python&logo=Python&color=3776AB&message=3.8%20|%203.9%20|%203.10%20|%203.11)](https://www.python.org/)
 
 vManage client is a package for creating simple and parallel automatic requests via official vManageAPI. It is intended to serve as a multiple session handler (provider, provider as a tenant, tenant). The library is not dependent on environment which is being run in, you just need a connection to any vManage.
