@@ -21,7 +21,6 @@ requests-toolbelt = "^1.0.0"
 packaging = "^23.0"
 pydantic = "^1.10.7"
 
-
 [tool.poetry.dev-dependencies]
 parameterized = "^0.8.1"
 pytest = "^7.1.2"
@@ -35,4 +34,3 @@ Sphinx = "^5.2.3"
 [build-system]
 requires = ["poetry-core>=1.4.0"]
 build-backend = "poetry.core.masonry.api"
-
