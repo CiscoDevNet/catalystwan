@@ -5,7 +5,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, delete, get, post, request, versions
+from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, versions
 from vmngclient.typed_list import DataSequence
 
 
@@ -55,18 +55,20 @@ class ConfigurationFeatureProfile(APIEndpoints):
     # TODO JSON return type
     # TODO resp_json_key
     @versions(supported_versions=(">=20.9"), raises=False)
-    @request(get, "/v1/feature-profile/sdwan/system/aaa/schema", resp_json_key="request")
-    def get_sdwan_system_aaa_parcel_schema(self, params: SchemaTypeQuery) -> dict:
+    @get("/v1/feature-profile/sdwan/system/aaa/schema", resp_json_key="request")
+    def get_sdwan_system_aaa_parcel_schema(self, params: SchemaTypeQuery) -> JSON:
         ...
 
     # TODO Optional payload (GetFeatureProfilesPayload)
     @versions(supported_versions=(">=20.9"), raises=False)
-    @request(get, "/v1/feature-profile/sdwan/transport")
-    def get_sdwan_transport_feature_profiles(self) -> DataSequence[FeatureProfileInfo]:
+    @get("/v1/feature-profile/sdwan/transport")
+    def get_sdwan_transport_feature_profiles(
+        self, payload: Optional[GetFeatureProfilesPayload]
+    ) -> DataSequence[FeatureProfileInfo]:
         ...
 
     @versions(supported_versions=(">=20.9"), raises=False)
-    @request(post, "/v1/feature-profile/sdwan/transport")
+    @post("/v1/feature-profile/sdwan/transport")
     def create_sdwan_transport_feature_profile(
         self, payload: FeatureProfileCreationPayload
     ) -> FeatureProfileCreationResponse:
@@ -74,6 +76,6 @@ class ConfigurationFeatureProfile(APIEndpoints):
 
     # TODO return type -> None
     @versions(supported_versions=(">=20.9"), raises=False)
-    @request(delete, "/v1/feature-profile/sdwan/transport/{transport_id}")
+    @delete("/v1/feature-profile/sdwan/transport/{transport_id}")
     def delete_sdwan_transport_feature_profile(self, transport_id: str) -> str:
         ...
