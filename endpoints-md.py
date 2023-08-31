@@ -1,5 +1,6 @@
-# Grabs API meta data collected while decorating API methods and bakes into serializable registry
-# TODO: versions and tenancy modes not showing up in markdown
+# Grabs API meta data collected while decorating API methods and prepares markdown documentation
+from __future__ import annotations
+
 from dataclasses import dataclass
 from inspect import getsourcefile, getsourcelines
 from pathlib import Path, PurePath
@@ -57,7 +58,7 @@ class CodeLink(MarkdownRenderer):
     lineno: Optional[int]
 
     @staticmethod
-    def from_func(func) -> "CodeLink":
+    def from_func(func) -> CodeLink:
         if sourcefile := getsourcefile(func):
             return CodeLink(
                 link_text=func.__qualname__,
@@ -66,7 +67,7 @@ class CodeLink(MarkdownRenderer):
             )
         raise Exception("Cannot locate source for {func}")
 
-    def __lt__(self, other: "CodeLink"):
+    def __lt__(self, other: CodeLink):
         return self.link_text < other.link_text
 
     def md(self) -> str:
@@ -80,21 +81,19 @@ class CompositeTypeLink(CodeLink, MarkdownRenderer):
     origin: str = "{}"
 
     @staticmethod
-    def builtin(name: str) -> "CompositeTypeLink":
+    def text_only(name: str) -> CompositeTypeLink:
         return CompositeTypeLink(link_text=name, sourcefile=None, lineno=None, origin="")
 
     @staticmethod
-    def json() -> "CompositeTypeLink":
-        return CompositeTypeLink(link_text="JSON", sourcefile=None, lineno=None, origin="")
-
-    @staticmethod
-    def from_type_specifier(typespec: TypeSpecifier) -> Optional["CompositeTypeLink"]:
+    def from_type_specifier(typespec: TypeSpecifier) -> CompositeTypeLink:
         if typespec.present:
+            if typespec.payload_type is None:
+                return CompositeTypeLink.text_only("None")
             if typespec.is_json:
-                return CompositeTypeLink.json()
+                return CompositeTypeLink.text_only("JSON")
             if payloadtype := typespec.payload_type:
                 if payloadtype.__module__ == "builtins":
-                    return CompositeTypeLink.builtin(payloadtype.__name__)
+                    return CompositeTypeLink.text_only(payloadtype.__name__)
                 elif sourcefile := getsourcefile(payloadtype):
                     return CompositeTypeLink(
                         link_text=payloadtype.__name__,
@@ -102,7 +101,7 @@ class CompositeTypeLink(CodeLink, MarkdownRenderer):
                         lineno=getsourcelines(payloadtype)[1],
                         origin=generate_origin_string(typespec),
                     )
-        return None
+        return CompositeTypeLink.text_only("")
 
     def md(self) -> str:
         if self.origin:
@@ -116,15 +115,15 @@ class Endpoint(MarkdownRenderer):
     supported_versions: str
     supported_tenancy_modes: str
     method: CodeLink
-    payload_type: Optional[CompositeTypeLink]
-    return_type: Optional[CompositeTypeLink]
+    payload_type: CompositeTypeLink
+    return_type: CompositeTypeLink
 
     @staticmethod
     def from_meta(
         meta: APIEndpointRequestMeta,
         versions: Optional[SpecifierSet],
         tenancy_modes: Optional[Set[SessionType]],
-    ) -> "Endpoint":
+    ) -> Endpoint:
         return Endpoint(
             http_request=meta.http_request,
             supported_versions=str(versions) if versions else "",
@@ -134,7 +133,7 @@ class Endpoint(MarkdownRenderer):
             return_type=CompositeTypeLink.from_type_specifier(meta.return_spec),
         )
 
-    def __lt__(self, other: "Endpoint"):
+    def __lt__(self, other: Endpoint):
         self.method < other.method
 
     def md(self) -> str:
@@ -143,8 +142,8 @@ class Endpoint(MarkdownRenderer):
                 self.http_request,
                 self.supported_versions,
                 self.method.md(),
-                self.payload_type.md() if self.payload_type else "",
-                self.return_type.md() if self.return_type else "",
+                self.payload_type.md(),
+                self.return_type.md(),
                 self.supported_tenancy_modes,
             ]
         )

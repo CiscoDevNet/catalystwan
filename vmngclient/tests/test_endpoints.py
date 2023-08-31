@@ -273,7 +273,7 @@ class TestAPIEndpoints(unittest.TestCase):
 
             class TestAPI(APIEndpoints):
                 @request("GET", "/v1/data/{payload}")
-                def get_data(self, payload: str):  # type: ignore [empty-body]
+                def get_data(self, payload: str) -> None:  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_unsupported_return_type(self):
@@ -305,7 +305,7 @@ class TestAPIEndpoints(unittest.TestCase):
 
             class TestAPI(APIEndpoints):
                 @request("POST", "/v1/data")
-                def get_data(self, payload: DataSequence):  # type: ignore [empty-body]
+                def get_data(self, payload: DataSequence) -> None:  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_unsupported_payload_sequence_type(self):
@@ -313,7 +313,7 @@ class TestAPIEndpoints(unittest.TestCase):
 
             class TestAPI(APIEndpoints):
                 @request("POST", "/v1/data")
-                def get_data(self, payload: List[str]):  # type: ignore [empty-body]
+                def get_data(self, payload: List[str]) -> None:  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_unsupported_payload_composite_type(self):
@@ -321,7 +321,7 @@ class TestAPIEndpoints(unittest.TestCase):
 
             class TestAPI(APIEndpoints):
                 @request("POST", "/v1/data")
-                def get_data(self, payload: Dict[str, BaseModelExample]):  # type: ignore [empty-body]
+                def get_data(self, payload: Dict[str, BaseModelExample]) -> None:  # type: ignore [empty-body]
                     ...
 
     @parameterized.expand(
@@ -340,7 +340,7 @@ class TestAPIEndpoints(unittest.TestCase):
     def test_request_decorator_payload_spec(self, payload_type, raises, expected_payload_spec):
         # Arrange
         class TestAPI(APIEndpoints):
-            def get_data(self, payload: payload_type):  # type: ignore [empty-body]
+            def get_data(self, payload: payload_type) -> None:  # type: ignore [empty-body]
                 ...
 
         decorator = request("POST", "/v1/data")
@@ -357,7 +357,7 @@ class TestAPIEndpoints(unittest.TestCase):
 
             class TestAPI(APIEndpoints):
                 @request("POST", "/v1/data")
-                def get_data(self, params):  # type: ignore [empty-body]
+                def get_data(self, params) -> None:  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_not_supprted_param_type(self):
@@ -365,7 +365,7 @@ class TestAPIEndpoints(unittest.TestCase):
 
             class TestAPI(APIEndpoints):
                 @request("POST", "/v1/data")
-                def get_data(self, params: List[str]):  # type: ignore [empty-body]
+                def get_data(self, params: List[str]) -> None:  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_not_annotated_url_field_arguments(self):
@@ -373,7 +373,7 @@ class TestAPIEndpoints(unittest.TestCase):
 
             class TestAPI(APIEndpoints):
                 @request("POST", "/v1/data/{id}")
-                def get_data(self, id):  # type: ignore [empty-body]
+                def get_data(self, id) -> None:  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_bogus_params(self):
@@ -381,30 +381,30 @@ class TestAPIEndpoints(unittest.TestCase):
 
             class TestAPI(APIEndpoints):
                 @request("POST", "/v1/data/{id}")
-                def get_data(self, id: str, payload: BaseModelExample, bogus: str):  # type: ignore [empty-body]
+                def get_data(self, id: str, payload: BaseModelExample, bogus: str) -> None:  # type: ignore [empty-body]
                     ...
 
     def test_request_decorator_accepts_optional_payload(self):
         # Arrange
         class TestAPIOptional(APIEndpoints):
             @request("GET", "/v1/data")
-            def get_data1(self, payload: Optional[BaseModelExample]):  # type: ignore [empty-body]
+            def get_data1(self, payload: Optional[BaseModelExample]) -> None:  # type: ignore [empty-body]
                 ...
 
         class TestAPIUnion(APIEndpoints):
             @request("GET", "/v2/data")
-            def get_data2(self, payload: Union[None, BaseModelExample]):  # type: ignore [empty-body]
+            def get_data2(self, payload: Union[None, BaseModelExample]) -> None:  # type: ignore [empty-body]
                 ...
 
         class TestAPIOptionalModelSequence(APIEndpoints):
             @request("GET", "/v3/data")
-            def get_data3(self, payload: Optional[List[BaseModelExample]]):  # type: ignore [empty-body]
+            def get_data3(self, payload: Optional[List[BaseModelExample]]) -> None:  # type: ignore [empty-body]
                 ...
 
     def test_request_decorator_call_from_unsuitable_base_class(self):
         class TestAPI:
             @request("GET", "/v1/data")
-            def get_data(self):  # type: ignore [empty-body]
+            def get_data(self) -> None:  # type: ignore [empty-body]
                 ...
 
         api = TestAPI()
@@ -415,7 +415,7 @@ class TestAPIEndpoints(unittest.TestCase):
         # Arrange
         class TestAPI(APIEndpoints):
             @request("GET", "/v1/data/{id}")
-            def get_data(self, id: str, payload: BaseModelExample):  # type: ignore [empty-body]
+            def get_data(self, id: str, payload: BaseModelExample) -> None:  # type: ignore [empty-body]
                 ...
 
         api = TestAPI(self.session_mock)
@@ -435,7 +435,7 @@ class TestAPIEndpoints(unittest.TestCase):
             @request("GET", "/v2/{category}/items")
             def get_data(
                 self, payload: BaseModelExample, category: str, params: ParamsExample
-            ):  # type: ignore [empty-body]
+            ) -> None:  # type: ignore [empty-body]
                 ...
 
         api = TestAPI(self.session_mock)
@@ -456,7 +456,7 @@ class TestAPIEndpoints(unittest.TestCase):
             @request("GET", "/v2/{category}/items")
             def get_data(
                 self, payload: BaseModelExample, category: str, params: ParamsExample
-            ):  # type: ignore [empty-body]
+            ) -> None:  # type: ignore [empty-body]
                 ...
 
         api = TestAPI(self.session_mock)
@@ -475,7 +475,7 @@ class TestAPIEndpoints(unittest.TestCase):
         # Arrange
         class TestAPI(APIEndpoints):
             @request("GET", "/aaa/bbb/ccc")
-            def get_data(self, payload: JSON):  # type: ignore [empty-body]
+            def get_data(self, payload: JSON) -> None:  # type: ignore [empty-body]
                 ...
 
         api = TestAPI(self.session_mock)
@@ -494,7 +494,7 @@ class TestAPIEndpoints(unittest.TestCase):
         # Arrange
         class TestAPI(APIEndpoints):
             @request("PUT", "/v1/data/{id}")
-            def put_data(self, id: str, payload: Optional[BaseModelExample]):  # type: ignore [empty-body]
+            def put_data(self, id: str, payload: Optional[BaseModelExample]) -> None:  # type: ignore [empty-body]
                 ...
 
         api = TestAPI(self.session_mock)
@@ -625,7 +625,7 @@ class TestAPIEndpoints(unittest.TestCase):
     def test_get_decorator(self):
         # Arrange
         class TestAPI(APIEndpoints):
-            def method(self):  # type: ignore [empty-body]
+            def method(self) -> None:  # type: ignore [empty-body]
                 ...
 
         decorator = get("/url/data")
@@ -636,7 +636,7 @@ class TestAPIEndpoints(unittest.TestCase):
     def test_put_decorator(self):
         # Arrange
         class TestAPI(APIEndpoints):
-            def method(self):  # type: ignore [empty-body]
+            def method(self) -> None:  # type: ignore [empty-body]
                 ...
 
         decorator = put("/url/data")
@@ -647,7 +647,7 @@ class TestAPIEndpoints(unittest.TestCase):
     def test_post_decorator(self):
         # Arrange
         class TestAPI(APIEndpoints):
-            def method(self):  # type: ignore [empty-body]
+            def method(self) -> None:  # type: ignore [empty-body]
                 ...
 
         decorator = post("/url/data")
@@ -658,7 +658,7 @@ class TestAPIEndpoints(unittest.TestCase):
     def test_delete_decorator(self):
         # Arrange
         class TestAPI(APIEndpoints):
-            def method(self):  # type: ignore [empty-body]
+            def method(self) -> None:  # type: ignore [empty-body]
                 ...
 
         decorator = delete("/url/data")
@@ -672,7 +672,7 @@ class TestAPIEndpoints(unittest.TestCase):
             @request("GET", "/v2/{category}/items")
             def get_data(
                 self, payload: BaseModelExample, category: str, params: ParamsExample
-            ):  # type: ignore [empty-body]
+            ) -> None:  # type: ignore [empty-body]
                 ...
 
         api = TestAPI(self.session_mock)
