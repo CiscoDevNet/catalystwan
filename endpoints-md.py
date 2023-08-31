@@ -4,16 +4,23 @@ from dataclasses import dataclass
 from inspect import getsourcefile, getsourcelines
 from pathlib import Path, PurePath
 from typing import Any, Dict, List, Optional, Protocol, Set
+from urllib.request import pathname2url
 
 from packaging.specifiers import SpecifierSet  # type: ignore
 
 from vmngclient.endpoints import BASE_PATH, APIEndpointRequestMeta, TypeSpecifier, request, versions, view
 from vmngclient.utils.session_type import SessionType  # type: ignore
 
+SOURCE_BASE_PATH = "https://github.com/CiscoDevNet/vManage-client/blob/main/"
+
 
 def relative(absolute: str) -> str:
     local = PurePath(Path.cwd())
     return str(PurePath(absolute).relative_to(local))
+
+
+def create_sourcefile_link(local: str) -> str:
+    return SOURCE_BASE_PATH + pathname2url(relative(local))
 
 
 def generate_origin_string(typespec: TypeSpecifier) -> str:
@@ -54,7 +61,7 @@ class CodeLink(MarkdownRenderer):
         if sourcefile := getsourcefile(func):
             return CodeLink(
                 link_text=func.__qualname__,
-                sourcefile=relative(sourcefile),
+                sourcefile=create_sourcefile_link(sourcefile),
                 lineno=getsourcelines(func)[1],
             )
         raise Exception("Cannot locate source for {func}")
@@ -91,7 +98,7 @@ class CompositeTypeLink(CodeLink, MarkdownRenderer):
                 elif sourcefile := getsourcefile(payloadtype):
                     return CompositeTypeLink(
                         link_text=payloadtype.__name__,
-                        sourcefile=relative(sourcefile),
+                        sourcefile=create_sourcefile_link(sourcefile),
                         lineno=getsourcelines(payloadtype)[1],
                         origin=generate_origin_string(typespec),
                     )
