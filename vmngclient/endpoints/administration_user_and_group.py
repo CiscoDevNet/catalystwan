@@ -155,11 +155,11 @@ class AdministrationUserAndGroup(APIEndpoints):
         ...
 
     @post("/admin/user")
-    def create_user(self, payload: User):
+    def create_user(self, payload: User) -> None:
         ...
 
     @post("/admin/usergroup")
-    def create_user_group(self, payload: UserGroup):
+    def create_user_group(self, payload: UserGroup) -> None:
         ...
 
     def create_vpn_group(self):
@@ -171,11 +171,11 @@ class AdministrationUserAndGroup(APIEndpoints):
         ...
 
     @delete("/admin/user/{username}")
-    def delete_user(self, username: str):
+    def delete_user(self, username: str) -> None:
         ...
 
     @delete("/admin/usergroup/{group_name}")
-    def delete_user_group(self, group_name: str):
+    def delete_user_group(self, group_name: str) -> None:
         ...
 
     def delete_vpn_group(self):
@@ -227,7 +227,7 @@ class AdministrationUserAndGroup(APIEndpoints):
         ...
 
     @post("/admin/user/reset")
-    def reset_user(self, payload: UserResetRequest):
+    def reset_user(self, payload: UserResetRequest) -> None:
         ...
 
     @get("/admin/resourcegroup")
@@ -235,19 +235,19 @@ class AdministrationUserAndGroup(APIEndpoints):
         ...
 
     @post("/admin/resourcegroup/switch")
-    def switch_resource_group(self, payload: ResourceGroupSwitchRequest):
+    def switch_resource_group(self, payload: ResourceGroupSwitchRequest) -> None:
         ...
 
     @put("/admin/resourcegroup/{group_id}")
-    def update_resource_group(self, group_id: str, payload: ResourceGroupUpdateRequest):
+    def update_resource_group(self, group_id: str, payload: ResourceGroupUpdateRequest) -> None:
         ...
 
     @delete("/admin/resourcegroup/{group_id}", json={})
-    def delete_resource_group(self, group_id: str):
+    def delete_resource_group(self, group_id: str) -> None:
         ...
 
     @post("/admin/resourcegroup")
-    def create_resource_group(self, payload: ResourceGroup):
+    def create_resource_group(self, payload: ResourceGroup) -> None:
         ...
 
     def resource_group_name(self):
@@ -259,7 +259,7 @@ class AdministrationUserAndGroup(APIEndpoints):
         ...
 
     @put("/admin/user/password/{username}")
-    def update_password(self, username: str, payload: UserUpdateRequest):
+    def update_password(self, username: str, payload: UserUpdateRequest) -> None:
         ...
 
     def update_profile_locale(self):
@@ -267,15 +267,15 @@ class AdministrationUserAndGroup(APIEndpoints):
         ...
 
     @put("/admin/user/profile/password")
-    def update_profile_password(self, payload: ProfilePasswordUpdateRequest):
+    def update_profile_password(self, payload: ProfilePasswordUpdateRequest) -> None:
         ...
 
     @put("/admin/user/{username}")
-    def update_user(self, username: str, payload: UserUpdateRequest):
+    def update_user(self, username: str, payload: UserUpdateRequest) -> None:
         ...
 
     @put("/admin/usergroup/{group_name}")
-    def update_user_group(self, group_name: str, payload: UserGroup):
+    def update_user_group(self, group_name: str, payload: UserGroup) -> None:
         ...
 
     def validate_password(self):
