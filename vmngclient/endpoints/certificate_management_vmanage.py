@@ -3,7 +3,7 @@ import datetime
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, get, request
+from vmngclient.endpoints import APIEndpoints, request
 
 
 class WebServerCertificateInfo(BaseModel):
@@ -40,6 +40,6 @@ class CertificateManagementVManage(APIEndpoints):
         # GET /setting/configuration/webserver/certificate/rollback
         ...
 
-    @request(get, "/setting/configuration/webserver/certificate")
+    @request("GET", "/setting/configuration/webserver/certificate")
     def show_info(self) -> WebServerCertificateInfo:
         ...

@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, get, request
+from vmngclient.endpoints import APIEndpoints, request
 from vmngclient.typed_list import DataSequence
 
 
@@ -113,7 +113,7 @@ class MonitoringDeviceDetails(APIEndpoints):
         #  GET /device/queues
         ...
 
-    @request(get, "/device/tier", "data")
+    @request("GET", "/device/tier", "data")
     def get_tiers(self) -> DataSequence[Tier]:
         ...
 

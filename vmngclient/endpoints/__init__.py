@@ -2,7 +2,7 @@
 vManage API endpoint handlers in declarative way.
 Just create a sub-class and define endpoints using using included decorators: request, view, versions.
 Method decorated with @request has no body, as decorator constructs and sends request.
->>> from vmngclient.endpoints import APIEndpoints, versions, view, request, delete
+>>> from vmngclient.endpoints import APIEndpoints, versions, view, request
 >>> from vmngclient.utils.session_type import ProviderView
 >>>
 >>>
@@ -18,7 +18,7 @@ Method decorated with @request has no body, as decorator constructs and sends re
 >>> class TenantManagementAPI(APIEndpoints):
 >>>     @versions(">=20.4")
 >>>     @view({ProviderView})
->>>     @request(delete, "/tenant/bulk/async")
+>>>     @request("DELETE", "/tenant/bulk/async")
 >>>     def delete_tenant_async_bulk(self, payload: TenantBulkDeleteRequest) -> TenantTaskId:
 >>>         ...
 >>>
@@ -565,9 +565,3 @@ class request(APIEndpointsDecorator):
                     return response.json()
 
         return wrapper
-
-
-get = "GET"
-post = "POST"
-put = "PUT"
-delete = "DELETE"

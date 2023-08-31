@@ -5,7 +5,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from vmngclient.endpoints import APIEndpoints, get, request
+from vmngclient.endpoints import APIEndpoints, request
 
 
 class TenancyModeEnum(str, Enum):
@@ -57,7 +57,7 @@ class ClusterManagement(APIEndpoints):
         # GET /clusterManagement/{tenantId}/connectedDevices/{vmanageIP}
         ...
 
-    @request(get, "/clusterManagement/tenancy/mode", "data")
+    @request("GET", "/clusterManagement/tenancy/mode", "data")
     def get_tenancy_mode(self) -> TenancyMode:
         ...
 

@@ -5,7 +5,7 @@ from urllib.parse import parse_qsl, urlsplit
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, get, post, request
+from vmngclient.endpoints import APIEndpoints, request
 from vmngclient.model.tenant import Tenant
 
 
@@ -36,24 +36,24 @@ class MigrationInfo(BaseModel):
 
 
 class TenantMigration(APIEndpoints):
-    @request(get, "/tenantmigration/download/{path}")
+    @request("GET", "/tenantmigration/download/{path}")
     def download_tenant_data(self, path: str = "default.tar.gz") -> bytes:
         ...
 
-    @request(post, "/tenantmigration/export")
+    @request("POST", "/tenantmigration/export")
     def export_tenant_data(self, payload: Tenant) -> ExportInfo:
         ...
 
-    @request(get, "/tenantmigration/migrationToken")
+    @request("GET", "/tenantmigration/migrationToken")
     def get_migration_token(self, params: MigrationTokenQueryParams) -> str:
         ...
 
     def import_tenant_data(self, data: BinaryIO) -> ImportInfo:
         # TODO implement dedicated payload types for files upload in request decorator
-        response = self._request(post, "/tenantmigration/import", files={"file": (Path(data.name).name, data)})
+        response = self._request("POST", "/tenantmigration/import", files={"file": (Path(data.name).name, data)})
         return response.dataobj(ImportInfo, None)
 
-    @request(post, "/tenantmigration/networkMigration")
+    @request("POST", "/tenantmigration/networkMigration")
     def migrate_network(self, payload: str) -> MigrationInfo:
         ...
 

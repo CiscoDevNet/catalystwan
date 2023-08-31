@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Set
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, delete, get, post, put, request
+from vmngclient.endpoints import APIEndpoints, request
 from vmngclient.typed_list import DataSequence
 
 
@@ -154,11 +154,11 @@ class AdministrationUserAndGroup(APIEndpoints):
         # GET /admin/usergroup/definition
         ...
 
-    @request(post, "/admin/user")
+    @request("POST", "/admin/user")
     def create_user(self, payload: User):
         ...
 
-    @request(post, "/admin/usergroup")
+    @request("POST", "/admin/usergroup")
     def create_user_group(self, payload: UserGroup):
         ...
 
@@ -170,11 +170,11 @@ class AdministrationUserAndGroup(APIEndpoints):
         # DELETE /admin/cologroup/{id}
         ...
 
-    @request(delete, "/admin/user/{username}")
+    @request("DELETE", "/admin/user/{username}")
     def delete_user(self, username: str):
         ...
 
-    @request(delete, "/admin/usergroup/{group_name}")
+    @request("DELETE", "/admin/usergroup/{group_name}")
     def delete_user_group(self, group_name: str):
         ...
 
@@ -190,11 +190,11 @@ class AdministrationUserAndGroup(APIEndpoints):
         # PUT /admin/vpngroup/{id}
         ...
 
-    @request(get, "/admin/user/userAuthType")
+    @request("GET", "/admin/user/userAuthType")
     def find_user_auth_type(self) -> UserAuthType:
         ...
 
-    @request(get, "/admin/usergroup", "data")
+    @request("GET", "/admin/usergroup", "data")
     def find_user_groups(self) -> DataSequence[UserGroup]:
         ...
 
@@ -202,15 +202,15 @@ class AdministrationUserAndGroup(APIEndpoints):
         # GET /admin/usergroup/keyvalue
         ...
 
-    @request(get, "/admin/user/role")
+    @request("GET", "/admin/user/role")
     def find_user_role(self) -> UserRole:
         ...
 
-    @request(get, "/admin/user", "data")
+    @request("GET", "/admin/user", "data")
     def find_users(self) -> DataSequence[User]:
         ...
 
-    @request(get, "/admin/user/activeSessions", "data")
+    @request("GET", "/admin/user/activeSessions", "data")
     def get_active_sessions(self) -> DataSequence[ActiveSession]:
         ...
 
@@ -222,31 +222,31 @@ class AdministrationUserAndGroup(APIEndpoints):
         # GET /admin/vpngroup
         ...
 
-    @request(delete, "/admin/user/removeSessions", "data")
+    @request("DELETE", "/admin/user/removeSessions", "data")
     def remove_sessions(self, payload: SessionsDeleteRequest) -> InvalidateSessionMessage:
         ...
 
-    @request(post, "/admin/user/reset")
+    @request("POST", "/admin/user/reset")
     def reset_user(self, payload: UserResetRequest):
         ...
 
-    @request(get, "/admin/resourcegroup")
+    @request("GET", "/admin/resourcegroup")
     def find_resource_groups(self) -> DataSequence[ResourceGroup]:
         ...
 
-    @request(post, "/admin/resourcegroup/switch")
+    @request("POST", "/admin/resourcegroup/switch")
     def switch_resource_group(self, payload: ResourceGroupSwitchRequest):
         ...
 
-    @request(put, "/admin/resourcegroup/{group_id}")
+    @request("PUT", "/admin/resourcegroup/{group_id}")
     def update_resource_group(self, group_id: str, payload: ResourceGroupUpdateRequest):
         ...
 
-    @request(delete, "/admin/resourcegroup/{group_id}", json={})
+    @request("DELETE", "/admin/resourcegroup/{group_id}", json={})
     def delete_resource_group(self, group_id: str):
         ...
 
-    @request(post, "/admin/resourcegroup")
+    @request("POST", "/admin/resourcegroup")
     def create_resource_group(self, payload: ResourceGroup):
         ...
 
@@ -258,7 +258,7 @@ class AdministrationUserAndGroup(APIEndpoints):
         # POST /admin/user/admin/password
         ...
 
-    @request(put, "/admin/user/password/{username}")
+    @request("PUT", "/admin/user/password/{username}")
     def update_password(self, username: str, payload: UserUpdateRequest):
         ...
 
@@ -266,15 +266,15 @@ class AdministrationUserAndGroup(APIEndpoints):
         # PUT /admin/user/profile/locale
         ...
 
-    @request(put, "/admin/user/profile/password")
+    @request("PUT", "/admin/user/profile/password")
     def update_profile_password(self, payload: ProfilePasswordUpdateRequest):
         ...
 
-    @request(put, "/admin/user/{username}")
+    @request("PUT", "/admin/user/{username}")
     def update_user(self, username: str, payload: UserUpdateRequest):
         ...
 
-    @request(put, "/admin/usergroup/{group_name}")
+    @request("PUT", "/admin/usergroup/{group_name}")
     def update_user_group(self, group_name: str, payload: UserGroup):
         ...
 
