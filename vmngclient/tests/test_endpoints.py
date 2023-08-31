@@ -481,6 +481,22 @@ class TestAPIEndpoints(unittest.TestCase):
             headers={"content-type": "application/json"},
         )
 
+    def test_request_decorator_call_optional_model_payload(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            @request("PUT", "/v1/data/{id}")
+            def put_data(self, id: str, payload: Optional[BaseModelExample]):  # type: ignore [empty-body]
+                ...
+
+        api = TestAPI(self.session_mock)
+        # Act
+        api.put_data("ID123", None)
+        # Assert
+        self.session_mock.request.assert_called_once_with(
+            "PUT",
+            self.base_path + "/v1/data/ID123",
+        )
+
     def test_request_decorator_call_and_return_model(self):
         # Arrange
         class TestAPI(APIEndpoints):
