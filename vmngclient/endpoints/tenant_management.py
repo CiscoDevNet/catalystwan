@@ -133,7 +133,7 @@ class TenantManagement(APIEndpoints):
 
     @view({ProviderView})
     @delete("/tenant/{tenant_id}/delete")
-    def delete_tenant(self, tenant_id: str, payload: TenantDeleteRequest):
+    def delete_tenant(self, tenant_id: str, payload: TenantDeleteRequest) -> None:
         ...
 
     @versions(">=20.4")
@@ -186,7 +186,7 @@ class TenantManagement(APIEndpoints):
 
     @view({ProviderView})
     @put("/tenant/{tenant_id}/vsmart")
-    def update_tenant_vsmart_placement(self, tenant_id: str, payload: vSmartPlacementUpdateRequest):
+    def update_tenant_vsmart_placement(self, tenant_id: str, payload: vSmartPlacementUpdateRequest) -> None:
         ...
 
     @view({ProviderView})

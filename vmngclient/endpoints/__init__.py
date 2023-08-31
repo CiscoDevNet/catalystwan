@@ -103,6 +103,10 @@ class TypeSpecifier:
         return TypeSpecifier(present=False)
 
     @classmethod
+    def none_type(cls) -> "TypeSpecifier":
+        return TypeSpecifier(True)
+
+    @classmethod
     def json(cls) -> "TypeSpecifier":
         return TypeSpecifier(present=True, is_json=True)
 
@@ -397,6 +401,13 @@ class request(APIEndpointsDecorator):
         annotation = self.sig.return_annotation
         if annotation == JSON:
             return TypeSpecifier.json()
+        if annotation is None:
+            return TypeSpecifier.none_type()
+        if annotation == _empty:
+            raise APIEndpointError(
+                "APIEndpoint methods decorated whit @request must specify return type, "
+                "use None annotation if function does not return any value"
+            )
         if (type_origin := get_origin(annotation)) and isclass(type_origin) and issubclass(type_origin, DataSequence):
             if (
                 (type_args := get_args(annotation))
@@ -410,13 +421,10 @@ class request(APIEndpointsDecorator):
             try:
                 if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModel, DataclassBase)):
                     return TypeSpecifier(True, None, annotation)
-                elif annotation == _empty:
-                    return TypeSpecifier.not_present()
                 raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
             except TypeError:
                 raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
-        else:
-            raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
+        raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
 
     def specify_payload_type(self) -> TypeSpecifier:
         """Specifies payload type based on decorated method signature annotations.
@@ -552,7 +560,9 @@ class request(APIEndpointsDecorator):
                         else:
                             raise TypeError(f"Expected dictionary as json payload but found: {type(full_json)}")
                     return full_json
-                if issubclass(self.return_spec.payload_type, (BaseModel, DataclassBase)):
+                if self.return_spec.payload_type is None:
+                    pass
+                elif issubclass(self.return_spec.payload_type, (BaseModel, DataclassBase)):
                     if self.return_spec.sequence_type == DataSequence:
                         return response.dataseq(self.return_spec.payload_type, self.resp_json_key)
                     else:
