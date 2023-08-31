@@ -5,7 +5,7 @@ from urllib.parse import parse_qsl, urlsplit
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, request
+from vmngclient.endpoints import APIEndpoints, get, post
 from vmngclient.model.tenant import Tenant
 
 
@@ -36,15 +36,15 @@ class MigrationInfo(BaseModel):
 
 
 class TenantMigration(APIEndpoints):
-    @request("GET", "/tenantmigration/download/{path}")
+    @get("/tenantmigration/download/{path}")
     def download_tenant_data(self, path: str = "default.tar.gz") -> bytes:
         ...
 
-    @request("POST", "/tenantmigration/export")
+    @post("/tenantmigration/export")
     def export_tenant_data(self, payload: Tenant) -> ExportInfo:
         ...
 
-    @request("GET", "/tenantmigration/migrationToken")
+    @get("/tenantmigration/migrationToken")
     def get_migration_token(self, params: MigrationTokenQueryParams) -> str:
         ...
 
@@ -53,7 +53,7 @@ class TenantMigration(APIEndpoints):
         response = self._request("POST", "/tenantmigration/import", files={"file": (Path(data.name).name, data)})
         return response.dataobj(ImportInfo, None)
 
-    @request("POST", "/tenantmigration/networkMigration")
+    @post("/tenantmigration/networkMigration")
     def migrate_network(self, payload: str) -> MigrationInfo:
         ...
 

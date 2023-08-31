@@ -3,7 +3,7 @@ from typing import Dict
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, request, view
+from vmngclient.endpoints import APIEndpoints, post, view
 from vmngclient.utils.session_type import ProviderView
 
 
@@ -17,6 +17,6 @@ class FeatureToCLIPayload(BaseModel):
 
 class ConfigurationDeviceTemplate(APIEndpoints):
     @view({ProviderView})
-    @request("POST", "/template/device/config/config/")
+    @post("/template/device/config/config/")
     def get_device_configuration_preview(self, payload: FeatureToCLIPayload) -> str:
         ...

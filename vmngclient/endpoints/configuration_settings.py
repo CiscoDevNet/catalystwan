@@ -5,7 +5,7 @@ from typing import Optional, Union
 
 from pydantic import BaseModel, Field, IPvAnyAddress
 
-from vmngclient.endpoints import APIEndpoints, request
+from vmngclient.endpoints import APIEndpoints, get
 from vmngclient.typed_list import DataSequence
 
 
@@ -205,131 +205,131 @@ class ConfigurationSettings(APIEndpoints):
         # GET /settings/configuration/certificate/{settingType}
         ...
 
-    @request("GET", "/settings/configuration/{setting_type}")
+    @get("/settings/configuration/{setting_type}")
     def get_configuration_by_setting_type(self, setting_type: str) -> dict:
         ...
 
-    @request("GET", "/settings/configuration/organization", "data")
+    @get("/settings/configuration/organization", "data")
     def get_organizations(self) -> DataSequence[Organization]:
         ...
 
-    @request("GET", "/settings/configuration/device", "data")
+    @get("/settings/configuration/device", "data")
     def get_devices(self) -> DataSequence[Device]:
         ...
 
-    @request("GET", "/settings/configuration/emailNotificationSettings", "data")
+    @get("/settings/configuration/emailNotificationSettings", "data")
     def get_email_notification_settings(self) -> DataSequence[EmailNotificationSettings]:
         ...
 
-    @request("GET", "/settings/configuration/hardwarerootca", "data")
+    @get("/settings/configuration/hardwarerootca", "data")
     def get_hardware_root_cas(self) -> DataSequence[HardwareRootCA]:
         ...
 
-    @request("GET", "/settings/configuration/certificate", "data")
+    @get("/settings/configuration/certificate", "data")
     def get_certificates(self) -> DataSequence[Certificate]:
         ...
 
-    @request("GET", "/settings/configuration/vedgecloud", "data")
+    @get("/settings/configuration/vedgecloud", "data")
     def get_vedge_cloud(self) -> DataSequence[VEdgeCloud]:
         ...
 
-    @request("GET", "/settings/configuration/banner", "data")
+    @get("/settings/configuration/banner", "data")
     def get_banners(self) -> DataSequence[Banner]:
         ...
 
-    @request("GET", "/settings/configuration/proxyHttpServer", "data")
+    @get("/settings/configuration/proxyHttpServer", "data")
     def get_proxy_http_servers(self) -> DataSequence[ProxyHTTPServer]:
         ...
 
-    @request("GET", "/settings/configuration/reverseproxy", "data")
+    @get("/settings/configuration/reverseproxy", "data")
     def get_reverse_proxies(self) -> DataSequence[ReverseProxy]:
         ...
 
-    @request("GET", "/settings/configuration/cloudx", "data")
+    @get("/settings/configuration/cloudx", "data")
     def get_cloudx(self) -> DataSequence[CloudX]:
         ...
 
-    @request("GET", "/settings/configuration/manageEncryptedPassword", "data")
+    @get("/settings/configuration/manageEncryptedPassword", "data")
     def get_manage_encrypted_password(self) -> DataSequence[ManageEncryptedPassword]:
         ...
 
-    @request("GET", "/settings/configuration/cloudservices", "data")
+    @get("/settings/configuration/cloudservices", "data")
     def get_cloudservices(self) -> DataSequence[CloudServices]:
         ...
 
-    @request("GET", "/settings/configuration/clientSessionTimeout", "data")
+    @get("/settings/configuration/clientSessionTimeout", "data")
     def get_client_session_timeout(self) -> DataSequence[ClientSessionTimeout]:
         ...
 
-    @request("GET", "/settings/configuration/sessionLifeTime", "data")
+    @get("/settings/configuration/sessionLifeTime", "data")
     def get_session_life_time(self) -> DataSequence[SessionLifeTime]:
         ...
 
-    @request("GET", "/settings/configuration/serverSessionTimeout", "data")
+    @get("/settings/configuration/serverSessionTimeout", "data")
     def get_server_session_timeout(self) -> DataSequence[ServerSessionTimeout]:
         ...
 
-    @request("GET", "/settings/configuration/maxSessionsPerUser", "data")
+    @get("/settings/configuration/maxSessionsPerUser", "data")
     def get_max_sessions_per_user(self) -> DataSequence[MaxSessionsPerUser]:
         ...
 
-    @request("GET", "/settings/configuration/passwordPolicy", "data")
+    @get("/settings/configuration/passwordPolicy", "data")
     def get_password_policy(self) -> DataSequence[PasswordPolicy]:
         ...
 
-    @request("GET", "/settings/configuration/vmanagedatastream", "data")
+    @get("/settings/configuration/vmanagedatastream", "data")
     def get_vmanage_data_stream(self) -> DataSequence[VManageDataStream]:
         ...
 
-    @request("GET", "/settings/configuration/dataCollectionOnNotification", "data")
+    @get("/settings/configuration/dataCollectionOnNotification", "data")
     def get_data_collection_on_notification(self) -> DataSequence[DataCollectionOnNotification]:
         ...
 
-    @request("GET", "/settings/configuration/sdWanTelemetry", "data")
+    @get("/settings/configuration/sdWanTelemetry", "data")
     def get_sdwan_telemetry(self) -> DataSequence[SDWANTelemetry]:
         ...
 
-    @request("GET", "/management/statsconfig")
+    @get("/management/statsconfig")
     def get_stats_config(self) -> DataSequence[StatsOperation]:
         ...
 
-    @request("GET", "/settings/configuration/spMetadata")
+    @get("/settings/configuration/spMetadata")
     def get_sp_metadata(self) -> str:
         ...
 
-    @request("GET", "/management/elasticsearch/index/size", "indexSize")
+    @get("/management/elasticsearch/index/size", "indexSize")
     def get_elasticsearch_db_size(self) -> DataSequence[ElasticSearchDBSize]:
         ...
 
-    @request("GET", "/settings/configuration/googleMapKey", "data")
+    @get("/settings/configuration/googleMapKey", "data")
     def get_google_map_key(self) -> DataSequence[GoogleMapKey]:
         ...
 
-    @request("GET", "/settings/configuration/maintenanceWindow", "data")
+    @get("/settings/configuration/maintenanceWindow", "data")
     def get_maintenance_window(self) -> DataSequence[MaintenanceWindow]:
         ...
 
-    @request("GET", "/settings/configuration/softwareMaintenance", "data")
+    @get("/settings/configuration/softwareMaintenance", "data")
     def get_software_install_timeout(self) -> DataSequence[SoftwareInstallTimeout]:
         ...
 
-    @request("GET", "/settings/configuration/credentials", "data")
+    @get("/settings/configuration/credentials", "data")
     def get_ips_signature_settings(self) -> DataSequence[IPSSignatureSettings]:
         ...
 
-    @request("GET", "/settings/configuration/smartaccountcredentials", "data")
+    @get("/settings/configuration/smartaccountcredentials", "data")
     def get_smart_account_credentials(self) -> DataSequence[SmartAccountCredentials]:
         ...
 
-    @request("GET", "/settings/configuration/pnpConnectSync", "data")
+    @get("/settings/configuration/pnpConnectSync", "data")
     def get_pnp_connect_sync(self) -> DataSequence[PnPConnectSync]:
         ...
 
-    @request("GET", "/settings/configuration/claimDevice", "data")
+    @get("/settings/configuration/claimDevice", "data")
     def get_claim_device(self) -> DataSequence[ClaimDevice]:
         ...
 
-    @request("GET", "/settings/configuration/walkme", "data")
+    @get("/settings/configuration/walkme", "data")
     def get_walkme(self) -> DataSequence[WalkMe]:
         ...
 

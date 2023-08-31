@@ -18,7 +18,7 @@ Method decorated with @request has no body, as decorator constructs and sends re
 >>> class TenantManagementAPI(APIEndpoints):
 >>>     @versions(">=20.4")
 >>>     @view({ProviderView})
->>>     @request("DELETE", "/tenant/bulk/async")
+>>>     @delete("/tenant/bulk/async")
 >>>     def delete_tenant_async_bulk(self, payload: TenantBulkDeleteRequest) -> TenantTaskId:
 >>>         ...
 >>>

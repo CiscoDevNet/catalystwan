@@ -90,7 +90,7 @@ Start reading our code, and you'll get the hang of it.
   ```python
   from pydantic import BaseModel, Field
   from typing import List
-  from vmngclient.endpoints import APIEndpoints, request, versions, view, delete
+  from vmngclient.endpoints import APIEndpoints, request, versions, view
   from vmngclient.utils.session_type import ProviderView
 
   class TenantBulkDeleteRequest(BaseModel):
@@ -104,7 +104,7 @@ Start reading our code, and you'll get the hang of it.
 
       @versions(">=20.4")
       @view({ProviderView})
-      @request(delete, "/tenant/bulk/async")
+      @request("DELETE", "/tenant/bulk/async")
       def delete_tenant_async_bulk(self, payload: TenantBulkDeleteRequest) -> TenantTaskId:
           ...
   ```
