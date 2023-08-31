@@ -52,14 +52,11 @@ class GetFeatureProfilesPayload(BaseModel):
 
 
 class ConfigurationFeatureProfile(APIEndpoints):
-    # TODO JSON return type
-    # TODO resp_json_key
     @versions(supported_versions=(">=20.9"), raises=False)
     @get("/v1/feature-profile/sdwan/system/aaa/schema", resp_json_key="request")
     def get_sdwan_system_aaa_parcel_schema(self, params: SchemaTypeQuery) -> JSON:
         ...
 
-    # TODO Optional payload (GetFeatureProfilesPayload)
     @versions(supported_versions=(">=20.9"), raises=False)
     @get("/v1/feature-profile/sdwan/transport")
     def get_sdwan_transport_feature_profiles(
@@ -74,8 +71,7 @@ class ConfigurationFeatureProfile(APIEndpoints):
     ) -> FeatureProfileCreationResponse:
         ...
 
-    # TODO return type -> None
     @versions(supported_versions=(">=20.9"), raises=False)
     @delete("/v1/feature-profile/sdwan/transport/{transport_id}")
-    def delete_sdwan_transport_feature_profile(self, transport_id: str) -> str:
+    def delete_sdwan_transport_feature_profile(self, transport_id: str) -> None:
         ...
