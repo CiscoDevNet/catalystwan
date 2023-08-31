@@ -10,9 +10,18 @@ from parameterized import parameterized  # type: ignore
 from pydantic import BaseModel
 
 from vmngclient.dataclasses import DataclassBase  # type: ignore
-from vmngclient.endpoints import BASE_PATH, JSON, APIEndpoints, CustomPayloadType, PreparedPayload, TypeSpecifier
+from vmngclient.endpoints import (
+    BASE_PATH,
+    JSON,
+    APIEndpoints,
+    CustomPayloadType,
+    PreparedPayload,
+    TypeSpecifier,
+    delete,
+    get,
+)
 from vmngclient.endpoints import logger as endpoints_logger
-from vmngclient.endpoints import request, versions, view
+from vmngclient.endpoints import post, put, request, versions, view
 from vmngclient.exceptions import APIEndpointError, APIRequestPayloadTypeError, APIVersionError, APIViewError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
@@ -612,6 +621,50 @@ class TestAPIEndpoints(unittest.TestCase):
         # Act / Assert
         with self.assertRaises(TypeError):
             api.get_data()
+
+    def test_get_decorator(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            def method(self):  # type: ignore [empty-body]
+                ...
+
+        decorator = get("/url/data")
+        # Act / Assert
+        decorator(TestAPI.method)
+        decorator.http_method = "GET"
+
+    def test_put_decorator(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            def method(self):  # type: ignore [empty-body]
+                ...
+
+        decorator = put("/url/data")
+        # Act / Assert
+        decorator(TestAPI.method)
+        decorator.http_method = "PUT"
+
+    def test_post_decorator(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            def method(self):  # type: ignore [empty-body]
+                ...
+
+        decorator = post("/url/data")
+        # Act / Assert
+        decorator(TestAPI.method)
+        decorator.http_method = "POST"
+
+    def test_delete_decorator(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            def method(self):  # type: ignore [empty-body]
+                ...
+
+        decorator = delete("/url/data")
+        # Act / Assert
+        decorator(TestAPI.method)
+        decorator.http_method = "DELETE"
 
     def test_no_mutable_state_when_calling_endpoint(self):
         # Arrange

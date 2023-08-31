@@ -565,3 +565,23 @@ class request(APIEndpointsDecorator):
                     return response.json()
 
         return wrapper
+
+
+class get(request):
+    def __init__(self, url: str, resp_json_key: Optional[str] = None, **kwargs):
+        super().__init__("GET", url, resp_json_key, **kwargs)
+
+
+class put(request):
+    def __init__(self, url: str, resp_json_key: Optional[str] = None, **kwargs):
+        super().__init__("PUT", url, resp_json_key, **kwargs)
+
+
+class post(request):
+    def __init__(self, url: str, resp_json_key: Optional[str] = None, **kwargs):
+        super().__init__("POST", url, resp_json_key, **kwargs)
+
+
+class delete(request):
+    def __init__(self, url: str, resp_json_key: Optional[str] = None, **kwargs):
+        super().__init__("DELETE", url, resp_json_key, **kwargs)
