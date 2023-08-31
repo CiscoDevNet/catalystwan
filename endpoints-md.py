@@ -16,6 +16,28 @@ def relative(absolute: str) -> str:
     return str(PurePath(absolute).relative_to(local))
 
 
+def generate_origin_string(typespec: TypeSpecifier) -> str:
+    string = ""
+    depth = 0
+
+    def add_origin(origin: str):
+        nonlocal string, depth
+        string = string[:-depth] + f"{origin}[]" + string[-depth:]
+        depth = depth + 1
+
+    seqtype = getattr(typespec.sequence_type, "__name__", None) or getattr(typespec.sequence_type, "_name", None)
+
+    if typespec.is_optional:
+        add_origin("Optional")
+
+    if seqtype:
+        add_origin(str(seqtype))
+
+    string = string[:-depth] + "{}" + string[-depth:]
+
+    return string
+
+
 class MarkdownRenderer(Protocol):
     def md(self) -> str:
         ...
@@ -48,29 +70,26 @@ class CodeLink(MarkdownRenderer):
 
 @dataclass
 class CompositeTypeLink(CodeLink, MarkdownRenderer):
-    origin: Optional[str]
+    origin: str = "{}"
 
     @staticmethod
     def from_type_specifier(typespec: TypeSpecifier) -> Optional["CompositeTypeLink"]:
         if typespec.present:
             if payloadtype := typespec.payload_type:
                 if payloadtype.__module__ == "builtins":
-                    return CompositeTypeLink(payloadtype.__name__, None, None, None)
+                    return CompositeTypeLink(payloadtype.__name__, None, None, "")
                 elif sourcefile := getsourcefile(payloadtype):
-                    seqtype = getattr(typespec.sequence_type, "__name__", None) or getattr(
-                        typespec.sequence_type, "_name", None
-                    )
                     return CompositeTypeLink(
                         link_text=payloadtype.__name__,
                         sourcefile=relative(sourcefile),
                         lineno=getsourcelines(payloadtype)[1],
-                        origin=seqtype,
+                        origin=generate_origin_string(typespec),
                     )
         return None
 
     def md(self) -> str:
         if self.origin:
-            return f"{self.origin}[[**{self.link_text}**]({self.sourcefile}#L{self.lineno})]"
+            return self.origin.format(f"[**{self.link_text}**]({self.sourcefile}#L{self.lineno})")
         return super().md()
 
 
