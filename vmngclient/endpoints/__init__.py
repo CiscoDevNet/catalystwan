@@ -99,15 +99,15 @@ class TypeSpecifier:
     is_optional: bool = False
 
     @classmethod
-    def not_present(cls) -> "TypeSpecifier":
+    def not_present(cls) -> TypeSpecifier:
         return TypeSpecifier(present=False)
 
     @classmethod
-    def none_type(cls) -> "TypeSpecifier":
-        return TypeSpecifier(True)
+    def none_type(cls) -> TypeSpecifier:
+        return TypeSpecifier(present=True)
 
     @classmethod
-    def json(cls) -> "TypeSpecifier":
+    def json(cls) -> TypeSpecifier:
         return TypeSpecifier(present=True, is_json=True)
 
 

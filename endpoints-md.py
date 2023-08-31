@@ -1,4 +1,6 @@
 # Grabs API meta data collected while decorating API methods and prepares markdown documentation
+from __future__ import annotations
+
 from dataclasses import dataclass
 from inspect import getsourcefile, getsourcelines
 from pathlib import Path, PurePath
@@ -56,7 +58,7 @@ class CodeLink(MarkdownRenderer):
     lineno: Optional[int]
 
     @staticmethod
-    def from_func(func) -> "CodeLink":
+    def from_func(func) -> CodeLink:
         if sourcefile := getsourcefile(func):
             return CodeLink(
                 link_text=func.__qualname__,
@@ -65,7 +67,7 @@ class CodeLink(MarkdownRenderer):
             )
         raise Exception("Cannot locate source for {func}")
 
-    def __lt__(self, other: "CodeLink"):
+    def __lt__(self, other: CodeLink):
         return self.link_text < other.link_text
 
     def md(self) -> str:
@@ -79,11 +81,11 @@ class CompositeTypeLink(CodeLink, MarkdownRenderer):
     origin: str = "{}"
 
     @staticmethod
-    def text_only(name: str) -> "CompositeTypeLink":
+    def text_only(name: str) -> CompositeTypeLink:
         return CompositeTypeLink(link_text=name, sourcefile=None, lineno=None, origin="")
 
     @staticmethod
-    def from_type_specifier(typespec: TypeSpecifier) -> "CompositeTypeLink":
+    def from_type_specifier(typespec: TypeSpecifier) -> CompositeTypeLink:
         if typespec.present:
             if typespec.payload_type is None:
                 return CompositeTypeLink.text_only("None")
@@ -121,7 +123,7 @@ class Endpoint(MarkdownRenderer):
         meta: APIEndpointRequestMeta,
         versions: Optional[SpecifierSet],
         tenancy_modes: Optional[Set[SessionType]],
-    ) -> "Endpoint":
+    ) -> Endpoint:
         return Endpoint(
             http_request=meta.http_request,
             supported_versions=str(versions) if versions else "",
@@ -131,7 +133,7 @@ class Endpoint(MarkdownRenderer):
             return_type=CompositeTypeLink.from_type_specifier(meta.return_spec),
         )
 
-    def __lt__(self, other: "Endpoint"):
+    def __lt__(self, other: Endpoint):
         self.method < other.method
 
     def md(self) -> str:
