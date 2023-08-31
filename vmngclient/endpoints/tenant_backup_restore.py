@@ -3,7 +3,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from vmngclient.endpoints import APIEndpoints, get, request, view
+from vmngclient.endpoints import APIEndpoints, get, view
 from vmngclient.utils.session_type import ProviderAsTenantView, TenantView
 
 
@@ -33,6 +33,6 @@ class TenantBackupRestore(APIEndpoints):
         ...
 
     @view({ProviderAsTenantView, TenantView})
-    @request(get, "/tenantbackup/list")
+    @get("/tenantbackup/list")
     def list_tenant_backup(self) -> BackupFiles:
         ...

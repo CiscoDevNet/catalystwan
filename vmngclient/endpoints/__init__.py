@@ -2,7 +2,7 @@
 vManage API endpoint handlers in declarative way.
 Just create a sub-class and define endpoints using using included decorators: request, view, versions.
 Method decorated with @request has no body, as decorator constructs and sends request.
->>> from vmngclient.endpoints import APIEndpoints, versions, view, request, delete
+>>> from vmngclient.endpoints import APIEndpoints, versions, view, request
 >>> from vmngclient.utils.session_type import ProviderView
 >>>
 >>>
@@ -18,7 +18,7 @@ Method decorated with @request has no body, as decorator constructs and sends re
 >>> class TenantManagementAPI(APIEndpoints):
 >>>     @versions(">=20.4")
 >>>     @view({ProviderView})
->>>     @request(delete, "/tenant/bulk/async")
+>>>     @delete("/tenant/bulk/async")
 >>>     def delete_tenant_async_bulk(self, payload: TenantBulkDeleteRequest) -> TenantTaskId:
 >>>         ...
 >>>
@@ -31,6 +31,7 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import asdict, dataclass
+from functools import wraps
 from inspect import _empty, isclass, signature
 from io import BufferedReader
 from string import Formatter
@@ -110,6 +111,7 @@ class TypeSpecifier:
 class APIEndpointRequestMeta:
     """Holds data for endpoints exctracted during decorating. Used for documentation"""
 
+    func: Any
     http_request: str
     payload_spec: TypeSpecifier
     return_spec: TypeSpecifier
@@ -275,15 +277,18 @@ class versions(APIEndpointsDecorator):
     Logs warning or raises exception when incompatibility found during runtime.
     """
 
-    meta_lookup: ClassVar[Dict[Any, SpecifierSet]] = {}  # maps decorated method instance to it's supported verisions
+    versions_lookup: ClassVar[
+        Dict[str, SpecifierSet]
+    ] = {}  # maps decorated method instance to it's supported verisions
 
     def __init__(self, supported_versions: str, raises: bool = False):
         self.supported_versions = SpecifierSet(supported_versions)
         self.raises = raises
 
     def __call__(self, func):
-        self.meta_lookup[func] = self.supported_versions
+        self.versions_lookup[func.__qualname__] = self.supported_versions
 
+        @wraps(func)
         def wrapper(*args, **kwargs):
             """Executes each time decorated method is called"""
             _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIEndpoints instance
@@ -307,15 +312,16 @@ class view(APIEndpointsDecorator):
     Logs warning or raises exception when incompatibility found during runtime.
     """
 
-    meta_lookup: ClassVar[Dict[Any, Set[SessionType]]] = {}  # maps decorated method instance to it's allowed sessions
+    view_lookup: ClassVar[Dict[str, Set[SessionType]]] = {}  # maps decorated method instance to it's allowed sessions
 
     def __init__(self, allowed_session_types: Set[SessionType], raises: bool = False):
         self.allowed_session_types = allowed_session_types
         self.raises = raises
 
     def __call__(self, func):
-        self.meta_lookup[func] = self.allowed_session_types
+        self.view_lookup[func.__qualname__] = self.allowed_session_types
 
+        @wraps(func)
         def wrapper(*args, **kwargs):
             """Executes each time decorated method is called"""
             _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIEndpoints instance
@@ -361,8 +367,8 @@ class request(APIEndpointsDecorator):
     """
 
     forbidden_url_field_names = {"self", "payload", "params"}
-    meta_lookup: ClassVar[
-        Dict[Any, APIEndpointRequestMeta]
+    request_lookup: ClassVar[
+        Dict[str, APIEndpointRequestMeta]
     ] = {}  # maps decorated method instance to it's meta information
 
     def __init__(self, http_method: str, url: str, resp_json_key: Optional[str] = None, **kwargs):
@@ -446,7 +452,7 @@ class request(APIEndpointsDecorator):
         # Check if regular class
         if isclass(annotation):
             if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModel, DataclassBase, CustomPayloadType)):
-                return TypeSpecifier(True, None, annotation, is_optional)
+                return TypeSpecifier(True, None, annotation, False, is_optional)
             else:
                 raise APIEndpointError(f"'payload' param must be annotated with supported type: {PayloadType}")
 
@@ -459,7 +465,7 @@ class request(APIEndpointsDecorator):
                     and isclass(type_args[0])
                     and issubclass(type_args[0], (BaseModel, DataclassBase))
                 ):
-                    return TypeSpecifier(True, annotation, type_args[0], is_optional)
+                    return TypeSpecifier(True, type_origin, type_args[0], False, is_optional)
             raise APIEndpointError(f"Expected: {PayloadType} but found payload {annotation}")
         else:
             raise APIEndpointError(f"Expected: {PayloadType} but found payload {annotation}")
@@ -514,10 +520,14 @@ class request(APIEndpointsDecorator):
         self.return_spec = self.specify_return_type()
         self.payload_spec = self.specify_payload_type()
         self.check_params()
-        self.meta_lookup[func] = APIEndpointRequestMeta(
-            http_request=f"{self.http_method} {self.url}", payload_spec=self.payload_spec, return_spec=self.return_spec
+        self.request_lookup[func.__qualname__] = APIEndpointRequestMeta(
+            func=func,
+            http_request=f"{self.http_method} {self.url}",
+            payload_spec=self.payload_spec,
+            return_spec=self.return_spec,
         )
 
+        @wraps(func)
         def wrapper(*args, **kwargs):
             """Executes each time decorated method is called"""
             _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIEndpoints instance
@@ -557,7 +567,21 @@ class request(APIEndpointsDecorator):
         return wrapper
 
 
-get = "GET"
-post = "POST"
-put = "PUT"
-delete = "DELETE"
+class get(request):
+    def __init__(self, url: str, resp_json_key: Optional[str] = None, **kwargs):
+        super().__init__("GET", url, resp_json_key, **kwargs)
+
+
+class put(request):
+    def __init__(self, url: str, resp_json_key: Optional[str] = None, **kwargs):
+        super().__init__("PUT", url, resp_json_key, **kwargs)
+
+
+class post(request):
+    def __init__(self, url: str, resp_json_key: Optional[str] = None, **kwargs):
+        super().__init__("POST", url, resp_json_key, **kwargs)
+
+
+class delete(request):
+    def __init__(self, url: str, resp_json_key: Optional[str] = None, **kwargs):
+        super().__init__("DELETE", url, resp_json_key, **kwargs)
