@@ -2,18 +2,10 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, Field, root_validator
+from pydantic import Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
-
-
-class CustomBaseModel(BaseModel):
-    @root_validator  # type: ignore
-    def convert_bool_to_string_validator(cls, values):
-        for key, value in values.items():
-            if isinstance(value, bool):
-                values[key] = str(value).lower()
-        return values
+from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
 
 
 class ColorType(str, Enum):
@@ -41,7 +33,7 @@ class ColorType(str, Enum):
     PRIVATE6 = "private6"
 
 
-class Color(CustomBaseModel):
+class Color(ConvertBoolToStringModel):
     color: ColorType
     hello_interval: Optional[int] = Field(1000, alias="hello-interval")
     multiplier: Optional[int] = 7
@@ -52,7 +44,7 @@ class Color(CustomBaseModel):
         allow_population_by_field_name = True
 
 
-class CiscoBFDModel(FeatureTemplate, CustomBaseModel):
+class CiscoBFDModel(FeatureTemplate, ConvertBoolToStringModel):
     class Config:
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
