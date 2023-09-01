@@ -5,8 +5,9 @@ from parameterized import parameterized  # type: ignore
 from pytest import mark  # type: ignore
 from tenacity import RetryError  # type: ignore
 
-from vmngclient.api.basic_api import DevicesAPI, DeviceStateAPI, FailedSend
+from vmngclient.api.basic_api import DevicesAPI, DeviceStateAPI
 from vmngclient.dataclasses import BfdSessionData, Connection, Device, Reboot, WanInterface
+from vmngclient.exceptions import InvalidOperationError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.personality import Personality
@@ -302,7 +303,7 @@ class TestDevicesAPI(TestCase):
             return DevicesAPI(mock_session).send_certificate_state_to_controllers()
 
         # Assert
-        self.assertRaises(FailedSend, answer)
+        self.assertRaises(InvalidOperationError, answer)
 
     @parameterized.expand([["vm200", 0], ["vm129", 1], ["vm128", 2], ["vm1", 3]])
     @patch("vmngclient.response.vManageResponse")

@@ -23,7 +23,9 @@ from vmngclient.api.templates.models.cisco_bgp_model import CiscoBGPModel
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
 from vmngclient.api.templates.models.cisco_vpn_interface_model import CiscoVpnInterfaceModel
 from vmngclient.api.templates.models.cisco_snmp_model import CiscoSNMPModel
+from vmngclient.api.templates.models.cisco_system import CiscoSystemModel
 from vmngclient.api.templates.models.cisco_vpn_model import CiscoVPNModel
+from vmngclient.api.templates.models.cli_template import CliTemplateModel
 from vmngclient.api.templates.models.omp_vsmart_model import OMPvSmart
 from vmngclient.api.templates.models.security_vsmart_model import SecurityvSmart
 from vmngclient.api.templates.models.system_vsmart_model import SystemVsmart
@@ -493,9 +495,11 @@ class TemplatesAPI:
             SecurityvSmart,
             SystemVsmart,
             CiscoVpnInterfaceModel,
+            CiscoSystemModel,
             CiscoSNMPModel,
             CiscoVPNModel,
             CiscoBGPModel,
+            CliTemplateModel,
         )
 
         return isinstance(template, ported_templates)

@@ -4,7 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, get, request
+from vmngclient.endpoints import APIEndpoints, get
 
 
 class CloudConnector(BaseModel):
@@ -25,7 +25,7 @@ class SDAVCCloudConnector(APIEndpoints):
         # POST /sdavc/cloudconnector
         ...
 
-    @request(get, "/sdavc/cloudconnector")
+    @get("/sdavc/cloudconnector")
     def get_cloud_connector(self) -> CloudConnector:
         ...
 

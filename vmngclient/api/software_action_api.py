@@ -11,6 +11,7 @@ from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import asdict
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.upgrades_helper import get_install_specification, validate_personality_homogeneity
+from vmngclient.version import parse_vmanage_version
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +43,6 @@ class SoftwareActionAPI:
     """
 
     def __init__(self, session: vManageSession) -> None:
-
         self.session = session
         self.repository = RepositoryAPI(self.session)
         self.device_versions = DeviceVersions(self.session)
@@ -91,8 +91,9 @@ class SoftwareActionAPI:
         devices: DataSequence[Device],
         reboot: bool = False,
         sync: bool = True,
-        image: Optional[str] = "",
-        image_version: Optional[str] = "",
+        image: str = "",
+        image_version: str = "",
+        downgrade_check: bool = True,
     ) -> Task:
         """
         Method to install new software
@@ -103,8 +104,9 @@ class SoftwareActionAPI:
             on which the action is to be performed
             reboot (bool): reboot device after action end
             sync (bool, optional): Synchronize settings. Defaults to True.
-            software_image (Optional[str]): path to software image
-            image_version (Optional[str]): version of software image
+            software_image (str): path to software image
+            image_version (str): version of software image
+            downgrade_check (bool): perform a downgrade check when applicable
 
             Notice: Have to pass one of those arguments (image_version,
             software_image)
@@ -113,7 +115,7 @@ class SoftwareActionAPI:
             ValueError: Raise error if downgrade in certain cases
 
         Returns:
-            str: action id
+            Task: Task object representing started install process
         """
         validate_personality_homogeneity(devices)
         if image and not image_version:
@@ -142,10 +144,7 @@ class SoftwareActionAPI:
             ],  # type: ignore
             "deviceType": install_specification.device_type.value,
         }
-        if devices.first().personality in (
-            Personality.VMANAGE,
-            Personality.EDGE,
-        ):  # block downgrade for edges and vmanages
+        if downgrade_check and devices.first().personality in (Personality.VMANAGE, Personality.EDGE):
             self._downgrade_check(payload["devices"], payload["input"]["version"], install_specification.family.value)
         upgrade = dict(self.session.post(url, json=payload).json())
         return Task(self.session, upgrade["id"])
@@ -165,24 +164,25 @@ class SoftwareActionAPI:
         incorrect_devices = []
         devices_versions_repo = self.repository.get_devices_versions_repository()
         for device in payload_devices:
-            dev_current_version = str(devices_versions_repo[device["deviceId"]].current_version)
-            splited_version_to_upgrade = version_to_upgrade.split(".")
-            for priority, label in enumerate(dev_current_version.split("-")[0].split(".")):
-                try:
-                    label = int(label)  # type: ignore
-                    version = int(splited_version_to_upgrade[priority])
-                except ValueError:
-                    pass
+            device_id = device["deviceId"]
+            current_version = parse_vmanage_version(devices_versions_repo[device_id].current_version)
+            upgrade_version = parse_vmanage_version(version_to_upgrade)
+            # check if downgrade
+            if current_version > upgrade_version:
+                logger.warning(
+                    f"Requested to downgrade device: {device_id} from {current_version} to {upgrade_version}"
+                )
+                # allow vmanage downgrade only if major and minor version match, downgrade for other devices is allowed
+                if family == "vmanage":
+                    if not current_version.release[:2] == upgrade_version.release[:2]:
+                        logger.error(
+                            f"Blocking downgrade of device: {device_id} "
+                            f"from {current_version.release} to {upgrade_version.release}"
+                        )
+                        incorrect_devices.append(device)
 
-                if label > version:  # type: ignore
-                    if family == "vmanage" and label == 2:
-                        continue
-                    incorrect_devices.append(device["deviceId"])
-                    break
-                elif label < version:  # type: ignore
-                    break
         if incorrect_devices:
             raise ValueError(
-                f"Current version of devices with id's {incorrect_devices} is \
-                higher than upgrade version. Action denied!"
+                f"Current version of devices with id's {incorrect_devices} is "
+                "higher than upgrade version. Action denied!"
             )

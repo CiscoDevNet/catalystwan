@@ -2,7 +2,7 @@
 vManage API endpoint handlers in declarative way.
 Just create a sub-class and define endpoints using using included decorators: request, view, versions.
 Method decorated with @request has no body, as decorator constructs and sends request.
->>> from vmngclient.endpoints import APIEndpoints, versions, view, request, delete
+>>> from vmngclient.endpoints import APIEndpoints, versions, view, request
 >>> from vmngclient.utils.session_type import ProviderView
 >>>
 >>>
@@ -18,7 +18,7 @@ Method decorated with @request has no body, as decorator constructs and sends re
 >>> class TenantManagementAPI(APIEndpoints):
 >>>     @versions(">=20.4")
 >>>     @view({ProviderView})
->>>     @request(delete, "/tenant/bulk/async")
+>>>     @delete("/tenant/bulk/async")
 >>>     def delete_tenant_async_bulk(self, payload: TenantBulkDeleteRequest) -> TenantTaskId:
 >>>         ...
 >>>
@@ -31,6 +31,7 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import asdict, dataclass
+from functools import wraps
 from inspect import _empty, isclass, signature
 from io import BufferedReader
 from string import Formatter
@@ -41,6 +42,7 @@ from typing import (
     Dict,
     Final,
     Iterable,
+    List,
     Mapping,
     Optional,
     Protocol,
@@ -77,9 +79,12 @@ class CustomPayloadType(Protocol):
         ...
 
 
+JSON = Union[str, int, float, bool, None, Dict[str, "JSON"], List["JSON"]]
 ModelPayloadType = Union[AttrsInstance, BaseModel, Sequence[AttrsInstance], Sequence[BaseModel]]
-PayloadType = Union[str, bytes, dict, ModelPayloadType, CustomPayloadType]
-ReturnType = Union[bytes, str, dict, BaseModel, DataclassBase, DataSequence[BaseModel], DataSequence[DataclassBase]]
+PayloadType = Union[None, JSON, str, bytes, dict, ModelPayloadType, CustomPayloadType]
+ReturnType = Union[
+    None, JSON, bytes, str, dict, BaseModel, DataclassBase, DataSequence[BaseModel], DataSequence[DataclassBase]
+]
 RequestParamsType = Union[Dict[str, str], BaseModel]
 
 
@@ -90,12 +95,27 @@ class TypeSpecifier:
     present: bool
     sequence_type: Optional[type] = None
     payload_type: Optional[type] = None
+    is_json: bool = False  # JSON is treated specially as it is type-alias / <typing special form>
+    is_optional: bool = False
+
+    @classmethod
+    def not_present(cls) -> TypeSpecifier:
+        return TypeSpecifier(present=False)
+
+    @classmethod
+    def none_type(cls) -> TypeSpecifier:
+        return TypeSpecifier(present=True)
+
+    @classmethod
+    def json(cls) -> TypeSpecifier:
+        return TypeSpecifier(present=True, is_json=True)
 
 
 @dataclass
 class APIEndpointRequestMeta:
     """Holds data for endpoints exctracted during decorating. Used for documentation"""
 
+    func: Any
     http_request: str
     payload_spec: TypeSpecifier
     return_spec: TypeSpecifier
@@ -162,18 +182,19 @@ class APIEndpoints:
     """
 
     @classmethod
-    def _prepare_payload(cls, payload: PayloadType) -> PreparedPayload:
+    def _prepare_payload(cls, payload: PayloadType, force_json: bool = False) -> PreparedPayload:
         """Helper method to prepare data for sending based on type"""
+        if force_json or isinstance(payload, dict):
+            return PreparedPayload(data=json.dumps(payload), headers={"content-type": "application/json"})
         if isinstance(payload, (str, bytes)):
             return PreparedPayload(data=payload)
-        elif isinstance(payload, dict):
-            return PreparedPayload(data=json.dumps(payload), headers={"content-type": "application/json"})
         elif isinstance(payload, BaseModel):
             return cls._prepare_basemodel_payload(payload)
         elif isinstance(payload, AttrsInstance):
             return cls._prepare_attrs_payload(payload)
         elif isinstance(payload, Sequence) and not isinstance(payload, (str, bytes)):
-            return cls._prepare_sequence_payload(payload)
+            return cls._prepare_sequence_payload(payload)  # type: ignore[arg-type]
+            # offender is List[JSON] which is also a Sequence can be ignored as long as force_json is passed correctly
         elif isinstance(payload, CustomPayloadType):
             return payload.prepared()
         else:
@@ -220,13 +241,17 @@ class APIEndpoints:
         url: str,
         payload: Optional[ModelPayloadType] = None,
         params: Optional[RequestParamsType] = None,
+        force_json_payload: bool = False,
         **kwargs,
     ) -> APIEndpointClientResponse:
         """Prepares and sends request using client protocol"""
         _kwargs = dict(kwargs)
         if payload is not None:
             _kwargs.update(
-                asdict(self._prepare_payload(payload), dict_factory=lambda x: {k: v for (k, v) in x if v is not None})
+                asdict(
+                    self._prepare_payload(payload, force_json_payload),
+                    dict_factory=lambda x: {k: v for (k, v) in x if v is not None},
+                )
             )  # optional fields set to None will not be inserted to _kwargs
         if params is not None:
             _kwargs.update({"params": self._prepare_params(params)})
@@ -256,15 +281,18 @@ class versions(APIEndpointsDecorator):
     Logs warning or raises exception when incompatibility found during runtime.
     """
 
-    meta_lookup: ClassVar[Dict[Any, SpecifierSet]] = {}  # maps decorated method instance to it's supported verisions
+    versions_lookup: ClassVar[
+        Dict[str, SpecifierSet]
+    ] = {}  # maps decorated method instance to it's supported verisions
 
     def __init__(self, supported_versions: str, raises: bool = False):
         self.supported_versions = SpecifierSet(supported_versions)
         self.raises = raises
 
     def __call__(self, func):
-        self.meta_lookup[func] = self.supported_versions
+        self.versions_lookup[func.__qualname__] = self.supported_versions
 
+        @wraps(func)
         def wrapper(*args, **kwargs):
             """Executes each time decorated method is called"""
             _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIEndpoints instance
@@ -288,15 +316,16 @@ class view(APIEndpointsDecorator):
     Logs warning or raises exception when incompatibility found during runtime.
     """
 
-    meta_lookup: ClassVar[Dict[Any, Set[SessionType]]] = {}  # maps decorated method instance to it's allowed sessions
+    view_lookup: ClassVar[Dict[str, Set[SessionType]]] = {}  # maps decorated method instance to it's allowed sessions
 
     def __init__(self, allowed_session_types: Set[SessionType], raises: bool = False):
         self.allowed_session_types = allowed_session_types
         self.raises = raises
 
     def __call__(self, func):
-        self.meta_lookup[func] = self.allowed_session_types
+        self.view_lookup[func.__qualname__] = self.allowed_session_types
 
+        @wraps(func)
         def wrapper(*args, **kwargs):
             """Executes each time decorated method is called"""
             _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIEndpoints instance
@@ -342,8 +371,8 @@ class request(APIEndpointsDecorator):
     """
 
     forbidden_url_field_names = {"self", "payload", "params"}
-    meta_lookup: ClassVar[
-        Dict[Any, APIEndpointRequestMeta]
+    request_lookup: ClassVar[
+        Dict[str, APIEndpointRequestMeta]
     ] = {}  # maps decorated method instance to it's meta information
 
     def __init__(self, http_method: str, url: str, resp_json_key: Optional[str] = None, **kwargs):
@@ -355,8 +384,8 @@ class request(APIEndpointsDecorator):
         self.url = url
         self.url_field_names = url_field_names
         self.resp_json_key = resp_json_key
-        self.return_spec = TypeSpecifier(False)
-        self.payload_spec = TypeSpecifier(False)
+        self.return_spec = TypeSpecifier.not_present()
+        self.payload_spec = TypeSpecifier.not_present()
         self.kwargs = kwargs
 
     def specify_return_type(self) -> TypeSpecifier:
@@ -370,6 +399,15 @@ class request(APIEndpointsDecorator):
             TypeSpecifier: Specification of return type
         """
         annotation = self.sig.return_annotation
+        if annotation == JSON:
+            return TypeSpecifier.json()
+        if annotation is None:
+            return TypeSpecifier.none_type()
+        if annotation == _empty:
+            raise APIEndpointError(
+                "APIEndpoint methods decorated with @request must specify return type, "
+                "use None annotation if function does not return any value"
+            )
         if (type_origin := get_origin(annotation)) and isclass(type_origin) and issubclass(type_origin, DataSequence):
             if (
                 (type_args := get_args(annotation))
@@ -383,13 +421,10 @@ class request(APIEndpointsDecorator):
             try:
                 if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModel, DataclassBase)):
                     return TypeSpecifier(True, None, annotation)
-                elif annotation == _empty:
-                    return TypeSpecifier(False)
                 raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
             except TypeError:
                 raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
-        else:
-            raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
+        raise APIEndpointError(f"Expected: {ReturnType} but return type {annotation}")
 
     def specify_payload_type(self) -> TypeSpecifier:
         """Specifies payload type based on decorated method signature annotations.
@@ -403,21 +438,42 @@ class request(APIEndpointsDecorator):
         """
         payload_param = self.sig.parameters.get("payload")
         if not payload_param:
-            return TypeSpecifier(False)
+            return TypeSpecifier.not_present()
+
         annotation = payload_param.annotation
+        is_optional = False
+
+        # Check if JSON
+        if annotation == JSON:
+            return TypeSpecifier.json()
+
+        # Check if Optional (flag and replace original annotation with optional type if exactly one is present)
+        if type_origin := get_origin(annotation):
+            type_args = get_args(annotation)
+            if type_origin == Union and (type(None) in type_args):
+                optional_type_args = tuple(arg for arg in get_args(annotation) if not arg == type(None))  # noqa: E721
+                # flake suggest using isinstance(arg, type(None)) above, but it doesn't match NoneType
+                if len(optional_type_args) == 1:
+                    is_optional = True
+                    annotation = optional_type_args[0]
+
+        # Check if regular class
         if isclass(annotation):
             if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModel, DataclassBase, CustomPayloadType)):
-                return TypeSpecifier(True, None, annotation)
+                return TypeSpecifier(True, None, annotation, False, is_optional)
             else:
                 raise APIEndpointError(f"'payload' param must be annotated with supported type: {PayloadType}")
-        elif (type_origin := get_origin(annotation)) and isclass(type_origin) and issubclass(type_origin, Sequence):
-            if (
-                (type_args := get_args(annotation))
-                and (len(type_args) == 1)
-                and isclass(type_args[0])
-                and issubclass(type_args[0], (BaseModel, DataclassBase))
-            ):
-                return TypeSpecifier(True, annotation, type_args[0])
+
+        # Check if Sequence[PayloadModelType] like List or DataSequence
+        elif type_origin := get_origin(annotation):
+            if isclass(type_origin) and issubclass(type_origin, Sequence):
+                if (
+                    (type_args := get_args(annotation))
+                    and (len(type_args) == 1)
+                    and isclass(type_args[0])
+                    and issubclass(type_args[0], (BaseModel, DataclassBase))
+                ):
+                    return TypeSpecifier(True, type_origin, type_args[0], False, is_optional)
             raise APIEndpointError(f"Expected: {PayloadType} but found payload {annotation}")
         else:
             raise APIEndpointError(f"Expected: {PayloadType} but found payload {annotation}")
@@ -472,10 +528,14 @@ class request(APIEndpointsDecorator):
         self.return_spec = self.specify_return_type()
         self.payload_spec = self.specify_payload_type()
         self.check_params()
-        self.meta_lookup[func] = APIEndpointRequestMeta(
-            http_request=f"{self.http_method} {self.url}", payload_spec=self.payload_spec, return_spec=self.return_spec
+        self.request_lookup[func.__qualname__] = APIEndpointRequestMeta(
+            func=func,
+            http_request=f"{self.http_method} {self.url}",
+            payload_spec=self.payload_spec,
+            return_spec=self.return_spec,
         )
 
+        @wraps(func)
         def wrapper(*args, **kwargs):
             """Executes each time decorated method is called"""
             _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIEndpoints instance
@@ -483,9 +543,26 @@ class request(APIEndpointsDecorator):
             payload = _kwargs.get("payload")
             params = _kwargs.get("params")
             formatted_url = self.url.format(**_kwargs)
-            response = _self._request(self.http_method, formatted_url, payload=payload, params=params, **self.kwargs)
+            response = _self._request(
+                self.http_method,
+                formatted_url,
+                payload=payload,
+                force_json_payload=self.payload_spec.is_json,
+                params=params,
+                **self.kwargs,
+            )
             if self.return_spec.present:
-                if issubclass(self.return_spec.payload_type, (BaseModel, DataclassBase)):
+                if self.return_spec.is_json:
+                    full_json = response.json()
+                    if self.resp_json_key is not None:
+                        if isinstance(full_json, dict):
+                            return full_json.get(self.resp_json_key)
+                        else:
+                            raise TypeError(f"Expected dictionary as json payload but found: {type(full_json)}")
+                    return full_json
+                if self.return_spec.payload_type is None:
+                    pass
+                elif issubclass(self.return_spec.payload_type, (BaseModel, DataclassBase)):
                     if self.return_spec.sequence_type == DataSequence:
                         return response.dataseq(self.return_spec.payload_type, self.resp_json_key)
                     else:
@@ -500,7 +577,21 @@ class request(APIEndpointsDecorator):
         return wrapper
 
 
-get = "GET"
-post = "POST"
-put = "PUT"
-delete = "DELETE"
+class get(request):
+    def __init__(self, url: str, resp_json_key: Optional[str] = None, **kwargs):
+        super().__init__("GET", url, resp_json_key, **kwargs)
+
+
+class put(request):
+    def __init__(self, url: str, resp_json_key: Optional[str] = None, **kwargs):
+        super().__init__("PUT", url, resp_json_key, **kwargs)
+
+
+class post(request):
+    def __init__(self, url: str, resp_json_key: Optional[str] = None, **kwargs):
+        super().__init__("POST", url, resp_json_key, **kwargs)
+
+
+class delete(request):
+    def __init__(self, url: str, resp_json_key: Optional[str] = None, **kwargs):
+        super().__init__("DELETE", url, resp_json_key, **kwargs)

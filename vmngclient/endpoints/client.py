@@ -5,7 +5,7 @@ from typing import Any, List, Optional
 from packaging.version import Version  # type: ignore
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, get, request
+from vmngclient.endpoints import APIEndpoints, get
 
 
 class VersionField(Version):
@@ -62,14 +62,14 @@ class ServerReady(BaseModel):
 
 
 class Client(APIEndpoints):
-    @request(get, "/client/server", "data")
+    @get("/client/server", "data")
     def server(self) -> ServerInfo:
         ...
 
-    @request(get, "/client/server/ready")
+    @get("/client/server/ready")
     def server_ready(self) -> ServerReady:
         ...
 
-    @request(get, "/client/about", "data")
+    @get("/client/about", "data")
     def about(self) -> AboutInfo:
         ...

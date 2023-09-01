@@ -316,7 +316,7 @@ except vManageBadRequestError as error:
 # code = 'USER0006'
 ```
 
-## [Supported API endpoints](ENDPOINTS.md)
+## [Supported API endpoints](https://github.com/CiscoDevNet/vManage-client/blob/main/ENDPOINTS.md)
 
 
 ## [Contributing, bug reporting and feature requests](https://github.com/CiscoDevNet/vManage-client/blob/main/CONTRIBUTING.md)
