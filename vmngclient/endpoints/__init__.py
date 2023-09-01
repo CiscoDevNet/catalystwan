@@ -31,7 +31,6 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import asdict, dataclass
-from functools import wraps
 from inspect import _empty, isclass, signature
 from io import BufferedReader
 from string import Formatter
@@ -290,9 +289,9 @@ class versions(APIEndpointsDecorator):
         self.raises = raises
 
     def __call__(self, func):
-        self.versions_lookup[func.__qualname__] = self.supported_versions
+        original_func = getattr(func, "_ofunc", func)  # grab original function
+        self.versions_lookup[original_func.__qualname__] = self.supported_versions
 
-        @wraps(func)
         def wrapper(*args, **kwargs):
             """Executes each time decorated method is called"""
             _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIEndpoints instance
@@ -307,6 +306,7 @@ class versions(APIEndpointsDecorator):
                     )
             return func(*args, **kwargs)
 
+        wrapper._ofunc = original_func  # provide original function to next decorator in chain
         return wrapper
 
 
@@ -323,9 +323,9 @@ class view(APIEndpointsDecorator):
         self.raises = raises
 
     def __call__(self, func):
-        self.view_lookup[func.__qualname__] = self.allowed_session_types
+        original_func = getattr(func, "_ofunc", func)  # grab original function
+        self.view_lookup[original_func.__qualname__] = self.allowed_session_types
 
-        @wraps(func)
         def wrapper(*args, **kwargs):
             """Executes each time decorated method is called"""
             _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIEndpoints instance
@@ -340,6 +340,7 @@ class view(APIEndpointsDecorator):
                     )
             return func(*args, **kwargs)
 
+        wrapper._ofunc = original_func  # provide original function to next decorator in chain
         return wrapper
 
 
@@ -524,18 +525,18 @@ class request(APIEndpointsDecorator):
         return all_args_dict
 
     def __call__(self, func):
-        self.sig = signature(func)
+        original_func = getattr(func, "_ofunc", func)  # grab original function
+        self.sig = signature(original_func)
         self.return_spec = self.specify_return_type()
         self.payload_spec = self.specify_payload_type()
         self.check_params()
-        self.request_lookup[func.__qualname__] = APIEndpointRequestMeta(
-            func=func,
+        self.request_lookup[original_func.__qualname__] = APIEndpointRequestMeta(
+            func=original_func,
             http_request=f"{self.http_method} {self.url}",
             payload_spec=self.payload_spec,
             return_spec=self.return_spec,
         )
 
-        @wraps(func)
         def wrapper(*args, **kwargs):
             """Executes each time decorated method is called"""
             _self = self.get_check_instance(*args, **kwargs)  # _self refers to APIEndpoints instance
@@ -574,6 +575,7 @@ class request(APIEndpointsDecorator):
                 elif issubclass(self.return_spec.payload_type, dict):
                     return response.json()
 
+        wrapper._ofunc = original_func  # provide original function to next decorator in chain
         return wrapper
 
 
