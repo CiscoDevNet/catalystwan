@@ -48,11 +48,7 @@ class FeatureProfileCreationResponse(BaseModel):
     id: str
 
 
-class ParcelCreationResponse(BaseModel):
-    parcelId: str
-
-
-class ParcelEditResponse(BaseModel):
+class ParcelId(BaseModel):
     id: str = Field(alias="parcelId")
 
 
@@ -107,12 +103,10 @@ class ConfigurationFeatureProfile(APIEndpoints):
 
     @versions(supported_versions=(">=20.9"), raises=False)
     @post("/v1/feature-profile/sdwan/system/{system_id}/aaa")
-    def create_aaa_profile_parcel_for_system(self, system_id: str, payload: MainParcel) -> ParcelCreationResponse:
+    def create_aaa_profile_parcel_for_system(self, system_id: str, payload: MainParcel) -> ParcelId:
         ...
 
     @versions(supported_versions=(">=20.9"), raises=False)
     @put("/v1/feature-profile/sdwan/system/{system_id}/aaa/{parcel_id}")
-    def edit_aaa_profile_parcel_for_system(
-        self, system_id: str, parcel_id: str, payload: MainParcel
-    ) -> ParcelEditResponse:
+    def edit_aaa_profile_parcel_for_system(self, system_id: str, parcel_id: str, payload: MainParcel) -> ParcelId:
         ...
