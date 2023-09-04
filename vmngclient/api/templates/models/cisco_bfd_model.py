@@ -7,6 +7,12 @@ from pydantic import Field
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
 
+DEFAULT_BFD_COLOR_MULTIPLIER = 7
+DEFAULT_BFD_DSCP = 48
+DEFAULT_BFD_HELLO_INTERVAL = 1000
+DEFAULT_BFD_POLL_INTERVAL = 600000
+DEFAULT_BFD_MULTIPLIER = 6
+
 
 class ColorType(str, Enum):
     DEFAULT = "default"
@@ -35,10 +41,10 @@ class ColorType(str, Enum):
 
 class Color(ConvertBoolToStringModel):
     color: ColorType
-    hello_interval: Optional[int] = Field(1000, alias="hello-interval")
-    multiplier: Optional[int] = 7
+    hello_interval: Optional[int] = Field(DEFAULT_BFD_HELLO_INTERVAL, alias="hello-interval")
+    multiplier: Optional[int] = DEFAULT_BFD_COLOR_MULTIPLIER
     pmtu_discovery: Optional[bool] = Field(True, alias="pmtu-discovery")
-    dscp: Optional[int] = 48
+    dscp: Optional[int] = DEFAULT_BFD_DSCP
 
     class Config:
         allow_population_by_field_name = True
@@ -49,9 +55,9 @@ class CiscoBFDModel(FeatureTemplate, ConvertBoolToStringModel):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    multiplier: Optional[int] = 6
-    poll_interval: Optional[int] = Field(600000, alias="poll-interval")
-    default_dscp: Optional[int] = Field(48, alias="default-dscp")
+    multiplier: Optional[int] = DEFAULT_BFD_MULTIPLIER
+    poll_interval: Optional[int] = Field(DEFAULT_BFD_POLL_INTERVAL, alias="poll-interval")
+    default_dscp: Optional[int] = Field(DEFAULT_BFD_DSCP, alias="default-dscp")
     color: Optional[List[Color]]
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
