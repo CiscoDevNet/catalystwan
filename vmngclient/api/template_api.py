@@ -20,6 +20,7 @@ from vmngclient.api.templates.feature_template_field import FeatureTemplateField
 from vmngclient.api.templates.feature_template_payload import FeatureTemplatePayload
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
 from vmngclient.api.templates.models.cisco_banner_model import CiscoBannerModel
+from vmngclient.api.templates.models.cisco_bfd_model import CiscoBFDModel
 from vmngclient.api.templates.models.cisco_bgp_model import CiscoBGPModel
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
 from vmngclient.api.templates.models.cisco_omp_model import CiscoOMPModel
@@ -492,6 +493,7 @@ class TemplatesAPI:
         """
         ported_templates = (
             CiscoAAAModel,
+            CiscoBFDModel,
             CiscoBannerModel,
             CiscoNTPModel,
             CiscoOMPModel,
