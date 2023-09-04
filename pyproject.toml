@@ -30,7 +30,6 @@ pre-commit = "^2.19.0"
 mypy = "^1.0.0"
 flake8 = "^5.0.4"
 Sphinx = "^5.2.3"
-parameterized = "^0.8.1"
 
 [build-system]
 requires = ["poetry-core>=1.4.0"]
