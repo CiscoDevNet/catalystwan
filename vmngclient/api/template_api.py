@@ -19,11 +19,17 @@ from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.api.templates.feature_template_field import FeatureTemplateField
 from vmngclient.api.templates.feature_template_payload import FeatureTemplatePayload
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
+from vmngclient.api.templates.models.cisco_banner_model import CiscoBannerModel
+from vmngclient.api.templates.models.cisco_bfd_model import CiscoBFDModel
 from vmngclient.api.templates.models.cisco_bgp_model import CiscoBGPModel
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
-from vmngclient.api.templates.models.cisco_ospf import CiscoOspfModel
+from vmngclient.api.templates.models.cisco_omp_model import CiscoOMPModel
+from vmngclient.api.templates.models.cisco_ospf import CiscoOSPFModel
 from vmngclient.api.templates.models.cisco_snmp_model import CiscoSNMPModel
+from vmngclient.api.templates.models.cisco_system import CiscoSystemModel
+from vmngclient.api.templates.models.cisco_vpn_interface_model import CiscoVpnInterfaceModel
 from vmngclient.api.templates.models.cisco_vpn_model import CiscoVPNModel
+from vmngclient.api.templates.models.cli_template import CliTemplateModel
 from vmngclient.api.templates.models.omp_vsmart_model import OMPvSmart
 from vmngclient.api.templates.models.security_vsmart_model import SecurityvSmart
 from vmngclient.api.templates.models.system_vsmart_model import SystemVsmart
@@ -488,14 +494,20 @@ class TemplatesAPI:
         """
         ported_templates = (
             CiscoAAAModel,
+            CiscoBFDModel,
+            CiscoBannerModel,
             CiscoNTPModel,
+            CiscoOMPModel,
             OMPvSmart,
             SecurityvSmart,
             SystemVsmart,
+            CiscoVpnInterfaceModel,
+            CiscoSystemModel,
             CiscoSNMPModel,
             CiscoVPNModel,
             CiscoBGPModel,
-            CiscoOspfModel,
+            CiscoOSPFModel,
+            CliTemplateModel,
         )
 
         return isinstance(template, ported_templates)
@@ -554,6 +566,9 @@ class TemplatesAPI:
                         break
                 if value is None:
                     value = template.dict(by_alias=True).get(field.key, None)
+
+            if template.type == "cisco_vpn_interface" and value is None:
+                continue
 
             if isinstance(value, bool):
                 value = str(value).lower()  # type: ignore

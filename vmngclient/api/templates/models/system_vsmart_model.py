@@ -4,7 +4,7 @@ from typing import ClassVar, Optional
 from pydantic import Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
-from vmngclient.utils.timezones_enum import Timezone
+from vmngclient.utils.timezone import Timezone
 
 
 class SystemVsmart(FeatureTemplate):

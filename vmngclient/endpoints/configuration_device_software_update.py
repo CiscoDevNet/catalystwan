@@ -1,4 +1,4 @@
-from vmngclient.endpoints import APIEndpoints, post, request
+from vmngclient.endpoints import APIEndpoints, post
 from vmngclient.utils.upgrades_helper import SoftwarePackageUpdatePayload
 
 
@@ -19,9 +19,8 @@ class ConfigurationDeviceSoftwareUpdate(APIEndpoints):
         # GET /device/action/software/package/imageCount
         ...
 
-    @request(post, "/device/action/software/package")
-    def install_pkg(self, payload: SoftwarePackageUpdatePayload):
-        # POST /device/action/software/package
+    @post("/device/action/software/package")
+    def install_pkg(self, payload: SoftwarePackageUpdatePayload) -> None:
         ...
 
     def process_software_image(self):

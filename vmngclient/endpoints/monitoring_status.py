@@ -3,7 +3,7 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, get, request
+from vmngclient.endpoints import APIEndpoints, get
 from vmngclient.typed_list import DataSequence
 
 
@@ -29,7 +29,7 @@ class MonitoringStatus(APIEndpoints):
         # GET /statistics/settings/status/device
         ...
 
-    @request(get, "/statistics/settings/status")
+    @get("/statistics/settings/status")
     def get_statistics_settings(self) -> DataSequence[Status]:
         ...
 

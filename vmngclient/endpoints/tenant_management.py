@@ -3,7 +3,7 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, delete, get, post, put, request, versions, view
+from vmngclient.endpoints import APIEndpoints, delete, get, post, put, versions, view
 from vmngclient.model.tenant import Tenant
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.session_type import ProviderAsTenantView, ProviderView
@@ -116,29 +116,29 @@ class vSessionId(BaseModel):
 
 class TenantManagement(APIEndpoints):
     @view({ProviderView})
-    @request(post, "/tenant")
+    @post("/tenant")
     def create_tenant(self, payload: Tenant) -> Tenant:
         ...
 
     @view({ProviderView})
-    @request(post, "/tenant/async")
+    @post("/tenant/async")
     def create_tenant_async(self, payload: Tenant) -> TenantTaskId:
         ...
 
     @versions(">=20.4")
     @view({ProviderView})
-    @request(post, "/tenant/bulk/async")
+    @post("/tenant/bulk/async")
     def create_tenant_async_bulk(self, payload: List[Tenant]) -> TenantTaskId:
         ...
 
     @view({ProviderView})
-    @request(delete, "/tenant/{tenant_id}/delete")
-    def delete_tenant(self, tenant_id: str, payload: TenantDeleteRequest):
+    @delete("/tenant/{tenant_id}/delete")
+    def delete_tenant(self, tenant_id: str, payload: TenantDeleteRequest) -> None:
         ...
 
     @versions(">=20.4")
     @view({ProviderView})
-    @request(delete, "/tenant/bulk/async")
+    @delete("/tenant/bulk/async")
     def delete_tenant_async_bulk(self, payload: TenantBulkDeleteRequest) -> TenantTaskId:
         ...
 
@@ -147,27 +147,27 @@ class TenantManagement(APIEndpoints):
         ...
 
     @view({ProviderView, ProviderAsTenantView})
-    @request(get, "/tenantstatus", "data")
+    @get("/tenantstatus", "data")
     def get_all_tenant_statuses(self) -> DataSequence[TenantStatus]:
         ...
 
     @view({ProviderView, ProviderAsTenantView})
-    @request(get, "/tenant", "data")
+    @get("/tenant", "data")
     def get_all_tenants(self) -> DataSequence[Tenant]:
         ...
 
     @view({ProviderView, ProviderAsTenantView})
-    @request(get, "/tenant/{tenant_id}")
+    @get("/tenant/{tenant_id}")
     def get_tenant(self, tenant_id: str) -> Tenant:
         ...
 
     @view({ProviderView})
-    @request(get, "/tenant/vsmart/capacity", "data")
+    @get("/tenant/vsmart/capacity", "data")
     def get_tenant_hosting_capacity_on_vsmarts(self) -> DataSequence[vSmartTenantCapacity]:
         ...
 
     @view({ProviderView, ProviderAsTenantView})
-    @request(get, "/tenant/vsmart")
+    @get("/tenant/vsmart")
     def get_tenant_vsmart_mapping(self) -> vSmartTenantMap:
         ...
 
@@ -180,16 +180,16 @@ class TenantManagement(APIEndpoints):
         ...
 
     @view({ProviderView})
-    @request(put, "/tenant/{tenant_id}")
+    @put("/tenant/{tenant_id}")
     def update_tenant(self, tenant_id: str, payload: TenantUpdateRequest) -> Tenant:
         ...
 
     @view({ProviderView})
-    @request(put, "/tenant/{tenant_id}/vsmart")
-    def update_tenant_vsmart_placement(self, tenant_id: str, payload: vSmartPlacementUpdateRequest):
+    @put("/tenant/{tenant_id}/vsmart")
+    def update_tenant_vsmart_placement(self, tenant_id: str, payload: vSmartPlacementUpdateRequest) -> None:
         ...
 
     @view({ProviderView})
-    @request(post, "/tenant/{tenant_id}/vsessionid")
+    @post("/tenant/{tenant_id}/vsessionid")
     def vsession_id(self, tenant_id: str) -> vSessionId:
         ...
