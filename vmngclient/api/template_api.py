@@ -22,6 +22,7 @@ from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
 from vmngclient.api.templates.models.cisco_banner_model import CiscoBannerModel
 from vmngclient.api.templates.models.cisco_bgp_model import CiscoBGPModel
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
+from vmngclient.api.templates.models.cisco_omp_model import CiscoOMPModel
 from vmngclient.api.templates.models.cisco_snmp_model import CiscoSNMPModel
 from vmngclient.api.templates.models.cisco_system import CiscoSystemModel
 from vmngclient.api.templates.models.cisco_vpn_interface_model import CiscoVpnInterfaceModel
@@ -493,6 +494,7 @@ class TemplatesAPI:
             CiscoAAAModel,
             CiscoBannerModel,
             CiscoNTPModel,
+            CiscoOMPModel,
             OMPvSmart,
             SecurityvSmart,
             SystemVsmart,
