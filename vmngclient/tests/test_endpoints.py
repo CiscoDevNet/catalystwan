@@ -697,3 +697,22 @@ class TestAPIEndpoints(unittest.TestCase):
                         params=params,
                     )
                     self.session_mock.reset_mock()
+
+    def test_decorator_chaining_order(self):
+        # Expected @request can access original function signature (it will raise otherwise)
+        class TestAPIMixedOrder1(APIEndpoints):
+            @request("GET", "/v2/{category}/items")
+            @versions("<2")
+            def get_data(
+                self, payload: BaseModelExample, category: str, params: ParamsExample
+            ) -> None:  # type: ignore [empty-body]
+                ...
+
+        class TestAPIMixedOrder2(APIEndpoints):
+            @request("GET", "/v2/{category}/items")
+            @versions("<2")
+            @view({ProviderView})
+            def get_data(
+                self, payload: BaseModelExample, category: str, params: ParamsExample
+            ) -> None:  # type: ignore [empty-body]
+                ...
