@@ -7,6 +7,13 @@ from pydantic import BaseModel, Field
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
 
+DEFAULT_OMP_HOLDTIME = 60
+DEFAULT_OMP_EOR_TIMER = 300
+DEFAULT_OMP_GRACEFUL_RESTART_TIMER = 43200
+DEFAULT_OMP_ADVERTISEMENT_INTERVAL = 1
+DEFAULT_OMP_SENDPATH_LIMIT = 4
+DEFAULT_OMP_ECMP_LIMIT = 4
+
 
 class IPv4AdvertiseProtocol(str, Enum):
     BGP = "bgp"
@@ -64,15 +71,15 @@ class CiscoOMPModel(FeatureTemplate, ConvertBoolToStringModel):
 
     graceful_restart: Optional[bool] = Field(True, alias="graceful-restart")
     overlay_as: Optional[int] = Field(alias="overlay-as")
-    send_path_limit: Optional[int] = Field(4, alias="send-path-limit")
-    ecmp_limit: Optional[int] = Field(4, alias="ecmp-limit")
+    send_path_limit: Optional[int] = Field(DEFAULT_OMP_SENDPATH_LIMIT, alias="send-path-limit")
+    ecmp_limit: Optional[int] = Field(DEFAULT_OMP_ECMP_LIMIT, alias="ecmp-limit")
     shutdown: Optional[bool]
     omp_admin_distance_ipv4: Optional[int] = Field(alias="omp-admin-distance-ipv4")
     omp_admin_distance_ipv6: Optional[int] = Field(alias="omp-admin-distance-ipv6")
-    advertisement_interval: Optional[int] = Field(1, alias="advertisement-interval")
-    graceful_restart_timer: Optional[int] = Field(43200, alias="graceful-restart-timer")
-    eor_timer: Optional[int] = Field(300, alias="eor-timer")
-    holdtime: Optional[int] = 60
+    advertisement_interval: Optional[int] = Field(DEFAULT_OMP_ADVERTISEMENT_INTERVAL, alias="advertisement-interval")
+    graceful_restart_timer: Optional[int] = Field(DEFAULT_OMP_GRACEFUL_RESTART_TIMER, alias="graceful-restart-timer")
+    eor_timer: Optional[int] = Field(DEFAULT_OMP_EOR_TIMER, alias="eor-timer")
+    holdtime: Optional[int] = DEFAULT_OMP_HOLDTIME
     advertise: Optional[List[IPv4Advertise]]
     ipv6_advertise: Optional[List[IPv6Advertise]] = Field(alias="ipv6-advertise")
     ignore_region_path_length: Optional[bool] = Field(False, alias="ignore-region-path-length")
