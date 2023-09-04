@@ -3,25 +3,28 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, Field, root_validator
+from pydantic import Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
+from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
+
+DEFAULT_STATIC_NAT64_SOURCE_VPN_ID = 0
+DEFAULT_STATIC_NAT_SOURCE_VPN_ID = 0
+DEFAULT_STATIC_PORT_FORWARD_SOURCE_PORT = 0
+DEFAULT_STATIC_PORT_FORWARD_TRANSLATE_PORT = 0
+DEFAULT_STATIC_PORT_FORWARD_SOURCE_VPN = 0
+DEFAULT_ENCAPSULATION_WEIGHT = 1
+DEFAULT_VRRP_PRIORITY = 100
+DEFAULT_VRRP_TIMER = 1000
+DEFAULT_IPV6_VRRP_PRIORITY = 100
+DEFAULT_IPV6_VRRP_TIMER = 1000
 
 
-class CustomBaseModel(BaseModel):
-    @root_validator  # type: ignore
-    def convert_bool_to_string_validator(cls, values):
-        for key, value in values.items():
-            if isinstance(value, bool):
-                values[key] = str(value).lower()
-        return values
-
-
-class SecondaryIPv4Address(CustomBaseModel):
+class SecondaryIPv4Address(ConvertBoolToStringModel):
     address: Optional[ipaddress.IPv4Interface]
 
 
-class SecondaryIPv6Address(CustomBaseModel):
+class SecondaryIPv6Address(ConvertBoolToStringModel):
     address: Optional[ipaddress.IPv6Interface]
 
 
@@ -30,7 +33,7 @@ class Direction(str, Enum):
     OUT = "out"
 
 
-class AccessList(CustomBaseModel):
+class AccessList(ConvertBoolToStringModel):
     direction: Direction
     acl_name: str = Field(alias="acl-name")
 
@@ -38,7 +41,7 @@ class AccessList(CustomBaseModel):
         allow_population_by_field_name = True
 
 
-class DhcpHelperV6(CustomBaseModel):
+class DhcpHelperV6(ConvertBoolToStringModel):
     address: ipaddress.IPv6Address
     vpn: Optional[int]
 
@@ -49,10 +52,10 @@ class NatChoice(str, Enum):
     LOOPBACK = "Loopback"
 
 
-class StaticNat66(CustomBaseModel):
+class StaticNat66(ConvertBoolToStringModel):
     source_prefix: ipaddress.IPv6Interface = Field(alias="source-prefix")
     translated_source_prefix: str = Field(alias="translated-source-prefix")
-    source_vpn_id: int = Field(0, alias="source-vpn-id")
+    source_vpn_id: int = Field(DEFAULT_STATIC_NAT64_SOURCE_VPN_ID, alias="source-vpn-id")
 
     class Config:
         allow_population_by_field_name = True
@@ -63,11 +66,11 @@ class StaticNatDirection(str, Enum):
     OUTSIDE = "outside"
 
 
-class Static(CustomBaseModel):
+class Static(ConvertBoolToStringModel):
     source_ip: ipaddress.IPv4Address = Field(alias="source-ip")
     translate_ip: ipaddress.IPv4Address = Field(alias="translate-ip")
     static_nat_direction: StaticNatDirection = Field(StaticNatDirection.INSIDE, alias="static-nat-direction")
-    source_vpn: int = Field(0, alias="source-vpn")
+    source_vpn: int = Field(DEFAULT_STATIC_NAT_SOURCE_VPN_ID, alias="source-vpn")
 
     class Config:
         allow_population_by_field_name = True
@@ -78,14 +81,14 @@ class Proto(str, Enum):
     UDP = "udp"
 
 
-class StaticPortForward(CustomBaseModel):
+class StaticPortForward(ConvertBoolToStringModel):
     source_ip: ipaddress.IPv4Address = Field(alias="source-ip")
     translate_ip: ipaddress.IPv4Address = Field(alias="translate-ip")
     static_nat_direction: StaticNatDirection = Field(StaticNatDirection.INSIDE, alias="static-nat-direction")
-    source_port: int = Field(0, alias="source-port")
-    translate_port: int = Field(0, alias="translate-port")
+    source_port: int = Field(DEFAULT_STATIC_PORT_FORWARD_SOURCE_PORT, alias="source-port")
+    translate_port: int = Field(DEFAULT_STATIC_PORT_FORWARD_TRANSLATE_PORT, alias="translate-port")
     proto: Proto
-    source_vpn: int = Field(0, alias="source-vpn")
+    source_vpn: int = Field(DEFAULT_STATIC_PORT_FORWARD_SOURCE_VPN, alias="source-vpn")
 
     class Config:
         allow_population_by_field_name = True
@@ -107,10 +110,10 @@ class Encap(str, Enum):
     IPSEC = "ipsec"
 
 
-class Encapsulation(CustomBaseModel):
+class Encapsulation(ConvertBoolToStringModel):
     encap: Encap
     preference: Optional[int]
-    weight: int = 1
+    weight: int = DEFAULT_ENCAPSULATION_WEIGHT
 
 
 class Mode(str, Enum):
@@ -175,12 +178,12 @@ class Duplex(str, Enum):
     AUTO = "auto"
 
 
-class Ip(CustomBaseModel):
+class Ip(ConvertBoolToStringModel):
     addr: ipaddress.IPv4Address
     mac: str
 
 
-class Ipv4Secondary(CustomBaseModel):
+class Ipv4Secondary(ConvertBoolToStringModel):
     address: ipaddress.IPv4Address
 
 
@@ -189,7 +192,7 @@ class TrackAction(str, Enum):
     SHUTDOWN = "Shutdown"
 
 
-class TrackingObject(CustomBaseModel):
+class TrackingObject(ConvertBoolToStringModel):
     name: int
     track_action: TrackAction = Field(TrackAction.DECREMENT, alias="track-action")
     decrement: int
@@ -198,10 +201,10 @@ class TrackingObject(CustomBaseModel):
         allow_population_by_field_name = True
 
 
-class Vrrp(CustomBaseModel):
+class Vrrp(ConvertBoolToStringModel):
     grp_id: int = Field(alias="grp-id")
-    priority: int = 100
-    timer: int = 1000
+    priority: int = DEFAULT_VRRP_PRIORITY
+    timer: int = DEFAULT_VRRP_TIMER
     track_omp: bool = Field(False, alias="track-omp")
     track_prefix_list: Optional[str] = Field(alias="track-prefix-list")
     address: Optional[ipaddress.IPv4Address]
@@ -214,7 +217,7 @@ class Vrrp(CustomBaseModel):
         allow_population_by_field_name = True
 
 
-class Ipv6(CustomBaseModel):
+class Ipv6(ConvertBoolToStringModel):
     ipv6_link_local: ipaddress.IPv6Address = Field(alias="ipv6-link-local")
     prefix: Optional[ipaddress.IPv6Interface]
 
@@ -222,10 +225,10 @@ class Ipv6(CustomBaseModel):
         allow_population_by_field_name = True
 
 
-class Ipv6Vrrp(CustomBaseModel):
+class Ipv6Vrrp(ConvertBoolToStringModel):
     grp_id: int = Field(alias="grp-id")
-    priority: int = 100
-    timer: int = 1000
+    priority: int = DEFAULT_IPV6_VRRP_PRIORITY
+    timer: int = DEFAULT_IPV6_VRRP_TIMER
     track_omp: bool = Field(False, alias="track-omp")
     track_prefix_list: Optional[str] = Field(alias="track-prefix-list")
     ipv6: Optional[List[Ipv6]]
@@ -234,7 +237,7 @@ class Ipv6Vrrp(CustomBaseModel):
         allow_population_by_field_name = True
 
 
-class CiscoVpnInterfaceModel(FeatureTemplate, CustomBaseModel):
+class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel):
     class Config:
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
