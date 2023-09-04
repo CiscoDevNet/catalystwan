@@ -1,6 +1,7 @@
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
 from vmngclient.api.templates.models.cisco_banner_model import CiscoBannerModel
 from vmngclient.api.templates.models.cisco_bfd_model import CiscoBFDModel
+from vmngclient.api.templates.models.cisco_logging_model import CiscoLoggingModel
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
 from vmngclient.api.templates.models.cisco_snmp_model import CiscoSNMPModel
 from vmngclient.api.templates.models.cisco_system import CiscoSystemModel
@@ -15,6 +16,7 @@ available_models = {
     "cisco_bfd": CiscoBFDModel,
     "cisco_banner": CiscoBannerModel,
     "cisco_ntp": CiscoNTPModel,
+    "cisco_logging": CiscoLoggingModel,
     "omp_vsmart": OMPvSmart,
     "security_vsmart": SecurityvSmart,
     "system_vsmart": SystemVsmart,
