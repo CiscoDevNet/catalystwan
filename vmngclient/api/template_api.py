@@ -19,11 +19,13 @@ from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.api.templates.feature_template_field import FeatureTemplateField
 from vmngclient.api.templates.feature_template_payload import FeatureTemplatePayload
 from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
+from vmngclient.api.templates.models.cisco_banner_model import CiscoBannerModel
 from vmngclient.api.templates.models.cisco_bfd_model import CiscoBFDModel
 from vmngclient.api.templates.models.cisco_bgp_model import CiscoBGPModel
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
 from vmngclient.api.templates.models.cisco_snmp_model import CiscoSNMPModel
 from vmngclient.api.templates.models.cisco_system import CiscoSystemModel
+from vmngclient.api.templates.models.cisco_vpn_interface_model import CiscoVpnInterfaceModel
 from vmngclient.api.templates.models.cisco_vpn_model import CiscoVPNModel
 from vmngclient.api.templates.models.cli_template import CliTemplateModel
 from vmngclient.api.templates.models.omp_vsmart_model import OMPvSmart
@@ -491,10 +493,12 @@ class TemplatesAPI:
         ported_templates = (
             CiscoAAAModel,
             CiscoBFDModel,
+            CiscoBannerModel,
             CiscoNTPModel,
             OMPvSmart,
             SecurityvSmart,
             SystemVsmart,
+            CiscoVpnInterfaceModel,
             CiscoSystemModel,
             CiscoSNMPModel,
             CiscoVPNModel,
@@ -558,6 +562,9 @@ class TemplatesAPI:
                         break
                 if value is None:
                     value = template.dict(by_alias=True).get(field.key, None)
+
+            if template.type == "cisco_vpn_interface" and value is None:
+                continue
 
             if isinstance(value, bool):
                 value = str(value).lower()  # type: ignore
