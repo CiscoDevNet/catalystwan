@@ -13,6 +13,7 @@ from vmngclient.endpoints.configuration_device_template import ConfigurationDevi
 from vmngclient.endpoints.configuration_feature_profile import ConfigurationFeatureProfile
 from vmngclient.endpoints.configuration_group import ConfigurationGroup
 from vmngclient.endpoints.configuration_policy_data_prefix_list_builder import ConfigurationPolicyDataPrefixListBuilder
+from vmngclient.endpoints.configuration_policy_site_list_builder import ConfigurationPolicySiteListBuilder
 from vmngclient.endpoints.configuration_settings import ConfigurationSettings
 from vmngclient.endpoints.monitoring_device_details import MonitoringDeviceDetails
 from vmngclient.endpoints.monitoring_status import MonitoringStatus
@@ -36,6 +37,7 @@ class APIEndpointContainter:
         self.configuration_device_software_update = ConfigurationDeviceSoftwareUpdate(session)
         self.configuration_device_template = ConfigurationDeviceTemplate(session)
         self.configuration_policy_data_prefix_list_builder = ConfigurationPolicyDataPrefixListBuilder(session)
+        self.configuration_policy_site_list_builder = ConfigurationPolicySiteListBuilder(session)
         self.configuration_settings = ConfigurationSettings(session)
         self.monitoring_device_details = MonitoringDeviceDetails(session)
         self.monitoring_status = MonitoringStatus(session)

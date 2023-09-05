@@ -75,7 +75,7 @@ class ConfigurationPolicyDataPrefixListBuilder(APIEndpoints):
         ...
 
     @post("/template/policy/list/dataprefix/preview")
-    def preview_policy_list(self, payload: DataPrefixListCreationPayload) -> None:
+    def preview_policy_list(self, payload: DataPrefixListCreationPayload) -> PolicyListPreview:
         # TODO: not working for some reason
         ...
 
