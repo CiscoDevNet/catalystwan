@@ -567,7 +567,13 @@ class TemplatesAPI:
                 if value is None:
                     value = template.dict(by_alias=True).get(field.key, None)
 
+            # TODO remove workaround, add specific object
+            # types like Ignore, Constant, None etc so generator will now
+            # which object to ommit while generating payload
             if template.type == "cisco_vpn_interface" and value is None:
+                continue
+
+            if template.type == "cisco_ospf" and value is None:
                 continue
 
             if isinstance(value, bool):
