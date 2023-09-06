@@ -13,8 +13,11 @@ class PolicyListId(BaseModel):
 
 
 class PolicyListCreationPayload(BaseModel):
-    name: str
-    description: str
+    name: str = Field(
+        regex="^[a-zA-Z0-9_-]{1,32}$",
+        description="Can include only alpha-numeric characters, hyphen '-' or underscore '_'; maximum 32 characters",
+    )
+    description: Optional[str] = "Desc Not Required"
     type: str
     entries: List
 
