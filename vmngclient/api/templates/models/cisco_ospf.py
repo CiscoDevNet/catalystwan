@@ -8,6 +8,18 @@ from pydantic import Field
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
 
+DEFAULT_OSPF_HELLO_INTERVAL = 10
+DEFAULT_OSPF_DEAD_INTERVAL = 40
+DEFAULT_OSPF_RETRANSMIT_INTERVAL = 5
+DEFAULT_OSPF_INTERFACE_PRIORITY = 1
+DEFAULT_OSPF_REFERENCE_BANDWIDTH = 100
+DEFAULT_OSPF_EXTERNAL = 110
+DEFAULT_OSPF_INTER_AREA = 110
+DEFAULT_OSPF_INTRA_AREA = 110
+DEFAULT_OSPF_DELAY = 200
+DEFAULT_OSPF_INITIAL_HOLD = 1000
+DEFAULT_OSPF_MAX_HOLD = 10000
+
 
 class MetricType(str, Enum):
     TYPE1 = "type1"
@@ -72,11 +84,11 @@ class Type(str, Enum):
 
 class Interface(ConvertBoolToStringModel):
     name: str
-    hello_interval: Optional[int] = Field(10, alias="hello-interval")
-    dead_interval: Optional[int] = Field(40, alias="dead-interval")
-    retransmit_interval: Optional[int] = Field(5, alias="retransmit-interval")
+    hello_interval: Optional[int] = Field(DEFAULT_OSPF_DEAD_INTERVAL, alias="hello-interval")
+    dead_interval: Optional[int] = Field(DEFAULT_OSPF_DEAD_INTERVAL, alias="dead-interval")
+    retransmit_interval: Optional[int] = Field(DEFAULT_OSPF_RETRANSMIT_INTERVAL, alias="retransmit-interval")
     cost: Optional[int]
-    priority: Optional[int] = 1
+    priority: Optional[int] = DEFAULT_OSPF_INTERFACE_PRIORITY
     network: Optional[Network] = Network.BROADCAST
     passive_interface: Optional[bool] = Field(False, alias="passive-interface")
     type: Optional[Type]
@@ -113,18 +125,18 @@ class CiscoOSPFModel(FeatureTemplate, ConvertBoolToStringModel):
         allow_population_by_field_name = True
 
     router_id: Optional[ipaddress.IPv4Address] = Field(alias="router-id")
-    reference_bandwidth: Optional[int] = Field(100, alias="reference-bandwidth")
+    reference_bandwidth: Optional[int] = Field(DEFAULT_OSPF_REFERENCE_BANDWIDTH, alias="reference-bandwidth")
     rfc1583: Optional[bool] = True
     originate: Optional[bool]
     always: Optional[bool]
     metric: Optional[int]
     metric_type: Optional[MetricType] = Field(alias="metric-type")
-    external: Optional[int] = 110
-    inter_area: Optional[int] = Field(110, alias="inter-area")
-    intra_area: Optional[int] = Field(110, alias="intra-area")
-    delay: Optional[int] = 200
-    initial_hold: Optional[int] = Field(1000, alias="initial-hold")
-    max_hold: Optional[int] = Field(10000, alias="max-hold")
+    external: Optional[int] = DEFAULT_OSPF_EXTERNAL
+    inter_area: Optional[int] = Field(DEFAULT_OSPF_INTER_AREA, alias="inter-area")
+    intra_area: Optional[int] = Field(DEFAULT_OSPF_INTRA_AREA, alias="intra-area")
+    delay: Optional[int] = DEFAULT_OSPF_DELAY
+    initial_hold: Optional[int] = Field(DEFAULT_OSPF_INITIAL_HOLD, alias="initial-hold")
+    max_hold: Optional[int] = Field(DEFAULT_OSPF_MAX_HOLD, alias="max-hold")
     redistribute: Optional[List[Redistribute]]
     router_lsa: Optional[List[RouterLsa]] = Field(alias="router-lsa")
     route_policy: Optional[List[RoutePolicy]] = Field(alias="route-policy")
