@@ -12,6 +12,7 @@ from vmngclient.endpoints.configuration_device_software_update import Configurat
 from vmngclient.endpoints.configuration_device_template import ConfigurationDeviceTemplate
 from vmngclient.endpoints.configuration_feature_profile import ConfigurationFeatureProfile
 from vmngclient.endpoints.configuration_group import ConfigurationGroup
+from vmngclient.endpoints.configuration_policy_data_definition_builder import ConfigurationPolicyDataDefinitionBuilder
 from vmngclient.endpoints.configuration_policy_data_prefix_list_builder import ConfigurationPolicyDataPrefixListBuilder
 from vmngclient.endpoints.configuration_policy_site_list_builder import ConfigurationPolicySiteListBuilder
 from vmngclient.endpoints.configuration_policy_vpn_list_builder import ConfigurationPolicyVPNListBuilder
@@ -37,6 +38,7 @@ class APIEndpointContainter:
         self.configuration_device_actions = ConfigurationDeviceActions(session)
         self.configuration_device_software_update = ConfigurationDeviceSoftwareUpdate(session)
         self.configuration_device_template = ConfigurationDeviceTemplate(session)
+        self.configuration_policy_data_definition_builder = ConfigurationPolicyDataDefinitionBuilder(session)
         self.configuration_policy_data_prefix_list_builder = ConfigurationPolicyDataPrefixListBuilder(session)
         self.configuration_policy_site_list_builder = ConfigurationPolicySiteListBuilder(session)
         self.configuration_policy_vpn_list_builder = ConfigurationPolicyVPNListBuilder(session)
