@@ -22,8 +22,8 @@ class PolicyListCreationPayload(BaseModel):
     entries: List
 
 
-class PolicyListEditPayload(PolicyListCreationPayload):
-    list_id: str = Field(alias="listId")
+class PolicyListEditPayload(PolicyListCreationPayload, PolicyListId):
+    pass
 
 
 class PolicyList(PolicyListEditPayload, InfoTag):
@@ -31,7 +31,6 @@ class PolicyList(PolicyListEditPayload, InfoTag):
     owner: str
     read_only: bool = Field(alias="readOnly")
     version: str
-    info_tag: str = Field(alias="infoTag")
     reference_count: int = Field(alias="referenceCount")
     references: List
     is_activated_by_vsmart: bool = Field(alias="isActivatedByVsmart")
