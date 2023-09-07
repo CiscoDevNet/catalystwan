@@ -3,6 +3,7 @@ from vmngclient.api.templates.models.cisco_banner_model import CiscoBannerModel
 from vmngclient.api.templates.models.cisco_bfd_model import CiscoBFDModel
 from vmngclient.api.templates.models.cisco_logging_model import CiscoLoggingModel
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
+from vmngclient.api.templates.models.cisco_ospf import CiscoOSPFModel
 from vmngclient.api.templates.models.cisco_snmp_model import CiscoSNMPModel
 from vmngclient.api.templates.models.cisco_system import CiscoSystemModel
 from vmngclient.api.templates.models.cisco_vpn_interface_model import CiscoVpnInterfaceModel
@@ -16,6 +17,7 @@ available_models = {
     "cisco_bfd": CiscoBFDModel,
     "cisco_banner": CiscoBannerModel,
     "cisco_ntp": CiscoNTPModel,
+    "cisco_ospf": CiscoOSPFModel,
     "cisco_logging": CiscoLoggingModel,
     "omp_vsmart": OMPvSmart,
     "security_vsmart": SecurityvSmart,

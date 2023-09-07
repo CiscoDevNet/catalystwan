@@ -25,6 +25,7 @@ from vmngclient.api.templates.models.cisco_bgp_model import CiscoBGPModel
 from vmngclient.api.templates.models.cisco_logging_model import CiscoLoggingModel
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
 from vmngclient.api.templates.models.cisco_omp_model import CiscoOMPModel
+from vmngclient.api.templates.models.cisco_ospf import CiscoOSPFModel
 from vmngclient.api.templates.models.cisco_snmp_model import CiscoSNMPModel
 from vmngclient.api.templates.models.cisco_system import CiscoSystemModel
 from vmngclient.api.templates.models.cisco_vpn_interface_model import CiscoVpnInterfaceModel
@@ -507,6 +508,7 @@ class TemplatesAPI:
             CiscoSNMPModel,
             CiscoVPNModel,
             CiscoBGPModel,
+            CiscoOSPFModel,
             CliTemplateModel,
         )
 
@@ -567,7 +569,13 @@ class TemplatesAPI:
                 if value is None:
                     value = template.dict(by_alias=True).get(field.key, None)
 
+            # TODO remove workaround, add specific object
+            # types like Ignore, Constant, None etc so generator will now
+            # which object to ommit while generating payload
             if template.type == "cisco_vpn_interface" and value is None:
+                continue
+
+            if template.type == "cisco_ospf" and value is None:
                 continue
 
             if isinstance(value, bool):
