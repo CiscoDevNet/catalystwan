@@ -8,6 +8,22 @@ from pydantic import BaseModel, Field
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.utils.pydantic_validators import ConvertIPToStringModel
 
+DEFAULT_TRACKER_THRESHOLD = 300
+DEFAULT_TRACKER_INTERVAL = 60
+DEFAULT_TRACKER_MULTIPLIER = 3
+DEFAULT_INTERFACE_MTU = 1400
+DEFAULT_INTERFACE_DPD_INTERVAL = 10
+DEFAULT_INTERFACE_DPD_RETRIES = 3
+DEFAULT_INTERFACE_IKE_VERSION = 2
+DEFAULT_INTERFACE_IKE_REKEY_INTERVAL = 14400
+DEFAULT_INTERFACE_IPSEC_REKEY_INTERVAL = 3600
+DEFAULT_INTERFACE_IPSEC_REPLAY_WINDOW = 512
+DEFAULT_INTERFACE_PAIR_ACTIVE_INTERFACE_WEIGHT = 1
+DEFAULT_INTERFACE_PAIR_BACKUP_INTERFACE_WEIGHT = 1
+DEFAULT_SIG_VPN_ID = 0
+DEFAULT_SERVICE_IDLE_TIME = 0
+DEFAULT_SERVICE_REFRESH_TIME = 0
+
 
 class Application(str, Enum):
     SIG = "sig"
@@ -69,23 +85,22 @@ class Interface(ConvertIPToStringModel):
     tunnel_route_via: str = Field(alias="tunnel-route-via")
     tunnel_destination: str = Field(alias="tunnel-destination")
     application: Application = Application.SIG
-    # application: Application = Application.SIG
     tunnel_set: TunnelSet = Field(TunnelSet.SECURE_INTERNET_GATEWAY_UMBRELLA, alias="tunnel-set")
     tunnel_dc_preference: TunnelDcPreference = Field(TunnelDcPreference.PRIMARY_DC, alias="tunnel-dc-preference")
     tcp_mss_adjust: Optional[int] = Field(alias="tcp-mss-adjust")
-    mtu: int = 1400
-    dpd_interval: Optional[int] = Field(10, alias="dpd-interval")
-    dpd_retries: Optional[int] = Field(3, alias="dpd-retries")
-    ike_version: int = Field(2, alias="ike-version")
+    mtu: int = DEFAULT_INTERFACE_MTU
+    dpd_interval: Optional[int] = Field(DEFAULT_INTERFACE_DPD_INTERVAL, alias="dpd-interval")
+    dpd_retries: Optional[int] = Field(DEFAULT_INTERFACE_DPD_RETRIES, alias="dpd-retries")
+    ike_version: int = Field(DEFAULT_INTERFACE_IKE_VERSION, alias="ike-version")
     pre_shared_secret: Optional[str] = Field(alias="pre-shared-secret")
-    ike_rekey_interval: Optional[int] = Field(14400, alias="ike-rekey-interval")
+    ike_rekey_interval: Optional[int] = Field(DEFAULT_INTERFACE_IKE_REKEY_INTERVAL, alias="ike-rekey-interval")
     ike_ciphersuite: Optional[IkeCiphersuite] = Field(IkeCiphersuite.AES256_CBC_SHA1, alias="ike-ciphersuite")
     ike_group: IkeGroup = Field(IkeGroup.FOURTEEN, alias="ike-group")
     pre_shared_key_dynamic: bool = Field(True, alias="pre-shared-key-dynamic")
     ike_local_id: Optional[str] = Field(alias="ike-local-id")
     ike_remote_id: Optional[str] = Field(alias="ike-remote-id")
-    ipsec_rekey_interval: Optional[int] = Field(3600, alias="ipsec-rekey-interval")
-    ipsec_replay_window: Optional[int] = Field(512, alias="ipsec-replay-window")
+    ipsec_rekey_interval: Optional[int] = Field(DEFAULT_INTERFACE_IPSEC_REKEY_INTERVAL, alias="ipsec-rekey-interval")
+    ipsec_replay_window: Optional[int] = Field(DEFAULT_INTERFACE_IPSEC_REPLAY_WINDOW, alias="ipsec-replay-window")
     ipsec_ciphersuite: IpsecCiphersuite = Field(IpsecCiphersuite.AES256_GCM, alias="ipsec-ciphersuite")
     perfect_forward_secrecy: PerfectForwardSecrecy = Field(PerfectForwardSecrecy.NONE, alias="perfect-forward-secrecy")
     tracker: Optional[bool]
@@ -101,9 +116,13 @@ class SvcType(str, Enum):
 
 class InterfacePair(BaseModel):
     active_interface: str = Field(alias="active-interface")
-    active_interface_weight: int = Field(1, alias="active-interface-weight")
+    active_interface_weight: int = Field(
+        DEFAULT_INTERFACE_PAIR_ACTIVE_INTERFACE_WEIGHT, alias="active-interface-weight"
+    )
     backup_interface: Optional[str] = Field("None", alias="backup-interface")
-    backup_interface_weight: int = Field(1, alias="backup-interface-weight")
+    backup_interface_weight: int = Field(
+        DEFAULT_INTERFACE_PAIR_BACKUP_INTERFACE_WEIGHT, alias="backup-interface-weight"
+    )
 
     class Config:
         allow_population_by_field_name = True
@@ -132,10 +151,10 @@ class Service(BaseModel):
     primary_data_center: Optional[str] = Field("Auto", alias="primary-data-center")
     secondary_data_center: Optional[str] = Field("Auto", alias="secondary-data-center")
     ip: Optional[bool]
-    idle_time: Optional[int] = Field(0, alias="idle-time")
+    idle_time: Optional[int] = Field(DEFAULT_SERVICE_IDLE_TIME, alias="idle-time")
     display_time_unit: Optional[DisplayTimeUnit] = Field(DisplayTimeUnit.MINUTE, alias="display-time-unit")
     ip_enforced_for_known_browsers: Optional[bool] = Field(False, alias="ip-enforced-for-known-browsers")
-    refresh_time: Optional[int] = Field(0, alias="refresh-time")
+    refresh_time: Optional[int] = Field(DEFAULT_SERVICE_REFRESH_TIME, alias="refresh-time")
     refresh_time_unit: Optional[RefreshTimeUnit] = Field(RefreshTimeUnit.MINUTE, alias="refresh-time-unit")
     enabled: Optional[bool]
     block_internet_until_accepted: Optional[bool] = Field(False, alias="block-internet-until-accepted")
@@ -155,9 +174,9 @@ class TrackerType(str, Enum):
 class Tracker(BaseModel):
     name: str
     endpoint_api_url: str = Field(alias="endpoint-api-url")
-    threshold: Optional[int] = 300
-    interval: Optional[int] = 60
-    multiplier: Optional[int] = 3
+    threshold: Optional[int] = DEFAULT_TRACKER_THRESHOLD
+    interval: Optional[int] = DEFAULT_TRACKER_INTERVAL
+    multiplier: Optional[int] = DEFAULT_TRACKER_MULTIPLIER
     tracker_type: TrackerType = Field(alias="tracker-type")
 
     class Config:
@@ -169,7 +188,7 @@ class CiscoSecureInternetGatewayModel(FeatureTemplate, ConvertIPToStringModel):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    vpn_id: int = Field(0, alias="vpn-id")
+    vpn_id: int = Field(DEFAULT_SIG_VPN_ID, alias="vpn-id")
     interface: List[Interface]
     service: List[Service]
     tracker_src_ip: ipaddress.IPv4Interface = Field(alias="tracker-src-ip")
