@@ -30,6 +30,10 @@ class PolicyDefinitionEditPayload(PolicyDefinitionCreationPayload, PolicyDefinit
     pass
 
 
+class PolicyDefinitionEditResponse(BaseModel):
+    master_templates_affected: List[str] = Field(default=[], alias="masterTemplatesAffected")
+
+
 class PolicyDefinition(PolicyDefinitionEditPayload, InfoTag):
     last_updated: datetime.datetime = Field(alias="lastUpdated")
     owner: str
