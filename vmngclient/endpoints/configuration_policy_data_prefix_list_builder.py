@@ -1,7 +1,8 @@
 # mypy: disable-error-code="empty-body"
+from ipaddress import IPv4Network
 from typing import List
 
-from pydantic import BaseModel, Field, IPvAnyNetwork
+from pydantic import BaseModel, Field
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.model.policy_list import (
@@ -19,7 +20,7 @@ class DataPrefixListEntry(BaseModel):
     class Config:
         allow_population_by_field_name = True
 
-    ip_prefix: IPvAnyNetwork = Field(alias="ipPrefix")
+    ip_prefix: IPv4Network = Field(alias="ipPrefix")
 
 
 class DataPrefixPayload(BaseModel):
