@@ -4,6 +4,7 @@ from vmngclient.api.templates.models.cisco_bfd_model import CiscoBFDModel
 from vmngclient.api.templates.models.cisco_logging_model import CiscoLoggingModel
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
 from vmngclient.api.templates.models.cisco_ospf import CiscoOSPFModel
+from vmngclient.api.templates.models.cisco_secure_internet_gateway import CiscoSecureInternetGatewayModel
 from vmngclient.api.templates.models.cisco_snmp_model import CiscoSNMPModel
 from vmngclient.api.templates.models.cisco_system import CiscoSystemModel
 from vmngclient.api.templates.models.cisco_vpn_interface_model import CiscoVpnInterfaceModel
@@ -27,4 +28,5 @@ available_models = {
     "cisco_vpn": CiscoVPNModel,
     "cisco_snmp": CiscoSNMPModel,
     "cisco_system": CiscoSystemModel,
+    "cisco_secure_internet_gateway": CiscoSecureInternetGatewayModel,
 }

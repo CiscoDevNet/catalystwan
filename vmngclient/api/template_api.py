@@ -26,6 +26,7 @@ from vmngclient.api.templates.models.cisco_logging_model import CiscoLoggingMode
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
 from vmngclient.api.templates.models.cisco_omp_model import CiscoOMPModel
 from vmngclient.api.templates.models.cisco_ospf import CiscoOSPFModel
+from vmngclient.api.templates.models.cisco_secure_internet_gateway import CiscoSecureInternetGatewayModel
 from vmngclient.api.templates.models.cisco_snmp_model import CiscoSNMPModel
 from vmngclient.api.templates.models.cisco_system import CiscoSystemModel
 from vmngclient.api.templates.models.cisco_vpn_interface_model import CiscoVpnInterfaceModel
@@ -510,6 +511,7 @@ class TemplatesAPI:
             CiscoBGPModel,
             CiscoOSPFModel,
             CliTemplateModel,
+            CiscoSecureInternetGatewayModel,
         )
 
         return isinstance(template, ported_templates)
