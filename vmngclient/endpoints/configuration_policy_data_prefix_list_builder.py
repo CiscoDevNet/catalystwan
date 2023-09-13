@@ -2,7 +2,7 @@
 from ipaddress import IPv4Network
 from typing import List
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.model.policy_list import (
@@ -20,7 +20,14 @@ class DataPrefixListEntry(BaseModel):
     class Config:
         allow_population_by_field_name = True
 
-    ip_prefix: IPv4Network = Field(alias="ipPrefix")
+    ip_prefix: str = Field(alias="ipPrefix", description="IP4 network prefixes separated by comma")
+
+    @validator("ip_prefix")
+    def check_network_prefixes(cls, ip_prefix: str):
+        nets = [IPv4Network(net.strip()) for net in ip_prefix.split(",")]
+        if len(nets) < 1:
+            raise ValueError("No network prefix provided")
+        return ip_prefix
 
 
 class DataPrefixPayload(BaseModel):
