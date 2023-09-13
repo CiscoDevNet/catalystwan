@@ -19,11 +19,10 @@ class VPNListEntry(BaseModel):
     class Config:
         allow_population_by_field_name = True
 
-    vpn: str = Field(alias="vpn", description="")
+    vpn: str = Field(alias="vpn", description="0-65530 range or single number")
 
     @validator("vpn")
-    def ckeck_range(cls, vpns_str):
-        # could be string containing single integer "100" or range "1000-2000"
+    def check_vpn_range(cls, vpns_str: str):
         vpns = [int(vpn) for vpn in vpns_str.split("-")]
         if len(vpns) > 2:
             raise ValueError("VPN range should consist two integers separated by hyphen")
