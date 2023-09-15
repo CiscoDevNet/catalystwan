@@ -424,7 +424,7 @@ class TemplatesAPI:
         if not template_id:
             raise NotImplementedError()
 
-        logger.info(f"Template {template.name} ({template_type}) was created successfully ({template_id}).")
+        logger.info(f"Template {template.template_name} ({template_type}) was created successfully ({template_id}).")
         return template_id
 
     def _create_feature_template(self, template: FeatureTemplate) -> str:
@@ -477,7 +477,10 @@ class TemplatesAPI:
 
         if edit:
             template_id = (
-                self.session.api.templates.get(DeviceTemplate).filter(name=device_template.name).single_or_default().id
+                self.session.api.templates.get(DeviceTemplate)
+                .filter(name=device_template.template_name)
+                .single_or_default()
+                .id
             )
             payload = json.loads(device_template.generate_payload())
             response = self.session.put(f"/dataservice/template/device/{template_id}", json=payload)
@@ -537,8 +540,8 @@ class TemplatesAPI:
         self, template: FeatureTemplate, schema: Any, debug: bool = False
     ) -> FeatureTemplatePayload:
         payload = FeatureTemplatePayload(
-            name=template.name,
-            description=template.description,
+            name=template.template_name,
+            description=template.template_description,
             template_type=template.type,
             device_types=[device_model.value for device_model in template.device_models],
             definition={},

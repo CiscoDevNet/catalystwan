@@ -1,12 +1,19 @@
 import unittest
 from unittest.mock import patch
 
+from parameterized import parameterized
+
 from vmngclient.api.task_status_api import SubTaskData, TaskResult
 from vmngclient.api.template_api import TemplatesAPI
+from vmngclient.api.templates.cli_template import CLITemplate
+from vmngclient.api.templates.device_template.device_template import DeviceTemplate
 from vmngclient.api.templates.feature_template import FeatureTemplate
+from vmngclient.api.templates.models.cisco_aaa_model import CiscoAAAModel
+from vmngclient.api.templates.payloads.aaa.aaa_model import AAAModel, AuthenticationOrder
 from vmngclient.dataclasses import Device, FeatureTemplateInfo, TemplateInfo
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
+from vmngclient.utils.device_model import DeviceModel
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.reachability import Reachability
 
@@ -46,7 +53,8 @@ class TestTemplatesAPI(unittest.TestCase):
             },
         ]
         self.templates = DataSequence(
-            TemplateInfo, [create_dataclass(TemplateInfo, template) for template in self.data_template]
+            TemplateInfo,
+            [create_dataclass(TemplateInfo, template) for template in self.data_template],
         )
         self.device_info = Device(
             personality=Personality.EDGE,
@@ -79,7 +87,6 @@ class TestTemplatesAPI(unittest.TestCase):
     @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
     def test_templates_success(self, mock_session, mocked_response):
-
         # Arrange
         mock_session.get.return_value = mocked_response
         mocked_response.dataseq.return_value = self.templates
@@ -93,7 +100,6 @@ class TestTemplatesAPI(unittest.TestCase):
     @patch("vmngclient.response.vManageResponse")
     @patch("vmngclient.session.vManageSession")
     def test_templates_get(self, mock_session, mocked_response):
-
         # Arrange
         mock_session.get_data.return_value = mocked_response
         mocked_response.dataseq.return_value = DataSequence(FeatureTemplateInfo, [])
@@ -103,6 +109,151 @@ class TestTemplatesAPI(unittest.TestCase):
 
         # Assert
         mock_session.get.assert_called_once_with(url="/dataservice/template/feature", params={"summary": True})
+
+    @parameterized.expand(
+        [
+            (
+                AAAModel(
+                    template_name="test_template",
+                    template_description="test_description",
+                    auth_order=[AuthenticationOrder.LOCAL],
+                    auth_fallback=False,
+                    auth_disable_audit_logs=True,
+                    auth_admin_order=True,
+                    auth_disable_netconf_logs=False,
+                ),
+                "aaa_id",
+            ),
+            (
+                DeviceTemplate(
+                    template_name="test_device_template",
+                    template_description="test_device_template_description",
+                    general_templates=[],
+                ),
+                "device_template_id",
+            ),
+            (
+                CLITemplate(template_name="test", template_description="test", device_model=DeviceModel.VEDGE),
+                "cli_id",
+            ),
+            (
+                CiscoAAAModel(
+                    template_name="test_aaa_model",
+                    template_description="test_aaa_description",
+                ),
+                "generator_id",
+            ),
+        ]
+    )
+    @patch("vmngclient.session.vManageSession")
+    @patch("vmngclient.api.template_api.TemplatesAPI.create_by_generator")
+    @patch("vmngclient.api.template_api.TemplatesAPI._create_feature_template")
+    @patch("vmngclient.api.template_api.TemplatesAPI._create_device_template")
+    @patch("vmngclient.api.template_api.TemplatesAPI._create_cli_template")
+    def test_templates_create_success(
+        self,
+        template,
+        template_id,
+        mock_create_cli_template,
+        mock_create_device_template,
+        mock_create_feature_template,
+        mock_create_by_generator,
+        mock_session,
+    ):
+        # Arrange
+        mock_create_by_generator.return_value = "generator_id"
+        mock_create_feature_template.return_value = "aaa_id"
+        mock_create_device_template.return_value = "device_template_id"
+        mock_create_cli_template.return_value = "cli_id"
+
+        # Act
+        templates_api = TemplatesAPI(mock_session)
+
+        # Assert
+        self.assertEqual(templates_api.create(template), template_id)
+
+    @parameterized.expand(
+        [
+            (
+                [
+                    AAAModel(
+                        template_name="test_template",
+                        template_description="test_description",
+                        auth_order=[AuthenticationOrder.LOCAL],
+                        auth_fallback=False,
+                        auth_disable_audit_logs=True,
+                        auth_admin_order=True,
+                        auth_disable_netconf_logs=False,
+                    ),
+                    DeviceTemplate(
+                        template_name="test_device_template",
+                        template_description="test_device_template_description",
+                        general_templates=[],
+                    ),
+                    CLITemplate(
+                        template_name="test_cli_template",
+                        template_description="test_cli_description",
+                        device_model=DeviceModel.VBOND,
+                    ),
+                    CiscoAAAModel(
+                        template_name="test_aaa_model",
+                        template_description="test_aaa_description",
+                    ),
+                ],
+                ["aaa_id", "device_template_id", "cli_id", "generator_id"],
+            ),
+        ]
+    )
+    @patch("vmngclient.session.vManageSession")
+    @patch("vmngclient.api.template_api.TemplatesAPI.create_by_generator")
+    @patch("vmngclient.api.template_api.TemplatesAPI._create_feature_template")
+    @patch("vmngclient.api.template_api.TemplatesAPI._create_device_template")
+    @patch("vmngclient.api.template_api.TemplatesAPI._create_cli_template")
+    def test_templates_create_list_success(
+        self,
+        templates,
+        template_ids,
+        mock_create_cli_template,
+        mock_create_device_template,
+        mock_create_feature_template,
+        mock_create_by_generator,
+        mock_session,
+    ):
+        # Arrange
+        mock_create_by_generator.return_value = "generator_id"
+        mock_create_feature_template.return_value = "aaa_id"
+        mock_create_device_template.return_value = "device_template_id"
+        mock_create_cli_template.return_value = "cli_id"
+
+        # Act
+        templates_api = TemplatesAPI(mock_session)
+
+        # Assert
+        self.assertEqual(templates_api.create(templates), template_ids)
+
+    @patch("vmngclient.session.vManageSession")
+    @patch("vmngclient.api.template_api.TemplatesAPI.create_by_generator")
+    @patch("vmngclient.api.template_api.TemplatesAPI._create_feature_template")
+    @patch("vmngclient.api.template_api.TemplatesAPI._create_device_template")
+    @patch("vmngclient.api.template_api.TemplatesAPI._create_cli_template")
+    def test_templates_create_failure(
+        self,
+        mock_create_cli_template,
+        mock_create_device_template,
+        mock_create_feature_template,
+        mock_create_by_generator,
+        mock_session,
+    ):
+        # Act
+        templates_api = TemplatesAPI(mock_session)
+
+        # Assert
+        with self.assertRaises(NotImplementedError):
+            templates_api.create(None)
+        assert not mock_create_cli_template.called
+        assert not mock_create_device_template.called
+        assert not mock_create_feature_template.called
+        assert not mock_create_by_generator.called
 
     # @patch.object(TemplatesAPI, "templates")
     # @patch("vmngclient.api.template_api.wait_for_completed")
