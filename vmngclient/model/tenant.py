@@ -47,3 +47,7 @@ class Tenant(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
+
+
+class MigrationTenant(Tenant):
+    is_destination_overlay_mt: Optional[bool] = Field(alias="isDestinationOverlayMT")
