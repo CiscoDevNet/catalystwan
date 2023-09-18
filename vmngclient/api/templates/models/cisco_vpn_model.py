@@ -392,28 +392,28 @@ class CiscoVPNModel(FeatureTemplate):
         allow_population_by_field_name = True
 
     vpn_id: int = Field(alias="vpn-id", default=0)
-    vpn_name: Optional[str] = Field(vmanage_key="name")
+    vpn_name: Optional[str] = Field(alias="name")
     tenant_vpn_id: Optional[int] = Field(alias="tenant-vpn-id")
     org_name: Optional[str] = Field(alias="org-name")
     omp_admin_distance_ipv4: Optional[int] = Field(alias="omp-admin-distance-ipv4")
     omp_admin_distance_ipv6: Optional[int] = Field(alias="omp-admin-distance-ipv6")
     dns: Optional[List[Dns]]
     dns_ipv6: Optional[List[DnsIpv6]] = Field(alias="dns-ipv6")
-    layer4: Optional[bool]
+    layer4: Optional[bool] = Field(data_path=["ecmp-hash-key"])
     host: Optional[List[Host]]
     service: Optional[List[Service]]
-    service_route: Optional[List[ServiceRoute]] = Field(alias="service-route")
-    route_v4: Optional[List[Routev4]] = Field(vmanage_key="route", data_path=["ip", "route"])
-    route_v6: Optional[List[Routev6]] = Field(vmanage_key="route", data_path=["ipv6", "route"])
-    gre_route: Optional[List[GreRoute]] = Field(alias="gre-route")
-    ipsec_route: Optional[List[IpsecRoute]] = Field(alias="ipsec-route")
-    advertise: Optional[List[Advertise]]
-    ipv6_advertise: Optional[List[Ipv6Advertise]] = Field(alias="ipv6-advertise")
-    pool: Optional[List[Pool]]
-    natpool: Optional[List[Natpool]]
-    static: Optional[List[Static]]
-    subnet_static: Optional[List[SubnetStatic]] = Field(alias="subnet-static")
-    port_forward: Optional[List[PortForward]] = Field(alias="port-forward")
+    service_route: Optional[List[ServiceRoute]] = Field(data_path=["ip"], alias="service-route")
+    route_v4: Optional[List[Routev4]] = Field(data_path=["ip"], alias="route")
+    route_v6: Optional[List[Routev6]] = Field(data_path=["ipv6"], alias="route")
+    gre_route: Optional[List[GreRoute]] = Field(data_path=["ip"], alias="gre-route")
+    ipsec_route: Optional[List[IpsecRoute]] = Field(data_path=["ip"], alias="ipsec-route")
+    advertise: Optional[List[Advertise]] = Field(data_path=["omp"])
+    ipv6_advertise: Optional[List[Ipv6Advertise]] = Field(data_path=["omp"], alias="ipv6-advertise")
+    pool: Optional[List[Pool]] = Field(data_path=["nat64", "v4"])
+    natpool: Optional[List[Natpool]] = Field(data_path=["nat"])
+    static: Optional[List[Static]] = Field(data_path=["nat"])
+    subnet_static: Optional[List[SubnetStatic]] = Field(data_path=["nat"], alias="subnet-static")
+    port_forward: Optional[List[PortForward]] = Field(data_path=["nat"], alias="port-forward")
     route_import: Optional[List[RouteImport]] = Field(alias="route-import")
     route_import_from: Optional[List[RouteImportFrom]] = Field(alias="route-import-from")
     route_export: Optional[List[RouteExport]] = Field(alias="route-export")

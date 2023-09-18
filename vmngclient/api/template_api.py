@@ -557,17 +557,12 @@ class TemplatesAPI:
             if field.key in template.device_specific_variables:
                 value = template.device_specific_variables[field.key]
             else:
-                # Iterate through every possible field, maybe refactor(?)
-                # Use data_path instead. data_path as tuple
-                # next(field_value.field_info.extra.get("vmanage_key") == field.key, template.__fields__.values())
                 for field_name, field_value in template.__fields__.items():
-                    if "vmanage_key" in field_value.field_info.extra:  # type: ignore
-                        vmanage_key = field_value.field_info.extra.get("vmanage_key")  # type: ignore
-                        if vmanage_key != field.key:
-                            break
-
-                        value = template.dict(by_alias=True).get(field_name, None)
-                        field_value.field_info.extra.pop("vmanage_key")  # type: ignore
+                    if (
+                        field.dataPath == field_value.field_info.extra.get("data_path", [])  # type: ignore
+                        and field.key == field_value.alias
+                    ):
+                        value = getattr(template, field_name)
                         break
                 if value is None:
                     value = template.dict(by_alias=True).get(field.key, None)
@@ -576,9 +571,6 @@ class TemplatesAPI:
             # types like Ignore, Constant, None etc so generator will now
             # which object to ommit while generating payload
             if template.type == "cisco_vpn_interface" and value is None:
-                continue
-
-            if template.type == "cisco_ospf" and value is None:
                 continue
 
             if isinstance(value, bool):

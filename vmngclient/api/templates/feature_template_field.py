@@ -4,8 +4,10 @@ from enum import Enum
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, validator
+from pydantic.fields import ModelField  # type: ignore
 
 from vmngclient.api.templates.device_variable import DeviceVariable
+from vmngclient.api.templates.feature_template import FeatureTemplate
 
 
 class FeatureTemplateOptionType(str, Enum):
@@ -111,10 +113,17 @@ class FeatureTemplateField(BaseModel):
                         for child in self.children:  # Child in schema
                             if current_path is None:
                                 current_path = []
-                            child_payload.update(
-                                child.payload_scheme(
-                                    obj[child.key], help=output, current_path=self.dataPath + [self.key]
+                            obj: FeatureTemplate  # type: ignore
+                            model_field: ModelField = next(
+                                filter(
+                                    lambda f: f.field_info.extra.get("data_path", []) == child.dataPath
+                                    and f.alias == child.key,
+                                    obj.__fields__.values(),
                                 )
+                            )
+                            obj_value = getattr(obj, model_field.name)
+                            child_payload.update(
+                                child.payload_scheme(obj_value, help=output, current_path=self.dataPath + [self.key])
                             )
                         children_output.append(child_payload)
                     output["vipValue"] = children_output

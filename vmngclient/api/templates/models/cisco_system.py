@@ -52,8 +52,9 @@ class Type(str, Enum):
 class Tracker(BaseModel):
     name: str
     endpoint_ip: str = Field(alias="endpoint-ip")
-    protocol: Protocol
-    port: int
+    endpoint_ip_transport_port: str = Field(alias="endpoint-ip", data_path=["endpoint-ip-transport-port"])
+    protocol: Protocol = Field(data_path=["endpoint-ip-transport-port"])
+    port: int = Field(data_path=["endpoint-ip-transport-port"])
     endpoint_dns_name: str = Field(alias="endpoint-dns-name")
     endpoint_api_url: str = Field(alias="endpoint-api-url")
     elements: List[str]
@@ -123,14 +124,17 @@ class CiscoSystemModel(FeatureTemplate):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    timezone: Optional[Timezone]
+    timezone: Optional[Timezone] = Field(data_path=["clock"])
     hostname: str = Field(default=DeviceVariable(name="system_host_name"), alias="host-name", validate_default=True)
     location: Optional[str]
-    latitude: Optional[float]
-    longitude: Optional[float]
-    range: Optional[int] = 100
-    enable: Optional[bool]
-    mobile_number: Optional[List[MobileNumber]] = Field(alias="mobile-number")
+    latitude: Optional[float] = Field(data_path=["gps-location"])
+    longitude: Optional[float] = Field(data_path=["gps-location"])
+    range: Optional[int] = Field(100, data_path=["gps-location", "geo-fencing"])
+    enable_fencing: Optional[bool] = Field(False, data_path=["gps-location", "geo-fencing"], alias="enable")
+    mobile_number: Optional[List[MobileNumber]] = Field(
+        alias="mobile-number", data_path=["gps-location", "geo-fencing", "sms"]
+    )
+    enable_sms: Optional[bool] = Field(False, data_path=["gps-location", "geo-fencing", "sms"], alias="enable")
     device_groups: Optional[List[str]] = Field(alias="device-groups")
     controller_group_list: Optional[List[int]] = Field(alias="controller-group-list")
     system_ip: DeviceVariable = Field(default=DeviceVariable(name="system_system_ip"), alias="system-ip")
@@ -147,14 +151,15 @@ class CiscoSystemModel(FeatureTemplate):
     multi_tenant: Optional[bool] = Field(alias="multi-tenant")
     track_default_gateway: Optional[bool] = Field(True, alias="track-default-gateway")
     admin_tech_on_failure: Optional[bool] = Field(alias="admin-tech-on-failure")
-    idle_timeout: Optional[int] = Field(alias="idle-timeout")
+    enable_tunnel: Optional[bool] = Field(False, alias="enable", data_path=["on-demand"])
+    idle_timeout: Optional[int] = Field(alias="idle-timeout", data_path=["on-demand"])
     tracker: Optional[List[Tracker]]
     object_track: Optional[List[ObjectTrack]] = Field(alias="object-track")
     region_id: Optional[int] = Field(alias="region-id")
     secondary_region: Optional[int] = Field(alias="secondary-region")
     role: Optional[Role]
-    affinity_group_number: Optional[int] = Field(alias="affinity-group-number")
-    preference: Optional[List[int]]
+    affinity_group_number: Optional[int] = Field(alias="affinity-group-number", data_path=["affinity-group"])
+    preference: Optional[List[int]] = Field(data_path=["affinity-group"])
     preference_auto: Optional[bool] = Field(alias="preference-auto")
     affinity_per_vrf: Optional[List[AffinityPerVrf]] = Field(alias="affinity-per-vrf")
     transport_gateway: Optional[bool] = Field(alias="transport-gateway")

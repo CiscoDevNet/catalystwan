@@ -87,7 +87,7 @@ class CiscoSNMPModel(FeatureTemplate):
     community: Optional[List[Community]]
     group: Optional[List[Group]]
     user: Optional[List[User]]
-    target: Optional[List[Target]]
+    target: Optional[List[Target]] = Field(data_path=["trap"])
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_snmp"

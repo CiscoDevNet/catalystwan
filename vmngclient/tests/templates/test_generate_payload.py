@@ -45,7 +45,7 @@ class RSA(BaseModel):
         allow_population_by_field_name = True
 
     key: str = Field(alias="key-string")
-    key_type: str = Field(alias="key-type")
+    key_type: str = Field(alias="key-type", data_path=["type", "RSA"])
 
 
 class User(BaseModel):
@@ -54,7 +54,7 @@ class User(BaseModel):
         allow_population_by_field_name = True
 
     name: str
-    password: str
+    password: str = Field(data_path=["list"])
     pubkey_chain: List[RSA] = Field(default=[], alias="pubkey-chain")
 
 

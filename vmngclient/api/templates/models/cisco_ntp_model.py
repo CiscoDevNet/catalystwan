@@ -32,11 +32,11 @@ class CiscoNTPModel(FeatureTemplate):
         allow_population_by_field_name = True
 
     server: List[Server] = Field(default=[])
-    authentication: List[Authentication] = Field(default=[])
-    trusted: List[int] = Field(default=[])
-    enable: Optional[bool] = Field(default=False)
-    stratum: Optional[int] = Field(default=None)
-    source: Optional[str] = Field(default=None)
+    authentication: List[Authentication] = Field(default=[], data_path=["keys"])
+    trusted: List[int] = Field(default=[], data_path=["keys"])
+    enable: Optional[bool] = Field(default=False, data_path=["master"])
+    stratum: Optional[int] = Field(default=None, data_path=["master"])
+    source: Optional[str] = Field(default=None, data_path=["master"])
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_ntp"
