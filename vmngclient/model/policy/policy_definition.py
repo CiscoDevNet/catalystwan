@@ -1,6 +1,6 @@
 import datetime
 from enum import Enum
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional, Sequence, Union
 
 from pydantic import BaseModel, Field, IPvAnyNetwork
 from typing_extensions import Annotated, Literal
@@ -45,6 +45,8 @@ class SequenceIpType(str, Enum):
 class BaseAction(str, Enum):
     DROP = "drop"
     ACCEPT = "accept"
+    PASS = "pass"
+    INSPECT = "inspect"
 
 
 class SequenceType(str, Enum):
@@ -53,66 +55,92 @@ class SequenceType(str, Enum):
     SERVICE_CHAINING = "serviceChaining"
     TRAFFIC_ENGINEERING = "trafficEngineering"
     QOS = "qos"
+    ZONE_BASED_FW = "zoneBasedFW"
+
+
+class Optimized(str, Enum):
+    TRUE = "true"
+    FALSE = "false"
 
 
 class PacketLengthEntry(BaseModel):
-    field: Literal["packetLength"]
+    field: Literal["packetLength"] = "packetLength"
     value: str = Field(description="0-65536 range or single number")
 
 
 class PLPEntry(BaseModel):
-    field: Literal["plp"]
+    field: Literal["plp"] = "plp"
     value: PLPEntryValues
 
 
 class ProtocolEntry(BaseModel):
-    field: Literal["protocol"]
+    field: Literal["protocol"] = "protocol"
     value: str = Field(description="0-255 single numbers separate by space")
 
 
 class DSCPEntry(BaseModel):
-    field: Literal["dscp"]
+    field: Literal["dscp"] = "dscp"
     value: str = Field(description="0-63 single numbers separate by space")
 
 
 class SourceIPEntry(BaseModel):
-    field: Literal["sourceIp"]
+    field: Literal["sourceIp"] = "sourceIp"
     value: str = Field(description="IP network specifier separate by space")
 
 
 class SourcePortEntry(BaseModel):
-    field: Literal["sourcePort"]
+    field: Literal["sourcePort"] = "sourcePort"
     value: str = Field(description="0-65535 range or separate by space")
 
 
 class DestinationIPEntry(BaseModel):
-    field: Literal["destinationIp"]
+    field: Literal["destinationIp"] = "destinationIp"
     value: IPvAnyNetwork
 
 
 class DestinationPortEntry(BaseModel):
-    field: Literal["destinationPort"]
+    field: Literal["destinationPort"] = "destinationPort"
     value: str = Field(description="0-65535 range or separate by space")
 
 
 class TCPEntry(BaseModel):
-    field: Literal["tcp"]
-    value: Literal["syn"]
+    field: Literal["tcp"] = "tcp"
+    value: Literal["syn"] = "syn"
 
 
 class DNSEntry(BaseModel):
-    field: Literal["dns"]
+    field: Literal["dns"] = "dns"
     value: DNSEntryValues
 
 
 class TrafficToEntry(BaseModel):
-    field: Literal["trafficTo"]
+    field: Literal["trafficTo"] = "trafficTo"
     value: TrafficToEntryValues
 
 
 class DestinationRegionEntry(BaseModel):
-    field: Literal["destinationRegion"]
+    field: Literal["destinationRegion"] = "destinationRegion"
     value: DestinationRegionEntryValues
+
+
+class SourceFQDNEntry(BaseModel):
+    field: Literal["sourceFqdn"] = "sourceFqdn"
+    value: str = Field(max_length=120)
+
+
+class DestinationFQDNEntry(BaseModel):
+    field: Literal["destinationFqdn"] = "destinationFqdn"
+    value: str = Field(max_length=120)
+
+
+class SourceGeoLocationEntry(BaseModel):
+    field: Literal["sourceGeoLocation"] = "sourceGeoLocation"
+    value: str = Field(description="Space separated list of ISO3166 country codes")
+
+
+class DestinationGeoLocationEntry(BaseModel):
+    field: Literal["destinationGeoLocation"] = "destinationGeoLocation"
+    value: str = Field(description="Space separated list of ISO3166 country codes")
 
 
 class SourceDataPrefixListEntry(BaseModel):
@@ -121,27 +149,67 @@ class SourceDataPrefixListEntry(BaseModel):
 
 
 class DestinationDataPrefixListEntry(BaseModel):
-    field: Literal["destinationDataPrefixList"]
+    field: Literal["destinationDataPrefixList"] = "destinationDataPrefixList"
     ref: str
 
 
 class SourceDataIPv6PrefixListEntry(BaseModel):
-    field: Literal["sourceDataIpv6PrefixList"]
+    field: Literal["sourceDataIpv6PrefixList"] = "sourceDataIpv6PrefixList"
     ref: str
 
 
 class DestinationDataIPv6PrefixListEntry(BaseModel):
-    field: Literal["destinationDataIpv6PrefixList"]
+    field: Literal["destinationDataIpv6PrefixList"] = "destinationDataIpv6PrefixList"
     ref: str
 
 
 class DNSAppListEntry(BaseModel):
-    field: Literal["dnsAppList"]
+    field: Literal["dnsAppList"] = "dnsAppList"
     ref: str
 
 
 class AppListEntry(BaseModel):
-    field: Literal["appList"]
+    field: Literal["appList"] = "appList"
+    ref: str
+
+
+class SourceFQDNListEntry(BaseModel):
+    field: Literal["sourceFqdnList"] = "sourceFqdnList"
+    ref: str
+
+
+class DestinationFQDNListEntry(BaseModel):
+    field: Literal["destinationFqdnList"] = "destinationFqdnList"
+    ref: str
+
+
+class SourceGeoLocationListEntry(BaseModel):
+    field: Literal["sourceGeoLocationList"] = "sourceGeoLocationList"
+    ref: str
+
+
+class DestinationGeoLocationListEntry(BaseModel):
+    field: Literal["destinationGeoLocationList"] = "destinationGeoLocationList"
+    ref: str
+
+
+class ProtocolNameListEntry(BaseModel):
+    field: Literal["protocolNameList"] = "protocolNameList"
+    ref: str
+
+
+class SourcePortListEntry(BaseModel):
+    field: Literal["sourcePortList"] = "sourcePortList"
+    ref: str
+
+
+class DestinationPortListEntry(BaseModel):
+    field: Literal["destinationPortList"] = "destinationPortList"
+    ref: str
+
+
+class RuleSetListEntry(BaseModel):
+    field: Literal["ruleSetList"] = "ruleSetList"
     ref: str
 
 
@@ -158,6 +226,10 @@ Entry = Annotated[
         TCPEntry,
         DNSEntry,
         TrafficToEntry,
+        SourceFQDNEntry,
+        DestinationFQDNEntry,
+        SourceGeoLocationEntry,
+        DestinationGeoLocationEntry,
         SourceDataPrefixListEntry,
         DestinationDataPrefixListEntry,
         SourceDataIPv6PrefixListEntry,
@@ -165,27 +237,35 @@ Entry = Annotated[
         DestinationRegionEntry,
         DNSAppListEntry,
         AppListEntry,
+        SourceFQDNListEntry,
+        DestinationFQDNListEntry,
+        SourceGeoLocationListEntry,
+        DestinationGeoLocationListEntry,
+        SourcePortListEntry,
+        DestinationPortListEntry,
+        ProtocolNameListEntry,
     ],
     Field(discriminator="field"),
 ]
 
 
 class Match(BaseModel):
-    entries: List[Entry]
+    entries: Sequence[Entry]
 
 
 class Action(BaseModel):
     pass
 
 
-class Sequence(BaseModel):
+class DefinitionSequence(BaseModel):
     sequence_id: int = Field(alias="sequenceId")
     sequence_name: str = Field(alias="sequenceName")
-    base_action: BaseAction = Field(alias="baseAction")
+    base_action: BaseAction = Field(default=BaseAction.DROP, alias="baseAction")
     sequence_type: SequenceType = Field(alias="sequenceType")
     sequence_ip_type: SequenceIpType = Field(alias="sequenceIpType")
+    ruleset: Optional[bool] = None
     match: Match
-    actions: List[Any]
+    actions: List[Any] = []
 
 
 class DefaultAction(BaseModel):
@@ -205,13 +285,37 @@ class PolicyReference(BaseModel):
     property: str
 
 
-class PolicyDefinitionCreationPayload(BaseModel):
+class PolicyDefinitionHeader(BaseModel):
     name: str = Field(
         regex="^[a-zA-Z0-9_-]{1,128}$",
         description="Can include only alpha-numeric characters, hyphen '-' or underscore '_'; maximum 128 characters",
     )
     description: str
     type: str
+    mode: Optional[str] = None
+    optimized: Optional[Optimized] = Optimized.FALSE
+
+
+class PolicyDefinitionInfo(PolicyDefinitionHeader):
+    last_updated: datetime.datetime = Field(alias="lastUpdated")
+    owner: str
+    reference_count: int = Field(alias="referenceCount")
+    references: List[PolicyReference]
+
+
+class PolicyDefinitionBody(BaseModel):
+    default_action: Optional[DefaultAction] = Field(
+        default=DefaultAction(type=DefaultActionType.DROP), alias="defaultAction"
+    )
+    sequences: Sequence[DefinitionSequence] = []
+
+
+class PolicyDefinitionCreationPayload(PolicyDefinitionHeader):
+    definition: PolicyDefinitionBody
+
+
+class PolicyDefinitionGetResponse(PolicyDefinitionCreationPayload, PolicyDefinitionId):
+    is_activated_by_vsmart: bool = Field(alias="isActivatedByVsmart")
 
 
 class PolicyDefinitionEditPayload(PolicyDefinitionCreationPayload, PolicyDefinitionId):
@@ -220,15 +324,6 @@ class PolicyDefinitionEditPayload(PolicyDefinitionCreationPayload, PolicyDefinit
 
 class PolicyDefinitionEditResponse(BaseModel):
     master_templates_affected: List[str] = Field(default=[], alias="masterTemplatesAffected")
-
-
-class PolicyDefinition(PolicyDefinitionEditPayload, InfoTag):
-    last_updated: datetime.datetime = Field(alias="lastUpdated")
-    owner: str
-    mode: str
-    optimized: str
-    reference_count: int = Field(alias="referenceCount")
-    references: List[PolicyReference]
 
 
 class PolicyDefinitionPreview(BaseModel):
