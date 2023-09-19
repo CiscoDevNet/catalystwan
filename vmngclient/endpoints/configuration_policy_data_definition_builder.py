@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, IPvAnyNetwork
 from typing_extensions import Annotated, Literal
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy_definition import (
+from vmngclient.model.policy.policy_definition import (
     PolicyDefinition,
     PolicyDefinitionCreationPayload,
     PolicyDefinitionEditPayload,
