@@ -34,15 +34,15 @@ class DeviceTemplate(BaseModel):
             "default_banner", # Banner
         ]
     >>> device_template = DeviceTemplate(
-            name="python",
-            description="python",
+            template_name="python",
+            template_description="python",
             general_templates=templates
         )
     >>> session.api.templates.create(device_template)
     """
 
-    name: str = Field(alias="templateName")
-    description: str = Field(alias="templateName")
+    template_name: str = Field(alias="templateName")
+    template_description: str = Field(alias="templateDescription")
     general_templates: List[GeneralTemplate] = Field(alias="generalTemplates")
     device_role: str = Field(default="", alias="deviceRole")
     device_type: str = Field(default="", alias="deviceType")

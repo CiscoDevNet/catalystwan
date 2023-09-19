@@ -16,8 +16,8 @@ if TYPE_CHECKING:
 
 
 class FeatureTemplate(BaseModel, ABC):
-    name: str
-    description: str
+    template_name: str
+    template_description: str
     device_models: List[DeviceModel] = []
     device_specific_variables: Dict[str, DeviceVariable] = {}
 
@@ -93,8 +93,8 @@ class FeatureTemplate(BaseModel, ABC):
         )
 
         return feature_template_model(
-            name=template_info.name,
-            description=template_info.description,
+            template_name=template_info.name,
+            template_description=template_info.description,
             device_models=[DeviceModel(model) for model in template_info.device_type],
             device_specific_variables=device_specific_variables,
             **values_from_template_definition,

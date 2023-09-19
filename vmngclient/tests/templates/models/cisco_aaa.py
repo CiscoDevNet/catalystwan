@@ -14,8 +14,8 @@ users = [
 
 # CiscoAAAModel(domain-stripping="?")
 cisco_aaa = CiscoAAAModel(
-    name="iuo",
-    description="zyx",
+    template_name="iuo",
+    template_description="zyx",
     device_models=[DeviceModel.VEDGE_C8000V],
     user=users,
     authentication_group=True,
@@ -29,8 +29,8 @@ cisco_aaa = CiscoAAAModel(
 )
 
 cisco_aaa_device_specific = CiscoAAAModel(
-    name="cisco_aaa_device_specific",
-    description="caaadp",
+    template_name="cisco_aaa_device_specific",
+    template_description="caaadp",
     device_models=[DeviceModel.VEDGE_C8000V],
     user=users,
     authentication_group=True,

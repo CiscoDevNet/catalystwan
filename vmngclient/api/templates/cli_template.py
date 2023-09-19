@@ -22,9 +22,8 @@ if TYPE_CHECKING:
 
 @define
 class CLITemplate:
-
-    name: str
-    description: str
+    template_name: str
+    template_description: str
     device_model: DeviceModel
     config: CiscoConfParse = CiscoConfParse([])
 
@@ -64,8 +63,8 @@ class CLITemplate:
     def generate_payload(self) -> dict:
         config_str = "\n".join(self.config.ioscfg)
         payload = {
-            "templateName": self.name,
-            "templateDescription": self.description,
+            "templateName": self.template_name,
+            "templateDescription": self.template_description,
             "deviceType": self.device_model.value,
             "templateConfiguration": config_str,
             "factoryDefault": False,
@@ -97,8 +96,8 @@ class CLITemplate:
         config_str = "\n".join(self.config.ioscfg)
         payload = {
             "templateId": id,
-            "templateName": self.name,
-            "templateDescription": self.description,
+            "templateName": self.template_name,
+            "templateDescription": self.template_description,
             "deviceType": self.device_model.value,
             "templateConfiguration": config_str,
             "factoryDefault": False,
@@ -113,7 +112,7 @@ class CLITemplate:
             logger.error(f'Response message: {response["message"]}')
             logger.error(f'Response details: {response["details"]}')
             return False
-        logger.info(f"Template with name: {self.name} - updated.")
+        logger.info(f"Template with name: {self.template_name} - updated.")
         return True
 
     @staticmethod

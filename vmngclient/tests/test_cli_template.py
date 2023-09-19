@@ -38,7 +38,7 @@ class TestCLITemplate(unittest.TestCase):
         # Arrange
         mock_session.get_json.return_value = {"configType": "file", "templateConfiguration": self.config}
         # Act
-        temp = CLITemplate(name="test", description="test", device_model=DeviceModel.VEDGE)
+        temp = CLITemplate(template_name="test", template_description="test", device_model=DeviceModel.VEDGE)
         answer = temp.load(session=mock_session, id="temp_id")
         # Assert
         self.assertEqual(answer.ioscfg, self.template.ioscfg)
@@ -52,7 +52,7 @@ class TestCLITemplate(unittest.TestCase):
             "templateConfiguration": self.config,
         }
         # Act
-        temp = CLITemplate(name="test", description="test", device_model=DeviceModel.VEDGE)
+        temp = CLITemplate(template_name="test", template_description="test", device_model=DeviceModel.VEDGE)
 
         def answer():
             return temp.load(session=mock_session, id="temp_id")
@@ -77,14 +77,16 @@ class TestCLITemplate(unittest.TestCase):
             model="vedge-cloud",
         )
         # Act
-        temp = CLITemplate(name="test", description="test", device_model=DeviceModel.VEDGE)
+        temp = CLITemplate(template_name="test", template_description="test", device_model=DeviceModel.VEDGE)
         answer = temp.load_running(session=mock_session, device=device)
         # Assert
         self.assertEqual(answer.ioscfg, self.template.ioscfg)
 
     def test_generate_payload(self):
         # Arrange
-        template = CLITemplate(name="test", description="test", device_model=DeviceModel.VEDGE, config=self.template)
+        template = CLITemplate(
+            template_name="test", template_description="test", device_model=DeviceModel.VEDGE, config=self.template
+        )
         # Act
         answer = template.generate_payload()
         # Assert
@@ -120,7 +122,10 @@ class TestCLITemplate(unittest.TestCase):
     def test_generate_payload_cedge(self):
         # Arrange
         template = CLITemplate(
-            name="test", description="test", device_model=DeviceModel.VEDGE_C8000V, config=self.template
+            template_name="test",
+            template_description="test",
+            device_model=DeviceModel.VEDGE_C8000V,
+            config=self.template,
         )
         # Act
         answer = template.generate_payload()
@@ -167,7 +172,7 @@ class TestCLITemplate(unittest.TestCase):
         )
         config = CiscoConfParse(templateConfiguration.splitlines())
         # Act
-        template = CLITemplate(name="test", description="test", device_model=DeviceModel.VEDGE)
+        template = CLITemplate(template_name="test", template_description="test", device_model=DeviceModel.VEDGE)
         result = template.update(session=mock_session, id="temp_id", config=config)
         # Assert
         self.assertTrue(result)
@@ -184,7 +189,7 @@ class TestCLITemplate(unittest.TestCase):
             "        system-ip               192.168.1.26\n"
         )
         config = CiscoConfParse(templateConfiguration.splitlines())
-        template = CLITemplate(name="test", description="test", device_model=DeviceModel.VEDGE)
+        template = CLITemplate(template_name="test", template_description="test", device_model=DeviceModel.VEDGE)
 
         # Act
         with self.assertRaises(HTTPError):
@@ -205,8 +210,8 @@ class TestCLITemplate(unittest.TestCase):
         )
         config2 = CiscoConfParse(templateConfiguration2.splitlines())
         # Act
-        result = CLITemplate(name="test", description="test", device_model=DeviceModel.VEDGE).compare_template(
-            config1, config2
-        )
+        result = CLITemplate(
+            template_name="test", template_description="test", device_model=DeviceModel.VEDGE
+        ).compare_template(config1, config2)
         # Assert
         self.assertEqual(result, "")

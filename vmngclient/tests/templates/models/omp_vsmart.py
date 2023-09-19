@@ -3,12 +3,12 @@ from vmngclient.api.templates.device_variable import DeviceVariable
 from vmngclient.api.templates.models.omp_vsmart_model import OMPvSmart
 from vmngclient.utils.device_model import DeviceModel
 
-default_omp = OMPvSmart(name="omp_1", description="default", device_models=[DeviceModel.VEDGE_C8000V])
+default_omp = OMPvSmart(template_name="omp_1", template_description="default", device_models=[DeviceModel.VEDGE_C8000V])
 
 
 omp_2 = OMPvSmart(
-    name="omp_2",
-    description="some changes",
+    template_name="omp_2",
+    template_description="some changes",
     device_models=[DeviceModel.VEDGE_C8000V],
     graceful_restart=False,
     send_backup_paths=False,
@@ -17,8 +17,8 @@ omp_2 = OMPvSmart(
 )
 
 omp_3 = OMPvSmart(
-    name="omp_3",
-    description="advanced",
+    template_name="omp_3",
+    template_description="advanced",
     device_models=[DeviceModel.VEDGE_C8000V],
     graceful_restart=False,
     graceful_restart_timer=DeviceVariable(name="omp_graceful_restart_timer"),

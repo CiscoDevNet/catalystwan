@@ -19,8 +19,8 @@ class MockedFeatureTemplate(FeatureTemplate):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    name: str = "test"
-    description: str = "test"
+    template_name: str = "test"
+    template_description: str = "test"
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "test_type"
 
@@ -32,8 +32,8 @@ class MockedFeatureTemplateAlias(FeatureTemplate):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    name: str = "test"
-    description: str = "test"
+    template_name: str = "test"
+    template_description: str = "test"
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "test_type"
 
@@ -63,8 +63,8 @@ class MockedFeatureTemplateChildren(FeatureTemplate):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    name: str = "test"
-    description: str = "test"
+    template_name: str = "test"
+    template_description: str = "test"
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "test_type"
 

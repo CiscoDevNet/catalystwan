@@ -22,7 +22,9 @@ class TestFeatureTemplate(TestCase):
 
         for template in map(models.__dict__.get, models.__all__):
             definition: Dict[str, Any]
-            with open(Path(__file__).resolve().parents[0] / Path("definitions") / Path(template.name + ".json")) as f:
+            with open(
+                Path(__file__).resolve().parents[0] / Path("definitions") / Path(template.template_name + ".json")
+            ) as f:
                 definition = json.load(f)
             feature_template_response.append(
                 {
@@ -30,9 +32,9 @@ class TestFeatureTemplate(TestCase):
                     "resource_group": "global",
                     "id": "xxx",
                     "factory_default": "False",
-                    "name": template.name,
+                    "name": template.template_name,
                     "devices_attached": 1,
-                    "description": template.description,
+                    "description": template.template_description,
                     "last_updated_on": 1111111111111,
                     "template_type": template.type,
                     "device_type": ["vedge-C8000V"],
@@ -53,7 +55,7 @@ class TestFeatureTemplate(TestCase):
         mock_session.api.templates._get_feature_templates.return_value = self.get_feature_templates_response
 
         # Act
-        feature_template_from_get = FeatureTemplate.get(session=mock_session, name=template.name)
+        feature_template_from_get = FeatureTemplate.get(session=mock_session, name=template.template_name)
 
         # Assert
         self.assertEqual(feature_template_from_get, template)
