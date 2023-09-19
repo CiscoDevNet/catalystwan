@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from parameterized import parameterized
+from parameterized import parameterized  # type: ignore
 
 from vmngclient.api.task_status_api import SubTaskData, TaskResult
 from vmngclient.api.template_api import TemplatesAPI
@@ -125,7 +125,7 @@ class TestTemplatesAPI(unittest.TestCase):
                 "aaa_id",
             ),
             (
-                DeviceTemplate(
+                DeviceTemplate(  # type: ignore
                     template_name="test_device_template",
                     template_description="test_device_template_description",
                     general_templates=[],
@@ -133,7 +133,9 @@ class TestTemplatesAPI(unittest.TestCase):
                 "device_template_id",
             ),
             (
-                CLITemplate(template_name="test", template_description="test", device_model=DeviceModel.VEDGE),
+                CLITemplate(  # type: ignore
+                    template_name="test", template_description="test", device_model=DeviceModel.VEDGE
+                ),
                 "cli_id",
             ),
             (
@@ -185,12 +187,12 @@ class TestTemplatesAPI(unittest.TestCase):
                         auth_admin_order=True,
                         auth_disable_netconf_logs=False,
                     ),
-                    DeviceTemplate(
+                    DeviceTemplate(  # type: ignore
                         template_name="test_device_template",
                         template_description="test_device_template_description",
                         general_templates=[],
                     ),
-                    CLITemplate(
+                    CLITemplate(  # type: ignore
                         template_name="test_cli_template",
                         template_description="test_cli_description",
                         device_model=DeviceModel.VBOND,
