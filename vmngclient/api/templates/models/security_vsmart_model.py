@@ -17,7 +17,7 @@ class SecurityvSmart(FeatureTemplate):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    protocol: Optional[Protocol] = Field(default=None)
-    tls_port: Optional[int] = Field(default=None, alias="tls-port")
+    protocol: Optional[Protocol] = Field(default=None, data_path=["control"])
+    tls_port: Optional[int] = Field(default=None, alias="tls-port", data_path=["control"])
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "security-vsmart"

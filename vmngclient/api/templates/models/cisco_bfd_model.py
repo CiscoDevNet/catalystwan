@@ -55,8 +55,8 @@ class CiscoBFDModel(FeatureTemplate, ConvertBoolToStringModel):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    multiplier: Optional[int] = DEFAULT_BFD_MULTIPLIER
-    poll_interval: Optional[int] = Field(DEFAULT_BFD_POLL_INTERVAL, alias="poll-interval")
+    multiplier: Optional[int] = Field(DEFAULT_BFD_MULTIPLIER, data_path=["app-route"])
+    poll_interval: Optional[int] = Field(DEFAULT_BFD_POLL_INTERVAL, alias="poll-interval", data_path=["app-route"])
     default_dscp: Optional[int] = Field(DEFAULT_BFD_DSCP, alias="default-dscp")
     color: Optional[List[Color]]
 

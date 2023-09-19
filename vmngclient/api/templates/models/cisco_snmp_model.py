@@ -5,9 +5,10 @@ from typing import ClassVar, List, Optional
 from pydantic import BaseModel, Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
+from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
 
 
-class Oid(BaseModel):
+class Oid(ConvertBoolToStringModel):
     id: str
     exclude: Optional[bool]
 
@@ -75,7 +76,7 @@ class Target(BaseModel):
         allow_population_by_field_name = True
 
 
-class CiscoSNMPModel(FeatureTemplate):
+class CiscoSNMPModel(FeatureTemplate, ConvertBoolToStringModel):
     class Config:
         arbitrary_types_allowed = True
         allow_population_by_field_name = True

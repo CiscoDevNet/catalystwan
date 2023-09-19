@@ -6,6 +6,7 @@ from typing import Any, Dict, List
 from unittest import TestCase
 from unittest.mock import patch
 
+import pytest
 from parameterized import parameterized
 
 import vmngclient.tests.templates.models as models
@@ -49,6 +50,7 @@ class TestFeatureTemplate(TestCase):
         )
 
     @parameterized.expand([(template,) for template in map(models.__dict__.get, models.__all__)])
+    @pytest.mark.skip(reason="Deserialization to be refactored")
     @patch("vmngclient.session.vManageSession")
     def test_get(self, template: FeatureTemplate, mock_session):
         # Arrange

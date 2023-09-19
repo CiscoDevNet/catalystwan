@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 from vmngclient.api.templates.device_variable import DeviceVariable
 from vmngclient.api.templates.feature_template import FeatureTemplate
+from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
 from vmngclient.utils.timezone import Timezone
 
 
@@ -119,7 +120,7 @@ class Epfr(str, Enum):
     CONSERVATIVE = "conservative"
 
 
-class CiscoSystemModel(FeatureTemplate):
+class CiscoSystemModel(FeatureTemplate, ConvertBoolToStringModel):
     class Config:
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
@@ -152,7 +153,8 @@ class CiscoSystemModel(FeatureTemplate):
     track_default_gateway: Optional[bool] = Field(True, alias="track-default-gateway")
     admin_tech_on_failure: Optional[bool] = Field(alias="admin-tech-on-failure")
     enable_tunnel: Optional[bool] = Field(False, alias="enable", data_path=["on-demand"])
-    idle_timeout: Optional[int] = Field(alias="idle-timeout", data_path=["on-demand"])
+    idle_timeout: Optional[int] = Field(alias="idle-timeout")
+    on_demand_idle_timeout_min: Optional[int] = Field(alias="idle-timeout", data_path=["on-demand"])
     tracker: Optional[List[Tracker]]
     object_track: Optional[List[ObjectTrack]] = Field(alias="object-track")
     region_id: Optional[int] = Field(alias="region-id")

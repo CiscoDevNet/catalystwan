@@ -269,7 +269,7 @@ class CiscoBGPModel(FeatureTemplate):
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_bgp"
 
-    @validator("shutdown")
+    @validator("shutdown", "deterministic", "missing_as_worst", "compare_router_id", "multipath_relax")
     def cast_to_str(cls, value):
         if value is not None:
             return str(value).lower()

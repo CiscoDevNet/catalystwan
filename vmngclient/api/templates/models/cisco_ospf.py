@@ -126,19 +126,25 @@ class CiscoOSPFModel(FeatureTemplate, ConvertBoolToStringModel):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    router_id: Optional[str] = Field(alias="router-id")
-    reference_bandwidth: Optional[int] = Field(DEFAULT_OSPF_REFERENCE_BANDWIDTH, alias="reference-bandwidth")
-    rfc1583: Optional[bool] = True
-    originate: Optional[bool]
-    always: Optional[bool]
-    metric: Optional[int]
-    metric_type: Optional[MetricType] = Field(alias="metric-type")
-    external: Optional[int] = DEFAULT_OSPF_EXTERNAL
-    inter_area: Optional[int] = Field(DEFAULT_OSPF_INTER_AREA, alias="inter-area")
-    intra_area: Optional[int] = Field(DEFAULT_OSPF_INTRA_AREA, alias="intra-area")
-    delay: Optional[int] = DEFAULT_OSPF_DELAY
-    initial_hold: Optional[int] = Field(DEFAULT_OSPF_INITIAL_HOLD, alias="initial-hold")
-    max_hold: Optional[int] = Field(DEFAULT_OSPF_MAX_HOLD, alias="max-hold")
+    router_id: Optional[str] = Field(alias="router-id", data_path=["ospf"])
+    reference_bandwidth: Optional[int] = Field(
+        DEFAULT_OSPF_REFERENCE_BANDWIDTH, data_path=["ospf", "auto-cost"], alias="reference-bandwidth"
+    )
+    rfc1583: Optional[bool] = Field(True, data_path=["ospf", "compatible"])
+    originate: Optional[bool] = Field(data_path=["ospf", "default-information"])
+    always: Optional[bool] = Field(data_path=["ospf", "default-information", "originate"])
+    metric: Optional[int] = Field(data_path=["ospf", "default-information", "originate"])
+    metric_type: Optional[MetricType] = Field(
+        alias="metric-type", data_path=["ospf", "default-information", "originate"]
+    )
+    external: Optional[int] = Field(DEFAULT_OSPF_EXTERNAL, data_path=["ospf", "distance"])
+    inter_area: Optional[int] = Field(DEFAULT_OSPF_INTER_AREA, data_path=["ospf", "distance"], alias="inter-area")
+    intra_area: Optional[int] = Field(DEFAULT_OSPF_INTRA_AREA, data_path=["ospf", "distance"], alias="intra-area")
+    delay: Optional[int] = Field(DEFAULT_OSPF_DELAY, data_path=["ospf", "timers", "spf"])
+    initial_hold: Optional[int] = Field(
+        DEFAULT_OSPF_INITIAL_HOLD, alias="initial-hold", data_path=["ospf", "timers", "spf"]
+    )
+    max_hold: Optional[int] = Field(DEFAULT_OSPF_MAX_HOLD, alias="max-hold", data_path=["ospf", "timers", "spf"])
     redistribute: Optional[List[Redistribute]] = Field(alias="redistribute", data_path=["ospf"])
     router_lsa: Optional[List[RouterLsa]] = Field(alias="router-lsa", data_path=["ospf", "max-metric"])
     route_policy: Optional[List[RoutePolicy]] = Field(alias="route-policy", data_path=["ospf"])

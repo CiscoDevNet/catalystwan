@@ -4,9 +4,10 @@ from typing import ClassVar, List, Optional
 from pydantic import BaseModel, Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
+from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
 
 
-class Server(BaseModel):
+class Server(ConvertBoolToStringModel):
     class Config:
         allow_population_by_field_name = True
 
@@ -26,7 +27,7 @@ class Authentication(BaseModel):
     md5: str
 
 
-class CiscoNTPModel(FeatureTemplate):
+class CiscoNTPModel(FeatureTemplate, ConvertBoolToStringModel):
     class Config:
         arbitrary_types_allowed = True
         allow_population_by_field_name = True

@@ -131,8 +131,9 @@ class FeatureTemplateField(BaseModel):
                     output["vipValue"] = value
             else:
                 if "default" in self.dataType:
-                    output["vipValue"] = self.dataType["default"] if value is None else value
-                    output["vipType"] = self.defaultOption.value
+                    return {}
+                    # output["vipValue"] = self.dataType["default"] if value is None else value
+                    # output["vipType"] = self.defaultOption.value
                 else:
                     output["vipValue"] = []
                     output["vipType"] = FeatureTemplateOptionType.IGNORE.value
