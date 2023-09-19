@@ -104,7 +104,6 @@ class ZoneBasedFWPolicyInfo(ZoneBasedFWPolicy, PolicyDefinitionInfo):
 class ConfigurationPolicyZoneBasedFirewallDefinitionBuilder(APIEndpoints):
     @post("/template/policy/definition/zonebasedfw")
     def create_policy_definition(self, payload: ZoneBasedFWPolicyCreationPayload) -> PolicyDefinitionId:
-        # POST /template/policy/definition/zonebasedfw
         ...
 
     @delete("/template/policy/definition/zonebasedfw/{id}")
