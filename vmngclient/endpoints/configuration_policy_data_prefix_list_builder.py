@@ -5,7 +5,7 @@ from typing import List
 from pydantic import BaseModel, Field, validator
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy_list import (
+from vmngclient.model.policy.policy_list import (
     InfoTag,
     PolicyList,
     PolicyListCreationPayload,
