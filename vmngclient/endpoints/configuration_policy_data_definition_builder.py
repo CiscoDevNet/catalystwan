@@ -1,14 +1,13 @@
 # mypy: disable-error-code="empty-body"
 from typing import List, Optional, Union
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 from typing_extensions import Annotated
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.model.policy.policy_definition import (
     AppListEntry,
-    DefaultAction,
-    DefaultActionType,
+    DefinitionSequence,
     DestinationDataIPv6PrefixListEntry,
     DestinationDataPrefixListEntry,
     DestinationIPEntry,
@@ -19,11 +18,11 @@ from vmngclient.model.policy.policy_definition import (
     DSCPEntry,
     PacketLengthEntry,
     PLPEntry,
-    PolicyDefinition,
-    PolicyDefinitionCreationPayload,
-    PolicyDefinitionEditPayload,
+    PolicyDefinitionBody,
     PolicyDefinitionEditResponse,
+    PolicyDefinitionHeader,
     PolicyDefinitionId,
+    PolicyDefinitionInfo,
     PolicyDefinitionPreview,
     ProtocolEntry,
     SourceDataIPv6PrefixListEntry,
@@ -60,30 +59,38 @@ DataPolicySequenceEntry = Annotated[
 ]
 
 
-class Data(BaseModel):
+class DataPolicySequence(DefinitionSequence):
     type: str = Field(default="data", const=True)
-    default_action: Optional[DefaultAction] = Field(
-        default=DefaultAction(type=DefaultActionType.DROP), alias="defaultAction"
-    )
-    is_activated_by_vsmart: Optional[bool] = Field(default=False, alias="isActivatedByVsmart")
-    sequences: List[DataPolicySequenceEntry] = []
+    entries: List[DataPolicySequenceEntry]
 
 
-class DataDefinitionCreationPayload(Data, PolicyDefinitionCreationPayload):
+class DataPolicy(PolicyDefinitionHeader):
+    type: str = Field(default="data", const=True)
+
+
+class DataPolicyDefinition(PolicyDefinitionBody):
+    sequences: List[DataPolicySequence] = []
+
+
+class DataPolicyCreationPayload(DataPolicy):
+    definition: Optional[DataPolicyDefinition] = None
+
+
+class DataPolicyGetResponse(DataPolicyCreationPayload, PolicyDefinitionId):
     pass
 
 
-class DataDefinitionEditPayload(Data, PolicyDefinitionEditPayload):
+class DataPolicyEditPayload(DataPolicyCreationPayload, PolicyDefinitionId):
     pass
 
 
-class DataDefinition(Data, PolicyDefinition):
+class DataPolicyInfo(DataPolicy, PolicyDefinitionInfo):
     pass
 
 
 class ConfigurationPolicyDataDefinitionBuilder(APIEndpoints):
     @post("/template/policy/definition/data")
-    def create_policy_definition(self, payload: DataDefinitionCreationPayload) -> PolicyDefinitionId:
+    def create_policy_definition(self, payload: DataPolicyCreationPayload) -> PolicyDefinitionId:
         ...
 
     @delete("/template/policy/definition/data/{id}")
@@ -95,19 +102,19 @@ class ConfigurationPolicyDataDefinitionBuilder(APIEndpoints):
         ...
 
     @put("/template/policy/definition/data/{id}")
-    def edit_policy_definition(self, id: str, payload: DataDefinitionEditPayload) -> PolicyDefinitionEditResponse:
+    def edit_policy_definition(self, id: str, payload: DataPolicyEditPayload) -> PolicyDefinitionEditResponse:
         ...
 
     @get("/template/policy/definition/data", "data")
-    def get_definitions(self) -> DataSequence[PolicyDefinition]:
+    def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
         ...
 
     @get("/template/policy/definition/data/{id}")
-    def get_policy_definition(self, id: str) -> DataDefinition:
+    def get_policy_definition(self, id: str) -> DataPolicyGetResponse:
         ...
 
     @post("/template/policy/definition/data/preview")
-    def preview_policy_definition(self, payload: DataDefinitionCreationPayload) -> PolicyDefinitionPreview:
+    def preview_policy_definition(self, payload: DataPolicyCreationPayload) -> PolicyDefinitionPreview:
         ...
 
     @get("/template/policy/definition/data/preview/{id}")
