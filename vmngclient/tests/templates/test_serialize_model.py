@@ -31,7 +31,9 @@ class TestFeatureTemplate2(TestCase):
         with open(Path(__file__).resolve().parents[0] / Path("schemas") / Path(template.type + ".json")) as f:
             schema = json.load(f)
 
-        with open(Path(__file__).resolve().parents[0] / Path("definitions") / Path(f"{template.name}.json")) as f:
+        with open(
+            Path(__file__).resolve().parents[0] / Path("definitions") / Path(f"{template.template_name}.json")
+        ) as f:
             definition = json.load(f)
 
         # Act
