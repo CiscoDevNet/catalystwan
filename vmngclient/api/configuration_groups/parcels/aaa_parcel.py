@@ -19,7 +19,7 @@ class User(Parcel):
 
 
 class RadiusServer(Parcel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="ignore")
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     address: str
     key: str

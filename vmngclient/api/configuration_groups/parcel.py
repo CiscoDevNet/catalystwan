@@ -7,7 +7,7 @@ T = TypeVar("T")
 
 
 class Parcel(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
 
 class OptionType(str, Enum):
@@ -17,7 +17,7 @@ class OptionType(str, Enum):
 
 
 class ParcelValue(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict()
 
     optionType: OptionType
 
