@@ -561,8 +561,8 @@ class TemplatesAPI:
             else:
                 # Iterate through every possible field, maybe refactor(?)
                 # Use data_path instead. data_path as tuple
-                # next(field_value.field_info.extra.get("vmanage_key") == field.key, template.__fields__.values())
-                for field_name, field_value in template.__fields__.items():
+                # next(field_value.field_info.extra.get("vmanage_key") == field.key, template.model_fields.values())
+                for field_name, field_value in template.model_fields.items():
                     if "vmanage_key" in field_value.field_info.extra:  # type: ignore
                         vmanage_key = field_value.field_info.extra.get("vmanage_key")  # type: ignore
                         if vmanage_key != field.key:

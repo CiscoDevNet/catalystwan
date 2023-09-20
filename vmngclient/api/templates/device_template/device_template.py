@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Final, List
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -14,8 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class GeneralTemplate(BaseModel):
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     name: str = ""
     subTemplates: List[GeneralTemplate] = []
@@ -55,7 +54,7 @@ class DeviceTemplate(BaseModel):
             undefined=DebugUndefined,
         )
         template = env.get_template(self.payload_path.name)
-        output = template.render(self.dict())
+        output = template.render(self.model_dump())
 
         ast = env.parse(output)
         if meta.find_undeclared_variables(ast):
@@ -63,7 +62,8 @@ class DeviceTemplate(BaseModel):
             raise Exception("There are undeclared variables.")
         return output
 
-    @validator("general_templates", pre=True)
+    @field_validator("general_templates", mode="before")
+    @classmethod
     def parse_templates(cls, value):
         output = []
         for template in value:
@@ -81,8 +81,7 @@ class DeviceTemplate(BaseModel):
         resp = session.get(f"dataservice/template/device/object/{device_template.id}").json()
         return DeviceTemplate(**resp)
 
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class DeviceSpecificValue(BaseModel):
