@@ -30,8 +30,7 @@ These steps will help you to automate feature template creation. We'll explain w
 
 	class OMPvSmart(FeatureTemplate):
 		class Config:
-			arbitrary_types_allowed = True
-			allow_population_by_field_name = True
+            model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 			
 			
 		payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
