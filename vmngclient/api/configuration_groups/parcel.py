@@ -1,17 +1,13 @@
 from enum import Enum
 from typing import Any, Generic, Optional, TypeVar
 
-from pydantic import BaseModel, Extra, Field
-from pydantic.generics import GenericModel
+from pydantic import BaseModel, ConfigDict, Field
 
 T = TypeVar("T")
 
 
 class Parcel(BaseModel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
-        extra = Extra.forbid
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
 
 class OptionType(str, Enum):
@@ -21,25 +17,24 @@ class OptionType(str, Enum):
 
 
 class ParcelValue(BaseModel):
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")
 
     optionType: OptionType
 
 
-class Global(GenericModel, Generic[T], ParcelValue):
+class Global(ParcelValue, Generic[T]):
     optionType: OptionType = OptionType.GLOBAL
     value: T
 
 
-class Variable(GenericModel, ParcelValue):
+class Variable(ParcelValue):
     optionType: OptionType = OptionType.VARIABLE
     value: str
 
 
-class Default(GenericModel, Generic[T], ParcelValue):
+class Default(ParcelValue, Generic[T]):
     optionType: OptionType = OptionType.DEFAULT
-    value: Any
+    value: Any = None
 
 
 class MainParcel(BaseModel):
@@ -47,6 +42,6 @@ class MainParcel(BaseModel):
     # F722 syntax error in forward annotation
     # https://github.com/pydantic/pydantic/issues/2872
     # https://github.com/pydantic/pydantic/issues/156
-    name: str = Field(regex=r'^[^&<>! "]+$', min_length=1, max_length=128)
-    description: Optional[str]
+    name: str = Field(pattern=r'^[^&<>! "]+$', min_length=1, max_length=128)
+    description: Optional[str] = None
     data: Parcel
