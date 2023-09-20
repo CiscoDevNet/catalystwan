@@ -21,15 +21,15 @@ class Tier(BaseModel):
     name: str = Field(alias="tierName")
     vpn: int
     rid: int = Field(alias="@rid")
-    ipv4_route_limit_type: Optional[str] = Field(alias="ipv4RouteLimitType")
-    ipv4_route_limit_threshold: Optional[int] = Field(alias="ipv4RouteLimitThreshold")
-    ipv4_route_limit: Optional[int] = Field(alias="ipv4RouteLimit")
-    ipv6_route_limit_type: Optional[str] = Field(alias="ipv6RouteLimitType")
-    ipv6_route_limit_threshold: Optional[int] = Field(alias="ipv6RouteLimitThreshold")
-    ipv6_route_limit: Optional[int] = Field(alias="ipv6RouteLimit")
+    ipv4_route_limit_type: Optional[str] = Field(None, alias="ipv4RouteLimitType")
+    ipv4_route_limit_threshold: Optional[int] = Field(None, alias="ipv4RouteLimitThreshold")
+    ipv4_route_limit: Optional[int] = Field(None, alias="ipv4RouteLimit")
+    ipv6_route_limit_type: Optional[str] = Field(None, alias="ipv6RouteLimitType")
+    ipv6_route_limit_threshold: Optional[int] = Field(None, alias="ipv6RouteLimitThreshold")
+    ipv6_route_limit: Optional[int] = Field(None, alias="ipv6RouteLimit")
     tlocs: List[TLOC] = Field(default=[])
     # New in 20.12 version
-    nat_session_limit: Optional[int] = Field(alias="natSessionLimit")
+    nat_session_limit: Optional[int] = Field(None, alias="natSessionLimit")
 
 
 class MonitoringDeviceDetails(APIEndpoints):

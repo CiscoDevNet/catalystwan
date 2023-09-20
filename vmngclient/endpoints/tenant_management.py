@@ -64,10 +64,10 @@ class TenantUpdateRequest(BaseModel):
     tenant_id: str = Field(alias="tenantId")
     subdomain: str = Field(alias="subDomain")
     desc: str
-    wan_edge_forecast: Optional[int] = Field(alias="wanEdgeForecast")
-    edge_connector_enable: Optional[bool] = Field(alias="edgeConnectorEnable")
-    edge_connector_system_ip: Optional[str] = Field(alias="edgeConnectorSystemIp")
-    edge_connector_tunnel_interface_name: Optional[str] = Field(alias="edgeConnectorTunnelInterfaceName")
+    wan_edge_forecast: Optional[int] = Field(None, alias="wanEdgeForecast")
+    edge_connector_enable: Optional[bool] = Field(None, alias="edgeConnectorEnable")
+    edge_connector_system_ip: Optional[str] = Field(None, alias="edgeConnectorSystemIp")
+    edge_connector_tunnel_interface_name: Optional[str] = Field(None, alias="edgeConnectorTunnelInterfaceName")
 
     @classmethod
     def from_tenant(cls, tenant: Tenant) -> "TenantUpdateRequest":
