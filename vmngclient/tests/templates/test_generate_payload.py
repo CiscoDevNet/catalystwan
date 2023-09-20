@@ -7,7 +7,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from parameterized import parameterized
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.api.template_api import TemplatesAPI
 from vmngclient.api.templates.feature_template import FeatureTemplate
@@ -15,9 +15,7 @@ from vmngclient.session import vManageSession
 
 
 class MockedFeatureTemplate(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     template_name: str = "test"
     template_description: str = "test"
@@ -28,9 +26,7 @@ class MockedFeatureTemplate(FeatureTemplate):
 
 
 class MockedFeatureTemplateAlias(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     template_name: str = "test"
     template_description: str = "test"
@@ -41,17 +37,14 @@ class MockedFeatureTemplateAlias(FeatureTemplate):
 
 
 class RSA(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     key: str = Field(alias="key-string")
     key_type: str = Field(alias="key-type")
 
 
 class User(BaseModel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     name: str
     password: str
@@ -59,9 +52,7 @@ class User(BaseModel):
 
 
 class MockedFeatureTemplateChildren(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     template_name: str = "test"
     template_description: str = "test"

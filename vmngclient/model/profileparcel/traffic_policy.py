@@ -9,7 +9,8 @@ from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
 from typing import List, Optional, Union
 
-from pydantic import BaseModel, Extra, Field, conint, constr
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+from typing_extensions import Annotated
 
 
 class Entries(BaseModel):
@@ -29,7 +30,7 @@ class Actions(BaseModel):
 
 
 class CgFpPpNameDef(BaseModel):
-    __root__: constr(regex=r'^[^&<>! "]+$', min_length=1, max_length=128)  # noqa: F722
+    __root__: Annotated[str, StringConstraints(pattern=r'^[^&<>! "]+$', min_length=1, max_length=128)]  # noqa: F722
 
 
 class GlobalOptionTypeDef(Enum):
@@ -37,7 +38,9 @@ class GlobalOptionTypeDef(Enum):
 
 
 class UuidDef(BaseModel):
-    __root__: constr(regex=r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")  # noqa: F722
+    __root__: Annotated[
+        str, StringConstraints(pattern=r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
+    ]  # noqa: F722
 
 
 class BooleanDef(BaseModel):
@@ -45,20 +48,25 @@ class BooleanDef(BaseModel):
 
 
 class Ipv4PrefixDef(BaseModel):
-    __root__: constr(
-        regex=r"(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\/)([0-2]?[0-9]$|[3]?[0-2])"  # noqa: F722, E501
-    )
+    __root__: Annotated[
+        str,
+        StringConstraints(
+            pattern=r"(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\/)([0-2]?[0-9]$|[3]?[0-2])"  # noqa: F722, E501
+        ),
+    ]
 
 
 class Ipv6PrefixDef(BaseModel):
-    __root__: constr(
-        regex=r"((^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*(\/)(\b([0-9]{1,2}|1[01][0-9]|12[0-8])\b)$))"  # noqa: F722, E501
-    )
+    __root__: Annotated[
+        str,
+        StringConstraints(
+            pattern=r"((^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*(\/)(\b([0-9]{1,2}|1[01][0-9]|12[0-8])\b)$))"  # noqa: F722, E501
+        ),
+    ]
 
 
 class OneOfMatchEntriesSourceIpv6OptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: Ipv6PrefixDef
@@ -94,7 +102,7 @@ class ColorDef(Enum):
 
 
 class Count(BaseModel):
-    __root__: constr(min_length=1, max_length=20)
+    __root__: Annotated[str, StringConstraints(min_length=1, max_length=20)]
 
 
 class DestinationRegion(Enum):
@@ -109,21 +117,19 @@ class Dns(Enum):
 
 
 class Ipv4AddressDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     __root__: IPv4Address
 
 
 class Ipv6AddressDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     __root__: IPv6Address
 
 
 class MatchEntriesDscpDef(BaseModel):
-    __root__: conint(ge=0, le=63)
+    __root__: Annotated[int, Field(ge=0, le=63)]
 
 
 class MatchEntriesIcmp6MessageDef(Enum):
@@ -247,11 +253,13 @@ class MatchEntriesTrafficClassOptionsDef(Enum):
 
 
 class NatPool(BaseModel):
-    __root__: conint(ge=1, le=31)
+    __root__: Annotated[int, Field(ge=1, le=31)]
 
 
 class ProtocolDef(BaseModel):
-    __root__: constr(regex=r"^(0|[1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$")  # noqa: F722, E501
+    __root__: Annotated[
+        str, StringConstraints(pattern=r"^(0|[1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$")
+    ]  # noqa: F722, E501
 
 
 class RedirectDn(Enum):
@@ -274,7 +282,7 @@ class SequencesBaseActionDef(Enum):
 
 
 class SequencesSequenceIdDef(BaseModel):
-    __root__: conint(ge=1, le=65536)
+    __root__: Annotated[int, Field(ge=1, le=65536)]
 
 
 class SequencesSequenceIpTypeDef(Enum):
@@ -304,10 +312,9 @@ class TrafficTo(Enum):
 
 
 class VpnDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
-    __root__: conint(ge=0, le=65530)
+    __root__: Annotated[int, Field(ge=0, le=65530)]
 
 
 class Encap(Enum):
@@ -316,35 +323,46 @@ class Encap(Enum):
 
 
 class EncapDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: Encap
 
 
 class PortNoDef(BaseModel):
-    __root__: constr(
-        regex=r"^(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"  # noqa: F722, E501
-    )
+    __root__: Annotated[
+        str,
+        StringConstraints(
+            pattern=r"^(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"  # noqa: F722, E501
+        ),
+    ]
 
 
 class PortRangeDef(BaseModel):
-    __root__: constr(
-        regex=r"^(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\-(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"  # noqa: F722, E501
-    )
+    __root__: Annotated[
+        str,
+        StringConstraints(
+            pattern=r"^(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\-(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"  # noqa: F722, E501
+        ),
+    ]
 
 
 class SequencesMatchEntriesPacketLengthDef(BaseModel):
-    __root__: constr(
-        regex=r"^(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"  # noqa: F722, E501
-    )
+    __root__: Annotated[
+        str,
+        StringConstraints(
+            pattern=r"^(0|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"  # noqa: F722, E501
+        ),
+    ]
 
 
 class SequencesMatchEntriesPacketLengthRangeDef(BaseModel):
-    __root__: constr(
-        regex=r"^([0-9]|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\-([1-9]|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"  # noqa: F722, E501
-    )
+    __root__: Annotated[
+        str,
+        StringConstraints(
+            pattern=r"^([0-9]|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\-([1-9]|[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"  # noqa: F722, E501
+        ),
+    ]
 
 
 class TypeDefinition(Enum):
@@ -359,23 +377,20 @@ class TypeDefinition(Enum):
 
 
 class RefId(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: UuidDef
 
 
 class ParcelReferenceDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     ref_id: RefId = Field(..., alias="refId")
 
 
 class BooleanDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: BooleanDef
@@ -386,40 +401,35 @@ class BooleanDefModel(BaseModel):
 
 
 class ColorMatchListDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
-    value: List[ColorDef] = Field(..., min_items=1, unique_items=True)
+    value: List[ColorDef] = Field(..., min_length=1, unique_items=True)
 
 
 class CountDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: Count
 
 
 class DestinationRegionDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: DestinationRegion
 
 
 class DnsDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: Dns
 
 
 class Ipv4PrefixDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: Ipv4PrefixDef
@@ -435,24 +445,21 @@ class UseVpn(BaseModel):
 
 
 class NatDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     use_vpn: UseVpn = Field(..., alias="useVpn")
     fallback: Optional[BooleanDefModel] = None
 
 
 class NatPoolDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: NatPool
 
 
 class OneOfMatchEntriesDestinationIpv6OptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: Ipv6PrefixDef
@@ -463,8 +470,7 @@ class OneOfMatchEntriesDestinationIpv6OptionsDef(BaseModel):
 
 
 class OneOfMatchEntriesDscpOptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: MatchEntriesDscpDef
@@ -475,11 +481,10 @@ class OneOfMatchEntriesDscpOptionsDef(BaseModel):
 
 
 class OneOfMatchEntriesIcmp6MessageOptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
-    value: List[MatchEntriesIcmp6MessageDef] = Field(..., min_items=1, unique_items=True)
+    value: List[MatchEntriesIcmp6MessageDef] = Field(..., min_length=1, unique_items=True)
 
 
 class OneOfMatchEntriesIcmp6MessageOptionsDef(BaseModel):
@@ -487,11 +492,10 @@ class OneOfMatchEntriesIcmp6MessageOptionsDef(BaseModel):
 
 
 class OneOfMatchEntriesIcmpMessageOptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
-    value: List[MatchEntriesIcmpMessageDef] = Field(..., min_items=1, unique_items=True)
+    value: List[MatchEntriesIcmpMessageDef] = Field(..., min_length=1, unique_items=True)
 
 
 class OneOfMatchEntriesIcmpMessageOptionsDef(BaseModel):
@@ -499,11 +503,10 @@ class OneOfMatchEntriesIcmpMessageOptionsDef(BaseModel):
 
 
 class OneOfMatchEntriesProtocolOptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
-    value: List[ProtocolDef] = Field(..., min_items=1, unique_items=True)
+    value: List[ProtocolDef] = Field(..., min_length=1, unique_items=True)
 
 
 class OneOfMatchEntriesProtocolOptionsDef(BaseModel):
@@ -511,8 +514,7 @@ class OneOfMatchEntriesProtocolOptionsDef(BaseModel):
 
 
 class OneOfMatchEntriesTcpOptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: MatchEntriesTcpDef
@@ -523,8 +525,7 @@ class OneOfMatchEntriesTcpOptionsDef(BaseModel):
 
 
 class OneOfMatchEntriesTrafficClassOptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: MatchEntriesTrafficClassOptionsDef
@@ -535,16 +536,14 @@ class OneOfMatchEntriesTrafficClassOptionsDef(BaseModel):
 
 
 class FieldModel(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: RedirectDnsTypes
 
 
 class Value(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: RedirectDns
@@ -556,8 +555,7 @@ class OneOfRedirectDnsDef(BaseModel):
 
 
 class OneOfSequencesBaseActionOptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: SequencesBaseActionDef
@@ -568,8 +566,7 @@ class OneOfSequencesBaseActionOptionsDef(BaseModel):
 
 
 class OneOfSequencesSequenceIdOptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: SequencesSequenceIdDef
@@ -580,8 +577,7 @@ class OneOfSequencesSequenceIdOptionsDef(BaseModel):
 
 
 class OneOfSequencesSequenceIpTypeOptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: SequencesSequenceIpTypeDef
@@ -592,8 +588,7 @@ class OneOfSequencesSequenceIpTypeOptionsDef(BaseModel):
 
 
 class OneOfSequencesSequenceNameOptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: SequencesSequenceNameDef
@@ -604,8 +599,7 @@ class OneOfSequencesSequenceNameOptionsDef(BaseModel):
 
 
 class OneOfTargetDirectionOptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: TargetDirectionDef
@@ -616,11 +610,10 @@ class OneOfTargetDirectionOptionsDef(BaseModel):
 
 
 class OneOfTargetVpnOptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
-    value: List[TargetVpnDef] = Field(..., min_items=1, unique_items=True)
+    value: List[TargetVpnDef] = Field(..., min_length=1, unique_items=True)
 
 
 class OneOfTargetVpnOptionsDef(BaseModel):
@@ -628,8 +621,7 @@ class OneOfTargetVpnOptionsDef(BaseModel):
 
 
 class SlaClassDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     sla_name: Optional[ParcelReferenceDef] = Field(None, alias="slaName")
     preferred_color: Optional[ColorMatchListDef] = Field(None, alias="preferredColor")
@@ -639,32 +631,28 @@ class SlaClassDef(BaseModel):
 
 
 class TrafficToDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: TrafficTo
 
 
 class EncapListDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
-    value: List[Encap] = Field(..., min_items=1, unique_items=True)
+    value: List[Encap] = Field(..., min_length=1, unique_items=True)
 
 
 class Ipv4AddressDefModel(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: Ipv4AddressDef
 
 
 class Ipv6AddressDefModel(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: Ipv6AddressDef
@@ -679,8 +667,7 @@ class PortValueDef(BaseModel):
 
 
 class TlocDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     color: ColorMatchListDef
     encap: EncapDef
@@ -688,16 +675,14 @@ class TlocDef(BaseModel):
 
 
 class TypeDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: TypeDefinition
 
 
 class VpnDefModel(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: VpnDef
@@ -708,19 +693,17 @@ class Restrict(BaseModel):
 
 
 class Target(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     vpn: Optional[OneOfTargetVpnOptionsDef] = Field(None, description="")
     direction: Optional[OneOfTargetDirectionOptionsDef] = Field(None, description="")
 
 
 class OneOfMatchEntriesDestinationPortOptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
-    value: List[PortValueDef] = Field(..., min_items=1)
+    value: List[PortValueDef] = Field(..., min_length=1)
 
 
 class OneOfMatchEntriesDestinationPortOptionsDef(BaseModel):
@@ -728,8 +711,7 @@ class OneOfMatchEntriesDestinationPortOptionsDef(BaseModel):
 
 
 class OneOfMatchEntriesPacketLengthOptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: OneOfSequencesMatchEntriesPacketLengthValueDef
@@ -740,11 +722,10 @@ class OneOfMatchEntriesPacketLengthOptionsDef(BaseModel):
 
 
 class OneOfMatchEntriesSourcePortOptionsDefItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
-    value: List[PortValueDef] = Field(..., min_items=1)
+    value: List[PortValueDef] = Field(..., min_length=1)
 
 
 class OneOfMatchEntriesSourcePortOptionsDef(BaseModel):
@@ -752,8 +733,7 @@ class OneOfMatchEntriesSourcePortOptionsDef(BaseModel):
 
 
 class ServiceItem(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     tloc: TlocDef
     vpn: VpnDefModel
@@ -761,8 +741,7 @@ class ServiceItem(BaseModel):
 
 
 class ServiceItem1(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     tloc_list: ParcelReferenceDef = Field(..., alias="tlocList")
     vpn: VpnDefModel
@@ -770,16 +749,14 @@ class ServiceItem1(BaseModel):
 
 
 class RestrictDef(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     option_type: GlobalOptionTypeDef = Field(..., alias="optionType")
     value: Restrict
 
 
 class Entry(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     app_list: Optional[ParcelReferenceDef] = Field(None, alias="appList", description="App list Reference")
     saas_app_list: Optional[ParcelReferenceDef] = Field(
@@ -850,15 +827,13 @@ class Entry(BaseModel):
 
 
 class Match(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     entries: Union[List[Entry], Entries] = Field(..., unique_items=True)
 
 
 class LocalTlocList(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     color: ColorMatchListDef
     restrict: Optional[RestrictDef] = None
@@ -866,8 +841,7 @@ class LocalTlocList(BaseModel):
 
 
 class SetProperties(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     dscp: Optional[OneOfMatchEntriesDscpOptionsDef] = None
     policer: Optional[ParcelReferenceDef] = None
@@ -884,8 +858,7 @@ class SetProperties(BaseModel):
 
 
 class Action(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     sla_class: Optional[Union[List[SlaClassDef], SlaClass]] = Field(None, alias="slaClass", description="slaClass")
     backup_sla_preferred_color: Optional[ColorMatchListDef] = Field(
@@ -904,8 +877,7 @@ class Action(BaseModel):
 
 
 class Sequence(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     sequence_id: Optional[OneOfSequencesSequenceIdOptionsDef] = Field(
         None, alias="sequenceId", description="Sequence Id"
@@ -924,8 +896,7 @@ class Sequence(BaseModel):
 
 
 class Data(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
     simple_flow: Optional[BooleanDefModel] = Field(None, alias="simpleFlow")
     target: Optional[Target] = Field(None, description="Target vpn and direction")
