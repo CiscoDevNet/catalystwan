@@ -19,7 +19,7 @@ class PolicyReference(BaseModel):
 
 class PolicyDefinitionCreationPayload(BaseModel):
     name: str = Field(
-        regex="^[a-zA-Z0-9_-]{1,128}$",
+        pattern="^[a-zA-Z0-9_-]{1,128}$",
         description="Can include only alpha-numeric characters, hyphen '-' or underscore '_'; maximum 128 characters",
     )
     description: str
