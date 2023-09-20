@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -14,11 +14,11 @@ class PolicyListId(BaseModel):
 
 class PolicyListCreationPayload(BaseModel):
     name: str = Field(
-        regex="^[a-zA-Z0-9_-]{1,32}$",
+        pattern="^[a-zA-Z0-9_-]{1,32}$",
         description="Can include only alpha-numeric characters, hyphen '-' or underscore '_'; maximum 32 characters",
     )
     description: Optional[str] = "Desc Not Required"
-    type: str
+    type: Any
     entries: List
 
 
