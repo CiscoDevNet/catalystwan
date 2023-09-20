@@ -204,7 +204,7 @@ class DefaultAction(BaseModel):
 
 
 class Data(BaseModel):
-    _type: Literal["data"] = Field(default="data", alias="type")
+    type: Literal["data"] = "data"
     default_action: Optional[DefaultAction] = Field(
         default=DefaultAction(type=DefaultActionType.DROP), alias="defaultAction"
     )

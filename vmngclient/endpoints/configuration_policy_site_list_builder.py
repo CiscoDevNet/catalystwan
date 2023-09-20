@@ -23,7 +23,7 @@ class SiteListEntry(BaseModel):
 
 class SitePayload(BaseModel):
     entries: List[SiteListEntry]
-    _type: Literal["site"] = Field(default="site", alias="type")
+    type: Literal["site"] = "site"
 
 
 class SiteListCreationPayload(SitePayload, PolicyListCreationPayload):
