@@ -15,7 +15,7 @@ class Protocol(Enum):
 class SecurityvSmart(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    protocol: Optional[Protocol] = Field(default=None, converter=Protocol)
+    protocol: Optional[Protocol] = Field(default=None)
     tls_port: Optional[int] = Field(default=None, alias="tls-port")
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "security-vsmart"

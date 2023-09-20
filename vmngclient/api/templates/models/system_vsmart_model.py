@@ -10,7 +10,7 @@ from vmngclient.utils.timezone import Timezone
 class SystemVsmart(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    timezone: Optional[Timezone] = Field(default=None, converter=Timezone)
+    timezone: Optional[Timezone] = Field(default=None)
     idle_timeout: Optional[int] = Field(default=None, alias="idle-timeout", ge=0, le=300)
     admin_tech_on_failure: Optional[bool] = Field(default=True, alias="admin-tech-on-failure")
     iptables_enable: Optional[bool] = Field(default=True, alias="iptables-enable")
