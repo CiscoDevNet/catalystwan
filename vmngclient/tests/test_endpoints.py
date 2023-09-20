@@ -698,6 +698,57 @@ class TestAPIEndpoints(unittest.TestCase):
                     )
                     self.session_mock.reset_mock()
 
+    def test_request_decorator_call_with_defaults_arguments(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            @request("GET", "/v2/{category}/items")
+            def get_data(
+                self,
+                payload: BaseModelExample = self.basemodel_payload,
+                category: str = "default-category",
+                params: ParamsExample = self.basemodel_params,
+            ) -> None:  # type: ignore [empty-body]
+                ...
+
+        api = TestAPI(self.session_mock)
+        # Act
+        api.get_data()
+        # Assert
+        self.session_mock.request.assert_called_once_with(
+            "GET",
+            self.base_path + "/v2/default-category/items",
+            data=self.json_payload,
+            headers={"content-type": "application/json"},
+            params=self.basemodel_params,
+        )
+
+    def test_request_decorator_call_with_defaults_arguments_override(self):
+        # Arrange
+        class TestAPI(APIEndpoints):
+            @request("GET", "/v2/{category}/items")
+            def get_data(
+                self,
+                payload: BaseModelExample = self.basemodel_payload,
+                category: str = "default",
+                params: ParamsExample = self.basemodel_params,
+            ) -> None:  # type: ignore [empty-body]
+                ...
+
+        api = TestAPI(self.session_mock)
+        # Act
+        payload_override = BaseModelExample(id="override-id", size=500, capacity=9.0001, active=False)
+        category_override = "override-category!"
+        params_override = ParamsExample(name="override-Name", color="override with orange!")
+        api.get_data(payload_override, category_override, params_override)
+        # Assert
+        self.session_mock.request.assert_called_once_with(
+            "GET",
+            self.base_path + f"/v2/{category_override}/items",
+            data=payload_override.json(),
+            headers={"content-type": "application/json"},
+            params=params_override,
+        )
+
     def test_decorator_chaining_order(self):
         # Expected @request can access original function signature (it will raise otherwise)
         class TestAPIMixedOrder1(APIEndpoints):

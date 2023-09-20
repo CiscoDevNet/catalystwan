@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 from vmngclient.api.task_status_api import Task
 from vmngclient.api.tenant_migration_api import ImportTask, TenantMigrationAPI
 from vmngclient.endpoints.tenant_migration import ImportInfo, MigrationInfo
-from vmngclient.model.tenant import Tenant
+from vmngclient.model.tenant import MigrationTenant, Tenant
 
 
 class TestTenantMigrationAPI(unittest.TestCase):
@@ -17,6 +17,17 @@ class TestTenantMigrationAPI(unittest.TestCase):
 
     def test_export_tenant(self):
         tenant = Tenant(desc="Test Tenant", name="test_tenant", subdomain="test_subdomain", org_name="test_org")
+        task = self.api.export_tenant(tenant=tenant)
+        self.assertIsInstance(task, Task)
+
+    def test_export_migration_tenant(self):
+        tenant = MigrationTenant(
+            desc="Test Tenant",
+            name="test_tenant",
+            subdomain="test_subdomain",
+            org_name="test_org",
+            is_destination_overlay_mt=False,
+        )
         task = self.api.export_tenant(tenant=tenant)
         self.assertIsInstance(task, Task)
 

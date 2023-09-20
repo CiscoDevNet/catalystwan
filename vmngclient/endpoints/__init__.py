@@ -519,7 +519,8 @@ class request(APIEndpointsDecorator):
         Returns: Dict[str, Any]: all passed args as keyword arguments (excluding "self")
         """
         all_args_names = [key for key in self.sig.parameters.keys()]
-        all_args_dict = dict(zip(all_args_names, positional_args))
+        all_args_dict = dict(self.defaults)
+        all_args_dict.update(dict(zip(all_args_names, positional_args)))
         all_args_dict.update(keyword_args)
         all_args_dict.pop("self", None)
         return all_args_dict
@@ -527,6 +528,9 @@ class request(APIEndpointsDecorator):
     def __call__(self, func):
         original_func = getattr(func, "_ofunc", func)  # grab original function
         self.sig = signature(original_func)
+        self.defaults = {
+            key: value.default for (key, value) in self.sig.parameters.items() if value.default is not _empty
+        }
         self.return_spec = self.specify_return_type()
         self.payload_spec = self.specify_payload_type()
         self.check_params()
