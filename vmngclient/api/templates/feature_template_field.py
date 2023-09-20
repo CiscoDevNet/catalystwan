@@ -93,6 +93,13 @@ class FeatureTemplateField(BaseModel):
 
         output["vipObjectType"] = self.objectType.value
 
+        def nest_value_in_output(value: Any) -> dict:
+            pointer = rel_output
+            for path in self.dataPath:
+                pointer = pointer[path]
+            pointer[self.key] = value
+            return rel_output
+
         if isinstance(value, DeviceVariable):
             vip_variable = VipVariable(
                 vipValue="",
@@ -100,8 +107,8 @@ class FeatureTemplateField(BaseModel):
                 vipObjectType=self.objectType,
                 vipVariableName=value.name,
             )
+            return nest_value_in_output(vip_variable.dict(by_alias=True, exclude_none=True))
 
-            return {self.key: vip_variable.dict(by_alias=True, exclude_none=True)}
         else:
             if value:
                 output["vipType"] = FeatureTemplateOptionType.CONSTANT.value
@@ -145,10 +152,4 @@ class FeatureTemplateField(BaseModel):
         if self.primaryKeys:
             output["vipPrimaryKey"] = self.primaryKeys
 
-        pointer = rel_output
-
-        for path in self.dataPath:
-            pointer = pointer[path]
-
-        pointer[self.key] = output
-        return rel_output
+        return nest_value_in_output(output)

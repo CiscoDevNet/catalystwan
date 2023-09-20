@@ -2,108 +2,16 @@
     "templateName": "iuo",
     "templateDescription": "zyx",
     "templateType": "cedge_aaa",
-    "deviceType": ["vedge-C8000V"],
+    "deviceType": [
+        "vedge-C8000V"
+    ],
     "factoryDefault": false,
     "templateMinVersion": "15.0.0",
     "templateDefinition": {
-        "authentication": {
-            "dot1x": {
-                "default": {
-                    "authentication_group": {
-                        "vipObjectType": "object",
-                        "vipType": "constant",
-                        "vipValue": "true"
-                    }
-                }
-            }
-        },
-        "accounting": {
-            "dot1x": {
-                "default": {
-                    "start-stop": {
-                        "accounting_group": {
-                            "vipObjectType": "object",
-                            "vipType": "constant",
-                            "vipValue": "false"
-                        }
-                    }
-                }
-            },
-            "accounting-rule": {
-                "vipObjectType": "tree",
-                "vipValue": [],
-                "vipType": "ignore",
-                "vipPrimaryKey": [
-                    "rule-id"
-                ]
-            }
-        },
-        "radius-dynamic-author": {
-            "radius-client": {
-                "vipObjectType": "tree",
-                "vipValue": [],
-                "vipType": "ignore",
-                "vipPrimaryKey": [
-                    "ip"
-                ]
-            },
-            "rda-server-key": {
-                "vipObjectType": "object",
-                "vipValue": [],
-                "vipType": "ignore"
-            },
-            "domain-stripping": {
-                "vipObjectType": "object",
-                "vipType": "constant",
-                "vipValue": "no"
-            },
-            "auth-type": {
-                "vipObjectType": "object",
-                "vipValue": "any",
-                "vipType": "ignore"
-            },
-            "port": {
-                "vipObjectType": "object",
-                "vipType": "constant",
-                "vipValue": 1700
-            }
-        },
-        "radius-trustsec": {
-            "cts-auth-list": {
-                "vipObjectType": "object",
-                "vipValue": [],
-                "vipType": "ignore"
-            },
-            "radius-trustsec-group": {
-                "vipObjectType": "object",
-                "vipValue": [],
-                "vipType": "ignore"
-            }
-        },
-        "authorization": {
-            "authorization-console": {
-                "vipObjectType": "object",
-                "vipValue": "false",
-                "vipType": "ignore"
-            },
-            "authorization-config-commands": {
-                "vipObjectType": "object",
-                "vipValue": "false",
-                "vipType": "ignore"
-            },
-            "authorization-rule": {
-                "vipObjectType": "tree",
-                "vipValue": [],
-                "vipType": "ignore",
-                "vipPrimaryKey": [
-                    "rule-id"
-                ]
-            }
-        },
         "server-auth-order": {
             "vipObjectType": "object",
-            "vipValue": "local",
-            "vipType": "constant"
+            "vipType": "constant",
+            "vipValue": "local"
         },
         "user": {
             "vipObjectType": "tree",
@@ -237,11 +145,6 @@
                                 "key-enum": {
                                     "vipObjectType": "object",
                                     "vipValue": [],
-                                    "vipType": "ignore"
-                                },
-                                "key-type": {
-                                    "vipObjectType": "object",
-                                    "vipValue": "key",
                                     "vipType": "ignore"
                                 }
                             }
