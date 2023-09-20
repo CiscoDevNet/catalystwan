@@ -10,8 +10,10 @@ from vmngclient.endpoints import APIEndpoints, get
 
 class VersionField(Version):
     @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
+    # TODO[pydantic]: Verify if that is working
+    # Check https://docs.pydantic.dev/latest/migration/#defining-custom-types
+    def __get_pydantic_core_schema__(cls) -> Version:
+        return cls.validate
 
     @classmethod
     def validate(cls, value):
@@ -19,42 +21,42 @@ class VersionField(Version):
 
 
 class ServerInfo(BaseModel):
-    server: Optional[str]
-    tenancy_mode: Optional[str] = Field(alias="tenancyMode")
-    user_mode: Optional[str] = Field(alias="userMode")
-    vsession_id: Optional[str] = Field(alias="VSessionId")
-    is_saml_user: Optional[bool] = Field(alias="isSamlUser")
-    is_rbac_vpn_user: Optional[bool] = Field(alias="isRbacVpnUser")
+    server: Optional[str] = None
+    tenancy_mode: Optional[str] = Field(None, alias="tenancyMode")
+    user_mode: Optional[str] = Field(None, alias="userMode")
+    vsession_id: Optional[str] = Field(None, alias="VSessionId")
+    is_saml_user: Optional[bool] = Field(None, alias="isSamlUser")
+    is_rbac_vpn_user: Optional[bool] = Field(None, alias="isRbacVpnUser")
     vpns: List[Any] = []
-    csrf_token: Optional[str] = Field(alias="CSRFToken")
-    provider_domain: Optional[str] = Field(alias="providerDomain")
-    tenant_id: Optional[str] = Field(alias="tenantId")
-    provider_id: Optional[str] = Field(alias="providerId")
-    view_mode: Optional[str] = Field(alias="viewMode")
+    csrf_token: Optional[str] = Field(None, alias="CSRFToken")
+    provider_domain: Optional[str] = Field(None, alias="providerDomain")
+    tenant_id: Optional[str] = Field(None, alias="tenantId")
+    provider_id: Optional[str] = Field(None, alias="providerId")
+    view_mode: Optional[str] = Field(None, alias="viewMode")
     capabilities: List[str] = []
-    user: Optional[str]
-    description: Optional[str]
-    locale: Optional[str]
+    user: Optional[str] = None
+    description: Optional[str] = None
+    locale: Optional[str] = None
     roles: List[str] = []
-    external_user: Optional[bool] = Field(alias="externalUser")
+    external_user: Optional[bool] = Field(None, alias="externalUser")
     platform_version: str = Field(default="", alias="platformVersion")
-    general_template: Optional[bool] = Field(alias="generalTemplate")
-    disable_full_config_push: Optional[bool] = Field(alias="disableFullConfigPush")
-    enable_server_events: Optional[bool] = Field(alias="enableServerEvents")
-    cloudx: Optional[str]
-    reverseproxy: Optional[str]
-    vmanage_mode: Optional[str] = Field(alias="vmanageMode")
+    general_template: Optional[bool] = Field(None, alias="generalTemplate")
+    disable_full_config_push: Optional[bool] = Field(None, alias="disableFullConfigPush")
+    enable_server_events: Optional[bool] = Field(None, alias="enableServerEvents")
+    cloudx: Optional[str] = None
+    reverseproxy: Optional[str] = None
+    vmanage_mode: Optional[str] = Field(None, alias="vmanageMode")
 
 
 class AboutInfo(BaseModel):
-    title: Optional[str]
+    title: Optional[str] = None
     version: str = Field(default="")
-    application_version: Optional[str] = Field(alias="applicationVersion")
-    application_server: Optional[str] = Field(alias="applicationServer")
-    copyright: Optional[str]
-    time: Optional[datetime]
-    time_zone: Optional[str] = Field(alias="timeZone")
-    logo: Optional[str]
+    application_version: Optional[str] = Field(None, alias="applicationVersion")
+    application_server: Optional[str] = Field(None, alias="applicationServer")
+    copyright: Optional[str] = None
+    time: Optional[datetime] = None
+    time_zone: Optional[str] = Field(None, alias="timeZone")
+    logo: Optional[str] = None
 
 
 class ServerReady(BaseModel):
