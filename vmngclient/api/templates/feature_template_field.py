@@ -24,10 +24,6 @@ class FeatureTemplateObjectType(str, Enum):
 
 
 class VipVariable(BaseModel):
-    # class Config:
-    #     arbitrary_types_allowed = True
-    #     allow_population_by_field_name = True
-
     value: Any = Field(None, alias="vipValue")
     type: FeatureTemplateOptionType = Field(alias="vipType")
     object_type: FeatureTemplateObjectType = Field(alias="vipObjectType")

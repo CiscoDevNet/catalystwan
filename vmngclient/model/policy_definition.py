@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -23,7 +23,7 @@ class PolicyDefinitionCreationPayload(BaseModel):
         description="Can include only alpha-numeric characters, hyphen '-' or underscore '_'; maximum 128 characters",
     )
     description: str
-    type: str
+    type: Any
 
 
 class PolicyDefinitionEditPayload(PolicyDefinitionCreationPayload, PolicyDefinitionId):
