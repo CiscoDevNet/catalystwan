@@ -1,11 +1,11 @@
 import ipaddress
 from typing import Any
 
-from pydantic import BaseModel, root_validator
+from pydantic import BaseModel, model_validator
 
 
 class ConvertBoolToStringModel(BaseModel):
-    @root_validator  # type: ignore
+    @model_validator  # type: ignore
     def convert_bool_to_string_validator(cls, values):
         for key, value in values.items():
             if isinstance(value, bool):
@@ -14,7 +14,7 @@ class ConvertBoolToStringModel(BaseModel):
 
 
 class ConvertIPToStringModel(BaseModel):
-    @root_validator  # type: ignore
+    @model_validator  # type: ignore
     def convert_ip_to_string_validator(cls, values):
         for key, value in values.items():
             values[key] = convert_ip_to_string(value)
