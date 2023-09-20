@@ -1,8 +1,8 @@
 # mypy: disable-error-code="empty-body"
 from ipaddress import IPv4Network
-from typing import List
+from typing import List, Literal
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.model.policy_list import (
@@ -17,12 +17,12 @@ from vmngclient.typed_list import DataSequence
 
 
 class DataPrefixListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     ip_prefix: str = Field(alias="ipPrefix", description="IP4 network prefixes separated by comma")
 
-    @validator("ip_prefix")
+    @field_validator("ip_prefix")
+    @classmethod
     def check_network_prefixes(cls, ip_prefix: str):
         nets = [IPv4Network(net.strip()) for net in ip_prefix.split(",")]
         if len(nets) < 1:
@@ -32,7 +32,7 @@ class DataPrefixListEntry(BaseModel):
 
 class DataPrefixPayload(BaseModel):
     entries: List[DataPrefixListEntry]
-    type: str = Field(default="dataPrefix", const=True)
+    type: Literal["dataPrefix"] = "dataPrefix"
 
 
 class DataPrefixListCreationPayload(DataPrefixPayload, PolicyListCreationPayload):

@@ -1,7 +1,7 @@
 # mypy: disable-error-code="empty-body"
-from typing import List
+from typing import List, Literal
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.model.policy_list import (
@@ -16,12 +16,12 @@ from vmngclient.typed_list import DataSequence
 
 
 class VPNListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     vpn: str = Field(alias="vpn", description="0-65530 range or single number")
 
-    @validator("vpn")
+    @field_validator("vpn")
+    @classmethod
     def check_vpn_range(cls, vpns_str: str):
         vpns = [int(vpn) for vpn in vpns_str.split("-")]
         if len(vpns) > 2:
@@ -36,7 +36,7 @@ class VPNListEntry(BaseModel):
 
 class VPNPayload(BaseModel):
     entries: List[VPNListEntry]
-    type: str = Field(default="vpn", const=True)
+    type: Literal["vpn"] = "vpn"
 
 
 class VPNListCreationPayload(VPNPayload, PolicyListCreationPayload):

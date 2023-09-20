@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 from vmngclient.api.templates.device_variable import DeviceVariable
 
@@ -28,7 +28,7 @@ class VipVariable(BaseModel):
     #     arbitrary_types_allowed = True
     #     allow_population_by_field_name = True
 
-    value: Any = Field(alias="vipValue")
+    value: Any = Field(None, alias="vipValue")
     type: FeatureTemplateOptionType = Field(alias="vipType")
     object_type: FeatureTemplateObjectType = Field(alias="vipObjectType")
     device_specific_name: Optional[str] = Field(default=None, alias="vipVariableName")
@@ -70,7 +70,8 @@ class FeatureTemplateField(BaseModel):
     primaryKeys: List[str] = []
     children: List[FeatureTemplateField] = []
 
-    @validator("dataType", pre=True)
+    @field_validator("dataType", mode="before")
+    @classmethod
     def convert_data_type_to_dict(cls, value):
         if isinstance(value, str):
             return {"type": value}

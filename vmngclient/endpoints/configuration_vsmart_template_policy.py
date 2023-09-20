@@ -1,7 +1,7 @@
 # mypy: disable-error-code="empty-body"
-from typing import List, Optional
+from typing import List, Literal, Optional
 
-from pydantic import BaseModel, Field, IPvAnyAddress, validator
+from pydantic import BaseModel, Field, IPvAnyAddress, field_validator
 
 from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, put
 from vmngclient.model.policy import (
@@ -16,7 +16,7 @@ from vmngclient.typed_list import DataSequence
 
 
 class Entry(BaseModel):
-    site_lists: Optional[List[str]] = Field(alias="siteLists")
+    site_lists: Optional[List[str]] = Field(None, alias="siteLists")
     vpn_lists: Optional[List[str]] = Field(None, alias="vpnLists")
     direction: Optional[str] = None
 
@@ -33,7 +33,8 @@ class VSmartPolicyDefinition(PolicyDefinition):
 class VSmartTemplate(PolicyCreationPayload):
     policy_definition: VSmartPolicyDefinition = Field(alias="policyDefinition")
 
-    @validator("policy_definition", pre=True)
+    @field_validator("policy_definition", mode="before")
+    @classmethod
     def try_parse(cls, policy_definition):
         # this is needed because GET /template/policy/vsmart contains string in policyDefinition field
         # while POST /template/policy/vsmart requires a regular object
@@ -61,7 +62,7 @@ class VSmartConnectivityStatus(BaseModel):
 
 
 class AutoConfirm(BaseModel):
-    confirm: str = Field(default="true", const=True)
+    confirm: Literal["true"] = "true"
 
 
 class ActivateDeactivateTaskId(BaseModel):
