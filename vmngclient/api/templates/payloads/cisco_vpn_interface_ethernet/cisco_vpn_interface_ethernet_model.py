@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import ClassVar, Optional
 
 from attr import define  # type: ignore
+from pydantic import ConfigDict
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 
@@ -97,12 +98,10 @@ class CiscoVpnInterfaceEthernetModel(FeatureTemplate):
     type: ClassVar[str] = "cisco_vpn_interface"  # Cisco VPN Interface Ethernet
     payload_path: ClassVar[Path] = Path(__file__).parent / "feature/cisco_vpn_interface_ethernet.json.j2"
     interface_name: InterfaceName
-    shutdown: Optional[bool]
+    shutdown: Optional[bool] = None
     type_address: TypeAddress = TypeAddress.STATIC
-    ip: Optional[str]
-    tunnel: Optional[Tunnel]
-    mtu: Optional[int]
-    autonegotiate: Optional[bool]
-
-    class Config:
-        arbitrary_types_allowed = True
+    ip: Optional[str] = None
+    tunnel: Optional[Tunnel] = None
+    mtu: Optional[int] = None
+    autonegotiate: Optional[bool] = None
+    model_config = ConfigDict(arbitrary_types_allowed=True)

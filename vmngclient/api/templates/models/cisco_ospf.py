@@ -3,7 +3,7 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
@@ -37,11 +37,9 @@ class Protocol(str, Enum):
 
 class Redistribute(ConvertBoolToStringModel):
     protocol: Protocol
-    route_policy: Optional[str] = Field(alias="route-policy")
+    route_policy: Optional[str] = Field(None, alias="route-policy")
     dia: Optional[bool] = True
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class AdType(str, Enum):
@@ -52,9 +50,7 @@ class AdType(str, Enum):
 class RouterLsa(ConvertBoolToStringModel):
     ad_type: AdType = Field(alias="ad-type")
     time: int
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Direction(str, Enum):
@@ -64,9 +60,7 @@ class Direction(str, Enum):
 class RoutePolicy(ConvertBoolToStringModel):
     direction: Direction
     pol_name: str = Field(alias="pol-name")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Network(str, Enum):
@@ -87,42 +81,34 @@ class Interface(ConvertBoolToStringModel):
     hello_interval: Optional[int] = Field(DEFAULT_OSPF_DEAD_INTERVAL, alias="hello-interval")
     dead_interval: Optional[int] = Field(DEFAULT_OSPF_DEAD_INTERVAL, alias="dead-interval")
     retransmit_interval: Optional[int] = Field(DEFAULT_OSPF_RETRANSMIT_INTERVAL, alias="retransmit-interval")
-    cost: Optional[int]
+    cost: Optional[int] = None
     priority: Optional[int] = DEFAULT_OSPF_INTERFACE_PRIORITY
     network: Optional[Network] = Network.BROADCAST
     passive_interface: Optional[bool] = Field(False, alias="passive-interface")
-    type: Optional[Type]
-    message_digest_key: Optional[int] = Field(alias="message-digest-key")
-    md5: Optional[str]
-
-    class Config:
-        allow_population_by_field_name = True
+    type: Optional[Type] = None
+    message_digest_key: Optional[int] = Field(None, alias="message-digest-key")
+    md5: Optional[str] = None
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Range(ConvertBoolToStringModel):
     address: ipaddress.IPv4Interface
-    cost: Optional[int]
+    cost: Optional[int] = None
     no_advertise: Optional[bool] = Field(False, alias="no-advertise")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Area(ConvertBoolToStringModel):
     a_num: int = Field(alias="a-num")
-    stub_no_summary: Optional[bool] = Field(vmanage_key="no-summary", data_path=["stub", "no_summary"])
-    nssa_no_summary: Optional[bool] = Field(vmanage_key="no-summary")
-    interface: Optional[List[Interface]]
-    range: Optional[List[Range]]
-
-    class Config:
-        allow_population_by_field_name = True
+    stub_no_summary: Optional[bool] = Field(None, vmanage_key="no-summary", data_path=["stub", "no_summary"])
+    nssa_no_summary: Optional[bool] = Field(None, vmanage_key="no-summary")
+    interface: Optional[List[Interface]] = None
+    range: Optional[List[Range]] = None
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class CiscoOSPFModel(FeatureTemplate, ConvertBoolToStringModel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     router_id: Optional[ipaddress.IPv4Address] = Field(alias="router-id")
     reference_bandwidth: Optional[int] = Field(DEFAULT_OSPF_REFERENCE_BANDWIDTH, alias="reference-bandwidth")

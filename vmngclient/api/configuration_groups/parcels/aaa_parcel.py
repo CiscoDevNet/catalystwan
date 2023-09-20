@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List, Optional, Union
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
 from vmngclient.api.configuration_groups.parcel import Default, Global, Parcel
 
@@ -19,10 +19,7 @@ class User(Parcel):
 
 
 class RadiusServer(Parcel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
-        extra = "ignore"
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="ignore")
 
     address: str
     key: str
@@ -34,9 +31,7 @@ class RadiusServer(Parcel):
 
 
 class Radius(Parcel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     groupName: str = Field(alias="group_name")
     vpn: int = 0
@@ -59,4 +54,4 @@ class AAAParcel(Parcel):
     authorization_config_commands: Union[Global[bool], Default[bool]] = Field(
         default=Default(value=False), alias="authorizationConfigCommands"
     )
-    radius: Optional[List[Radius]]
+    radius: Optional[List[Radius]] = None

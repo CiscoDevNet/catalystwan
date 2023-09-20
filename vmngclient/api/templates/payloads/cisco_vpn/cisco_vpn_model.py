@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, List, Optional
 
 from attr import define, field  # type: ignore
-from pydantic import validator
+from pydantic import ConfigDict, validator
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.api.templates.payloads.aaa.aaa_model import VpnType
@@ -60,14 +60,16 @@ class IPv6Route:
 class CiscoVPNModel(FeatureTemplate):
     type: ClassVar[str] = "cisco_vpn"  # Cisco VPN
     payload_path: ClassVar[Path] = Path(__file__).parent / "feature/cisco_vpn.json.j2"
-    tenant_vpn: Optional[int]
-    tenant_org_name: Optional[str]
+    tenant_vpn: Optional[int] = None
+    tenant_org_name: Optional[str] = None
     vpn_id: int
     dns: Optional[DNS] = None
     mapping: List[Mapping] = []
     ipv4route: List[IPv4Route] = []
     ipv6route: List[IPv6Route] = []
 
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
     @validator("vpn_id")
     def check_id(cls, v, values):
         if v not in [VpnType.VPN_TRANSPORT.value, VpnType.VPN_MANAGMENT.value]:
@@ -87,5 +89,4 @@ class CiscoVPNModel(FeatureTemplate):
             self.generate_vpn_id(session=session)
         return super().generate_payload(session)
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)

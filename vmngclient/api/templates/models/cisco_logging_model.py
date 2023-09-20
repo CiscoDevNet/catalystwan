@@ -2,7 +2,7 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
@@ -25,10 +25,8 @@ class TlsProfile(ConvertBoolToStringModel):
     profile: str
     version: Optional[Version] = Version.TLSV11
     auth_type: AuthType = Field(alias="auth-type")
-    ciphersuite_list: Optional[List] = Field(alias="ciphersuite-list")
-
-    class Config:
-        allow_population_by_field_name = True
+    ciphersuite_list: Optional[List] = Field(None, alias="ciphersuite-list")
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Priority(str, Enum):
@@ -44,34 +42,28 @@ class Priority(str, Enum):
 
 class Server(ConvertBoolToStringModel):
     name: str
-    vpn: Optional[int]
-    source_interface: Optional[str] = Field(alias="source-interface")
+    vpn: Optional[int] = None
+    source_interface: Optional[str] = Field(None, alias="source-interface")
     priority: Optional[Priority] = Priority.INFORMATION
     enable_tls: Optional[bool] = Field(False, alias="enable-tls")
     custom_profile: Optional[bool] = Field(False, alias="custom-profile")
-    profile: Optional[str]
-
-    class Config:
-        allow_population_by_field_name = True
+    profile: Optional[str] = None
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Ipv6Server(ConvertBoolToStringModel):
     name: str
-    vpn: Optional[int]
-    source_interface: Optional[str] = Field(alias="source-interface")
+    vpn: Optional[int] = None
+    source_interface: Optional[str] = Field(None, alias="source-interface")
     priority: Optional[Priority] = Priority.INFORMATION
     enable_tls: Optional[bool] = Field(False, alias="enable-tls")
     custom_profile: Optional[bool] = Field(False, alias="custom-profile")
-    profile: Optional[str]
-
-    class Config:
-        allow_population_by_field_name = True
+    profile: Optional[str] = None
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class CiscoLoggingModel(FeatureTemplate, ConvertBoolToStringModel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     enable: Optional[bool] = True
     size: Optional[int] = DEFAULT_LOGGING_SIZE

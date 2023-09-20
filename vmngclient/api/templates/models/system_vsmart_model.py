@@ -1,16 +1,14 @@
 from pathlib import Path
 from typing import ClassVar, Optional
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.utils.timezone import Timezone
 
 
 class SystemVsmart(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     timezone: Optional[Timezone] = Field(default=None, converter=Timezone)
     idle_timeout: Optional[int] = Field(default=None, alias="idle-timeout", ge=0, le=300)

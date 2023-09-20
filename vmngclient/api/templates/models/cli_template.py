@@ -1,13 +1,13 @@
 from pathlib import Path
 from typing import ClassVar
 
+from pydantic import ConfigDict
+
 from vmngclient.api.templates.feature_template import FeatureTemplate
 
 
 class CliTemplateModel(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     config: str
 

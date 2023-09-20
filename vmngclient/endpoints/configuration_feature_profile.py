@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.api.configuration_groups.parcel import MainParcel
 from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, put, versions
@@ -21,8 +21,7 @@ class SchemaType(str, Enum):
 
 
 class SchemaTypeQuery(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     schema_type: SchemaType = Field(alias="schemaType")
 
@@ -53,8 +52,8 @@ class ParcelId(BaseModel):
 
 
 class GetFeatureProfilesPayload(BaseModel):
-    limit: Optional[int]
-    offset: Optional[int]
+    limit: Optional[int] = None
+    offset: Optional[int] = None
 
 
 class ConfigurationFeatureProfile(APIEndpoints):

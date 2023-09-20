@@ -22,14 +22,14 @@ class ConfigGroupCreationPayload(BaseModel):
     name: str
     description: str
     solution: Solution
-    profiles: Optional[List[ProfileId]]
+    profiles: Optional[List[ProfileId]] = None
 
 
 class ConfigGroupEditPayload(BaseModel):
     name: str
     description: str
     solution: Solution
-    profiles: Optional[List[ProfileId]]
+    profiles: Optional[List[ProfileId]] = None
 
 
 class ConfigGroupCreationResponse(BaseModel):

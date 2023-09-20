@@ -10,11 +10,11 @@ from vmngclient.typed_list import DataSequence
 
 class User(BaseModel):
     username: str = Field(alias="userName")
-    password: Optional[str]
+    password: Optional[str] = None
     group: List[str]
-    locale: Optional[str]
-    description: Optional[str]
-    resource_group: Optional[str] = Field(alias="resGroupName")
+    locale: Optional[str] = None
+    description: Optional[str] = None
+    resource_group: Optional[str] = Field(None, alias="resGroupName")
 
 
 class UserUpdateRequest(BaseModel):
@@ -22,12 +22,12 @@ class UserUpdateRequest(BaseModel):
     current_password: bool = Field(alias="currentPassword", default=False)
     show_password: bool = Field(alias="showPassword", default=False)
     show_confirm_password: bool = Field(alias="showConfirmPassword", default=False)
-    current_user_password: Optional[str] = Field(alias="currentUserPassword")
-    password: Optional[str]
-    group: Optional[List[str]]
-    locale: Optional[str]
-    description: Optional[str]
-    resource_group: Optional[str] = Field(alias="resGroupName")
+    current_user_password: Optional[str] = Field(None, alias="currentUserPassword")
+    password: Optional[str] = None
+    group: Optional[List[str]] = None
+    locale: Optional[str] = None
+    description: Optional[str] = None
+    resource_group: Optional[str] = Field(None, alias="resGroupName")
 
 
 class UserRole(BaseModel):
@@ -88,18 +88,18 @@ class UserResetRequest(BaseModel):
 
 class ActiveSession(BaseModel):
     uuid: str
-    source_ip: Optional[str] = Field(alias="sourceIp")
-    remote_host: Optional[str] = Field(alias="remoteHost")
-    raw_username: Optional[str] = Field(alias="rawUserName")
-    raw_id: Optional[str] = Field(alias="rawId")
-    tenant_domain: Optional[str] = Field(alias="tenantDomain")
+    source_ip: Optional[str] = Field(None, alias="sourceIp")
+    remote_host: Optional[str] = Field(None, alias="remoteHost")
+    raw_username: Optional[str] = Field(None, alias="rawUserName")
+    raw_id: Optional[str] = Field(None, alias="rawId")
+    tenant_domain: Optional[str] = Field(None, alias="tenantDomain")
     user_group: Optional[str] = Field(
-        alias="userGroup"
+        None, alias="userGroup"
     )  # workaround: should be List[str] but JSON array is quoted in response
-    user_mode: Optional[str] = Field(alias="userMode")
-    create_date_time: Optional[datetime] = Field(alias="createDateTime")
-    tenant_id: Optional[str] = Field(alias="tenantId")
-    last_accessed_time: Optional[datetime] = Field(alias="lastAccessedTime")
+    user_mode: Optional[str] = Field(None, alias="userMode")
+    create_date_time: Optional[datetime] = Field(None, alias="createDateTime")
+    tenant_id: Optional[str] = Field(None, alias="tenantId")
+    last_accessed_time: Optional[datetime] = Field(None, alias="lastAccessedTime")
 
 
 class SessionsDeleteRequest(BaseModel):
@@ -116,7 +116,7 @@ class SessionsDeleteRequest(BaseModel):
 
 
 class InvalidateSessionMessage(BaseModel):
-    message: Optional[str]
+    message: Optional[str] = None
 
 
 class ProfilePasswordUpdateRequest(BaseModel):
@@ -125,13 +125,13 @@ class ProfilePasswordUpdateRequest(BaseModel):
 
 
 class ResourceGroup(BaseModel):
-    id: Optional[str]
+    id: Optional[str] = None
     name: str
     desc: str
     site_ids: List[int] = Field(alias="siteIds")
-    device_ips: Optional[List[str]] = Field(alias="deviceIPs")
-    mgmt_sytem_ips_map: Optional[Dict[str, str]] = Field(alias="mgmtSytemIpsMap")
-    uuid_sytem_ips_map: Optional[Dict[str, str]] = Field(alias="uuidSytemIpsMap")
+    device_ips: Optional[List[str]] = Field(None, alias="deviceIPs")
+    mgmt_sytem_ips_map: Optional[Dict[str, str]] = Field(None, alias="mgmtSytemIpsMap")
+    uuid_sytem_ips_map: Optional[Dict[str, str]] = Field(None, alias="uuidSytemIpsMap")
 
 
 class ResourceGroupUpdateRequest(BaseModel):

@@ -2,7 +2,7 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
@@ -65,9 +65,7 @@ class SiteTypes(str, Enum):
 
 
 class CiscoOMPModel(FeatureTemplate, ConvertBoolToStringModel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     graceful_restart: Optional[bool] = Field(True, alias="graceful-restart")
     overlay_as: Optional[int] = Field(alias="overlay-as")

@@ -2,7 +2,7 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
@@ -45,15 +45,11 @@ class Color(ConvertBoolToStringModel):
     multiplier: Optional[int] = DEFAULT_BFD_COLOR_MULTIPLIER
     pmtu_discovery: Optional[bool] = Field(True, alias="pmtu-discovery")
     dscp: Optional[int] = DEFAULT_BFD_DSCP
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class CiscoBFDModel(FeatureTemplate, ConvertBoolToStringModel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     multiplier: Optional[int] = DEFAULT_BFD_MULTIPLIER
     poll_interval: Optional[int] = Field(DEFAULT_BFD_POLL_INTERVAL, alias="poll-interval")

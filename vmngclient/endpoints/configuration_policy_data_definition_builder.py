@@ -1,9 +1,9 @@
 # mypy: disable-error-code="empty-body"
 from enum import Enum
-from typing import Any, List, Optional, Union
+from typing import Any, List, Literal, Optional, Union
 
 from pydantic import BaseModel, Field, IPvAnyNetwork
-from typing_extensions import Annotated, Literal
+from typing_extensions import Annotated
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.model.policy_definition import (
@@ -204,7 +204,7 @@ class DefaultAction(BaseModel):
 
 
 class Data(BaseModel):
-    type: str = Field(default="data", const=True)
+    _type: Literal["data"] = Field(default="data", alias="type")
     default_action: Optional[DefaultAction] = Field(
         default=DefaultAction(type=DefaultActionType.DROP), alias="defaultAction"
     )

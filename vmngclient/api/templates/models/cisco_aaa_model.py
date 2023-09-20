@@ -2,7 +2,7 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 
@@ -11,13 +11,12 @@ class User(BaseModel):
     name: str
     password: str
     secret: str
-    privilege: Optional[str]
+    privilege: Optional[str] = None
     pubkey_chain: List[str] = Field(default=[], alias="pubkey-chain")
 
 
 class RadiusServer(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     address: str
     auth_port: int = Field(alias="auth-port", default=1812)
@@ -31,9 +30,7 @@ class RadiusServer(BaseModel):
 
 
 class RadiusGroup(BaseModel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     group_name: str = Field(alias="group-name")
     vpn: Optional[int]
@@ -48,8 +45,7 @@ class DomainStripping(str, Enum):
 
 
 class TacacsServer(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     address: str
     port: int = 49
@@ -60,8 +56,7 @@ class TacacsServer(BaseModel):
 
 
 class TacacsGroup(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     group_name: str = Field(alias="group-name")
     vpn: int = 0
@@ -70,9 +65,7 @@ class TacacsGroup(BaseModel):
 
 
 class CiscoAAAModel(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     user: List[User] = []
     authentication_group: bool = Field(alias="authentication_group", default=False)

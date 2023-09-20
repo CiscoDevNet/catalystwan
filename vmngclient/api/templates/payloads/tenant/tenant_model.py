@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.endpoints.monitoring_device_details import Tier as TierInfo
@@ -18,13 +18,12 @@ class Tenant(BaseModel):
 
     organization_name: str
     tier_name: str
-    tenant_info: Optional[TenantInfo]
-    tier_info: Optional[TierInfo]
+    tenant_info: Optional[TenantInfo] = None
+    tier_info: Optional[TierInfo] = None
 
 
 class TenantModel(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     type: ClassVar[str] = "tenant"  # Tenant
     payload_path: ClassVar[Path] = Path(__file__).parent / "tenant.json.j2"

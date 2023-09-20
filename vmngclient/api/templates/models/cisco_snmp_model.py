@@ -2,19 +2,19 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 
 
 class Oid(BaseModel):
     id: str
-    exclude: Optional[bool]
+    exclude: Optional[bool] = None
 
 
 class View(BaseModel):
     name: str
-    oid: Optional[List[Oid]]
+    oid: Optional[List[Oid]] = None
 
 
 class Authorization(str, Enum):
@@ -37,9 +37,7 @@ class Group(BaseModel):
     name: str
     security_level: SecurityLevel = Field(alias="security-level")
     view: str
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Auth(str, Enum):
@@ -53,14 +51,12 @@ class Priv(str, Enum):
 
 class User(BaseModel):
     name: str
-    auth: Optional[Auth]
-    auth_password: Optional[str] = Field(alias="auth-password")
-    priv: Optional[Priv]
-    priv_password: Optional[str] = Field(alias="priv-password")
+    auth: Optional[Auth] = None
+    auth_password: Optional[str] = Field(None, alias="auth-password")
+    priv: Optional[Priv] = None
+    priv_password: Optional[str] = Field(None, alias="priv-password")
     group: str
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Target(BaseModel):
@@ -70,15 +66,11 @@ class Target(BaseModel):
     community_name: str = Field(alias="community-name")
     user: str
     source_interface: str = Field(alias="source-interface")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class CiscoSNMPModel(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     shutdown: Optional[bool] = True
     contact: Optional[str]

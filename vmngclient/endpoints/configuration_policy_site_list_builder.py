@@ -1,7 +1,7 @@
 # mypy: disable-error-code="empty-body"
-from typing import List
+from typing import List, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.model.policy_list import (
@@ -16,15 +16,14 @@ from vmngclient.typed_list import DataSequence
 
 
 class SiteListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     site_id: str = Field(alias="siteId")
 
 
 class SitePayload(BaseModel):
     entries: List[SiteListEntry]
-    type: str = Field(default="site", const=True)
+    _type: Literal["site"] = Field(default="site", alias="type")
 
 
 class SiteListCreationPayload(SitePayload, PolicyListCreationPayload):

@@ -3,7 +3,7 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
@@ -21,11 +21,11 @@ DEFAULT_IPV6_VRRP_TIMER = 1000
 
 
 class SecondaryIPv4Address(ConvertBoolToStringModel):
-    address: Optional[ipaddress.IPv4Interface]
+    address: Optional[ipaddress.IPv4Interface] = None
 
 
 class SecondaryIPv6Address(ConvertBoolToStringModel):
-    address: Optional[ipaddress.IPv6Interface]
+    address: Optional[ipaddress.IPv6Interface] = None
 
 
 class Direction(str, Enum):
@@ -36,14 +36,12 @@ class Direction(str, Enum):
 class AccessList(ConvertBoolToStringModel):
     direction: Direction
     acl_name: str = Field(alias="acl-name")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class DhcpHelperV6(ConvertBoolToStringModel):
     address: ipaddress.IPv6Address
-    vpn: Optional[int]
+    vpn: Optional[int] = None
 
 
 class NatChoice(str, Enum):
@@ -56,9 +54,7 @@ class StaticNat66(ConvertBoolToStringModel):
     source_prefix: ipaddress.IPv6Interface = Field(alias="source-prefix")
     translated_source_prefix: str = Field(alias="translated-source-prefix")
     source_vpn_id: int = Field(DEFAULT_STATIC_NAT64_SOURCE_VPN_ID, alias="source-vpn-id")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class StaticNatDirection(str, Enum):
@@ -71,9 +67,7 @@ class Static(ConvertBoolToStringModel):
     translate_ip: ipaddress.IPv4Address = Field(alias="translate-ip")
     static_nat_direction: StaticNatDirection = Field(StaticNatDirection.INSIDE, alias="static-nat-direction")
     source_vpn: int = Field(DEFAULT_STATIC_NAT_SOURCE_VPN_ID, alias="source-vpn")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Proto(str, Enum):
@@ -89,9 +83,7 @@ class StaticPortForward(ConvertBoolToStringModel):
     translate_port: int = Field(DEFAULT_STATIC_PORT_FORWARD_TRANSLATE_PORT, alias="translate-port")
     proto: Proto
     source_vpn: int = Field(DEFAULT_STATIC_PORT_FORWARD_SOURCE_VPN, alias="source-vpn")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class CoreRegion(str, Enum):
@@ -112,7 +104,7 @@ class Encap(str, Enum):
 
 class Encapsulation(ConvertBoolToStringModel):
     encap: Encap
-    preference: Optional[int]
+    preference: Optional[int] = None
     weight: int = DEFAULT_ENCAPSULATION_WEIGHT
 
 
@@ -196,9 +188,7 @@ class TrackingObject(ConvertBoolToStringModel):
     name: int
     track_action: TrackAction = Field(TrackAction.DECREMENT, alias="track-action")
     decrement: int
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Vrrp(ConvertBoolToStringModel):
@@ -206,23 +196,19 @@ class Vrrp(ConvertBoolToStringModel):
     priority: int = DEFAULT_VRRP_PRIORITY
     timer: int = DEFAULT_VRRP_TIMER
     track_omp: bool = Field(False, alias="track-omp")
-    track_prefix_list: Optional[str] = Field(alias="track-prefix-list")
-    address: Optional[ipaddress.IPv4Address]
-    ipv4_secondary: Optional[List[Ipv4Secondary]] = Field(alias="ipv4-secondary")
+    track_prefix_list: Optional[str] = Field(None, alias="track-prefix-list")
+    address: Optional[ipaddress.IPv4Address] = None
+    ipv4_secondary: Optional[List[Ipv4Secondary]] = Field(None, alias="ipv4-secondary")
     tloc_change_pref: bool = Field(False, alias="tloc-change-pref")
     value: int
-    tracking_object: Optional[List[TrackingObject]] = Field(alias="tracking-object")
-
-    class Config:
-        allow_population_by_field_name = True
+    tracking_object: Optional[List[TrackingObject]] = Field(None, alias="tracking-object")
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Ipv6(ConvertBoolToStringModel):
     ipv6_link_local: ipaddress.IPv6Address = Field(alias="ipv6-link-local")
-    prefix: Optional[ipaddress.IPv6Interface]
-
-    class Config:
-        allow_population_by_field_name = True
+    prefix: Optional[ipaddress.IPv6Interface] = None
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Ipv6Vrrp(ConvertBoolToStringModel):
@@ -230,17 +216,13 @@ class Ipv6Vrrp(ConvertBoolToStringModel):
     priority: int = DEFAULT_IPV6_VRRP_PRIORITY
     timer: int = DEFAULT_IPV6_VRRP_TIMER
     track_omp: bool = Field(False, alias="track-omp")
-    track_prefix_list: Optional[str] = Field(alias="track-prefix-list")
-    ipv6: Optional[List[Ipv6]]
-
-    class Config:
-        allow_population_by_field_name = True
+    track_prefix_list: Optional[str] = Field(None, alias="track-prefix-list")
+    ipv6: Optional[List[Ipv6]] = None
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     if_name: str = Field(alias="if-name")
     interface_description: Optional[str] = Field(vmanage_key="description")

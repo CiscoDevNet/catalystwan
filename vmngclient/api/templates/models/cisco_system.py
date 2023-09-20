@@ -2,7 +2,7 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.api.templates.device_variable import DeviceVariable
 from vmngclient.api.templates.feature_template import FeatureTemplate
@@ -62,9 +62,7 @@ class Tracker(BaseModel):
     interval: Optional[int] = 60
     multiplier: Optional[int] = 3
     type: Optional[Type] = Type.INTERFACE
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Object(BaseModel):
@@ -80,9 +78,7 @@ class ObjectTrack(BaseModel):
     vpn: int
     object: List[Object]
     boolean: Boolean
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Role(str, Enum):
@@ -91,11 +87,9 @@ class Role(str, Enum):
 
 
 class AffinityPerVrf(BaseModel):
-    affinity_group_number: Optional[int] = Field(alias="affinity-group-number")
-    vrf_range: Optional[str] = Field(alias="vrf-range")
-
-    class Config:
-        allow_population_by_field_name = True
+    affinity_group_number: Optional[int] = Field(None, alias="affinity-group-number")
+    vrf_range: Optional[str] = Field(None, alias="vrf-range")
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class EnableMrfMigration(str, Enum):
@@ -105,10 +99,8 @@ class EnableMrfMigration(str, Enum):
 
 class Vrf(BaseModel):
     vrf_id: int = Field(alias="vrf-id")
-    gateway_preference: Optional[List[int]] = Field(alias="gateway-preference")
-
-    class Config:
-        allow_population_by_field_name = True
+    gateway_preference: Optional[List[int]] = Field(None, alias="gateway-preference")
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Epfr(str, Enum):
@@ -119,9 +111,7 @@ class Epfr(str, Enum):
 
 
 class CiscoSystemModel(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     timezone: Optional[Timezone]
     hostname: str = Field(default=DeviceVariable(name="system_host_name"), alias="host-name", validate_default=True)

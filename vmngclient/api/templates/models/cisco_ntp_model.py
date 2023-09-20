@@ -1,14 +1,13 @@
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 
 
 class Server(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     name: str
     key: Optional[int] = Field(default=None)
@@ -19,17 +18,14 @@ class Server(BaseModel):
 
 
 class Authentication(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     number: int
     md5: str
 
 
 class CiscoNTPModel(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     server: List[Server] = Field(default=[])
     authentication: List[Authentication] = Field(default=[])
