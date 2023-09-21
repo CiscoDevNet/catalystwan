@@ -6,7 +6,7 @@ from typing import ClassVar, List, Optional
 from pydantic import Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
-from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
+from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel, ConvertIPToStringModel
 
 DEFAULT_OSPF_HELLO_INTERVAL = 10
 DEFAULT_OSPF_DEAD_INTERVAL = 40
@@ -91,15 +91,17 @@ class Interface(ConvertBoolToStringModel):
     priority: Optional[int] = DEFAULT_OSPF_INTERFACE_PRIORITY
     network: Optional[Network] = Network.BROADCAST
     passive_interface: Optional[bool] = Field(False, alias="passive-interface")
-    type: Optional[Type]
-    message_digest_key: Optional[int] = Field(alias="message-digest-key")
-    md5: Optional[str]
+    type: Optional[Type] = Field(data_path=["authentication"])
+    message_digest_key: Optional[int] = Field(
+        alias="message-digest-key", data_path=["authentication", "message-digest"]
+    )
+    md5: Optional[str] = Field(data_path=["authentication", "message-digest"])
 
     class Config:
         allow_population_by_field_name = True
 
 
-class Range(ConvertBoolToStringModel):
+class Range(ConvertBoolToStringModel, ConvertIPToStringModel):
     address: ipaddress.IPv4Interface
     cost: Optional[int]
     no_advertise: Optional[bool] = Field(False, alias="no-advertise")
@@ -110,8 +112,8 @@ class Range(ConvertBoolToStringModel):
 
 class Area(ConvertBoolToStringModel):
     a_num: int = Field(alias="a-num")
-    stub_no_summary: Optional[bool] = Field(vmanage_key="no-summary", data_path=["stub", "no_summary"])
-    nssa_no_summary: Optional[bool] = Field(vmanage_key="no-summary")
+    stub: Optional[bool] = Field(alias="no-summary", data_path=["stub"])
+    nssa: Optional[bool] = Field(alias="no-summary", data_path=["nssa"])
     interface: Optional[List[Interface]]
     range: Optional[List[Range]]
 
@@ -124,23 +126,29 @@ class CiscoOSPFModel(FeatureTemplate, ConvertBoolToStringModel):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    router_id: Optional[ipaddress.IPv4Address] = Field(alias="router-id")
-    reference_bandwidth: Optional[int] = Field(DEFAULT_OSPF_REFERENCE_BANDWIDTH, alias="reference-bandwidth")
-    rfc1583: Optional[bool] = True
-    originate: Optional[bool]
-    always: Optional[bool]
-    metric: Optional[int]
-    metric_type: Optional[MetricType] = Field(alias="metric-type")
-    external: Optional[int] = DEFAULT_OSPF_EXTERNAL
-    inter_area: Optional[int] = Field(DEFAULT_OSPF_INTER_AREA, alias="inter-area")
-    intra_area: Optional[int] = Field(DEFAULT_OSPF_INTRA_AREA, alias="intra-area")
-    delay: Optional[int] = DEFAULT_OSPF_DELAY
-    initial_hold: Optional[int] = Field(DEFAULT_OSPF_INITIAL_HOLD, alias="initial-hold")
-    max_hold: Optional[int] = Field(DEFAULT_OSPF_MAX_HOLD, alias="max-hold")
-    redistribute: Optional[List[Redistribute]]
-    router_lsa: Optional[List[RouterLsa]] = Field(alias="router-lsa")
-    route_policy: Optional[List[RoutePolicy]] = Field(alias="route-policy")
-    area: Optional[List[Area]]
+    router_id: Optional[str] = Field(alias="router-id", data_path=["ospf"])
+    reference_bandwidth: Optional[int] = Field(
+        DEFAULT_OSPF_REFERENCE_BANDWIDTH, data_path=["ospf", "auto-cost"], alias="reference-bandwidth"
+    )
+    rfc1583: Optional[bool] = Field(True, data_path=["ospf", "compatible"])
+    originate: Optional[bool] = Field(data_path=["ospf", "default-information"])
+    always: Optional[bool] = Field(data_path=["ospf", "default-information", "originate"])
+    metric: Optional[int] = Field(data_path=["ospf", "default-information", "originate"])
+    metric_type: Optional[MetricType] = Field(
+        alias="metric-type", data_path=["ospf", "default-information", "originate"]
+    )
+    external: Optional[int] = Field(DEFAULT_OSPF_EXTERNAL, data_path=["ospf", "distance"])
+    inter_area: Optional[int] = Field(DEFAULT_OSPF_INTER_AREA, data_path=["ospf", "distance"], alias="inter-area")
+    intra_area: Optional[int] = Field(DEFAULT_OSPF_INTRA_AREA, data_path=["ospf", "distance"], alias="intra-area")
+    delay: Optional[int] = Field(DEFAULT_OSPF_DELAY, data_path=["ospf", "timers", "spf"])
+    initial_hold: Optional[int] = Field(
+        DEFAULT_OSPF_INITIAL_HOLD, alias="initial-hold", data_path=["ospf", "timers", "spf"]
+    )
+    max_hold: Optional[int] = Field(DEFAULT_OSPF_MAX_HOLD, alias="max-hold", data_path=["ospf", "timers", "spf"])
+    redistribute: Optional[List[Redistribute]] = Field(alias="redistribute", data_path=["ospf"])
+    router_lsa: Optional[List[RouterLsa]] = Field(alias="router-lsa", data_path=["ospf", "max-metric"])
+    route_policy: Optional[List[RoutePolicy]] = Field(alias="route-policy", data_path=["ospf"])
+    area: Optional[List[Area]] = Field(alias="area", data_path=["ospf"])
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_ospf"

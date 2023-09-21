@@ -4,8 +4,10 @@ from enum import Enum
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, validator
+from pydantic.fields import ModelField  # type: ignore
 
 from vmngclient.api.templates.device_variable import DeviceVariable
+from vmngclient.api.templates.feature_template import FeatureTemplate
 
 
 class FeatureTemplateOptionType(str, Enum):
@@ -91,6 +93,13 @@ class FeatureTemplateField(BaseModel):
 
         output["vipObjectType"] = self.objectType.value
 
+        def nest_value_in_output(value: Any) -> dict:
+            pointer = rel_output
+            for path in self.dataPath:
+                pointer = pointer[path]
+            pointer[self.key] = value
+            return rel_output
+
         if isinstance(value, DeviceVariable):
             vip_variable = VipVariable(
                 vipValue="",
@@ -98,8 +107,8 @@ class FeatureTemplateField(BaseModel):
                 vipObjectType=self.objectType,
                 vipVariableName=value.name,
             )
+            return nest_value_in_output(vip_variable.dict(by_alias=True, exclude_none=True))
 
-            return {self.key: vip_variable.dict(by_alias=True, exclude_none=True)}
         else:
             if value:
                 output["vipType"] = FeatureTemplateOptionType.CONSTANT.value
@@ -111,10 +120,17 @@ class FeatureTemplateField(BaseModel):
                         for child in self.children:  # Child in schema
                             if current_path is None:
                                 current_path = []
-                            child_payload.update(
-                                child.payload_scheme(
-                                    obj[child.key], help=output, current_path=self.dataPath + [self.key]
+                            obj: FeatureTemplate  # type: ignore
+                            model_field: ModelField = next(
+                                filter(
+                                    lambda f: f.field_info.extra.get("data_path", []) == child.dataPath
+                                    and f.alias == child.key,
+                                    obj.__fields__.values(),
                                 )
+                            )
+                            obj_value = getattr(obj, model_field.name)
+                            child_payload.update(
+                                child.payload_scheme(obj_value, help=output, current_path=self.dataPath + [self.key])
                             )
                         children_output.append(child_payload)
                     output["vipValue"] = children_output
@@ -122,8 +138,9 @@ class FeatureTemplateField(BaseModel):
                     output["vipValue"] = value
             else:
                 if "default" in self.dataType:
-                    output["vipValue"] = self.dataType["default"] if value is None else value
-                    output["vipType"] = self.defaultOption.value
+                    return {}
+                    # output["vipValue"] = self.dataType["default"] if value is None else value
+                    # output["vipType"] = self.defaultOption.value
                 else:
                     output["vipValue"] = []
                     output["vipType"] = FeatureTemplateOptionType.IGNORE.value
@@ -135,10 +152,4 @@ class FeatureTemplateField(BaseModel):
         if self.primaryKeys:
             output["vipPrimaryKey"] = self.primaryKeys
 
-        pointer = rel_output
-
-        for path in self.dataPath:
-            pointer = pointer[path]
-
-        pointer[self.key] = output
-        return rel_output
+        return nest_value_in_output(output)

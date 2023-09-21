@@ -105,10 +105,10 @@ class AddressFamily(BaseModel):
     ipv6_aggregate_address: Optional[List[Ipv6AggregateAddress]] = Field(alias="ipv6-aggregate-address")
     network: Optional[List[Network]]
     ipv6_network: Optional[List[Ipv6Network]] = Field(alias="ipv6-network")
-    paths: Optional[int]
-    originate: Optional[bool]
-    name: Optional[str]
-    filter: Optional[bool]
+    paths: Optional[int] = Field(data_path=["maximum-paths"])
+    originate: Optional[bool] = Field(data_path=["default-information"])
+    policy_name: Optional[str] = Field(data_path=["table-map"], alias="name")
+    filter: Optional[bool] = Field(data_path=["table-map"])
     redistribute: Optional[List[Redistribute]]
 
     class Config:
@@ -141,10 +141,10 @@ class RoutePolicy(BaseModel):
 
 class NeighborAddressFamily(BaseModel):
     family_type: NeighborFamilyType = Field(alias="family-type")
-    prefix_num: Optional[int] = Field(alias="prefix-num")
-    threshold: Optional[int]
-    restart: Optional[int]
-    warning_only: Optional[bool] = Field(alias="warning-only")
+    prefix_num: Optional[int] = Field(data_path=["maximum-prefixes"], alias="prefix-num")
+    threshold: Optional[int] = Field(data_path=["maximum-prefixes"])
+    restart: Optional[int] = Field(data_path=["maximum-prefixes"])
+    warning_only: Optional[bool] = Field(data_path=["maximum-prefixes"], alias="warning-only")
     route_policy: Optional[List[RoutePolicy]] = Field(alias="route-policy")
 
     class Config:
@@ -156,9 +156,9 @@ class Neighbor(BaseModel):
     description: Optional[str]
     shutdown: Optional[bool]
     remote_as: int = Field(alias="remote-as")
-    keepalive: Optional[int]
-    holdtime: Optional[int]
-    if_name: Optional[str] = Field(alias="if-name")
+    keepalive: Optional[int] = Field(data_path=["timers"])
+    holdtime: Optional[int] = Field(data_path=["timers"])
+    if_name: Optional[str] = Field(data_path=["update-source"], alias="if-name")
     next_hop_self: Optional[bool] = Field(alias="next-hop-self")
     send_community: Optional[bool] = Field(alias="send-community")
     send_ext_community: Optional[bool] = Field(alias="send-ext-community")
@@ -167,7 +167,7 @@ class Neighbor(BaseModel):
     send_label: Optional[bool] = Field(alias="send-label")
     send_label_explicit: Optional[bool] = Field(alias="send-label-explicit")
     as_override: Optional[bool] = Field(alias="as-override")
-    as_number: Optional[int] = Field(alias="as-number")
+    as_number: Optional[int] = Field(data_path=["allowas-in"], alias="as-number")
     address_family: Optional[List[NeighborAddressFamily]] = Field(alias="address-family")
 
     class Config:
@@ -193,10 +193,10 @@ class IPv6NeighborFamilyType(str, Enum):
 
 class IPv6NeighborAddressFamily(BaseModel):
     family_type: IPv6NeighborFamilyType = Field(alias="family-type")
-    prefix_num: Optional[int] = Field(0, alias="prefix-num")
-    threshold: Optional[int]
-    restart: Optional[int]
-    warning_only: Optional[bool] = Field(False, alias="warning-only")
+    prefix_num: Optional[int] = Field(0, data_path=["maximum-prefixes"], alias="prefix-num")
+    threshold: Optional[int] = Field(data_path=["maximum-prefixes"])
+    restart: Optional[int] = Field(data_path=["maximum-prefixes"])
+    warning_only: Optional[bool] = Field(False, data_path=["maximum-prefixes"], alias="warning-only")
     route_policy: Optional[List[RoutePolicy]] = Field(alias="route-policy")
 
     class Config:
@@ -208,9 +208,9 @@ class Ipv6Neighbor(BaseModel):
     description: Optional[str]
     shutdown: Optional[bool]
     remote_as: int = Field(alias="remote-as")
-    keepalive: Optional[int]
-    holdtime: Optional[int]
-    if_name: Optional[str] = Field(alias="if-name")
+    keepalive: Optional[int] = Field(data_path=["timers"])
+    holdtime: Optional[int] = Field(data_path=["timers"])
+    if_name: Optional[str] = Field(data_path=["update-source"], alias="if-name")
     next_hop_self: Optional[bool] = Field(False, alias="next-hop-self")
     send_community: Optional[bool] = Field(True, alias="send-community")
     send_ext_community: Optional[bool] = Field(True, alias="send-ext-community")
@@ -219,7 +219,7 @@ class Ipv6Neighbor(BaseModel):
     send_label: Optional[bool] = Field(False, alias="send-label")
     send_label_explicit: Optional[bool] = Field(False, alias="send-label-explicit")
     as_override: Optional[bool] = Field(False, alias="as-override")
-    as_number: Optional[int] = Field(alias="as-number")
+    as_number: Optional[int] = Field(data_path=["allowas-in"], alias="as-number")
     address_family: Optional[List[IPv6NeighborAddressFamily]] = Field(alias="address-family")
 
     class Config:
@@ -244,32 +244,32 @@ class CiscoBGPModel(FeatureTemplate):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    as_num: Optional[str] = Field(alias="as-num")
-    shutdown: Optional[bool]
-    router_id: Optional[str] = Field(alias="router-id")
-    propagate_aspath: Optional[bool] = Field(alias="propagate-aspath")
-    propagate_community: Optional[bool] = Field(alias="propagate-community")
-    route_target_ipv4: List[RouteTargetIpv4] = Field([], alias="route-target-ipv4")
-    route_target_ipv6: List[RouteTargetIpv6] = Field([], alias="route-target-ipv6")
-    mpls_interface: Optional[List[MplsInterface]] = Field(alias="mpls-interface")
-    external: Optional[int]
-    internal: Optional[int]
-    local: Optional[int]
-    keepalive: Optional[int]
-    holdtime: Optional[int]
-    always_compare: Optional[bool] = Field(alias="always-compare")
-    deterministic: Optional[bool]
-    missing_as_worst: Optional[bool] = Field(alias="missing-as-worst")
-    compare_router_id: Optional[bool] = Field(alias="compare-router-id")
-    multipath_relax: Optional[bool] = Field(alias="multipath-relax")
-    address_family: Optional[List[AddressFamily]] = Field(alias="address-family")
-    neighbor: Optional[List[Neighbor]]
-    ipv6_neighbor: Optional[List[Ipv6Neighbor]] = Field(alias="ipv6-neighbor")
+    as_num: Optional[str] = Field(data_path=["bgp"], alias="as-num")
+    shutdown: Optional[bool] = Field(data_path=["bgp"])
+    router_id: Optional[str] = Field(data_path=["bgp"], alias="router-id")
+    propagate_aspath: Optional[bool] = Field(data_path=["bgp"], alias="propagate-aspath")
+    propagate_community: Optional[bool] = Field(data_path=["bgp"], alias="propagate-community")
+    route_target_ipv4: List[RouteTargetIpv4] = Field([], data_path=["bgp", "target"], alias="route-target-ipv4")
+    route_target_ipv6: List[RouteTargetIpv6] = Field([], data_path=["bgp", "target"], alias="route-target-ipv6")
+    mpls_interface: Optional[List[MplsInterface]] = Field(data_path=["bgp"], alias="mpls-interface")
+    external: Optional[int] = Field(data_path=["bgp", "distance"])
+    internal: Optional[int] = Field(data_path=["bgp", "distance"])
+    local: Optional[int] = Field(data_path=["bgp", "distance"])
+    keepalive: Optional[int] = Field(data_path=["bgp", "timers"])
+    holdtime: Optional[int] = Field(data_path=["bgp", "timers"])
+    always_compare: Optional[bool] = Field(data_path=["bgp", "best-path", "med"], alias="always-compare")
+    deterministic: Optional[bool] = Field(data_path=["bgp", "best-path", "med"])
+    missing_as_worst: Optional[bool] = Field(data_path=["bgp", "best-path", "med"], alias="missing-as-worst")
+    compare_router_id: Optional[bool] = Field(data_path=["bgp", "best-path"], alias="compare-router-id")
+    multipath_relax: Optional[bool] = Field(data_path=["bgp", "best-path", "as-path"], alias="multipath-relax")
+    address_family: Optional[List[AddressFamily]] = Field(data_path=["bgp"], alias="address-family")
+    neighbor: Optional[List[Neighbor]] = Field(data_path=["bgp"])
+    ipv6_neighbor: Optional[List[Ipv6Neighbor]] = Field(data_path=["bgp"], alias="ipv6-neighbor")
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_bgp"
 
-    @validator("shutdown")
+    @validator("shutdown", "deterministic", "missing_as_worst", "compare_router_id", "multipath_relax")
     def cast_to_str(cls, value):
         if value is not None:
             return str(value).lower()

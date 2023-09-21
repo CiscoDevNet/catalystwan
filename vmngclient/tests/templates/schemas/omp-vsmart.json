@@ -1,0 +1,202 @@
+{
+    "name": "OMP",
+    "xmlPath": [],
+    "xmlRootTag": "omp",
+    "nameSpace": "http://viptela.com/omp",
+    "fields": [
+        {
+            "key": "graceful-restart",
+            "description": "Graceful Restart for OMP",
+            "details": "Enable or disable OMP graceful restart",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "boolean",
+                "default": "true"
+            },
+            "dataPath": [],
+            "objectType": "object"
+        },
+        {
+            "key": "send-path-limit",
+            "description": "Number of Paths Advertised per Prefix",
+            "details": "Set number of equal-cost routes advertised by vSmart to vEdge",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "number",
+                "min": 1,
+                "max": 32,
+                "default": 4
+            },
+            "dataPath": [],
+            "objectType": "object"
+        },
+        {
+            "key": "send-backup-paths",
+            "description": "Send Backup Paths",
+            "details": "Enable or disable advertisement of backup routes to vEdges",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "boolean",
+                "default": "false"
+            },
+            "dataPath": [],
+            "objectType": "object"
+        },
+        {
+            "key": "discard-rejected",
+            "description": "Discard Rejected Routes",
+            "details": "Enable or disable discarding of routes rejected by policy",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "boolean",
+                "default": "false"
+            },
+            "dataPath": [],
+            "objectType": "object"
+        },
+        {
+            "key": "shutdown",
+            "description": "Shutdown",
+            "details": "Enable or disable OMP",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "boolean",
+                "default": "false",
+                "label": {
+                    "on": "Yes",
+                    "off": "No"
+                }
+            },
+            "dataPath": [],
+            "objectType": "object"
+        },
+        {
+            "key": "advertisement-interval",
+            "description": "Advertisement Interval (seconds)",
+            "details": "Set the time between OMP Update packets",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "number",
+                "min": 0,
+                "max": 65535,
+                "default": 1
+            },
+            "dataPath": [
+                "timers"
+            ],
+            "objectType": "object"
+        },
+        {
+            "key": "graceful-restart-timer",
+            "description": "Graceful Restart Timer (seconds)",
+            "details": "Set the OMP graceful restart timer",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "number",
+                "min": 1,
+                "max": 604800,
+                "default": 43200
+            },
+            "dataPath": [
+                "timers"
+            ],
+            "objectType": "object"
+        },
+        {
+            "key": "eor-timer",
+            "description": "EOR Timer",
+            "details": "End of RIB timer <1..604800> seconds",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "number",
+                "min": 1,
+                "max": 3600,
+                "default": 300
+            },
+            "dataPath": [
+                "timers"
+            ],
+            "objectType": "object"
+        },
+        {
+            "key": "holdtime",
+            "description": "Hold Time (seconds)",
+            "details": "Set how long to wait before closing OMP peer connection",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "number",
+                "range": "0,3-65535",
+                "default": 60
+            },
+            "dataPath": [
+                "timers"
+            ],
+            "objectType": "object"
+        },
+        {
+            "key": "affinity-group-preference",
+            "description": "Enable Filtering Route Updates Based on Affinity",
+            "details": "Filter routes based on affinity preference list",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "boolean",
+                "default": "false"
+            },
+            "dataPath": [
+                "filter-route",
+                "outbound"
+            ],
+            "objectType": "object"
+        }
+    ]
+}

@@ -1,0 +1,20 @@
+{
+    "templateName": "cisco_banner",
+    "templateDescription": "na",
+    "templateType": "cisco_banner",
+    "deviceType": [],
+    "factoryDefault": false,
+    "templateMinVersion": "15.0.0",
+    "templateDefinition": {
+        "login": {
+            "vipObjectType": "object",
+            "vipType": "constant",
+            "vipValue": "login banner"
+        },
+        "motd": {
+            "vipObjectType": "object",
+            "vipType": "constant",
+            "vipValue": "motd_bnanner"
+        }
+    }
+}

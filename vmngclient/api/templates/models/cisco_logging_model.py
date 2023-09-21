@@ -23,9 +23,9 @@ class AuthType(str, Enum):
 
 class TlsProfile(ConvertBoolToStringModel):
     profile: str
-    version: Optional[Version] = Version.TLSV11
+    version: Optional[Version] = Field(Version.TLSV11, data_path=["tls-version"])
     auth_type: AuthType = Field(alias="auth-type")
-    ciphersuite_list: Optional[List] = Field(alias="ciphersuite-list")
+    ciphersuite_list: Optional[List] = Field(data_path=["ciphersuite"], alias="ciphersuite-list")
 
     class Config:
         allow_population_by_field_name = True
@@ -47,9 +47,9 @@ class Server(ConvertBoolToStringModel):
     vpn: Optional[int]
     source_interface: Optional[str] = Field(alias="source-interface")
     priority: Optional[Priority] = Priority.INFORMATION
-    enable_tls: Optional[bool] = Field(False, alias="enable-tls")
-    custom_profile: Optional[bool] = Field(False, alias="custom-profile")
-    profile: Optional[str]
+    enable_tls: Optional[bool] = Field(False, data_path=["tls"], alias="enable-tls")
+    custom_profile: Optional[bool] = Field(False, data_path=["tls", "tls-properties"], alias="custom-profile")
+    profile: Optional[str] = Field(data_path=["tls", "tls-properties"])
 
     class Config:
         allow_population_by_field_name = True
@@ -60,9 +60,9 @@ class Ipv6Server(ConvertBoolToStringModel):
     vpn: Optional[int]
     source_interface: Optional[str] = Field(alias="source-interface")
     priority: Optional[Priority] = Priority.INFORMATION
-    enable_tls: Optional[bool] = Field(False, alias="enable-tls")
-    custom_profile: Optional[bool] = Field(False, alias="custom-profile")
-    profile: Optional[str]
+    enable_tls: Optional[bool] = Field(False, data_path=["tls"], alias="enable-tls")
+    custom_profile: Optional[bool] = Field(False, data_path=["tls", "tls-properties"], alias="custom-profile")
+    profile: Optional[str] = Field(data_path=["tls", "tls-properties"])
 
     class Config:
         allow_population_by_field_name = True
@@ -73,9 +73,9 @@ class CiscoLoggingModel(FeatureTemplate, ConvertBoolToStringModel):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    enable: Optional[bool] = True
-    size: Optional[int] = DEFAULT_LOGGING_SIZE
-    rotate: Optional[int] = DEFAULT_LOGGING_ROTATE
+    enable: Optional[bool] = Field(True, data_path=["disk"])
+    size: Optional[int] = Field(DEFAULT_LOGGING_SIZE, data_path=["disk", "file"])
+    rotate: Optional[int] = Field(DEFAULT_LOGGING_ROTATE, data_path=["disk", "file"])
     tls_profile: List[TlsProfile] = Field(alias="tls-profile")
     server: Optional[List[Server]]
     ipv6_server: Optional[List[Ipv6Server]] = Field(alias="ipv6-server")

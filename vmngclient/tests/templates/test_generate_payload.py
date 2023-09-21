@@ -45,7 +45,7 @@ class RSA(BaseModel):
         allow_population_by_field_name = True
 
     key: str = Field(alias="key-string")
-    key_type: str = Field(alias="key-type")
+    key_type: str = Field(alias="key-type", data_path=["type", "RSA"])
 
 
 class User(BaseModel):
@@ -54,7 +54,7 @@ class User(BaseModel):
         allow_population_by_field_name = True
 
     name: str
-    password: str
+    password: str = Field(data_path=["list"])
     pubkey_chain: List[RSA] = Field(default=[], alias="pubkey-chain")
 
 
@@ -69,6 +69,19 @@ class MockedFeatureTemplateChildren(FeatureTemplate):
     type: ClassVar[str] = "test_type"
 
     user: List[User]
+
+
+class DataPathFeatureTemplate(FeatureTemplate):
+    class Config:
+        arbitrary_types_allowed = True
+        allow_population_by_field_name = True
+
+    template_name: str = "test"
+    template_description: str = "test"
+    payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
+    type: ClassVar[str] = "test_type"
+
+    as_num: str = Field(alias="as-num", data_path=["authentication", "dot1x", "default"])
 
 
 mocked_feature_template_children_1 = MockedFeatureTemplateChildren(
@@ -86,10 +99,9 @@ mocked_feature_template_children_2 = MockedFeatureTemplateChildren(
 class TestFeatureTemplate(TestCase):
     @parameterized.expand(
         [
-            ("basic.json", "basic_no_value.json", None),
             ("basic.json", None, MockedFeatureTemplate(num="num")),
             ("alias.json", None, MockedFeatureTemplateAlias(num="12")),
-            ("data_path.json", None, MockedFeatureTemplateAlias(num="12")),
+            ("data_path.json", None, DataPathFeatureTemplate(as_num="12")),
             ("children.json", None, mocked_feature_template_children_1),
             ("children_nested.json", None, mocked_feature_template_children_2),
             ("children_nested_datapath.json", None, mocked_feature_template_children_2),

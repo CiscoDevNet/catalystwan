@@ -1,0 +1,1071 @@
+{
+    "templateName": "test_vpn_new",
+    "templateDescription": "NA",
+    "templateType": "cisco_vpn",
+    "deviceType": [
+        "vedge-cloud"
+    ],
+    "factoryDefault": false,
+    "templateMinVersion": "15.0.0",
+    "templateDefinition": {
+        "name": {
+            "vipObjectType": "object",
+            "vipType": "constant",
+            "vipValue": "test_vpn_name"
+        },
+        "omp-admin-distance-ipv4": {
+            "vipObjectType": "object",
+            "vipType": "constant",
+            "vipValue": 10
+        },
+        "omp-admin-distance-ipv6": {
+            "vipObjectType": "object",
+            "vipType": "constant",
+            "vipValue": 100
+        },
+        "dns": {
+            "vipObjectType": "tree",
+            "vipType": "constant",
+            "vipValue": [
+                {
+                    "dns-addr": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "1.1.1.1"
+                    },
+                    "role": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "primary"
+                    }
+                },
+                {
+                    "dns-addr": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "2.2.2.2"
+                    },
+                    "role": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "secondary"
+                    }
+                }
+            ],
+            "vipPrimaryKey": [
+                "dns-addr"
+            ]
+        },
+        "dns-ipv6": {
+            "vipObjectType": "tree",
+            "vipType": "constant",
+            "vipValue": [
+                {
+                    "dns-addr": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "30a8:b25e:3db5:fe9f:231f:7478:4181:9234"
+                    },
+                    "role": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "primary"
+                    }
+                }
+            ],
+            "vipPrimaryKey": [
+                "dns-addr"
+            ]
+        },
+        "host": {
+            "vipObjectType": "tree",
+            "vipType": "constant",
+            "vipValue": [
+                {
+                    "hostname": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "test_hostname"
+                    },
+                    "ip": {
+                        "vipObjectType": "list",
+                        "vipType": "constant",
+                        "vipValue": [
+                            "1.1.1.1"
+                        ]
+                    }
+                }
+            ],
+            "vipPrimaryKey": [
+                "hostname"
+            ]
+        },
+        "service": {
+            "vipObjectType": "tree",
+            "vipType": "constant",
+            "vipValue": [
+                {
+                    "svc-type": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "appqoe"
+                    },
+                    "address": {
+                        "vipObjectType": "list",
+                        "vipType": "constant",
+                        "vipValue": [
+                            "1.1.1.1"
+                        ]
+                    },
+                    "interface": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "Gig0/0/1"
+                    },
+                    "track-enable": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "false"
+                    }
+                },
+                {
+                    "svc-type": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "FW"
+                    },
+                    "address": {
+                        "vipObjectType": "list",
+                        "vipType": "constant",
+                        "vipValue": [
+                            "1.1.122.1",
+                            "2.2.2.2"
+                        ]
+                    },
+                    "interface": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "Gig0/0/2"
+                    },
+                    "track-enable": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "true"
+                    }
+                },
+                {
+                    "svc-type": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "IDP"
+                    },
+                    "address": {
+                        "vipObjectType": "list",
+                        "vipType": "constant",
+                        "vipValue": [
+                            "1.1.122.2",
+                            "3.2.2.2"
+                        ]
+                    },
+                    "interface": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "Gig0/0/3"
+                    },
+                    "track-enable": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "false"
+                    }
+                }
+            ],
+            "vipPrimaryKey": [
+                "svc-type"
+            ]
+        },
+        "ip": {
+            "service-route": {
+                "vipObjectType": "tree",
+                "vipType": "constant",
+                "vipValue": [
+                    {
+                        "prefix": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "service_route"
+                        },
+                        "vpn": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 1
+                        },
+                        "service": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "sig"
+                        }
+                    },
+                    {
+                        "prefix": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "service_route100"
+                        },
+                        "vpn": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 100
+                        },
+                        "service": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "sig"
+                        }
+                    }
+                ],
+                "vipPrimaryKey": [
+                    "prefix"
+                ]
+            },
+            "route": {
+                "vipObjectType": "tree",
+                "vipType": "constant",
+                "vipValue": [
+                    {
+                        "prefix": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "prefixv4"
+                        },
+                        "next-hop": {
+                            "vipObjectType": "tree",
+                            "vipType": "constant",
+                            "vipValue": [
+                                {
+                                    "address": {
+                                        "vipObjectType": "object",
+                                        "vipType": "constant",
+                                        "vipValue": "1.1.1.1"
+                                    },
+                                    "distance": {
+                                        "vipObjectType": "object",
+                                        "vipType": "constant",
+                                        "vipValue": 1
+                                    }
+                                }
+                            ],
+                            "vipPrimaryKey": [
+                                "address"
+                            ]
+                        },
+                        "next-hop-with-track": {
+                            "vipObjectType": "tree",
+                            "vipValue": [],
+                            "vipType": "ignore",
+                            "vipPrimaryKey": [
+                                "address"
+                            ]
+                        },
+                        "distance": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 1
+                        }
+                    }
+                ],
+                "vipPrimaryKey": [
+                    "prefix"
+                ]
+            },
+            "gre-route": {
+                "vipObjectType": "tree",
+                "vipType": "constant",
+                "vipValue": [
+                    {
+                        "prefix": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "gre_route"
+                        },
+                        "vpn": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 100
+                        },
+                        "interface": {
+                            "vipObjectType": "list",
+                            "vipValue": [],
+                            "vipType": "ignore"
+                        }
+                    },
+                    {
+                        "prefix": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "gre_route2"
+                        },
+                        "vpn": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 2
+                        },
+                        "interface": {
+                            "vipObjectType": "list",
+                            "vipType": "constant",
+                            "vipValue": [
+                                "Gig0/0/1",
+                                "ge0/0"
+                            ]
+                        }
+                    }
+                ],
+                "vipPrimaryKey": [
+                    "prefix"
+                ]
+            },
+            "ipsec-route": {
+                "vipObjectType": "tree",
+                "vipType": "constant",
+                "vipValue": [
+                    {
+                        "prefix": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "ipsec-prefix"
+                        },
+                        "vpn": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 10
+                        },
+                        "interface": {
+                            "vipObjectType": "list",
+                            "vipType": "constant",
+                            "vipValue": [
+                                "ge0/0",
+                                "Gig0/0/1"
+                            ]
+                        }
+                    },
+                    {
+                        "prefix": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "prefix-2"
+                        },
+                        "vpn": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 100
+                        },
+                        "interface": {
+                            "vipObjectType": "list",
+                            "vipValue": [],
+                            "vipType": "ignore"
+                        }
+                    }
+                ],
+                "vipPrimaryKey": [
+                    "prefix"
+                ]
+            }
+        },
+        "ipv6": {
+            "route": {
+                "vipObjectType": "tree",
+                "vipType": "constant",
+                "vipValue": [
+                    {
+                        "prefix": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "prefixv6"
+                        },
+                        "next-hop": {
+                            "vipObjectType": "tree",
+                            "vipType": "constant",
+                            "vipValue": [
+                                {
+                                    "address": {
+                                        "vipObjectType": "object",
+                                        "vipType": "constant",
+                                        "vipValue": "2.2.2.2"
+                                    },
+                                    "distance": {
+                                        "vipObjectType": "object",
+                                        "vipType": "constant",
+                                        "vipValue": 1
+                                    }
+                                }
+                            ],
+                            "vipPrimaryKey": [
+                                "address"
+                            ]
+                        },
+                        "nat": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "NAT64"
+                        }
+                    }
+                ],
+                "vipPrimaryKey": [
+                    "prefix"
+                ]
+            }
+        },
+        "omp": {
+            "advertise": {
+                "vipObjectType": "tree",
+                "vipType": "constant",
+                "vipValue": [
+                    {
+                        "protocol": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "aggregate"
+                        },
+                        "route-policy": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "route-policy"
+                        },
+                        "protocol-sub-type": {
+                            "vipObjectType": "list",
+                            "vipType": "constant",
+                            "vipValue": [
+                                "external"
+                            ]
+                        },
+                        "prefix-list": {
+                            "vipObjectType": "tree",
+                            "vipType": "constant",
+                            "vipValue": [
+                                {
+                                    "prefix-entry": {
+                                        "vipObjectType": "object",
+                                        "vipType": "constant",
+                                        "vipValue": "prefix_entry"
+                                    },
+                                    "aggregate-only": {
+                                        "vipObjectType": "object",
+                                        "vipType": "constant",
+                                        "vipValue": true
+                                    }
+                                }
+                            ],
+                            "vipPrimaryKey": [
+                                "prefix-entry"
+                            ]
+                        }
+                    }
+                ],
+                "vipPrimaryKey": [
+                    "protocol"
+                ]
+            },
+            "ipv6-advertise": {
+                "vipObjectType": "tree",
+                "vipType": "constant",
+                "vipValue": [
+                    {
+                        "protocol": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "aggregate"
+                        },
+                        "route-policy": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "route-policyv6"
+                        },
+                        "protocol-sub-type": {
+                            "vipObjectType": "list",
+                            "vipType": "constant",
+                            "vipValue": [
+                                "external"
+                            ]
+                        },
+                        "prefix-list": {
+                            "vipObjectType": "tree",
+                            "vipType": "constant",
+                            "vipValue": [
+                                {
+                                    "prefix-entry": {
+                                        "vipObjectType": "object",
+                                        "vipType": "constant",
+                                        "vipValue": "prefix_entryv6"
+                                    }
+                                }
+                            ],
+                            "vipPrimaryKey": [
+                                "prefix-entry"
+                            ]
+                        }
+                    },
+                    {
+                        "protocol": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "connected"
+                        },
+                        "route-policy": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "route-policyv6-connected"
+                        },
+                        "protocol-sub-type": {
+                            "vipObjectType": "list",
+                            "vipType": "constant",
+                            "vipValue": [
+                                "external"
+                            ]
+                        },
+                        "prefix-list": {
+                            "vipObjectType": "tree",
+                            "vipType": "constant",
+                            "vipValue": [
+                                {
+                                    "prefix-entry": {
+                                        "vipObjectType": "object",
+                                        "vipType": "constant",
+                                        "vipValue": "prefix_entryv6-connected"
+                                    },
+                                    "aggregate-only": {
+                                        "vipObjectType": "object",
+                                        "vipType": "constant",
+                                        "vipValue": true
+                                    }
+                                }
+                            ],
+                            "vipPrimaryKey": [
+                                "prefix-entry"
+                            ]
+                        }
+                    }
+                ],
+                "vipPrimaryKey": [
+                    "protocol"
+                ]
+            }
+        },
+        "nat64": {
+            "v4": {
+                "pool": {
+                    "vipObjectType": "tree",
+                    "vipType": "constant",
+                    "vipValue": [
+                        {
+                            "name": {
+                                "vipObjectType": "object",
+                                "vipType": "constant",
+                                "vipValue": "pool"
+                            },
+                            "start-address": {
+                                "vipObjectType": "object",
+                                "vipType": "constant",
+                                "vipValue": "1.1.1.1"
+                            },
+                            "end-address": {
+                                "vipObjectType": "object",
+                                "vipType": "constant",
+                                "vipValue": "10.10.10.10"
+                            },
+                            "leak_from_global": {
+                                "vipObjectType": "object",
+                                "vipType": "constant",
+                                "vipValue": true
+                            },
+                            "leak_from_global_protocol": {
+                                "vipObjectType": "object",
+                                "vipType": "constant",
+                                "vipValue": "connected"
+                            }
+                        }
+                    ],
+                    "vipPrimaryKey": [
+                        "name"
+                    ]
+                }
+            }
+        },
+        "nat": {
+            "natpool": {
+                "vipObjectType": "tree",
+                "vipType": "constant",
+                "vipValue": [
+                    {
+                        "name": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 1
+                        },
+                        "prefix-length": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 24
+                        },
+                        "range-start": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "10"
+                        },
+                        "range-end": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "100"
+                        },
+                        "overload": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "false"
+                        },
+                        "direction": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "inside"
+                        },
+                        "tracker-id": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 10
+                        }
+                    },
+                    {
+                        "name": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 2
+                        },
+                        "prefix-length": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 24
+                        },
+                        "range-start": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "10"
+                        },
+                        "range-end": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "100"
+                        },
+                        "overload": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "true"
+                        },
+                        "direction": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "outside"
+                        },
+                        "tracker-id": {
+                            "vipObjectType": "object",
+                            "vipValue": [],
+                            "vipType": "ignore"
+                        }
+                    }
+                ],
+                "vipPrimaryKey": [
+                    "name"
+                ]
+            },
+            "static": {
+                "vipObjectType": "tree",
+                "vipType": "constant",
+                "vipValue": [
+                    {
+                        "pool-name": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 1
+                        },
+                        "source-ip": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "1.1.1.1"
+                        },
+                        "translate-ip": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "1.1.1.2"
+                        },
+                        "static-nat-direction": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "inside"
+                        },
+                        "tracker-id": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 1
+                        }
+                    },
+                    {
+                        "pool-name": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 2
+                        },
+                        "source-ip": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "2.1.1.1"
+                        },
+                        "translate-ip": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "2.1.1.2"
+                        },
+                        "static-nat-direction": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "outside"
+                        },
+                        "tracker-id": {
+                            "vipObjectType": "object",
+                            "vipValue": [],
+                            "vipType": "ignore"
+                        }
+                    }
+                ],
+                "vipPrimaryKey": [
+                    "source-ip",
+                    "translate-ip"
+                ]
+            },
+            "subnet-static": {
+                "vipObjectType": "tree",
+                "vipType": "constant",
+                "vipValue": [
+                    {
+                        "source-ip-subnet": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "1.1.1.1"
+                        },
+                        "translate-ip-subnet": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "2.2.2.2"
+                        },
+                        "prefix-length": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 24
+                        },
+                        "static-nat-direction": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "outside"
+                        },
+                        "tracker-id": {
+                            "vipObjectType": "object",
+                            "vipValue": [],
+                            "vipType": "ignore"
+                        }
+                    },
+                    {
+                        "source-ip-subnet": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "1.1.2.1"
+                        },
+                        "translate-ip-subnet": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "2.3.2.2"
+                        },
+                        "prefix-length": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 24
+                        },
+                        "static-nat-direction": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "inside"
+                        },
+                        "tracker-id": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 10
+                        }
+                    }
+                ],
+                "vipPrimaryKey": [
+                    "source-ip-subnet",
+                    "translate-ip-subnet"
+                ]
+            },
+            "port-forward": {
+                "vipObjectType": "tree",
+                "vipType": "constant",
+                "vipValue": [
+                    {
+                        "pool-name": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 1
+                        },
+                        "source-port": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 1000
+                        },
+                        "translate-port": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 2000
+                        },
+                        "source-ip": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "1.1.1.1"
+                        },
+                        "translate-ip": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "2.2.2.2"
+                        },
+                        "proto": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "tcp"
+                        }
+                    },
+                    {
+                        "pool-name": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 2
+                        },
+                        "source-port": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 1000
+                        },
+                        "translate-port": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": 2000
+                        },
+                        "source-ip": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "1.1.4.1"
+                        },
+                        "translate-ip": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "2.2.3.2"
+                        },
+                        "proto": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "udp"
+                        }
+                    }
+                ],
+                "vipPrimaryKey": [
+                    "source-port",
+                    "translate-port",
+                    "source-ip",
+                    "translate-ip",
+                    "proto"
+                ]
+            }
+        },
+        "route-import": {
+            "vipObjectType": "tree",
+            "vipType": "constant",
+            "vipValue": [
+                {
+                    "protocol": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "bgp"
+                    },
+                    "protocol-sub-type": {
+                        "vipObjectType": "list",
+                        "vipType": "constant",
+                        "vipValue": [
+                            "external"
+                        ]
+                    },
+                    "route-policy": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "test_route_policy"
+                    },
+                    "redistribute": {
+                        "vipObjectType": "tree",
+                        "vipType": "constant",
+                        "vipValue": [
+                            {
+                                "protocol": {
+                                    "vipObjectType": "object",
+                                    "vipType": "constant",
+                                    "vipValue": "eigrp"
+                                },
+                                "route-policy": {
+                                    "vipObjectType": "object",
+                                    "vipType": "constant",
+                                    "vipValue": "test_route_policy"
+                                }
+                            }
+                        ],
+                        "vipPrimaryKey": [
+                            "protocol"
+                        ]
+                    }
+                }
+            ],
+            "vipPrimaryKey": [
+                "protocol"
+            ]
+        },
+        "route-import-from": {
+            "vipObjectType": "tree",
+            "vipType": "constant",
+            "vipValue": [
+                {
+                    "source-vpn": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": 1
+                    },
+                    "protocol": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "connected"
+                    },
+                    "protocol-sub-type": {
+                        "vipObjectType": "list",
+                        "vipType": "constant",
+                        "vipValue": [
+                            "external"
+                        ]
+                    },
+                    "route-policy": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "test_route_policy"
+                    },
+                    "redistribute": {
+                        "vipObjectType": "tree",
+                        "vipType": "constant",
+                        "vipValue": [
+                            {
+                                "protocol": {
+                                    "vipObjectType": "object",
+                                    "vipType": "constant",
+                                    "vipValue": "bgp"
+                                }
+                            }
+                        ],
+                        "vipPrimaryKey": [
+                            "protocol"
+                        ]
+                    }
+                },
+                {
+                    "source-vpn": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": 100
+                    },
+                    "protocol": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "bgp"
+                    },
+                    "protocol-sub-type": {
+                        "vipObjectType": "list",
+                        "vipType": "constant",
+                        "vipValue": [
+                            "external"
+                        ]
+                    },
+                    "route-policy": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "test_route_policy"
+                    },
+                    "redistribute": {
+                        "vipObjectType": "tree",
+                        "vipType": "constant",
+                        "vipValue": [
+                            {
+                                "protocol": {
+                                    "vipObjectType": "object",
+                                    "vipType": "constant",
+                                    "vipValue": "eigrp"
+                                },
+                                "route-policy": {
+                                    "vipObjectType": "object",
+                                    "vipType": "constant",
+                                    "vipValue": "test_route_policy"
+                                }
+                            }
+                        ],
+                        "vipPrimaryKey": [
+                            "protocol"
+                        ]
+                    }
+                }
+            ],
+            "vipPrimaryKey": [
+                "source-vpn",
+                "protocol"
+            ]
+        },
+        "route-export": {
+            "vipObjectType": "tree",
+            "vipType": "constant",
+            "vipValue": [
+                {
+                    "protocol": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "static"
+                    },
+                    "protocol-sub-type": {
+                        "vipObjectType": "list",
+                        "vipType": "constant",
+                        "vipValue": [
+                            "external"
+                        ]
+                    },
+                    "redistribute": {
+                        "vipObjectType": "tree",
+                        "vipType": "constant",
+                        "vipValue": [
+                            {
+                                "protocol": {
+                                    "vipObjectType": "object",
+                                    "vipType": "constant",
+                                    "vipValue": "ospf"
+                                },
+                                "route-policy": {
+                                    "vipObjectType": "object",
+                                    "vipType": "constant",
+                                    "vipValue": "test_route_policy"
+                                }
+                            }
+                        ],
+                        "vipPrimaryKey": [
+                            "protocol"
+                        ]
+                    }
+                }
+            ],
+            "vipPrimaryKey": [
+                "protocol"
+            ]
+        }
+    }
+}

@@ -76,10 +76,14 @@ class CiscoOMPModel(FeatureTemplate, ConvertBoolToStringModel):
     shutdown: Optional[bool]
     omp_admin_distance_ipv4: Optional[int] = Field(alias="omp-admin-distance-ipv4")
     omp_admin_distance_ipv6: Optional[int] = Field(alias="omp-admin-distance-ipv6")
-    advertisement_interval: Optional[int] = Field(DEFAULT_OMP_ADVERTISEMENT_INTERVAL, alias="advertisement-interval")
-    graceful_restart_timer: Optional[int] = Field(DEFAULT_OMP_GRACEFUL_RESTART_TIMER, alias="graceful-restart-timer")
-    eor_timer: Optional[int] = Field(DEFAULT_OMP_EOR_TIMER, alias="eor-timer")
-    holdtime: Optional[int] = DEFAULT_OMP_HOLDTIME
+    advertisement_interval: Optional[int] = Field(
+        DEFAULT_OMP_ADVERTISEMENT_INTERVAL, alias="advertisement-interval", data_path=["timers"]
+    )
+    graceful_restart_timer: Optional[int] = Field(
+        DEFAULT_OMP_GRACEFUL_RESTART_TIMER, alias="graceful-restart-timer", data_path=["timers"]
+    )
+    eor_timer: Optional[int] = Field(DEFAULT_OMP_EOR_TIMER, alias="eor-timer", data_path=["timers"])
+    holdtime: Optional[int] = Field(DEFAULT_OMP_HOLDTIME, data_path=["timers"])
     advertise: Optional[List[IPv4Advertise]]
     ipv6_advertise: Optional[List[IPv6Advertise]] = Field(alias="ipv6-advertise")
     ignore_region_path_length: Optional[bool] = Field(False, alias="ignore-region-path-length")
