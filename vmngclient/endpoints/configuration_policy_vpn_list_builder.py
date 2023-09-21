@@ -1,35 +1,10 @@
 # mypy: disable-error-code="empty-body"
-from typing import List
 
-from pydantic import BaseModel, Field, validator
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.policy_list import InfoTag, PolicyList, PolicyListId, PolicyListInfo, PolicyListPreview
+from vmngclient.model.policy.lists import VPNList
+from vmngclient.model.policy.policy_list import InfoTag, PolicyListId, PolicyListInfo, PolicyListPreview
 from vmngclient.typed_list import DataSequence
-
-
-class VPNListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
-
-    vpn: str = Field(alias="vpn", description="0-65530 range or single number")
-
-    @validator("vpn")
-    def check_vpn_range(cls, vpns_str: str):
-        vpns = [int(vpn) for vpn in vpns_str.split("-")]
-        if len(vpns) > 2:
-            raise ValueError("VPN range should consist two integers separated by hyphen")
-        for vpn in vpns:
-            if vpn < 0 or vpn > 65530:
-                raise ValueError("VPN should be in range 0-65530")
-        if len(vpns) == 2 and vpns[0] >= vpns[1]:
-            raise ValueError("Second VPN in range should be greater than first")
-        return vpns_str
-
-
-class VPNList(PolicyList):
-    entries: List[VPNListEntry]
-    type: str = Field(default="vpn", const=True)
 
 
 class VPNListEditPayload(VPNList, PolicyListId):
