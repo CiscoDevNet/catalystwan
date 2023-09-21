@@ -15,7 +15,7 @@ class Server(ConvertBoolToStringModel):
     key: Optional[int] = Field(default=None)
     vpn: Optional[int] = Field(default=0)
     version: Optional[int] = Field(default=4)
-    source_interface: Optional[str] = Field(alias="source-interface", default=None)
+    source_interface: Optional[str] = Field(vmanage_key="source-interface", default=None)
     prefer: Optional[bool] = Field(default=False)
 
 
