@@ -55,3 +55,7 @@ class ZoneListEntry(BaseModel):
         if vpn < 0 or vpn > 65530:
             raise ValueError("VPN should be in range 0-65530")
         return vpn_str
+
+
+class FQDNListEntry(BaseModel):
+    pattern: str
