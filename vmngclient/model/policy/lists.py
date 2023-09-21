@@ -3,7 +3,7 @@ from typing import List, Literal, Optional, Union
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated
 
-from vmngclient.model.policy.lists_entries import DataPrefixListEntry, SiteListEntry, VPNListEntry
+from vmngclient.model.policy.lists_entries import DataPrefixListEntry, SiteListEntry, VPNListEntry, ZoneListEntry
 
 
 class PolicyListHeader(BaseModel):
@@ -29,4 +29,9 @@ class VPNList(PolicyListHeader):
     entries: List[VPNListEntry]
 
 
-AllPolicyLists = Annotated[Union[DataPrefixList, SiteList, VPNList], Field(discriminator="type")]
+class ZoneList(PolicyListHeader):
+    type: Literal["zone"] = "zone"
+    entries: List[ZoneListEntry]
+
+
+AllPolicyLists = Annotated[Union[DataPrefixList, SiteList, VPNList, ZoneList], Field(discriminator="type")]
