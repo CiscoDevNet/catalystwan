@@ -5,14 +5,7 @@ from typing import List
 from pydantic import BaseModel, Field, validator
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.policy_list import (
-    InfoTag,
-    PolicyList,
-    PolicyListCreationPayload,
-    PolicyListEditPayload,
-    PolicyListId,
-    PolicyListPreview,
-)
+from vmngclient.model.policy.policy_list import InfoTag, PolicyList, PolicyListId, PolicyListInfo, PolicyListPreview
 from vmngclient.typed_list import DataSequence
 
 
@@ -30,26 +23,22 @@ class DataPrefixListEntry(BaseModel):
         return ip_prefix
 
 
-class DataPrefixPayload(BaseModel):
+class DataPrefixList(PolicyList):
     entries: List[DataPrefixListEntry]
     type: str = Field(default="dataPrefix", const=True)
 
 
-class DataPrefixListCreationPayload(DataPrefixPayload, PolicyListCreationPayload):
+class DataPrefixListEditPayload(DataPrefixList, PolicyListId):
     pass
 
 
-class DataPrefixListEditPayload(DataPrefixPayload, PolicyListEditPayload):
-    pass
-
-
-class DataPrefixList(DataPrefixPayload, PolicyList):
+class DataPrefixListInfo(DataPrefixList, PolicyListInfo):
     pass
 
 
 class ConfigurationPolicyDataPrefixListBuilder(APIEndpoints):
     @post("/template/policy/list/dataprefix")
-    def create_policy_list(self, payload: DataPrefixListCreationPayload) -> PolicyListId:
+    def create_policy_list(self, payload: DataPrefixList) -> PolicyListId:
         ...
 
     @delete("/template/policy/list/dataprefix/{id}")
@@ -58,9 +47,6 @@ class ConfigurationPolicyDataPrefixListBuilder(APIEndpoints):
 
     @delete("/template/policy/list/dataprefix")
     def delete_policy_lists_with_info_tag(self, params: InfoTag) -> None:
-        # TODO: dont know how to assing tags to check if filter works
-        # (it is present in GET response but cannot be added to POST, PUT payload)
-        # for now it was tested with default info tag value == ""
         ...
 
     @put("/template/policy/list/dataprefix/{id}")
@@ -68,23 +54,19 @@ class ConfigurationPolicyDataPrefixListBuilder(APIEndpoints):
         ...
 
     @get("/template/policy/list/dataprefix/{id}")
-    def get_lists_by_id(self, id: str) -> DataPrefixList:
+    def get_lists_by_id(self, id: str) -> DataPrefixListInfo:
         ...
 
     @get("/template/policy/list/dataprefix", "data")
-    def get_policy_lists(self) -> DataSequence[DataPrefixList]:
+    def get_policy_lists(self) -> DataSequence[DataPrefixListInfo]:
         ...
 
     @get("/template/policy/list/dataprefix/filtered", "data")
-    def get_policy_lists_with_info_tag(self, params: InfoTag) -> DataSequence[DataPrefixList]:
-        # TODO: dont know how to assing tags to check if filter works
-        # (it is present in GET response but cannot be added to POST, PUT payload)
-        # for now it was tested with default info tag value == ""
+    def get_policy_lists_with_info_tag(self, params: InfoTag) -> DataSequence[DataPrefixListInfo]:
         ...
 
     @post("/template/policy/list/dataprefix/preview")
-    def preview_policy_list(self, payload: DataPrefixListCreationPayload) -> PolicyListPreview:
-        # TODO: not working for some reason
+    def preview_policy_list(self, payload: DataPrefixList) -> PolicyListPreview:
         ...
 
     @get("/template/policy/list/dataprefix/preview/{id}")

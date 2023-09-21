@@ -4,14 +4,7 @@ from typing import List
 from pydantic import BaseModel, Field
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.policy_list import (
-    InfoTag,
-    PolicyList,
-    PolicyListCreationPayload,
-    PolicyListEditPayload,
-    PolicyListId,
-    PolicyListPreview,
-)
+from vmngclient.model.policy.policy_list import InfoTag, PolicyList, PolicyListId, PolicyListInfo, PolicyListPreview
 from vmngclient.typed_list import DataSequence
 
 
@@ -22,30 +15,26 @@ class SiteListEntry(BaseModel):
     site_id: str = Field(alias="siteId")
 
 
-class SitePayload(BaseModel):
+class SiteList(PolicyList):
     entries: List[SiteListEntry]
     type: str = Field(default="site", const=True)
 
 
-class SiteListCreationPayload(SitePayload, PolicyListCreationPayload):
+class SiteListEditPayload(SiteList, PolicyListId):
     pass
 
 
-class SiteListEditPayload(SitePayload, PolicyListEditPayload):
-    pass
-
-
-class SiteList(SitePayload, PolicyList):
+class SiteListInfo(SiteList, PolicyListInfo):
     pass
 
 
 class ConfigurationPolicySiteListBuilder(APIEndpoints):
     @post("/template/policy/list/site/defaultsite")
-    def create_default_site_list(self, payload: SiteListCreationPayload) -> PolicyListId:
+    def create_default_site_list(self, payload: SiteList) -> PolicyListId:
         ...
 
     @post("/template/policy/list/site")
-    def create_policy_list(self, payload: SiteListCreationPayload) -> PolicyListId:
+    def create_policy_list(self, payload: SiteList) -> PolicyListId:
         ...
 
     @delete("/template/policy/list/site/{id}")
@@ -54,9 +43,6 @@ class ConfigurationPolicySiteListBuilder(APIEndpoints):
 
     @delete("/template/policy/list/site")
     def delete_policy_lists_with_info_tag(self, params: InfoTag) -> None:
-        # TODO: dont know how to assing tags to check if filter works
-        # (it is present in GET response but cannot be added to POST, PUT payload)
-        # for now it was tested with default info tag value == ""
         ...
 
     @put("/template/policy/list/site/{id}")
@@ -64,22 +50,19 @@ class ConfigurationPolicySiteListBuilder(APIEndpoints):
         ...
 
     @get("/template/policy/list/site/{id}")
-    def get_lists_by_id(self, id: str) -> SiteList:
+    def get_lists_by_id(self, id: str) -> SiteListInfo:
         ...
 
     @get("/template/policy/list/site", "data")
-    def get_policy_lists(self) -> DataSequence[SiteList]:
+    def get_policy_lists(self) -> DataSequence[SiteListInfo]:
         ...
 
     @get("/template/policy/list/site/filtered", "data")
-    def get_policy_lists_with_info_tag(self, params: InfoTag) -> DataSequence[SiteList]:
-        # TODO: dont know how to assing tags to check if filter works
-        # (it is present in GET response but cannot be added to POST, PUT payload)
-        # for now it was tested with default info tag value == ""
+    def get_policy_lists_with_info_tag(self, params: InfoTag) -> DataSequence[SiteListInfo]:
         ...
 
     @post("/template/policy/list/site/preview")
-    def preview_policy_list(self, payload: SiteListCreationPayload) -> PolicyListPreview:
+    def preview_policy_list(self, payload: SiteList) -> PolicyListPreview:
         ...
 
     @get("/template/policy/list/site/preview/{id}")
