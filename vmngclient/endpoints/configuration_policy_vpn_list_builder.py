@@ -4,14 +4,7 @@ from typing import List
 from pydantic import BaseModel, Field, validator
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.policy_list import (
-    InfoTag,
-    PolicyList,
-    PolicyListCreationPayload,
-    PolicyListEditPayload,
-    PolicyListId,
-    PolicyListPreview,
-)
+from vmngclient.model.policy.policy_list import InfoTag, PolicyList, PolicyListId, PolicyListInfo, PolicyListPreview
 from vmngclient.typed_list import DataSequence
 
 
@@ -34,26 +27,22 @@ class VPNListEntry(BaseModel):
         return vpns_str
 
 
-class VPNPayload(BaseModel):
+class VPNList(PolicyList):
     entries: List[VPNListEntry]
     type: str = Field(default="vpn", const=True)
 
 
-class VPNListCreationPayload(VPNPayload, PolicyListCreationPayload):
+class VPNListEditPayload(VPNList, PolicyListId):
     pass
 
 
-class VPNListEditPayload(VPNPayload, PolicyListEditPayload):
-    pass
-
-
-class VPNList(VPNPayload, PolicyList):
+class VPNListInfo(VPNList, PolicyListInfo):
     pass
 
 
 class ConfigurationPolicyVPNListBuilder(APIEndpoints):
     @post("/template/policy/list/vpn")
-    def create_policy_list(self, payload: VPNListCreationPayload) -> PolicyListId:
+    def create_policy_list(self, payload: VPNList) -> PolicyListId:
         ...
 
     @delete("/template/policy/list/vpn/{id}")
@@ -62,9 +51,6 @@ class ConfigurationPolicyVPNListBuilder(APIEndpoints):
 
     @delete("/template/policy/list/vpn")
     def delete_policy_lists_with_info_tag(self, params: InfoTag) -> None:
-        # TODO: dont know how to assing tags to check if filter works
-        # (it is present in GET response but cannot be added to POST, PUT payload)
-        # for now it was tested with default info tag value == ""
         ...
 
     @put("/template/policy/list/vpn/{id}")
@@ -72,22 +58,19 @@ class ConfigurationPolicyVPNListBuilder(APIEndpoints):
         ...
 
     @get("/template/policy/list/vpn/{id}")
-    def get_lists_by_id(self, id: str) -> VPNList:
+    def get_lists_by_id(self, id: str) -> VPNListInfo:
         ...
 
     @get("/template/policy/list/vpn", "data")
-    def get_policy_lists(self) -> DataSequence[VPNList]:
+    def get_policy_lists(self) -> DataSequence[VPNListInfo]:
         ...
 
     @get("/template/policy/list/vpn/filtered", "data")
-    def get_policy_lists_with_info_tag(self, params: InfoTag) -> DataSequence[VPNList]:
-        # TODO: dont know how to assing tags to check if filter works
-        # (it is present in GET response but cannot be added to POST, PUT payload)
-        # for now it was tested with default info tag value == ""
+    def get_policy_lists_with_info_tag(self, params: InfoTag) -> DataSequence[VPNListInfo]:
         ...
 
     @post("/template/policy/list/vpn/preview")
-    def preview_policy_list(self, payload: VPNListCreationPayload) -> PolicyListPreview:
+    def preview_policy_list(self, payload: VPNList) -> PolicyListPreview:
         ...
 
     @get("/template/policy/list/vpn/preview/{id}")

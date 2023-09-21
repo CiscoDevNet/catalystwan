@@ -12,7 +12,7 @@ class PolicyListId(BaseModel):
     list_id: str = Field(alias="listId")
 
 
-class PolicyListCreationPayload(BaseModel):
+class PolicyList(BaseModel):
     name: str = Field(
         regex="^[a-zA-Z0-9_-]{1,32}$",
         description="Can include only alpha-numeric characters, hyphen '-' or underscore '_'; maximum 32 characters",
@@ -22,18 +22,18 @@ class PolicyListCreationPayload(BaseModel):
     entries: List
 
 
-class PolicyListEditPayload(PolicyListCreationPayload, PolicyListId):
-    pass
-
-
-class PolicyList(PolicyListEditPayload, InfoTag):
+class PolicyListInfo(PolicyListId, InfoTag):
     last_updated: datetime.datetime = Field(alias="lastUpdated")
     owner: str
     read_only: bool = Field(alias="readOnly")
     version: str
     reference_count: int = Field(alias="referenceCount")
     references: List
-    is_activated_by_vsmart: bool = Field(alias="isActivatedByVsmart")
+    is_activated_by_vsmart: Optional[bool] = Field(None, alias="isActivatedByVsmart")
+
+
+class PolicyListEditPayload(PolicyList, PolicyListId):
+    pass
 
 
 class PolicyListPreview(BaseModel):

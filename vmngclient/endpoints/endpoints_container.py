@@ -19,6 +19,7 @@ from vmngclient.endpoints.configuration_policy_vpn_list_builder import Configura
 from vmngclient.endpoints.configuration_policy_zone_based_firewall_definition_builder import (
     ConfigurationPolicyZoneBasedFirewallDefinitionBuilder,
 )
+from vmngclient.endpoints.configuration_policy_zone_list_builder import ConfigurationPolicyZoneListBuilder
 from vmngclient.endpoints.configuration_settings import ConfigurationSettings
 from vmngclient.endpoints.configuration_vsmart_template_policy import ConfigurationVSmartTemplatePolicy
 from vmngclient.endpoints.monitoring_device_details import MonitoringDeviceDetails
@@ -50,6 +51,7 @@ class APIEndpointContainter:
         self.configuration_policy_zone_based_firewall_definition_builder = (
             ConfigurationPolicyZoneBasedFirewallDefinitionBuilder(session)
         )
+        self.configuration_policy_zone_list_builder = ConfigurationPolicyZoneListBuilder(session)
         self.configuration_settings = ConfigurationSettings(session)
         self.monitoring_device_details = MonitoringDeviceDetails(session)
         self.monitoring_status = MonitoringStatus(session)
