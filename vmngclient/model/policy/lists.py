@@ -69,9 +69,23 @@ class LocalAppList(PolicyListHeader):
     entries: List[LocalAppListEntry]
 
 
+class AppList(PolicyListHeader):
+    type: Literal["app"] = "app"
+    entries: List
+
+
 AllPolicyLists = Annotated[
     Union[
-        DataPrefixList, SiteList, VPNList, ZoneList, FQDNList, GeoLocationList, PortList, ProtocolNameList, LocalAppList
+        DataPrefixList,
+        SiteList,
+        VPNList,
+        ZoneList,
+        FQDNList,
+        GeoLocationList,
+        PortList,
+        ProtocolNameList,
+        LocalAppList,
+        AppList,
     ],
     Field(discriminator="type"),
 ]
