@@ -6,6 +6,7 @@ from typing_extensions import Annotated
 from vmngclient.model.policy.lists_entries import (
     DataPrefixListEntry,
     FQDNListEntry,
+    GeoLocationListEntry,
     SiteListEntry,
     VPNListEntry,
     ZoneListEntry,
@@ -45,4 +46,11 @@ class FQDNList(PolicyListHeader):
     entries: List[FQDNListEntry]
 
 
-AllPolicyLists = Annotated[Union[DataPrefixList, SiteList, VPNList, ZoneList, FQDNList], Field(discriminator="type")]
+class GeoLocationList(PolicyListHeader):
+    type: Literal["geoLocation"] = "geoLocation"
+    entries: List[GeoLocationListEntry]
+
+
+AllPolicyLists = Annotated[
+    Union[DataPrefixList, SiteList, VPNList, ZoneList, FQDNList, GeoLocationList], Field(discriminator="type")
+]
