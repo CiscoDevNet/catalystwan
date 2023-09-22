@@ -98,7 +98,7 @@ class LocalAppListEntry(BaseModel):
     app: Optional[str]
 
     @root_validator(pre=True)
-    def check_country_or_continent(cls, values):
+    def check_app_or_appfamily(cls, values):
         checked_values = [values.get("app"), values.get("appFamily")]
         set_values = [value for value in checked_values if value is not None]
         if len(set_values) != 1:
@@ -107,4 +107,16 @@ class LocalAppListEntry(BaseModel):
 
 
 class AppListEntry(BaseModel):
-    app: str
+    app_family: Optional[str] = Field(alias="appFamily")
+    app: Optional[str]
+
+    def check_app_or_appfamily(cls, values):
+        checked_values = [values.get("app"), values.get("appFamily")]
+        set_values = [value for value in checked_values if value is not None]
+        if len(set_values) != 1:
+            raise ValueError("Either app or appFamily is required")
+        return values
+
+
+class ColorListEntry(BaseModel):
+    color: str

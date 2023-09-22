@@ -11,6 +11,7 @@ from vmngclient.endpoints.configuration.policy.definition_builder.zone_based_fir
     ConfigurationPolicyZoneBasedFirewallDefinitionBuilder,
 )
 from vmngclient.endpoints.configuration.policy.list_builder.app import ConfigurationPolicyApplicationListBuilder
+from vmngclient.endpoints.configuration.policy.list_builder.color import ConfigurationPolicyColorListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.data_prefix import ConfigurationPolicyDataPrefixListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.fqdn import ConfigurationPolicyFQDNListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.geo_location import (
@@ -55,6 +56,7 @@ class ConfigurationPolicyListBuilderContainer:
         self.protocol_name = ConfigurationPolicyProtocolNameListBuilder(session)
         self.local_app = ConfigurationPolicyLocalAppListBuilder(session)
         self.app = ConfigurationPolicyApplicationListBuilder(session)
+        self.color = ConfigurationPolicyColorListBuilder(session)
 
 
 class ConfigurationPolicyDefinitionBuilderContainer:
