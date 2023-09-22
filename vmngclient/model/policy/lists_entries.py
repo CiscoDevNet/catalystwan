@@ -104,3 +104,7 @@ class LocalAppListEntry(BaseModel):
         if len(set_values) != 1:
             raise ValueError("Either app or appFamily is required")
         return values
+
+
+class AppListEntry(BaseModel):
+    app: str
