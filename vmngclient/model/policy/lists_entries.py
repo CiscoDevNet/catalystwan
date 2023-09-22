@@ -1,6 +1,7 @@
 from ipaddress import IPv4Network
+from typing import Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, root_validator, validator
 
 
 class DataPrefixListEntry(BaseModel):
@@ -59,3 +60,16 @@ class ZoneListEntry(BaseModel):
 
 class FQDNListEntry(BaseModel):
     pattern: str
+
+
+class GeoLocationListEntry(BaseModel):
+    country: Optional[str] = Field(description="ISO-3166 alpha-3 country code eg: FRA")
+    continent: Optional[str] = Field(description="One of 2-letter continent codes: AF, NA, OC, AN, AS, EU, SA")
+
+    @root_validator(pre=True)
+    def check_country_or_continent(cls, values):
+        checked_values = [values.get("country"), values.get("continent")]
+        set_values = [value for value in checked_values if value is not None]
+        if len(set_values) != 1:
+            raise ValueError("Either country or continent is required")
+        return values
