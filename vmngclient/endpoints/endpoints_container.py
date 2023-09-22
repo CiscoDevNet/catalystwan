@@ -37,27 +37,45 @@ if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
 
+class ConfigurationPolicyListBuilderContainer:
+    def __init__(self, session: vManageSession):
+        self.data_prefix = ConfigurationPolicyDataPrefixListBuilder(session)
+        self.geo_location = ConfigurationPolicyGeoLocationListBuilder(session)
+        self.fqdn = ConfigurationPolicyFQDNListBuilder(session)
+        self.site = ConfigurationPolicySiteListBuilder(session)
+        self.vpn = ConfigurationPolicyVPNListBuilder(session)
+        self.zone = ConfigurationPolicyZoneListBuilder(session)
+
+
+class ConfigurationPolicyDefinitionBuilderContainer:
+    def __init__(self, session: vManageSession):
+        self.data = ConfigurationPolicyDataDefinitionBuilder(session)
+        self.zone_based_firewall = ConfigurationPolicyZoneBasedFirewallDefinitionBuilder(session)
+
+
+class ConfigurationPolicyContainer:
+    def __init__(self, session: vManageSession):
+        self.list_builder = ConfigurationPolicyListBuilderContainer(session)
+        self.definition_builder = ConfigurationPolicyDefinitionBuilderContainer(session)
+        self.vsmart_template = ConfigurationVSmartTemplatePolicy(session)
+
+
+class ConfigurationContainer:
+    def __init__(self, session: vManageSession):
+        self.policy = ConfigurationPolicyContainer(session)
+
+
 class APIEndpointContainter:
     def __init__(self, session: vManageSession):
         self.administration_user_and_group = AdministrationUserAndGroup(session)
         self.certificate_management_vmanage = CertificateManagementVManage(session)
         self.client = Client(session)
         self.cluster_management = ClusterManagement(session)
+        self.configuration = ConfigurationContainer(session)
         self.configuration_dashboard_status = ConfigurationDashboardStatus(session)
         self.configuration_device_actions = ConfigurationDeviceActions(session)
         self.configuration_device_software_update = ConfigurationDeviceSoftwareUpdate(session)
         self.configuration_device_template = ConfigurationDeviceTemplate(session)
-        self.configuration_policy_data_definition_builder = ConfigurationPolicyDataDefinitionBuilder(session)
-        self.configuration_policy_data_prefix_list_builder = ConfigurationPolicyDataPrefixListBuilder(session)
-        self.configuration_policy_geo_location_list_builder = ConfigurationPolicyGeoLocationListBuilder(session)
-        self.configuration_policy_fqdn_list_builder = ConfigurationPolicyFQDNListBuilder(session)
-        self.configuration_policy_site_list_builder = ConfigurationPolicySiteListBuilder(session)
-        self.configuration_policy_vpn_list_builder = ConfigurationPolicyVPNListBuilder(session)
-        self.configuration_vsmart_template_policy = ConfigurationVSmartTemplatePolicy(session)
-        self.configuration_policy_zone_based_firewall_definition_builder = (
-            ConfigurationPolicyZoneBasedFirewallDefinitionBuilder(session)
-        )
-        self.configuration_policy_zone_list_builder = ConfigurationPolicyZoneListBuilder(session)
         self.configuration_settings = ConfigurationSettings(session)
         self.monitoring_device_details = MonitoringDeviceDetails(session)
         self.monitoring_status = MonitoringStatus(session)
