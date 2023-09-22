@@ -7,6 +7,7 @@ from vmngclient.model.policy.lists_entries import (
     DataPrefixListEntry,
     FQDNListEntry,
     GeoLocationListEntry,
+    LocalAppListEntry,
     PortListEntry,
     ProtocolNameListEntry,
     SiteListEntry,
@@ -63,7 +64,14 @@ class ProtocolNameList(PolicyListHeader):
     entries: List[ProtocolNameListEntry]
 
 
+class LocalAppList(PolicyListHeader):
+    type: Literal["localApp"] = "localApp"
+    entries: List[LocalAppListEntry]
+
+
 AllPolicyLists = Annotated[
-    Union[DataPrefixList, SiteList, VPNList, ZoneList, FQDNList, GeoLocationList, PortList, ProtocolNameList],
+    Union[
+        DataPrefixList, SiteList, VPNList, ZoneList, FQDNList, GeoLocationList, PortList, ProtocolNameList, LocalAppList
+    ],
     Field(discriminator="type"),
 ]

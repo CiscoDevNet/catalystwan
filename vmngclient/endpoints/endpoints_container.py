@@ -15,6 +15,7 @@ from vmngclient.endpoints.configuration.policy.list_builder.fqdn import Configur
 from vmngclient.endpoints.configuration.policy.list_builder.geo_location import (
     ConfigurationPolicyGeoLocationListBuilder,
 )
+from vmngclient.endpoints.configuration.policy.list_builder.local_app import ConfigurationPolicyLocalAppListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.port import ConfigurationPolicyPortListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.protocol_name import (
     ConfigurationPolicyProtocolNameListBuilder,
@@ -51,6 +52,7 @@ class ConfigurationPolicyListBuilderContainer:
         self.zone = ConfigurationPolicyZoneListBuilder(session)
         self.port = ConfigurationPolicyPortListBuilder(session)
         self.protocol_name = ConfigurationPolicyProtocolNameListBuilder(session)
+        self.local_app = ConfigurationPolicyLocalAppListBuilder(session)
 
 
 class ConfigurationPolicyDefinitionBuilderContainer:
