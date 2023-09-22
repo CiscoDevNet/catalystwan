@@ -84,3 +84,10 @@ class PortListEntry(BaseModel):
         if port < 0 or port > 65535:
             raise ValueError("Port should be in range 0-65535")
         return port_str
+
+
+class ProtocolNameListEntry(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    protocol_name: str = Field(alias="protocolName")
