@@ -124,7 +124,7 @@ class FeatureTemplateField(BaseModel):
                             model_field: ModelField = next(
                                 filter(
                                     lambda f: f.field_info.extra.get("data_path", []) == child.dataPath
-                                    and f.alias == child.key,
+                                    and (f.alias == child.key or f.field_info.extra.get("vmanage_key") == child.key),
                                     obj.__fields__.values(),
                                 )
                             )

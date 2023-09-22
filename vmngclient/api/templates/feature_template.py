@@ -55,10 +55,12 @@ class FeatureTemplate(BaseModel, ABC):
             values["device_specific_variables"] = {}
         to_delete = {}
 
+        # TODO: Add support for nested models with DeviceVariable
         for key, value in values.items():
             if isinstance(value, DeviceVariable):
                 to_delete[key] = value
-                values["device_specific_variables"][cls.__fields__[key].alias] = DeviceVariable(name=value.name)
+                field_key = cls.__fields__[key].field_info.extra.get("vmanage_key", cls.__fields__[key].alias)
+                values["device_specific_variables"][field_key] = DeviceVariable(name=value.name)
 
         for var in to_delete:
             if var in values:

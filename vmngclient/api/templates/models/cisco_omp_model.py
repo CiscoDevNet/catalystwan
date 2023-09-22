@@ -69,27 +69,27 @@ class CiscoOMPModel(FeatureTemplate, ConvertBoolToStringModel):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    graceful_restart: Optional[bool] = Field(True, alias="graceful-restart")
-    overlay_as: Optional[int] = Field(alias="overlay-as")
-    send_path_limit: Optional[int] = Field(DEFAULT_OMP_SENDPATH_LIMIT, alias="send-path-limit")
-    ecmp_limit: Optional[int] = Field(DEFAULT_OMP_ECMP_LIMIT, alias="ecmp-limit")
+    graceful_restart: Optional[bool] = Field(True, vmanage_key="graceful-restart")
+    overlay_as: Optional[int] = Field(vmanage_key="overlay-as")
+    send_path_limit: Optional[int] = Field(DEFAULT_OMP_SENDPATH_LIMIT, vmanage_key="send-path-limit")
+    ecmp_limit: Optional[int] = Field(DEFAULT_OMP_ECMP_LIMIT, vmanage_key="ecmp-limit")
     shutdown: Optional[bool]
-    omp_admin_distance_ipv4: Optional[int] = Field(alias="omp-admin-distance-ipv4")
-    omp_admin_distance_ipv6: Optional[int] = Field(alias="omp-admin-distance-ipv6")
+    omp_admin_distance_ipv4: Optional[int] = Field(vmanage_key="omp-admin-distance-ipv4")
+    omp_admin_distance_ipv6: Optional[int] = Field(vmanage_key="omp-admin-distance-ipv6")
     advertisement_interval: Optional[int] = Field(
-        DEFAULT_OMP_ADVERTISEMENT_INTERVAL, alias="advertisement-interval", data_path=["timers"]
+        DEFAULT_OMP_ADVERTISEMENT_INTERVAL, vmanage_key="advertisement-interval", data_path=["timers"]
     )
     graceful_restart_timer: Optional[int] = Field(
-        DEFAULT_OMP_GRACEFUL_RESTART_TIMER, alias="graceful-restart-timer", data_path=["timers"]
+        DEFAULT_OMP_GRACEFUL_RESTART_TIMER, vmanage_key="graceful-restart-timer", data_path=["timers"]
     )
-    eor_timer: Optional[int] = Field(DEFAULT_OMP_EOR_TIMER, alias="eor-timer", data_path=["timers"])
+    eor_timer: Optional[int] = Field(DEFAULT_OMP_EOR_TIMER, vmanage_key="eor-timer", data_path=["timers"])
     holdtime: Optional[int] = Field(DEFAULT_OMP_HOLDTIME, data_path=["timers"])
     advertise: Optional[List[IPv4Advertise]]
-    ipv6_advertise: Optional[List[IPv6Advertise]] = Field(alias="ipv6-advertise")
-    ignore_region_path_length: Optional[bool] = Field(False, alias="ignore-region-path-length")
-    transport_gateway: Optional[TransportGateway] = Field(alias="transport-gateway")
-    site_types: Optional[List[SiteTypes]] = Field(alias="site-types")
-    auto_translate: Optional[bool] = Field(False, alias="auto-translate")
+    ipv6_advertise: Optional[List[IPv6Advertise]] = Field(vmanage_key="ipv6-advertise")
+    ignore_region_path_length: Optional[bool] = Field(False, vmanage_key="ignore-region-path-length")
+    transport_gateway: Optional[TransportGateway] = Field(vmanage_key="transport-gateway")
+    site_types: Optional[List[SiteTypes]] = Field(vmanage_key="site-types")
+    auto_translate: Optional[bool] = Field(False, vmanage_key="auto-translate")
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_omp"

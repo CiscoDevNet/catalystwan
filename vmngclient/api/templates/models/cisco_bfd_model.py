@@ -41,9 +41,9 @@ class ColorType(str, Enum):
 
 class Color(ConvertBoolToStringModel):
     color: ColorType
-    hello_interval: Optional[int] = Field(DEFAULT_BFD_HELLO_INTERVAL, alias="hello-interval")
+    hello_interval: Optional[int] = Field(DEFAULT_BFD_HELLO_INTERVAL, vmanage_key="hello-interval")
     multiplier: Optional[int] = DEFAULT_BFD_COLOR_MULTIPLIER
-    pmtu_discovery: Optional[bool] = Field(True, alias="pmtu-discovery")
+    pmtu_discovery: Optional[bool] = Field(True, vmanage_key="pmtu-discovery")
     dscp: Optional[int] = DEFAULT_BFD_DSCP
 
     class Config:
@@ -56,8 +56,10 @@ class CiscoBFDModel(FeatureTemplate, ConvertBoolToStringModel):
         allow_population_by_field_name = True
 
     multiplier: Optional[int] = Field(DEFAULT_BFD_MULTIPLIER, data_path=["app-route"])
-    poll_interval: Optional[int] = Field(DEFAULT_BFD_POLL_INTERVAL, alias="poll-interval", data_path=["app-route"])
-    default_dscp: Optional[int] = Field(DEFAULT_BFD_DSCP, alias="default-dscp")
+    poll_interval: Optional[int] = Field(
+        DEFAULT_BFD_POLL_INTERVAL, vmanage_key="poll-interval", data_path=["app-route"]
+    )
+    default_dscp: Optional[int] = Field(DEFAULT_BFD_DSCP, vmanage_key="default-dscp")
     color: Optional[List[Color]]
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"

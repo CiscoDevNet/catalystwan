@@ -12,7 +12,7 @@ class User(BaseModel):
     password: str
     secret: str
     privilege: Optional[str]
-    pubkey_chain: List[str] = Field(default=[], alias="pubkey-chain")
+    pubkey_chain: List[str] = Field(default=[], vmanage_key="pubkey-chain")
 
 
 class RadiusServer(BaseModel):
@@ -20,14 +20,14 @@ class RadiusServer(BaseModel):
         allow_population_by_field_name = True
 
     address: str
-    auth_port: int = Field(alias="auth-port", default=1812)
-    acct_port: int = Field(alias="acct-port", default=1813)
+    auth_port: int = Field(vmanage_key="auth-port", default=1812)
+    acct_port: int = Field(vmanage_key="acct-port", default=1813)
     timeout: int = Field(default=5)
     retransmit: int = 3
     key: str
-    secret_key: Optional[str] = Field(alias="secret-key", default=None)
-    key_enum: Optional[str] = Field(alias="key-enum", default=None)
-    key_type: Optional[str] = Field(alias="key-type", default=None)
+    secret_key: Optional[str] = Field(vmanage_key="secret-key", default=None)
+    key_enum: Optional[str] = Field(vmanage_key="key-enum", default=None)
+    key_type: Optional[str] = Field(vmanage_key="key-type", default=None)
 
 
 class RadiusGroup(BaseModel):
@@ -35,9 +35,9 @@ class RadiusGroup(BaseModel):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    group_name: str = Field(alias="group-name")
+    group_name: str = Field(vmanage_key="group-name")
     vpn: Optional[int]
-    source_interface: Optional[str] = Field(alias="source-interface")
+    source_interface: Optional[str] = Field(vmanage_key="source-interface")
     server: List[RadiusServer] = []
 
 
@@ -55,17 +55,17 @@ class TacacsServer(BaseModel):
     port: int = 49
     timeout: int = Field(default=5)
     key: str
-    secret_key: Optional[str] = Field(alias="secret-key", default=None)
-    key_enum: Optional[str] = Field(alias="key-enum", default=None)
+    secret_key: Optional[str] = Field(vmanage_key="secret-key", default=None)
+    key_enum: Optional[str] = Field(vmanage_key="key-enum", default=None)
 
 
 class TacacsGroup(BaseModel):
     class Config:
         allow_population_by_field_name = True
 
-    group_name: str = Field(alias="group-name")
+    group_name: str = Field(vmanage_key="group-name")
     vpn: int = 0
-    source_interface: Optional[str] = Field(alias="source-interface", default=None)
+    source_interface: Optional[str] = Field(vmanage_key="source-interface", default=None)
     server: List[TacacsServer] = []
 
 
@@ -75,13 +75,13 @@ class CiscoAAAModel(FeatureTemplate):
         allow_population_by_field_name = True
 
     user: List[User] = []
-    authentication_group: bool = Field(alias="authentication_group", default=False)
+    authentication_group: bool = Field(vmanage_key="authentication_group", default=False)
     accounting_group: bool = True
     radius: List[RadiusGroup] = []
-    domain_stripping: Optional[DomainStripping] = Field(alias="domain-stripping", default=None)
+    domain_stripping: Optional[DomainStripping] = Field(vmanage_key="domain-stripping", default=None)
     port: int = 1700
     tacacs: List[TacacsGroup] = []
-    server_auth_order: str = Field(alias="server-auth-order", default="local")
+    server_auth_order: str = Field(vmanage_key="server-auth-order", default="local")
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cedge_aaa"
