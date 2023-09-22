@@ -4,6 +4,8 @@ from pydantic import BaseModel, Field
 from typing_extensions import Annotated
 
 from vmngclient.model.policy.lists_entries import (
+    AppListEntry,
+    ColorListEntry,
     DataPrefixListEntry,
     FQDNListEntry,
     GeoLocationListEntry,
@@ -71,7 +73,12 @@ class LocalAppList(PolicyListHeader):
 
 class AppList(PolicyListHeader):
     type: Literal["app"] = "app"
-    entries: List
+    entries: List[AppListEntry]
+
+
+class ColorList(PolicyListHeader):
+    type: Literal["color"] = "color"
+    entries: List[ColorListEntry]
 
 
 AllPolicyLists = Annotated[
@@ -86,6 +93,7 @@ AllPolicyLists = Annotated[
         ProtocolNameList,
         LocalAppList,
         AppList,
+        ColorList,
     ],
     Field(discriminator="type"),
 ]
