@@ -73,3 +73,14 @@ class GeoLocationListEntry(BaseModel):
         if len(set_values) != 1:
             raise ValueError("Either country or continent is required")
         return values
+
+
+class PortListEntry(BaseModel):
+    port: str
+
+    @validator("port")
+    def check_port_range(cls, port_str: str):
+        port = int(port_str)
+        if port < 0 or port > 65535:
+            raise ValueError("Port should be in range 0-65535")
+        return port_str
