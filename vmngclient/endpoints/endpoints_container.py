@@ -25,7 +25,7 @@ from vmngclient.endpoints.configuration.policy.list_builder.port import Configur
 from vmngclient.endpoints.configuration.policy.list_builder.protocol_name import (
     ConfigurationPolicyProtocolNameListBuilder,
 )
-from vmngclient.endpoints.configuration.policy.list_builder.site_list_builder import ConfigurationPolicySiteListBuilder
+from vmngclient.endpoints.configuration.policy.list_builder.site import ConfigurationPolicySiteListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.vpn import ConfigurationPolicyVPNListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.zone import ConfigurationPolicyZoneListBuilder
 from vmngclient.endpoints.configuration.policy.vsmart_template import ConfigurationVSmartTemplatePolicy
