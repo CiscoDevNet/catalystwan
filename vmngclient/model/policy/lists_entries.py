@@ -1,21 +1,16 @@
-from ipaddress import IPv4Network
+from ipaddress import IPv4Network, IPv6Network
 from typing import Optional
 
 from pydantic import BaseModel, Field, root_validator, validator
+
+from vmngclient.model.common import InterfaceTypeEnum
 
 
 class DataPrefixListEntry(BaseModel):
     class Config:
         allow_population_by_field_name = True
 
-    ip_prefix: str = Field(alias="ipPrefix", description="IP4 network prefixes separated by comma")
-
-    @validator("ip_prefix")
-    def check_network_prefixes(cls, ip_prefix: str):
-        nets = [IPv4Network(net.strip()) for net in ip_prefix.split(",")]
-        if len(nets) < 1:
-            raise ValueError("No network prefix provided")
-        return ip_prefix
+    ip_prefix: IPv4Network = Field(alias="ipPrefix")
 
 
 class SiteListEntry(BaseModel):
@@ -26,10 +21,7 @@ class SiteListEntry(BaseModel):
 
 
 class VPNListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
-
-    vpn: str = Field(alias="vpn", description="0-65530 range or single number")
+    vpn: str = Field(description="0-65530 range or single number")
 
     @validator("vpn")
     def check_vpn_range(cls, vpns_str: str):
@@ -45,10 +37,8 @@ class VPNListEntry(BaseModel):
 
 
 class ZoneListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
-
-    vpn: str = Field(alias="vpn", description="0-65530 single number")
+    vpn: Optional[str] = Field(None, description="0-65530 single number")
+    interface: Optional[InterfaceTypeEnum]
 
     @validator("vpn")
     def check_vpn_range(cls, vpn_str: str):
@@ -56,6 +46,14 @@ class ZoneListEntry(BaseModel):
         if vpn < 0 or vpn > 65530:
             raise ValueError("VPN should be in range 0-65530")
         return vpn_str
+
+    @root_validator(pre=True)
+    def check_vpn_xor_interface(cls, values):
+        checked_values = [values.get("vpn"), values.get("interface")]
+        set_values = [value for value in checked_values if value is not None]
+        if len(set_values) != 1:
+            raise ValueError("Either vpn or interface is required")
+        return values
 
 
 class FQDNListEntry(BaseModel):
@@ -67,7 +65,7 @@ class GeoLocationListEntry(BaseModel):
     continent: Optional[str] = Field(description="One of 2-letter continent codes: AF, NA, OC, AN, AS, EU, SA")
 
     @root_validator(pre=True)
-    def check_country_or_continent(cls, values):
+    def check_country_xor_continent(cls, values):
         checked_values = [values.get("country"), values.get("continent")]
         set_values = [value for value in checked_values if value is not None]
         if len(set_values) != 1:
@@ -98,7 +96,7 @@ class LocalAppListEntry(BaseModel):
     app: Optional[str]
 
     @root_validator(pre=True)
-    def check_app_or_appfamily(cls, values):
+    def check_app_xor_appfamily(cls, values):
         checked_values = [values.get("app"), values.get("appFamily")]
         set_values = [value for value in checked_values if value is not None]
         if len(set_values) != 1:
@@ -110,7 +108,8 @@ class AppListEntry(BaseModel):
     app_family: Optional[str] = Field(alias="appFamily")
     app: Optional[str]
 
-    def check_app_or_appfamily(cls, values):
+    @root_validator(pre=True)
+    def check_app_xor_appfamily(cls, values):
         checked_values = [values.get("app"), values.get("appFamily")]
         set_values = [value for value in checked_values if value is not None]
         if len(set_values) != 1:
@@ -120,3 +119,10 @@ class AppListEntry(BaseModel):
 
 class ColorListEntry(BaseModel):
     color: str
+
+
+class DataIPv6PrefixListEntry(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    ipv6_prefix: IPv6Network = Field(alias="ipv6Prefix")

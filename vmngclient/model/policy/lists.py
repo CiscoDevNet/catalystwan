@@ -6,6 +6,7 @@ from typing_extensions import Annotated
 from vmngclient.model.policy.lists_entries import (
     AppListEntry,
     ColorListEntry,
+    DataIPv6PrefixListEntry,
     DataPrefixListEntry,
     FQDNListEntry,
     GeoLocationListEntry,
@@ -81,6 +82,11 @@ class ColorList(PolicyListHeader):
     entries: List[ColorListEntry]
 
 
+class DataIPv6PrefixList(PolicyListHeader):
+    type: Literal["dataIpv6Prefix"] = "dataIpv6Prefix"
+    entries: List[DataIPv6PrefixListEntry]
+
+
 AllPolicyLists = Annotated[
     Union[
         DataPrefixList,
@@ -94,6 +100,7 @@ AllPolicyLists = Annotated[
         LocalAppList,
         AppList,
         ColorList,
+        DataIPv6PrefixList,
     ],
     Field(discriminator="type"),
 ]
