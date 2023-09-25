@@ -147,3 +147,10 @@ class IPSSignatureListEntry(BaseModel):
 
     generator_id: str = Field(alias="generatorId")
     signature_id: str = Field(alias="signatureId")
+
+
+class URLListEntry(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    pattern: str

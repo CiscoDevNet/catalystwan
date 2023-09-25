@@ -16,6 +16,7 @@ from vmngclient.model.policy.lists_entries import (
     PortListEntry,
     ProtocolNameListEntry,
     SiteListEntry,
+    URLListEntry,
     VPNListEntry,
     ZoneListEntry,
 )
@@ -99,6 +100,16 @@ class IPSSignatureList(PolicyListHeader):
     entries: List[IPSSignatureListEntry]
 
 
+class URLWhiteList(PolicyListHeader):
+    type: Literal["urlWhiteList"] = "urlWhiteList"
+    entries: List[URLListEntry]
+
+
+class URLBlackList(PolicyListHeader):
+    type: Literal["urlBlackList"] = "urlBlackList"
+    entries: List[URLListEntry]
+
+
 AllPolicyLists = Annotated[
     Union[
         DataPrefixList,
@@ -115,6 +126,7 @@ AllPolicyLists = Annotated[
         DataIPv6PrefixList,
         LocalDomainList,
         IPSSignatureList,
+        URLWhiteList,
     ],
     Field(discriminator="type"),
 ]
