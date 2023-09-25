@@ -126,3 +126,16 @@ class DataIPv6PrefixListEntry(BaseModel):
         allow_population_by_field_name = True
 
     ipv6_prefix: IPv6Network = Field(alias="ipv6Prefix")
+
+
+class LocalDomainListEntry(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    name_server: str = Field(
+        pattern="^[^*+].*",
+        alias="nameServer",
+        max_length=240,
+        description="Must be valid std regex."
+        "String cannot start with a '*' or a '+', be empty, or be more than 240 characters",
+    )
