@@ -11,6 +11,7 @@ from vmngclient.model.policy.lists_entries import (
     FQDNListEntry,
     GeoLocationListEntry,
     LocalAppListEntry,
+    LocalDomainListEntry,
     PortListEntry,
     ProtocolNameListEntry,
     SiteListEntry,
@@ -87,6 +88,11 @@ class DataIPv6PrefixList(PolicyListHeader):
     entries: List[DataIPv6PrefixListEntry]
 
 
+class LocalDomainList(PolicyListHeader):
+    type: Literal["localDomain"] = "localDomain"
+    entries: List[LocalDomainListEntry]
+
+
 AllPolicyLists = Annotated[
     Union[
         DataPrefixList,
@@ -101,6 +107,7 @@ AllPolicyLists = Annotated[
         AppList,
         ColorList,
         DataIPv6PrefixList,
+        LocalDomainList,
     ],
     Field(discriminator="type"),
 ]
