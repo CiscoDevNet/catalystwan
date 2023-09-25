@@ -139,3 +139,11 @@ class LocalDomainListEntry(BaseModel):
         description="Must be valid std regex."
         "String cannot start with a '*' or a '+', be empty, or be more than 240 characters",
     )
+
+
+class IPSSignatureListEntry(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    generator_id: str = Field(alias="generatorId")
+    signature_id: str = Field(alias="signatureId")
