@@ -20,6 +20,9 @@ from vmngclient.endpoints.configuration.policy.list_builder.fqdn import Configur
 from vmngclient.endpoints.configuration.policy.list_builder.geo_location import (
     ConfigurationPolicyGeoLocationListBuilder,
 )
+from vmngclient.endpoints.configuration.policy.list_builder.ips_signature import (
+    ConfigurationPolicyIPSSignatureListBuilder,
+)
 from vmngclient.endpoints.configuration.policy.list_builder.local_app import ConfigurationPolicyLocalAppListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.local_domain import (
     ConfigurationPolicyLocalDomainListBuilder,
@@ -65,6 +68,7 @@ class ConfigurationPolicyListBuilderContainer:
         self.color = ConfigurationPolicyColorListBuilder(session)
         self.data_ipv6_prefix = ConfigurationPolicyDataIPv6PrefixListBuilder(session)
         self.local_domain = ConfigurationPolicyLocalDomainListBuilder(session)
+        self.ips_signature = ConfigurationPolicyIPSSignatureListBuilder(session)
 
 
 class ConfigurationPolicyDefinitionBuilderContainer:

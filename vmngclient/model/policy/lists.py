@@ -10,6 +10,7 @@ from vmngclient.model.policy.lists_entries import (
     DataPrefixListEntry,
     FQDNListEntry,
     GeoLocationListEntry,
+    IPSSignatureListEntry,
     LocalAppListEntry,
     LocalDomainListEntry,
     PortListEntry,
@@ -93,6 +94,11 @@ class LocalDomainList(PolicyListHeader):
     entries: List[LocalDomainListEntry]
 
 
+class IPSSignatureList(PolicyListHeader):
+    type: Literal["ipsSignature"] = "ipsSignature"
+    entries: List[IPSSignatureListEntry]
+
+
 AllPolicyLists = Annotated[
     Union[
         DataPrefixList,
@@ -108,6 +114,7 @@ AllPolicyLists = Annotated[
         ColorList,
         DataIPv6PrefixList,
         LocalDomainList,
+        IPSSignatureList,
     ],
     Field(discriminator="type"),
 ]
