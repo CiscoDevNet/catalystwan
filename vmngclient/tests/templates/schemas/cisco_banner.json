@@ -1,0 +1,44 @@
+{
+    "name": "cisco_banner",
+    "xmlPath": [],
+    "xmlRootTag": "banner",
+    "nameSpace": "http://viptela.com/system",
+    "fields": [
+        {
+            "key": "login",
+            "description": "Login Banner",
+            "details": "Set message to display before login prompt",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+            },
+            "dataPath": [],
+            "objectType": "object"
+        },
+        {
+            "key": "motd",
+            "description": "MOTD Banner",
+            "details": "Set message to display after a user logs in",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2048
+            },
+            "dataPath": [],
+            "objectType": "object"
+        }
+    ]
+}

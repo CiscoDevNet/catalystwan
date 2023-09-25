@@ -1,0 +1,90 @@
+{
+    "templateName": "cisco_bfd",
+    "templateDescription": "na",
+    "templateType": "cisco_bfd",
+    "deviceType": [],
+    "factoryDefault": false,
+    "templateMinVersion": "15.0.0",
+    "templateDefinition": {
+        "app-route": {
+            "multiplier": {
+                "vipObjectType": "object",
+                "vipType": "constant",
+                "vipValue": 100
+            },
+            "poll-interval": {
+                "vipObjectType": "object",
+                "vipType": "constant",
+                "vipValue": 50
+            }
+        },
+        "default-dscp": {
+            "vipObjectType": "object",
+            "vipType": "constant",
+            "vipValue": 50
+        },
+        "color": {
+            "vipObjectType": "tree",
+            "vipType": "constant",
+            "vipValue": [
+                {
+                    "color": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "biz-internet"
+                    },
+                    "hello-interval": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": 50
+                    },
+                    "multiplier": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": 7
+                    },
+                    "pmtu-discovery": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "false"
+                    },
+                    "dscp": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": 100
+                    }
+                },
+                {
+                    "color": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "silver"
+                    },
+                    "hello-interval": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": 150
+                    },
+                    "multiplier": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": 7
+                    },
+                    "pmtu-discovery": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "true"
+                    },
+                    "dscp": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": 20
+                    }
+                }
+            ],
+            "vipPrimaryKey": [
+                "color"
+            ]
+        }
+    }
+}

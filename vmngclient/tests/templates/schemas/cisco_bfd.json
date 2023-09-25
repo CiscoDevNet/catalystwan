@@ -1,0 +1,266 @@
+{
+    "name": "cisco_bfd",
+    "xmlPath": [],
+    "xmlRootTag": "bfd",
+    "nameSpace": "http://viptela.com/bfd",
+    "fields": [
+        {
+            "key": "multiplier",
+            "description": "Multiplier",
+            "details": "Set the number of polling intervals used to determine tunnel SLA class",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "number",
+                "min": 1,
+                "max": 6,
+                "default": 6
+            },
+            "dataPath": [
+                "app-route"
+            ],
+            "objectType": "object"
+        },
+        {
+            "key": "poll-interval",
+            "description": "Poll Interval (milliseconds)",
+            "details": "Set how often BFD polls tunnels to collect packet latency, loss, and statistics",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "number",
+                "min": 1,
+                "max": 4294967295,
+                "default": 600000
+            },
+            "dataPath": [
+                "app-route"
+            ],
+            "objectType": "object"
+        },
+        {
+            "key": "default-dscp",
+            "description": "Default DSCP value for BFD packets",
+            "details": "Set default DSCP value for BFD packets",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataType": {
+                "type": "number",
+                "min": 0,
+                "max": 63,
+                "default": 48
+            },
+            "dataPath": [],
+            "objectType": "object"
+        },
+        {
+            "key": "color",
+            "description": "Color",
+            "details": "Set color that identifies the WAN transport tunnel",
+            "optionType": [
+                "constant",
+                "variable",
+                "ignore"
+            ],
+            "defaultOption": "ignore",
+            "dataPath": [],
+            "objectType": "tree",
+            "primaryKeys": [
+                "color"
+            ],
+            "children": [
+                {
+                    "key": "color",
+                    "description": "Color",
+                    "details": "Set color that identifies the WAN transport tunnel",
+                    "optionType": [
+                        "constant",
+                        "variable"
+                    ],
+                    "defaultOption": "constant",
+                    "dataType": {
+                        "type": "enum",
+                        "values": [
+                            {
+                                "key": "default",
+                                "value": "Default"
+                            },
+                            {
+                                "key": "mpls",
+                                "value": "MPLS"
+                            },
+                            {
+                                "key": "metro-ethernet",
+                                "value": "Metro Ethernet"
+                            },
+                            {
+                                "key": "biz-internet",
+                                "value": "Biz Internet"
+                            },
+                            {
+                                "key": "public-internet",
+                                "value": "Public Internet"
+                            },
+                            {
+                                "key": "lte",
+                                "value": "LTE"
+                            },
+                            {
+                                "key": "3g",
+                                "value": "3G"
+                            },
+                            {
+                                "key": "red",
+                                "value": "Red"
+                            },
+                            {
+                                "key": "green",
+                                "value": "Green"
+                            },
+                            {
+                                "key": "blue",
+                                "value": "Blue"
+                            },
+                            {
+                                "key": "gold",
+                                "value": "Gold"
+                            },
+                            {
+                                "key": "silver",
+                                "value": "Silver"
+                            },
+                            {
+                                "key": "bronze",
+                                "value": "Bronze"
+                            },
+                            {
+                                "key": "custom1",
+                                "value": "Custom 1"
+                            },
+                            {
+                                "key": "custom2",
+                                "value": "Custom 2"
+                            },
+                            {
+                                "key": "custom3",
+                                "value": "Custom 3"
+                            },
+                            {
+                                "key": "private1",
+                                "value": "Private 1"
+                            },
+                            {
+                                "key": "private2",
+                                "value": "Private 2"
+                            },
+                            {
+                                "key": "private3",
+                                "value": "Private 3"
+                            },
+                            {
+                                "key": "private4",
+                                "value": "Private 4"
+                            },
+                            {
+                                "key": "private5",
+                                "value": "Private 5"
+                            },
+                            {
+                                "key": "private6",
+                                "value": "Private 6"
+                            }
+                        ]
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "hello-interval",
+                    "description": "Hello Interval (milliseconds)",
+                    "details": "Set how often BFD sends Hello packets",
+                    "optionType": [
+                        "constant",
+                        "variable",
+                        "ignore"
+                    ],
+                    "defaultOption": "ignore",
+                    "dataType": {
+                        "type": "number",
+                        "min": 100,
+                        "max": 300000,
+                        "default": 1000
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "multiplier",
+                    "description": "Multiplier",
+                    "details": "Set how many Hello packet intervals to wait before declaring that a tunnel has failed",
+                    "optionType": [
+                        "constant",
+                        "variable",
+                        "ignore"
+                    ],
+                    "defaultOption": "ignore",
+                    "dataType": {
+                        "type": "number",
+                        "min": 1,
+                        "max": 60,
+                        "default": 7
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "pmtu-discovery",
+                    "description": "Path MTU Discovery",
+                    "details": "Control automatic path MTU discovery",
+                    "optionType": [
+                        "constant",
+                        "variable",
+                        "ignore"
+                    ],
+                    "defaultOption": "ignore",
+                    "dataType": {
+                        "type": "boolean",
+                        "default": "true"
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                },
+                {
+                    "key": "dscp",
+                    "description": "BFD Default DSCP value for tloc color",
+                    "details": "Set BFD Default DSCP value for tloc color",
+                    "optionType": [
+                        "constant",
+                        "variable",
+                        "ignore"
+                    ],
+                    "defaultOption": "ignore",
+                    "dataType": {
+                        "type": "number",
+                        "min": 0,
+                        "max": 63,
+                        "default": 48
+                    },
+                    "dataPath": [],
+                    "objectType": "object"
+                }
+            ]
+        }
+    ]
+}

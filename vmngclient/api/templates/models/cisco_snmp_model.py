@@ -5,9 +5,10 @@ from typing import ClassVar, List, Optional
 from pydantic import BaseModel, Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
+from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
 
 
-class Oid(BaseModel):
+class Oid(ConvertBoolToStringModel):
     id: str
     exclude: Optional[bool]
 
@@ -35,7 +36,7 @@ class SecurityLevel(str, Enum):
 
 class Group(BaseModel):
     name: str
-    security_level: SecurityLevel = Field(alias="security-level")
+    security_level: SecurityLevel = Field(vmanage_key="security-level")
     view: str
 
     class Config:
@@ -54,9 +55,9 @@ class Priv(str, Enum):
 class User(BaseModel):
     name: str
     auth: Optional[Auth]
-    auth_password: Optional[str] = Field(alias="auth-password")
+    auth_password: Optional[str] = Field(vmanage_key="auth-password")
     priv: Optional[Priv]
-    priv_password: Optional[str] = Field(alias="priv-password")
+    priv_password: Optional[str] = Field(vmanage_key="priv-password")
     group: str
 
     class Config:
@@ -64,18 +65,18 @@ class User(BaseModel):
 
 
 class Target(BaseModel):
-    vpn_id: int = Field(alias="vpn-id")
+    vpn_id: int = Field(vmanage_key="vpn-id")
     ip: str
     port: int
-    community_name: str = Field(alias="community-name")
+    community_name: str = Field(vmanage_key="community-name")
     user: str
-    source_interface: str = Field(alias="source-interface")
+    source_interface: str = Field(vmanage_key="source-interface")
 
     class Config:
         allow_population_by_field_name = True
 
 
-class CiscoSNMPModel(FeatureTemplate):
+class CiscoSNMPModel(FeatureTemplate, ConvertBoolToStringModel):
     class Config:
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
@@ -87,7 +88,7 @@ class CiscoSNMPModel(FeatureTemplate):
     community: Optional[List[Community]]
     group: Optional[List[Group]]
     user: Optional[List[User]]
-    target: Optional[List[Target]]
+    target: Optional[List[Target]] = Field(data_path=["trap"])
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_snmp"

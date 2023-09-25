@@ -1,21 +1,30 @@
 {
     "user": {
         "vipObjectType": "tree",
+        "vipPrimaryKey": [
+            "name"
+        ],
         "vipType": "constant",
         "vipValue": [
             {
+                "list": {
+                    "password": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "pass"
+                    }
+                },
                 "name": {
                     "vipObjectType": "object",
                     "vipType": "constant",
                     "vipValue": "user1"
                 },
-                "password": {
-                    "vipObjectType": "object",
-                    "vipType": "constant",
-                    "vipValue": "pass"
-                },
                 "pubkey-chain": {
                     "vipObjectType": "tree",
+                    "vipPrimaryKey": [
+                        "key-string"
+                    ],
+                    "vipType": "constant",
                     "vipValue": [
                         {
                             "key-string": {
@@ -23,42 +32,42 @@
                                 "vipType": "constant",
                                 "vipValue": "*****"
                             },
-                            "key-type": {
-                                "vipObjectType": "object",
-                                "vipType": "constant",
-                                "vipValue": "RSA"
+                            "type": {
+                                "RSA": {
+                                    "key-type": {
+                                        "vipObjectType": "object",
+                                        "vipType": "constant",
+                                        "vipValue": "RSA"
+                                    }
+                                }
                             }
                         }
-                    ],
-                    "vipType": "constant",
-                    "vipPrimaryKey": [
-                        "key-string"
                     ]
                 }
             },
             {
+                "list": {
+                    "password": {
+                        "vipObjectType": "object",
+                        "vipType": "constant",
+                        "vipValue": "pass"
+                    }
+                },
                 "name": {
                     "vipObjectType": "object",
                     "vipType": "constant",
                     "vipValue": "user2"
                 },
-                "password": {
-                    "vipObjectType": "object",
-                    "vipType": "constant",
-                    "vipValue": "pass"
-                },
                 "pubkey-chain": {
                     "vipObjectType": "tree",
-                    "vipValue": [],
-                    "vipType": "ignore",
                     "vipPrimaryKey": [
                         "key-string"
+                    ],
+                    "vipType": "ignore",
+                    "vipValue": [
                     ]
                 }
             }
-        ],
-        "vipPrimaryKey": [
-            "name"
         ]
     }
 }

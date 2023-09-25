@@ -13,7 +13,7 @@ class Role(str, Enum):
 
 
 class Dns(BaseModel):
-    dns_addr: str = Field(alias="dns-addr")
+    dns_addr: str = Field(vmanage_key="dns-addr")
     role: Role = Role.PRIMARY
 
     class Config:
@@ -21,7 +21,7 @@ class Dns(BaseModel):
 
 
 class DnsIpv6(BaseModel):
-    dns_addr: str = Field(alias="dns-addr")
+    dns_addr: str = Field(vmanage_key="dns-addr")
     role: Optional[Role] = Role.PRIMARY
 
     class Config:
@@ -46,10 +46,10 @@ class SvcType(str, Enum):
 
 
 class Service(BaseModel):
-    svc_type: SvcType = Field(alias="svc-type")
+    svc_type: SvcType = Field(vmanage_key="svc-type")
     address: List[str]
     interface: str
-    track_enable: bool = Field(True, alias="track-enable")
+    track_enable: bool = Field(True, vmanage_key="track-enable")
 
     class Config:
         allow_population_by_field_name = True
@@ -82,8 +82,8 @@ class NextHopWithTrack(BaseModel):
 
 class Routev4(BaseModel):
     prefix: str
-    next_hop: Optional[List[NextHop]] = Field(alias="next-hop")
-    next_hop_with_track: Optional[List[NextHopWithTrack]] = Field(alias="next-hop-with-track")
+    next_hop: Optional[List[NextHop]] = Field(vmanage_key="next-hop")
+    next_hop_with_track: Optional[List[NextHopWithTrack]] = Field(vmanage_key="next-hop-with-track")
     null0: Optional[bool]
     distance: Optional[int] = 1
     vpn: Optional[int]
@@ -105,7 +105,7 @@ class Nat(str, Enum):
 
 class Routev6(BaseModel):
     prefix: str
-    next_hop: Optional[List[NextHopv6]] = Field(alias="next-hop")
+    next_hop: Optional[List[NextHopv6]] = Field(vmanage_key="next-hop")
     null0: Optional[bool]
     vpn: Optional[int]
     nat: Optional[Nat]
@@ -149,8 +149,8 @@ class Region(str, Enum):
 
 
 class PrefixList(BaseModel):
-    prefix_entry: str = Field(alias="prefix-entry")
-    aggregate_only: Optional[bool] = Field(alias="aggregate-only")
+    prefix_entry: str = Field(vmanage_key="prefix-entry")
+    aggregate_only: Optional[bool] = Field(vmanage_key="aggregate-only")
     region: Optional[Region]
 
     class Config:
@@ -159,9 +159,9 @@ class PrefixList(BaseModel):
 
 class Advertise(BaseModel):
     protocol: AdvertiseProtocol
-    route_policy: Optional[str] = Field(alias="route-policy")
-    protocol_sub_type: Optional[List[AdvertiseProtocolSubType]] = Field(alias="protocol-sub-type")
-    prefix_list: Optional[List[PrefixList]] = Field(alias="prefix-list")
+    route_policy: Optional[str] = Field(vmanage_key="route-policy")
+    protocol_sub_type: Optional[List[AdvertiseProtocolSubType]] = Field(vmanage_key="protocol-sub-type")
+    prefix_list: Optional[List[PrefixList]] = Field(vmanage_key="prefix-list")
 
     class Config:
         allow_population_by_field_name = True
@@ -182,9 +182,9 @@ class Ipv6AdvertiseProtocolSubType(str, Enum):
 
 class Ipv6Advertise(BaseModel):
     protocol: Ipv6AdvertiseProtocol
-    route_policy: Optional[str] = Field(alias="route-policy")
-    protocol_sub_type: Optional[List[Ipv6AdvertiseProtocolSubType]] = Field(alias="protocol-sub-type")
-    prefix_list: Optional[List[PrefixList]] = Field(alias="prefix-list")
+    route_policy: Optional[str] = Field(vmanage_key="route-policy")
+    protocol_sub_type: Optional[List[Ipv6AdvertiseProtocolSubType]] = Field(vmanage_key="protocol-sub-type")
+    prefix_list: Optional[List[PrefixList]] = Field(vmanage_key="prefix-list")
 
     class Config:
         allow_population_by_field_name = True
@@ -201,8 +201,8 @@ class LeakFromGlobalProtocol(str, Enum):
 
 class Pool(BaseModel):
     name: str
-    start_address: str = Field(alias="start-address")
-    end_address: str = Field(alias="end-address")
+    start_address: str = Field(vmanage_key="start-address")
+    end_address: str = Field(vmanage_key="end-address")
     overload: Optional[bool]
     leak_from_global: bool
     leak_from_global_protocol: LeakFromGlobalProtocol
@@ -224,12 +224,12 @@ class Overload(str, Enum):
 
 class Natpool(BaseModel):
     name: int
-    prefix_length: int = Field(alias="prefix-length")
-    range_start: str = Field(alias="range-start")
-    range_end: str = Field(alias="range-end")
+    prefix_length: int = Field(vmanage_key="prefix-length")
+    range_start: str = Field(vmanage_key="range-start")
+    range_end: str = Field(vmanage_key="range-end")
     overload: Overload = Overload.TRUE
     direction: Direction
-    tracker_id: Optional[int] = Field(alias="tracker-id")
+    tracker_id: Optional[int] = Field(vmanage_key="tracker-id")
 
     class Config:
         allow_population_by_field_name = True
@@ -241,22 +241,22 @@ class StaticNatDirection(str, Enum):
 
 
 class Static(BaseModel):
-    pool_name: Optional[int] = Field(alias="pool-name")
-    source_ip: str = Field(alias="source-ip")
-    translate_ip: str = Field(alias="translate-ip")
-    static_nat_direction: StaticNatDirection = Field(alias="static-nat-direction")
-    tracker_id: Optional[int] = Field(alias="tracker-id")
+    pool_name: Optional[int] = Field(vmanage_key="pool-name")
+    source_ip: str = Field(vmanage_key="source-ip")
+    translate_ip: str = Field(vmanage_key="translate-ip")
+    static_nat_direction: StaticNatDirection = Field(vmanage_key="static-nat-direction")
+    tracker_id: Optional[int] = Field(vmanage_key="tracker-id")
 
     class Config:
         allow_population_by_field_name = True
 
 
 class SubnetStatic(BaseModel):
-    source_ip_subnet: str = Field(alias="source-ip-subnet")
-    translate_ip_subnet: str = Field(alias="translate-ip-subnet")
-    prefix_length: int = Field(alias="prefix-length")
-    static_nat_direction: StaticNatDirection = Field(alias="static-nat-direction")
-    tracker_id: Optional[int] = Field(alias="tracker-id")
+    source_ip_subnet: str = Field(vmanage_key="source-ip-subnet")
+    translate_ip_subnet: str = Field(vmanage_key="translate-ip-subnet")
+    prefix_length: int = Field(vmanage_key="prefix-length")
+    static_nat_direction: StaticNatDirection = Field(vmanage_key="static-nat-direction")
+    tracker_id: Optional[int] = Field(vmanage_key="tracker-id")
 
     class Config:
         allow_population_by_field_name = True
@@ -268,11 +268,11 @@ class Proto(str, Enum):
 
 
 class PortForward(BaseModel):
-    pool_name: Optional[int] = Field(alias="pool-name")
-    source_port: int = Field(alias="source-port")
-    translate_port: int = Field(alias="translate-port")
-    source_ip: str = Field(alias="source-ip")
-    translate_ip: str = Field(alias="translate-ip")
+    pool_name: Optional[int] = Field(vmanage_key="pool-name")
+    source_port: int = Field(vmanage_key="source-port")
+    translate_port: int = Field(vmanage_key="translate-port")
+    source_ip: str = Field(vmanage_key="source-ip")
+    translate_ip: str = Field(vmanage_key="translate-ip")
     proto: Proto
 
     class Config:
@@ -298,7 +298,7 @@ class RouteImportRedistributeProtocol(str, Enum):
 
 class RouteImportRedistribute(BaseModel):
     protocol: RouteImportRedistributeProtocol
-    route_policy: Optional[str] = Field(alias="route-policy")
+    route_policy: Optional[str] = Field(vmanage_key="route-policy")
 
     class Config:
         allow_population_by_field_name = True
@@ -306,8 +306,8 @@ class RouteImportRedistribute(BaseModel):
 
 class RouteImport(BaseModel):
     protocol: RouteImportProtocol
-    protocol_sub_type: List[RouteImportProtocolSubType] = Field(alias="protocol-sub-type")
-    route_policy: Optional[str] = Field(alias="route-policy")
+    protocol_sub_type: List[RouteImportProtocolSubType] = Field(vmanage_key="protocol-sub-type")
+    route_policy: Optional[str] = Field(vmanage_key="route-policy")
     redistribute: Optional[List[RouteImportRedistribute]]
 
     class Config:
@@ -334,17 +334,17 @@ class RouteImportFromRedistributeProtocol(str, Enum):
 
 class RouteImportFromRedistribute(BaseModel):
     protocol: RouteImportFromRedistributeProtocol
-    route_policy: Optional[str] = Field(alias="route-policy")
+    route_policy: Optional[str] = Field(vmanage_key="route-policy")
 
     class Config:
         allow_population_by_field_name = True
 
 
 class RouteImportFrom(BaseModel):
-    source_vpn: int = Field(alias="source-vpn")
+    source_vpn: int = Field(vmanage_key="source-vpn")
     protocol: RouteImportFromProtocol
-    protocol_sub_type: List[RouteImportFromProtocolSubType] = Field(alias="protocol-sub-type")
-    route_policy: Optional[str] = Field(alias="route-policy")
+    protocol_sub_type: List[RouteImportFromProtocolSubType] = Field(vmanage_key="protocol-sub-type")
+    route_policy: Optional[str] = Field(vmanage_key="route-policy")
     redistribute: Optional[List[RouteImportFromRedistribute]]
 
     class Config:
@@ -370,7 +370,7 @@ class RouteExportRedistributeProtocol(str, Enum):
 
 class RouteExportRedistribute(BaseModel):
     protocol: RouteExportRedistributeProtocol
-    route_policy: Optional[str] = Field(alias="route-policy")
+    route_policy: Optional[str] = Field(vmanage_key="route-policy")
 
     class Config:
         allow_population_by_field_name = True
@@ -378,8 +378,8 @@ class RouteExportRedistribute(BaseModel):
 
 class RouteExport(BaseModel):
     protocol: RouteExportProtocol
-    protocol_sub_type: List[RouteExportProtocolSubType] = Field(alias="protocol-sub-type")
-    route_policy: Optional[str] = Field(alias="route-policy")
+    protocol_sub_type: List[RouteExportProtocolSubType] = Field(vmanage_key="protocol-sub-type")
+    route_policy: Optional[str] = Field(vmanage_key="route-policy")
     redistribute: Optional[List[RouteExportRedistribute]]
 
     class Config:
@@ -391,32 +391,32 @@ class CiscoVPNModel(FeatureTemplate):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    vpn_id: int = Field(alias="vpn-id", default=0)
+    vpn_id: int = Field(vmanage_key="vpn-id", default=0)
     vpn_name: Optional[str] = Field(vmanage_key="name")
-    tenant_vpn_id: Optional[int] = Field(alias="tenant-vpn-id")
-    org_name: Optional[str] = Field(alias="org-name")
-    omp_admin_distance_ipv4: Optional[int] = Field(alias="omp-admin-distance-ipv4")
-    omp_admin_distance_ipv6: Optional[int] = Field(alias="omp-admin-distance-ipv6")
+    tenant_vpn_id: Optional[int] = Field(vmanage_key="tenant-vpn-id")
+    org_name: Optional[str] = Field(vmanage_key="org-name")
+    omp_admin_distance_ipv4: Optional[int] = Field(vmanage_key="omp-admin-distance-ipv4")
+    omp_admin_distance_ipv6: Optional[int] = Field(vmanage_key="omp-admin-distance-ipv6")
     dns: Optional[List[Dns]]
-    dns_ipv6: Optional[List[DnsIpv6]] = Field(alias="dns-ipv6")
-    layer4: Optional[bool]
+    dns_ipv6: Optional[List[DnsIpv6]] = Field(vmanage_key="dns-ipv6")
+    layer4: Optional[bool] = Field(data_path=["ecmp-hash-key"])
     host: Optional[List[Host]]
     service: Optional[List[Service]]
-    service_route: Optional[List[ServiceRoute]] = Field(alias="service-route")
-    route_v4: Optional[List[Routev4]] = Field(vmanage_key="route", data_path=["ip", "route"])
-    route_v6: Optional[List[Routev6]] = Field(vmanage_key="route", data_path=["ipv6", "route"])
-    gre_route: Optional[List[GreRoute]] = Field(alias="gre-route")
-    ipsec_route: Optional[List[IpsecRoute]] = Field(alias="ipsec-route")
-    advertise: Optional[List[Advertise]]
-    ipv6_advertise: Optional[List[Ipv6Advertise]] = Field(alias="ipv6-advertise")
-    pool: Optional[List[Pool]]
-    natpool: Optional[List[Natpool]]
-    static: Optional[List[Static]]
-    subnet_static: Optional[List[SubnetStatic]] = Field(alias="subnet-static")
-    port_forward: Optional[List[PortForward]] = Field(alias="port-forward")
-    route_import: Optional[List[RouteImport]] = Field(alias="route-import")
-    route_import_from: Optional[List[RouteImportFrom]] = Field(alias="route-import-from")
-    route_export: Optional[List[RouteExport]] = Field(alias="route-export")
+    service_route: Optional[List[ServiceRoute]] = Field(data_path=["ip"], vmanage_key="service-route")
+    route_v4: Optional[List[Routev4]] = Field(data_path=["ip"], vmanage_key="route")
+    route_v6: Optional[List[Routev6]] = Field(data_path=["ipv6"], vmanage_key="route")
+    gre_route: Optional[List[GreRoute]] = Field(data_path=["ip"], vmanage_key="gre-route")
+    ipsec_route: Optional[List[IpsecRoute]] = Field(data_path=["ip"], vmanage_key="ipsec-route")
+    advertise: Optional[List[Advertise]] = Field(data_path=["omp"])
+    ipv6_advertise: Optional[List[Ipv6Advertise]] = Field(data_path=["omp"], vmanage_key="ipv6-advertise")
+    pool: Optional[List[Pool]] = Field(data_path=["nat64", "v4"])
+    natpool: Optional[List[Natpool]] = Field(data_path=["nat"])
+    static: Optional[List[Static]] = Field(data_path=["nat"])
+    subnet_static: Optional[List[SubnetStatic]] = Field(data_path=["nat"], vmanage_key="subnet-static")
+    port_forward: Optional[List[PortForward]] = Field(data_path=["nat"], vmanage_key="port-forward")
+    route_import: Optional[List[RouteImport]] = Field(vmanage_key="route-import")
+    route_import_from: Optional[List[RouteImportFrom]] = Field(vmanage_key="route-import-from")
+    route_export: Optional[List[RouteExport]] = Field(vmanage_key="route-export")
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_vpn"

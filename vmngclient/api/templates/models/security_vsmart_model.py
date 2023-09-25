@@ -7,9 +7,9 @@ from pydantic import Field
 from vmngclient.api.templates.feature_template import FeatureTemplate
 
 
-class Protocol(Enum):
-    DTLS: str = "DTLS"
-    TLS: str = "TLS"
+class Protocol(str, Enum):
+    DTLS: str = "dtls"
+    TLS: str = "tls"
 
 
 class SecurityvSmart(FeatureTemplate):
@@ -17,7 +17,7 @@ class SecurityvSmart(FeatureTemplate):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    protocol: Optional[Protocol] = Field(default=None, converter=Protocol)
-    tls_port: Optional[int] = Field(default=None, alias="tls-port")
+    protocol: Optional[Protocol] = Field(default=None, data_path=["control"])
+    tls_port: Optional[int] = Field(default=None, vmanage_key="tls-port", data_path=["control"])
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "security-vsmart"

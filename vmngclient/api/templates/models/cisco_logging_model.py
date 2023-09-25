@@ -23,9 +23,9 @@ class AuthType(str, Enum):
 
 class TlsProfile(ConvertBoolToStringModel):
     profile: str
-    version: Optional[Version] = Version.TLSV11
-    auth_type: AuthType = Field(alias="auth-type")
-    ciphersuite_list: Optional[List] = Field(alias="ciphersuite-list")
+    version: Optional[Version] = Field(Version.TLSV11, data_path=["tls-version"])
+    auth_type: AuthType = Field(vmanage_key="auth-type")
+    ciphersuite_list: Optional[List] = Field(data_path=["ciphersuite"], vmanage_key="ciphersuite-list")
 
     class Config:
         allow_population_by_field_name = True
@@ -45,11 +45,11 @@ class Priority(str, Enum):
 class Server(ConvertBoolToStringModel):
     name: str
     vpn: Optional[int]
-    source_interface: Optional[str] = Field(alias="source-interface")
+    source_interface: Optional[str] = Field(vmanage_key="source-interface")
     priority: Optional[Priority] = Priority.INFORMATION
-    enable_tls: Optional[bool] = Field(False, alias="enable-tls")
-    custom_profile: Optional[bool] = Field(False, alias="custom-profile")
-    profile: Optional[str]
+    enable_tls: Optional[bool] = Field(False, data_path=["tls"], vmanage_key="enable-tls")
+    custom_profile: Optional[bool] = Field(False, data_path=["tls", "tls-properties"], vmanage_key="custom-profile")
+    profile: Optional[str] = Field(data_path=["tls", "tls-properties"])
 
     class Config:
         allow_population_by_field_name = True
@@ -58,11 +58,11 @@ class Server(ConvertBoolToStringModel):
 class Ipv6Server(ConvertBoolToStringModel):
     name: str
     vpn: Optional[int]
-    source_interface: Optional[str] = Field(alias="source-interface")
+    source_interface: Optional[str] = Field(vmanage_key="source-interface")
     priority: Optional[Priority] = Priority.INFORMATION
-    enable_tls: Optional[bool] = Field(False, alias="enable-tls")
-    custom_profile: Optional[bool] = Field(False, alias="custom-profile")
-    profile: Optional[str]
+    enable_tls: Optional[bool] = Field(False, data_path=["tls"], vmanage_key="enable-tls")
+    custom_profile: Optional[bool] = Field(False, data_path=["tls", "tls-properties"], vmanage_key="custom-profile")
+    profile: Optional[str] = Field(data_path=["tls", "tls-properties"])
 
     class Config:
         allow_population_by_field_name = True
@@ -73,12 +73,12 @@ class CiscoLoggingModel(FeatureTemplate, ConvertBoolToStringModel):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    enable: Optional[bool] = True
-    size: Optional[int] = DEFAULT_LOGGING_SIZE
-    rotate: Optional[int] = DEFAULT_LOGGING_ROTATE
-    tls_profile: List[TlsProfile] = Field(alias="tls-profile")
+    enable: Optional[bool] = Field(True, data_path=["disk"])
+    size: Optional[int] = Field(DEFAULT_LOGGING_SIZE, data_path=["disk", "file"])
+    rotate: Optional[int] = Field(DEFAULT_LOGGING_ROTATE, data_path=["disk", "file"])
+    tls_profile: List[TlsProfile] = Field(vmanage_key="tls-profile")
     server: Optional[List[Server]]
-    ipv6_server: Optional[List[Ipv6Server]] = Field(alias="ipv6-server")
+    ipv6_server: Optional[List[Ipv6Server]] = Field(vmanage_key="ipv6-server")
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_logging"
