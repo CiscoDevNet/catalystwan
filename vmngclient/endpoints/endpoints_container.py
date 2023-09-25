@@ -32,6 +32,8 @@ from vmngclient.endpoints.configuration.policy.list_builder.protocol_name import
     ConfigurationPolicyProtocolNameListBuilder,
 )
 from vmngclient.endpoints.configuration.policy.list_builder.site import ConfigurationPolicySiteListBuilder
+from vmngclient.endpoints.configuration.policy.list_builder.url_black_list import ConfigurationPolicyURLBlackListBuilder
+from vmngclient.endpoints.configuration.policy.list_builder.url_white_list import ConfigurationPolicyURLWhiteListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.vpn import ConfigurationPolicyVPNListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.zone import ConfigurationPolicyZoneListBuilder
 from vmngclient.endpoints.configuration.policy.vsmart_template import ConfigurationVSmartTemplatePolicy
@@ -69,6 +71,8 @@ class ConfigurationPolicyListBuilderContainer:
         self.data_ipv6_prefix = ConfigurationPolicyDataIPv6PrefixListBuilder(session)
         self.local_domain = ConfigurationPolicyLocalDomainListBuilder(session)
         self.ips_signature = ConfigurationPolicyIPSSignatureListBuilder(session)
+        self.url_white_list = ConfigurationPolicyURLWhiteListBuilder(session)
+        self.url_black_list = ConfigurationPolicyURLBlackListBuilder(session)
 
 
 class ConfigurationPolicyDefinitionBuilderContainer:
