@@ -4,7 +4,6 @@ from pathlib import Path
 from unittest import TestCase
 from unittest.mock import patch
 
-import pytest  # type: ignore
 from parameterized import parameterized  # type: ignore
 
 import vmngclient.tests.templates.models as models
@@ -17,7 +16,6 @@ from vmngclient.session import vManageSession
 # Compare payload with definition
 
 
-@pytest.mark.skip()
 class TestFeatureTemplate2(TestCase):
     @parameterized.expand(
         [(template,) for template in map(models.__dict__.get, models.__all__)],  # type: ignore

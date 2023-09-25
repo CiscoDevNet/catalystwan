@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 from vmngclient.api.templates.device_variable import DeviceVariable
 from vmngclient.api.templates.feature_template import FeatureTemplate
+from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
 from vmngclient.utils.timezone import Timezone
 
 
@@ -51,11 +52,12 @@ class Type(str, Enum):
 
 class Tracker(BaseModel):
     name: str
-    endpoint_ip: str = Field(alias="endpoint-ip")
-    protocol: Protocol
-    port: int
-    endpoint_dns_name: str = Field(alias="endpoint-dns-name")
-    endpoint_api_url: str = Field(alias="endpoint-api-url")
+    endpoint_ip: str = Field(vmanage_key="endpoint-ip")
+    endpoint_ip_transport_port: str = Field(vmanage_key="endpoint-ip", data_path=["endpoint-ip-transport-port"])
+    protocol: Protocol = Field(data_path=["endpoint-ip-transport-port"])
+    port: int = Field(data_path=["endpoint-ip-transport-port"])
+    endpoint_dns_name: str = Field(vmanage_key="endpoint-dns-name")
+    endpoint_api_url: str = Field(vmanage_key="endpoint-api-url")
     elements: List[str]
     boolean: Optional[Boolean] = Boolean.OR
     threshold: Optional[int] = 300
@@ -72,7 +74,7 @@ class Object(BaseModel):
 
 
 class ObjectTrack(BaseModel):
-    object_number: int = Field(alias="object-number")
+    object_number: int = Field(vmanage_key="object-number")
     interface: str
     sig: str
     ip: str
@@ -91,8 +93,8 @@ class Role(str, Enum):
 
 
 class AffinityPerVrf(BaseModel):
-    affinity_group_number: Optional[int] = Field(alias="affinity-group-number")
-    vrf_range: Optional[str] = Field(alias="vrf-range")
+    affinity_group_number: Optional[int] = Field(vmanage_key="affinity-group-number")
+    vrf_range: Optional[str] = Field(vmanage_key="vrf-range")
 
     class Config:
         allow_population_by_field_name = True
@@ -104,8 +106,8 @@ class EnableMrfMigration(str, Enum):
 
 
 class Vrf(BaseModel):
-    vrf_id: int = Field(alias="vrf-id")
-    gateway_preference: Optional[List[int]] = Field(alias="gateway-preference")
+    vrf_id: int = Field(vmanage_key="vrf-id")
+    gateway_preference: Optional[List[int]] = Field(vmanage_key="gateway-preference")
 
     class Config:
         allow_population_by_field_name = True
@@ -118,51 +120,58 @@ class Epfr(str, Enum):
     CONSERVATIVE = "conservative"
 
 
-class CiscoSystemModel(FeatureTemplate):
+class CiscoSystemModel(FeatureTemplate, ConvertBoolToStringModel):
     class Config:
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    timezone: Optional[Timezone]
-    hostname: str = Field(default=DeviceVariable(name="system_host_name"), alias="host-name", validate_default=True)
+    timezone: Optional[Timezone] = Field(data_path=["clock"])
+    hostname: str = Field(
+        default=DeviceVariable(name="system_host_name"), vmanage_key="host-name", validate_default=True
+    )
     location: Optional[str]
-    latitude: Optional[float]
-    longitude: Optional[float]
-    range: Optional[int] = 100
-    enable: Optional[bool]
-    mobile_number: Optional[List[MobileNumber]] = Field(alias="mobile-number")
-    device_groups: Optional[List[str]] = Field(alias="device-groups")
-    controller_group_list: Optional[List[int]] = Field(alias="controller-group-list")
-    system_ip: DeviceVariable = Field(default=DeviceVariable(name="system_system_ip"), alias="system-ip")
-    overlay_id: Optional[int] = Field(1, alias="overlay-id")
-    site_id: int = Field(default=DeviceVariable(name="system_site_id"), alias="site-id")
-    site_type: Optional[List[SiteType]] = Field(alias="site-type")
-    port_offset: Optional[int] = Field(alias="port-offset")
-    port_hop: Optional[bool] = Field(True, alias="port-hop")
-    control_session_pps: Optional[int] = Field(300, alias="control-session-pps")
-    track_transport: Optional[bool] = Field(True, alias="track-transport")
-    track_interface_tag: Optional[int] = Field(alias="track-interface-tag")
-    console_baud_rate: Optional[ConsoleBaudRate] = Field(alias="console-baud-rate")
-    max_omp_sessions: Optional[int] = Field(alias="max-omp-sessions")
-    multi_tenant: Optional[bool] = Field(alias="multi-tenant")
-    track_default_gateway: Optional[bool] = Field(True, alias="track-default-gateway")
-    admin_tech_on_failure: Optional[bool] = Field(alias="admin-tech-on-failure")
-    idle_timeout: Optional[int] = Field(alias="idle-timeout")
+    latitude: Optional[float] = Field(data_path=["gps-location"])
+    longitude: Optional[float] = Field(data_path=["gps-location"])
+    range: Optional[int] = Field(100, data_path=["gps-location", "geo-fencing"])
+    enable_fencing: Optional[bool] = Field(False, data_path=["gps-location", "geo-fencing"], vmanage_key="enable")
+    mobile_number: Optional[List[MobileNumber]] = Field(
+        vmanage_key="mobile-number", data_path=["gps-location", "geo-fencing", "sms"]
+    )
+    enable_sms: Optional[bool] = Field(False, data_path=["gps-location", "geo-fencing", "sms"], vmanage_key="enable")
+    device_groups: Optional[List[str]] = Field(vmanage_key="device-groups")
+    controller_group_list: Optional[List[int]] = Field(vmanage_key="controller-group-list")
+    system_ip: DeviceVariable = Field(default=DeviceVariable(name="system_system_ip"), vmanage_key="system-ip")
+    overlay_id: Optional[int] = Field(1, vmanage_key="overlay-id")
+    site_id: int = Field(default=DeviceVariable(name="system_site_id"), vmanage_key="site-id")
+    site_type: Optional[List[SiteType]] = Field(vmanage_key="site-type")
+    port_offset: Optional[int] = Field(vmanage_key="port-offset")
+    port_hop: Optional[bool] = Field(True, vmanage_key="port-hop")
+    control_session_pps: Optional[int] = Field(300, vmanage_key="control-session-pps")
+    track_transport: Optional[bool] = Field(True, vmanage_key="track-transport")
+    track_interface_tag: Optional[int] = Field(vmanage_key="track-interface-tag")
+    console_baud_rate: Optional[ConsoleBaudRate] = Field(vmanage_key="console-baud-rate")
+    max_omp_sessions: Optional[int] = Field(vmanage_key="max-omp-sessions")
+    multi_tenant: Optional[bool] = Field(vmanage_key="multi-tenant")
+    track_default_gateway: Optional[bool] = Field(True, vmanage_key="track-default-gateway")
+    admin_tech_on_failure: Optional[bool] = Field(vmanage_key="admin-tech-on-failure")
+    enable_tunnel: Optional[bool] = Field(False, vmanage_key="enable", data_path=["on-demand"])
+    idle_timeout: Optional[int] = Field(vmanage_key="idle-timeout")
+    on_demand_idle_timeout_min: Optional[int] = Field(vmanage_key="idle-timeout", data_path=["on-demand"])
     tracker: Optional[List[Tracker]]
-    object_track: Optional[List[ObjectTrack]] = Field(alias="object-track")
-    region_id: Optional[int] = Field(alias="region-id")
-    secondary_region: Optional[int] = Field(alias="secondary-region")
+    object_track: Optional[List[ObjectTrack]] = Field(vmanage_key="object-track")
+    region_id: Optional[int] = Field(vmanage_key="region-id")
+    secondary_region: Optional[int] = Field(vmanage_key="secondary-region")
     role: Optional[Role]
-    affinity_group_number: Optional[int] = Field(alias="affinity-group-number")
-    preference: Optional[List[int]]
-    preference_auto: Optional[bool] = Field(alias="preference-auto")
-    affinity_per_vrf: Optional[List[AffinityPerVrf]] = Field(alias="affinity-per-vrf")
-    transport_gateway: Optional[bool] = Field(alias="transport-gateway")
-    enable_mrf_migration: Optional[EnableMrfMigration] = Field(alias="enable-mrf-migration")
-    migration_bgp_community: Optional[int] = Field(alias="migration-bgp-community")
-    enable_management_region: Optional[bool] = Field(alias="enable-management-region")
+    affinity_group_number: Optional[int] = Field(vmanage_key="affinity-group-number", data_path=["affinity-group"])
+    preference: Optional[List[int]] = Field(data_path=["affinity-group"])
+    preference_auto: Optional[bool] = Field(vmanage_key="preference-auto")
+    affinity_per_vrf: Optional[List[AffinityPerVrf]] = Field(vmanage_key="affinity-per-vrf")
+    transport_gateway: Optional[bool] = Field(vmanage_key="transport-gateway")
+    enable_mrf_migration: Optional[EnableMrfMigration] = Field(vmanage_key="enable-mrf-migration")
+    migration_bgp_community: Optional[int] = Field(vmanage_key="migration-bgp-community")
+    enable_management_region: Optional[bool] = Field(vmanage_key="enable-management-region")
     vrf: Optional[List[Vrf]]
-    management_gateway: Optional[bool] = Field(alias="management-gateway")
+    management_gateway: Optional[bool] = Field(vmanage_key="management-gateway")
     epfr: Optional[Epfr] = Epfr.DISABLED
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"

@@ -50,7 +50,7 @@
                         "type": "passphrase",
                         "maxLength": 32
                     },
-                    "dataPath": [],
+                    "dataPath": ["list"],
                     "objectType": "object"
                 },
                 {
@@ -101,7 +101,7 @@
                                 "minLength": 1,
                                 "maxLength": 32
                             },
-                            "dataPath": [],
+                            "dataPath": ["type", "RSA"],
                             "objectType": "object"
                         }
                     ]

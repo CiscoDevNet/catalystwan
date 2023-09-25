@@ -26,6 +26,7 @@ from vmngclient.api.templates.models.cisco_logging_model import CiscoLoggingMode
 from vmngclient.api.templates.models.cisco_ntp_model import CiscoNTPModel
 from vmngclient.api.templates.models.cisco_omp_model import CiscoOMPModel
 from vmngclient.api.templates.models.cisco_ospf import CiscoOSPFModel
+from vmngclient.api.templates.models.cisco_ospfv3 import CiscoOspfv3Model
 from vmngclient.api.templates.models.cisco_secure_internet_gateway import CiscoSecureInternetGatewayModel
 from vmngclient.api.templates.models.cisco_snmp_model import CiscoSNMPModel
 from vmngclient.api.templates.models.cisco_system import CiscoSystemModel
@@ -94,7 +95,10 @@ class TemplatesAPI:
         raise NotImplementedError()
 
     def _get_feature_templates(
-        self, summary: bool = True, offset: Optional[int] = None, limit: Optional[int] = None
+        self,
+        summary: bool = True,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
     ) -> DataSequence[FeatureTemplateInfo]:
         """In a multitenant vManage system, this API is only available in the Provider view."""
         endpoint = "/dataservice/template/feature"
@@ -139,7 +143,11 @@ class TemplatesAPI:
         def get_device_specific_variables(name: str):
             endpoint = "/dataservice/template/device/config/exportcsv"
             template_id = self.get(DeviceTemplate).filter(name=name).single_or_default().id
-            body = {"templateId": template_id, "isEdited": False, "isMasterEdited": False}
+            body = {
+                "templateId": template_id,
+                "isEdited": False,
+                "isMasterEdited": False,
+            }
 
             values = self.session.post(endpoint, json=body).json()["header"]["columns"]
             return [DeviceSpecificValue(**value) for value in values]
@@ -454,7 +462,8 @@ class TemplatesAPI:
             return _template
 
         def parse_general_template(
-            general_template: GeneralTemplate, fr_templates: DataSequence[FeatureTemplateInfo]
+            general_template: GeneralTemplate,
+            fr_templates: DataSequence[FeatureTemplateInfo],
         ) -> GeneralTemplate:
             if general_template.subTemplates:
                 general_template.subTemplates = [
@@ -515,6 +524,7 @@ class TemplatesAPI:
             CiscoOSPFModel,
             CliTemplateModel,
             CiscoSecureInternetGatewayModel,
+            CiscoOspfv3Model,
         )
 
         return isinstance(template, ported_templates)
@@ -559,32 +569,15 @@ class TemplatesAPI:
             if field.key in template.device_specific_variables:
                 value = template.device_specific_variables[field.key]
             else:
-                # Iterate through every possible field, maybe refactor(?)
-                # Use data_path instead. data_path as tuple
-                # next(field_value.field_info.extra.get("vmanage_key") == field.key, template.__fields__.values())
                 for field_name, field_value in template.__fields__.items():
-                    if "vmanage_key" in field_value.field_info.extra:  # type: ignore
-                        vmanage_key = field_value.field_info.extra.get("vmanage_key")  # type: ignore
-                        if vmanage_key != field.key:
-                            break
-
-                        value = template.dict(by_alias=True).get(field_name, None)
-                        field_value.field_info.extra.pop("vmanage_key")  # type: ignore
+                    if field.dataPath == field_value.field_info.extra.get("data_path", []) and (  # type: ignore
+                        field.key == field_value.alias
+                        or field.key == field_value.field_info.extra.get("vmanage_key")  # type: ignore
+                    ):
+                        value = getattr(template, field_name)
                         break
                 if value is None:
-                    value = template.dict(by_alias=True).get(field.key, None)
-
-            # TODO remove workaround, add specific object
-            # types like Ignore, Constant, None etc so generator will now
-            # which object to ommit while generating payload
-            if template.type == "cisco_vpn_interface" and value is None:
-                continue
-
-            if template.type == "cisco_ospf" and value is None:
-                continue
-
-            if isinstance(value, bool):
-                value = str(value).lower()  # type: ignore
+                    continue
 
             # Merge dictionaries
 
@@ -685,7 +678,12 @@ class TemplatesAPI:
             error_details = json.loads(error.response.text)
             logger.error(f"Error in config: {error_details['error']['details']}.")
             return False
-        payload = {"templateId": template_id, "deviceIds": [device.uuid], "isEdited": True, "isMasterEdited": True}
+        payload = {
+            "templateId": template_id,
+            "deviceIds": [device.uuid],
+            "isEdited": True,
+            "isMasterEdited": True,
+        }
         endpoint = "/dataservice/template/device/config/input/"
         logger.info(f"Editing template: {name} of device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()

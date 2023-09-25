@@ -5,7 +5,7 @@
 [Add more in depth analysis of what changed, provide logs, examples of usage]
 
 # Checklist:
-- [ ] Make sure to run pre-commit before commiting changes
+- [ ] Make sure to run pre-commit before committing changes
 - [ ] Make sure all checks have passed
 - [ ] PR description is clear and comprehensive
 - [ ] Mentioned the issue that this PR solves (if applicable)
