@@ -115,7 +115,7 @@ class ConfigurationPolicyZoneBasedFirewallDefinitionBuilder(APIEndpoints):
         ...
 
     @put("/template/policy/definition/zonebasedfw/{id}")
-    def edit_policy_definition(self, id: str) -> PolicyDefinitionEditResponse:
+    def edit_policy_definition(self, id: str, payload: ZoneBasedFWPolicyEditPayload) -> PolicyDefinitionEditResponse:
         ...
 
     @get("/template/policy/definition/zonebasedfw", "data")
