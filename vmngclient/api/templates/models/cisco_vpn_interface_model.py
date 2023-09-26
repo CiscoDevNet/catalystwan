@@ -280,7 +280,9 @@ class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel, ConvertI
     enable_core_region: Optional[bool] = Field(vmanage_key="enable-core-region")
     core_region: Optional[CoreRegion] = Field(vmanage_key="core-region")
     secondary_region: Optional[SecondaryRegion] = Field(vmanage_key="secondary-region")
-    tloc_encapsulation: Optional[List[Encapsulation]]
+    tloc_encapsulation: Optional[List[Encapsulation]] = Field(
+        vmanage_key="encapsulation", data_path=["tunnel-interface"]
+    )
     border: Optional[bool] = Field(data_path=["tunnel-interface"])
     per_tunnel_qos: Optional[bool] = Field(vmanage_key="per-tunnel-qos")
     per_tunnel_qos_aggregator: Optional[bool] = Field(vmanage_key="per-tunnel-qos-aggregator")
