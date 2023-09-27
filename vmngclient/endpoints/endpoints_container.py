@@ -15,7 +15,9 @@ from vmngclient.endpoints.configuration.policy.definition_builder.zone_based_fir
 )
 from vmngclient.endpoints.configuration.policy.list_builder.app import ConfigurationPolicyApplicationListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.as_path import ConfigurationPolicyASPathListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.class_map import ConfigurationPolicyClassMapListBuilder
+from vmngclient.endpoints.configuration.policy.list_builder.class_map import (
+    ConfigurationPolicyForwardingClassListBuilder,
+)
 from vmngclient.endpoints.configuration.policy.list_builder.color import ConfigurationPolicyColorListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.community import ConfigurationPolicyCommunityListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.data_ipv6_prefix import (
@@ -36,7 +38,7 @@ from vmngclient.endpoints.configuration.policy.list_builder.local_app import Con
 from vmngclient.endpoints.configuration.policy.list_builder.local_domain import (
     ConfigurationPolicyLocalDomainListBuilder,
 )
-from vmngclient.endpoints.configuration.policy.list_builder.policer import ConfigurationPolicyPolicerListBuilder
+from vmngclient.endpoints.configuration.policy.list_builder.policer import ConfigurationPolicyPolicerClassListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.port import ConfigurationPolicyPortListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.protocol_name import (
     ConfigurationPolicyProtocolNameListBuilder,
@@ -85,9 +87,9 @@ class ConfigurationPolicyListBuilderContainer:
         self.url_black_list = ConfigurationPolicyURLBlackListBuilder(session)
         self.community = ConfigurationPolicyCommunityListBuilder(session)
         self.expanded_community = ConfigurationPolicyExpandedCommunityListBuilder(session)
-        self.policer = ConfigurationPolicyPolicerListBuilder(session)
+        self.policer = ConfigurationPolicyPolicerClassListBuilder(session)
         self.as_path = ConfigurationPolicyASPathListBuilder(session)
-        self.class_map = ConfigurationPolicyClassMapListBuilder(session)
+        self.class_map = ConfigurationPolicyForwardingClassListBuilder(session)
 
 
 class ConfigurationPolicyDefinitionBuilderContainer:

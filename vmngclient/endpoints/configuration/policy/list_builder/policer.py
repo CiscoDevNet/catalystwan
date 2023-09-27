@@ -13,7 +13,7 @@ class PolicerListInfo(PolicerList, PolicyListInfo):
     pass
 
 
-class ConfigurationPolicyPolicerListBuilder(APIEndpoints):
+class ConfigurationPolicyPolicerClassListBuilder(APIEndpoints):
     @post("/template/policy/list/policer")
     def create_policy_list(self, payload: PolicerList) -> PolicyListId:
         ...

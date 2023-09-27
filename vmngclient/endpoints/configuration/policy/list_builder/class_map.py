@@ -13,7 +13,7 @@ class ClassMapListInfo(ClassMapList, PolicyListInfo):
     pass
 
 
-class ConfigurationPolicyClassMapListBuilder(APIEndpoints):
+class ConfigurationPolicyForwardingClassListBuilder(APIEndpoints):
     @post("/template/policy/list/class")
     def create_policy_list(self, payload: ClassMapList) -> PolicyListId:
         ...
