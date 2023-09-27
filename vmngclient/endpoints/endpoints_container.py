@@ -15,6 +15,7 @@ from vmngclient.endpoints.configuration.policy.definition_builder.zone_based_fir
 )
 from vmngclient.endpoints.configuration.policy.list_builder.app import ConfigurationPolicyApplicationListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.as_path import ConfigurationPolicyASPathListBuilder
+from vmngclient.endpoints.configuration.policy.list_builder.class_map import ConfigurationPolicyClassMapListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.color import ConfigurationPolicyColorListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.community import ConfigurationPolicyCommunityListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.data_ipv6_prefix import (
@@ -86,6 +87,7 @@ class ConfigurationPolicyListBuilderContainer:
         self.expanded_community = ConfigurationPolicyExpandedCommunityListBuilder(session)
         self.policer = ConfigurationPolicyPolicerListBuilder(session)
         self.as_path = ConfigurationPolicyASPathListBuilder(session)
+        self.class_map = ConfigurationPolicyClassMapListBuilder(session)
 
 
 class ConfigurationPolicyDefinitionBuilderContainer:

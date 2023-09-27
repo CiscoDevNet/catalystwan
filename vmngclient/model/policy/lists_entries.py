@@ -197,3 +197,14 @@ class ASPathListEntry(BaseModel):
         allow_population_by_field_name = True
 
     as_path: str = Field(alias="asPath")
+
+
+class ClassMapListEntry(BaseModel):
+    queue: str
+
+    @validator("queue")
+    def check_queue(cls, queue_str: str):
+        queue = int(queue_str)
+        if queue < 0 or queue > 7:
+            raise ValueError("queue should be in range 0-7")
+        return queue_str

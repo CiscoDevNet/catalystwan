@@ -6,6 +6,7 @@ from typing_extensions import Annotated
 from vmngclient.model.policy.lists_entries import (
     AppListEntry,
     ASPathListEntry,
+    ClassMapListEntry,
     ColorListEntry,
     CommunityListEntry,
     DataIPv6PrefixListEntry,
@@ -133,6 +134,11 @@ class ASPathList(PolicyListHeader):
     entries: List[ASPathListEntry]
 
 
+class ClassMapList(PolicyListHeader):
+    type: Literal["class"] = "class"
+    entries: List[ClassMapListEntry]
+
+
 AllPolicyLists = Annotated[
     Union[
         DataPrefixList,
@@ -155,6 +161,7 @@ AllPolicyLists = Annotated[
         ExpandedCommunityList,
         PolicerList,
         ASPathList,
+        ClassMapList,
     ],
     Field(discriminator="type"),
 ]
