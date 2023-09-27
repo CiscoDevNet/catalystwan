@@ -190,3 +190,10 @@ class PolicerListEntry(BaseModel):
         if rate < 8 or rate > 100000000000:
             raise ValueError("rate should be in range 15000-10000000")
         return rate_str
+
+
+class ASPathListEntry(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    as_path: str = Field(alias="asPath")
