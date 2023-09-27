@@ -6,6 +6,7 @@ from typing_extensions import Annotated
 from vmngclient.model.policy.lists_entries import (
     AppListEntry,
     ColorListEntry,
+    CommunityListEntry,
     DataIPv6PrefixListEntry,
     DataPrefixListEntry,
     FQDNListEntry,
@@ -108,6 +109,16 @@ class URLWhiteList(PolicyListHeader):
 class URLBlackList(PolicyListHeader):
     type: Literal["urlBlackList"] = "urlBlackList"
     entries: List[URLListEntry]
+
+
+class CommunityList(PolicyListHeader):
+    type: Literal["community"] = "community"
+    entries: List[CommunityListEntry]
+
+
+class ExpandedCommunityList(PolicyListHeader):
+    type: Literal["expandedCommunity"] = "expandedCommunity"
+    entries: List[CommunityListEntry]
 
 
 AllPolicyLists = Annotated[

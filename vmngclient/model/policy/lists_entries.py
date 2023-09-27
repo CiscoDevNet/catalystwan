@@ -154,3 +154,10 @@ class URLListEntry(BaseModel):
         allow_population_by_field_name = True
 
     pattern: str
+
+
+class CommunityListEntry(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    community: str = Field(description="Example: 1000:10000 or internet or local-AS or no advertise or no-export")
