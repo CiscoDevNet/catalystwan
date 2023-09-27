@@ -38,6 +38,7 @@ from vmngclient.endpoints.configuration.policy.list_builder.local_app import Con
 from vmngclient.endpoints.configuration.policy.list_builder.local_domain import (
     ConfigurationPolicyLocalDomainListBuilder,
 )
+from vmngclient.endpoints.configuration.policy.list_builder.mirror import ConfigurationPolicyMirrorListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.policer import ConfigurationPolicyPolicerClassListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.port import ConfigurationPolicyPortListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.protocol_name import (
@@ -90,6 +91,7 @@ class ConfigurationPolicyListBuilderContainer:
         self.policer = ConfigurationPolicyPolicerClassListBuilder(session)
         self.as_path = ConfigurationPolicyASPathListBuilder(session)
         self.class_map = ConfigurationPolicyForwardingClassListBuilder(session)
+        self.mirror = ConfigurationPolicyMirrorListBuilder(session)
 
 
 class ConfigurationPolicyDefinitionBuilderContainer:

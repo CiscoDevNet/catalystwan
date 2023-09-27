@@ -2,7 +2,7 @@ from enum import Enum
 from ipaddress import IPv4Network, IPv6Network
 from typing import Optional
 
-from pydantic import BaseModel, Field, root_validator, validator
+from pydantic import BaseModel, Field, IPvAnyAddress, root_validator, validator
 
 from vmngclient.model.common import InterfaceTypeEnum
 
@@ -208,3 +208,11 @@ class ClassMapListEntry(BaseModel):
         if queue < 0 or queue > 7:
             raise ValueError("queue should be in range 0-7")
         return queue_str
+
+
+class MirrorListEntry(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    remote_dest: IPvAnyAddress = Field(alias="remoteDest")
+    source: IPvAnyAddress

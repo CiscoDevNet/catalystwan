@@ -16,6 +16,7 @@ from vmngclient.model.policy.lists_entries import (
     IPSSignatureListEntry,
     LocalAppListEntry,
     LocalDomainListEntry,
+    MirrorListEntry,
     PolicerListEntry,
     PortListEntry,
     ProtocolNameListEntry,
@@ -139,6 +140,11 @@ class ClassMapList(PolicyListHeader):
     entries: List[ClassMapListEntry]
 
 
+class MirrorList(PolicyListHeader):
+    type: Literal["mirror"] = "mirror"
+    entries: List[MirrorListEntry]
+
+
 AllPolicyLists = Annotated[
     Union[
         DataPrefixList,
@@ -162,6 +168,7 @@ AllPolicyLists = Annotated[
         PolicerList,
         ASPathList,
         ClassMapList,
+        MirrorList,
     ],
     Field(discriminator="type"),
 ]
