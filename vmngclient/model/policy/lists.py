@@ -14,6 +14,7 @@ from vmngclient.model.policy.lists_entries import (
     IPSSignatureListEntry,
     LocalAppListEntry,
     LocalDomainListEntry,
+    PolicerListEntry,
     PortListEntry,
     ProtocolNameListEntry,
     SiteListEntry,
@@ -121,6 +122,11 @@ class ExpandedCommunityList(PolicyListHeader):
     entries: List[CommunityListEntry]
 
 
+class PolicerList(PolicyListHeader):
+    type: Literal["policer"] = "policer"
+    entries: List[PolicerListEntry]
+
+
 AllPolicyLists = Annotated[
     Union[
         DataPrefixList,
@@ -138,6 +144,10 @@ AllPolicyLists = Annotated[
         LocalDomainList,
         IPSSignatureList,
         URLWhiteList,
+        URLBlackList,
+        CommunityList,
+        ExpandedCommunityList,
+        PolicerList,
     ],
     Field(discriminator="type"),
 ]

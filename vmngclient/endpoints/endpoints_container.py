@@ -34,6 +34,7 @@ from vmngclient.endpoints.configuration.policy.list_builder.local_app import Con
 from vmngclient.endpoints.configuration.policy.list_builder.local_domain import (
     ConfigurationPolicyLocalDomainListBuilder,
 )
+from vmngclient.endpoints.configuration.policy.list_builder.policer import ConfigurationPolicyPolicerListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.port import ConfigurationPolicyPortListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.protocol_name import (
     ConfigurationPolicyProtocolNameListBuilder,
@@ -82,6 +83,7 @@ class ConfigurationPolicyListBuilderContainer:
         self.url_black_list = ConfigurationPolicyURLBlackListBuilder(session)
         self.community = ConfigurationPolicyCommunityListBuilder(session)
         self.expanded_community = ConfigurationPolicyExpandedCommunityListBuilder(session)
+        self.policer = ConfigurationPolicyPolicerListBuilder(session)
 
 
 class ConfigurationPolicyDefinitionBuilderContainer:

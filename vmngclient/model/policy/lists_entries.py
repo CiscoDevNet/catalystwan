@@ -1,9 +1,15 @@
+from enum import Enum
 from ipaddress import IPv4Network, IPv6Network
 from typing import Optional
 
 from pydantic import BaseModel, Field, root_validator, validator
 
 from vmngclient.model.common import InterfaceTypeEnum
+
+
+class PolicerExceedAction(str, Enum):
+    DROP = "drop"
+    REMARK = "remark"
 
 
 class DataPrefixListEntry(BaseModel):
@@ -161,3 +167,26 @@ class CommunityListEntry(BaseModel):
         allow_population_by_field_name = True
 
     community: str = Field(description="Example: 1000:10000 or internet or local-AS or no advertise or no-export")
+
+
+class PolicerListEntry(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    burst: str = Field(description="bytes: integer in range 15000-10000000")
+    exceed: PolicerExceedAction = PolicerExceedAction.DROP
+    rate: str = Field(description="bps: integer in range 8-100000000000")
+
+    @validator("burst")
+    def check_burst(cls, burst_str: str):
+        burst = int(burst_str)
+        if burst < 15000 or burst > 10000000:
+            raise ValueError("burst should be in range 15000-10000000")
+        return burst_str
+
+    @validator("rate")
+    def check_rate(cls, rate_str: str):
+        rate = int(rate_str)
+        if rate < 8 or rate > 100000000000:
+            raise ValueError("rate should be in range 15000-10000000")
+        return rate_str
