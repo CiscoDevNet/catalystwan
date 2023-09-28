@@ -20,6 +20,7 @@ from vmngclient.model.policy.lists_entries import (
     MirrorListEntry,
     PolicerListEntry,
     PortListEntry,
+    PreferredColorGroupListEntry,
     ProtocolNameListEntry,
     SiteListEntry,
     SLAClassListEntry,
@@ -163,6 +164,11 @@ class TLOCList(PolicyListHeader):
     entries: List[TLOCListEntry]
 
 
+class PreferredColorGroupList(PolicyListHeader):
+    type: Literal["preferredColorGroup"] = "preferredColorGroup"
+    entries: List[PreferredColorGroupListEntry]
+
+
 AllPolicyLists = Annotated[
     Union[
         DataPrefixList,
@@ -190,6 +196,7 @@ AllPolicyLists = Annotated[
         AppProbeClassList,
         SLAClassList,
         TLOCList,
+        PreferredColorGroupList,
     ],
     Field(discriminator="type"),
 ]

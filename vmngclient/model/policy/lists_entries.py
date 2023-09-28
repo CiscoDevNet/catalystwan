@@ -7,21 +7,6 @@ from pydantic import BaseModel, Field, IPvAnyAddress, root_validator, validator
 from vmngclient.model.common import InterfaceTypeEnum
 
 
-class PolicerExceedAction(str, Enum):
-    DROP = "drop"
-    REMARK = "remark"
-
-
-class ColorDSCPMap(BaseModel):
-    color: str
-    dscp: int = Field(ge=0, le=63)
-
-
-class EncapEnum(str, Enum):
-    IPSEC = "ipsec"
-    GRE = "gre"
-
-
 def check_jitter_ms(jitter_str: str) -> str:
     jitter = int(jitter_str)
     if jitter < 1 or jitter > 1000:
@@ -41,6 +26,35 @@ def check_loss_percent(loss_str: str) -> str:
     if loss < 0 or loss > 100:
         raise ValueError("loss should be in range 0-100")
     return loss_str
+
+
+class PolicerExceedAction(str, Enum):
+    DROP = "drop"
+    REMARK = "remark"
+
+
+class EncapEnum(str, Enum):
+    IPSEC = "ipsec"
+    GRE = "gre"
+
+
+class PathPreferenceEnum(str, Enum):
+    DIRECT_PATH = "direct-path"
+    MULTI_HOP_PATH = "multi-hop-path"
+    ALL_PATHS = "all-paths"
+
+
+class ColorDSCPMap(BaseModel):
+    color: str
+    dscp: int = Field(ge=0, le=63)
+
+
+class ColorGroupPreference(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    color_preference: str = Field(alias="colorPreference")
+    path_preference: PathPreferenceEnum = Field(alias="pathPreference")
 
 
 class FallbackBestTunnel(BaseModel):
@@ -325,3 +339,18 @@ class TLOCListEntry(BaseModel):
         if preference < 0 or preference > 4294967295:
             raise ValueError("preference should be in range 0-4294967295")
         return preference_str
+
+
+class PreferredColorGroupListEntry(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    primary_preference: ColorGroupPreference = Field(alias="primaryPreference")
+    secondary_preference: Optional[ColorGroupPreference] = Field(None, alias="secondaryPreference")
+    tertiary_preference: Optional[ColorGroupPreference] = Field(None, alias="tertiaryPreference")
+
+    @root_validator  # type: ignore[call-overload]
+    def check_optional_preferences_order(cls, values):
+        if values.get("secondary_preference") is None and values.get("tertiary_preference") is not None:
+            raise ValueError("tertiary_preference cannot be set without secondary_preference")
+        return values

@@ -42,6 +42,9 @@ from vmngclient.endpoints.configuration.policy.list_builder.local_domain import 
 from vmngclient.endpoints.configuration.policy.list_builder.mirror import ConfigurationPolicyMirrorListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.policer import ConfigurationPolicyPolicerClassListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.port import ConfigurationPolicyPortListBuilder
+from vmngclient.endpoints.configuration.policy.list_builder.preferred_color_group import (
+    ConfigurationPreferredColorGroupListBuilder,
+)
 from vmngclient.endpoints.configuration.policy.list_builder.protocol_name import (
     ConfigurationPolicyProtocolNameListBuilder,
 )
@@ -98,6 +101,7 @@ class ConfigurationPolicyListBuilderContainer:
         self.app_probe = ConfigurationPolicyAppProbeClassListBuilder(session)
         self.sla = ConfigurationPolicySLAClassListBuilder(session)
         self.tloc = ConfigurationPolicyTLOCListBuilder(session)
+        self.preferred_color_group = ConfigurationPreferredColorGroupListBuilder(session)
 
 
 class ConfigurationPolicyDefinitionBuilderContainer:
