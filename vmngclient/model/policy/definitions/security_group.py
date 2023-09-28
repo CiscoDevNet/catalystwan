@@ -64,11 +64,10 @@ class SecurityGroupIPv6Definition(BaseModel):
 
 
 class SecurityGroup(PolicyDefinitionHeader):
+    # TODO: cannot use sequence_ip_type discriminated unions here as this is root of model
+    # EndpointAPI would need to support annotated union as payload parameter
     type: str = Field(default="securityGroup", const=True)
     mode: str = Field(default="unified", const=True)
-
-
-class SecurityGroupDefinition(SecurityGroup):
     sequence_ip_type: SequenceIPType = Field(alias="sequenceIpType")
     definition: Union[SecurityGroupIPv4Definition, SecurityGroupIPv6Definition]
 

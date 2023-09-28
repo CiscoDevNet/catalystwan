@@ -1,6 +1,6 @@
 # mypy: disable-error-code="empty-body"
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.definitions.security_group import SecurityGroupDefinition
+from vmngclient.model.policy.definitions.security_group import SecurityGroup
 from vmngclient.model.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionId,
@@ -10,7 +10,7 @@ from vmngclient.model.policy.policy_definition import (
 from vmngclient.typed_list import DataSequence
 
 
-class SecurityGroupCreationPayload(SecurityGroupDefinition):
+class SecurityGroupCreationPayload(SecurityGroup):
     pass
 
 
@@ -18,7 +18,7 @@ class SecurityGroupEditPayload(SecurityGroupCreationPayload, PolicyDefinitionId)
     pass
 
 
-class SecurityGroupInfo(SecurityGroupDefinition, PolicyDefinitionId, PolicyDefinitionInfo):
+class SecurityGroupInfo(SecurityGroup, PolicyDefinitionId, PolicyDefinitionInfo):
     pass
 
 
