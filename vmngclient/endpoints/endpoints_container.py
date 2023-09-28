@@ -47,6 +47,7 @@ from vmngclient.endpoints.configuration.policy.list_builder.protocol_name import
 )
 from vmngclient.endpoints.configuration.policy.list_builder.site import ConfigurationPolicySiteListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.sla import ConfigurationPolicySLAClassListBuilder
+from vmngclient.endpoints.configuration.policy.list_builder.tloc import ConfigurationPolicyTLOCListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.url_black_list import ConfigurationPolicyURLBlackListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.url_white_list import ConfigurationPolicyURLWhiteListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.vpn import ConfigurationPolicyVPNListBuilder
@@ -96,6 +97,7 @@ class ConfigurationPolicyListBuilderContainer:
         self.mirror = ConfigurationPolicyMirrorListBuilder(session)
         self.app_probe = ConfigurationPolicyAppProbeClassListBuilder(session)
         self.sla = ConfigurationPolicySLAClassListBuilder(session)
+        self.tloc = ConfigurationPolicyTLOCListBuilder(session)
 
 
 class ConfigurationPolicyDefinitionBuilderContainer:

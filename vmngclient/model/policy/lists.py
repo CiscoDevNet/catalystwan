@@ -23,6 +23,7 @@ from vmngclient.model.policy.lists_entries import (
     ProtocolNameListEntry,
     SiteListEntry,
     SLAClassListEntry,
+    TLOCListEntry,
     URLListEntry,
     VPNListEntry,
     ZoneListEntry,
@@ -157,6 +158,11 @@ class SLAClassList(PolicyListHeader):
     entries: List[SLAClassListEntry]
 
 
+class TLOCList(PolicyListHeader):
+    type: Literal["tloc"] = "tloc"
+    entries: List[TLOCListEntry]
+
+
 AllPolicyLists = Annotated[
     Union[
         DataPrefixList,
@@ -182,6 +188,8 @@ AllPolicyLists = Annotated[
         ClassMapList,
         MirrorList,
         AppProbeClassList,
+        SLAClassList,
+        TLOCList,
     ],
     Field(discriminator="type"),
 ]

@@ -1,5 +1,5 @@
 from enum import Enum
-from ipaddress import IPv4Network, IPv6Network
+from ipaddress import IPv4Address, IPv4Network, IPv6Network
 from typing import List, Optional
 
 from pydantic import BaseModel, Field, IPvAnyAddress, root_validator, validator
@@ -15,6 +15,11 @@ class PolicerExceedAction(str, Enum):
 class ColorDSCPMap(BaseModel):
     color: str
     dscp: int = Field(ge=0, le=63)
+
+
+class EncapEnum(str, Enum):
+    IPSEC = "ipsec"
+    GRE = "gre"
 
 
 def check_jitter_ms(jitter_str: str) -> str:
@@ -247,7 +252,7 @@ class PolicerListEntry(BaseModel):
     def check_rate(cls, rate_str: str):
         rate = int(rate_str)
         if rate < 8 or rate > 100000000000:
-            raise ValueError("rate should be in range 15000-10000000")
+            raise ValueError("rate should be in range 8-10000000")
         return rate_str
 
 
@@ -306,3 +311,17 @@ class SLAClassListEntry(BaseModel):
         if not any(checked_values):
             raise ValueError("At leas one of jitter, loss, latency entries must be set")
         return values
+
+
+class TLOCListEntry(BaseModel):
+    tloc: IPv4Address
+    color: str
+    encap: EncapEnum
+    preference: str
+
+    @validator("preference")
+    def check_preference(cls, preference_str: str):
+        preference = int(preference_str)
+        if preference < 0 or preference > 4294967295:
+            raise ValueError("preference should be in range 0-4294967295")
+        return preference_str
