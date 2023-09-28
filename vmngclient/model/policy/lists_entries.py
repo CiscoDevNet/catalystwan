@@ -354,3 +354,35 @@ class PreferredColorGroupListEntry(BaseModel):
         if values.get("secondary_preference") is None and values.get("tertiary_preference") is not None:
             raise ValueError("tertiary_preference cannot be set without secondary_preference")
         return values
+
+
+class PrefixListEntry(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    ip_prefix: IPv4Network = Field(alias="ipPrefix")
+    ge: Optional[str]
+    le: Optional[str]
+
+    @validator("ge", "le")
+    def check_ge_and_le(cls, ge_le_str: str):
+        ge_le = int(ge_le_str)
+        if ge_le < 0 or ge_le > 32:
+            raise ValueError("ge,le should be in range 0-32")
+        return ge_le_str
+
+
+class IPv6PrefixListEntry(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    ipv6_prefix: IPv6Network = Field(alias="ipv6Prefix")
+    ge: Optional[str]
+    le: Optional[str]
+
+    @validator("ge", "le")
+    def check_ge_and_le(cls, ge_le_str: str):
+        ge_le = int(ge_le_str)
+        if ge_le < 0 or ge_le > 128:
+            raise ValueError("ge,le should be in range 0-128")
+        return ge_le_str

@@ -15,12 +15,14 @@ from vmngclient.model.policy.lists_entries import (
     FQDNListEntry,
     GeoLocationListEntry,
     IPSSignatureListEntry,
+    IPv6PrefixListEntry,
     LocalAppListEntry,
     LocalDomainListEntry,
     MirrorListEntry,
     PolicerListEntry,
     PortListEntry,
     PreferredColorGroupListEntry,
+    PrefixListEntry,
     ProtocolNameListEntry,
     SiteListEntry,
     SLAClassListEntry,
@@ -169,6 +171,16 @@ class PreferredColorGroupList(PolicyListHeader):
     entries: List[PreferredColorGroupListEntry]
 
 
+class PrefixList(PolicyListHeader):
+    type: Literal["prefix"] = "prefix"
+    entries: List[PrefixListEntry]
+
+
+class IPv6PrefixList(PolicyListHeader):
+    type: Literal["ipv6prefix"] = "ipv6prefix"
+    entries: List[IPv6PrefixListEntry]
+
+
 AllPolicyLists = Annotated[
     Union[
         DataPrefixList,
@@ -197,6 +209,8 @@ AllPolicyLists = Annotated[
         SLAClassList,
         TLOCList,
         PreferredColorGroupList,
+        PrefixList,
+        IPv6PrefixList,
     ],
     Field(discriminator="type"),
 ]
