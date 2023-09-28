@@ -17,6 +17,60 @@ class ColorDSCPMap(BaseModel):
     dscp: int = Field(ge=0, le=63)
 
 
+def check_jitter_ms(jitter_str: str) -> str:
+    jitter = int(jitter_str)
+    if jitter < 1 or jitter > 1000:
+        raise ValueError("jitter should be in range 1-1000")
+    return jitter_str
+
+
+def check_latency_ms(latency_str: str) -> str:
+    latency = int(latency_str)
+    if latency < 1 or latency > 1000:
+        raise ValueError("latency should be in range 1-1000")
+    return latency_str
+
+
+def check_loss_percent(loss_str: str) -> str:
+    loss = int(loss_str)
+    if loss < 0 or loss > 100:
+        raise ValueError("loss should be in range 0-100")
+    return loss_str
+
+
+class FallbackBestTunnel(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    criteria: str
+    jitter_variance: Optional[str] = Field(None, alias="jitterVariance", description="jitter variance in ms")
+    latency_variance: Optional[str] = Field(None, alias="latencyVariance", description="latency variance in ms")
+    loss_variance: Optional[str] = Field(None, alias="lossVariance", description="loss variance as percentage")
+
+    # validators
+    _jitter_validator = validator("jitter_variance", allow_reuse=True)(check_jitter_ms)  # type: ignore[type-var]
+    _latency_validator = validator("latency_variance", allow_reuse=True)(check_latency_ms)  # type: ignore[type-var]
+    _loss_validator = validator("loss_variance", allow_reuse=True)(check_loss_percent)  # type: ignore[type-var]
+
+    @root_validator  # type: ignore[call-overload]
+    def check_criteria(cls, values):
+        expected_criteria = set()
+        if values.get("jitter_variance") is not None:
+            expected_criteria.add("jitter")
+        if values.get("latency_variance") is not None:
+            expected_criteria.add("latency")
+        if values.get("loss_variance") is not None:
+            expected_criteria.add("loss")
+        if len(expected_criteria) < 1:
+            raise ValueError("At least one variance type needs to be present")
+        observed_criteria = set(str(values.get("criteria")).split("-"))
+        if expected_criteria != observed_criteria:
+            if len(expected_criteria) == 1:
+                raise ValueError(f"Criteria must contain: {expected_criteria}")
+            raise ValueError(f"Criteria must contain: {expected_criteria} separated by hyphen")
+        return values
+
+
 class DataPrefixListEntry(BaseModel):
     class Config:
         allow_population_by_field_name = True
@@ -58,7 +112,7 @@ class ZoneListEntry(BaseModel):
             raise ValueError("VPN should be in range 0-65530")
         return vpn_str
 
-    @root_validator(pre=True)
+    @root_validator  # type: ignore[call-overload]
     def check_vpn_xor_interface(cls, values):
         checked_values = [values.get("vpn"), values.get("interface")]
         set_values = [value for value in checked_values if value is not None]
@@ -75,7 +129,7 @@ class GeoLocationListEntry(BaseModel):
     country: Optional[str] = Field(description="ISO-3166 alpha-3 country code eg: FRA")
     continent: Optional[str] = Field(description="One of 2-letter continent codes: AF, NA, OC, AN, AS, EU, SA")
 
-    @root_validator(pre=True)
+    @root_validator  # type: ignore[call-overload]
     def check_country_xor_continent(cls, values):
         checked_values = [values.get("country"), values.get("continent")]
         set_values = [value for value in checked_values if value is not None]
@@ -106,12 +160,12 @@ class LocalAppListEntry(BaseModel):
     app_family: Optional[str] = Field(alias="appFamily")
     app: Optional[str]
 
-    @root_validator(pre=True)
+    @root_validator  # type: ignore[call-overload]
     def check_app_xor_appfamily(cls, values):
-        checked_values = [values.get("app"), values.get("appFamily")]
+        checked_values = [values.get("app"), values.get("app_family")]
         set_values = [value for value in checked_values if value is not None]
         if len(set_values) != 1:
-            raise ValueError("Either app or appFamily is required")
+            raise ValueError("Either app or app_family is required")
         return values
 
 
@@ -119,12 +173,12 @@ class AppListEntry(BaseModel):
     app_family: Optional[str] = Field(alias="appFamily")
     app: Optional[str]
 
-    @root_validator(pre=True)
+    @root_validator  # type: ignore[call-overload]
     def check_app_xor_appfamily(cls, values):
-        checked_values = [values.get("app"), values.get("appFamily")]
+        checked_values = [values.get("app"), values.get("app_family")]
         set_values = [value for value in checked_values if value is not None]
         if len(set_values) != 1:
-            raise ValueError("Either app or appFamily is required")
+            raise ValueError("Either app or app_family is required")
         return values
 
 
@@ -229,3 +283,26 @@ class AppProbeClassListEntry(BaseModel):
 
     map: List[ColorDSCPMap]
     forwarding_class: str = Field(alias="forwardingClass")
+
+
+class SLAClassListEntry(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    latency: Optional[str] = None
+    loss: Optional[str] = None
+    jitter: Optional[str] = None
+    app_probe_class: Optional[str] = Field(alias="appProbeClass")
+    fallback_best_tunnel: Optional[FallbackBestTunnel] = Field(None, alias="fallbackBestTunnel")
+
+    # validators
+    _jitter_validator = validator("jitter", allow_reuse=True)(check_jitter_ms)  # type: ignore[type-var]
+    _latency_validator = validator("latency", allow_reuse=True)(check_latency_ms)  # type: ignore[type-var]
+    _loss_validator = validator("loss", allow_reuse=True)(check_loss_percent)  # type: ignore[type-var]
+
+    @root_validator  # type: ignore[call-overload]
+    def check_at_least_one_criteria_is_set(cls, values):
+        checked_values = {values.get("latency"), values.get("loss"), values.get("jitter")}
+        if not any(checked_values):
+            raise ValueError("At leas one of jitter, loss, latency entries must be set")
+        return values

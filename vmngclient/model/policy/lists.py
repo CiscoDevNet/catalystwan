@@ -22,6 +22,7 @@ from vmngclient.model.policy.lists_entries import (
     PortListEntry,
     ProtocolNameListEntry,
     SiteListEntry,
+    SLAClassListEntry,
     URLListEntry,
     VPNListEntry,
     ZoneListEntry,
@@ -149,6 +150,11 @@ class MirrorList(PolicyListHeader):
 class AppProbeClassList(PolicyListHeader):
     type: Literal["appProbe"] = "appProbe"
     entries: List[AppProbeClassListEntry]
+
+
+class SLAClassList(PolicyListHeader):
+    type: Literal["sla"] = "sla"
+    entries: List[SLAClassListEntry]
 
 
 AllPolicyLists = Annotated[

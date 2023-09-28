@@ -43,16 +43,16 @@ class SecurityGroupIPv4Definition(BaseModel):
         extra = Extra.forbid
         allow_population_by_field_name = True
 
-    @root_validator(pre=True)
+    @root_validator  # type: ignore[call-overload]
     def check_exclusive_fields(cls, values):
-        if values.get("dataPrefix") is not None and values.get("dataPrefixList") is not None:
-            raise ValueError("dataPrefix and dataPrefixList cannot be set at the same time")
-        if values.get("fqdn") is not None and values.get("fqdnList") is not None:
-            raise ValueError("fqdn and fqdnList cannot be set at the same time")
-        if values.get("geoLocation") is not None and values.get("geoLocationList") is not None:
-            raise ValueError("geoLocation and geoLocationList cannot be set at the same time")
-        if values.get("port") is not None and values.get("portList") is not None:
-            raise ValueError("port and portList cannot be set at the same time")
+        if values.get("data_prefix") is not None and values.get("data_prefix_list") is not None:
+            raise ValueError("geo_location and data_prefix_list cannot be set at the same time")
+        if values.get("fqdn") is not None and values.get("fqdn_list") is not None:
+            raise ValueError("fqdn and fqdn_list cannot be set at the same time")
+        if values.get("geo_location") is not None and values.get("geo_location_list") is not None:
+            raise ValueError("geoLocation and geo_location_list cannot be set at the same time")
+        if values.get("port") is not None and values.get("port_list") is not None:
+            raise ValueError("port and port_list cannot be set at the same time")
         return values
 
 
@@ -64,10 +64,10 @@ class SecurityGroupIPv6Definition(BaseModel):
         extra = Extra.forbid
         allow_population_by_field_name = True
 
-    @root_validator(pre=True)
+    @root_validator  # type: ignore[call-overload]
     def check_exclusive_fields(cls, values):
-        if values.get("dataIPV6Prefix") is not None and values.get("dataIPV6PrefixList") is not None:
-            raise ValueError("dataPrefix and dataPrefixList cannot be set at the same time")
+        if values.get("data_ipv6_prefix") is not None and values.get("data_ipv6_prefix_list") is not None:
+            raise ValueError("data_ipv6_prefix and data_ipv6_prefix_list cannot be set at the same time")
         return values
 
 
@@ -80,9 +80,9 @@ class SecurityGroupDefinition(SecurityGroup):
     sequence_ip_type: SequenceIPType = Field(alias="sequenceIpType")
     definition: Union[SecurityGroupIPv4Definition, SecurityGroupIPv6Definition]
 
-    @root_validator(pre=True)
+    @root_validator  # type: ignore[call-overload]
     def validate_by_sequence_ip_type(cls, values):
-        ip_type = values.get("sequenceIpType")
+        ip_type = values.get("sequence_ip_type")
         definition = values.get("definition")
         if (ip_type == SequenceIPType.IPV4 and isinstance(definition, SecurityGroupIPv6Definition)) or (
             ip_type == SequenceIPType.IPV6 and isinstance(definition, SecurityGroupIPv4Definition)
