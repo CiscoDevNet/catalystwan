@@ -5,6 +5,7 @@ from typing_extensions import Annotated
 
 from vmngclient.model.policy.lists_entries import (
     AppListEntry,
+    AppProbeClassListEntry,
     ASPathListEntry,
     ClassMapListEntry,
     ColorListEntry,
@@ -145,6 +146,11 @@ class MirrorList(PolicyListHeader):
     entries: List[MirrorListEntry]
 
 
+class AppProbeClassList(PolicyListHeader):
+    type: Literal["appProbe"] = "appProbe"
+    entries: List[AppProbeClassListEntry]
+
+
 AllPolicyLists = Annotated[
     Union[
         DataPrefixList,
@@ -169,6 +175,7 @@ AllPolicyLists = Annotated[
         ASPathList,
         ClassMapList,
         MirrorList,
+        AppProbeClassList,
     ],
     Field(discriminator="type"),
 ]

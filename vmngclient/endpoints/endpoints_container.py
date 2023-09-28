@@ -14,6 +14,7 @@ from vmngclient.endpoints.configuration.policy.definition_builder.zone_based_fir
     ConfigurationPolicyZoneBasedFirewallDefinitionBuilder,
 )
 from vmngclient.endpoints.configuration.policy.list_builder.app import ConfigurationPolicyApplicationListBuilder
+from vmngclient.endpoints.configuration.policy.list_builder.app_probe import ConfigurationPolicyAppProbeClassListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.as_path import ConfigurationPolicyASPathListBuilder
 from vmngclient.endpoints.configuration.policy.list_builder.class_map import (
     ConfigurationPolicyForwardingClassListBuilder,
@@ -92,6 +93,7 @@ class ConfigurationPolicyListBuilderContainer:
         self.as_path = ConfigurationPolicyASPathListBuilder(session)
         self.class_map = ConfigurationPolicyForwardingClassListBuilder(session)
         self.mirror = ConfigurationPolicyMirrorListBuilder(session)
+        self.app_probe = ConfigurationPolicyAppProbeClassListBuilder(session)
 
 
 class ConfigurationPolicyDefinitionBuilderContainer:

@@ -1,6 +1,6 @@
 from enum import Enum
 from ipaddress import IPv4Network, IPv6Network
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, Field, IPvAnyAddress, root_validator, validator
 
@@ -10,6 +10,11 @@ from vmngclient.model.common import InterfaceTypeEnum
 class PolicerExceedAction(str, Enum):
     DROP = "drop"
     REMARK = "remark"
+
+
+class ColorDSCPMap(BaseModel):
+    color: str
+    dscp: int = Field(ge=0, le=63)
 
 
 class DataPrefixListEntry(BaseModel):
@@ -216,3 +221,11 @@ class MirrorListEntry(BaseModel):
 
     remote_dest: IPvAnyAddress = Field(alias="remoteDest")
     source: IPvAnyAddress
+
+
+class AppProbeClassListEntry(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    map: List[ColorDSCPMap]
+    forwarding_class: str = Field(alias="forwardingClass")
