@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING, Final, List
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
 from pydantic import BaseModel, Field, validator
 
+from vmngclient.utils.device_model import DeviceModel
+
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
@@ -44,8 +46,8 @@ class DeviceTemplate(BaseModel):
     template_name: str = Field(alias="templateName")
     template_description: str = Field(alias="templateDescription")
     general_templates: List[GeneralTemplate] = Field(alias="generalTemplates")
-    device_role: str = Field(default="", alias="deviceRole")
-    device_type: str = Field(default="", alias="deviceType")
+    device_role: str = Field(default="sdwan-edge", alias="deviceRole")
+    device_type: DeviceModel = Field(alias="deviceType")
 
     def generate_payload(self) -> str:
         env = Environment(
@@ -72,6 +74,10 @@ class DeviceTemplate(BaseModel):
             else:
                 output.append(template)
         return output
+
+    @validator("device_type")
+    def convert_to_string(cls, device_type: DeviceModel):
+        return device_type.value
 
     payload_path: Final[Path] = Path(__file__).parent / "device_template_payload.json.j2"
 
