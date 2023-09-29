@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class DeviceModel(Enum):
+class DeviceModel(str, Enum):
     # controlers
     VSMART = "vsmart"
     VBOND = "vedge-cloud"

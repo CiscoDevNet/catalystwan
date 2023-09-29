@@ -75,10 +75,6 @@ class DeviceTemplate(BaseModel):
                 output.append(template)
         return output
 
-    @validator("device_type")
-    def convert_to_string(cls, device_type: DeviceModel):
-        return device_type.value
-
     payload_path: Final[Path] = Path(__file__).parent / "device_template_payload.json.j2"
 
     @classmethod
@@ -89,6 +85,7 @@ class DeviceTemplate(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
+        use_enum_values = True
 
 
 class DeviceSpecificValue(BaseModel):
