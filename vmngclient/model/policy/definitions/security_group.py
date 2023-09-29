@@ -5,20 +5,13 @@ from typing import Optional, Union
 
 from pydantic import BaseModel, Extra, Field, root_validator
 
-from vmngclient.model.policy.policy_definition import PolicyDefinitionHeader
+from vmngclient.model.common import check_any_of_exclusive_field_sets, check_fields_exclusive
+from vmngclient.model.policy.policy_definition import ListReference, PolicyDefinitionHeader, VariableName
 
 
 class SequenceIPType(str, Enum):
     IPV4 = "ipv4"
     IPV6 = "ipv6"
-
-
-class ListReference(BaseModel):
-    ref: str
-
-
-class VariableName(BaseModel):
-    vip_variable_name: str = Field(alias="vipVariableName")
 
 
 class SecurityGroupIPv4Definition(BaseModel):
@@ -37,14 +30,15 @@ class SecurityGroupIPv4Definition(BaseModel):
 
     @root_validator  # type: ignore[call-overload]
     def check_exclusive_fields(cls, values):
-        if values.get("data_prefix") is not None and values.get("data_prefix_list") is not None:
-            raise ValueError("geo_location and data_prefix_list cannot be set at the same time")
-        if values.get("fqdn") is not None and values.get("fqdn_list") is not None:
-            raise ValueError("fqdn and fqdn_list cannot be set at the same time")
-        if values.get("geo_location") is not None and values.get("geo_location_list") is not None:
-            raise ValueError("geoLocation and geo_location_list cannot be set at the same time")
-        if values.get("port") is not None and values.get("port_list") is not None:
-            raise ValueError("port and port_list cannot be set at the same time")
+        check_any_of_exclusive_field_sets(
+            values,
+            [
+                ({"data_prefix", "data_prefix_list"}, False),
+                ({"fqdn", "fqdn_list"}, False),
+                ({"geo_location", "geo_location_list"}, False),
+                ({"port", "port_list"}, False),
+            ],
+        )
         return values
 
 
@@ -58,8 +52,7 @@ class SecurityGroupIPv6Definition(BaseModel):
 
     @root_validator  # type: ignore[call-overload]
     def check_exclusive_fields(cls, values):
-        if values.get("data_ipv6_prefix") is not None and values.get("data_ipv6_prefix_list") is not None:
-            raise ValueError("data_ipv6_prefix and data_ipv6_prefix_list cannot be set at the same time")
+        check_fields_exclusive(values, {"data_ipv6_prefix", "data_ipv6_prefix_list"}, True)
         return values
 
 

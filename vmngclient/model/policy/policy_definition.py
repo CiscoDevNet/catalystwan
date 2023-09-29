@@ -9,6 +9,14 @@ from typing_extensions import Annotated, Literal
 # TODO: model actions
 
 
+class ListReference(BaseModel):
+    ref: str
+
+
+class VariableName(BaseModel):
+    vip_variable_name: str = Field(alias="vipVariableName")
+
+
 class DefaultActionType(str, Enum):
     DROP = "drop"
     ACCEPT = "accept"

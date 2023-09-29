@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field, IPvAnyAddress, root_validator, validator
 
-from vmngclient.model.common import InterfaceTypeEnum
+from vmngclient.model.common import InterfaceTypeEnum, check_fields_exclusive
 
 
 def check_jitter_ms(jitter_str: str) -> str:
@@ -133,10 +133,7 @@ class ZoneListEntry(BaseModel):
 
     @root_validator  # type: ignore[call-overload]
     def check_vpn_xor_interface(cls, values):
-        checked_values = [values.get("vpn"), values.get("interface")]
-        set_values = [value for value in checked_values if value is not None]
-        if len(set_values) != 1:
-            raise ValueError("Either vpn or interface is required")
+        check_fields_exclusive(values, {"vpn", "interface"}, True)
         return values
 
 
@@ -150,10 +147,7 @@ class GeoLocationListEntry(BaseModel):
 
     @root_validator  # type: ignore[call-overload]
     def check_country_xor_continent(cls, values):
-        checked_values = [values.get("country"), values.get("continent")]
-        set_values = [value for value in checked_values if value is not None]
-        if len(set_values) != 1:
-            raise ValueError("Either country or continent is required")
+        check_fields_exclusive(values, {"country", "continent"}, True)
         return values
 
 
@@ -181,10 +175,7 @@ class LocalAppListEntry(BaseModel):
 
     @root_validator  # type: ignore[call-overload]
     def check_app_xor_appfamily(cls, values):
-        checked_values = [values.get("app"), values.get("app_family")]
-        set_values = [value for value in checked_values if value is not None]
-        if len(set_values) != 1:
-            raise ValueError("Either app or app_family is required")
+        check_fields_exclusive(values, {"app", "app_family"}, True)
         return values
 
 
@@ -194,10 +185,7 @@ class AppListEntry(BaseModel):
 
     @root_validator  # type: ignore[call-overload]
     def check_app_xor_appfamily(cls, values):
-        checked_values = [values.get("app"), values.get("app_family")]
-        set_values = [value for value in checked_values if value is not None]
-        if len(set_values) != 1:
-            raise ValueError("Either app or app_family is required")
+        check_fields_exclusive(values, {"app", "app_family"}, True)
         return values
 
 
