@@ -7,6 +7,9 @@ from vmngclient.endpoints.certificate_management_vmanage import CertificateManag
 from vmngclient.endpoints.client import Client
 from vmngclient.endpoints.cluster_management import ClusterManagement
 from vmngclient.endpoints.configuration.policy.definition_builder.data import ConfigurationPolicyDataDefinitionBuilder
+from vmngclient.endpoints.configuration.policy.definition_builder.rule_set import (
+    ConfigurationPolicyRuleSetDefinitionBuilder,
+)
 from vmngclient.endpoints.configuration.policy.definition_builder.security_group import (
     ConfigurationPolicySecurityGroupDefinitionBuilder,
 )
@@ -113,6 +116,7 @@ class ConfigurationPolicyDefinitionBuilderContainer:
         self.data = ConfigurationPolicyDataDefinitionBuilder(session)
         self.zone_based_firewall = ConfigurationPolicyZoneBasedFirewallDefinitionBuilder(session)
         self.security_group = ConfigurationPolicySecurityGroupDefinitionBuilder(session)
+        self.rule_set = ConfigurationPolicyRuleSetDefinitionBuilder(session)
 
 
 class ConfigurationPolicyContainer:
