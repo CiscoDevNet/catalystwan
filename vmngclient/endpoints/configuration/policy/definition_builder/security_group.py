@@ -2,6 +2,7 @@
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.model.policy.definitions.security_group import SecurityGroup
 from vmngclient.model.policy.policy_definition import (
+    PolicyDefinitionBuilder,
     PolicyDefinitionEditResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
@@ -18,7 +19,7 @@ class SecurityGroupInfo(SecurityGroup, PolicyDefinitionId, PolicyDefinitionInfo)
     pass
 
 
-class ConfigurationPolicySecurityGroupDefinitionBuilder(APIEndpoints):
+class ConfigurationPolicySecurityGroupDefinitionBuilder(APIEndpoints, PolicyDefinitionBuilder):
     @post("/template/policy/definition/securitygroup")
     def create_policy_definition(self, payload: SecurityGroup) -> PolicyDefinitionId:
         ...

@@ -2,6 +2,7 @@
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.model.policy.definitions.rule_set import RuleSet
 from vmngclient.model.policy.policy_definition import (
+    PolicyDefinitionBuilder,
     PolicyDefinitionEditResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
@@ -18,7 +19,7 @@ class RuleSetInfo(RuleSet, PolicyDefinitionId, PolicyDefinitionInfo):
     pass
 
 
-class ConfigurationPolicyRuleSetDefinitionBuilder(APIEndpoints):
+class ConfigurationPolicyRuleSetDefinitionBuilder(APIEndpoints, PolicyDefinitionBuilder):
     @post("/template/policy/definition/ruleset")
     def create_policy_definition(self, payload: RuleSet) -> PolicyDefinitionId:
         ...

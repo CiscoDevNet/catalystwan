@@ -1,7 +1,13 @@
 # mypy: disable-error-code="empty-body"
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.model.policy.lists import URLWhiteList
-from vmngclient.model.policy.policy_list import InfoTag, PolicyListId, PolicyListInfo, PolicyListPreview
+from vmngclient.model.policy.policy_list import (
+    InfoTag,
+    PolicyListBuilder,
+    PolicyListId,
+    PolicyListInfo,
+    PolicyListPreview,
+)
 from vmngclient.typed_list import DataSequence
 
 
@@ -13,7 +19,7 @@ class URLWhiteListInfo(URLWhiteList, PolicyListInfo):
     pass
 
 
-class ConfigurationPolicyURLWhiteListBuilder(APIEndpoints):
+class ConfigurationPolicyURLWhiteListBuilder(APIEndpoints, PolicyListBuilder):
     @post("/template/policy/list/urlwhitelist")
     def create_policy_list(self, payload: URLWhiteList) -> PolicyListId:
         ...

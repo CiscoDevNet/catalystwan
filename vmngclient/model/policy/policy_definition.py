@@ -1,9 +1,11 @@
 import datetime
 from enum import Enum
-from typing import Any, List, Optional, Sequence, Union
+from typing import Any, List, Optional, Protocol, Sequence, Union
 
 from pydantic import BaseModel, Field, IPvAnyNetwork
 from typing_extensions import Annotated, Literal
+
+from vmngclient.typed_list import DataSequence
 
 # TODO: add validators for custom strings (eg.: port ranges, space separated networks)
 # TODO: model actions
@@ -336,3 +338,20 @@ class PolicyDefinitionEditResponse(BaseModel):
 
 class PolicyDefinitionPreview(BaseModel):
     preview: str
+
+
+class PolicyDefinitionBuilder(Protocol):
+    def create_policy_definition(self, payload: BaseModel) -> PolicyDefinitionId:
+        ...
+
+    def delete_policy_definition(self, id: str) -> None:
+        ...
+
+    def edit_policy_definition(self, id: str, payload: BaseModel) -> PolicyDefinitionEditResponse:
+        ...
+
+    def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
+        ...
+
+    def get_policy_definition(self, id: str) -> PolicyDefinitionGetResponse:
+        ...

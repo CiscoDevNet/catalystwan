@@ -1,7 +1,13 @@
 # mypy: disable-error-code="empty-body"
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.model.policy.lists import TLOCList
-from vmngclient.model.policy.policy_list import InfoTag, PolicyListId, PolicyListInfo, PolicyListPreview
+from vmngclient.model.policy.policy_list import (
+    InfoTag,
+    PolicyListBuilder,
+    PolicyListId,
+    PolicyListInfo,
+    PolicyListPreview,
+)
 from vmngclient.typed_list import DataSequence
 
 
@@ -13,7 +19,7 @@ class TLOCListInfo(TLOCList, PolicyListInfo):
     pass
 
 
-class ConfigurationPolicyTLOCListBuilder(APIEndpoints):
+class ConfigurationPolicyTLOCListBuilder(APIEndpoints, PolicyListBuilder):
     @post("/template/policy/list/tloc")
     def create_policy_list(self, payload: TLOCList) -> PolicyListId:
         ...

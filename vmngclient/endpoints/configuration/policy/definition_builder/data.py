@@ -4,6 +4,7 @@ from typing import Optional
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.model.policy.definitions.data import DataPolicy, DataPolicyDefinition
 from vmngclient.model.policy.policy_definition import (
+    PolicyDefinitionBuilder,
     PolicyDefinitionEditResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
@@ -28,7 +29,7 @@ class DataPolicyInfo(DataPolicy, PolicyDefinitionInfo):
     pass
 
 
-class ConfigurationPolicyDataDefinitionBuilder(APIEndpoints):
+class ConfigurationPolicyDataDefinitionBuilder(APIEndpoints, PolicyDefinitionBuilder):
     @post("/template/policy/definition/data")
     def create_policy_definition(self, payload: DataPolicyCreationPayload) -> PolicyDefinitionId:
         ...

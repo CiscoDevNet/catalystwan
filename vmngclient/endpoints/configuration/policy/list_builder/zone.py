@@ -1,7 +1,13 @@
 # mypy: disable-error-code="empty-body"
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.model.policy.lists import ZoneList
-from vmngclient.model.policy.policy_list import InfoTag, PolicyListId, PolicyListInfo, PolicyListPreview
+from vmngclient.model.policy.policy_list import (
+    InfoTag,
+    PolicyListBuilder,
+    PolicyListId,
+    PolicyListInfo,
+    PolicyListPreview,
+)
 from vmngclient.typed_list import DataSequence
 
 
@@ -13,7 +19,7 @@ class ZoneListInfo(ZoneList, PolicyListInfo):
     pass
 
 
-class ConfigurationPolicyZoneListBuilder(APIEndpoints):
+class ConfigurationPolicyZoneListBuilder(APIEndpoints, PolicyListBuilder):
     @post("/template/policy/list/zone")
     def create_policy_list(self, payload: ZoneList) -> PolicyListId:
         ...

@@ -2,6 +2,7 @@
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.model.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy, ZoneBasedFWPolicyDefinition
 from vmngclient.model.policy.policy_definition import (
+    PolicyDefinitionBuilder,
     PolicyDefinitionEditResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
@@ -26,7 +27,7 @@ class ZoneBasedFWPolicyInfo(ZoneBasedFWPolicy, PolicyDefinitionInfo):
     pass
 
 
-class ConfigurationPolicyZoneBasedFirewallDefinitionBuilder(APIEndpoints):
+class ConfigurationPolicyZoneBasedFirewallDefinitionBuilder(APIEndpoints, PolicyDefinitionBuilder):
     @post("/template/policy/definition/zonebasedfw")
     def create_policy_definition(self, payload: ZoneBasedFWPolicyCreationPayload) -> PolicyDefinitionId:
         ...

@@ -1,7 +1,13 @@
 # mypy: disable-error-code="empty-body"
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.model.policy.lists import IPv6PrefixList
-from vmngclient.model.policy.policy_list import InfoTag, PolicyListId, PolicyListInfo, PolicyListPreview
+from vmngclient.model.policy.policy_list import (
+    InfoTag,
+    PolicyListBuilder,
+    PolicyListId,
+    PolicyListInfo,
+    PolicyListPreview,
+)
 from vmngclient.typed_list import DataSequence
 
 
@@ -13,7 +19,7 @@ class IPv6PrefixListInfo(IPv6PrefixList, PolicyListInfo):
     pass
 
 
-class ConfigurationPolicyIPv6PrefixListBuilder(APIEndpoints):
+class ConfigurationPolicyIPv6PrefixListBuilder(APIEndpoints, PolicyListBuilder):
     @post("/template/policy/list/ipv6prefix")
     def create_policy_list(self, payload: IPv6PrefixList) -> PolicyListId:
         ...
