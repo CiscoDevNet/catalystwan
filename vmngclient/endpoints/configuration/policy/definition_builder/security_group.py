@@ -10,11 +10,7 @@ from vmngclient.model.policy.policy_definition import (
 from vmngclient.typed_list import DataSequence
 
 
-class SecurityGroupCreationPayload(SecurityGroup):
-    pass
-
-
-class SecurityGroupEditPayload(SecurityGroupCreationPayload, PolicyDefinitionId):
+class SecurityGroupEditPayload(SecurityGroup, PolicyDefinitionId):
     pass
 
 
@@ -24,7 +20,7 @@ class SecurityGroupInfo(SecurityGroup, PolicyDefinitionId, PolicyDefinitionInfo)
 
 class ConfigurationPolicySecurityGroupDefinitionBuilder(APIEndpoints):
     @post("/template/policy/definition/securitygroup")
-    def create_policy_definition(self, payload: SecurityGroupCreationPayload) -> PolicyDefinitionId:
+    def create_policy_definition(self, payload: SecurityGroup) -> PolicyDefinitionId:
         ...
 
     @delete("/template/policy/definition/securitygroup/{id}")
@@ -48,7 +44,7 @@ class ConfigurationPolicySecurityGroupDefinitionBuilder(APIEndpoints):
         ...
 
     @post("/template/policy/definition/securitygroup/preview")
-    def preview_policy_definition(self, payload: SecurityGroupCreationPayload) -> PolicyDefinitionPreview:
+    def preview_policy_definition(self, payload: SecurityGroup) -> PolicyDefinitionPreview:
         ...
 
     @get("/template/policy/definition/securitygroup/preview/{id}")
