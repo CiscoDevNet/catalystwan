@@ -12,7 +12,7 @@ class User(BaseModel):
     password: str
     secret: str
     privilege: Optional[str]
-    pubkey_chain: List[str] = Field(default=[], vmanage_key="pubkey-chain")
+    pubkey_chain: Optional[List[str]] = Field(default=None, vmanage_key="pubkey-chain")
 
 
 class RadiusServer(BaseModel):
@@ -77,10 +77,10 @@ class CiscoAAAModel(FeatureTemplate):
     user: List[User] = []
     authentication_group: bool = Field(vmanage_key="authentication_group", default=False)
     accounting_group: bool = True
-    radius: List[RadiusGroup] = []
+    radius: Optional[List[RadiusGroup]]
     domain_stripping: Optional[DomainStripping] = Field(vmanage_key="domain-stripping", default=None)
     port: int = 1700
-    tacacs: List[TacacsGroup] = []
+    tacacs: Optional[List[TacacsGroup]]
     server_auth_order: str = Field(vmanage_key="server-auth-order", default="local")
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
