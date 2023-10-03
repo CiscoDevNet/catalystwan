@@ -110,7 +110,7 @@ class FeatureTemplateField(BaseModel):
             return nest_value_in_output(vip_variable.dict(by_alias=True, exclude_none=True))
 
         else:
-            if value:
+            if value is not None:
                 output["vipType"] = FeatureTemplateOptionType.CONSTANT.value
                 if self.children:
                     children_output = []
