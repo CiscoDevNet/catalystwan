@@ -128,6 +128,7 @@ class TestTemplatesAPI(unittest.TestCase):
                 DeviceTemplate(  # type: ignore
                     template_name="test_device_template",
                     template_description="test_device_template_description",
+                    device_type=DeviceModel.VEDGE_2000,
                     general_templates=[],
                 ),
                 "device_template_id",
@@ -190,6 +191,7 @@ class TestTemplatesAPI(unittest.TestCase):
                     DeviceTemplate(  # type: ignore
                         template_name="test_device_template",
                         template_description="test_device_template_description",
+                        device_type=DeviceModel.VEDGE_2000,
                         general_templates=[],
                     ),
                     CLITemplate(  # type: ignore
