@@ -36,7 +36,7 @@ class Task:
         if not task.validation:
             return None
         if task.validation.status in (OperationStatus.FAILURE, OperationStatus.VALIDATION_FAILURE):
-            raise TaskValidationError(f"Task status validation failed, validation status is:{task.validation.status}")
+            raise TaskValidationError(f"Task status validation failed, validation status is: {task.validation.status}")
 
     def wait_for_completed(
         self,

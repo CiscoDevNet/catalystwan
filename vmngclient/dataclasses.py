@@ -18,7 +18,7 @@ class DataclassBase:
     def __str__(self):
         return (
             f"{self.__class__.__name__}(\n"
-            + "\n".join(f"    {attribute[0]}: {attribute[1]}," for attribute in asdict(self).items())
+            + "\n".join(f"    {attribute[0]}: {attribute[1]}, " for attribute in asdict(self).items())
             + "\n)"
         )
 
@@ -106,7 +106,7 @@ class AlarmData(DataclassBase):
 
     def __str__(self):
         result = (
-            f"{self.__class__.__name__}:\n    "
+            f"{self.__class__.__name__}: \n    "
             f"{self.message}\n    "
             f"{self.alarm_severity_print()}\n    "
             f"Alarm received at {self.format_datetime(self.receive_time)} "
