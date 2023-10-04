@@ -246,7 +246,7 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
         scheme: str = url.scheme or "https"
         base_url = urlunparse((scheme, netloc, "", None, None, None))
         if self.port:
-            return f"{base_url}:{self.port}"  #noqa: E231
+            return f"{base_url}:{self.port}"  # noqa: E231
         return base_url
 
     def about(self) -> AboutInfo:
