@@ -10,7 +10,10 @@ from vmngclient.endpoints.configuration_dashboard_status import ConfigurationDas
 from vmngclient.endpoints.configuration_device_actions import ConfigurationDeviceActions
 from vmngclient.endpoints.configuration_device_software_update import ConfigurationDeviceSoftwareUpdate
 from vmngclient.endpoints.configuration_device_template import ConfigurationDeviceTemplate
-from vmngclient.endpoints.configuration_feature_profile import ConfigurationFeatureProfile
+from vmngclient.endpoints.configuration_feature_profile import (
+    ConfigurationFeatureProfile,
+    SDRoutingConfigurationFeatureProfile,
+)
 from vmngclient.endpoints.configuration_group import ConfigurationGroup
 from vmngclient.endpoints.configuration_policy_data_definition_builder import ConfigurationPolicyDataDefinitionBuilder
 from vmngclient.endpoints.configuration_policy_data_prefix_list_builder import ConfigurationPolicyDataPrefixListBuilder
@@ -18,6 +21,7 @@ from vmngclient.endpoints.configuration_policy_site_list_builder import Configur
 from vmngclient.endpoints.configuration_policy_vpn_list_builder import ConfigurationPolicyVPNListBuilder
 from vmngclient.endpoints.configuration_settings import ConfigurationSettings
 from vmngclient.endpoints.configuration_vsmart_template_policy import ConfigurationVSmartTemplatePolicy
+from vmngclient.endpoints.device import Device
 from vmngclient.endpoints.monitoring_device_details import MonitoringDeviceDetails
 from vmngclient.endpoints.monitoring_status import MonitoringStatus
 from vmngclient.endpoints.sdavc_cloud_connector import SDAVCCloudConnector
@@ -53,3 +57,5 @@ class APIEndpointContainter:
         self.tenant_migration = TenantMigration(session)
         self.configuration_feature_profile = ConfigurationFeatureProfile(session)
         self.configuration_group = ConfigurationGroup(session)
+        self.sd_routing_configuration_feature_profile = SDRoutingConfigurationFeatureProfile(session)
+        self.device = Device(session)
