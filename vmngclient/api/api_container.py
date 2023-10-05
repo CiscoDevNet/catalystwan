@@ -13,9 +13,9 @@ from vmngclient.api.administration import (
 )
 from vmngclient.api.alarms_api import AlarmsAPI
 from vmngclient.api.basic_api import DevicesAPI, DeviceStateAPI
+from vmngclient.api.config_device_inventory_api import ConfigurationDeviceInventoryAPI
 from vmngclient.api.config_group_api import ConfigGroupAPI
 from vmngclient.api.dashboard_api import DashboardAPI
-from vmngclient.api.device_api import DeviceAPI
 from vmngclient.api.feature_profile_api import SDRoutingFeatureProfileAPI
 from vmngclient.api.logs_api import LogsAPI
 from vmngclient.api.omp_api import OmpAPI
@@ -40,9 +40,9 @@ class APIContainer:
         self.admin_tech = AdminTechAPI(session)
         self.administration_settings = AdministrationSettingsAPI(session)
         self.alarms = AlarmsAPI(session)
+        self.config_device_inventory_api = ConfigurationDeviceInventoryAPI(session)
         self.config_group = ConfigGroupAPI(session)
         self.dashboard = DashboardAPI(session)
-        self.device = DeviceAPI(session)
         self.devices = DevicesAPI(session)
         self.device_state = DeviceStateAPI(session)
         self.logs = LogsAPI(session)

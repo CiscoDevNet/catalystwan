@@ -5,13 +5,17 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
-from vmngclient.endpoints.device import Device, DeviceUnlockPayload, UnlockDeviceDetail
+from vmngclient.endpoints.configuration_device_inventory import (
+    ConfigurationDeviceInventory,
+    DeviceUnlockPayload,
+    UnlockDeviceDetail,
+)
 
 
-class DeviceAPI:
+class ConfigurationDeviceInventoryAPI:
     def __init__(self, session: vManageSession):
         self.session = session
-        self.endpoint = Device(session)
+        self.endpoint = ConfigurationDeviceInventory(session)
 
     def unlock(self, device_uuid: str, device_type: str, device_details: list):
         """

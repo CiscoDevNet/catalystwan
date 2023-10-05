@@ -20,7 +20,7 @@ class DeviceUnlockResponse(BaseModel):
     parentTaskId: str
 
 
-class Device(APIEndpoints):
+class ConfigurationDeviceInventory(APIEndpoints):
     @versions(supported_versions=(">=20.9"), raises=False)
     @post("/system/device/{device_uuid}/unlock")
     def unlock(self, device_uuid: str, payload: DeviceUnlockPayload) -> DeviceUnlockResponse:
