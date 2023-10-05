@@ -8,6 +8,7 @@ from vmngclient.endpoints.client import Client
 from vmngclient.endpoints.cluster_management import ClusterManagement
 from vmngclient.endpoints.configuration_dashboard_status import ConfigurationDashboardStatus
 from vmngclient.endpoints.configuration_device_actions import ConfigurationDeviceActions
+from vmngclient.endpoints.configuration_device_inventory import ConfigurationDeviceInventory
 from vmngclient.endpoints.configuration_device_software_update import ConfigurationDeviceSoftwareUpdate
 from vmngclient.endpoints.configuration_device_template import ConfigurationDeviceTemplate
 from vmngclient.endpoints.configuration_feature_profile import (
@@ -21,7 +22,6 @@ from vmngclient.endpoints.configuration_policy_site_list_builder import Configur
 from vmngclient.endpoints.configuration_policy_vpn_list_builder import ConfigurationPolicyVPNListBuilder
 from vmngclient.endpoints.configuration_settings import ConfigurationSettings
 from vmngclient.endpoints.configuration_vsmart_template_policy import ConfigurationVSmartTemplatePolicy
-from vmngclient.endpoints.device import Device
 from vmngclient.endpoints.monitoring_device_details import MonitoringDeviceDetails
 from vmngclient.endpoints.monitoring_status import MonitoringStatus
 from vmngclient.endpoints.sdavc_cloud_connector import SDAVCCloudConnector
@@ -58,4 +58,4 @@ class APIEndpointContainter:
         self.configuration_feature_profile = ConfigurationFeatureProfile(session)
         self.configuration_group = ConfigurationGroup(session)
         self.sd_routing_configuration_feature_profile = SDRoutingConfigurationFeatureProfile(session)
-        self.device = Device(session)
+        self.configuration_device_inventory = ConfigurationDeviceInventory(session)
