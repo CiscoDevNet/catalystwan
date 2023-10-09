@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 from vmngclient.endpoints.configuration_device_inventory import (
     ConfigurationDeviceInventory,
     DeviceUnlockPayload,
+    DeviceUnlockResponse,
     UnlockDeviceDetail,
 )
 
@@ -17,7 +18,7 @@ class ConfigurationDeviceInventoryAPI:
         self.session = session
         self.endpoint = ConfigurationDeviceInventory(session)
 
-    def unlock(self, device_uuid: str, device_type: str, device_details: list):
+    def unlock(self, device_uuid: str, device_type: str, device_details: list) -> DeviceUnlockResponse:
         """
         Unlocks device from config-group
         """
