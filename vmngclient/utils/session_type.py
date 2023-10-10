@@ -2,6 +2,7 @@ from enum import Enum, auto
 
 
 class SessionType(Enum):
+    SINGLE_TENANT = auto()
     PROVIDER = auto()
     TENANT = auto()
     PROVIDER_AS_TENANT = auto()
