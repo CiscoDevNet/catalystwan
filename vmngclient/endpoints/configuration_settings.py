@@ -5,8 +5,9 @@ from typing import List, Literal, Optional, Union
 
 from pydantic import BaseModel, Field, IPvAnyAddress, validator
 
-from vmngclient.endpoints import JSON, APIEndpoints, get, post, put
+from vmngclient.endpoints import JSON, APIEndpoints, get, post, put, view
 from vmngclient.typed_list import DataSequence
+from vmngclient.utils.session_type import ProviderView, SingleTenantView
 
 
 class ModeEnum(str, Enum):
@@ -30,6 +31,12 @@ class SmartLicensingSettingModeEnum(str, Enum):
     ONPREM = "on-prem"
     OFFLINE = "offline"
     ONLINE = "online"
+
+
+class CRLActionEnum(str, Enum):
+    DISABLE = "disable"
+    REVOKE = "revoke"
+    QUARANTINE = "quarantine"
 
 
 class Organization(BaseModel):
@@ -304,6 +311,30 @@ class StatsConfig(BaseModel):
         return StatsConfig(config=[StatsCollectionInterval(operationInterval=interval)])
 
 
+class CRLSettings(BaseModel):
+    class Config:
+        allow_population_by_field_name = True
+
+    action: CRLActionEnum
+    crl_url: Optional[str] = Field(None, alias="crlUrl")
+    polling_interval: Optional[str] = Field(description="Retrieval interval (1-24 hours)")
+    vpn: Optional[str]
+
+    @validator("polling_interval")
+    def check_polling_interval(cls, polling_interval_str: str):
+        polling_interval = int(polling_interval_str)
+        if polling_interval < 1 or polling_interval > 24:
+            raise ValueError("Polling interval should be in range 1-24")
+        return polling_interval_str
+
+    @validator("vpn")
+    def check_vpn(cls, vpn_str: str):
+        vpn = int(vpn_str)
+        if vpn < 0 or vpn > 65530:
+            raise ValueError("vpn should be in range 0-65530")
+        return vpn_str
+
+
 class ConfigurationSettings(APIEndpoints):
     def create_analytics_data_file(self):
         # POST /settings/configuration/analytics/dca
@@ -329,6 +360,7 @@ class ConfigurationSettings(APIEndpoints):
     def get_organizations(self) -> DataSequence[Organization]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @get("/settings/configuration/device", "data")
     def get_devices(self) -> DataSequence[Device]:
         ...
@@ -337,16 +369,24 @@ class ConfigurationSettings(APIEndpoints):
     def get_email_notification_settings(self) -> DataSequence[EmailNotificationSettings]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @get("/settings/configuration/hardwarerootca", "data")
     def get_hardware_root_cas(self) -> DataSequence[HardwareRootCA]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @get("/settings/configuration/certificate", "data")
     def get_certificates(self) -> DataSequence[Certificate]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @get("/settings/configuration/vedgecloud", "data")
     def get_vedge_cloud(self) -> DataSequence[VEdgeCloud]:
+        ...
+
+    @view({SingleTenantView, ProviderView})
+    @get("/settings/configuration/crlSetting")
+    def get_clr_settings(self) -> DataSequence[CRLSettings]:
         ...
 
     @get("/settings/configuration/banner", "data")
@@ -393,18 +433,22 @@ class ConfigurationSettings(APIEndpoints):
     def get_password_policy(self) -> DataSequence[PasswordPolicy]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @get("/settings/configuration/vmanagedatastream", "data")
     def get_vmanage_data_stream(self) -> DataSequence[VManageDataStream]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @get("/settings/configuration/dataCollectionOnNotification", "data")
     def get_data_collection_on_notification(self) -> DataSequence[DataCollectionOnNotification]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @get("/settings/configuration/sdWanTelemetry", "data")
     def get_sdwan_telemetry(self) -> DataSequence[SDWANTelemetry]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @get("/management/statsconfig")
     def get_stats_config(self) -> DataSequence[StatsOperation]:
         ...
@@ -421,6 +465,7 @@ class ConfigurationSettings(APIEndpoints):
     def get_google_map_key(self) -> DataSequence[GoogleMapKey]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @get("/settings/configuration/maintenanceWindow", "data")
     def get_maintenance_window(self) -> DataSequence[MaintenanceWindow]:
         ...
@@ -433,10 +478,12 @@ class ConfigurationSettings(APIEndpoints):
     def get_ips_signature_settings(self) -> DataSequence[IPSSignatureSettings]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @get("/settings/configuration/smartaccountcredentials", "data")
     def get_smart_account_credentials(self) -> DataSequence[SmartAccountCredentials]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @get("/settings/configuration/pnpConnectSync", "data")
     def get_pnp_connect_sync(self) -> DataSequence[PnPConnectSync]:
         ...
@@ -449,6 +496,7 @@ class ConfigurationSettings(APIEndpoints):
     def get_walkme(self) -> DataSequence[WalkMe]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @get("/settings/configuration/smartLicensing", "data")
     def get_smart_licensing_settings(self) -> DataSequence[SmartLicensingSetting]:
         ...
@@ -469,6 +517,7 @@ class ConfigurationSettings(APIEndpoints):
     def edit_organizations(self, payload: Organization) -> DataSequence[Organization]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @put("/settings/configuration/device", "data")
     def edit_devices(self, payload: Device) -> DataSequence[Device]:
         ...
@@ -479,14 +528,17 @@ class ConfigurationSettings(APIEndpoints):
     ) -> DataSequence[EmailNotificationSettings]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @put("/settings/configuration/hardwarerootca", "data")
     def edit_hardware_root_cas(self, payload: HardwareRootCA) -> DataSequence[HardwareRootCA]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @put("/settings/configuration/certificate", "data")
     def edit_certificates(self, payload: Certificate) -> DataSequence[Certificate]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @put("/settings/configuration/vedgecloud", "data")
     def edit_vedge_cloud(self, payload: VEdgeCloud) -> DataSequence[VEdgeCloud]:
         ...
@@ -535,20 +587,24 @@ class ConfigurationSettings(APIEndpoints):
     def edit_password_policy(self, payload: PasswordPolicy) -> DataSequence[PasswordPolicy]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @put("/settings/configuration/vmanagedatastream", "data")
     def edit_vmanage_data_stream(self, payload: VManageDataStream) -> DataSequence[VManageDataStream]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @put("/settings/configuration/dataCollectionOnNotification", "data")
     def edit_data_collection_on_notification(
         self, payload: DataCollectionOnNotification
     ) -> DataSequence[DataCollectionOnNotification]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @put("/settings/configuration/sdWanTelemetry", "data")
     def edit_sdwan_telemetry(self, payload: SDWANTelemetry) -> DataSequence[SDWANTelemetry]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @post("/management/statsconfig")
     def edit_stats_config(self, payload: StatsConfig) -> DataSequence[StatsOperation]:
         ...
@@ -565,6 +621,7 @@ class ConfigurationSettings(APIEndpoints):
     def edit_google_map_key(self, payload: GoogleMapKey) -> DataSequence[GoogleMapKey]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @put("/settings/configuration/maintenanceWindow")
     def edit_maintenance_window(self, payload: MaintenanceWindow) -> DataSequence[MaintenanceWindow]:
         ...
@@ -577,10 +634,12 @@ class ConfigurationSettings(APIEndpoints):
     def edit_ips_signature_settings(self, payload: IPSSignatureSettings) -> DataSequence[IPSSignatureSettings]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @put("/settings/configuration/smartaccountcredentials", "data")
     def edit_smart_account_credentials(self, payload: SmartAccountCredentials) -> DataSequence[SmartAccountCredentials]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @put("/settings/configuration/pnpConnectSync", "data")
     def edit_pnp_connect_sync(self, payload: PnPConnectSync) -> DataSequence[PnPConnectSync]:
         ...
@@ -593,6 +652,7 @@ class ConfigurationSettings(APIEndpoints):
     def edit_walkme(self, payload: WalkMe) -> DataSequence[WalkMe]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @put("/settings/configuration/smartLicensing", "data")
     def edit_smart_licensing_settings(self, payload: SmartLicensingSetting) -> DataSequence[SmartLicensingSetting]:
         ...

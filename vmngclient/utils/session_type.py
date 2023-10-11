@@ -12,3 +12,4 @@ class SessionType(Enum):
 ProviderView = SessionType.PROVIDER
 TenantView = SessionType.TENANT
 ProviderAsTenantView = SessionType.PROVIDER_AS_TENANT
+SingleTenantView = SessionType.SINGLE_TENANT
