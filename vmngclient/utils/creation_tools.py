@@ -35,7 +35,7 @@ def create_dataclass(cls: Type[T], data: Dict[str, Any]) -> T:
         return dict(filter(lambda key_value: key_value[0] in available_fields, data.items()))
 
     data_copy = data.copy()
-    for field in fields(cls):
+    for field in fields(cls):  # type: ignore[misc]
         json_field_name = field.metadata.get(FIELD_NAME, None)
         if json_field_name and json_field_name in data_copy:
             data_copy[field.name] = data_copy.pop(json_field_name)
