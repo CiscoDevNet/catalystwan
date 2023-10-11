@@ -43,7 +43,7 @@ class ConfigGroupAPI:
 
         self.endpoint.associate(config_group_id=cg_id, payload=payload)
 
-    def create(self, name: str, description: str, solution: Solution, profile_ids) -> ConfigGroupCreationResponse:
+    def create(self, name: str, description: str, solution: Solution, profile_ids: list) -> ConfigGroupCreationResponse:
         """
         Creates new config-group
         """
