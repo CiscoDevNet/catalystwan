@@ -86,7 +86,7 @@ def asdict(dataclass: AttrsInstance) -> dict:
     json_fields_excluded = attrs.asdict(dataclass, filter=lambda x, _: FIELD_NAME not in x.metadata)
     json_fields = attrs.asdict(dataclass, filter=lambda x, _: FIELD_NAME in x.metadata)
 
-    for field in fields(dataclass.__class__):
+    for field in fields(dataclass.__class__):  # type: ignore[misc]
         field_value = getattr(dataclass, field.name)
 
         json_field_name = field.metadata.get(FIELD_NAME, None)
