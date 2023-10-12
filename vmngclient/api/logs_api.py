@@ -52,8 +52,8 @@ class LogsAPI:
                 time = dt.utcfromtimestamp(log["entry_time"] / 1000)
                 time_readable = time.strftime("%Y-%m-%d %H:%M:%S")
                 file.write(
-                    f"Entry time: {time_readable} - LogId: {log['logid']} - "  # noqa: Q000
-                    f"Log message: {log['logmessage']} - TenantId: {log['tenant']}\n"  # noqa: Q000
+                    f"Entry time: {time_readable} - LogId: {log['logid']} - "
+                    f"Log message: {log['logmessage']} - TenantId: {log['tenant']}\n"
                 )
 
         logger.info(f"Logs saved to {file_path}")

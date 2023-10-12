@@ -213,7 +213,7 @@ class TemplatesAPI:
             return False
         except HTTPError as error:
             error_details = json.loads(error.response.text)
-            logger.error(f"Error in config: {error_details['error']['details']}.")  # noqa: Q000
+            logger.error(f"Error in config: {error_details['error']['details']}.")
             return False
         payload = {
             "deviceTemplateList": [
@@ -592,7 +592,7 @@ class TemplatesAPI:
                         elif a[key] == b[key]:
                             pass  # same leaf value
                         else:
-                            raise Exception(f"Conflict at {'.'.join(path + [str(key)])}")  # noqa: Q000
+                            raise Exception(f"Conflict at {'.'.join(path + [str(key)])}")
                     else:
                         a[key] = b[key]
                 return a
@@ -676,7 +676,7 @@ class TemplatesAPI:
             return False
         except HTTPError as error:
             error_details = json.loads(error.response.text)
-            logger.error(f"Error in config: {error_details['error']['details']}.")  # noqa: Q000
+            logger.error(f"Error in config: {error_details['error']['details']}.")
             return False
         payload = {
             "templateId": template_id,
