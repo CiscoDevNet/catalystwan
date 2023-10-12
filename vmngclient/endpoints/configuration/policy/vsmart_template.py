@@ -4,7 +4,7 @@ from typing import List, Optional
 from pydantic import BaseModel, Field, IPvAnyAddress, validator
 
 from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, put
-from vmngclient.model.policy import (
+from vmngclient.model.policy.policy import (
     AssemblyItem,
     PolicyCreationPayload,
     PolicyDefinition,
