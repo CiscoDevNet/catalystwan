@@ -28,7 +28,7 @@ pytest-mock = "^3.7.0"
 isort = "^5.10.1"
 pre-commit = "^2.19.0"
 mypy = "^1.0.0"
-flake8 = "^6.1.4"
+flake8 = "^6.1.0"
 Sphinx = "^5.2.3"
 
 [build-system]
