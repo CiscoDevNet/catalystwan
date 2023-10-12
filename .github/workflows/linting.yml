@@ -41,5 +41,5 @@ jobs:
         run: poetry run flake8 --max-line-length 120 --inline-quotes double vmngclient 
         if: ${{ matrix.python-version != '3.12' }}
       - name: Check code style for Python 3.12
-        run: poetry run flake8 --max-line-length 120 vmngclient 
+        run: poetry run flake8 --max-line-length 120 --ignore=Q000,W503,W504 vmngclient
         if: ${{ matrix.python-version == '3.12' }} 
