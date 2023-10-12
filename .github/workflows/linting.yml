@@ -39,3 +39,7 @@ jobs:
         run: poetry run mypy --show-error-codes --show-error-context --pretty --install-types --non-interactive vmngclient --cache-dir=.mypy_cache/
       - name: Check code style
         run: poetry run flake8 --max-line-length 120 --inline-quotes double vmngclient 
+        if: ${{ matrix.python-version != '3.12' }}
+      - name: Check code style for Python 3.12
+        run: poetry run flake8 --max-line-length 120 vmngclient 
+        if: ${{ matrix.python-version == '3.12' }} 
