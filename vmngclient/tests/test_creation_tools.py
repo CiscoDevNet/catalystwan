@@ -142,8 +142,8 @@ class TestCreationTools(unittest.TestCase):
         # Act
         conv_data = create_dataclass(ConvertibleData, conv_data_dict)
         # Assert
-        assert type(conv_data.date_time_1) == datetime.datetime
-        assert type(conv_data.date_time_2) == datetime.datetime
+        assert isinstance(conv_data.date_time_1, datetime.datetime)
+        assert isinstance(conv_data.date_time_2, datetime.datetime)
 
 
 if __name__ == "__main__":

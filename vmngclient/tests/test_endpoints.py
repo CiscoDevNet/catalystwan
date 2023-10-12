@@ -607,7 +607,7 @@ class TestAPIEndpoints(unittest.TestCase):
         # Assert
         self.session_mock.request.return_value.json.assert_called_once()
         assert retval == json
-        assert type(retval) == jtype
+        assert isinstance(retval, jtype)
 
     def test_request_decorator_call_raises_when_payload_has_no_resp_json_key(self):
         # Arrange
