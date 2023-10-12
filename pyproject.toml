@@ -7,7 +7,7 @@ readme = "README.md"
 repository = "https://github.com/CiscoDevNet/vManage-client"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.8.1"
 requests = "^2.27.1"
 python-dateutil = "^2.8.2"
 attrs = "^21.4.0"
