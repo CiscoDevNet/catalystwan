@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -19,30 +18,24 @@ class SDRoutingFeatureProfilesAPI:
         self.cli = SDRoutingCLIFeatureProfileAPI(session=session)
 
 
-class FeatureProfileAPI(ABC):
-    def __init__(self, session: vManageSession):
-        self.session = session
-
-    @abstractmethod
+class FeatureProfileAPI(Protocol):
     def init_parcels(self, fp_id: str) -> None:
         """
         Initialized parcel(s) associated with this feature profile
         """
-        pass
+        ...
 
-    @abstractmethod
     def create(self, name: str, description: str) -> FeatureProfileCreationResponse:
         """
         Creates feature profile
         """
-        pass
+        ...
 
-    @abstractmethod
     def delete(self, fp_id: str) -> None:
         """
         Deletes feature profile
         """
-        pass
+        ...
 
 
 class SDRoutingCLIFeatureProfileAPI(FeatureProfileAPI):
@@ -51,10 +44,13 @@ class SDRoutingCLIFeatureProfileAPI(FeatureProfileAPI):
     """
 
     def __init__(self, session: vManageSession):
-        super().__init__(session)
+        self.session = session
         self.endpoint = SDRoutingConfigurationFeatureProfile(session)
 
     def init_parcels(self, fp_id: str) -> None:
+        """
+        Initialize CLI full-config parcel associated with this feature profile
+        """
         self.full_config_parcel = SDRoutingFullConfigParcelAPI(session=self.session, fp_id=fp_id)
 
     def create(self, name: str, description: str) -> FeatureProfileCreationResponse:

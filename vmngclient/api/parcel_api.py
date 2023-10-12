@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -10,22 +9,15 @@ from vmngclient.endpoints.configuration_feature_profile import ParcelId, SDRouti
 from vmngclient.model.feature_profile_parcel import FullConfig, FullConfigParcel
 
 
-class ParcelAPI(ABC):
-    @abstractmethod
-    def __init__(self, session: vManageSession, fp_id: str):
-        pass
-
-    @abstractmethod
+class ParcelAPI(Protocol):
     def create(self, name: str, description: str, data: dict) -> ParcelId:
-        pass
+        ...
 
-    @abstractmethod
     def edit(self, parcel_id: str, name: str, description: str, data: dict) -> None:
-        pass
+        ...
 
-    @abstractmethod
     def delete(self, parcel_id: str) -> None:
-        pass
+        ...
 
 
 class SDRoutingFullConfigParcelAPI(ParcelAPI):
