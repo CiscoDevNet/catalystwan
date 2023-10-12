@@ -409,6 +409,7 @@ class ConfigurationSettings(APIEndpoints):
     def get_manage_encrypted_password(self) -> DataSequence[ManageEncryptedPassword]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @get("/settings/configuration/cloudservices", "data")
     def get_cloudservices(self) -> DataSequence[CloudServices]:
         ...
@@ -563,6 +564,7 @@ class ConfigurationSettings(APIEndpoints):
     def edit_manage_encrypted_password(self, payload: ManageEncryptedPassword) -> DataSequence[ManageEncryptedPassword]:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @put("/settings/configuration/cloudservices", "data")
     def edit_cloudservices(self, payload: CloudServices) -> DataSequence[CloudServices]:
         ...
