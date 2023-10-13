@@ -32,17 +32,17 @@ class PolicyListPreview(BaseModel):
 
 
 class PolicyListBuilder(Protocol):
-    def create_policy_list(self, payload: BaseModel) -> PolicyListId:
+    def create_policy_list(self, payload: PolicyList) -> PolicyListId:
         ...
 
     def delete_policy_list(self, id: str) -> None:
         ...
 
-    def edit_policy_list(self, id: str, payload: BaseModel) -> None:
+    def edit_policy_list(self, id: str, payload: PolicyList) -> None:
         ...
 
-    def get_lists_by_id(self, id: str) -> BaseModel:
+    def get_lists_by_id(self, id: str) -> PolicyListInfo:
         ...
 
-    def get_policy_lists(self) -> DataSequence[BaseModel]:
+    def get_policy_lists(self) -> DataSequence[PolicyListInfo]:
         ...

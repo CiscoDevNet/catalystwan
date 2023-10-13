@@ -63,17 +63,32 @@ class ZoneBasedFWPolicySequence(DefinitionSequence):
     sequence_type: SequenceType = Field(default=SequenceType.ZONE_BASED_FW, const=True, alias="sequenceType")
     match: ZoneBasedFWPolicyMatch
 
+    class Config:
+        allow_population_by_field_name = True
+
 
 class ZoneBasedFWPolicyEntry(BaseModel):
     source_zone: str = Field(default="self", alias="sourceZone")
     destination_zone: str = Field(alias="destinationZone")
 
+    class Config:
+        allow_population_by_field_name = True
 
-class ZoneBasedFWPolicy(PolicyDefinitionHeader):
+
+class ZoneBasedFWPolicyHeader(PolicyDefinitionHeader):
     type: str = Field(default="zoneBasedFW", const=True)
     mode: str = Field(default="security", const=True)
+
+    class Config:
+        allow_population_by_field_name = True
 
 
 class ZoneBasedFWPolicyDefinition(PolicyDefinitionBody):
     sequences: List[ZoneBasedFWPolicySequence] = []
     entries: List[ZoneBasedFWPolicyEntry]
+
+
+class ZoneBasedFWPolicy(ZoneBasedFWPolicyHeader):
+    type: str = Field(default="zoneBasedFW", const=True)
+    mode: str = Field(default="security", const=True)
+    definition: ZoneBasedFWPolicyDefinition

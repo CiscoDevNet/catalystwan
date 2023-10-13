@@ -53,7 +53,7 @@ DataPolicySequenceEntry = Annotated[
 ]
 
 
-class DataPolicy(PolicyDefinitionHeader):
+class DataPolicyHeader(PolicyDefinitionHeader):
     type: str = Field(default="data", const=True)
 
 
@@ -64,3 +64,7 @@ class DataPolicySequence(DefinitionSequence):
 
 class DataPolicyDefinition(PolicyDefinitionBody):
     sequences: List[DataPolicySequence] = []
+
+
+class DataPolicy(DataPolicyHeader):
+    type: str = Field(default="data", const=True)

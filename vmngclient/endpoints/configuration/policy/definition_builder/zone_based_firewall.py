@@ -1,6 +1,6 @@
 # mypy: disable-error-code="empty-body"
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy, ZoneBasedFWPolicyDefinition
+from vmngclient.model.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy, ZoneBasedFWPolicyHeader
 from vmngclient.model.policy.policy_definition import (
     PolicyDefinitionBuilder,
     PolicyDefinitionEditResponse,
@@ -11,25 +11,21 @@ from vmngclient.model.policy.policy_definition import (
 from vmngclient.typed_list import DataSequence
 
 
-class ZoneBasedFWPolicyCreationPayload(ZoneBasedFWPolicy):
-    definition: ZoneBasedFWPolicyDefinition
-
-
-class ZoneBasedFWPolicyGetResponse(ZoneBasedFWPolicyCreationPayload, PolicyDefinitionId):
+class ZoneBasedFWPolicyGetResponse(ZoneBasedFWPolicy, PolicyDefinitionId):
     pass
 
 
-class ZoneBasedFWPolicyEditPayload(ZoneBasedFWPolicyCreationPayload, PolicyDefinitionId):
+class ZoneBasedFWPolicyEditPayload(ZoneBasedFWPolicy, PolicyDefinitionId):
     pass
 
 
-class ZoneBasedFWPolicyInfo(ZoneBasedFWPolicy, PolicyDefinitionInfo):
+class ZoneBasedFWPolicyInfo(ZoneBasedFWPolicyHeader, PolicyDefinitionInfo):
     pass
 
 
 class ConfigurationPolicyZoneBasedFirewallDefinitionBuilder(APIEndpoints, PolicyDefinitionBuilder):
     @post("/template/policy/definition/zonebasedfw")
-    def create_policy_definition(self, payload: ZoneBasedFWPolicyCreationPayload) -> PolicyDefinitionId:
+    def create_policy_definition(self, payload: ZoneBasedFWPolicy) -> PolicyDefinitionId:
         ...
 
     @delete("/template/policy/definition/zonebasedfw/{id}")
@@ -53,7 +49,7 @@ class ConfigurationPolicyZoneBasedFirewallDefinitionBuilder(APIEndpoints, Policy
         ...
 
     @post("/template/policy/definition/zonebasedfw/preview")
-    def preview_policy_definition(self, payload: ZoneBasedFWPolicyCreationPayload) -> PolicyDefinitionPreview:
+    def preview_policy_definition(self, payload: ZoneBasedFWPolicy) -> PolicyDefinitionPreview:
         ...
 
     @get("/template/policy/definition/zonebasedfw/preview/{id}")

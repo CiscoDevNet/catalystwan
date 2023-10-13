@@ -1,8 +1,7 @@
 # mypy: disable-error-code="empty-body"
-from typing import Optional
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.definitions.data import DataPolicy, DataPolicyDefinition
+from vmngclient.model.policy.definitions.data import DataPolicy, DataPolicyHeader
 from vmngclient.model.policy.policy_definition import (
     PolicyDefinitionBuilder,
     PolicyDefinitionEditResponse,
@@ -13,25 +12,21 @@ from vmngclient.model.policy.policy_definition import (
 from vmngclient.typed_list import DataSequence
 
 
-class DataPolicyCreationPayload(DataPolicy):
-    definition: Optional[DataPolicyDefinition] = None
-
-
-class DataPolicyGetResponse(DataPolicyCreationPayload, PolicyDefinitionId):
+class DataPolicyGetResponse(DataPolicy, PolicyDefinitionId):
     pass
 
 
-class DataPolicyEditPayload(DataPolicyCreationPayload, PolicyDefinitionId):
+class DataPolicyEditPayload(DataPolicy, PolicyDefinitionId):
     pass
 
 
-class DataPolicyInfo(DataPolicy, PolicyDefinitionInfo):
+class DataPolicyInfo(DataPolicyHeader, PolicyDefinitionInfo):
     pass
 
 
 class ConfigurationPolicyDataDefinitionBuilder(APIEndpoints, PolicyDefinitionBuilder):
     @post("/template/policy/definition/data")
-    def create_policy_definition(self, payload: DataPolicyCreationPayload) -> PolicyDefinitionId:
+    def create_policy_definition(self, payload: DataPolicy) -> PolicyDefinitionId:
         ...
 
     @delete("/template/policy/definition/data/{id}")
@@ -55,7 +50,7 @@ class ConfigurationPolicyDataDefinitionBuilder(APIEndpoints, PolicyDefinitionBui
         ...
 
     @post("/template/policy/definition/data/preview")
-    def preview_policy_definition(self, payload: DataPolicyCreationPayload) -> PolicyDefinitionPreview:
+    def preview_policy_definition(self, payload: DataPolicy) -> PolicyDefinitionPreview:
         ...
 
     @get("/template/policy/definition/data/preview/{id}")
