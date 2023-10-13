@@ -564,7 +564,7 @@ class TemplatesAPI:
         # "name"
         for i, field in enumerate(fr_template_fields):
             value = None
-
+            priority_order = None
             # TODO How to discover Device specific variable
             if field.key in template.device_specific_variables:
                 value = template.device_specific_variables[field.key]
@@ -574,6 +574,7 @@ class TemplatesAPI:
                         field.key == field_value.alias
                         or field.key == field_value.field_info.extra.get("vmanage_key")  # type: ignore
                     ):
+                        priority_order = field_value.field_info.extra.get("priority_order")  # type: ignore
                         value = getattr(template, field_name)
                         break
                 if value is None:
@@ -597,7 +598,8 @@ class TemplatesAPI:
                         a[key] = b[key]
                 return a
 
-            payload.definition = merge(payload.definition, field.payload_scheme(value))
+            # print(field.payload_scheme(value))
+            payload.definition = merge(payload.definition, field.payload_scheme(value, priority_order=priority_order))
 
         if debug:
             with open(f"payload_{template.type}.json", "w") as f:
