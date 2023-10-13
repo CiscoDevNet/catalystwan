@@ -27,6 +27,7 @@ class TestTenantMigrationAPI(unittest.TestCase):
             subdomain="test_subdomain",
             org_name="test_org",
             is_destination_overlay_mt=False,
+            migration_key="Cisco12345",
         )
         task = self.api.export_tenant(tenant=tenant)
         self.assertIsInstance(task, Task)
@@ -40,6 +41,7 @@ class TestTenantMigrationAPI(unittest.TestCase):
             assert open(download_path, "rb").read() == content
 
     def test_import_tenant(self):
+        migration_key = "Cisco12345"
         migration_id = "dcbed267-eb0d-4dcd-9c12-2536e8562f75"
         with tempfile.TemporaryDirectory() as tmpdir:
             import_file = Path(tmpdir) / "tenant.tar.gz"
@@ -54,7 +56,7 @@ class TestTenantMigrationAPI(unittest.TestCase):
                     ),
                 )
             )
-            task = self.api.import_tenant(import_file)
+            task = self.api.import_tenant(migration_key, import_file)
             self.assertIsInstance(task, ImportTask)
             assert task.import_info.migration_token_query_params.migration_id == migration_id
 

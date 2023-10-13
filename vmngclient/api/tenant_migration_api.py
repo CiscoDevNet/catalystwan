@@ -59,7 +59,7 @@ class TenantMigrationAPI:
         with open(download_path, "wb") as file:
             file.write(tenant_data)
 
-    def import_tenant(self, migrationKey, import_file: Path) -> ImportTask:
+    def import_tenant(self, migration_key, import_file: Path) -> ImportTask:
         """Imports the single-tenant deployment and configuration data into multi-tenant vManage instance.
         Should be executed on target multi-tenant system.
 
@@ -69,7 +69,7 @@ class TenantMigrationAPI:
         Returns:
             ImportTask: object representing initiated import process
         """
-        import_info = self.session.endpoints.tenant_migration.import_tenant_data(migrationKey, open(import_file, "rb"))
+        import_info = self.session.endpoints.tenant_migration.import_tenant_data(migration_key, open(import_file, "rb"))
         return ImportTask(self.session, import_info)
 
     def store_token(self, migration_id: str, download_path: Path):
@@ -119,7 +119,7 @@ def st_to_mt(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Pa
     migration_file_prefix = f"{tenant.name}-{st_api.session.server_name}-{migration_timestamp}"
     export_path = workdir / f"{migration_file_prefix}.tar.gz"
     token_path = workdir / f"{migration_file_prefix}.token"
-    migrationKey = tenant.migration_key
+    migration_key = tenant.migration_key
 
     logger.info(f"1/5 Exporting {tenant.name} ...")
     export_task = st_api.export_tenant(tenant=tenant)
@@ -130,7 +130,7 @@ def st_to_mt(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Pa
     st_api.download(export_path, remote_filename)
 
     logger.info(f"3/5 Importing {export_path} ...")
-    import_task = mt_api.import_tenant(migrationKey, export_path)
+    import_task = mt_api.import_tenant(migration_key, export_path)
 
     logger.info("4/5 Obtaining migration token ...")
     import_task.wait_for_completed()
@@ -162,7 +162,7 @@ def mt_to_st(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Pa
     migration_file_prefix = f"{tenant.name}-{st_api.session.server_name}-{migration_timestamp}"
     export_path = workdir / f"{migration_file_prefix}.tar.gz"
     token_path = workdir / f"{migration_file_prefix}.token"
-    migrationKey = tenant.migration_key
+    migration_key = tenant.migration_key
 
     logger.info(f"1/5 Exporting {tenant.name} ...")
     export_task = mt_api.export_tenant(tenant=tenant)
@@ -173,7 +173,7 @@ def mt_to_st(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Pa
     mt_api.download(export_path, remote_filename)
 
     logger.info(f"3/5 Importing {export_path} ...")
-    import_task = st_api.import_tenant(migrationKey, export_path)
+    import_task = st_api.import_tenant(migration_key, export_path)
 
     logger.info("4/5 Obtaining migration token ...")
     import_task.wait_for_completed()
