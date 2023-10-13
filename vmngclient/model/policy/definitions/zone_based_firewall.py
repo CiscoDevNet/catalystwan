@@ -19,6 +19,7 @@ from vmngclient.model.policy.policy_definition import (
     PolicyDefinitionHeader,
     ProtocolEntry,
     ProtocolNameListEntry,
+    RuleSetListEntry,
     SequenceType,
     SourceDataPrefixListEntry,
     SourceFQDNEntry,
@@ -50,6 +51,7 @@ ZoneBasedFWPolicySequenceEntry = Annotated[
         DestinationPortListEntry,
         ProtocolNameListEntry,
         AppListEntry,
+        RuleSetListEntry,
     ],
     Field(discriminator="field"),
 ]

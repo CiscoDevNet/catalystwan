@@ -254,6 +254,7 @@ Entry = Annotated[
         SourcePortListEntry,
         DestinationPortListEntry,
         ProtocolNameListEntry,
+        RuleSetListEntry,
     ],
     Field(discriminator="field"),
 ]
