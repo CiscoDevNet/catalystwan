@@ -51,3 +51,4 @@ class Tenant(BaseModel):
 
 class MigrationTenant(Tenant):
     is_destination_overlay_mt: Optional[bool] = Field(alias="isDestinationOverlayMT")
+    migration_key: Optional[str] = Field(alias="migrationKey")

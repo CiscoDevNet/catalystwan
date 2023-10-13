@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 from vmngclient.api.task_status_api import Task, TaskResult
 from vmngclient.endpoints.tenant_migration import ImportInfo, MigrationTokenQueryParams
-from vmngclient.model.tenant import Tenant
+from vmngclient.model.tenant import MigrationTenant, Tenant
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +59,7 @@ class TenantMigrationAPI:
         with open(download_path, "wb") as file:
             file.write(tenant_data)
 
-    def import_tenant(self, import_file: Path) -> ImportTask:
+    def import_tenant(self, migrationKey, import_file: Path) -> ImportTask:
         """Imports the single-tenant deployment and configuration data into multi-tenant vManage instance.
         Should be executed on target multi-tenant system.
 
@@ -69,7 +69,7 @@ class TenantMigrationAPI:
         Returns:
             ImportTask: object representing initiated import process
         """
-        import_info = self.session.endpoints.tenant_migration.import_tenant_data(open(import_file, "rb"))
+        import_info = self.session.endpoints.tenant_migration.import_tenant_data(migrationKey, open(import_file, "rb"))
         return ImportTask(self.session, import_info)
 
     def store_token(self, migration_id: str, download_path: Path):
@@ -100,7 +100,7 @@ class TenantMigrationAPI:
         return Task(self.session, process_id)
 
 
-def st_to_mt(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Path, tenant: Tenant):
+def st_to_mt(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Path, tenant: MigrationTenant):
     """Performs single-tenant migration to multi-tenant environment procedure according to:
     https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/system-interface/vedge-20-x/systems-interfaces-book/sdwan-multitenancy.html#concept_sjj_jmm_z4b
     1. Export the single-tenant deployment and configuration data from a Cisco vManage instance controlling the overlay.
@@ -119,6 +119,7 @@ def st_to_mt(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Pa
     migration_file_prefix = f"{tenant.name}-{st_api.session.server_name}-{migration_timestamp}"
     export_path = workdir / f"{migration_file_prefix}.tar.gz"
     token_path = workdir / f"{migration_file_prefix}.token"
+    migrationKey = tenant.migration_key
 
     logger.info(f"1/5 Exporting {tenant.name} ...")
     export_task = st_api.export_tenant(tenant=tenant)
@@ -129,7 +130,7 @@ def st_to_mt(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Pa
     st_api.download(export_path, remote_filename)
 
     logger.info(f"3/5 Importing {export_path} ...")
-    import_task = mt_api.import_tenant(export_path)
+    import_task = mt_api.import_tenant(migrationKey, export_path)
 
     logger.info("4/5 Obtaining migration token ...")
     import_task.wait_for_completed()
@@ -138,5 +139,48 @@ def st_to_mt(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Pa
 
     logger.info(f"5/5 Initiating network migration: {migration_id}, using token file: {token_path} ...")
     migrate_task = st_api.migrate_network(token_path)
+    migrate_task.wait_for_completed()
+    logger.info(f"5/5 {tenant.name} migration completed successfully!")
+
+
+def mt_to_st(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Path, tenant: MigrationTenant):
+    """Performs single-tenant migration to multi-tenant environment procedure according to:
+    https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/system-interface/vedge-20-x/systems-interfaces-book/sdwan-multitenancy.html#concept_sjj_jmm_z4b
+    1. Export the MT deployment and configuration data from a Cisco vManage instance controlling the overlay.
+    2. Check the status of the data export task in Cisco vManage. Download the data when the task succeeds.
+    3. On a ST Cisco vManage instance, import the data exported from the MT tenant data.
+    4. Obtain the migration token using the token URL obtained in response to the API call in Step 3.
+    5. On the MT tenant Cisco vManage instance, initiate the migration of the overlay to the ST deployment.
+
+    Args:
+        st_api (TenantMigrationAPI): TenantMigrationAPI created with session to target single-tenant vManage instance
+        mt_api (TenantMigrationAPI): TenantMigrationAPI created with session to source multi-tenant vManage instance
+        workdir (Path): directory to store migration artifacts (token and export file)
+        tenant (Tenant): Tenant object containig required fields: desc, name, subdomain, org_name
+    """
+    migration_timestamp = datetime.now().strftime("%Y-%m-%d-%H%M")
+    migration_file_prefix = f"{tenant.name}-{st_api.session.server_name}-{migration_timestamp}"
+    export_path = workdir / f"{migration_file_prefix}.tar.gz"
+    token_path = workdir / f"{migration_file_prefix}.token"
+    migrationKey = tenant.migration_key
+
+    logger.info(f"1/5 Exporting {tenant.name} ...")
+    export_task = mt_api.export_tenant(tenant=tenant)
+    export_result = export_task.wait_for_completed()
+    remote_filename = _get_file_name_from_export_task_result(export_result)
+
+    logger.info(f"2/5 Downloading {remote_filename} to {export_path} ...")
+    mt_api.download(export_path, remote_filename)
+
+    logger.info(f"3/5 Importing {export_path} ...")
+    import_task = st_api.import_tenant(migrationKey, export_path)
+
+    logger.info("4/5 Obtaining migration token ...")
+    import_task.wait_for_completed()
+    migration_id = import_task.import_info.migration_token_query_params.migration_id
+    st_api.store_token(migration_id, token_path)
+
+    logger.info(f"5/5 Initiating network migration: {migration_id}, using token file: {token_path} ...")
+    migrate_task = mt_api.migrate_network(token_path)
     migrate_task.wait_for_completed()
     logger.info(f"5/5 {tenant.name} migration completed successfully!")
