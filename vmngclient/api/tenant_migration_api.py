@@ -4,10 +4,12 @@ import logging
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
+
+from packaging.version import Version  # type: ignore
 
 from vmngclient.api.task_status_api import Task, TaskResult
-from vmngclient.endpoints.tenant_migration import ImportInfo, MigrationTokenQueryParams
+from vmngclient.endpoints.tenant_migration import ImportInfo, MigrationFile, MigrationTokenQueryParams
 from vmngclient.model.tenant import MigrationTenant, Tenant
 
 logger = logging.getLogger(__name__)
@@ -59,17 +61,24 @@ class TenantMigrationAPI:
         with open(download_path, "wb") as file:
             file.write(tenant_data)
 
-    def import_tenant(self, migration_key, import_file: Path) -> ImportTask:
+    def import_tenant(self, import_file: Path, migration_key: Optional[str] = None) -> ImportTask:
         """Imports the single-tenant deployment and configuration data into multi-tenant vManage instance.
         Should be executed on target multi-tenant system.
 
         Args:
             import_file (Path): full path to previously exported single-tenant data file
+            migration_key (str): migration key (required starting from 20.13)
 
         Returns:
             ImportTask: object representing initiated import process
         """
-        import_info = self.session.endpoints.tenant_migration.import_tenant_data(migration_key, open(import_file, "rb"))
+        import_file_payload = MigrationFile(data=open(import_file, "rb"))
+        if self.session.api_version >= Version("20.13") and migration_key is not None:
+            import_info = self.session.endpoints.tenant_migration.import_tenant_data_with_key(
+                import_file_payload, migration_key
+            )
+        else:
+            import_info = self.session.endpoints.tenant_migration.import_tenant_data(import_file_payload)
         return ImportTask(self.session, import_info)
 
     def store_token(self, migration_id: str, download_path: Path):
@@ -130,7 +139,7 @@ def st_to_mt(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Pa
     st_api.download(export_path, remote_filename)
 
     logger.info(f"3/5 Importing {export_path} ...")
-    import_task = mt_api.import_tenant(migration_key, export_path)
+    import_task = mt_api.import_tenant(export_path, migration_key)
 
     logger.info("4/5 Obtaining migration token ...")
     import_task.wait_for_completed()
@@ -173,7 +182,7 @@ def mt_to_st(st_api: TenantMigrationAPI, mt_api: TenantMigrationAPI, workdir: Pa
     mt_api.download(export_path, remote_filename)
 
     logger.info(f"3/5 Importing {export_path} ...")
-    import_task = st_api.import_tenant(migration_key, export_path)
+    import_task = st_api.import_tenant(export_path, migration_key)
 
     logger.info("4/5 Obtaining migration token ...")
     import_task.wait_for_completed()

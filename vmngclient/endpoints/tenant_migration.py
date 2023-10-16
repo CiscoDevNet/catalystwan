@@ -1,11 +1,11 @@
 # mypy: disable-error-code="empty-body"
+from io import BufferedReader
 from pathlib import Path
-from typing import BinaryIO
 from urllib.parse import parse_qsl, urlsplit
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, get, post
+from vmngclient.endpoints import APIEndpoints, CustomPayloadType, PreparedPayload, get, post, versions
 from vmngclient.model.tenant import Tenant
 
 
@@ -35,6 +35,14 @@ class MigrationInfo(BaseModel):
     process_id: str = Field(alias="processId")
 
 
+class MigrationFile(CustomPayloadType):
+    def __init__(self, data: BufferedReader):
+        self.payload = PreparedPayload(files={"file": (Path(data.name).name, data)})
+
+    def prepared(self) -> PreparedPayload:
+        return self.payload
+
+
 class TenantMigration(APIEndpoints):
     @get("/tenantmigration/download/{path}")
     def download_tenant_data(self, path: str = "default.tar.gz") -> bytes:
@@ -48,12 +56,15 @@ class TenantMigration(APIEndpoints):
     def get_migration_token(self, params: MigrationTokenQueryParams) -> str:
         ...
 
-    def import_tenant_data(self, migrationKey, data: BinaryIO) -> ImportInfo:
-        # TODO implement dedicated payload types for files upload in request decorator
-        response = self._request(
-            "POST", "/tenantmigration/import/migrationKey", files={"file": (Path(data.name).name, data)}
-        )
-        return response.dataobj(ImportInfo, None)
+    @versions("<20.13")
+    @post("/tenantmigration/import")
+    def import_tenant_data(self, payload: MigrationFile) -> ImportInfo:
+        ...
+
+    @versions(">=20.13")
+    @post("/tenantmigration/import/{migration_key}")
+    def import_tenant_data_with_key(self, payload: MigrationFile, migration_key: str) -> ImportInfo:
+        ...
 
     @post("/tenantmigration/networkMigration")
     def migrate_network(self, payload: str) -> MigrationInfo:
