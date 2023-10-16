@@ -1,0 +1,224 @@
+{
+  "templateName": "{{ template_name }}",
+  "templateDescription": "{{ template_description }}",
+  "templateType": "cisco_vpn",
+  "deviceType": [
+    "vedge-C8000V"
+  ],
+  "templateMinVersion": "15.0.0",
+  "templateDefinition": {
+    "vpn-id": {
+      "vipObjectType": "object",
+      "vipType": "constant",
+      "vipValue": {{ vpn_id }}
+    },
+    "name": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipVariableName": "vpn_name"
+    },
+    "ecmp-hash-key": {
+      "layer4": {
+        "vipObjectType": "object",
+        "vipType": "ignore",
+        "vipValue": "false",
+        "vipVariableName": "vpn_layer4"
+      }
+    },
+    "nat64-global": {
+      "prefix": {
+        "stateful": {
+          
+        }
+      }
+    },
+    "nat64": {
+      "v4": {
+        "pool": {
+          "vipType": "ignore",
+          "vipValue": [
+            
+          ],
+          "vipObjectType": "tree",
+          "vipPrimaryKey": [
+            "name"
+          ]
+        }
+      }
+    },
+    {% if vpn_id != 0 and vpn_id != 512 %}
+      "tenant-vpn-id": {
+        "vipObjectType": "object",
+        "vipType": "constant",
+        "vipValue": {{ tenant_vpn }}
+      },
+      "org-name": {
+        "vipObjectType": "object",
+        "vipType": "constant",
+        "vipValue": "{{ tenant_org_name }}"
+      },
+    {% endif %}
+    "omp-admin-distance-ipv4": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipVariableName": "vpn_omp-admin-distance-ipv4"
+    },
+    "omp-admin-distance-ipv6": {
+      "vipObjectType": "object",
+      "vipType": "ignore",
+      "vipVariableName": "vpn_omp-admin-distance-ipv6"
+    },
+    "nat": {
+      "natpool": {
+        "vipType": "ignore",
+        "vipValue": [
+          
+        ],
+        "vipObjectType": "tree",
+        "vipPrimaryKey": [
+          "name"
+        ]
+      },
+      "port-forward": {
+        "vipType": "ignore",
+        "vipValue": [
+          
+        ],
+        "vipObjectType": "tree",
+        "vipPrimaryKey": [
+          "source-port",
+          "translate-port",
+          "source-ip",
+          "translate-ip",
+          "proto"
+        ]
+      },
+      "static": {
+        "vipType": "ignore",
+        "vipValue": [
+          
+        ],
+        "vipObjectType": "tree",
+        "vipPrimaryKey": [
+          "source-ip",
+          "translate-ip"
+        ]
+      },
+      "subnet-static": {
+        "vipType": "ignore",
+        "vipValue": [
+          
+        ],
+        "vipObjectType": "tree",
+        "vipPrimaryKey": [
+          "source-ip-subnet",
+          "translate-ip-subnet"
+        ]
+      }
+    },
+    "route-import-from": {
+      "vipType": "ignore",
+      "vipValue": [
+        
+      ],
+      "vipObjectType": "tree",
+      "vipPrimaryKey": [
+        "protocol",
+        "source-vpn"
+      ]
+    },
+    "route-import": {
+      "vipType": "ignore",
+      "vipValue": [
+        
+      ],
+      "vipObjectType": "tree",
+      "vipPrimaryKey": [
+        "protocol"
+      ]
+    },
+    "route-export": {
+      "vipType": "ignore",
+      "vipValue": [
+        
+      ],
+      "vipObjectType": "tree",
+      "vipPrimaryKey": [
+        "protocol"
+      ]
+    },
+    "host": {
+      {% if mapping %}
+        "vipType": "constant",
+        "vipValue": [
+        {% include 'mapping.json.j2' %}
+        ],
+      {% else %}
+        "vipType": "ignore",
+        "vipValue": [
+        
+        ],
+      {% endif %}
+      "vipObjectType": "tree",
+      "vipPrimaryKey": [
+        "hostname"
+      ]
+    },
+    "service": {
+      "vipType": "ignore",
+      "vipValue": [
+        
+      ],
+      "vipObjectType": "tree",
+      "vipPrimaryKey": [
+        "svc-type"
+      ]
+    },
+    "ip": {
+      "gre-route": {
+        
+      },
+      "ipsec-route": {
+        
+      },
+      {% if ipv4route %}
+        "route": {% include 'ipv4route.json.j2' %},
+      {% endif %}
+      "service-route": {
+        
+      }
+      
+    },
+    "ipv6": {
+      {% if ipv6route %}
+        "route": {% include 'ipv6route.json.j2' %}
+      {% endif %}
+    },
+    {% if dns %}
+      "dns": {% include 'dns.json.j2' %},
+    {% endif %}
+    "omp": {
+      "advertise": {
+        "vipType": "ignore",
+        "vipValue": [
+          
+        ],
+        "vipObjectType": "tree",
+        "vipPrimaryKey": [
+          "protocol"
+        ]
+      },
+      "ipv6-advertise": {
+        "vipType": "ignore",
+        "vipValue": [
+          
+        ],
+        "vipObjectType": "tree",
+        "vipPrimaryKey": [
+          "protocol"
+        ]
+      }
+    }
+  },
+  "factoryDefault": false
+}
