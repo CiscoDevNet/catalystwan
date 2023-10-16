@@ -8,6 +8,11 @@
     "factoryDefault": false,
     "templateMinVersion": "15.0.0",
     "templateDefinition": {
+        "vpn-id": {
+            "vipObjectType": "object",
+            "vipType": "constant",
+            "vipValue": 0
+        },
         "name": {
             "vipObjectType": "object",
             "vipType": "constant",
@@ -86,7 +91,11 @@
                         "vipObjectType": "object",
                         "vipType": "constant",
                         "vipValue": "test_hostname"
-                    },
+                    },                
+                    "priority-order": [
+                        "hostname",
+                        "ip"
+                    ],
                     "ip": {
                         "vipObjectType": "list",
                         "vipType": "constant",
@@ -236,7 +245,12 @@
                             "vipObjectType": "object",
                             "vipType": "constant",
                             "vipValue": "prefixv4"
-                        },
+                        },                    
+                        "priority-order": [
+                            "next-hop",
+                            "next-hop-with-track",
+                            "prefix"
+                        ],
                         "next-hop": {
                             "vipObjectType": "tree",
                             "vipType": "constant",
@@ -247,6 +261,10 @@
                                         "vipType": "constant",
                                         "vipValue": "1.1.1.1"
                                     },
+                                    "priority-order": [
+                                        "address",
+                                        "distance"
+                                    ],
                                     "distance": {
                                         "vipObjectType": "object",
                                         "vipType": "constant",
@@ -257,19 +275,6 @@
                             "vipPrimaryKey": [
                                 "address"
                             ]
-                        },
-                        "next-hop-with-track": {
-                            "vipObjectType": "tree",
-                            "vipValue": [],
-                            "vipType": "ignore",
-                            "vipPrimaryKey": [
-                                "address"
-                            ]
-                        },
-                        "distance": {
-                            "vipObjectType": "object",
-                            "vipType": "constant",
-                            "vipValue": 1
                         }
                     }
                 ],
@@ -291,11 +296,6 @@
                             "vipObjectType": "object",
                             "vipType": "constant",
                             "vipValue": 100
-                        },
-                        "interface": {
-                            "vipObjectType": "list",
-                            "vipValue": [],
-                            "vipType": "ignore"
                         }
                     },
                     {
@@ -357,11 +357,6 @@
                             "vipObjectType": "object",
                             "vipType": "constant",
                             "vipValue": 100
-                        },
-                        "interface": {
-                            "vipObjectType": "list",
-                            "vipValue": [],
-                            "vipType": "ignore"
                         }
                     }
                 ],
@@ -495,6 +490,11 @@
                                         "vipObjectType": "object",
                                         "vipType": "constant",
                                         "vipValue": "prefix_entryv6"
+                                    },
+                                    "aggregate-only": {
+                                        "vipObjectType": "object",
+                                        "vipType": "constant",
+                                        "vipValue": false
                                     }
                                 }
                             ],
@@ -571,6 +571,11 @@
                                 "vipType": "constant",
                                 "vipValue": "10.10.10.10"
                             },
+                            "overload": {
+                                "vipObjectType": "node-only",
+                                "vipType": "constant",
+                                "vipValue": false
+                            },
                             "leak_from_global": {
                                 "vipObjectType": "object",
                                 "vipType": "constant",
@@ -580,6 +585,11 @@
                                 "vipObjectType": "object",
                                 "vipType": "constant",
                                 "vipValue": "connected"
+                            },
+                            "leak_to_global": {
+                                "vipObjectType": "object",
+                                "vipType": "constant",
+                                "vipValue": false
                             }
                         }
                     ],
@@ -661,11 +671,6 @@
                             "vipObjectType": "object",
                             "vipType": "constant",
                             "vipValue": "outside"
-                        },
-                        "tracker-id": {
-                            "vipObjectType": "object",
-                            "vipValue": [],
-                            "vipType": "ignore"
                         }
                     }
                 ],
@@ -724,11 +729,6 @@
                             "vipObjectType": "object",
                             "vipType": "constant",
                             "vipValue": "outside"
-                        },
-                        "tracker-id": {
-                            "vipObjectType": "object",
-                            "vipValue": [],
-                            "vipType": "ignore"
                         }
                     }
                 ],
@@ -761,11 +761,6 @@
                             "vipObjectType": "object",
                             "vipType": "constant",
                             "vipValue": "outside"
-                        },
-                        "tracker-id": {
-                            "vipObjectType": "object",
-                            "vipValue": [],
-                            "vipType": "ignore"
                         }
                     },
                     {

@@ -54,14 +54,6 @@
                         "vipType": "constant",
                         "vipValue": "pass"
                     }
-                },
-                "pubkey-chain": {
-                    "vipObjectType": "tree",
-                    "vipValue": [],
-                    "vipType": "ignore",
-                    "vipPrimaryKey": [
-                        "key-string"
-                    ]
                 }
             }
         ],
