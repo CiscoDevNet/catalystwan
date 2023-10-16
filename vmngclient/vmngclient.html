@@ -1615,20 +1615,27 @@
 <section id="module-vmngclient.session">
 <span id="session-module"></span><h2>session module<a class="headerlink" href="#module-vmngclient.session" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="vmngclient.session.UserMode">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.session.</span></span><span class="sig-name descname"><span class="pre">UserMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.session.UserMode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<dt class="sig sig-object py" id="vmngclient.session.TenancyMode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.session.</span></span><span class="sig-name descname"><span class="pre">TenancyMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.session.TenancyMode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <p>An enumeration.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="vmngclient.session.UserMode.NOT_FOUND">
-<span class="sig-name descname"><span class="pre">NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'not</span> <span class="pre">found'</span></em><a class="headerlink" href="#vmngclient.session.UserMode.NOT_FOUND" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="vmngclient.session.TenancyMode.MULTI_TENANT">
+<span class="sig-name descname"><span class="pre">MULTI_TENANT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'MultiTenant'</span></em><a class="headerlink" href="#vmngclient.session.TenancyMode.MULTI_TENANT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="vmngclient.session.UserMode.NOT_RECOGNIZED">
-<span class="sig-name descname"><span class="pre">NOT_RECOGNIZED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'not</span> <span class="pre">recognized'</span></em><a class="headerlink" href="#vmngclient.session.UserMode.NOT_RECOGNIZED" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="vmngclient.session.TenancyMode.SINGLE_TENANT">
+<span class="sig-name descname"><span class="pre">SINGLE_TENANT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'SingleTenant'</span></em><a class="headerlink" href="#vmngclient.session.TenancyMode.SINGLE_TENANT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vmngclient.session.UserMode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.session.</span></span><span class="sig-name descname"><span class="pre">UserMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.session.UserMode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="vmngclient.session.UserMode.PROVIDER">
 <span class="sig-name descname"><span class="pre">PROVIDER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'provider'</span></em><a class="headerlink" href="#vmngclient.session.UserMode.PROVIDER" title="Permalink to this definition">¶</a></dt>
@@ -1644,18 +1651,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="vmngclient.session.ViewMode">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.session.</span></span><span class="sig-name descname"><span class="pre">ViewMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.session.ViewMode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <p>An enumeration.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="vmngclient.session.ViewMode.NOT_FOUND">
-<span class="sig-name descname"><span class="pre">NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'not</span> <span class="pre">found'</span></em><a class="headerlink" href="#vmngclient.session.ViewMode.NOT_FOUND" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="vmngclient.session.ViewMode.NOT_RECOGNIZED">
-<span class="sig-name descname"><span class="pre">NOT_RECOGNIZED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'not</span> <span class="pre">recognized'</span></em><a class="headerlink" href="#vmngclient.session.ViewMode.NOT_RECOGNIZED" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="vmngclient.session.ViewMode.PROVIDER">
 <span class="sig-name descname"><span class="pre">PROVIDER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'provider'</span></em><a class="headerlink" href="#vmngclient.session.ViewMode.PROVIDER" title="Permalink to this definition">¶</a></dt>
@@ -1692,6 +1689,11 @@ works only on provider user mode</p></li>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="vmngclient.session.determine_session_type">
+<span class="sig-prename descclassname"><span class="pre">vmngclient.session.</span></span><span class="sig-name descname"><span class="pre">determine_session_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tenancy_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">SessionType</span></span></span><a class="headerlink" href="#vmngclient.session.determine_session_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="vmngclient.session.vManageBadRequestError">
@@ -2144,9 +2146,11 @@ for current package</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-vmngclient.session">session module</a><ul>
+<li><a class="reference internal" href="#vmngclient.session.TenancyMode"><code class="docutils literal notranslate"><span class="pre">TenancyMode</span></code></a></li>
 <li><a class="reference internal" href="#vmngclient.session.UserMode"><code class="docutils literal notranslate"><span class="pre">UserMode</span></code></a></li>
 <li><a class="reference internal" href="#vmngclient.session.ViewMode"><code class="docutils literal notranslate"><span class="pre">ViewMode</span></code></a></li>
 <li><a class="reference internal" href="#vmngclient.session.create_vManageSession"><code class="docutils literal notranslate"><span class="pre">create_vManageSession()</span></code></a></li>
+<li><a class="reference internal" href="#vmngclient.session.determine_session_type"><code class="docutils literal notranslate"><span class="pre">determine_session_type()</span></code></a></li>
 <li><a class="reference internal" href="#vmngclient.session.vManageBadRequestError"><code class="docutils literal notranslate"><span class="pre">vManageBadRequestError</span></code></a></li>
 <li><a class="reference internal" href="#vmngclient.session.vManageResponseAdapter"><code class="docutils literal notranslate"><span class="pre">vManageResponseAdapter</span></code></a></li>
 <li><a class="reference internal" href="#vmngclient.session.vManageSession"><code class="docutils literal notranslate"><span class="pre">vManageSession</span></code></a></li>
