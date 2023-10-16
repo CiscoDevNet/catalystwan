@@ -6,7 +6,6 @@ from enum import Enum
 from typing import TYPE_CHECKING, Any, Optional, Type, overload
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
-from requests.exceptions import HTTPError
 
 from vmngclient.api.task_status_api import Task
 from vmngclient.api.templates.cli_template import CLITemplate
@@ -210,10 +209,6 @@ class TemplatesAPI:
             self.template_validation(template_id, device=device)
         except TemplateNotFoundError:
             logger.error(f"Error, Template with name {name} not found on {device}.")
-            return False
-        except HTTPError as error:
-            error_details = json.loads(error.response.text)
-            logger.error(f"Error in config: {error_details['error']['details']}.")
             return False
         payload = {
             "deviceTemplateList": [
@@ -564,7 +559,7 @@ class TemplatesAPI:
         # "name"
         for i, field in enumerate(fr_template_fields):
             value = None
-
+            priority_order = None
             # TODO How to discover Device specific variable
             if field.key in template.device_specific_variables:
                 value = template.device_specific_variables[field.key]
@@ -574,6 +569,7 @@ class TemplatesAPI:
                         field.key == field_value.alias
                         or field.key == field_value.field_info.extra.get("vmanage_key")  # type: ignore
                     ):
+                        priority_order = field_value.field_info.extra.get("priority_order")  # type: ignore
                         value = getattr(template, field_name)
                         break
                 if value is None:
@@ -597,7 +593,8 @@ class TemplatesAPI:
                         a[key] = b[key]
                 return a
 
-            payload.definition = merge(payload.definition, field.payload_scheme(value))
+            # print(field.payload_scheme(value))
+            payload.definition = merge(payload.definition, field.payload_scheme(value, priority_order=priority_order))
 
         if debug:
             with open(f"payload_{template.type}.json", "w") as f:
@@ -673,10 +670,6 @@ class TemplatesAPI:
             self.template_validation(template_id, device=device)
         except TemplateNotFoundError:
             logger.error(f"Error, Template with name {name} not found on {device}.")
-            return False
-        except HTTPError as error:
-            error_details = json.loads(error.response.text)
-            logger.error(f"Error in config: {error_details['error']['details']}.")
             return False
         payload = {
             "templateId": template_id,
