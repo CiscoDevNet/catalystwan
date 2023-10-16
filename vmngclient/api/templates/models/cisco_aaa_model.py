@@ -77,10 +77,10 @@ class CiscoAAAModel(FeatureTemplate):
     user: List[User] = []
     authentication_group: bool = Field(vmanage_key="authentication_group", default=False)
     accounting_group: bool = True
-    radius: Optional[List[RadiusGroup]]
+    radius: Optional[List[RadiusGroup]] = None
     domain_stripping: Optional[DomainStripping] = Field(vmanage_key="domain-stripping", default=None)
     port: int = 1700
-    tacacs: Optional[List[TacacsGroup]]
+    tacacs: Optional[List[TacacsGroup]] = None
     server_auth_order: str = Field(vmanage_key="server-auth-order", default="local")
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
