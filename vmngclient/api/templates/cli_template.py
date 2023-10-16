@@ -108,9 +108,12 @@ class CLITemplate:
         try:
             session.put(url=endpoint, json=payload)
         except HTTPError as error:
-            response = json.loads(error.response.text)["error"]
-            logger.error(f'Response message: {response["message"]}')
-            logger.error(f'Response details: {response["details"]}')
+            if error.response:
+                response = json.loads(error.response.text)["error"]
+                logger.error(f'Response message: {response["message"]}')
+                logger.error(f'Response details: {response["details"]}')
+            else:
+                logger.error("Response is None.")
             return False
         logger.info(f"Template with name: {self.template_name} - updated.")
         return True

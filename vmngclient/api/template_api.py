@@ -6,7 +6,6 @@ from enum import Enum
 from typing import TYPE_CHECKING, Any, Optional, Type, overload
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
-from requests.exceptions import HTTPError
 
 from vmngclient.api.task_status_api import Task
 from vmngclient.api.templates.cli_template import CLITemplate
@@ -210,10 +209,6 @@ class TemplatesAPI:
             self.template_validation(template_id, device=device)
         except TemplateNotFoundError:
             logger.error(f"Error, Template with name {name} not found on {device}.")
-            return False
-        except HTTPError as error:
-            error_details = json.loads(error.response.text)
-            logger.error(f"Error in config: {error_details['error']['details']}.")
             return False
         payload = {
             "deviceTemplateList": [
@@ -675,10 +670,6 @@ class TemplatesAPI:
             self.template_validation(template_id, device=device)
         except TemplateNotFoundError:
             logger.error(f"Error, Template with name {name} not found on {device}.")
-            return False
-        except HTTPError as error:
-            error_details = json.loads(error.response.text)
-            logger.error(f"Error in config: {error_details['error']['details']}.")
             return False
         payload = {
             "templateId": template_id,
