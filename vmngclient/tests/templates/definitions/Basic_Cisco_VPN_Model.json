@@ -7,5 +7,11 @@
     ],
     "factoryDefault": false,
     "templateMinVersion": "15.0.0",
-    "templateDefinition": {}
+    "templateDefinition": {
+        "vpn-id": {
+            "vipObjectType": "object",
+            "vipType": "constant",
+            "vipValue": 0
+        }
+    }
 }

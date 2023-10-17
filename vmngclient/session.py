@@ -46,18 +46,36 @@ class vManageBadRequestError(vManageClientError):
         super().__init__(error_info)
 
 
-class UserMode(Enum):
+class UserMode(str, Enum):
     PROVIDER = "provider"
     TENANT = "tenant"
-    NOT_RECOGNIZED = "not recognized"
-    NOT_FOUND = "not found"
 
 
-class ViewMode(Enum):
+class ViewMode(str, Enum):
     PROVIDER = "provider"
     TENANT = "tenant"
-    NOT_RECOGNIZED = "not recognized"
-    NOT_FOUND = "not found"
+
+
+class TenancyMode(str, Enum):
+    SINGLE_TENANT = "SingleTenant"
+    MULTI_TENANT = "MultiTenant"
+
+
+def determine_session_type(
+    tenancy_mode: Optional[str], user_mode: Optional[str], view_mode: Optional[str]
+) -> SessionType:
+    modes_map = {
+        (TenancyMode.SINGLE_TENANT, UserMode.TENANT, ViewMode.TENANT): SessionType.SINGLE_TENANT,
+        (TenancyMode.MULTI_TENANT, UserMode.PROVIDER, ViewMode.PROVIDER): SessionType.PROVIDER,
+        (TenancyMode.MULTI_TENANT, UserMode.PROVIDER, ViewMode.TENANT): SessionType.PROVIDER_AS_TENANT,
+        (TenancyMode.MULTI_TENANT, UserMode.TENANT, ViewMode.TENANT): SessionType.TENANT,
+    }
+    try:
+        return modes_map.get(
+            (TenancyMode(tenancy_mode), UserMode(user_mode), ViewMode(view_mode)), SessionType.NOT_DEFINED
+        )
+    except ValueError:
+        return SessionType.NOT_DEFINED
 
 
 def create_vManageSession(
@@ -101,32 +119,21 @@ def create_vManageSession(
     session.server_name = server_info.server
     session.on_session_create_hook()
 
-    try:
-        user_mode = UserMode(server_info.user_mode or "not found")
-    except ValueError:
-        user_mode = UserMode.NOT_RECOGNIZED
-        session.logger.warning(f"Unrecognized user mode is: '{server_info.user_mode}'")
+    tenancy_mode = server_info.tenancy_mode
+    user_mode = server_info.user_mode
+    view_mode = server_info.view_mode
 
-    try:
-        view_mode = ViewMode(server_info.view_mode or "not found")
-    except ValueError:
-        view_mode = ViewMode.NOT_RECOGNIZED
-        session.logger.warning(f"Unrecognized user mode is: '{server_info.view_mode}'")
-
-    if user_mode is UserMode.TENANT and not subdomain and view_mode is ViewMode.TENANT:
-        session._session_type = SessionType.TENANT
-    elif user_mode is UserMode.PROVIDER and not subdomain and view_mode is ViewMode.PROVIDER:
-        session._session_type = SessionType.PROVIDER
-    elif user_mode is UserMode.PROVIDER and view_mode is ViewMode.TENANT:
-        session._session_type = SessionType.PROVIDER_AS_TENANT
-    elif user_mode is UserMode.TENANT and subdomain:
+    session._session_type = determine_session_type(tenancy_mode, user_mode, view_mode)
+    if user_mode is UserMode.TENANT and subdomain:
         raise SessionNotCreatedError(
             f"Session not created. Subdomain {subdomain} passed to tenant session, "
             "cannot switch to tenant from tenant user mode."
         )
-    else:
-        session._session_type = SessionType.NOT_DEFINED
-        session.logger.warning(f"Session created with {user_mode} and {view_mode}.")
+    elif session._session_type is SessionType.NOT_DEFINED:
+        session.logger.warning(
+            "Cannot determine session type for "
+            f"tenancy-mode: {tenancy_mode}, user-mode: {user_mode}, view-mode: {view_mode}"
+        )
 
     session.logger.info(
         f"Logged to vManage({session.platform_version}) as {username}. The session type is {session.session_type}"

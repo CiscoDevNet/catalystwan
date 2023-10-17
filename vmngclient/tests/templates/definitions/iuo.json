@@ -37,14 +37,6 @@
                         "vipObjectType": "object",
                         "vipType": "constant",
                         "vipValue": "15"
-                    },
-                    "pubkey-chain": {
-                        "vipObjectType": "tree",
-                        "vipValue": [],
-                        "vipType": "ignore",
-                        "vipPrimaryKey": [
-                            "key-string"
-                        ]
                     }
                 },
                 {
@@ -67,14 +59,6 @@
                         "vipObjectType": "object",
                         "vipType": "constant",
                         "vipValue": "14"
-                    },
-                    "pubkey-chain": {
-                        "vipObjectType": "tree",
-                        "vipValue": [],
-                        "vipType": "ignore",
-                        "vipPrimaryKey": [
-                            "key-string"
-                        ]
                     }
                 }
             ],
@@ -136,16 +120,6 @@
                                     "vipObjectType": "object",
                                     "vipType": "constant",
                                     "vipValue": "21"
-                                },
-                                "secret-key": {
-                                    "vipObjectType": "object",
-                                    "vipValue": [],
-                                    "vipType": "ignore"
-                                },
-                                "key-enum": {
-                                    "vipObjectType": "object",
-                                    "vipValue": [],
-                                    "vipType": "ignore"
                                 }
                             }
                         ],
@@ -155,14 +129,6 @@
                     }
                 }
             ],
-            "vipPrimaryKey": [
-                "group-name"
-            ]
-        },
-        "tacacs": {
-            "vipObjectType": "tree",
-            "vipValue": [],
-            "vipType": "ignore",
             "vipPrimaryKey": [
                 "group-name"
             ]
