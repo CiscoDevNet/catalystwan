@@ -3,6 +3,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+from packaging.version import Version  # type: ignore
+
 from vmngclient.api.task_status_api import Task
 from vmngclient.api.tenant_migration_api import ImportTask, TenantMigrationAPI
 from vmngclient.endpoints.tenant_migration import ImportInfo, MigrationInfo
@@ -27,6 +29,7 @@ class TestTenantMigrationAPI(unittest.TestCase):
             subdomain="test_subdomain",
             org_name="test_org",
             is_destination_overlay_mt=False,
+            migration_key="Cisco12345",
         )
         task = self.api.export_tenant(tenant=tenant)
         self.assertIsInstance(task, Task)
@@ -40,6 +43,8 @@ class TestTenantMigrationAPI(unittest.TestCase):
             assert open(download_path, "rb").read() == content
 
     def test_import_tenant(self):
+        self.session.api_version = Version("20.12")
+        migration_key = "Cisco12345"
         migration_id = "dcbed267-eb0d-4dcd-9c12-2536e8562f75"
         with tempfile.TemporaryDirectory() as tmpdir:
             import_file = Path(tmpdir) / "tenant.tar.gz"
@@ -54,7 +59,28 @@ class TestTenantMigrationAPI(unittest.TestCase):
                     ),
                 )
             )
-            task = self.api.import_tenant(import_file)
+            task = self.api.import_tenant(import_file, migration_key)
+            self.assertIsInstance(task, ImportTask)
+            assert task.import_info.migration_token_query_params.migration_id == migration_id
+
+    def test_import_tenant_with_key(self):
+        self.session.api_version = Version("20.13")
+        migration_key = "Cisco12345"
+        migration_id = "dcbed267-eb0d-4dcd-9c12-2536e8562f75"
+        with tempfile.TemporaryDirectory() as tmpdir:
+            import_file = Path(tmpdir) / "tenant.tar.gz"
+            with open(import_file, "wb") as f:
+                f.write(b"\xFEtest_data")
+            self.session.endpoints.tenant_migration.import_tenant_data_with_key = MagicMock(
+                return_value=ImportInfo(
+                    processId="123",
+                    migrationTokenURL=(
+                        "/dataservice/tenantmigration/migrationToken?"
+                        "migrationId=dcbed267-eb0d-4dcd-9c12-2536e8562f75"
+                    ),
+                )
+            )
+            task = self.api.import_tenant(import_file, migration_key)
             self.assertIsInstance(task, ImportTask)
             assert task.import_info.migration_token_query_params.migration_id == migration_id
 
