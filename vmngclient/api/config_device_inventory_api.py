@@ -5,10 +5,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
+from vmngclient.api.task_status_api import Task
 from vmngclient.endpoints.configuration_device_inventory import (
     ConfigurationDeviceInventory,
     DeviceUnlockPayload,
-    DeviceUnlockResponse,
     UnlockDeviceDetail,
 )
 
@@ -18,7 +18,7 @@ class ConfigurationDeviceInventoryAPI:
         self.session = session
         self.endpoint = ConfigurationDeviceInventory(session)
 
-    def unlock(self, device_uuid: str, device_type: str, device_details: list) -> DeviceUnlockResponse:
+    def unlock(self, device_uuid: str, device_type: str, device_details: list) -> Task:
         """
         Unlocks device from config-group
         """
@@ -31,4 +31,5 @@ class ConfigurationDeviceInventoryAPI:
 
         payload = DeviceUnlockPayload(deviceType=device_type, devices=devices)
 
-        return self.endpoint.unlock(device_uuid=device_uuid, payload=payload)
+        task_id = self.endpoint.unlock(device_uuid=device_uuid, payload=payload).parentTaskId
+        return Task(self.session, task_id=task_id)

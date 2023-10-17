@@ -1,18 +1,18 @@
 # mypy: disable-error-code="empty-body"
 from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from vmngclient.endpoints import APIEndpoints, post, versions
 
 
 class UnlockDeviceDetail(BaseModel):
-    deviceId: str
-    deviceIP: str
+    device_id: str = Field(alias="deviceId")
+    device_ip: str = Field(alias="deviceIP")
 
 
 class DeviceUnlockPayload(BaseModel):
-    deviceType: str
+    device_type: str = Field(alias="deviceType")
     devices: List[UnlockDeviceDetail]
 
 
