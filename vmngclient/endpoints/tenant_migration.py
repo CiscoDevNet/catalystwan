@@ -5,8 +5,9 @@ from urllib.parse import parse_qsl, urlsplit
 
 from pydantic import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, CustomPayloadType, PreparedPayload, get, post, versions
+from vmngclient.endpoints import APIEndpoints, CustomPayloadType, PreparedPayload, get, post, versions, view
 from vmngclient.model.tenant import Tenant
+from vmngclient.utils.session_type import ProviderView, SingleTenantView
 
 
 class MigrationTokenQueryParams(BaseModel):
@@ -44,28 +45,34 @@ class MigrationFile(CustomPayloadType):
 
 
 class TenantMigration(APIEndpoints):
+    @view({SingleTenantView, ProviderView})
     @get("/tenantmigration/download/{path}")
     def download_tenant_data(self, path: str = "default.tar.gz") -> bytes:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @post("/tenantmigration/export")
     def export_tenant_data(self, payload: Tenant) -> ExportInfo:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @get("/tenantmigration/migrationToken")
     def get_migration_token(self, params: MigrationTokenQueryParams) -> str:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @versions("<20.13")
     @post("/tenantmigration/import")
     def import_tenant_data(self, payload: MigrationFile) -> ImportInfo:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @versions(">=20.13")
     @post("/tenantmigration/import/{migration_key}")
     def import_tenant_data_with_key(self, payload: MigrationFile, migration_key: str) -> ImportInfo:
         ...
 
+    @view({SingleTenantView, ProviderView})
     @post("/tenantmigration/networkMigration")
     def migrate_network(self, payload: str) -> MigrationInfo:
         ...
