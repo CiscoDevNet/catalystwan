@@ -1,0 +1,58 @@
+{% for route in ipv6route %}
+    {
+        "vipType": "constant",
+        "vipValue": [
+        {
+            "prefix": {
+            "vipObjectType": "object",
+            "vipType": "constant",
+            "vipValue": "{{ route.prefixv6 }}",
+            "vipVariableName": "{{ route.gatewayv6.value }}"
+            },
+            {% if route.gatewayv6.value == "next-hop" %}
+                "next-hop": {
+                "vipType": "constant",
+                "vipValue": [
+                    {% for hop in route.next_hopv6 %}
+                        {
+                        "address": {
+                            "vipObjectType": "object",
+                            "vipType": "constant",
+                            "vipValue": "{{ hop.address }}",
+                            "vipVariableName": "vpn_next_hop_ipv6_address_{{loop.index}}"
+                        },
+                        "distance": {
+                            "vipObjectType": "object",
+                            {% if hop.en_distance %}
+                                "vipType": "ignore",
+                            {% else %}
+                                "vipType": "constant",
+                            {% endif %}
+                            "vipValue": {{ hop.distance }},
+                            "vipVariableName": "vpn_next_hop_ipv6_distance_{{loop.index}}"
+                        },
+                        "priority-order": [
+                            "address",
+                            "distance"
+                        ]
+                        }{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                "vipObjectType": "tree",
+                "vipPrimaryKey": [
+                    "address"
+                ]
+                },
+            {% endif %}
+            "priority-order": [
+            "prefix",
+            "next-hop"
+            ]
+        }{% if not loop.last %},{% endif %}
+        ],
+        "vipObjectType": "tree",
+        "vipPrimaryKey": [
+        "prefix"
+        ]
+  }{% if not loop.last %},{% endif %}
+{% endfor %}
