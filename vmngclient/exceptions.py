@@ -115,3 +115,9 @@ class APIEndpointError(vManageClientError):
     """Raised when there is a problem with endpoint definition"""
 
     pass
+
+
+class TenantMigrationPreconditionsError(vManageClientError):
+    """Raised when preconditions for tenant migration fail"""
+
+    pass
