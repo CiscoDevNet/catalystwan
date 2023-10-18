@@ -13,7 +13,10 @@ from vmngclient.api.administration import (
 )
 from vmngclient.api.alarms_api import AlarmsAPI
 from vmngclient.api.basic_api import DevicesAPI, DeviceStateAPI
+from vmngclient.api.config_device_inventory_api import ConfigurationDeviceInventoryAPI
+from vmngclient.api.config_group_api import ConfigGroupAPI
 from vmngclient.api.dashboard_api import DashboardAPI
+from vmngclient.api.feature_profile_api import SDRoutingFeatureProfilesAPI
 from vmngclient.api.logs_api import LogsAPI
 from vmngclient.api.omp_api import OmpAPI
 from vmngclient.api.packet_capture_api import PacketCaptureAPI
@@ -37,6 +40,8 @@ class APIContainer:
         self.admin_tech = AdminTechAPI(session)
         self.administration_settings = AdministrationSettingsAPI(session)
         self.alarms = AlarmsAPI(session)
+        self.config_device_inventory_api = ConfigurationDeviceInventoryAPI(session)
+        self.config_group = ConfigGroupAPI(session)
         self.dashboard = DashboardAPI(session)
         self.devices = DevicesAPI(session)
         self.device_state = DeviceStateAPI(session)
@@ -56,3 +61,4 @@ class APIContainer:
         self.user_groups = UserGroupsAPI(session)
         self.resource_groups = ResourceGroupsAPI(session)
         self.sessions = SessionsAPI(session)
+        self.sd_routing_feature_profiles = SDRoutingFeatureProfilesAPI(session)

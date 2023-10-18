@@ -63,9 +63,13 @@ from vmngclient.endpoints.configuration.policy.list_builder.zone import Configur
 from vmngclient.endpoints.configuration.policy.vsmart_template import ConfigurationVSmartTemplatePolicy
 from vmngclient.endpoints.configuration_dashboard_status import ConfigurationDashboardStatus
 from vmngclient.endpoints.configuration_device_actions import ConfigurationDeviceActions
+from vmngclient.endpoints.configuration_device_inventory import ConfigurationDeviceInventory
 from vmngclient.endpoints.configuration_device_software_update import ConfigurationDeviceSoftwareUpdate
 from vmngclient.endpoints.configuration_device_template import ConfigurationDeviceTemplate
-from vmngclient.endpoints.configuration_feature_profile import ConfigurationFeatureProfile
+from vmngclient.endpoints.configuration_feature_profile import (
+    ConfigurationFeatureProfile,
+    SDRoutingConfigurationFeatureProfile,
+)
 from vmngclient.endpoints.configuration_group import ConfigurationGroup
 from vmngclient.endpoints.configuration_settings import ConfigurationSettings
 from vmngclient.endpoints.monitoring_device_details import MonitoringDeviceDetails
@@ -151,3 +155,5 @@ class APIEndpointContainter:
         self.tenant_migration = TenantMigration(session)
         self.configuration_feature_profile = ConfigurationFeatureProfile(session)
         self.configuration_group = ConfigurationGroup(session)
+        self.sd_routing_configuration_feature_profile = SDRoutingConfigurationFeatureProfile(session)
+        self.configuration_device_inventory = ConfigurationDeviceInventory(session)
