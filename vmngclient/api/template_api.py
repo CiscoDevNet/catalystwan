@@ -361,9 +361,9 @@ class TemplatesAPI:
         ...
 
     def edit(self, template):
-        template_info = self.get(template).filter(name=template.name).single_or_default()
+        template_info = self.get(template).filter(name=template.template_name).single_or_default()
         if not template_info:
-            raise TemplateNotFoundError(f"Template with name [{template.name}] does not exists.")
+            raise TemplateNotFoundError(f"Template with name [{template.template_name}] does not exists.")
 
         if isinstance(template, FeatureTemplate):
             return self._edit_feature_template(template, template_info)
