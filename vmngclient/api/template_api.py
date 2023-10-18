@@ -117,17 +117,17 @@ class TemplatesAPI:
         templates = self.session.get(url=endpoint, params=params)
         return templates.dataseq(DeviceTemplateInfo)
 
-    def attach(self, name: str, device: Device, **kwargs):
+    def attach(self, name: str, device: Device, timeout_seconds: int = 300, **kwargs):
         template_type = self.get(DeviceTemplate).filter(name=name).single_or_default().config_type
         if template_type == TemplateType.CLI:
-            return self._attach_cli(name, device, **kwargs)
+            return self._attach_cli(name, device, timeout_seconds=timeout_seconds, **kwargs)
 
         if template_type == TemplateType.FEATURE:
-            return self._attach_feature(name, device, **kwargs)
+            return self._attach_feature(name, device, timeout_seconds=timeout_seconds, **kwargs)
 
         raise NotImplementedError()
 
-    def _attach_feature(self, name: str, device: Device, **kwargs):
+    def _attach_feature(self, name: str, device: Device, timeout_seconds: int = 300, **kwargs):
         """Attach Device Template created with Feature Templates.
 
         Args:
@@ -186,14 +186,14 @@ class TemplatesAPI:
         endpoint = "/dataservice/template/device/config/attachfeature"
         logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
-        task = Task(session=self.session, task_id=response["id"]).wait_for_completed()
+        task = Task(session=self.session, task_id=response["id"]).wait_for_completed(timeout_seconds=timeout_seconds)
         if task.result:
             return True
         logger.warning(f"Failed to attach tempate: {name} to the device: {device.hostname}.")
         logger.warning(f"Task activity information: {task.sub_tasks_data[0].activity}")
         return False
 
-    def _attach_cli(self, name: str, device: Device, is_edited: bool = False) -> bool:
+    def _attach_cli(self, name: str, device: Device, is_edited: bool = False, timeout_seconds: int = 300) -> bool:
         """
 
         Args:
@@ -231,7 +231,7 @@ class TemplatesAPI:
         endpoint = "/dataservice/template/device/config/attachcli"
         logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
-        task = Task(session=self.session, task_id=response["id"]).wait_for_completed()
+        task = Task(session=self.session, task_id=response["id"]).wait_for_completed(timeout_seconds=timeout_seconds)
         if task.result:
             return True
         logger.warning(f"Failed to attach tempate: {name} to the device: {device.hostname}.")
