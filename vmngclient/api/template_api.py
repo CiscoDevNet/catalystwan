@@ -6,7 +6,6 @@ from enum import Enum
 from typing import TYPE_CHECKING, Any, Optional, Type, overload
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
-from requests.exceptions import HTTPError
 
 from vmngclient.api.task_status_api import Task
 from vmngclient.api.templates.cli_template import CLITemplate
@@ -118,17 +117,17 @@ class TemplatesAPI:
         templates = self.session.get(url=endpoint, params=params)
         return templates.dataseq(DeviceTemplateInfo)
 
-    def attach(self, name: str, device: Device, **kwargs):
+    def attach(self, name: str, device: Device, timeout_seconds: int = 300, **kwargs):
         template_type = self.get(DeviceTemplate).filter(name=name).single_or_default().config_type
         if template_type == TemplateType.CLI:
-            return self._attach_cli(name, device, **kwargs)
+            return self._attach_cli(name, device, timeout_seconds=timeout_seconds, **kwargs)
 
         if template_type == TemplateType.FEATURE:
-            return self._attach_feature(name, device, **kwargs)
+            return self._attach_feature(name, device, timeout_seconds=timeout_seconds, **kwargs)
 
         raise NotImplementedError()
 
-    def _attach_feature(self, name: str, device: Device, **kwargs):
+    def _attach_feature(self, name: str, device: Device, timeout_seconds: int = 300, **kwargs):
         """Attach Device Template created with Feature Templates.
 
         Args:
@@ -187,14 +186,14 @@ class TemplatesAPI:
         endpoint = "/dataservice/template/device/config/attachfeature"
         logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
-        task = Task(session=self.session, task_id=response["id"]).wait_for_completed()
+        task = Task(session=self.session, task_id=response["id"]).wait_for_completed(timeout_seconds=timeout_seconds)
         if task.result:
             return True
         logger.warning(f"Failed to attach tempate: {name} to the device: {device.hostname}.")
         logger.warning(f"Task activity information: {task.sub_tasks_data[0].activity}")
         return False
 
-    def _attach_cli(self, name: str, device: Device, is_edited: bool = False) -> bool:
+    def _attach_cli(self, name: str, device: Device, is_edited: bool = False, timeout_seconds: int = 300) -> bool:
         """
 
         Args:
@@ -210,10 +209,6 @@ class TemplatesAPI:
             self.template_validation(template_id, device=device)
         except TemplateNotFoundError:
             logger.error(f"Error, Template with name {name} not found on {device}.")
-            return False
-        except HTTPError as error:
-            error_details = json.loads(error.response.text)
-            logger.error(f"Error in config: {error_details['error']['details']}.")
             return False
         payload = {
             "deviceTemplateList": [
@@ -236,7 +231,7 @@ class TemplatesAPI:
         endpoint = "/dataservice/template/device/config/attachcli"
         logger.info(f"Attaching a template: {name} to the device: {device.hostname}.")
         response = self.session.post(url=endpoint, json=payload).json()
-        task = Task(session=self.session, task_id=response["id"]).wait_for_completed()
+        task = Task(session=self.session, task_id=response["id"]).wait_for_completed(timeout_seconds=timeout_seconds)
         if task.result:
             return True
         logger.warning(f"Failed to attach tempate: {name} to the device: {device.hostname}.")
@@ -366,9 +361,9 @@ class TemplatesAPI:
         ...
 
     def edit(self, template):
-        template_info = self.get(template).filter(name=template.name).single_or_default()
+        template_info = self.get(template).filter(name=template.template_name).single_or_default()
         if not template_info:
-            raise TemplateNotFoundError(f"Template with name [{template.name}] does not exists.")
+            raise TemplateNotFoundError(f"Template with name [{template.template_name}] does not exists.")
 
         if isinstance(template, FeatureTemplate):
             return self._edit_feature_template(template, template_info)
@@ -564,7 +559,7 @@ class TemplatesAPI:
         # "name"
         for i, field in enumerate(fr_template_fields):
             value = None
-
+            priority_order = None
             # TODO How to discover Device specific variable
             if field.key in template.device_specific_variables:
                 value = template.device_specific_variables[field.key]
@@ -574,6 +569,7 @@ class TemplatesAPI:
                         field.key == field_value.alias
                         or field.key == field_value.field_info.extra.get("vmanage_key")  # type: ignore
                     ):
+                        priority_order = field_value.field_info.extra.get("priority_order")  # type: ignore
                         value = getattr(template, field_name)
                         break
                 if value is None:
@@ -597,7 +593,8 @@ class TemplatesAPI:
                         a[key] = b[key]
                 return a
 
-            payload.definition = merge(payload.definition, field.payload_scheme(value))
+            # print(field.payload_scheme(value))
+            payload.definition = merge(payload.definition, field.payload_scheme(value, priority_order=priority_order))
 
         if debug:
             with open(f"payload_{template.type}.json", "w") as f:
@@ -673,10 +670,6 @@ class TemplatesAPI:
             self.template_validation(template_id, device=device)
         except TemplateNotFoundError:
             logger.error(f"Error, Template with name {name} not found on {device}.")
-            return False
-        except HTTPError as error:
-            error_details = json.loads(error.response.text)
-            logger.error(f"Error in config: {error_details['error']['details']}.")
             return False
         payload = {
             "templateId": template_id,

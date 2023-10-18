@@ -7,12 +7,22 @@ from pydantic import BaseModel, Field
 
 from vmngclient.api.configuration_groups.parcel import MainParcel
 from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, put, versions
+from vmngclient.model.feature_profile_parcel import FullConfigParcel
 from vmngclient.typed_list import DataSequence
+
+
+class Solution(str, Enum):
+    MOBILITY = "mobility"
+    SDWAN = "sdwan"
+    NFVIRTUAL = "nfvirtual"
+    SDROUTING = "sd-routing"
 
 
 class ProfileType(str, Enum):
     TRANSPORT = "transport"
     SYSTEM = "system"
+    CLI = "cli"
+    SERVICE = "service"
 
 
 class SchemaType(str, Enum):
@@ -106,7 +116,36 @@ class ConfigurationFeatureProfile(APIEndpoints):
     def create_aaa_profile_parcel_for_system(self, system_id: str, payload: MainParcel) -> ParcelId:
         ...
 
-    @versions(supported_versions=(">=20.9"), raises=False)
-    @put("/v1/feature-profile/sdwan/system/{system_id}/aaa/{parcel_id}")
-    def edit_aaa_profile_parcel_for_system(self, system_id: str, parcel_id: str, payload: MainParcel) -> ParcelId:
+
+class SDRoutingConfigurationFeatureProfile(APIEndpoints):
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sd-routing/cli")
+    def create_cli_feature_profile(self, payload: FeatureProfileCreationPayload) -> FeatureProfileCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sd-routing/cli/{cli_fp_id}/full-config")
+    def create_cli_full_config_parcel(self, cli_fp_id: str, payload: FullConfigParcel) -> ParcelId:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sd-routing/cli/{cli_fp_id}")
+    def delete_cli_feature_profile(self, cli_fp_id: str) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sd-routing/cli/{cli_fp_id}/full-config/{parcel_id}")
+    def delete_cli_full_config_parcel(self, cli_fp_id: str, parcel_id: str) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sd-routing/cli/{cli_fp_id}/full-config/{parcel_id}")
+    def edit_cli_full_config_parcel(self, cli_fp_id: str, parcel_id: str, payload: FullConfigParcel) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sd-routing/cli")
+    def get_cli_feature_profiles(
+        self, payload: Optional[GetFeatureProfilesPayload]
+    ) -> DataSequence[FeatureProfileInfo]:
         ...

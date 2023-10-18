@@ -1,0 +1,24 @@
+{% for host in mapping %}
+    {
+        "hostname": {
+            "vipObjectType": "object",
+            "vipType": "constant",
+            "vipValue": "{{ host.name }}",
+            "vipVariableName": "vpn_host_hostname"
+        },
+        "ip": {
+            "vipObjectType": "list",
+            "vipType": "constant",
+            "vipValue": [
+                {% for ip in host.ips%}
+                    "{{ ip }}"{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            "vipVariableName": "vpn_host_ip"
+        },
+        "priority-order": [
+            "hostname",
+            "ip"
+        ]
+    }{% if not loop.last %},{% endif %}
+{% endfor %}

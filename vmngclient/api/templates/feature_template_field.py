@@ -86,7 +86,7 @@ class FeatureTemplateField(BaseModel):
         return output
 
     # value must be JSON serializable, return JSON serializable dict
-    def payload_scheme(self, value: Any = None, help=None, current_path=None) -> dict:
+    def payload_scheme(self, value: Any = None, help=None, current_path=None, priority_order=None) -> dict:
         output: dict = {}
         rel_output: dict = {}
         rel_output.update(get_path_dict([self.dataPath]))
@@ -110,7 +110,7 @@ class FeatureTemplateField(BaseModel):
             return nest_value_in_output(vip_variable.dict(by_alias=True, exclude_none=True))
 
         else:
-            if value:
+            if value is not None:
                 output["vipType"] = FeatureTemplateOptionType.CONSTANT.value
                 if self.children:
                     children_output = []
@@ -129,14 +129,21 @@ class FeatureTemplateField(BaseModel):
                                 )
                             )
                             obj_value = getattr(obj, model_field.name)
+                            po = model_field.field_info.extra.get("priority_order")
                             child_payload.update(
-                                child.payload_scheme(obj_value, help=output, current_path=self.dataPath + [self.key])
+                                child.payload_scheme(
+                                    obj_value, help=output, current_path=self.dataPath + [self.key], priority_order=po
+                                )
                             )
+                            if priority_order:
+                                child_payload.update({"priority-order": priority_order})
                         children_output.append(child_payload)
                     output["vipValue"] = children_output
                 else:
                     output["vipValue"] = value
             else:
+                if value is None:
+                    return {}
                 if "default" in self.dataType:
                     return {}
                     # output["vipValue"] = self.dataType["default"] if value is None else value

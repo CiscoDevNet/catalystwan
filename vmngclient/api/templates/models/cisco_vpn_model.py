@@ -82,10 +82,10 @@ class NextHopWithTrack(BaseModel):
 
 class Routev4(BaseModel):
     prefix: str
-    next_hop: Optional[List[NextHop]] = Field(vmanage_key="next-hop")
-    next_hop_with_track: Optional[List[NextHopWithTrack]] = Field(vmanage_key="next-hop-with-track")
+    next_hop: Optional[List[NextHop]] = Field(vmanage_key="next-hop", priority_order=["address", "distance"])
+    next_hop_with_track: Optional[List[NextHopWithTrack]] = Field(default=None, vmanage_key="next-hop-with-track")
     null0: Optional[bool]
-    distance: Optional[int] = 1
+    distance: Optional[int] = None
     vpn: Optional[int]
     dhcp: Optional[bool]
 
@@ -400,10 +400,12 @@ class CiscoVPNModel(FeatureTemplate):
     dns: Optional[List[Dns]]
     dns_ipv6: Optional[List[DnsIpv6]] = Field(vmanage_key="dns-ipv6")
     layer4: Optional[bool] = Field(data_path=["ecmp-hash-key"])
-    host: Optional[List[Host]]
+    host: Optional[List[Host]] = Field(priority_order=["hostname", "ip"])
     service: Optional[List[Service]]
     service_route: Optional[List[ServiceRoute]] = Field(data_path=["ip"], vmanage_key="service-route")
-    route_v4: Optional[List[Routev4]] = Field(data_path=["ip"], vmanage_key="route")
+    route_v4: Optional[List[Routev4]] = Field(
+        data_path=["ip"], vmanage_key="route", priority_order=["next-hop", "next-hop-with-track", "prefix"]
+    )
     route_v6: Optional[List[Routev6]] = Field(data_path=["ipv6"], vmanage_key="route")
     gre_route: Optional[List[GreRoute]] = Field(data_path=["ip"], vmanage_key="gre-route")
     ipsec_route: Optional[List[IpsecRoute]] = Field(data_path=["ip"], vmanage_key="ipsec-route")
@@ -420,3 +422,10 @@ class CiscoVPNModel(FeatureTemplate):
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_vpn"
+
+    def generate_vpn_id(self, session):
+        if self.vpn_id not in [0, 512]:
+            payload = {"resourcePoolDataType": "vpn", "tenantId": self.org_name, "tenantVpn": self.vpn_id}
+            url = "/dataservice/resourcepool/resource/vpn"
+            response = session.put(url=url, json=payload).json()
+            self.vpn_id = response["deviceVpn"]
