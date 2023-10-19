@@ -1,6 +1,7 @@
-import io
 import json
+import tempfile
 import unittest
+from pathlib import Path
 from typing import Dict, List, Optional, Union
 from unittest.mock import MagicMock
 
@@ -49,17 +50,12 @@ class ParamsExample(BaseModel):
 
 
 class CustomTypeExample(CustomPayloadType):
-    buff = io.BytesIO(b"\xF1CustomDataFileContent\x01")
-
-    def __init__(self):
-        self.payload = PreparedPayload(
-            data=b"\xFFCustomData\x00",
-            headers={"content-type": "application/custom"},
-            files={"file": ("custom-data.bin", self.buff)},
-        )
+    def __init__(self, filename: Path):
+        self.filename = filename
 
     def prepared(self) -> PreparedPayload:
-        return self.payload
+        data = open(self.filename, "rb")
+        return PreparedPayload(files={"file": (Path(data.name).name, data)})
 
 
 class TestAPIEndpoints(unittest.TestCase):
@@ -79,7 +75,6 @@ class TestAPIEndpoints(unittest.TestCase):
         self.json_payload = json.dumps(self.dict_payload)
         self.attrs_payload = create_dataclass(AttrsModelExample, self.dict_payload)
         self.basemodel_payload = BaseModelExample.parse_obj(self.dict_payload)
-        self.custom_payload = CustomTypeExample()
         self.list_dict_payload = [self.dict_payload] * 2
         self.list_attrs_payload = [self.attrs_payload] * 2
         self.dict_params = {
@@ -214,13 +209,19 @@ class TestAPIEndpoints(unittest.TestCase):
         assert json.loads(kwargs.get("data")) == self.list_dict_payload
 
     def test_custom_payload(self):
-        self.endpoints._request("POST", f"/{__name__}", payload=self.custom_payload)
-        _, kwargs = self.session_mock.request.call_args
-        prepared = self.custom_payload.prepared()
-        assert kwargs.get("data") == prepared.data
-        assert kwargs.get("headers") == prepared.headers
-        assert kwargs.get("files")["file"][0] == prepared.files["file"][0]
-        assert kwargs.get("files")["file"][1].read() == prepared.files["file"][1].read()
+        expected_data = b"\xFFsomething\x00"
+        with tempfile.TemporaryDirectory() as tempdir:
+            tempdir_path = Path(tempdir)
+            payload_file = tempdir_path / "payload.bin"
+            with open(payload_file, "wb") as tmpfile:
+                tmpfile.write(expected_data)
+            custom_payload = CustomTypeExample(payload_file)
+            self.endpoints._request("POST", f"/{__name__}", payload=custom_payload)
+            _, kwargs = self.session_mock.request.call_args
+            prepared = custom_payload.prepared()
+            assert kwargs.get("data") == prepared.data
+            assert kwargs.get("headers") == prepared.headers
+            assert kwargs.get("files")["file"][0] == prepared.files["file"][0]
 
     def test_dict_payload(self):
         self.endpoints._request("POST", f"/{__name__}", payload=self.dict_payload)

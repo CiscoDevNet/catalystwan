@@ -26,10 +26,19 @@ def raise_or_log_precondition_check(msg: str, raises: bool) -> None:
     logger.warning(msg)
 
 
-def _get_file_name_from_export_task_result(task_result: TaskResult) -> str:
-    filepath = re.search("""file location: (.*)""", task_result.sub_tasks_data[0].activity[-1])
-    assert filepath, "File location not found."
-    return Path(filepath.group(1)).name
+class ExportTask(Task):
+    def __init__(self, session: vManageSession, task_id: str):
+        super().__init__(session, task_id)
+
+    @staticmethod
+    def get_file_name_from_export_task_result(task_result: TaskResult) -> str:
+        filepath = re.search("""file location: (.*)""", task_result.sub_tasks_data[0].activity[-1])
+        assert filepath, "File location not found."
+        return Path(filepath.group(1)).name
+
+    def wait_for_file(self) -> str:
+        task_result = super().wait_for_completed()
+        return self.get_file_name_from_export_task_result(task_result)
 
 
 class ImportTask(Task):
@@ -44,7 +53,7 @@ class TenantMigrationAPI:
     def __init__(self, session: vManageSession):
         self.session = session
 
-    def export_tenant(self, tenant: Tenant) -> Task:
+    def export_tenant(self, tenant: Tenant) -> ExportTask:
         """Exports the deployment and configuration data from a Cisco vManage instance.
         Should be executed on migration origin.
 
@@ -55,7 +64,7 @@ class TenantMigrationAPI:
             Task: object representing initiated export process
         """
         process_id = self.session.endpoints.tenant_migration.export_tenant_data(tenant).process_id
-        return Task(self.session, process_id)
+        return ExportTask(self.session, process_id)
 
     def download(self, download_path: Path, remote_filename: str = "default.tar.gz"):
         """Download exported deployment and configuration data from a Cisco vManage instance
@@ -80,7 +89,7 @@ class TenantMigrationAPI:
         Returns:
             ImportTask: object representing initiated import process
         """
-        import_file_payload = MigrationFile(data=open(import_file, "rb"))
+        import_file_payload = MigrationFile(import_file)
         if self.session.api_version >= Version("20.13") and migration_key is not None:
             import_info = self.session.endpoints.tenant_migration.import_tenant_data_with_key(
                 import_file_payload, migration_key
@@ -132,6 +141,7 @@ def migration_preconditions_check(
         bool: true only when all preconditions pass
     """
     ok = True
+    target_org = target_session.endpoints.configuration_settings.get_organizations().first().org
     if target_session.session_type == SessionType.PROVIDER:
         if not tenant.is_destination_overlay_mt:
             raise_or_log_precondition_check("Migrating to MT but 'isDestinationOverlayMT' is not set", raises)
@@ -141,31 +151,42 @@ def migration_preconditions_check(
                 "Migration to MT (using provider) is expected to be initiated from ST (using single tenant)", raises
             )
             ok = False
+        if not tenant.org_name.startswith(target_org):
+            raise_or_log_precondition_check(
+                f"Provided '{tenant.org_name}' but target organization is '{target_org}'", raises
+            )
+            ok = False
     elif target_session.session_type == SessionType.SINGLE_TENANT:
         if tenant.is_destination_overlay_mt is True:
             raise_or_log_precondition_check("Migrating to ST but 'isDestinationOverlayMT' is set to True", raises)
             ok = False
-        if origin_session.session_type != SessionType.SINGLE_TENANT:
+        if origin_session.session_type != SessionType.PROVIDER:
             raise_or_log_precondition_check(
                 "Migration to ST (using single tenant) is expected to be initiated from MT (using provider)", raises
             )
             ok = False
+        if tenant.org_name != target_org:
+            raise_or_log_precondition_check(
+                f"Provided '{tenant.org_name}' but target organization is '{target_org}'", raises
+            )
+            ok = False
     else:
         raise_or_log_precondition_check(
-            "Migration target is expected to be executed as single tenant or provider "
-            "but found: {target_session.session_type}",
+            f"Migration target is expected to be executed as single tenant or provider "
+            f"but found: {target_session.session_type}",
             raises,
         )
         ok = False
 
     if target_session.api_version != origin_session.api_version:
         raise_or_log_precondition_check(
-            "Migration source and target expect to have same version but found "
-            "origin: {origin_session.api_version} "
-            "target: {target_session.api_version}",
+            f"Migration source and target expect to have same version but found "
+            f"origin: {origin_session.api_version} "
+            f"target: {target_session.api_version}",
             raises,
         )
         ok = False
+
     return ok
 
 
@@ -201,8 +222,7 @@ def migration_workflow(
 
     logger.info(f"1/5 Exporting {tenant.name} ...")
     export_task = origin_api.export_tenant(tenant=tenant)
-    export_result = export_task.wait_for_completed()
-    remote_filename = _get_file_name_from_export_task_result(export_result)
+    remote_filename = export_task.wait_for_file()
 
     logger.info(f"2/5 Downloading {remote_filename} to {export_path} ...")
     origin_api.download(export_path, remote_filename)

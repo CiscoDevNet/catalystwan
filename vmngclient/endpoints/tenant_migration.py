@@ -1,5 +1,4 @@
 # mypy: disable-error-code="empty-body"
-from io import BufferedReader
 from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit
 
@@ -37,11 +36,12 @@ class MigrationInfo(BaseModel):
 
 
 class MigrationFile(CustomPayloadType):
-    def __init__(self, data: BufferedReader):
-        self.payload = PreparedPayload(files={"file": (Path(data.name).name, data)})
+    def __init__(self, filename: Path):
+        self.filename = filename
 
     def prepared(self) -> PreparedPayload:
-        return self.payload
+        data = open(self.filename, "rb")
+        return PreparedPayload(files={"file": (Path(data.name).name, data)})
 
 
 class TenantMigration(APIEndpoints):
