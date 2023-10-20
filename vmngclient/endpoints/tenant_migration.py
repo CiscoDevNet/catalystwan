@@ -46,22 +46,25 @@ class MigrationFile(CustomPayloadType):
 
 class TenantMigration(APIEndpoints):
     @view({SingleTenantView, ProviderView})
+    @versions(">=20.6")
     @get("/tenantmigration/download/{path}")
     def download_tenant_data(self, path: str = "default.tar.gz") -> bytes:
         ...
 
     @view({SingleTenantView, ProviderView})
+    @versions(">=20.6")
     @post("/tenantmigration/export")
     def export_tenant_data(self, payload: Tenant) -> ExportInfo:
         ...
 
     @view({SingleTenantView, ProviderView})
+    @versions(">=20.6")
     @get("/tenantmigration/migrationToken")
     def get_migration_token(self, params: MigrationTokenQueryParams) -> str:
         ...
 
     @view({SingleTenantView, ProviderView})
-    @versions("<20.13")
+    @versions(">=20.6,<20.13")
     @post("/tenantmigration/import")
     def import_tenant_data(self, payload: MigrationFile) -> ImportInfo:
         ...
@@ -73,6 +76,7 @@ class TenantMigration(APIEndpoints):
         ...
 
     @view({SingleTenantView, ProviderView})
+    @versions(">=20.6")
     @post("/tenantmigration/networkMigration")
     def migrate_network(self, payload: str) -> MigrationInfo:
         ...

@@ -168,7 +168,6 @@ def migration_preconditions_check(
             f"Migration target is expected to be executed as single tenant or provider "
             f"but found: {target_session.session_type}"
         )
-
     if target_session.api_version != origin_session.api_version:
         problems.append(
             f"Migration source and target expect to have same version but found "
