@@ -69,7 +69,7 @@ class TenantMigrationAPI:
 
     def download(self, download_path: Path, remote_filename: str = "default.tar.gz"):
         """Download exported deployment and configuration data from a Cisco vManage instance
-        to a local file system. Should be executed on migration target.
+        to a local file system. Should be executed on migration origin.
 
         Args:
             download_path (Path): full download path containing a filename eg.: Path("/home/user/tenant-export.tar.gz")
