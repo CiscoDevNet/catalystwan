@@ -249,52 +249,55 @@ api.get_vsmart_mapping()
 
 <details>
     <summary> <b>Tenant migration</b> <i>(click to expand)</i></summary>
-Preparation:
-
-```python
-from vmngclient.api.tenant_migration_api import TenantMigrationAPI, st_to_mt
-from vmngclient.model.tenant import Tenant
-from vmngclient.session import create_vManageSession
-# create sessions to both systems
-st_session = create_vManageSession(**single_tenant_login)
-mt_session = create_vManageSession(**multi_tenant_provider_login)
-# create api and tenant objects
-st_api = TenantMigrationAPI(st_session)
-mt_api = TenantMigrationAPI(mt_session)
-tenant = Tenant.parse_obj({
-    "name": "single-tenant",
-    "desc": "Migrated from Single Tenant",
-    "orgName": "vIPtela Inc Regression",
-    "subDomain": "single-tenant.fruits.com",
-    "wanEdgeForecast": 99
-})
-```
-
-Method below performs multi-step migration procedure according to [Migrate Single-Tenant Cisco SD-WAN Overlay to Multitenant Cisco SD-WAN Deployment](https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/system-interface/vedge-20-x/systems-interfaces-book/sdwan-multitenancy.html#concept_sjj_jmm_z4b)
 
 ```python
 from pathlib import Path
-st_to_mt(st_api, mt_api, workdir=Path.cwd(), tenant=tenant)
+from vmngclient.session import create_vManageSession
+from vmngclient.model.tenant import MigrationTenant
+from vmngclient.api.tenant_migration_api import migration_workflow
+
+
+tenant = MigrationTenant(
+    name="mango",
+    org_name="vIPtela Inc MT to ST Migration Regression-Mango Inc",
+    subdomain="mango.fruits.com",
+    desc="Mango Tenant",
+    wan_edge_forecast=100,
+    migration_key="MangoTenantMigrationKey",
+    is_destination_overlay_mt=False,
+)
+# provide hostname and credentials for single-tenant (or multi-tenant provider) admin
+origin_session = create_vManageSession(url="10.0.1.15", username="st-admin", password="")
+# provide hostname and credentials for or multi-tenant provider (or single-tenant) admin
+target_session = create_vManageSession(url="10.9.0.16", username="mt-provider-admin", password="")
+
+migration_workflow(origin_session, target_session, Path("workdir"), tenant)
 ```
 
-Each step of the procedure can be executed independently using api methods: `export_tenant`, `download`, `import_tenant`, `store_token`, `migrate_network`
+`migration_workflow` performs multi-step migration procedure according to [Migrate Single-Tenant Cisco SD-WAN Overlay to Multitenant Cisco SD-WAN Deployment](https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/system-interface/vedge-20-x/systems-interfaces-book/sdwan-multitenancy.html#concept_sjj_jmm_z4b)
+Since 20.13 also MT to ST is supported.
+
+
+Each step of the `migration_workflow` procedure can be executed independently using api methods: `export_tenant`, `download`, `import_tenant`, `store_token`, `migrate_network`
 
 ```python
+origin_api = origin_session.api.tenant_migration_api
+target_api = target_session.api.tenant_migration_api
 tenant_file = Path("~/tenant.tar.gz")
 token_file = Path("~/tenant-token.txt")
 # export
-export_task = st_api.export_tenant(tenant=tenant)
-export_result = export_task.wait_for_completed()
+export_task = origin_api.export_tenant(tenant=tenant)
+remote_filename = export_task.wait_for_file()
 # download
-st_api.download(tenant_file)
+origin_api.download(export_path, remote_filename)
 # import
-import_task = mt_api.import_tenant(tenant_file)
+import_task = target_api.import_tenant(export_path, tenant.migration_key)
 import_task.wait_for_completed()
 # get token
 migration_id = import_task.import_info.migration_token_query_params.migration_id
-mt_api.store_token(migration_id, token_file)
+target_api.store_token(migration_id, token_path)
 # migrate network
-migrate_task = st_api.migrate_network(token_file)
+migrate_task = origin_api.migrate_network(token_path)
 migrate_task.wait_for_completed()
 ```
 </details>

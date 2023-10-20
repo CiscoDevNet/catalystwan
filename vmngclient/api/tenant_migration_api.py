@@ -4,13 +4,13 @@ import logging
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from packaging.version import Version  # type: ignore
 
 from vmngclient.api.task_status_api import Task, TaskResult
 from vmngclient.endpoints.tenant_migration import ImportInfo, MigrationFile, MigrationTokenQueryParams
-from vmngclient.exceptions import TenantMigrationPreconditionsError
+from vmngclient.exceptions import TenantMigrationExportFileNotFound, TenantMigrationPreconditionsError
 from vmngclient.model.tenant import MigrationTenant, Tenant
 from vmngclient.utils.session_type import SessionType
 
@@ -33,7 +33,8 @@ class ExportTask(Task):
     @staticmethod
     def get_file_name_from_export_task_result(task_result: TaskResult) -> str:
         filepath = re.search("""file location: (.*)""", task_result.sub_tasks_data[0].activity[-1])
-        assert filepath, "File location not found."
+        if not filepath:
+            raise TenantMigrationExportFileNotFound("Client cannot find export file name in export task result")
         return Path(filepath.group(1)).name
 
     def wait_for_file(self) -> str:
@@ -140,54 +141,46 @@ def migration_preconditions_check(
     Returns:
         bool: true only when all preconditions pass
     """
-    ok = True
+    problems: List[str] = []
     target_org = target_session.endpoints.configuration_settings.get_organizations().first().org
     if target_session.session_type == SessionType.PROVIDER:
         if not tenant.is_destination_overlay_mt:
-            raise_or_log_precondition_check("Migrating to MT but 'isDestinationOverlayMT' is not set", raises)
-            ok = False
+            problems.append("Migrating to MT but 'isDestinationOverlayMT' is not set")
         if origin_session.session_type != SessionType.SINGLE_TENANT:
-            raise_or_log_precondition_check(
-                "Migration to MT (using provider) is expected to be initiated from ST (using single tenant)", raises
+            problems.append(
+                "Migration to MT (using provider) is expected to be initiated from ST (using single tenant)"
             )
-            ok = False
         if not tenant.org_name.startswith(target_org):
-            raise_or_log_precondition_check(
-                f"Provided '{tenant.org_name}' but target organization is '{target_org}'", raises
-            )
-            ok = False
+            problems.append(f"Provided '{tenant.org_name}' but target organization is '{target_org}'")
     elif target_session.session_type == SessionType.SINGLE_TENANT:
+        if target_session.api_version < Version("20.13"):
+            problems.append("Migration to ST not supported prior 20.13")
         if tenant.is_destination_overlay_mt is True:
-            raise_or_log_precondition_check("Migrating to ST but 'isDestinationOverlayMT' is set to True", raises)
-            ok = False
+            problems.append("Migrating to ST but 'isDestinationOverlayMT' is set to True")
         if origin_session.session_type != SessionType.PROVIDER:
-            raise_or_log_precondition_check(
-                "Migration to ST (using single tenant) is expected to be initiated from MT (using provider)", raises
+            problems.append(
+                "Migration to ST (using single tenant) is expected to be initiated from MT (using provider)"
             )
-            ok = False
         if tenant.org_name != target_org:
-            raise_or_log_precondition_check(
-                f"Provided '{tenant.org_name}' but target organization is '{target_org}'", raises
-            )
-            ok = False
+            problems.append(f"Provided '{tenant.org_name}' but target organization is '{target_org}'")
     else:
-        raise_or_log_precondition_check(
+        problems.append(
             f"Migration target is expected to be executed as single tenant or provider "
-            f"but found: {target_session.session_type}",
-            raises,
+            f"but found: {target_session.session_type}"
         )
-        ok = False
 
     if target_session.api_version != origin_session.api_version:
-        raise_or_log_precondition_check(
+        problems.append(
             f"Migration source and target expect to have same version but found "
             f"origin: {origin_session.api_version} "
             f"target: {target_session.api_version}",
-            raises,
         )
-        ok = False
-
-    return ok
+    if problems:
+        problem_lines = "\n".join(problems)
+        message = f"Found {len(problems)} problems in precondition check for migration:\n{problem_lines}"
+        raise_or_log_precondition_check(message, raises)
+        return False
+    return True
 
 
 def migration_workflow(
@@ -195,7 +188,7 @@ def migration_workflow(
     target_session: vManageSession,
     workdir: Path,
     tenant: MigrationTenant,
-    raises: bool = False,
+    raises: bool = True,
 ):
     """Performs migration from origin sdwan instance to target sdwan instance based on:
     https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/system-interface/vedge-20-x/systems-interfaces-book/sdwan-multitenancy.html#concept_sjj_jmm_z4b
