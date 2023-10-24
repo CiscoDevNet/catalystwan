@@ -266,16 +266,19 @@ tenant = MigrationTenant(
     migration_key="MangoTenantMigrationKey",
     is_destination_overlay_mt=False,
 )
-# provide hostname and credentials for single-tenant (or multi-tenant provider) admin
-origin_session = create_vManageSession(url="10.0.1.15", username="st-admin", password="")
-# provide hostname and credentials for or multi-tenant provider (or single-tenant) admin
-target_session = create_vManageSession(url="10.9.0.16", username="mt-provider-admin", password="")
 
-migration_workflow(origin_session, target_session, Path("workdir"), tenant)
+with create_vManageSession(
+    url="10.0.1.15", username="st-admin", password=""
+), create_vManageSession(
+    url="10.9.0.16", username="mt-provider-admin", password=""
+) as origin_session, target_session:
+    migration_workflow(origin_session, target_session, Path("workdir"), tenant)
 ```
 
 `migration_workflow` performs multi-step migration procedure according to [Migrate Single-Tenant Cisco SD-WAN Overlay to Multitenant Cisco SD-WAN Deployment](https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/system-interface/vedge-20-x/systems-interfaces-book/sdwan-multitenancy.html#concept_sjj_jmm_z4b)
-Since 20.13 also MT to ST is supported.
+
+
+Since 20.13 also MT to ST is supported (just provide suitable origin/target sessions, and `is_destination_overlay_mt` parameter)
 
 
 Each step of the `migration_workflow` procedure can be executed independently using api methods: `export_tenant`, `download`, `import_tenant`, `store_token`, `migrate_network`
