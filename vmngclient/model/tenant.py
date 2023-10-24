@@ -51,7 +51,7 @@ class Tenant(BaseModel):
 
 class MigrationTenant(Tenant):
     is_destination_overlay_mt: Optional[bool] = Field(alias="isDestinationOverlayMT")
-    migration_key: Optional[str] = Field(alias="migrationKey")
+    migration_key: Optional[str] = Field(alias="migrationKey", regex=r"^[a-zA-Z0-9\-\._\~]{8,32}$")
 
     class Config:
         allow_population_by_field_name = True
