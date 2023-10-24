@@ -267,11 +267,8 @@ tenant = MigrationTenant(
     is_destination_overlay_mt=False,
 )
 
-with create_vManageSession(
-    url="10.0.1.15", username="st-admin", password=""
-), create_vManageSession(
-    url="10.9.0.16", username="mt-provider-admin", password=""
-) as origin_session, target_session:
+with create_vManageSession(url="10.0.1.15", username="st-admin", password="") as origin_session, \
+     create_vManageSession(url="10.9.0.16", username="mt-provider-admin", password="") as target_session:
     migration_workflow(origin_session, target_session, Path("workdir"), tenant)
 ```
 
