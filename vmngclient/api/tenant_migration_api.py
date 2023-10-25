@@ -179,6 +179,7 @@ def migration_preconditions_check(
         message = f"Found {len(problems)} problems in precondition check for migration:\n{problem_lines}"
         raise_or_log_precondition_check(message, raises)
         return False
+    logger.info("Preconditions checks for tenant migration succeeded!")
     return True
 
 
