@@ -253,23 +253,21 @@ api.get_vsmart_mapping()
 ```python
 from pathlib import Path
 from vmngclient.session import create_vManageSession
-from vmngclient.model.tenant import MigrationTenant
-from vmngclient.api.tenant_migration_api import migration_workflow
+from vmngclient.model.tenant import TenantExport
+from vmngclient.workflows.tenant_migration import migration_workflow
 
-
-tenant = MigrationTenant(
+tenant = TenantExport(
     name="mango",
-    org_name="vIPtela Inc MT to ST Migration Regression-Mango Inc",
+    org_name="Provider Org-Mango Inc",
     subdomain="mango.fruits.com",
-    desc="Mango Tenant",
     wan_edge_forecast=100,
-    migration_key="MangoTenantMigrationKey",
-    is_destination_overlay_mt=False,
+    migration_key="MangoTenantMigrationKey",   # only for SDWAN Manager >= 20.13
+    is_destination_overlay_mt=True,            # only for SDWAN Manager >= 20.13
 )
 
 with create_vManageSession(url="10.0.1.15", username="st-admin", password="") as origin_session, \
      create_vManageSession(url="10.9.0.16", username="mt-provider-admin", password="") as target_session:
-    migration_workflow(origin_session, target_session, Path("workdir"), tenant)
+    migration_workflow(origin_session, target_session, Path("workdir"), tenant, "10.9.1.100")
 ```
 
 `migration_workflow` performs multi-step migration procedure according to [Migrate Single-Tenant Cisco SD-WAN Overlay to Multitenant Cisco SD-WAN Deployment](https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/system-interface/vedge-20-x/systems-interfaces-book/sdwan-multitenancy.html#concept_sjj_jmm_z4b)

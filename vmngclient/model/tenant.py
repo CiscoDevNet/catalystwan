@@ -49,9 +49,17 @@ class Tenant(BaseModel):
         allow_population_by_field_name = True
 
 
-class MigrationTenant(Tenant):
-    is_destination_overlay_mt: Optional[bool] = Field(alias="isDestinationOverlayMT")
-    migration_key: Optional[str] = Field(alias="migrationKey", regex=r"^[a-zA-Z0-9]{8,32}$")
+class TenantExport(BaseModel):
+    name: str
+    org_name: str = Field(alias="orgName")
+    subdomain: str = Field(alias="subDomain")
+    wan_edge_forecast: Optional[int] = Field(alias="wanEdgeForecast")
+    is_destination_overlay_mt: Optional[bool] = Field(
+        alias="isDestinationOverlayMT", description="required starting from 20.13"
+    )
+    migration_key: Optional[str] = Field(
+        alias="migrationKey", regex=r"^[a-zA-Z0-9]{8,32}$", description="required starting from 20.13"
+    )
 
     class Config:
         allow_population_by_field_name = True

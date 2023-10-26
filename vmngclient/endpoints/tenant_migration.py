@@ -5,7 +5,7 @@ from urllib.parse import parse_qsl, urlsplit
 from pydantic import BaseModel, Field
 
 from vmngclient.endpoints import APIEndpoints, CustomPayloadType, PreparedPayload, get, post, versions, view
-from vmngclient.model.tenant import Tenant
+from vmngclient.model.tenant import TenantExport
 from vmngclient.utils.session_type import ProviderView, SingleTenantView
 
 
@@ -54,7 +54,7 @@ class TenantMigration(APIEndpoints):
     @view({SingleTenantView, ProviderView})
     @versions(">=20.6")
     @post("/tenantmigration/export")
-    def export_tenant_data(self, payload: Tenant) -> ExportInfo:
+    def export_tenant_data(self, payload: TenantExport) -> ExportInfo:
         ...
 
     @view({SingleTenantView, ProviderView})
