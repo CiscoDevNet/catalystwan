@@ -267,7 +267,13 @@ tenant = TenantExport(
 
 with create_vManageSession(url="10.0.1.15", username="st-admin", password="") as origin_session, \
      create_vManageSession(url="10.9.0.16", username="mt-provider-admin", password="") as target_session:
-    migration_workflow(origin_session, target_session, Path("workdir"), tenant, "10.9.1.100")
+    migration_workflow(
+        origin_session=origin_session,
+        target_session=target_session,
+        workdir=Path("workdir"),
+        tenant=tenant,
+        validator="10.9.12.26"
+    )
 ```
 
 `migration_workflow` performs multi-step migration procedure according to [Migrate Single-Tenant Cisco SD-WAN Overlay to Multitenant Cisco SD-WAN Deployment](https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/system-interface/vedge-20-x/systems-interfaces-book/sdwan-multitenancy.html#concept_sjj_jmm_z4b)
