@@ -78,6 +78,7 @@ from vmngclient.endpoints.sdavc_cloud_connector import SDAVCCloudConnector
 from vmngclient.endpoints.tenant_backup_restore import TenantBackupRestore
 from vmngclient.endpoints.tenant_management import TenantManagement
 from vmngclient.endpoints.tenant_migration import TenantMigration
+from vmngclient.endpoints.troubleshooting_tools.device_connectivity import TroubleshootingToolsDeviceConnectivity
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -135,6 +136,11 @@ class ConfigurationContainer:
         self.policy = ConfigurationPolicyContainer(session)
 
 
+class TroubleshootingToolsContainer:
+    def __init__(self, session: vManageSession):
+        self.device_connectivity = TroubleshootingToolsDeviceConnectivity(session)
+
+
 class APIEndpointContainter:
     def __init__(self, session: vManageSession):
         self.administration_user_and_group = AdministrationUserAndGroup(session)
@@ -157,3 +163,4 @@ class APIEndpointContainter:
         self.configuration_group = ConfigurationGroup(session)
         self.sd_routing_configuration_feature_profile = SDRoutingConfigurationFeatureProfile(session)
         self.configuration_device_inventory = ConfigurationDeviceInventory(session)
+        self.troubleshooting_tools = TroubleshootingToolsContainer(session)

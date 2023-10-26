@@ -117,6 +117,12 @@ class APIEndpointError(vManageClientError):
     pass
 
 
+class TenantMigrationExportFileNotFound(vManageClientError):
+    """Raised when client cannot find exported file name in export task result"""
+
+    pass
+
+
 class TenantMigrationPreconditionsError(vManageClientError):
     """Raised when preconditions for tenant migration fail"""
 

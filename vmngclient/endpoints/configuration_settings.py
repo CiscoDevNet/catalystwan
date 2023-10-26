@@ -43,9 +43,9 @@ class Organization(BaseModel):
     class Config:
         allow_population_by_field_name = True
 
-    domain_id: str = Field(alias="domain-id")
     org: str
-    control_connection_up: bool = Field(alias="controlConnectionUp")
+    domain_id: Optional[str] = Field(alias="domain-id")
+    control_connection_up: Optional[bool] = Field(alias="controlConnectionUp")
 
 
 class Device(BaseModel):

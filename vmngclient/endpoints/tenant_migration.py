@@ -1,12 +1,11 @@
 # mypy: disable-error-code="empty-body"
-from io import BufferedReader
 from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit
 
 from pydantic import BaseModel, Field
 
 from vmngclient.endpoints import APIEndpoints, CustomPayloadType, PreparedPayload, get, post, versions, view
-from vmngclient.model.tenant import Tenant
+from vmngclient.model.tenant import TenantExport
 from vmngclient.utils.session_type import ProviderView, SingleTenantView
 
 
@@ -37,31 +36,35 @@ class MigrationInfo(BaseModel):
 
 
 class MigrationFile(CustomPayloadType):
-    def __init__(self, data: BufferedReader):
-        self.payload = PreparedPayload(files={"file": (Path(data.name).name, data)})
+    def __init__(self, filename: Path):
+        self.filename = filename
 
     def prepared(self) -> PreparedPayload:
-        return self.payload
+        data = open(self.filename, "rb")
+        return PreparedPayload(files={"file": (Path(data.name).name, data)})
 
 
 class TenantMigration(APIEndpoints):
     @view({SingleTenantView, ProviderView})
+    @versions(">=20.6")
     @get("/tenantmigration/download/{path}")
     def download_tenant_data(self, path: str = "default.tar.gz") -> bytes:
         ...
 
     @view({SingleTenantView, ProviderView})
+    @versions(">=20.6")
     @post("/tenantmigration/export")
-    def export_tenant_data(self, payload: Tenant) -> ExportInfo:
+    def export_tenant_data(self, payload: TenantExport) -> ExportInfo:
         ...
 
     @view({SingleTenantView, ProviderView})
+    @versions(">=20.6")
     @get("/tenantmigration/migrationToken")
     def get_migration_token(self, params: MigrationTokenQueryParams) -> str:
         ...
 
     @view({SingleTenantView, ProviderView})
-    @versions("<20.13")
+    @versions(">=20.6,<20.13")
     @post("/tenantmigration/import")
     def import_tenant_data(self, payload: MigrationFile) -> ImportInfo:
         ...
@@ -73,6 +76,7 @@ class TenantMigration(APIEndpoints):
         ...
 
     @view({SingleTenantView, ProviderView})
+    @versions(">=20.6")
     @post("/tenantmigration/networkMigration")
     def migrate_network(self, payload: str) -> MigrationInfo:
         ...

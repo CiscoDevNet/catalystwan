@@ -24,13 +24,13 @@ Method decorated with @request has no body, as decorator constructs and sends re
 >>>
 To send request instantiate API with logged vManageSession:
 >>> api = TenantManagementAPI(session)
->>> api.delete_tenant_async_bulk(TenantBulkDeleteRequest(password="p4s$w0rD", tenantIdList=["TNT00005"]))
+>>> api.delete_tenant_async_bulk(TenantBulkDeleteRequest(password="", tenantIdList=["TNT00005"]))
 """
 from __future__ import annotations
 
 import json
 import logging
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass, fields
 from inspect import _empty, isclass, signature
 from io import BufferedReader
 from string import Formatter
@@ -127,6 +127,14 @@ class PreparedPayload:
     data: Union[str, bytes, None] = None
     headers: Optional[Mapping[str, Any]] = None
     files: Optional[Dict[str, Tuple[str, BufferedReader]]] = None
+
+    def asdict(self) -> Dict[str, Any]:
+        """Needed because python builtin does deepcopy of objects (it is impossible for BufferedReader)"""
+        result = {}
+        for f in fields(self):
+            if value := getattr(self, f.name):
+                result[f.name] = value
+        return result
 
 
 class APIEndpointClientResponse(Protocol):
@@ -246,12 +254,7 @@ class APIEndpoints:
         """Prepares and sends request using client protocol"""
         _kwargs = dict(kwargs)
         if payload is not None:
-            _kwargs.update(
-                asdict(
-                    self._prepare_payload(payload, force_json_payload),
-                    dict_factory=lambda x: {k: v for (k, v) in x if v is not None},
-                )
-            )  # optional fields set to None will not be inserted to _kwargs
+            _kwargs.update(self._prepare_payload(payload, force_json_payload).asdict())
         if params is not None:
             _kwargs.update({"params": self._prepare_params(params)})
         return self._client.request(method, self._basepath + url, **_kwargs)
