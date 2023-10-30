@@ -8,7 +8,7 @@ from packaging.version import Version  # type: ignore
 from vmngclient.api.task_status_api import Task
 from vmngclient.api.tenant_migration_api import ImportTask, TenantMigrationAPI
 from vmngclient.endpoints.tenant_migration import ImportInfo, MigrationInfo
-from vmngclient.model.tenant import MigrationTenant, Tenant
+from vmngclient.model.tenant import Tenant, TenantExport
 
 
 class TestTenantMigrationAPI(unittest.TestCase):
@@ -23,8 +23,7 @@ class TestTenantMigrationAPI(unittest.TestCase):
         self.assertIsInstance(task, Task)
 
     def test_export_migration_tenant(self):
-        tenant = MigrationTenant(
-            desc="Test Tenant",
+        tenant = TenantExport(
             name="test_tenant",
             subdomain="test_subdomain",
             org_name="test_org",
