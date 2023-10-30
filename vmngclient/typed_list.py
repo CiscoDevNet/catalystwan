@@ -163,9 +163,9 @@ class DataSequence(TypedList[T], Generic[T]):
         pretty_message = ""
         for element in self:
             if issubclass(element.__class__, BaseModel):
-                pprint = "\n".join(f"    {attr[0]}: {attr[1]}," for attr in element.dict().items())  # type: ignore
+                pprint = "\n".join(f"    {attr[0]}: {attr[1]}, " for attr in element.dict().items())  # type: ignore
             else:
-                pprint = "\n".join(f"    {attr[0]}: {attr[1]}," for attr in asdict(element).items())  # type: ignore
+                pprint = "\n".join(f"    {attr[0]}: {attr[1]}, " for attr in asdict(element).items())  # type: ignore
 
             pretty_message += f"\n{element.__class__.__name__}(\n" + pprint + "\n)"  # type: ignore
         return pretty_message
