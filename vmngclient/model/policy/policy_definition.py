@@ -301,7 +301,7 @@ class PolicyDefinitionHeader(BaseModel):
         regex="^[a-zA-Z0-9_-]{1,128}$",
         description="Can include only alpha-numeric characters, hyphen '-' or underscore '_'; maximum 128 characters",
     )
-    description: str
+    description: str = "default description"
     type: str
     mode: Optional[str] = None
     optimized: Optional[Optimized] = Optimized.FALSE
