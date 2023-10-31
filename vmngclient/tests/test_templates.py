@@ -140,7 +140,7 @@ class TestTemplatesAPI(unittest.TestCase):
                 "cli_id",
             ),
             (
-                CiscoAAAModel(
+                CiscoAAAModel(  # type: ignore
                     template_name="test_aaa_model",
                     template_description="test_aaa_description",
                 ),
@@ -199,7 +199,7 @@ class TestTemplatesAPI(unittest.TestCase):
                         template_description="test_cli_description",
                         device_model=DeviceModel.VBOND,
                     ),
-                    CiscoAAAModel(
+                    CiscoAAAModel(  # type: ignore
                         template_name="test_aaa_model",
                         template_description="test_aaa_description",
                     ),
