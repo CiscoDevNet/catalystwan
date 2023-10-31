@@ -247,9 +247,9 @@
                             "vipValue": "prefixv4"
                         },                    
                         "priority-order": [
+                            "prefix",
                             "next-hop",
-                            "next-hop-with-track",
-                            "prefix"
+                            "next-hop-with-track"                            
                         ],
                         "next-hop": {
                             "vipObjectType": "tree",
