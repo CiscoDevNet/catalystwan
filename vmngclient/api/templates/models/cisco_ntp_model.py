@@ -12,11 +12,11 @@ class Server(ConvertBoolToStringModel):
         allow_population_by_field_name = True
 
     name: str
-    key: Optional[int] = Field(default=None)
-    vpn: Optional[int] = Field(default=0)
-    version: Optional[int] = Field(default=4)
+    key: Optional[int]
+    vpn: Optional[int]
+    version: Optional[int]
     source_interface: Optional[str] = Field(vmanage_key="source-interface", default=None)
-    prefer: Optional[bool] = Field(default=False)
+    prefer: Optional[bool]
 
 
 class Authentication(BaseModel):
@@ -33,11 +33,11 @@ class CiscoNTPModel(FeatureTemplate, ConvertBoolToStringModel):
         allow_population_by_field_name = True
 
     server: List[Server] = Field(default=[])
-    authentication: List[Authentication] = Field(default=[], data_path=["keys"])
-    trusted: List[int] = Field(default=[], data_path=["keys"])
-    enable: Optional[bool] = Field(default=False, data_path=["master"])
-    stratum: Optional[int] = Field(default=None, data_path=["master"])
-    source: Optional[str] = Field(default=None, data_path=["master"])
+    authentication: Optional[List[Authentication]] = Field(data_path=["keys"])
+    trusted: Optional[List[int]] = Field(data_path=["keys"])
+    enable: Optional[bool] = Field(data_path=["master"])
+    stratum: Optional[int] = Field(data_path=["master"])
+    source: Optional[str] = Field(data_path=["master"])
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_ntp"
