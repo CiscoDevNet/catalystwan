@@ -130,3 +130,6 @@ dmypy.json
 
 # Poetry lock
 poetry.lock
+
+# Garzum
+garzum/
