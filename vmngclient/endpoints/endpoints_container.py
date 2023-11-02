@@ -66,7 +66,7 @@ if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
 
-class ConfigurationPolicyListBuilderContainer:
+class ConfigurationPolicyListContainer:
     def __init__(self, session: vManageSession):
         self.app = ConfigurationPolicyApplicationList(session)
         self.app_probe = ConfigurationPolicyAppProbeClassList(session)
@@ -98,7 +98,7 @@ class ConfigurationPolicyListBuilderContainer:
         self.zone = ConfigurationPolicyZoneList(session)
 
 
-class ConfigurationPolicyDefinitionBuilderContainer:
+class ConfigurationPolicyDefinitionContainer:
     def __init__(self, session: vManageSession):
         self.data = ConfigurationPolicyDataDefinition(session)
         self.rule_set = ConfigurationPolicyRuleSetDefinition(session)
@@ -108,8 +108,8 @@ class ConfigurationPolicyDefinitionBuilderContainer:
 
 class ConfigurationPolicyContainer:
     def __init__(self, session: vManageSession):
-        self.list = ConfigurationPolicyListBuilderContainer(session)
-        self.definition = ConfigurationPolicyDefinitionBuilderContainer(session)
+        self.list = ConfigurationPolicyListContainer(session)
+        self.definition = ConfigurationPolicyDefinitionContainer(session)
         self.vsmart_template = ConfigurationVSmartTemplatePolicy(session)
 
 
