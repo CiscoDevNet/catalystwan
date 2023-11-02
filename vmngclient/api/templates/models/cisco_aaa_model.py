@@ -9,10 +9,10 @@ from vmngclient.api.templates.feature_template import FeatureTemplate
 
 class User(BaseModel):
     name: str
-    password: str
-    secret: str
+    password: Optional[str]
+    secret: Optional[str]
     privilege: Optional[str]
-    pubkey_chain: Optional[List[str]] = Field(default=None, vmanage_key="pubkey-chain")
+    pubkey_chain: List[str] = Field(default=[], vmanage_key="pubkey-chain", vip_type="ignore")
 
 
 class RadiusServer(BaseModel):
@@ -74,7 +74,7 @@ class CiscoAAAModel(FeatureTemplate):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    user: List[User] = []
+    user: Optional[List[User]]
     authentication_group: bool = Field(vmanage_key="authentication_group", default=False)
     accounting_group: bool = True
     radius: Optional[List[RadiusGroup]] = None

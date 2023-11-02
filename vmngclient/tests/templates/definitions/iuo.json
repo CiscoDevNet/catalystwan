@@ -37,6 +37,12 @@
                         "vipObjectType": "object",
                         "vipType": "constant",
                         "vipValue": "15"
+                    },
+                    "pubkey-chain": {
+                        "vipObjectType": "tree",
+                        "vipPrimaryKey": ["key-string"],
+                        "vipType": "ignore",
+                        "vipValue": []
                     }
                 },
                 {
@@ -59,6 +65,12 @@
                         "vipObjectType": "object",
                         "vipType": "constant",
                         "vipValue": "14"
+                    },
+                    "pubkey-chain": {
+                        "vipObjectType": "tree",
+                        "vipPrimaryKey": ["key-string"],
+                        "vipType": "ignore",
+                        "vipValue": []
                     }
                 }
             ],

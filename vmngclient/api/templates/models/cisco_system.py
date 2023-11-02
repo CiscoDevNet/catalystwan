@@ -133,7 +133,7 @@ class CiscoSystemModel(FeatureTemplate, ConvertBoolToStringModel):
     latitude: Optional[float] = Field(data_path=["gps-location"])
     longitude: Optional[float] = Field(data_path=["gps-location"])
     range: Optional[int] = Field(100, data_path=["gps-location", "geo-fencing"])
-    enable_fencing: Optional[bool] = Field(False, data_path=["gps-location", "geo-fencing"], vmanage_key="enable")
+    enable_fencing: Optional[bool] = Field(data_path=["gps-location", "geo-fencing"], vmanage_key="enable")
     mobile_number: Optional[List[MobileNumber]] = Field(
         vmanage_key="mobile-number", data_path=["gps-location", "geo-fencing", "sms"]
     )
@@ -141,20 +141,20 @@ class CiscoSystemModel(FeatureTemplate, ConvertBoolToStringModel):
     device_groups: Optional[List[str]] = Field(vmanage_key="device-groups")
     controller_group_list: Optional[List[int]] = Field(vmanage_key="controller-group-list")
     system_ip: DeviceVariable = Field(default=DeviceVariable(name="system_system_ip"), vmanage_key="system-ip")
-    overlay_id: Optional[int] = Field(1, vmanage_key="overlay-id")
+    overlay_id: Optional[int] = Field(vmanage_key="overlay-id")
     site_id: int = Field(default=DeviceVariable(name="system_site_id"), vmanage_key="site-id")
     site_type: Optional[List[SiteType]] = Field(vmanage_key="site-type")
     port_offset: Optional[int] = Field(vmanage_key="port-offset")
-    port_hop: Optional[bool] = Field(True, vmanage_key="port-hop")
-    control_session_pps: Optional[int] = Field(300, vmanage_key="control-session-pps")
-    track_transport: Optional[bool] = Field(True, vmanage_key="track-transport")
+    port_hop: Optional[bool] = Field(vmanage_key="port-hop")
+    control_session_pps: Optional[int] = Field(vmanage_key="control-session-pps")
+    track_transport: Optional[bool] = Field(vmanage_key="track-transport")
     track_interface_tag: Optional[int] = Field(vmanage_key="track-interface-tag")
     console_baud_rate: Optional[ConsoleBaudRate] = Field(vmanage_key="console-baud-rate")
     max_omp_sessions: Optional[int] = Field(vmanage_key="max-omp-sessions")
     multi_tenant: Optional[bool] = Field(vmanage_key="multi-tenant")
-    track_default_gateway: Optional[bool] = Field(True, vmanage_key="track-default-gateway")
+    track_default_gateway: Optional[bool] = Field(vmanage_key="track-default-gateway")
     admin_tech_on_failure: Optional[bool] = Field(vmanage_key="admin-tech-on-failure")
-    enable_tunnel: Optional[bool] = Field(False, vmanage_key="enable", data_path=["on-demand"])
+    enable_tunnel: Optional[bool] = Field(vmanage_key="enable", data_path=["on-demand"])
     idle_timeout: Optional[int] = Field(vmanage_key="idle-timeout")
     on_demand_idle_timeout_min: Optional[int] = Field(vmanage_key="idle-timeout", data_path=["on-demand"])
     tracker: Optional[List[Tracker]]
@@ -172,7 +172,7 @@ class CiscoSystemModel(FeatureTemplate, ConvertBoolToStringModel):
     enable_management_region: Optional[bool] = Field(vmanage_key="enable-management-region")
     vrf: Optional[List[Vrf]]
     management_gateway: Optional[bool] = Field(vmanage_key="management-gateway")
-    epfr: Optional[Epfr] = Epfr.DISABLED
+    epfr: Optional[Epfr]
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_system"

@@ -86,7 +86,9 @@ class FeatureTemplateField(BaseModel):
         return output
 
     # value must be JSON serializable, return JSON serializable dict
-    def payload_scheme(self, value: Any = None, help=None, current_path=None, priority_order=None) -> dict:
+    def payload_scheme(
+        self, value: Any = None, help=None, current_path=None, priority_order=None, vip_type=None
+    ) -> dict:
         output: dict = {}
         rel_output: dict = {}
         rel_output.update(get_path_dict([self.dataPath]))
@@ -111,7 +113,7 @@ class FeatureTemplateField(BaseModel):
 
         else:
             if value is not None:
-                output["vipType"] = FeatureTemplateOptionType.CONSTANT.value
+                output["vipType"] = vip_type or FeatureTemplateOptionType.CONSTANT.value
                 if self.children:
                     children_output = []
 
@@ -130,9 +132,14 @@ class FeatureTemplateField(BaseModel):
                             )
                             obj_value = getattr(obj, model_field.name)
                             po = model_field.field_info.extra.get("priority_order")
+                            vip_type = model_field.field_info.extra.get("vip_type")
                             child_payload.update(
                                 child.payload_scheme(
-                                    obj_value, help=output, current_path=self.dataPath + [self.key], priority_order=po
+                                    obj_value,
+                                    help=output,
+                                    current_path=self.dataPath + [self.key],
+                                    priority_order=po,
+                                    vip_type=vip_type,
                                 )
                             )
                             if priority_order:

@@ -69,7 +69,7 @@ class Target(BaseModel):
     ip: str
     port: int
     community_name: str = Field(vmanage_key="community-name")
-    user: str
+    user: Optional[str]
     source_interface: str = Field(vmanage_key="source-interface")
 
     class Config:

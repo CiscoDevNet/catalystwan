@@ -7,9 +7,6 @@ from pydantic import Field
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel
 
-DEFAULT_LOGGING_SIZE = 10
-DEFAULT_LOGGING_ROTATE = 10
-
 
 class Version(str, Enum):
     TLSV11 = "TLSv1.1"
@@ -73,10 +70,10 @@ class CiscoLoggingModel(FeatureTemplate, ConvertBoolToStringModel):
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
 
-    enable: Optional[bool] = Field(True, data_path=["disk"])
-    size: Optional[int] = Field(DEFAULT_LOGGING_SIZE, data_path=["disk", "file"])
-    rotate: Optional[int] = Field(DEFAULT_LOGGING_ROTATE, data_path=["disk", "file"])
-    tls_profile: List[TlsProfile] = Field(vmanage_key="tls-profile")
+    enable: Optional[bool] = Field(data_path=["disk"])
+    size: Optional[int] = Field(data_path=["disk", "file"])
+    rotate: Optional[int] = Field(data_path=["disk", "file"])
+    tls_profile: Optional[List[TlsProfile]] = Field(vmanage_key="tls-profile")
     server: Optional[List[Server]]
     ipv6_server: Optional[List[Ipv6Server]] = Field(vmanage_key="ipv6-server")
 

@@ -404,7 +404,7 @@ class CiscoVPNModel(FeatureTemplate):
     service: Optional[List[Service]]
     service_route: Optional[List[ServiceRoute]] = Field(data_path=["ip"], vmanage_key="service-route")
     route_v4: Optional[List[Routev4]] = Field(
-        data_path=["ip"], vmanage_key="route", priority_order=["next-hop", "next-hop-with-track", "prefix"]
+        data_path=["ip"], vmanage_key="route", priority_order=["prefix", "next-hop", "next-hop-with-track"]
     )
     route_v6: Optional[List[Routev6]] = Field(data_path=["ipv6"], vmanage_key="route")
     gre_route: Optional[List[GreRoute]] = Field(data_path=["ip"], vmanage_key="gre-route")
