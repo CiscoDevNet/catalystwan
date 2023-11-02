@@ -31,7 +31,7 @@ class PolicyListPreview(BaseModel):
     preview: str
 
 
-class PolicyListBuilder(Protocol):
+class PolicyListEndpoints(Protocol):
     def create_policy_list(self, payload: PolicyList) -> PolicyListId:
         ...
 

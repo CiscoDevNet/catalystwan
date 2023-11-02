@@ -341,7 +341,7 @@ class PolicyDefinitionPreview(BaseModel):
     preview: str
 
 
-class PolicyDefinitionBuilder(Protocol):
+class PolicyDefinitionEndpoints(Protocol):
     def create_policy_definition(self, payload: BaseModel) -> PolicyDefinitionId:
         ...
 
