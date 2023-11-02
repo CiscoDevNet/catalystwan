@@ -155,8 +155,8 @@ class Neighbor(BaseModel):
     address: str
     description: Optional[str]
     shutdown: Optional[bool]
-    remote_as: str = Field(vmanage_key="remote-as")
-    keepalive: int = Field(data_path=["timers"])
+    remote_as: int = Field(vmanage_key="remote-as")
+    keepalive: Optional[int] = Field(data_path=["timers"])
     holdtime: Optional[int] = Field(data_path=["timers"])
     if_name: Optional[str] = Field(data_path=["update-source"], vmanage_key="if-name")
     next_hop_self: Optional[bool] = Field(vmanage_key="next-hop-self")
@@ -249,12 +249,8 @@ class CiscoBGPModel(FeatureTemplate):
     router_id: Optional[str] = Field(data_path=["bgp"], vmanage_key="router-id")
     propagate_aspath: Optional[bool] = Field(data_path=["bgp"], vmanage_key="propagate-aspath")
     propagate_community: Optional[bool] = Field(data_path=["bgp"], vmanage_key="propagate-community")
-    route_target_ipv4: Optional[List[RouteTargetIpv4]] = Field(
-        data_path=["bgp", "target"], vmanage_key="route-target-ipv4"
-    )
-    route_target_ipv6: Optional[List[RouteTargetIpv6]] = Field(
-        data_path=["bgp", "target"], vmanage_key="route-target-ipv6"
-    )
+    route_target_ipv4: List[RouteTargetIpv4] = Field([], data_path=["bgp", "target"], vmanage_key="route-target-ipv4")
+    route_target_ipv6: List[RouteTargetIpv6] = Field([], data_path=["bgp", "target"], vmanage_key="route-target-ipv6")
     mpls_interface: Optional[List[MplsInterface]] = Field(data_path=["bgp"], vmanage_key="mpls-interface")
     external: Optional[int] = Field(data_path=["bgp", "distance"])
     internal: Optional[int] = Field(data_path=["bgp", "distance"])
