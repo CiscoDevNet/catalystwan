@@ -1,55 +1,10 @@
 # mypy: disable-error-code="empty-body"
-from typing import List, Optional
-
-from pydantic import BaseModel, Field, IPvAnyAddress, validator
+from pydantic import BaseModel, Field, IPvAnyAddress
 
 from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.policy import (
-    AssemblyItem,
-    PolicyCreationPayload,
-    PolicyDefinition,
-    PolicyEditPayload,
-    PolicyId,
-    PolicyInfo,
-)
+from vmngclient.model.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
+from vmngclient.model.policy.policy import PolicyId
 from vmngclient.typed_list import DataSequence
-
-
-class Entry(BaseModel):
-    site_lists: Optional[List[str]] = Field(alias="siteLists")
-    vpn_lists: Optional[List[str]] = Field(None, alias="vpnLists")
-    direction: Optional[str] = None
-
-
-class VSmartAssemblyItem(AssemblyItem):
-    entries: Optional[List[Entry]] = None
-
-
-class VSmartPolicyDefinition(PolicyDefinition):
-    assembly: List[AssemblyItem]
-    region_role_assembly: List = Field(alias="regionRoleAssembly")
-
-
-class VSmartTemplate(PolicyCreationPayload):
-    policy_definition: VSmartPolicyDefinition = Field(alias="policyDefinition")
-
-    @validator("policy_definition", pre=True)
-    def try_parse(cls, policy_definition):
-        # this is needed because GET /template/policy/vsmart contains string in policyDefinition field
-        # while POST /template/policy/vsmart requires a regular object
-        # it makes sense to reuse that model for both requests and present parsed data to the user
-        if isinstance(policy_definition, str):
-            return VSmartPolicyDefinition.parse_raw(policy_definition)
-        return policy_definition
-
-
-class VSmartTemplateEditPayload(PolicyEditPayload, VSmartTemplate):
-    rid: Optional[str] = Field(default=None, alias="@rid")
-    pass
-
-
-class VSmartTemplateInfo(PolicyInfo, VSmartTemplateEditPayload):
-    pass
 
 
 class VSmartConnectivityStatus(BaseModel):
@@ -84,7 +39,7 @@ class ConfigurationVSmartTemplatePolicy(APIEndpoints):
         ...
 
     @post("/template/policy/vsmart")
-    def create_vsmart_template(self, payload: VSmartTemplate) -> PolicyId:
+    def create_vsmart_template(self, payload: CentralizedPolicy) -> PolicyId:
         ...
 
     @post("/template/policy/vsmart/deactivate/{id}")
@@ -98,19 +53,19 @@ class ConfigurationVSmartTemplatePolicy(APIEndpoints):
         ...
 
     @put("/template/policy/vsmart/central/{id}")
-    def edit_template_without_lock_checks(self, id: str, payload: VSmartTemplateEditPayload) -> JSON:
+    def edit_template_without_lock_checks(self, id: str, payload: CentralizedPolicyEditPayload) -> JSON:
         ...
 
     @put("/template/policy/vsmart/{id}")
-    def edit_vsmart_template(self, id: str, payload: VSmartTemplateEditPayload) -> JSON:
+    def edit_vsmart_template(self, id: str, payload: CentralizedPolicyEditPayload) -> JSON:
         ...
 
     @get("/template/policy/vsmart", "data")
-    def generate_vsmart_policy_template_list(self) -> DataSequence[VSmartTemplateInfo]:
+    def generate_vsmart_policy_template_list(self) -> DataSequence[CentralizedPolicyInfo]:
         ...
 
     @get("/template/policy/vsmart/definition/{id}")
-    def get_template_by_policy_id(self, id: str) -> VSmartTemplate:
+    def get_template_by_policy_id(self, id: str) -> CentralizedPolicy:
         ...
 
     def qosmos_nbar_migration_warning(self):
