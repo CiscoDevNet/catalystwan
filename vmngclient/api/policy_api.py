@@ -174,7 +174,7 @@ POLICY_DEFINITION_ENDPOINTS_MAP: Mapping[type, type] = {
 SupportedPolicyDefinitions = Union[RuleSet, SecurityGroup, ZoneBasedFWPolicy, DataPolicy]
 
 
-class PolicyBuilder:
+class PolicyAPI:
     def __init__(self, session: vManageSession):
         self.session = session
 

@@ -21,7 +21,7 @@ from vmngclient.api.logs_api import LogsAPI
 from vmngclient.api.omp_api import OmpAPI
 from vmngclient.api.packet_capture_api import PacketCaptureAPI
 from vmngclient.api.partition_manager_api import PartitionManagerAPI
-from vmngclient.api.policy_builder import PolicyBuilder
+from vmngclient.api.policy_api import PolicyAPI
 from vmngclient.api.resource_pool_api import ResourcePoolAPI
 from vmngclient.api.software_action_api import SoftwareActionAPI
 from vmngclient.api.speedtest_api import SpeedtestAPI
@@ -62,5 +62,5 @@ class APIContainer:
         self.user_groups = UserGroupsAPI(session)
         self.resource_groups = ResourceGroupsAPI(session)
         self.sessions = SessionsAPI(session)
-        self.policy_builder = PolicyBuilder(session)
+        self.policy = PolicyAPI(session)
         self.sd_routing_feature_profiles = SDRoutingFeatureProfilesAPI(session)
