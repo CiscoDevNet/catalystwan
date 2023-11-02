@@ -105,7 +105,7 @@ class AddressFamily(BaseModel):
     ipv6_aggregate_address: Optional[List[Ipv6AggregateAddress]] = Field(vmanage_key="ipv6-aggregate-address")
     network: Optional[List[Network]]
     ipv6_network: Optional[List[Ipv6Network]] = Field(vmanage_key="ipv6-network")
-    paths: int = Field(data_path=["maximum-paths"])
+    paths: Optional[int] = Field(data_path=["maximum-paths"])
     originate: Optional[bool] = Field(data_path=["default-information"])
     policy_name: Optional[str] = Field(data_path=["table-map"], vmanage_key="name")
     filter: Optional[bool] = Field(data_path=["table-map"])
