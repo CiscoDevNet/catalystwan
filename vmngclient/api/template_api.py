@@ -689,3 +689,19 @@ class TemplatesAPI:
         text_config = self.session.endpoints.configuration_device_template.get_device_configuration_preview(payload)
 
         return CiscoConfParse(text_config.splitlines())
+
+    def load_running(self, device: Device) -> CiscoConfParse:
+        """Load running config from device.
+
+        Args:
+            device: The device from which load config.
+
+        Returns:
+            CiscoConfParse: A working configuration on the machine.
+        """
+        encoded_uuid = device.uuid.replace("/", "%2F")
+        endpoint = f"/dataservice/template/config/running/{encoded_uuid}"
+        response = self.session.get_json(endpoint)
+        config = CiscoConfParse(response["config"].splitlines())
+        logger.debug(f"Template loaded from {device.hostname}.")
+        return config
