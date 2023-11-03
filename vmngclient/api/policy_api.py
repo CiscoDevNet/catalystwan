@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Mapping, Optional, Type, Union, overload
 
+from vmngclient.api.task_status_api import Task
 from vmngclient.endpoints.configuration.policy.definition.data import (
     ConfigurationPolicyDataDefinition,
     DataPolicy,
@@ -87,6 +88,11 @@ from vmngclient.endpoints.configuration.policy.list.url_white_list import (
 )
 from vmngclient.endpoints.configuration.policy.list.vpn import ConfigurationPolicyVPNList, VPNListInfo
 from vmngclient.endpoints.configuration.policy.list.zone import ConfigurationPolicyZoneList, ZoneListInfo
+from vmngclient.endpoints.configuration.policy.vsmart_template import (
+    ConfigurationVSmartTemplatePolicy,
+    VSmartConnectivityStatus,
+)
+from vmngclient.model.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
 from vmngclient.model.policy.definitions.rule_set import RuleSet
 from vmngclient.model.policy.definitions.security_group import SecurityGroup
 from vmngclient.model.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy
@@ -174,15 +180,56 @@ POLICY_DEFINITION_ENDPOINTS_MAP: Mapping[type, type] = {
 SupportedPolicyDefinitions = Union[RuleSet, SecurityGroup, ZoneBasedFWPolicy, DataPolicy]
 
 
+class CentralizedPolicyAPI:
+    def __init__(self, session: vManageSession):
+        self._session = session
+        self._endpoints = ConfigurationVSmartTemplatePolicy(session)
+
+    def activate(self, id: str) -> Task:
+        task_id = self._endpoints.activate_policy(id).id
+        return Task(self._session, task_id)
+
+    def deactivate(self, id: str) -> Task:
+        task_id = self._endpoints.deactivate_policy(id).id
+        return Task(self._session, task_id)
+
+    def create(self, policy: CentralizedPolicy) -> str:
+        return self._endpoints.create_vsmart_template(policy).policy_id
+
+    def edit(self, policy: CentralizedPolicyEditPayload, lock_checks: bool = True) -> None:
+        if lock_checks:
+            self._endpoints.edit_vsmart_template(policy.policy_id, policy)
+        self._endpoints.edit_template_without_lock_checks(policy.policy_id, policy)
+
+    def delete(self, id: str) -> None:
+        self._endpoints.delete_vsmart_template(id)
+
+    @overload
+    def get(self) -> DataSequence[CentralizedPolicyInfo]:
+        ...
+
+    @overload
+    def get(self, id: str) -> CentralizedPolicy:
+        ...
+
+    def get(self, id: Optional[str] = None) -> Any:
+        if id is not None:
+            return self._endpoints.get_template_by_policy_id(id)
+        return self._endpoints.generate_vsmart_policy_template_list()
+
+    def check_vsmart_connectivity(self) -> DataSequence[VSmartConnectivityStatus]:
+        return self._endpoints.check_vsmart_connectivity_status()
+
+
 class PolicyListsAPI:
     def __init__(self, session: vManageSession):
-        self.session = session
+        self._session = session
 
     def __get_list_endpoints_instance(self, payload_type: type) -> PolicyListEndpoints:
         endpoints_class = POLICY_LIST_ENDPOINTS_MAP.get(payload_type)
         if endpoints_class is None:
             raise TypeError(f"Unsupported policy list type: {payload_type}")
-        return endpoints_class(self.session)
+        return endpoints_class(self._session)
 
     def create(self, policy_list: AllPolicyLists) -> str:
         endpoints = self.__get_list_endpoints_instance(type(policy_list))
@@ -431,13 +478,13 @@ class PolicyListsAPI:
 
 class PolicyDefinitionsAPI:
     def __init__(self, session: vManageSession):
-        self.session = session
+        self._session = session
 
     def __get_definition_endpoints_instance(self, payload_type: type) -> PolicyDefinitionEndpoints:
         endpoints_class = POLICY_DEFINITION_ENDPOINTS_MAP.get(payload_type)
         if endpoints_class is None:
             raise TypeError(f"Unsupported policy definition type: {payload_type}")
-        return endpoints_class(self.session)
+        return endpoints_class(self._session)
 
     def create(self, policy_definition: SupportedPolicyDefinitions) -> str:
         endpoints = self.__get_definition_endpoints_instance(type(policy_definition))
@@ -494,6 +541,7 @@ class PolicyDefinitionsAPI:
 
 class PolicyAPI:
     def __init__(self, session: vManageSession):
-        self.session = session
+        self._session = session
+        self.centralized = CentralizedPolicyAPI(session)
         self.definitions = PolicyDefinitionsAPI(session)
         self.lists = PolicyListsAPI(session)
