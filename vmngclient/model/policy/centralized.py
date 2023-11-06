@@ -23,6 +23,7 @@ class CentralizedPolicyAssemblyItem(AssemblyItem):
 
 class CentralizedPolicyDefinition(PolicyDefinition):
     region_role_assembly: List = Field(alias="regionRoleAssembly")
+    assembly: List[CentralizedPolicyAssemblyItem]
 
 
 class CentralizedPolicy(PolicyCreationPayload):

@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Sequence
 
 from pydantic import BaseModel, Field
 
@@ -15,7 +15,7 @@ class AssemblyItem(BaseModel):
 
 
 class PolicyDefinition(BaseModel):
-    assembly: List[AssemblyItem]
+    assembly: Sequence[AssemblyItem]
 
 
 class PolicyCreationPayload(BaseModel):
