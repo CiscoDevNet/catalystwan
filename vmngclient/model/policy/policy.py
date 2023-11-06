@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, List, Optional, Sequence
+from typing import Sequence
 
 from pydantic import BaseModel, Field
 
@@ -11,7 +11,6 @@ class PolicyId(BaseModel):
 class AssemblyItem(BaseModel):
     definition_id: str = Field(alias="definitionId")
     type: str
-    entries: Optional[List[Any]] = []
 
 
 class PolicyDefinition(BaseModel):
