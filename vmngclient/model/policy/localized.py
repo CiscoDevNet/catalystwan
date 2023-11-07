@@ -52,19 +52,19 @@ class LocalizedPolicy(PolicyCreationPayload):
     def add_vpn_qos_map(self, definition_id: str) -> None:
         self._add_item("vpnQosMap", definition_id)
 
-    def add_acl(self, definition_id: str) -> None:
+    def add_access_control_list(self, definition_id: str) -> None:
         self._add_item("acl", definition_id)
 
-    def add_acl_v6(self, definition_id: str) -> None:
+    def add_access_control_list_ipv6(self, definition_id: str) -> None:
         self._add_item("aclv6", definition_id)
 
     def add_device_access_policy(self, definition_id: str) -> None:
         self._add_item("deviceAccessPolicy", definition_id)
 
-    def add_device_access_policy_v6(self, definition_id: str) -> None:
+    def add_device_access_policy_ipv6(self, definition_id: str) -> None:
         self._add_item("deviceAccessPolicyv6", definition_id)
 
-    def add_vedge_route(self, definition_id: str) -> None:
+    def add_route_policy(self, definition_id: str) -> None:
         self._add_item("vedgeRoute", definition_id)
 
     @validator("policy_definition", pre=True)
