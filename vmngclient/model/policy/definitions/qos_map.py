@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field, root_validator, validator
 
@@ -56,11 +56,12 @@ class QoSScheduler(BaseModel):
         return percent_str
 
     @validator("burst")
-    def check_burst(cls, burst_str: str):
-        burst = int(burst_str)
-        if burst < 5000 or burst > 10_000_000:
-            raise ValueError("burst should be in range 5000-10000000")
-        return burst_str
+    def check_burst(cls, burst_val: Union[str, None]):
+        if burst_val is not None:
+            burst = int(burst_val)
+            if burst < 5000 or burst > 10_000_000:
+                raise ValueError("burst should be in range 5000-10000000")
+        return burst_val
 
 
 class QoSMapDefinition(BaseModel):
@@ -74,8 +75,30 @@ class QoSMap(PolicyDefinitionHeader):
     type: str = Field(default="qosMap", const=True)
     definition: QoSMapDefinition = QoSMapDefinition(qosSchedulers=[])
 
-    def add_scheduler(self, scheduler: QoSScheduler) -> None:
-        self.definition.qos_schedulers.append(scheduler)
+    class Config:
+        allow_population_by_field_name = True
+
+    def add_scheduler(
+        self,
+        queue: int,
+        class_map_ref: str,
+        bandwidth: int = 1,
+        buffer: int = 1,
+        scheduling: QoSSchedulingEnum = QoSSchedulingEnum.WRR,
+        drops: QoSDropEnum = QoSDropEnum.TAIL,
+        burst: Optional[int] = None,
+    ) -> None:
+        self.definition.qos_schedulers.append(
+            QoSScheduler(  # type: ignore[call-arg]
+                queue=str(queue),
+                class_map_ref=class_map_ref,
+                bandwidth_percent=str(bandwidth),
+                buffer_percent=str(buffer),
+                burst=str(burst) if burst is not None else None,
+                scheduling=scheduling,
+                drops=drops,
+            )
+        )
 
     @root_validator  # type: ignore[call-overload]
     def generate_default_control_scheduler(cls, values) -> Dict:
