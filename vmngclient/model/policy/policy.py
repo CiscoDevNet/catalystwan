@@ -23,10 +23,13 @@ class PolicyCreationPayload(BaseModel):
         regex="^[a-zA-Z0-9_-]{1,127}$",
         description="Can include only alpha-numeric characters, hyphen '-' or underscore '_'; maximum 127 characters",
     )
-    policy_description: str = Field(alias="policyDescription")
+    policy_description: str = Field("Default description", alias="policyDescription")
     policy_type: str = Field(alias="policyType")
     policy_definition: PolicyDefinition = Field(alias="policyDefinition")
     is_policy_activated: bool = Field(default=False, alias="isPolicyActivated")
+
+    class Config:
+        allow_population_by_field_name = True
 
 
 class PolicyEditPayload(PolicyCreationPayload, PolicyId):

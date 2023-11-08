@@ -8,6 +8,7 @@ from vmngclient.endpoints.configuration.policy.definition.data import (
     DataPolicy,
     DataPolicyGetResponse,
 )
+from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition, QoSMapInfo
 from vmngclient.endpoints.configuration.policy.definition.rule_set import (
     ConfigurationPolicyRuleSetDefinition,
     RuleSetInfo,
@@ -93,6 +94,7 @@ from vmngclient.endpoints.configuration.policy.vsmart_template import (
     VSmartConnectivityStatus,
 )
 from vmngclient.model.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
+from vmngclient.model.policy.definitions.qos_map import QoSMap
 from vmngclient.model.policy.definitions.rule_set import RuleSet
 from vmngclient.model.policy.definitions.security_group import SecurityGroup
 from vmngclient.model.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy
@@ -175,9 +177,10 @@ POLICY_DEFINITION_ENDPOINTS_MAP: Mapping[type, type] = {
     SecurityGroup: ConfigurationPolicySecurityGroupDefinition,
     ZoneBasedFWPolicy: ConfigurationPolicyZoneBasedFirewallDefinition,
     DataPolicy: ConfigurationPolicyDataDefinition,
+    QoSMap: ConfigurationPolicyQoSMapDefinition,
 }
 
-SupportedPolicyDefinitions = Union[RuleSet, SecurityGroup, ZoneBasedFWPolicy, DataPolicy]
+SupportedPolicyDefinitions = Union[RuleSet, SecurityGroup, ZoneBasedFWPolicy, DataPolicy, QoSMap]
 
 
 class CentralizedPolicyAPI:
@@ -514,6 +517,10 @@ class PolicyDefinitionsAPI:
     def get(self, type: Type[ZoneBasedFWPolicy]) -> DataSequence[ZoneBasedFWPolicyInfo]:
         ...
 
+    @overload
+    def get(self, type: Type[QoSMap]) -> DataSequence[QoSMapInfo]:
+        ...
+
     # get by id
 
     @overload
@@ -530,6 +537,10 @@ class PolicyDefinitionsAPI:
 
     @overload
     def get(self, type: Type[ZoneBasedFWPolicy], id: str) -> ZoneBasedFWPolicyGetResponse:
+        ...
+
+    @overload
+    def get(self, type: Type[QoSMap], id: str) -> QoSMapInfo:
         ...
 
     def get(self, type: Type[SupportedPolicyDefinitions], id: Optional[str] = None) -> Any:

@@ -38,7 +38,10 @@ class LocalizedPolicyDefinition(PolicyDefinition):
 
 
 class LocalizedPolicy(PolicyCreationPayload):
-    policy_definition: LocalizedPolicyDefinition = Field(alias="policyDefinition")
+    policy_definition: LocalizedPolicyDefinition = Field(
+        LocalizedPolicyDefinition(assembly=[]), alias="policyDefinition"
+    )
+    policy_type: str = Field("feature", const=True)
 
     def _add_item(self, type: LocalizedPolicySupportedItemType, id: str) -> None:
         self.policy_definition.assembly.append(LocalizedPolicyAssemblyItem(type=type, definition_id=id))

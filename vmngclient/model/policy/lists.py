@@ -143,7 +143,10 @@ class ASPathList(PolicyListHeader):
 
 class ClassMapList(PolicyListHeader):
     type: Literal["class"] = "class"
-    entries: List[ClassMapListEntry]
+    entries: List[ClassMapListEntry] = []
+
+    def add_queue(self, queue: int) -> None:
+        self.entries.append(ClassMapListEntry(queue=str(queue)))
 
 
 class MirrorList(PolicyListHeader):
