@@ -51,6 +51,7 @@ class Tenant(BaseModel):
 
 class TenantExport(BaseModel):
     name: str
+    desc: str
     org_name: str = Field(alias="orgName")
     subdomain: str = Field(alias="subDomain")
     wan_edge_forecast: Optional[int] = Field(alias="wanEdgeForecast")
