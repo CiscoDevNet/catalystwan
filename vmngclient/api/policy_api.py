@@ -89,6 +89,7 @@ from vmngclient.endpoints.configuration.policy.list.url_white_list import (
 )
 from vmngclient.endpoints.configuration.policy.list.vpn import ConfigurationPolicyVPNList, VPNListInfo
 from vmngclient.endpoints.configuration.policy.list.zone import ConfigurationPolicyZoneList, ZoneListInfo
+from vmngclient.endpoints.configuration.policy.vedge_template import ConfigurationVEdgeTemplatePolicy
 from vmngclient.endpoints.configuration.policy.vsmart_template import (
     ConfigurationVSmartTemplatePolicy,
     VSmartConnectivityStatus,
@@ -128,6 +129,12 @@ from vmngclient.model.policy.lists import (
     URLWhiteList,
     VPNList,
     ZoneList,
+)
+from vmngclient.model.policy.localized import (
+    LocalizedPolicy,
+    LocalizedPolicyDeviceInfo,
+    LocalizedPolicyEditResponse,
+    LocalizedPolicyInfo,
 )
 from vmngclient.model.policy.policy_definition import (
     PolicyDefinitionEditResponse,
@@ -222,6 +229,39 @@ class CentralizedPolicyAPI:
 
     def check_vsmart_connectivity(self) -> DataSequence[VSmartConnectivityStatus]:
         return self._endpoints.check_vsmart_connectivity_status()
+
+
+class LocalizedPolicyAPI:
+    def __init__(self, session: vManageSession):
+        self._session = session
+        self._endpoints = ConfigurationVEdgeTemplatePolicy(session)
+
+    def create(self, policy: LocalizedPolicy) -> str:
+        return self._endpoints.create_vedge_template(policy).policy_id
+
+    def edit(self, id: str, policy: LocalizedPolicy) -> LocalizedPolicyEditResponse:
+        return self._endpoints.edit_vedge_template(id, policy)
+
+    def delete(self, id: str) -> None:
+        self._endpoints.delete_vedge_template(id)
+
+    @overload
+    def get(self) -> DataSequence[LocalizedPolicyInfo]:
+        ...
+
+    @overload
+    def get(self, id: str) -> LocalizedPolicy:
+        ...
+
+    def get(self, id: Optional[str] = None) -> Any:
+        if id is not None:
+            return self._endpoints.get_vedge_template(id)
+        return self._endpoints.generate_policy_template_list()
+
+    def list_devices(self, id: Optional[str] = None) -> DataSequence[LocalizedPolicyDeviceInfo]:
+        if id is not None:
+            return self._endpoints.get_device_list_by_policy(id)
+        return self._endpoints.get_vedge_policy_device_list()
 
 
 class PolicyListsAPI:
@@ -551,8 +591,11 @@ class PolicyDefinitionsAPI:
 
 
 class PolicyAPI:
+    """This is exposing so called 'UX 1.0' API"""
+
     def __init__(self, session: vManageSession):
         self._session = session
         self.centralized = CentralizedPolicyAPI(session)
+        self.localized = LocalizedPolicyAPI(session)
         self.definitions = PolicyDefinitionsAPI(session)
         self.lists = PolicyListsAPI(session)

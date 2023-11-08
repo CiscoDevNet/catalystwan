@@ -1,5 +1,5 @@
 import datetime
-from typing import Sequence
+from typing import Optional, Sequence
 
 from pydantic import BaseModel, Field
 
@@ -41,4 +41,4 @@ class PolicyInfo(PolicyEditPayload):
     created_on: datetime.datetime = Field(alias="createdOn")
     last_updated_by: str = Field(alias="lastUpdatedBy")
     last_updated_on: datetime.datetime = Field(alias="lastUpdatedOn")
-    policy_version: str = Field(alias="policyVersion")
+    policy_version: Optional[str] = Field(None, alias="policyVersion")

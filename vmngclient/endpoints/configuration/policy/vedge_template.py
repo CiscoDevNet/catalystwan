@@ -1,5 +1,13 @@
 # mypy: disable-error-code="empty-body"
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
+from vmngclient.model.policy.localized import (
+    LocalizedPolicy,
+    LocalizedPolicyDeviceInfo,
+    LocalizedPolicyEditResponse,
+    LocalizedPolicyInfo,
+)
+from vmngclient.model.policy.policy import PolicyId
+from vmngclient.typed_list import DataSequence
 
 
 class ConfigurationVEdgeTemplatePolicy(APIEndpoints):
@@ -8,36 +16,29 @@ class ConfigurationVEdgeTemplatePolicy(APIEndpoints):
         ...
 
     @post("/template/policy/vedge")
-    def create_vedge_template(self):
-        # POST /template/policy/vedge
+    def create_vedge_template(self, payload: LocalizedPolicy) -> PolicyId:
         ...
 
     @delete("/template/policy/vedge/{id}")
-    def delete_vedge_template(self, id: str):
-        # DELETE /template/policy/vedge/{policyId}
+    def delete_vedge_template(self, id: str) -> None:
         ...
 
     @put("/template/policy/vedge/{id}")
-    def edit_vedge_template(self, id: str):
-        # PUT /template/policy/vedge/{policyId}
+    def edit_vedge_template(self, id: str, payload: LocalizedPolicy) -> LocalizedPolicyEditResponse:
         ...
 
     @get("/template/policy/vedge", "data")
-    def generate_policy_template_list(self):
-        # GET /template/policy/vedge
+    def generate_policy_template_list(self) -> DataSequence[LocalizedPolicyInfo]:
         ...
 
-    @get("/template/policy/vedge/devices/{id}")
-    def get_device_list_by_policy(self):
-        # GET /template/policy/vedge/devices/{policyId}
+    @get("/template/policy/vedge/devices/{id}", "data")
+    def get_device_list_by_policy(self, id: str) -> DataSequence[LocalizedPolicyDeviceInfo]:
         ...
 
-    @get("/template/policy/vedge/devices")
-    def get_vedge_policy_device_list(self):
-        # GET /template/policy/vedge/devices
+    @get("/template/policy/vedge/devices", "data")
+    def get_vedge_policy_device_list(self) -> DataSequence[LocalizedPolicyDeviceInfo]:
         ...
 
     @get("/template/policy/vedge/definition/{id}")
-    def get_vedge_template(self):
-        # GET /template/policy/vedge/definition/{policyId}
+    def get_vedge_template(self, id: str) -> LocalizedPolicy:
         ...

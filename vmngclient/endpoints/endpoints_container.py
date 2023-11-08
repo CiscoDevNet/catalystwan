@@ -43,6 +43,7 @@ from vmngclient.endpoints.configuration.policy.list.url_black_list import Config
 from vmngclient.endpoints.configuration.policy.list.url_white_list import ConfigurationPolicyURLWhiteList
 from vmngclient.endpoints.configuration.policy.list.vpn import ConfigurationPolicyVPNList
 from vmngclient.endpoints.configuration.policy.list.zone import ConfigurationPolicyZoneList
+from vmngclient.endpoints.configuration.policy.vedge_template import ConfigurationVEdgeTemplatePolicy
 from vmngclient.endpoints.configuration.policy.vsmart_template import ConfigurationVSmartTemplatePolicy
 from vmngclient.endpoints.configuration_dashboard_status import ConfigurationDashboardStatus
 from vmngclient.endpoints.configuration_device_actions import ConfigurationDeviceActions
@@ -113,6 +114,7 @@ class ConfigurationPolicyContainer:
         self.list = ConfigurationPolicyListContainer(session)
         self.definition = ConfigurationPolicyDefinitionContainer(session)
         self.vsmart_template = ConfigurationVSmartTemplatePolicy(session)
+        self.vedge_template = ConfigurationVEdgeTemplatePolicy(session)
 
 
 class ConfigurationContainer:
