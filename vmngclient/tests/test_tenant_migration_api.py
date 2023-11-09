@@ -25,6 +25,7 @@ class TestTenantMigrationAPI(unittest.TestCase):
     def test_export_migration_tenant(self):
         tenant = TenantExport(
             name="test_tenant",
+            desc="Test Tenant Description",
             subdomain="test_subdomain",
             org_name="test_org",
             is_destination_overlay_mt=False,

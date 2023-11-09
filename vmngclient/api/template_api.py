@@ -41,6 +41,7 @@ from vmngclient.exceptions import AttachedError, TemplateNotFoundError
 from vmngclient.response import vManageResponse
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.device_model import DeviceModel
+from vmngclient.utils.dict import merge
 from vmngclient.utils.template_type import TemplateType
 
 if TYPE_CHECKING:
@@ -574,24 +575,6 @@ class TemplatesAPI:
                         break
                 if value is None:
                     continue
-
-            # Merge dictionaries
-
-            # TODO unittests
-            def merge(a, b, path=None):
-                if path is None:
-                    path = []
-                for key in b:
-                    if key in a:
-                        if isinstance(a[key], dict) and isinstance(b[key], dict):
-                            merge(a[key], b[key], path + [str(key)])
-                        elif a[key] == b[key]:
-                            pass  # same leaf value
-                        else:
-                            raise Exception(f"Conflict at {'.'.join(path + [str(key)])}")
-                    else:
-                        a[key] = b[key]
-                return a
 
             # print(field.payload_scheme(value))
             payload.definition = merge(payload.definition, field.payload_scheme(value, priority_order=priority_order))

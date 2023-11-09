@@ -8,6 +8,7 @@ from pydantic.fields import ModelField  # type: ignore
 
 from vmngclient.api.templates.device_variable import DeviceVariable
 from vmngclient.api.templates.feature_template import FeatureTemplate
+from vmngclient.utils.dict import merge
 
 
 class FeatureTemplateOptionType(str, Enum):
@@ -118,7 +119,7 @@ class FeatureTemplateField(BaseModel):
                     children_output = []
 
                     for obj in value:  # obj is User, atomic value. Loop every child
-                        child_payload = {}
+                        child_payload: dict = {}
                         for child in self.children:  # Child in schema
                             if current_path is None:
                                 current_path = []
@@ -133,14 +134,15 @@ class FeatureTemplateField(BaseModel):
                             obj_value = getattr(obj, model_field.name)
                             po = model_field.field_info.extra.get("priority_order")
                             vip_type = model_field.field_info.extra.get("vip_type")
-                            child_payload.update(
+                            merge(
+                                child_payload,
                                 child.payload_scheme(
                                     obj_value,
                                     help=output,
                                     current_path=self.dataPath + [self.key],
                                     priority_order=po,
                                     vip_type=vip_type,
-                                )
+                                ),
                             )
                             if priority_order:
                                 child_payload.update({"priority-order": priority_order})
