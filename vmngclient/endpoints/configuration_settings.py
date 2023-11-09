@@ -202,8 +202,8 @@ class MaintenanceWindow(BaseModel):
 
     enabled: Optional[bool] = False
     message: Optional[str] = ""
-    start: Optional[datetime.datetime] = Field(default=None, alias="epochStartTimeInMillis")
-    end: Optional[datetime.datetime] = Field(default=None, alias="epochEndTimeInMillis")
+    start: int = Field(default=None, alias="epochStartTimeInMillis")
+    end: int = Field(default=None, alias="epochEndTimeInMillis")
 
 
 class ElasticSearchDBSize(BaseModel):
