@@ -85,13 +85,19 @@ def migration_preconditions_check(
             f"origin: {origin_session._platform_version} "
             f"target: {target_session._platform_version}",
         )
+    # Export Params check
+    logger.info("Performing export parameters checks...")
+    if origin_session.api_version >= Version("20.13"):
+        if tenant.is_destination_overlay_mt is None or tenant.migration_key is None:
+            problems.append("'isDestinationOverlayMT' and 'migrationKey' must be provided using >= 20.13")
     # Target checks
     logger.info("Performing target checks...")
     target_org = target_session.endpoints.configuration_settings.get_organizations().first().org
     # Checks for MT target
     if target_session.session_type == SessionType.PROVIDER:
-        if not tenant.is_destination_overlay_mt:
-            problems.append("Migrating to MT but 'isDestinationOverlayMT' is not set")
+        if origin_session.api_version >= Version("20.13"):
+            if not tenant.is_destination_overlay_mt:
+                problems.append("Migrating to MT using >= 20.13 but 'isDestinationOverlayMT' is not set")
         if origin_session.session_type != SessionType.SINGLE_TENANT:
             problems.append(
                 "Migration to MT (using provider) is expected to be initiated from ST (using single tenant)"
