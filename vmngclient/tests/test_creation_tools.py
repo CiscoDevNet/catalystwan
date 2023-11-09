@@ -61,6 +61,8 @@ class TestCreationTools(unittest.TestCase):
                     "status": None,
                     "memUsage": None,
                     "state_description": None,
+                    "site-id": None,
+                    "site-name": None,
                 },
             ),
             (_TestObjectA(1, _TestObjectB(2)), {"BBB": {"RANDOM": 2}, "A": 1, "c": None}),
@@ -113,11 +115,12 @@ class TestCreationTools(unittest.TestCase):
             (TLOC(1, 1), '{"color": 1, "encapsulation": 1}'),
             (PacketSetup(1, 2), '{"sessionId": 1, "isNewSession": 2}'),
             (
-                Device(1, "vbond", *range(2), "reachable", 1),
+                Device(1, "vbond", *range(2), "reachable", 1, site_id="100", site_name="SITE_100"),
                 '{"deviceId": 0, "host-name": 1, "local-system-ip": 1, "memState": null, "cpuState": null, '
                 '"cpuLoad": null, "connectedVManages": [], "device-model": null, "board-serial": null, '
-                '"vedgeCertificateState": null, "chasisNumber": null, "uuid": 1, "personality": "vbond", '
-                '"reachability": "reachable", "status": null, "memUsage": null, "state_description": null}',
+                '"vedgeCertificateState": null, "chasisNumber": null, "site-id": "100", "site-name": "SITE_100", '
+                '"uuid": 1, "personality": "vbond", "reachability": "reachable", "status": null, "memUsage": null, '
+                '"state_description": null}',
             ),
         ]
     )
