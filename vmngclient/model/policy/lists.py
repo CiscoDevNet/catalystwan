@@ -1,8 +1,9 @@
-from typing import List, Literal, Optional, Union
+from typing import List, Literal, Optional, Set, Union
 
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated
 
+from vmngclient.model.common import InterfaceTypeEnum
 from vmngclient.model.policy.lists_entries import (
     AppListEntry,
     AppProbeClassListEntry,
@@ -58,7 +59,13 @@ class VPNList(PolicyListHeader):
 
 class ZoneList(PolicyListHeader):
     type: Literal["zone"] = "zone"
-    entries: List[ZoneListEntry]
+    entries: List[ZoneListEntry] = []
+
+    def assign_vpns(self, vpns: Set[int]) -> None:
+        self.entries = [ZoneListEntry(vpn=str(vpn)) for vpn in vpns]  # type: ignore[call-arg]
+
+    def assign_interfaces(self, ifs: Set[InterfaceTypeEnum]) -> None:
+        self.entries = [ZoneListEntry(interface=interface) for interface in ifs]  # type: ignore[call-arg]
 
 
 class FQDNList(PolicyListHeader):

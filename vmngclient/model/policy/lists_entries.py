@@ -122,7 +122,7 @@ class VPNListEntry(BaseModel):
 
 class ZoneListEntry(BaseModel):
     vpn: Optional[str] = Field(None, description="0-65530 single number")
-    interface: Optional[InterfaceTypeEnum]
+    interface: Optional[InterfaceTypeEnum] = None
 
     @validator("vpn")
     def check_vpn_range(cls, vpn_str: str):

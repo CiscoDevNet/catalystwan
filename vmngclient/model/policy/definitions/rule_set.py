@@ -141,3 +141,60 @@ class RuleSet(PolicyDefinitionHeader):
         insert_index = len(self.definition.rules)
         self.definition.rules.append(rule)
         self._enumerate_rules(insert_index)
+
+    def add_ipv4_rule(
+        self,
+        action: str = "permit",
+        source_security_group_id: Optional[str] = None,
+        source_ip: Optional[IPv4Network] = None,
+        source_ip_variable: Optional[str] = None,
+        source_data_prefix_list_id: Optional[str] = None,
+        source_fqdn: Optional[str] = None,
+        source_fqdn_list_id: Optional[str] = None,
+        source_geo_location: Optional[str] = None,
+        source_geo_location_list_id: Optional[str] = None,
+        source_port: Optional[str] = None,
+        source_port_list_id: Optional[str] = None,
+        destination_security_group_id: Optional[str] = None,
+        destination_ip: Optional[IPv4Network] = None,
+        destination_ip_variable: Optional[str] = None,
+        destination_data_prefix_list_id: Optional[str] = None,
+        destination_fqdn: Optional[str] = None,
+        destination_fqdn_list_id: Optional[str] = None,
+        destination_geo_location: Optional[str] = None,
+        destination_geo_location_list_id: Optional[str] = None,
+        destination_port: Optional[str] = None,
+        destination_port_list_id: Optional[str] = None,
+        protocols: Optional[List[int]] = None,
+        protocol_names: Optional[str] = None,
+        protocol_name_list_id: Optional[str] = None,
+    ) -> None:
+        if source_ip is not None and source_ip_variable is not None:
+            raise ValueError("Source IP and variable name cannot be set at the same time")
+        if destination_ip is not None and destination_ip_variable is not None:
+            raise ValueError("Destination IP and variable name cannot be set at the same time")
+        ipv4_rule = IPv4Rule(  # type: ignore[call-arg]
+            action=action,
+            source_security_group=source_security_group_id,
+            source_ip=source_ip or source_ip_variable,
+            source_data_prefix_list=source_data_prefix_list_id,
+            source_fqdn=source_fqdn,
+            source_fqdn_list=source_fqdn_list_id,
+            source_geo_location=source_geo_location,
+            source_geo_location_list=source_geo_location_list_id,
+            source_port=source_port,
+            source_port_list=source_port_list_id,
+            destination_security_group=destination_security_group_id,
+            destination_ip=destination_ip or destination_ip_variable,
+            destination_data_prefix_list=destination_data_prefix_list_id,
+            destination_fqdn=destination_fqdn,
+            destination_fqdn_list=destination_fqdn_list_id,
+            destination_geo_location=destination_geo_location,
+            destination_geo_location_list=destination_geo_location_list_id,
+            destination_port=destination_port,
+            destination_port_list=destination_port_list_id,
+            protocol=" ".join(str(p) for p in protocols) if protocols else None,
+            protocol_name=" ".join(p for p in protocol_names) if protocol_names else None,
+            protocol_name_list=protocol_name_list_id,
+        )
+        self.add(ipv4_rule)

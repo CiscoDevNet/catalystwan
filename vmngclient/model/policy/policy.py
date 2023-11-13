@@ -12,6 +12,9 @@ class AssemblyItem(BaseModel):
     definition_id: str = Field(alias="definitionId")
     type: str
 
+    class Config:
+        allow_population_by_field_name = True
+
 
 class PolicyDefinition(BaseModel):
     assembly: Sequence[AssemblyItem]

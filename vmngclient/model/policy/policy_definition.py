@@ -1,14 +1,28 @@
 import datetime
 from enum import Enum
-from typing import Any, List, Optional, Protocol, Sequence, Union
+from ipaddress import IPv4Network
+from typing import Any, List, Optional, Protocol, Sequence, Set, Tuple, Union
 
-from pydantic import BaseModel, Field, IPvAnyNetwork
+from pydantic import BaseModel, Field
 from typing_extensions import Annotated, Literal
 
 from vmngclient.typed_list import DataSequence
 
 # TODO: add validators for custom strings (eg.: port ranges, space separated networks)
 # TODO: model actions
+
+
+def port_set_and_ranges_to_str(ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> str:
+    if not ports and not port_ranges:
+        raise ValueError("Non empty port set or port range list must be provided")
+    ports_str = " ".join(f"{port_begin}-{port_end}" for port_begin, port_end in port_ranges)
+    ports_str = " " if ports_str else ""
+    ports_str += " ".join(str(p) for p in ports)
+    return ports_str
+
+
+def ipv4_networks_to_str(networks: List[IPv4Network]) -> str:
+    return " ".join(str(net) for net in networks)
 
 
 class ListReference(BaseModel):
@@ -87,6 +101,10 @@ class ProtocolEntry(BaseModel):
     field: Literal["protocol"] = "protocol"
     value: str = Field(description="0-255 single numbers separate by space")
 
+    @staticmethod
+    def from_protocol_set(protocols: Set[int]) -> "ProtocolEntry":
+        return ProtocolEntry(value=" ".join(str(p) for p in protocols))
+
 
 class DSCPEntry(BaseModel):
     field: Literal["dscp"] = "dscp"
@@ -97,20 +115,38 @@ class SourceIPEntry(BaseModel):
     field: Literal["sourceIp"] = "sourceIp"
     value: str = Field(description="IP network specifier separate by space")
 
+    @staticmethod
+    def from_ipv4_networks(networks: List[IPv4Network]) -> "SourceIPEntry":
+        return SourceIPEntry(value=ipv4_networks_to_str(networks))
+
 
 class SourcePortEntry(BaseModel):
     field: Literal["sourcePort"] = "sourcePort"
     value: str = Field(description="0-65535 range or separate by space")
 
+    @staticmethod
+    def from_port_set_and_ranges(ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> "SourcePortEntry":
+        return SourcePortEntry(value=port_set_and_ranges_to_str(ports, port_ranges))
+
 
 class DestinationIPEntry(BaseModel):
     field: Literal["destinationIp"] = "destinationIp"
-    value: IPvAnyNetwork
+    value: str
+
+    @staticmethod
+    def from_ipv4_networks(networks: List[IPv4Network]) -> "DestinationIPEntry":
+        return DestinationIPEntry(value=ipv4_networks_to_str(networks))
 
 
 class DestinationPortEntry(BaseModel):
     field: Literal["destinationPort"] = "destinationPort"
     value: str = Field(description="0-65535 range or separate by space")
+
+    @staticmethod
+    def from_port_set_and_ranges(
+        ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []
+    ) -> "DestinationPortEntry":
+        return DestinationPortEntry(value=port_set_and_ranges_to_str(ports, port_ranges))
 
 
 class TCPEntry(BaseModel):
@@ -154,7 +190,7 @@ class DestinationGeoLocationEntry(BaseModel):
 
 
 class SourceDataPrefixListEntry(BaseModel):
-    field: Literal["sourceDataPrefixList"]
+    field: Literal["sourceDataPrefixList"] = "sourceDataPrefixList"
     ref: str
 
 
@@ -221,6 +257,10 @@ class DestinationPortListEntry(BaseModel):
 class RuleSetListEntry(BaseModel):
     field: Literal["ruleSetList"] = "ruleSetList"
     ref: str
+
+    @staticmethod
+    def with_rule_set_ids(rule_set_ids: Set[str]) -> "RuleSetListEntry":
+        return RuleSetListEntry(ref=" ".join(rule_set_ids))
 
 
 Entry = Annotated[

@@ -89,6 +89,7 @@ from vmngclient.endpoints.configuration.policy.list.url_white_list import (
 )
 from vmngclient.endpoints.configuration.policy.list.vpn import ConfigurationPolicyVPNList, VPNListInfo
 from vmngclient.endpoints.configuration.policy.list.zone import ConfigurationPolicyZoneList, ZoneListInfo
+from vmngclient.endpoints.configuration.policy.security_template import ConfigurationSecurityTemplatePolicy
 from vmngclient.endpoints.configuration.policy.vedge_template import ConfigurationVEdgeTemplatePolicy
 from vmngclient.endpoints.configuration.policy.vsmart_template import (
     ConfigurationVSmartTemplatePolicy,
@@ -142,6 +143,7 @@ from vmngclient.model.policy.policy_definition import (
     PolicyDefinitionInfo,
 )
 from vmngclient.model.policy.policy_list import PolicyListEndpoints
+from vmngclient.model.policy.security import SecurityPolicy, SecurityPolicyEditResponse, SecurityPolicyInfo
 from vmngclient.typed_list import DataSequence
 
 if TYPE_CHECKING:
@@ -262,6 +264,38 @@ class LocalizedPolicyAPI:
         if id is not None:
             return self._endpoints.get_device_list_by_policy(id)
         return self._endpoints.get_vedge_policy_device_list()
+
+
+class SecurityPolicyAPI:
+    def __init__(self, session: vManageSession):
+        self._session = session
+        self._endpoints = ConfigurationSecurityTemplatePolicy(session)
+
+    def create(self, policy: SecurityPolicy) -> str:
+        # POST does not return anything! we need to list all after creation and find by name to get id
+        self._endpoints.create_security_template(policy)
+        all_policies_infos = self._endpoints.generate_security_template_list()
+        policy_info = all_policies_infos.filter(policy_name=policy.policy_name).first()
+        return policy_info.policy_id
+
+    def edit(self, id: str, policy: SecurityPolicy) -> SecurityPolicyEditResponse:
+        return self._endpoints.edit_security_template(id, policy)
+
+    def delete(self, id: str) -> None:
+        self._endpoints.delete_security_template(id)
+
+    @overload
+    def get(self) -> DataSequence[SecurityPolicyInfo]:
+        ...
+
+    @overload
+    def get(self, id: str) -> SecurityPolicy:
+        ...
+
+    def get(self, id: Optional[str] = None) -> Any:
+        if id is not None:
+            return self._endpoints.get_security_template(id)
+        return self._endpoints.generate_security_template_list()
 
 
 class PolicyListsAPI:
@@ -597,5 +631,6 @@ class PolicyAPI:
         self._session = session
         self.centralized = CentralizedPolicyAPI(session)
         self.localized = LocalizedPolicyAPI(session)
+        self.security = SecurityPolicyAPI(session)
         self.definitions = PolicyDefinitionsAPI(session)
         self.lists = PolicyListsAPI(session)
