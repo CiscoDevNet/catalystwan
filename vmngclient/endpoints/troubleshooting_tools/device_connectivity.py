@@ -19,7 +19,7 @@ class NPingRequest(BaseModel):
 
     host: str
     vpn: str
-    probe_type: PingProbeType = Field(dafault=PingProbeType.ICMP, alias="probeType")
+    probe_type: PingProbeType = Field(PingProbeType.ICMP, alias="probeType")
     count: Optional[str] = None
     dest_port: Optional[str] = Field(None, alias="destPort")
     df: Optional[str] = None
