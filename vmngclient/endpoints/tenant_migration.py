@@ -2,7 +2,7 @@
 from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit
 
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 
 from vmngclient.endpoints import APIEndpoints, CustomPayloadType, PreparedPayload, get, post, versions, view
 from vmngclient.model.tenant import TenantExport

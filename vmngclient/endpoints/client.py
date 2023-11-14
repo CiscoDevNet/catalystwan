@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any, List, Optional
 
 from packaging.version import Version  # type: ignore
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 
 from vmngclient.endpoints import APIEndpoints, get
 

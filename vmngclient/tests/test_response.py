@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from attr import define, field  # type: ignore
 from parameterized import parameterized  # type: ignore
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 
 from vmngclient.dataclasses import DataclassBase
 from vmngclient.response import ErrorInfo, vManageResponse

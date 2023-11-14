@@ -1,7 +1,7 @@
 # mypy: disable-error-code="empty-body"
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 
 from vmngclient.endpoints import APIEndpoints, get
 from vmngclient.utils.operation_status import OperationStatus

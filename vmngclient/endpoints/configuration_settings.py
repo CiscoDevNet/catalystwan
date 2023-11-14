@@ -3,7 +3,7 @@ import datetime
 from enum import Enum
 from typing import List, Literal, Optional, Union
 
-from pydantic import BaseModel, Field, IPvAnyAddress, validator
+from pydantic.v1 import BaseModel, Field, IPvAnyAddress, validator
 
 from vmngclient.endpoints import JSON, APIEndpoints, get, post, put, view
 from vmngclient.typed_list import DataSequence

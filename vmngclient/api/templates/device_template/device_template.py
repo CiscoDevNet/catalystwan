@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Final, List
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
-from pydantic import BaseModel, Field, validator
+from pydantic.v1 import BaseModel, Field, validator
 
 from vmngclient.utils.device_model import DeviceModel
 

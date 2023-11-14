@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import ClassVar, Optional
 
-from pydantic import Field
+from pydantic.v1 import Field
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.utils.pydantic_validators import ConvertBoolToStringModel

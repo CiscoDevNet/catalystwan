@@ -3,8 +3,8 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field, validator
-from pydantic.fields import ModelField  # type: ignore
+from pydantic.v1 import BaseModel, Field, validator
+from pydantic.v1.fields import ModelField  # type: ignore
 
 from vmngclient.api.templates.device_variable import DeviceVariable
 from vmngclient.api.templates.feature_template import FeatureTemplate

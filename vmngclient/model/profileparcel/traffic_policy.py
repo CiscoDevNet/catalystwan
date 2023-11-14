@@ -9,7 +9,7 @@ from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
 from typing import List, Optional, Union
 
-from pydantic import BaseModel, Extra, Field, conint, constr
+from pydantic.v1 import BaseModel, Extra, Field, conint, constr
 
 
 class Entries(BaseModel):

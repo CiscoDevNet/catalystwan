@@ -8,7 +8,7 @@ from unittest.mock import MagicMock
 from attr import define  # type: ignore
 from packaging.version import Version  # type: ignore
 from parameterized import parameterized  # type: ignore
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 from vmngclient.dataclasses import DataclassBase  # type: ignore
 from vmngclient.endpoints import (
