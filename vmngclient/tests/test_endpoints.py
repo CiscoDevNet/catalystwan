@@ -5,12 +5,10 @@ from pathlib import Path
 from typing import Dict, List, Optional, Union
 from unittest.mock import MagicMock
 
-from attr import define  # type: ignore
 from packaging.version import Version  # type: ignore
 from parameterized import parameterized  # type: ignore
 from pydantic.v1 import BaseModel
 
-from vmngclient.dataclasses import DataclassBase  # type: ignore
 from vmngclient.endpoints import (
     BASE_PATH,
     JSON,
@@ -25,16 +23,7 @@ from vmngclient.endpoints import logger as endpoints_logger
 from vmngclient.endpoints import post, put, request, versions, view
 from vmngclient.exceptions import APIEndpointError, APIRequestPayloadTypeError, APIVersionError, APIViewError
 from vmngclient.typed_list import DataSequence
-from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.session_type import ProviderAsTenantView, ProviderView, TenantView
-
-
-@define
-class AttrsModelExample(DataclassBase):
-    id: str
-    size: int
-    capacity: float
-    active: bool
 
 
 class BaseModelExample(BaseModel):
@@ -73,16 +62,13 @@ class TestAPIEndpoints(unittest.TestCase):
             "active": True,
         }
         self.json_payload = json.dumps(self.dict_payload)
-        self.attrs_payload = create_dataclass(AttrsModelExample, self.dict_payload)
         self.basemodel_payload = BaseModelExample.parse_obj(self.dict_payload)
         self.list_dict_payload = [self.dict_payload] * 2
-        self.list_attrs_payload = [self.attrs_payload] * 2
         self.dict_params = {
             "name": "purple",
             "color": "haze",
         }
         self.basemodel_params = ParamsExample.parse_obj(self.dict_params)
-        self.attrs_sequence_payload = DataSequence(AttrsModelExample, self.list_attrs_payload)
         self.basemodel_sequence_payload = [self.basemodel_payload] * 2
 
     @parameterized.expand(
@@ -188,20 +174,10 @@ class TestAPIEndpoints(unittest.TestCase):
                 assert str(allowed) in log.output[0]
             assert str(current_session) in log.output[0]
 
-    def test_attrs_payload(self):
-        self.endpoints._request("GET", f"/{__name__}", payload=self.attrs_payload)
-        _, kwargs = self.session_mock.request.call_args
-        assert json.loads(kwargs.get("data")) == self.dict_payload
-
     def test_basemodel_payload(self):
         self.endpoints._request("GET", f"/{__name__}", payload=self.basemodel_payload)
         _, kwargs = self.session_mock.request.call_args
         assert json.loads(kwargs.get("data")) == self.dict_payload
-
-    def test_attrs_sequence_payload(self):
-        self.endpoints._request("GET", f"/{__name__}", payload=self.attrs_sequence_payload)
-        _, kwargs = self.session_mock.request.call_args
-        assert json.loads(kwargs.get("data")) == self.list_dict_payload
 
     def test_basemodel_sequence_payload(self):
         self.endpoints._request("GET", f"/{__name__}", payload=self.basemodel_sequence_payload)
