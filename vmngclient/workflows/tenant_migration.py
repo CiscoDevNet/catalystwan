@@ -44,7 +44,7 @@ def check_control_connectivity_from_edge_devices(session: vManageSession, host: 
         logger.info(f"Checking {edge.id} can reach {host}...")
         conn_status_by_device_id[edge.id] = False
         for _ in range(attempts):
-            ping_request = NPingRequest(host=host, vpn="0", probe_type="icmp")  # type: ignore[call-arg]
+            ping_request = NPingRequest(host=host, vpn="0")
             ping_result = session.endpoints.troubleshooting_tools.device_connectivity.nping_device(
                 edge.id, ping_request
             )
@@ -52,9 +52,7 @@ def check_control_connectivity_from_edge_devices(session: vManageSession, host: 
                 conn_status_by_device_id[edge.id] = True
                 break
     logger.info(f"Connectivity status to host: {host} by device:\n{conn_status_by_device_id}")
-    if all(conn_status_by_device_id.values()):
-        return True
-    return False
+    return all(conn_status_by_device_id.values())
 
 
 def migration_preconditions_check(
