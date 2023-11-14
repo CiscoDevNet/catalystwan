@@ -2,7 +2,7 @@ import datetime
 from enum import Enum
 from typing import Any, List, Optional, Protocol, Sequence, Union
 
-from pydantic import BaseModel, Field, IPvAnyNetwork
+from pydantic.v1 import BaseModel, Field, IPvAnyNetwork
 from typing_extensions import Annotated, Literal
 
 from vmngclient.typed_list import DataSequence

@@ -7,7 +7,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from parameterized import parameterized
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 
 from vmngclient.api.template_api import TemplatesAPI
 from vmngclient.api.templates.feature_template import FeatureTemplate

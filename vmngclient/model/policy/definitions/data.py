@@ -1,7 +1,7 @@
 # mypy: disable-error-code="empty-body"
 from typing import List, Union
 
-from pydantic import Field
+from pydantic.v1 import Field
 from typing_extensions import Annotated
 
 from vmngclient.model.policy.policy_definition import (

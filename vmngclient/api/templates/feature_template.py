@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, cast
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
-from pydantic import BaseModel, root_validator
+from pydantic.v1 import BaseModel, root_validator
 
 from vmngclient.api.templates.device_variable import DeviceVariable
 from vmngclient.utils.device_model import DeviceModel

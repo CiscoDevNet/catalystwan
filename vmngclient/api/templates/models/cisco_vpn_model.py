@@ -2,7 +2,7 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic.v1 import BaseModel, Field, validator
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 
