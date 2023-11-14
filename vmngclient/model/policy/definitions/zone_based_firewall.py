@@ -106,67 +106,70 @@ class ZoneBasedFWPolicySequence(DefinitionSequence):
     class Config:
         allow_population_by_field_name = True
 
-    def add_match(self, match: ZoneBasedFWPolicySequenceEntry):
-        added_fields = [entry.field for entry in self.match.entries]
-        if match.field in added_fields:
-            raise ValueError("{match.field} already added")
+    def insert_match(self, match: ZoneBasedFWPolicySequenceEntry) -> int:
+        # overwrite if exists
+        for index, entry in enumerate(self.match.entries):
+            if match.field == entry.field:
+                self.match.entries[index] == match
+                return index
         self.match.entries.append(match)
+        return len(self.match.entries) - 1
 
     def match_app_list(self, app_list_id: str) -> None:
         if self.base_action != BaseAction.INSPECT:
             raise ValueError("Action must be Inspect when Application/Application Family List is selected.")
-        self.add_match(AppListEntry(ref=app_list_id))
+        self.insert_match(AppListEntry(ref=app_list_id))
 
     def match_destination_data_prefix_list(self, data_prefix_list_id: str) -> None:
-        self.add_match(DestinationDataPrefixListEntry(ref=data_prefix_list_id))
+        self.insert_match(DestinationDataPrefixListEntry(ref=data_prefix_list_id))
 
     def match_destination_fqdn(self, fqdn: str) -> None:
-        self.add_match(DestinationFQDNEntry(value=fqdn))
+        self.insert_match(DestinationFQDNEntry(value=fqdn))
 
     def match_destination_geo_location(self, geo_location: str) -> None:
-        self.add_match(DestinationGeoLocationEntry(value=geo_location))
+        self.insert_match(DestinationGeoLocationEntry(value=geo_location))
 
     def match_destination_geo_location_list(self, geo_location_list_id: str) -> None:
-        self.add_match(DestinationGeoLocationListEntry(ref=geo_location_list_id))
+        self.insert_match(DestinationGeoLocationListEntry(ref=geo_location_list_id))
 
     def match_destination_ip(self, networks: List[IPv4Network]) -> None:
-        self.add_match(DestinationIPEntry.from_ipv4_networks(networks))
+        self.insert_match(DestinationIPEntry.from_ipv4_networks(networks))
 
     def match_destination_ports(self, ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> None:
-        self.add_match(DestinationPortEntry.from_port_set_and_ranges(ports, port_ranges))
+        self.insert_match(DestinationPortEntry.from_port_set_and_ranges(ports, port_ranges))
 
     def match_destination_port_list(self, port_list_id: str) -> None:
-        self.add_match(DestinationPortListEntry(ref=port_list_id))
+        self.insert_match(DestinationPortListEntry(ref=port_list_id))
 
     def match_protocols(self, protocols: Set[int]) -> None:
-        self.add_match(ProtocolEntry.from_protocol_set(protocols))
+        self.insert_match(ProtocolEntry.from_protocol_set(protocols))
 
     def match_protocol_name_list(self, protocol_name_list_id: str) -> None:
-        self.add_match(ProtocolNameListEntry(ref=protocol_name_list_id))
+        self.insert_match(ProtocolNameListEntry(ref=protocol_name_list_id))
 
     def match_source_data_prefix_list(self, data_prefix_list_id: str) -> None:
-        self.add_match(SourceDataPrefixListEntry(ref=data_prefix_list_id))
+        self.insert_match(SourceDataPrefixListEntry(ref=data_prefix_list_id))
 
     def match_source_fqdn(self, fqdn: str) -> None:
-        self.add_match(SourceFQDNEntry(value=fqdn))
+        self.insert_match(SourceFQDNEntry(value=fqdn))
 
     def match_source_fqdn_list(self, fqdn_list_id: str) -> None:
-        self.add_match(SourceFQDNListEntry(ref=fqdn_list_id))
+        self.insert_match(SourceFQDNListEntry(ref=fqdn_list_id))
 
     def match_source_geo_location(self, geo_location: str) -> None:
-        self.add_match(SourceGeoLocationEntry(value=geo_location))
+        self.insert_match(SourceGeoLocationEntry(value=geo_location))
 
     def match_source_geo_location_list(self, geo_location_list: str) -> None:
-        self.add_match(SourceGeoLocationListEntry(ref=geo_location_list))
+        self.insert_match(SourceGeoLocationListEntry(ref=geo_location_list))
 
     def match_source_ip(self, networks: List[IPv4Network]) -> None:
-        self.add_match(SourceIPEntry.from_ipv4_networks(networks))
+        self.insert_match(SourceIPEntry.from_ipv4_networks(networks))
 
     def match_source_port(self, ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> None:
-        self.add_match(SourcePortEntry.from_port_set_and_ranges(ports, port_ranges))
+        self.insert_match(SourcePortEntry.from_port_set_and_ranges(ports, port_ranges))
 
     def match_source_port_list(self, port_list_id: str) -> None:
-        self.add_match(SourcePortListEntry(ref=port_list_id))
+        self.insert_match(SourcePortListEntry(ref=port_list_id))
 
 
 class ZoneBasedFWPolicyEntry(BaseModel):
