@@ -74,6 +74,7 @@ from vmngclient.endpoints.configuration_group import ConfigurationGroup
 from vmngclient.endpoints.configuration_settings import ConfigurationSettings
 from vmngclient.endpoints.monitoring_device_details import MonitoringDeviceDetails
 from vmngclient.endpoints.monitoring_status import MonitoringStatus
+from vmngclient.endpoints.real_time_monitoring.reboot_history import RealTimeMonitoringRebootHistory
 from vmngclient.endpoints.sdavc_cloud_connector import SDAVCCloudConnector
 from vmngclient.endpoints.tenant_backup_restore import TenantBackupRestore
 from vmngclient.endpoints.tenant_management import TenantManagement
@@ -141,6 +142,11 @@ class TroubleshootingToolsContainer:
         self.device_connectivity = TroubleshootingToolsDeviceConnectivity(session)
 
 
+class RealTimeMonitoringContainer:
+    def __init__(self, session: vManageSession):
+        self.reboot_history = RealTimeMonitoringRebootHistory(session)
+
+
 class APIEndpointContainter:
     def __init__(self, session: vManageSession):
         self.administration_user_and_group = AdministrationUserAndGroup(session)
@@ -164,3 +170,4 @@ class APIEndpointContainter:
         self.sd_routing_configuration_feature_profile = SDRoutingConfigurationFeatureProfile(session)
         self.configuration_device_inventory = ConfigurationDeviceInventory(session)
         self.troubleshooting_tools = TroubleshootingToolsContainer(session)
+        self.real_time_monitoring = RealTimeMonitoringContainer(session)
