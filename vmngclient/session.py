@@ -33,7 +33,7 @@ JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
 
 
 class vManageBadResponseError(vManageClientError):
-    """Indicates that vManage returned HTTP status code other than 200."""
+    """Indicates that vManage returned error HTTP status code other than 400."""
 
     def __init__(self, error_info: Optional[ErrorInfo], response: vManageResponse):
         self.response = response
