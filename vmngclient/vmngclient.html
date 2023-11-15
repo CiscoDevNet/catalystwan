@@ -1708,11 +1708,18 @@ works only on provider user mode</p></li>
 <dl class="py exception">
 <dt class="sig sig-object py" id="vmngclient.session.vManageBadRequestError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.session.</span></span><span class="sig-name descname"><span class="pre">vManageBadRequestError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">ErrorInfo</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">vManageResponse</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.session.vManageBadRequestError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">vManageClientError</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#vmngclient.session.vManageBadResponseError" title="vmngclient.session.vManageBadResponseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">vManageBadResponseError</span></code></a></p>
 <p>Indicates that vManage returned HTTP status code 400.</p>
 <p>A 400 Bad Request response status code indicates that the server
 could not understand the request due to invalid syntax,
 malformed request message, or missing request parameters.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="vmngclient.session.vManageBadResponseError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vmngclient.session.</span></span><span class="sig-name descname"><span class="pre">vManageBadResponseError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">ErrorInfo</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">vManageResponse</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vmngclient.session.vManageBadResponseError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">vManageClientError</span></code></p>
+<p>Indicates that vManage returned error HTTP status code other than 400.</p>
 </dd></dl>
 
 <dl class="py class">
@@ -2162,6 +2169,7 @@ for current package</p>
 <li><a class="reference internal" href="#vmngclient.session.create_vManageSession"><code class="docutils literal notranslate"><span class="pre">create_vManageSession()</span></code></a></li>
 <li><a class="reference internal" href="#vmngclient.session.determine_session_type"><code class="docutils literal notranslate"><span class="pre">determine_session_type()</span></code></a></li>
 <li><a class="reference internal" href="#vmngclient.session.vManageBadRequestError"><code class="docutils literal notranslate"><span class="pre">vManageBadRequestError</span></code></a></li>
+<li><a class="reference internal" href="#vmngclient.session.vManageBadResponseError"><code class="docutils literal notranslate"><span class="pre">vManageBadResponseError</span></code></a></li>
 <li><a class="reference internal" href="#vmngclient.session.vManageResponseAdapter"><code class="docutils literal notranslate"><span class="pre">vManageResponseAdapter</span></code></a></li>
 <li><a class="reference internal" href="#vmngclient.session.vManageSession"><code class="docutils literal notranslate"><span class="pre">vManageSession</span></code></a></li>
 </ul>
