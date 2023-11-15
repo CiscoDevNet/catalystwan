@@ -111,7 +111,6 @@ class TestResponse(unittest.TestCase):
 
     @parameterized.expand(
         [
-            (True, None),
             (True, "string"),
             (True, {}),
             (True, {"key1": "string", "key2": 12, "key3": 4.5}),
@@ -126,11 +125,12 @@ class TestResponse(unittest.TestCase):
             (False, {"error": {"message": "Error happened!", "details": "error details", "code": "ABC123"}}),
         ]
     )
-    def test_get_error(self, raises: bool, json: Any):
+    def test_get_error(self, empty_error: bool, json: Any):
         self.response_mock.json.return_value = json
         vmng_response = vManageResponse(self.response_mock)
-        if not raises:
-            assert isinstance(vmng_response.get_error_info(), ErrorInfo)
-        else:
-            with self.assertRaises(TypeError):
-                vmng_response.get_error_info()
+        error_info = vmng_response.get_error_info()
+        assert isinstance(error_info, ErrorInfo)
+        if empty_error:
+            assert error_info.message is None
+            assert error_info.details is None
+            assert error_info.code is None
