@@ -18,10 +18,10 @@ T = TypeVar("T")
 PRINTABLE_CONTENT = re.compile(r"(text\/.+)|(application\/(json|html|xhtml|xml|x-www-form-urlencoded))", re.IGNORECASE)
 
 
-class ErrorInfo(BaseModelV2):
-    message: str
-    details: str
-    code: str
+class ErrorInfo(BaseModel):
+    message: Union[str, None]
+    details: Union[str, None]
+    code: Union[str, None]
 
 
 def response_debug(response: Optional[Response], request: Union[Request, PreparedRequest, None]) -> str:
@@ -211,7 +211,12 @@ class vManageResponse(Response, APIEndpointClientResponse):
         """Returns error information from JSON payload"""
 
         if self.payload.error is None:
-            raise TypeError("Payload error should not be None.")
+            return ErrorInfo(
+                message=None,
+                details=None,
+                code=None,
+            )
+
         return ErrorInfo(**self.payload.error)
 
 
