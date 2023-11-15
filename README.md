@@ -313,6 +313,10 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 ```
 
+## Resonses and exceptions inheritance
+
+![Exceptions](docs/images/exceptions.png)
+
 ## Catching Exceptions
 ```python
 try:
@@ -325,6 +329,7 @@ except vManageBadRequestError as error:
 # details = 'No user with name XYZ was found' 
 # code = 'USER0006'
 ```
+
 
 ## [Supported API endpoints](https://github.com/CiscoDevNet/vManage-client/blob/main/ENDPOINTS.md)
 
