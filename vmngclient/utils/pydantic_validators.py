@@ -1,7 +1,7 @@
 import ipaddress
 from typing import Any
 
-from pydantic import BaseModel, root_validator
+from pydantic.v1 import BaseModel, root_validator
 
 
 class ConvertBoolToStringModel(BaseModel):

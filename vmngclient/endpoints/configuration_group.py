@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put, versions
 from vmngclient.endpoints.configuration_feature_profile import ProfileType, Solution

@@ -2,7 +2,7 @@ import datetime as dt
 from typing import List, Optional
 
 from attr import define, field  # type: ignore
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 
 from vmngclient.exceptions import RetrieveIntervalOutOfRange
 from vmngclient.utils.alarm_status import Severity
@@ -136,6 +136,8 @@ class Device(DataclassBase):
     board_serial: Optional[str] = field(default=None, metadata={FIELD_NAME: "board-serial"})
     vedgeCertificateState: Optional[str] = field(default=None, metadata={FIELD_NAME: "vedgeCertificateState"})  # TODO
     chasis_number: Optional[str] = field(default=None, metadata={FIELD_NAME: "chasisNumber"})
+    site_id: Optional[str] = field(default=None, metadata={FIELD_NAME: "site-id"})
+    site_name: Optional[str] = field(default=None, metadata={FIELD_NAME: "site-name"})
 
     @property
     def is_reachable(self) -> bool:

@@ -41,6 +41,7 @@ from vmngclient.exceptions import AttachedError, TemplateNotFoundError
 from vmngclient.response import vManageResponse
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.device_model import DeviceModel
+from vmngclient.utils.dict import merge
 from vmngclient.utils.template_type import TemplateType
 
 if TYPE_CHECKING:
@@ -575,24 +576,6 @@ class TemplatesAPI:
                 if value is None:
                     continue
 
-            # Merge dictionaries
-
-            # TODO unittests
-            def merge(a, b, path=None):
-                if path is None:
-                    path = []
-                for key in b:
-                    if key in a:
-                        if isinstance(a[key], dict) and isinstance(b[key], dict):
-                            merge(a[key], b[key], path + [str(key)])
-                        elif a[key] == b[key]:
-                            pass  # same leaf value
-                        else:
-                            raise Exception(f"Conflict at {'.'.join(path + [str(key)])}")
-                    else:
-                        a[key] = b[key]
-                return a
-
             # print(field.payload_scheme(value))
             payload.definition = merge(payload.definition, field.payload_scheme(value, priority_order=priority_order))
 
@@ -689,3 +672,19 @@ class TemplatesAPI:
         text_config = self.session.endpoints.configuration_device_template.get_device_configuration_preview(payload)
 
         return CiscoConfParse(text_config.splitlines())
+
+    def load_running(self, device: Device) -> CiscoConfParse:
+        """Load running config from device.
+
+        Args:
+            device: The device from which load config.
+
+        Returns:
+            CiscoConfParse: A working configuration on the machine.
+        """
+        encoded_uuid = device.uuid.replace("/", "%2F")
+        endpoint = f"/dataservice/template/config/running/{encoded_uuid}"
+        response = self.session.get_json(endpoint)
+        config = CiscoConfParse(response["config"].splitlines())
+        logger.debug(f"Template loaded from {device.hostname}.")
+        return config

@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.8', '3.9', '3.10', '3.11']
     defaults:
       run:
         shell: sh
@@ -38,8 +38,4 @@ jobs:
       - name: Check static-typing
         run: poetry run mypy --show-error-codes --show-error-context --pretty --install-types --non-interactive vmngclient --cache-dir=.mypy_cache/
       - name: Check code style
-        run: poetry run flake8 --max-line-length 120 --inline-quotes double vmngclient 
-        if: ${{ matrix.python-version != '3.12' }}
-      - name: Check code style for Python 3.12
-        run: poetry run flake8 --max-line-length 120 --ignore=Q000,W503,W504 vmngclient
-        if: ${{ matrix.python-version == '3.12' }} 
+        run: poetry run flake8 --max-line-length 120 --inline-quotes double vmngclient

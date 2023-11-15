@@ -88,7 +88,7 @@ Start reading our code, and you'll get the hang of it.
   Example:
 
   ```python
-  from pydantic import BaseModel, Field
+  from pydantic.v1 import BaseModel, Field
   from typing import List
   from vmngclient.endpoints import APIEndpoints, request, versions, view
   from vmngclient.utils.session_type import ProviderView

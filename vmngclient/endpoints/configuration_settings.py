@@ -3,7 +3,7 @@ import datetime
 from enum import Enum
 from typing import List, Literal, Optional, Union
 
-from pydantic import BaseModel, Field, IPvAnyAddress, validator
+from pydantic.v1 import BaseModel, Field, IPvAnyAddress, validator
 
 from vmngclient.endpoints import JSON, APIEndpoints, get, post, put, view
 from vmngclient.typed_list import DataSequence
@@ -202,8 +202,8 @@ class MaintenanceWindow(BaseModel):
 
     enabled: Optional[bool] = False
     message: Optional[str] = ""
-    start: Optional[datetime.datetime] = Field(default=None, alias="epochStartTimeInMillis")
-    end: Optional[datetime.datetime] = Field(default=None, alias="epochEndTimeInMillis")
+    start: Optional[int] = Field(default=None, alias="epochStartTimeInMillis")
+    end: Optional[int] = Field(default=None, alias="epochEndTimeInMillis")
 
 
 class ElasticSearchDBSize(BaseModel):

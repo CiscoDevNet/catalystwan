@@ -1,7 +1,7 @@
 # mypy: disable-error-code="empty-body"
 import datetime
 
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 
 from vmngclient.endpoints import APIEndpoints, get
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, List, Optional
 
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 from vmngclient.api.templates.feature_template import FeatureTemplate
 from vmngclient.endpoints.monitoring_device_details import Tier as TierInfo

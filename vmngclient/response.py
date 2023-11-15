@@ -3,7 +3,7 @@ from functools import wraps
 from pprint import pformat
 from typing import Any, Callable, Dict, Optional, Sequence, Type, TypeVar, Union, cast
 
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 from requests import PreparedRequest, Request, Response
 from requests.cookies import RequestsCookieJar
 from requests.exceptions import JSONDecodeError

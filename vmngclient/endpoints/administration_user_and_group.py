@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import Dict, List, Optional, Set
 
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.typed_list import DataSequence

@@ -258,6 +258,7 @@ from vmngclient.workflows.tenant_migration import migration_workflow
 
 tenant = TenantExport(
     name="mango",
+    desc="Mango tenant description",
     org_name="Provider Org-Mango Inc",
     subdomain="mango.fruits.com",
     wan_edge_forecast=100,

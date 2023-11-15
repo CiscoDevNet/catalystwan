@@ -58,7 +58,7 @@ from typing import (
 
 from packaging.specifiers import SpecifierSet  # type: ignore
 from packaging.version import Version  # type: ignore
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 from vmngclient.dataclasses import DataclassBase
 from vmngclient.exceptions import APIEndpointError, APIRequestPayloadTypeError, APIVersionError, APIViewError
