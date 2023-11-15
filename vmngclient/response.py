@@ -18,7 +18,7 @@ T = TypeVar("T")
 PRINTABLE_CONTENT = re.compile(r"(text\/.+)|(application\/(json|html|xhtml|xml|x-www-form-urlencoded))", re.IGNORECASE)
 
 
-class ErrorInfo(BaseModelV1):
+class ErrorInfo(BaseModelV2):
     message: str
     details: str
     code: str
