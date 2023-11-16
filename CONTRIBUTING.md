@@ -82,7 +82,7 @@ Start reading our code, and you'll get the hang of it.
   * endpoint url
   * payload data-model (subtyping `pydantic.BaseModel` and others)
   * return type (subtyping `pydantic.BaseModel` and others)
-  * allowed sessions/views
+  * allowed views (session types)
   * supported versions
 
   Example:
