@@ -243,3 +243,39 @@ class DataSequence(TypedList[T], Generic[T]):
             raise InvalidOperationError("The input sequence contains no elements.")
 
         return self.data[0]
+
+    @classmethod
+    def from_flatlist(cls, model: Type[T], key: str, array: list) -> DataSequence[T]:
+        """Creates a DataSequence of pydantic model from a flat list.
+
+        Some endpoints return a flat list of objects, which cannot be directly casted
+        into a DataSequence. This function creates a DataSequence of pydantic model
+        from a flat list.
+
+        ## Example:
+        >>> flatlist = [
+        ...     "interfacestatistics",
+        ...     "eioltestatistics",
+        ...     "sulstatistics",
+        ...     "qosstatistics",
+        ...     "devicesystemstatusstatistics",
+        ...     ]
+        >>> DataSequence.from_flatlist(EnabledIndex, "indexName", flatlist)
+        DataSequence(EnabledIndex, [
+            EnabledIndex(indexName='interfacestatistics'),
+            EnabledIndex(indexName='eioltestatistics'),
+            EnabledIndex(indexName='sulstatistics'),
+            EnabledIndex(indexName='qosstatistics'),
+            EnabledIndex(indexName='devicesystemstatusstatistics')
+        ])
+
+        Args:
+            model (Type[T]): Type of the model
+            key (str): Key of the model
+            array (list): List of objects
+
+        Returns:
+            DataSequence[T]: DataSequence of pydantic model
+        """
+        mapped_items = [{key: item} for item in array]
+        return cls(model, [model(**item) for item in mapped_items])

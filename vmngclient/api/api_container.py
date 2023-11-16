@@ -18,6 +18,7 @@ from vmngclient.api.config_group_api import ConfigGroupAPI
 from vmngclient.api.dashboard_api import DashboardAPI
 from vmngclient.api.feature_profile_api import SDRoutingFeatureProfilesAPI
 from vmngclient.api.logs_api import LogsAPI
+from vmngclient.api.monitoring_status_api import MonitoringStatusAPI
 from vmngclient.api.omp_api import OmpAPI
 from vmngclient.api.packet_capture_api import PacketCaptureAPI
 from vmngclient.api.partition_manager_api import PartitionManagerAPI
@@ -62,3 +63,4 @@ class APIContainer:
         self.resource_groups = ResourceGroupsAPI(session)
         self.sessions = SessionsAPI(session)
         self.sd_routing_feature_profiles = SDRoutingFeatureProfilesAPI(session)
+        self.monitoring_status = MonitoringStatusAPI(session)
