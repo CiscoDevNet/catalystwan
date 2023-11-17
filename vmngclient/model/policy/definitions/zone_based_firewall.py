@@ -1,10 +1,11 @@
 # mypy: disable-error-code="empty-body"
 from ipaddress import IPv4Network
-from typing import List, Literal, Set, Tuple, Union
+from typing import Dict, List, Literal, Set, Tuple, Union
 
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated
 
+from vmngclient.model.misc.application_protocols import ApplicationProtocol
 from vmngclient.model.policy.policy_definition import (
     AppListEntry,
     BaseAction,
@@ -20,6 +21,7 @@ from vmngclient.model.policy.policy_definition import (
     PolicyDefinitionBody,
     PolicyDefinitionHeader,
     ProtocolEntry,
+    ProtocolNameEntry,
     ProtocolNameListEntry,
     RuleSetListEntry,
     SequenceType,
@@ -44,6 +46,7 @@ ZoneBasedFWPolicySequenceEntry = Annotated[
         DestinationPortEntry,
         DestinationPortListEntry,
         ProtocolEntry,
+        ProtocolNameEntry,
         ProtocolNameListEntry,
         RuleSetListEntry,
         SourceDataPrefixListEntry,
@@ -84,19 +87,13 @@ class ZoneBasedFWPolicySequenceWithRuleSets(DefinitionSequence):
     class Config:
         allow_population_by_field_name = True
 
-    def add_match(self, match: ZoneBasedFWPolicySequenceEntryWithRuleSets):
-        added_fields = [entry.field for entry in self.match.entries]
-        if match.field in added_fields:
-            raise ValueError("{match.field} already added")
-        self.match.entries.append(match)
-
     def match_rule_set_lists(self, rule_set_ids: Set[str]) -> None:
-        self.add_match(RuleSetListEntry.with_rule_set_ids(rule_set_ids))
+        self.insert_match(RuleSetListEntry.with_rule_set_ids(rule_set_ids))
 
     def match_app_list(self, app_list_id: str) -> None:
         if self.base_action != BaseAction.INSPECT:
             raise ValueError("Action must be Inspect when Application/Application Family List is selected.")
-        self.add_match(AppListEntry(ref=app_list_id))
+        self.insert_match(AppListEntry(ref=app_list_id))
 
 
 class ZoneBasedFWPolicySequence(DefinitionSequence):
@@ -105,15 +102,6 @@ class ZoneBasedFWPolicySequence(DefinitionSequence):
 
     class Config:
         allow_population_by_field_name = True
-
-    def insert_match(self, match: ZoneBasedFWPolicySequenceEntry) -> int:
-        # overwrite if exists
-        for index, entry in enumerate(self.match.entries):
-            if match.field == entry.field:
-                self.match.entries[index] == match
-                return index
-        self.match.entries.append(match)
-        return len(self.match.entries) - 1
 
     def match_app_list(self, app_list_id: str) -> None:
         if self.base_action != BaseAction.INSPECT:
@@ -143,6 +131,17 @@ class ZoneBasedFWPolicySequence(DefinitionSequence):
 
     def match_protocols(self, protocols: Set[int]) -> None:
         self.insert_match(ProtocolEntry.from_protocol_set(protocols))
+
+    def match_protocol_names(self, names: Set[str], protocol_map: Dict[str, ApplicationProtocol]) -> None:
+        app_protocols = []
+        for name in names:
+            app_protocol = protocol_map.get(name, None)
+            if app_protocol is None:
+                raise ValueError(f"{name} not found in protocol map keys: {protocol_map.keys()}")
+            app_protocols.append(app_protocol)
+        self.insert_match(ProtocolNameEntry.from_application_protocols(app_protocols))
+        self.insert_match(DestinationPortEntry.from_application_protocols(app_protocols), False)
+        self.insert_match(ProtocolEntry.from_application_protocols(app_protocols), False)
 
     def match_protocol_name_list(self, protocol_name_list_id: str) -> None:
         self.insert_match(ProtocolNameListEntry(ref=protocol_name_list_id))
