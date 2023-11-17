@@ -4,7 +4,10 @@ from unittest.mock import patch
 
 from attr import define, field  # type: ignore
 from parameterized import parameterized  # type: ignore
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel as BaseModelV2
+from pydantic import Field as FieldV2
+from pydantic.v1 import BaseModel as BaseModelV1
+from pydantic.v1 import Field as FieldV1
 
 from vmngclient.dataclasses import DataclassBase
 from vmngclient.response import ErrorInfo, vManageResponse
@@ -18,10 +21,16 @@ class ParsedDataTypeAttrs(DataclassBase):
     key3: Optional[float] = field(default=None)
 
 
-class ParsedDataTypePydantic(BaseModel):
+class ParsedDataTypePydanticV1(BaseModelV1):
     key1: str
     key2: int
-    key3: Optional[float] = Field(default=None)
+    key3: Optional[float] = FieldV1(default=None)
+
+
+class ParsedDataTypePydanticV2(BaseModelV2):
+    key1: str
+    key2: int
+    key3: Optional[float] = FieldV2(default=None)
 
 
 PARSE_DATASEQ_TEST_DATA: List = [
@@ -76,16 +85,28 @@ class TestResponse(unittest.TestCase):
                 vmng_response.dataseq(ParsedDataTypeAttrs, sourcekey)
 
     @parameterized.expand(PARSE_DATASEQ_TEST_DATA)
-    def test_dataseq_pydantic(self, raises: bool, json: Any, expected_len: int, sourcekey: str):
+    def test_dataseq_pydantic_v1(self, raises: bool, json: Any, expected_len: int, sourcekey: str):
         self.response_mock.json.return_value = json
         vmng_response = vManageResponse(self.response_mock)
         if not raises:
-            data_sequence = vmng_response.dataseq(ParsedDataTypePydantic, sourcekey)
+            data_sequence = vmng_response.dataseq(ParsedDataTypePydanticV1, sourcekey)
             assert isinstance(data_sequence, DataSequence)
             assert len(data_sequence) == expected_len
         else:
             with self.assertRaises(Exception):
-                vmng_response.dataseq(ParsedDataTypePydantic, sourcekey)
+                vmng_response.dataseq(ParsedDataTypePydanticV1, sourcekey)
+
+    @parameterized.expand(PARSE_DATASEQ_TEST_DATA)
+    def test_dataseq_pydantic_v2(self, raises: bool, json: Any, expected_len: int, sourcekey: str):
+        self.response_mock.json.return_value = json
+        vmng_response = vManageResponse(self.response_mock)
+        if not raises:
+            data_sequence = vmng_response.dataseq(ParsedDataTypePydanticV2, sourcekey)
+            assert isinstance(data_sequence, DataSequence)
+            assert len(data_sequence) == expected_len
+        else:
+            with self.assertRaises(Exception):
+                vmng_response.dataseq(ParsedDataTypePydanticV2, sourcekey)
 
     @parameterized.expand(PARSE_DATAOBJ_TEST_DATA)
     def test_dataobj_attrs(self, raises: bool, json: Any, sourcekey: str):
@@ -99,15 +120,26 @@ class TestResponse(unittest.TestCase):
                 vmng_response.dataobj(ParsedDataTypeAttrs, sourcekey)
 
     @parameterized.expand(PARSE_DATAOBJ_TEST_DATA)
-    def test_dataobj_pydantic(self, raises: bool, json: Any, sourcekey: str):
+    def test_dataobj_pydantic_v1(self, raises: bool, json: Any, sourcekey: str):
         self.response_mock.json.return_value = json
         vmng_response = vManageResponse(self.response_mock)
         if not raises:
-            data_object = vmng_response.dataobj(ParsedDataTypePydantic, sourcekey)
-            assert isinstance(data_object, ParsedDataTypePydantic)
+            data_object = vmng_response.dataobj(ParsedDataTypePydanticV1, sourcekey)
+            assert isinstance(data_object, ParsedDataTypePydanticV1)
         else:
             with self.assertRaises(Exception):
-                vmng_response.dataobj(ParsedDataTypePydantic, sourcekey)
+                vmng_response.dataobj(ParsedDataTypePydanticV1, sourcekey)
+
+    @parameterized.expand(PARSE_DATAOBJ_TEST_DATA)
+    def test_dataobj_pydantic_v2(self, raises: bool, json: Any, sourcekey: str):
+        self.response_mock.json.return_value = json
+        vmng_response = vManageResponse(self.response_mock)
+        if not raises:
+            data_object = vmng_response.dataobj(ParsedDataTypePydanticV2, sourcekey)
+            assert isinstance(data_object, ParsedDataTypePydanticV2)
+        else:
+            with self.assertRaises(Exception):
+                vmng_response.dataobj(ParsedDataTypePydanticV2, sourcekey)
 
     @parameterized.expand(
         [
