@@ -1,46 +1,102 @@
+# type: ignore
 import unittest
 from unittest.mock import MagicMock, patch
 
 from vmngclient.api.monitoring_status_api import MonitoringStatusAPI
-from vmngclient.endpoints.monitoring_status import DisabledDevice, EnabledIndex
+from vmngclient.endpoints.monitoring_status import (
+    DisabledDeviceListResponse,
+    EnabledIndexDeviceListResponse,
+    Status,
+    StatusEnum,
+    UpdateIndexResponse,
+    UpdateStatus,
+)
 from vmngclient.typed_list import DataSequence
 
 
 class TestMonitoringStatusAPI(unittest.TestCase):
-    @patch("vmngclient.session.Session")
-    def test_get_enabled_index_for_device(self, mock_session):
+    def test_get_statistic_settings(self):
         # Arrange
-        mock_session.get_json.return_value = self.list_enabled_indexes
-        monitoring_status_api = MonitoringStatusAPI(mock_session)
+        self.api._endpoints.get_statistics_settings.return_value = self.returned_get_statistic_settings
         # Act
-        result = monitoring_status_api.get_enabled_index_for_device(self.device_id)
+        result = self.api.get_statistic_settings()
         # Assert
-        self.assertEqual(result, self.list_enabled_indexes_datasequence)
+        assert result == self.expected_get_statistic_settings
+        assert self.api._endpoints.get_statistics_settings.called_once()
 
-    @patch("vmngclient.session.Session")
-    def test_get_disabled_devices_by_index(self, mock_session):
+    def test_update_statistics_settings(self):
         # Arrange
-        mock_session.get_json.return_value = self.get_list_disabled_devices_response
-        monitoring_status_api = MonitoringStatusAPI(mock_session)
+        self.api._endpoints.update_statistics_settings.return_value = self.returned_update_statistics_settings
         # Act
-        result = monitoring_status_api.get_disabled_devices_by_index(self.indexName)
+        result = self.api.update_statistics_settings(self.update_statistics_settings_payload)
         # Assert
-        self.assertEqual(result, self.get_list_disabled_devices_datasequence)
+        assert result == self.expected_update_statistics_settings
+        assert self.api._endpoints.update_statistics_settings.called_once_with(self.update_statistics_settings_payload)
 
-    @patch("vmngclient.session.Session")
-    def test_update_disabled_devices_by_index(self, mock_session):
+    def test_get_disabled_devices_by_index(self):
         # Arrange
-        mock_session.put.return_value = self.update_list_disabled_devices_response
-        monitoring_status_api = MonitoringStatusAPI(mock_session)
+        self.api._endpoints.get_disabled_device_list.return_value = self.returned_list_disabled_devices
         # Act
-        result = monitoring_status_api.update_disabled_devices_by_index(self.indexName, self.device_id)
+        result = self.api.get_disabled_devices_by_index(self.indexName)
         # Assert
-        self.assertEqual(result, self.update_list_disabled_devices_return)
+        assert result == self.expected_list_disabled_devices
+        assert self.api._endpoints.get_disabled_device_list.called_once_with(self.indexName)
 
-    def setUp(self) -> None:
+    def test_update_disabled_devices_by_index(self):
+        # Arrange
+        self.api._endpoints.update_statistics_device_list.return_value = self.returned_update_list_disabled_devices
+        # Act
+        result = self.api.update_disabled_devices_by_index(self.indexName, self.update_disabled_devices_by_index_list)
+        # Assert
+        assert result == self.expected_update_list_disabled_devices
+        assert self.api._endpoints.update_statistics_device_list.called_once_with(
+            self.indexName, self.update_disabled_devices_by_index_list
+        )
+
+    def test_get_enabled_index_for_device(self):
+        # Arrange
+        self.api._endpoints.get_enabled_index_for_device.return_value = self.returned_list_enabled_indexes
+        # Act
+        result = self.api.get_enabled_index_for_device(self.device_id)
+        # Assert
+        assert result == self.expected_list_enabled_indexes
+        assert self.api._endpoints.get_enabled_index_for_device.called_once_with(self.device_id)
+
+    @patch("vmngclient.session.vManageSession")
+    def setUp(self, mock_session) -> None:
+        self.session = mock_session
+        self.session.api_version = None
+        self.session.session_type = None
+        self.session.password = "P4s$w0rD"  # pragma: allowlist secret
+        self.api = MonitoringStatusAPI(self.session)
+        self.api._endpoints = MagicMock()
         self.device_id = "1.1.1.1"
         self.indexName = "aggregatedappsdpisummary"
-        self.list_enabled_indexes = [
+        self.get_statistic_settings = [
+            Status(indexName="interfacestatistics", status=StatusEnum.enable, displayName="Interface Statistics"),
+            Status(indexName="eioltestatistics", status=StatusEnum.enable, displayName="EIO LTE Statistics"),
+            Status(indexName="sulstatistics", status=StatusEnum.enable, displayName="SUL Statistics"),
+        ]
+        self.returned_get_statistic_settings = DataSequence(Status, self.get_statistic_settings)
+        self.expected_get_statistic_settings = DataSequence(Status, self.get_statistic_settings)
+        self.update_statistics_settings_payload = [
+            UpdateStatus(indexName="interfacestatistics", status=StatusEnum.disable),
+            UpdateStatus(indexName="eioltestatistics", status=StatusEnum.disable),
+            UpdateStatus(indexName="sulstatistics", status=StatusEnum.disable),
+        ]
+        self.update_statistics_settings = [
+            Status(indexName="interfacestatistics", status=StatusEnum.disable, displayName="Interface Statistics"),
+            Status(indexName="eioltestatistics", status=StatusEnum.disable, displayName="EIO LTE Statistics"),
+            Status(indexName="sulstatistics", status=StatusEnum.disable, displayName="SUL Statistics"),
+        ]
+        self.returned_update_statistics_settings = DataSequence(Status, self.update_statistics_settings)
+        self.expected_update_statistics_settings = DataSequence(Status, self.update_statistics_settings)
+        self.update_disabled_devices_by_index_list = ["127.0.0.1", "10.0.1.0"]
+        self.expected_update_list_disabled_devices = True
+        self.returned_update_list_disabled_devices = UpdateIndexResponse(response=True)
+        self.returned_list_disabled_devices = DisabledDeviceListResponse(["1.1.1.1", "2.2.2.2", "3.3.3.3"])
+        self.expected_list_disabled_devices = ["1.1.1.1", "2.2.2.2", "3.3.3.3"]
+        self.expected_list_enabled_indexes = [
             "interfacestatistics",
             "eioltestatistics",
             "sulstatistics",
@@ -64,12 +120,4 @@ class TestMonitoringStatusAPI(unittest.TestCase):
             "trackerstatistics",
             "cloudxstatistics",
         ]
-        self.list_enabled_indexes_datasequence = DataSequence.from_flatlist(
-            EnabledIndex, "indexName", self.list_enabled_indexes
-        )
-        self.update_list_disabled_devices_response = MagicMock(status_code=200, response=True)
-        self.update_list_disabled_devices_return = True
-        self.get_list_disabled_devices_response = ["172.16.255.14"]
-        self.get_list_disabled_devices_datasequence = DataSequence.from_flatlist(
-            DisabledDevice, "ip_address", self.get_list_disabled_devices_response
-        )
+        self.returned_list_enabled_indexes = EnabledIndexDeviceListResponse(self.expected_list_enabled_indexes)
