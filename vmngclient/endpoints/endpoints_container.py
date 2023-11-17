@@ -57,6 +57,7 @@ from vmngclient.endpoints.configuration_feature_profile import (
 )
 from vmngclient.endpoints.configuration_group import ConfigurationGroup
 from vmngclient.endpoints.configuration_settings import ConfigurationSettings
+from vmngclient.endpoints.misc import MiscellaneousEndpoints
 from vmngclient.endpoints.monitoring_device_details import MonitoringDeviceDetails
 from vmngclient.endpoints.monitoring_status import MonitoringStatus
 from vmngclient.endpoints.sdavc_cloud_connector import SDAVCCloudConnector
@@ -152,3 +153,4 @@ class APIEndpointContainter:
         self.sd_routing_configuration_feature_profile = SDRoutingConfigurationFeatureProfile(session)
         self.configuration_device_inventory = ConfigurationDeviceInventory(session)
         self.troubleshooting_tools = TroubleshootingToolsContainer(session)
+        self.misc = MiscellaneousEndpoints(session)

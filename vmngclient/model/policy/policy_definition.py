@@ -1,11 +1,12 @@
 import datetime
 from enum import Enum
 from ipaddress import IPv4Network
-from typing import Any, List, Optional, Protocol, Sequence, Set, Tuple, Union
+from typing import Any, Dict, List, MutableSequence, Optional, Protocol, Sequence, Set, Tuple, Union
 
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated, Literal
 
+from vmngclient.model.misc.application_protocols import ApplicationProtocol
 from vmngclient.typed_list import DataSequence
 
 # TODO: add validators for custom strings (eg.: port ranges, space separated networks)
@@ -100,10 +101,18 @@ class PLPEntry(BaseModel):
 class ProtocolEntry(BaseModel):
     field: Literal["protocol"] = "protocol"
     value: str = Field(description="0-255 single numbers separate by space")
+    app: Optional[str] = None
 
     @staticmethod
     def from_protocol_set(protocols: Set[int]) -> "ProtocolEntry":
         return ProtocolEntry(value=" ".join(str(p) for p in protocols))
+
+    @staticmethod
+    def from_application_protocols(app_prots: List[ApplicationProtocol]) -> "ProtocolEntry":
+        return ProtocolEntry(
+            value=" ".join(p.protocol_as_string_of_numbers() for p in app_prots),
+            app=" ".join(p.name for p in app_prots),
+        )
 
 
 class DSCPEntry(BaseModel):
@@ -141,12 +150,20 @@ class DestinationIPEntry(BaseModel):
 class DestinationPortEntry(BaseModel):
     field: Literal["destinationPort"] = "destinationPort"
     value: str = Field(description="0-65535 range or separate by space")
+    app: Optional[str] = None
 
     @staticmethod
     def from_port_set_and_ranges(
         ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []
     ) -> "DestinationPortEntry":
         return DestinationPortEntry(value=port_set_and_ranges_to_str(ports, port_ranges))
+
+    @staticmethod
+    def from_application_protocols(app_prots: List[ApplicationProtocol]) -> "DestinationPortEntry":
+        return DestinationPortEntry(
+            value=" ".join(p.port for p in app_prots if p.port),
+            app=" ".join(p.name for p in app_prots),
+        )
 
 
 class TCPEntry(BaseModel):
@@ -187,6 +204,15 @@ class SourceGeoLocationEntry(BaseModel):
 class DestinationGeoLocationEntry(BaseModel):
     field: Literal["destinationGeoLocation"] = "destinationGeoLocation"
     value: str = Field(description="Space separated list of ISO3166 country codes")
+
+
+class ProtocolNameEntry(BaseModel):
+    field: Literal["protocolName"] = "protocolName"
+    value: str
+
+    @staticmethod
+    def from_application_protocols(app_prots: List[ApplicationProtocol]) -> "ProtocolNameEntry":
+        return ProtocolNameEntry(value=" ".join(p.name for p in app_prots))
 
 
 class SourceDataPrefixListEntry(BaseModel):
@@ -294,10 +320,28 @@ Entry = Annotated[
         SourcePortListEntry,
         DestinationPortListEntry,
         ProtocolNameListEntry,
+        ProtocolNameEntry,
         RuleSetListEntry,
     ],
     Field(discriminator="field"),
 ]
+
+MUTUALLY_EXCLUSIVE_MATCH_FIELDS = [
+    {"destinationDataPrefixList", "destinationIp"},
+    {"sourceDataPrefixList", "sourceIp"},
+    {"protocolName", "protocolNameList", "protocol", "destinationPort", "destinationPortList"},
+]
+
+
+def generate_field_name_check_lookup(spec: Sequence[Set[str]]) -> Dict[str, List[str]]:
+    lookup: Dict[str, List[str]] = {}
+    for exclusive_set in spec:
+        for field in exclusive_set:
+            lookup[field] = list(exclusive_set - {field})
+    return lookup
+
+
+MUTUALLY_EXCLUSIVE_MATCH_FIELD_LOOKUP = generate_field_name_check_lookup(MUTUALLY_EXCLUSIVE_MATCH_FIELDS)
 
 
 class Match(BaseModel):
@@ -317,6 +361,27 @@ class DefinitionSequence(BaseModel):
     ruleset: Optional[bool] = None
     match: Match
     actions: List[Any] = []
+
+    def insert_match(self, match: Entry, insert_field_check: bool = True) -> int:
+        # inserts new item or replaces item with same field name if found
+        if insert_field_check:
+            self.check_match_can_be_inserted(match)
+        if isinstance(self.match.entries, MutableSequence):
+            for index, entry in enumerate(self.match.entries):
+                if match.field == entry.field:
+                    self.match.entries[index] == match
+                    return index
+            self.match.entries.append(match)
+            return len(self.match.entries) - 1
+        else:
+            raise TypeError("Match entries must be defined as MutableSequence (eg. List) to use insert_match method")
+
+    def check_match_can_be_inserted(self, match: Entry) -> None:
+        existing_fields = set([entry.field for entry in self.match.entries])
+        forbidden_fields = set(MUTUALLY_EXCLUSIVE_MATCH_FIELD_LOOKUP.get(match.field, []))
+        colliding_fields = set(existing_fields) & set(forbidden_fields)
+        if colliding_fields:
+            raise ValueError(f"{match.field} is mutually exclusive with {colliding_fields}")
 
 
 class DefaultAction(BaseModel):

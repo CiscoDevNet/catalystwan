@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Mapping, Optional, Type, Union, overload
+from typing import TYPE_CHECKING, Any, Dict, Mapping, Optional, Type, Union, overload
 
 from vmngclient.api.task_status_api import Task
 from vmngclient.endpoints.configuration.policy.definition.data import (
@@ -95,6 +95,7 @@ from vmngclient.endpoints.configuration.policy.vsmart_template import (
     ConfigurationVSmartTemplatePolicy,
     VSmartConnectivityStatus,
 )
+from vmngclient.model.misc.application_protocols import ApplicationProtocol
 from vmngclient.model.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
 from vmngclient.model.policy.definitions.qos_map import QoSMap
 from vmngclient.model.policy.definitions.rule_set import RuleSet
@@ -634,3 +635,10 @@ class PolicyAPI:
         self.security = SecurityPolicyAPI(session)
         self.definitions = PolicyDefinitionsAPI(session)
         self.lists = PolicyListsAPI(session)
+
+    def get_protocol_map(self) -> Dict[str, ApplicationProtocol]:
+        result = {}
+        protocol_map_list = self._session.endpoints.misc.get_application_protocols()
+        for protocol_map in protocol_map_list:
+            result.update(protocol_map.__root__)
+        return result
