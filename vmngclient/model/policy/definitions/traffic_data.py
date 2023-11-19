@@ -1,5 +1,5 @@
 # mypy: disable-error-code="empty-body"
-from typing import List, Union
+from typing import Any, List, Union
 
 from pydantic import Field
 from typing_extensions import Annotated
@@ -17,7 +17,6 @@ from vmngclient.model.policy.policy_definition import (
     DSCPEntry,
     PacketLengthEntry,
     PLPEntry,
-    PolicyDefinitionBody,
     PolicyDefinitionHeader,
     ProtocolEntry,
     SourceDataIPv6PrefixListEntry,
@@ -28,7 +27,7 @@ from vmngclient.model.policy.policy_definition import (
     TrafficToEntry,
 )
 
-DataPolicySequenceEntry = Annotated[
+TrafficDataPolicySequenceEntry = Annotated[
     Union[
         PacketLengthEntry,
         PLPEntry,
@@ -52,19 +51,21 @@ DataPolicySequenceEntry = Annotated[
     Field(discriminator="field"),
 ]
 
+TrafficDataPolicySequenceActions = Any  # TODO
 
-class DataPolicyHeader(PolicyDefinitionHeader):
+
+class TrafficDataPolicyHeader(PolicyDefinitionHeader):
     type: str = Field(default="data", const=True)
 
 
-class DataPolicySequence(DefinitionSequence):
+class TrafficDataPolicySequence(DefinitionSequence):
     type: str = Field(default="data", const=True)
-    entries: List[DataPolicySequenceEntry]
+    entries: List[TrafficDataPolicySequenceEntry]
+    actions: List[TrafficDataPolicySequenceActions]
 
 
-class DataPolicyDefinition(PolicyDefinitionBody):
-    sequences: List[DataPolicySequence] = []
+class TrafficDataPolicy(TrafficDataPolicyHeader):
+    sequences: List[TrafficDataPolicySequence] = []  # type: ignore [assignment]
 
-
-class DataPolicy(DataPolicyHeader):
-    type: str = Field(default="data", const=True)
+    def add_ipv4_sequence(self, name: str) -> TrafficDataPolicySequence:
+        pass

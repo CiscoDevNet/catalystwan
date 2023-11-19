@@ -6,12 +6,12 @@ from vmngclient.endpoints.administration_user_and_group import AdministrationUse
 from vmngclient.endpoints.certificate_management_vmanage import CertificateManagementVManage
 from vmngclient.endpoints.client import Client
 from vmngclient.endpoints.cluster_management import ClusterManagement
-from vmngclient.endpoints.configuration.policy.definition.data import ConfigurationPolicyDataDefinition
 from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition
 from vmngclient.endpoints.configuration.policy.definition.rule_set import ConfigurationPolicyRuleSetDefinition
 from vmngclient.endpoints.configuration.policy.definition.security_group import (
     ConfigurationPolicySecurityGroupDefinition,
 )
+from vmngclient.endpoints.configuration.policy.definition.traffic_data import ConfigurationPolicyDataDefinition
 from vmngclient.endpoints.configuration.policy.definition.zone_based_firewall import (
     ConfigurationPolicyZoneBasedFirewallDefinition,
 )

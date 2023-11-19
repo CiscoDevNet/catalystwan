@@ -3,11 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Dict, Mapping, Optional, Type, Union, overload
 
 from vmngclient.api.task_status_api import Task
-from vmngclient.endpoints.configuration.policy.definition.data import (
-    ConfigurationPolicyDataDefinition,
-    DataPolicy,
-    DataPolicyGetResponse,
-)
 from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition, QoSMapInfo
 from vmngclient.endpoints.configuration.policy.definition.rule_set import (
     ConfigurationPolicyRuleSetDefinition,
@@ -16,6 +11,12 @@ from vmngclient.endpoints.configuration.policy.definition.rule_set import (
 from vmngclient.endpoints.configuration.policy.definition.security_group import (
     ConfigurationPolicySecurityGroupDefinition,
     SecurityGroupInfo,
+)
+from vmngclient.endpoints.configuration.policy.definition.traffic_data import (
+    ConfigurationPolicyDataDefinition,
+    TrafficDataPolicy,
+    TrafficDataPolicyGetResponse,
+    TrafficDataPolicyInfo,
 )
 from vmngclient.endpoints.configuration.policy.definition.zone_based_firewall import (
     ConfigurationPolicyZoneBasedFirewallDefinition,
@@ -138,11 +139,7 @@ from vmngclient.model.policy.localized import (
     LocalizedPolicyEditResponse,
     LocalizedPolicyInfo,
 )
-from vmngclient.model.policy.policy_definition import (
-    PolicyDefinitionEditResponse,
-    PolicyDefinitionEndpoints,
-    PolicyDefinitionInfo,
-)
+from vmngclient.model.policy.policy_definition import PolicyDefinitionEditResponse, PolicyDefinitionEndpoints
 from vmngclient.model.policy.policy_list import PolicyListEndpoints
 from vmngclient.model.policy.security import SecurityPolicy, SecurityPolicyEditResponse, SecurityPolicyInfo
 from vmngclient.typed_list import DataSequence
@@ -186,11 +183,11 @@ POLICY_DEFINITION_ENDPOINTS_MAP: Mapping[type, type] = {
     RuleSet: ConfigurationPolicyRuleSetDefinition,
     SecurityGroup: ConfigurationPolicySecurityGroupDefinition,
     ZoneBasedFWPolicy: ConfigurationPolicyZoneBasedFirewallDefinition,
-    DataPolicy: ConfigurationPolicyDataDefinition,
+    TrafficDataPolicy: ConfigurationPolicyDataDefinition,
     QoSMap: ConfigurationPolicyQoSMapDefinition,
 }
 
-SupportedPolicyDefinitions = Union[RuleSet, SecurityGroup, ZoneBasedFWPolicy, DataPolicy, QoSMap]
+SupportedPolicyDefinitions = Union[RuleSet, SecurityGroup, ZoneBasedFWPolicy, TrafficDataPolicy, QoSMap]
 
 
 class CentralizedPolicyAPI:
@@ -577,7 +574,7 @@ class PolicyDefinitionsAPI:
         endpoints.delete_policy_definition(id=id)
 
     @overload
-    def get(self, type: Type[DataPolicy]) -> DataSequence[PolicyDefinitionInfo]:
+    def get(self, type: Type[TrafficDataPolicy]) -> DataSequence[TrafficDataPolicyInfo]:
         ...
 
     @overload
@@ -599,7 +596,7 @@ class PolicyDefinitionsAPI:
     # get by id
 
     @overload
-    def get(self, type: Type[DataPolicy], id: str) -> DataPolicyGetResponse:
+    def get(self, type: Type[TrafficDataPolicy], id: str) -> TrafficDataPolicyGetResponse:
         ...
 
     @overload
