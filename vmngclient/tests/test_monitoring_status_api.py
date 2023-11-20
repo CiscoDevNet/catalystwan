@@ -22,7 +22,6 @@ class TestMonitoringStatusAPI(unittest.TestCase):
         result = self.api.get_statistic_settings()
         # Assert
         assert result == self.expected_get_statistic_settings
-        assert self.api._endpoints.get_statistics_settings.called_once()
 
     def test_update_statistics_settings(self):
         # Arrange
@@ -31,7 +30,6 @@ class TestMonitoringStatusAPI(unittest.TestCase):
         result = self.api.update_statistics_settings(self.update_statistics_settings_payload)
         # Assert
         assert result == self.expected_update_statistics_settings
-        assert self.api._endpoints.update_statistics_settings.called_once_with(self.update_statistics_settings_payload)
 
     def test_get_disabled_devices_by_index(self):
         # Arrange
@@ -40,7 +38,6 @@ class TestMonitoringStatusAPI(unittest.TestCase):
         result = self.api.get_disabled_devices_by_index(self.indexName)
         # Assert
         assert result == self.expected_list_disabled_devices
-        assert self.api._endpoints.get_disabled_device_list.called_once_with(self.indexName)
 
     def test_update_disabled_devices_by_index(self):
         # Arrange
@@ -49,9 +46,6 @@ class TestMonitoringStatusAPI(unittest.TestCase):
         result = self.api.update_disabled_devices_by_index(self.indexName, self.update_disabled_devices_by_index_list)
         # Assert
         assert result == self.expected_update_list_disabled_devices
-        assert self.api._endpoints.update_statistics_device_list.called_once_with(
-            self.indexName, self.update_disabled_devices_by_index_list
-        )
 
     def test_get_enabled_index_for_device(self):
         # Arrange
@@ -60,7 +54,6 @@ class TestMonitoringStatusAPI(unittest.TestCase):
         result = self.api.get_enabled_index_for_device(self.device_id)
         # Assert
         assert result == self.expected_list_enabled_indexes
-        assert self.api._endpoints.get_enabled_index_for_device.called_once_with(self.device_id)
 
     @patch("vmngclient.session.vManageSession")
     def setUp(self, mock_session) -> None:
