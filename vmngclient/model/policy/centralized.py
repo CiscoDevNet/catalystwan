@@ -39,7 +39,20 @@ class CentralizedPolicyAssemblyItem(AssemblyItem):
 
 class TrafficDataApplication(CentralizedPolicyAssemblyItem):
     type: Literal["data"] = "data"
-    entries: Optional[List[TrafficDataApplicationEntry]] = []
+    entries: List[TrafficDataApplicationEntry] = []
+
+    def apply(
+        self,
+        site_list_ids: List[str],
+        vpn_list_ids: List[str],
+        direction: TrafficDataDirectionEnum = TrafficDataDirectionEnum.SERVICE,
+    ) -> None:
+        entry = TrafficDataApplicationEntry(  # type: ignore[call-arg]
+            direction=direction,
+            site_lists=site_list_ids,
+            vpn_lists=vpn_list_ids,
+        )
+        self.entries.append(entry)
 
 
 class CentralizedPolicyDefinition(PolicyDefinition):
@@ -51,9 +64,10 @@ class CentralizedPolicyDefinition(PolicyDefinition):
 
 
 class CentralizedPolicy(PolicyCreationPayload):
-    policy_definition: CentralizedPolicyDefinition = Field(alias="policyDefinition")
+    policy_definition: CentralizedPolicyDefinition = Field(CentralizedPolicyDefinition(), alias="policyDefinition")
+    policy_type: str = Field("feature", const=True, alias="policyType")
 
-    def add_traffic_data(self, traffic_data_id: str) -> TrafficDataApplication:
+    def add_traffic_data_policy(self, traffic_data_id: str) -> TrafficDataApplication:
         item = TrafficDataApplication(definition_id=traffic_data_id)  # type: ignore[call-arg]
         self.policy_definition.assembly.append(item)
         return item

@@ -9,9 +9,6 @@ from typing_extensions import Annotated, Literal
 from vmngclient.model.misc.application_protocols import ApplicationProtocol
 from vmngclient.typed_list import DataSequence
 
-# TODO: add validators for custom strings (eg.: port ranges, space separated networks)
-# TODO: model actions
-
 
 def port_set_and_ranges_to_str(ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> str:
     if not ports and not port_ranges:
@@ -215,6 +212,16 @@ class ProtocolNameEntry(BaseModel):
         return ProtocolNameEntry(value=" ".join(p.name for p in app_prots))
 
 
+class ForwardingClassEntry(BaseModel):
+    field: Literal["forwardingClass"] = "forwardingClass"
+    value: str
+
+
+class NATPoolEntry(BaseModel):
+    field: Literal["pool"] = "pool"
+    value: str
+
+
 class SourceDataPrefixListEntry(BaseModel):
     field: Literal["sourceDataPrefixList"] = "sourceDataPrefixList"
     ref: str
@@ -289,7 +296,58 @@ class RuleSetListEntry(BaseModel):
         return RuleSetListEntry(ref=" ".join(rule_set_ids))
 
 
-Entry = Annotated[
+class PrefferedColorGroupListEntry(BaseModel):
+    field: Literal["preferredColorGroup"] = "preferredColorGroup"
+    ref: str
+    color_restrict: bool = Field(False, alias="colorRestrict")
+
+    class Config:
+        allow_population_by_field_name = True
+
+
+ActionSetEntry = Annotated[
+    Union[DSCPEntry, ForwardingClassEntry, PrefferedColorGroupListEntry],
+    Field(discriminator="field"),
+]
+
+
+class LogAction(BaseModel):
+    type: Literal["log"] = "log"
+    parameter: str = ""
+
+
+class CountAction(BaseModel):
+    type: Literal["count"] = "count"
+    parameter: str
+
+
+class ActionSet(BaseModel):
+    type: Literal["set"] = "set"
+    parameter: Sequence[ActionSetEntry]
+
+
+class NATAction(BaseModel):
+    type: Literal["nat"] = "nat"
+    parameter: NATPoolEntry
+
+
+class CFlowDAction(BaseModel):
+    type: Literal["cflowd"] = "cflowd"
+
+
+ActionEntry = Annotated[
+    Union[
+        LogAction,
+        CountAction,
+        ActionSet,
+        NATAction,
+        CFlowDAction,
+    ],
+    Field(discriminator="field"),
+]
+
+
+MatchEntry = Annotated[
     Union[
         PacketLengthEntry,
         PLPEntry,
@@ -345,7 +403,7 @@ MUTUALLY_EXCLUSIVE_MATCH_FIELD_LOOKUP = generate_field_name_check_lookup(MUTUALL
 
 
 class Match(BaseModel):
-    entries: Sequence[Entry]
+    entries: Sequence[MatchEntry]
 
 
 class Action(BaseModel):
@@ -360,9 +418,9 @@ class DefinitionSequence(BaseModel):
     sequence_ip_type: SequenceIpType = Field(alias="sequenceIpType")
     ruleset: Optional[bool] = None
     match: Match
-    actions: List[Any] = []
+    actions: Sequence[Any]  # allow any for now, chenge to ActionEntry when complete
 
-    def insert_match(self, match: Entry, insert_field_check: bool = True) -> int:
+    def insert_match(self, match: MatchEntry, insert_field_check: bool = True) -> int:
         # inserts new item or replaces item with same field name if found
         if insert_field_check:
             self.check_match_can_be_inserted(match)
@@ -376,12 +434,21 @@ class DefinitionSequence(BaseModel):
         else:
             raise TypeError("Match entries must be defined as MutableSequence (eg. List) to use insert_match method")
 
-    def check_match_can_be_inserted(self, match: Entry) -> None:
+    def check_match_can_be_inserted(self, match: MatchEntry) -> None:
         existing_fields = set([entry.field for entry in self.match.entries])
         forbidden_fields = set(MUTUALLY_EXCLUSIVE_MATCH_FIELD_LOOKUP.get(match.field, []))
         colliding_fields = set(existing_fields) & set(forbidden_fields)
         if colliding_fields:
             raise ValueError(f"{match.field} is mutually exclusive with {colliding_fields}")
+
+    def insert_action(self, action: ActionEntry) -> None:
+        if isinstance(self.actions, MutableSequence):
+            for index, entry in enumerate(self.actions):
+                if action.type == entry.type:
+                    self.actions[index] == action
+            self.actions.append(action)
+        else:
+            raise TypeError("Action entries must be defined as MutableSequence (eg. List) to use insert_match method")
 
 
 class DefaultAction(BaseModel):
