@@ -62,7 +62,15 @@ class SiteList(PolicyListHeader):
 
 class VPNList(PolicyListHeader):
     type: Literal["vpn"] = "vpn"
-    entries: List[VPNListEntry]
+    entries: List[VPNListEntry] = []
+
+    def add_vpns(self, vpns: List[int]):
+        for vpn in vpns:
+            self.entries.append(VPNListEntry(vpn=str(vpn)))  # type: ignore[call-arg]
+
+    def add_vpn_range(self, vpn_range: Tuple[int, int]):
+        entry = VPNListEntry(vpn=f"{vpn_range[0]}-{vpn_range[1]}")  # type: ignore[call-arg]
+        self.entries.append(entry)
 
 
 class ZoneList(PolicyListHeader):
