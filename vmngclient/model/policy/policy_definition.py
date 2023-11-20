@@ -285,7 +285,7 @@ class RuleSetListEntry(BaseModel):
     ref: str
 
     @staticmethod
-    def with_rule_set_ids(rule_set_ids: Set[str]) -> "RuleSetListEntry":
+    def from_rule_set_ids(rule_set_ids: Set[str]) -> "RuleSetListEntry":
         return RuleSetListEntry(ref=" ".join(rule_set_ids))
 
 

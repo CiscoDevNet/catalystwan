@@ -88,7 +88,7 @@ class ZoneBasedFWPolicySequenceWithRuleSets(DefinitionSequence):
         allow_population_by_field_name = True
 
     def match_rule_set_lists(self, rule_set_ids: Set[str]) -> None:
-        self.insert_match(RuleSetListEntry.with_rule_set_ids(rule_set_ids))
+        self.insert_match(RuleSetListEntry.from_rule_set_ids(rule_set_ids))
 
     def match_app_list(self, app_list_id: str) -> None:
         if self.base_action != BaseAction.INSPECT:
