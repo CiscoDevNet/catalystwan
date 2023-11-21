@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional, Set, Union
+from typing import List, Literal, Optional, Set, Tuple, Union
 
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated
@@ -49,12 +49,28 @@ class DataPrefixList(PolicyListHeader):
 
 class SiteList(PolicyListHeader):
     type: Literal["site"] = "site"
-    entries: List[SiteListEntry]
+    entries: List[SiteListEntry] = []
+
+    def add_sites(self, sites: List[int]):
+        for site in sites:
+            self.entries.append(SiteListEntry(site_id=str(site)))  # type: ignore[call-arg]
+
+    def add_site_range(self, site_range: Tuple[int, int]):
+        entry = SiteListEntry(site_id=f"{site_range[0]}-{site_range[1]}")  # type: ignore[call-arg]
+        self.entries.append(entry)
 
 
 class VPNList(PolicyListHeader):
     type: Literal["vpn"] = "vpn"
-    entries: List[VPNListEntry]
+    entries: List[VPNListEntry] = []
+
+    def add_vpns(self, vpns: List[int]):
+        for vpn in vpns:
+            self.entries.append(VPNListEntry(vpn=str(vpn)))  # type: ignore[call-arg]
+
+    def add_vpn_range(self, vpn_range: Tuple[int, int]):
+        entry = VPNListEntry(vpn=f"{vpn_range[0]}-{vpn_range[1]}")  # type: ignore[call-arg]
+        self.entries.append(entry)
 
 
 class ZoneList(PolicyListHeader):

@@ -1,7 +1,8 @@
 # mypy: disable-error-code="empty-body"
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.definitions.data import DataPolicy, DataPolicyHeader
+from vmngclient.model.policy.definitions.traffic_data import TrafficDataPolicy, TrafficDataPolicyHeader
+from vmngclient.model.policy.policy import PolicyId
 from vmngclient.model.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
@@ -12,21 +13,21 @@ from vmngclient.model.policy.policy_definition import (
 from vmngclient.typed_list import DataSequence
 
 
-class DataPolicyGetResponse(DataPolicy, PolicyDefinitionId):
+class TrafficDataPolicyGetResponse(TrafficDataPolicy, PolicyDefinitionId):
     pass
 
 
-class DataPolicyEditPayload(DataPolicy, PolicyDefinitionId):
+class TrafficDataPolicyEditPayload(TrafficDataPolicy, PolicyDefinitionId):
     pass
 
 
-class DataPolicyInfo(DataPolicyHeader, PolicyDefinitionInfo):
+class TrafficDataPolicyInfo(TrafficDataPolicyHeader, PolicyDefinitionInfo, PolicyId):
     pass
 
 
 class ConfigurationPolicyDataDefinition(APIEndpoints, PolicyDefinitionEndpoints):
     @post("/template/policy/definition/data")
-    def create_policy_definition(self, payload: DataPolicy) -> PolicyDefinitionId:
+    def create_policy_definition(self, payload: TrafficDataPolicy) -> PolicyDefinitionId:
         ...
 
     @delete("/template/policy/definition/data/{id}")
@@ -38,7 +39,7 @@ class ConfigurationPolicyDataDefinition(APIEndpoints, PolicyDefinitionEndpoints)
         ...
 
     @put("/template/policy/definition/data/{id}")
-    def edit_policy_definition(self, id: str, payload: DataPolicyEditPayload) -> PolicyDefinitionEditResponse:
+    def edit_policy_definition(self, id: str, payload: TrafficDataPolicyEditPayload) -> PolicyDefinitionEditResponse:
         ...
 
     @get("/template/policy/definition/data", "data")
@@ -46,11 +47,11 @@ class ConfigurationPolicyDataDefinition(APIEndpoints, PolicyDefinitionEndpoints)
         ...
 
     @get("/template/policy/definition/data/{id}")
-    def get_policy_definition(self, id: str) -> DataPolicyGetResponse:
+    def get_policy_definition(self, id: str) -> TrafficDataPolicyGetResponse:
         ...
 
     @post("/template/policy/definition/data/preview")
-    def preview_policy_definition(self, payload: DataPolicy) -> PolicyDefinitionPreview:
+    def preview_policy_definition(self, payload: TrafficDataPolicy) -> PolicyDefinitionPreview:
         ...
 
     @get("/template/policy/definition/data/preview/{id}")

@@ -9,9 +9,6 @@ from typing_extensions import Annotated, Literal
 from vmngclient.model.misc.application_protocols import ApplicationProtocol
 from vmngclient.typed_list import DataSequence
 
-# TODO: add validators for custom strings (eg.: port ranges, space separated networks)
-# TODO: model actions
-
 
 def port_set_and_ranges_to_str(ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> str:
     if not ports and not port_ranges:
@@ -215,6 +212,16 @@ class ProtocolNameEntry(BaseModel):
         return ProtocolNameEntry(value=" ".join(p.name for p in app_prots))
 
 
+class ForwardingClassEntry(BaseModel):
+    field: Literal["forwardingClass"] = "forwardingClass"
+    value: str
+
+
+class NATPoolEntry(BaseModel):
+    field: Literal["pool"] = "pool"
+    value: str
+
+
 class SourceDataPrefixListEntry(BaseModel):
     field: Literal["sourceDataPrefixList"] = "sourceDataPrefixList"
     ref: str
@@ -285,11 +292,62 @@ class RuleSetListEntry(BaseModel):
     ref: str
 
     @staticmethod
-    def with_rule_set_ids(rule_set_ids: Set[str]) -> "RuleSetListEntry":
+    def from_rule_set_ids(rule_set_ids: Set[str]) -> "RuleSetListEntry":
         return RuleSetListEntry(ref=" ".join(rule_set_ids))
 
 
-Entry = Annotated[
+class PrefferedColorGroupListEntry(BaseModel):
+    field: Literal["preferredColorGroup"] = "preferredColorGroup"
+    ref: str
+    color_restrict: bool = Field(False, alias="colorRestrict")
+
+    class Config:
+        allow_population_by_field_name = True
+
+
+ActionSetEntry = Annotated[
+    Union[DSCPEntry, ForwardingClassEntry, PrefferedColorGroupListEntry],
+    Field(discriminator="field"),
+]
+
+
+class LogAction(BaseModel):
+    type: Literal["log"] = "log"
+    parameter: str = ""
+
+
+class CountAction(BaseModel):
+    type: Literal["count"] = "count"
+    parameter: str
+
+
+class ActionSet(BaseModel):
+    type: Literal["set"] = "set"
+    parameter: Sequence[ActionSetEntry]
+
+
+class NATAction(BaseModel):
+    type: Literal["nat"] = "nat"
+    parameter: NATPoolEntry
+
+
+class CFlowDAction(BaseModel):
+    type: Literal["cflowd"] = "cflowd"
+
+
+ActionEntry = Annotated[
+    Union[
+        LogAction,
+        CountAction,
+        ActionSet,
+        NATAction,
+        CFlowDAction,
+    ],
+    Field(discriminator="field"),
+]
+
+
+MatchEntry = Annotated[
     Union[
         PacketLengthEntry,
         PLPEntry,
@@ -345,7 +403,7 @@ MUTUALLY_EXCLUSIVE_MATCH_FIELD_LOOKUP = generate_field_name_check_lookup(MUTUALL
 
 
 class Match(BaseModel):
-    entries: Sequence[Entry]
+    entries: Sequence[MatchEntry]
 
 
 class Action(BaseModel):
@@ -360,9 +418,9 @@ class DefinitionSequence(BaseModel):
     sequence_ip_type: SequenceIpType = Field(alias="sequenceIpType")
     ruleset: Optional[bool] = None
     match: Match
-    actions: List[Any] = []
+    actions: Sequence[Any]  # allow any for now, chenge to ActionEntry when complete
 
-    def insert_match(self, match: Entry, insert_field_check: bool = True) -> int:
+    def insert_match(self, match: MatchEntry, insert_field_check: bool = True) -> int:
         # inserts new item or replaces item with same field name if found
         if insert_field_check:
             self.check_match_can_be_inserted(match)
@@ -376,12 +434,21 @@ class DefinitionSequence(BaseModel):
         else:
             raise TypeError("Match entries must be defined as MutableSequence (eg. List) to use insert_match method")
 
-    def check_match_can_be_inserted(self, match: Entry) -> None:
+    def check_match_can_be_inserted(self, match: MatchEntry) -> None:
         existing_fields = set([entry.field for entry in self.match.entries])
         forbidden_fields = set(MUTUALLY_EXCLUSIVE_MATCH_FIELD_LOOKUP.get(match.field, []))
         colliding_fields = set(existing_fields) & set(forbidden_fields)
         if colliding_fields:
             raise ValueError(f"{match.field} is mutually exclusive with {colliding_fields}")
+
+    def insert_action(self, action: ActionEntry) -> None:
+        if isinstance(self.actions, MutableSequence):
+            for index, entry in enumerate(self.actions):
+                if action.type == entry.type:
+                    self.actions[index] == action
+            self.actions.append(action)
+        else:
+            raise TypeError("Action entries must be defined as MutableSequence (eg. List) to use insert_match method")
 
 
 class DefaultAction(BaseModel):
@@ -424,6 +491,51 @@ class PolicyDefinitionBody(BaseModel):
         default=DefaultAction(type=DefaultActionType.DROP), alias="defaultAction"
     )
     sequences: Sequence[DefinitionSequence] = []
+
+    def _enumerate_sequences(self, from_index: int = 0) -> None:
+        """Updates sequence entries with appropriate index.
+
+        Args:
+            from_index (int, optional): Only rules after that index in table will be updated. Defaults to 0.
+        """
+        if isinstance(self.sequences, MutableSequence):
+            start_index = from_index
+            sequence_count = len(self.sequences)
+            if from_index < 0:
+                start_index = sequence_count - start_index
+            for i in range(start_index, sequence_count):
+                self.sequences[i].sequence_id = i + 1
+        else:
+            raise TypeError("sequences be defined as MutableSequence (eg. List) to use _enumerate_sequences method")
+
+    def pop(self, index: int = -1) -> None:
+        """Removes a sequence item at given index, consecutive sequence items will be enumarated again.
+
+        Args:
+            index (int, optional): Defaults to -1.
+        """
+        if isinstance(self.sequences, MutableSequence):
+            self.sequences.pop(index)
+            self._enumerate_sequences(index)
+        else:
+            raise TypeError("sequences be defined as MutableSequence (eg. List) to use pop method")
+
+    def add(self, item: DefinitionSequence) -> int:
+        """Adds new sequence item as last in table, index will be autogenerated.
+
+        Args:
+            item (DefinitionSequence): item to be added to sequences
+
+        Returns:
+            int: index at which item was added
+        """
+        if isinstance(self.sequences, MutableSequence):
+            insert_index = len(self.sequences)
+            self.sequences.append(item)
+            self._enumerate_sequences(insert_index)
+            return insert_index
+        else:
+            raise TypeError("sequences be defined as MutableSequence (eg. List) to add method")
 
 
 class PolicyDefinitionCreationPayload(PolicyDefinitionHeader):

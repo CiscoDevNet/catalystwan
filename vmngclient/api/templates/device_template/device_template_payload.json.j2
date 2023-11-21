@@ -14,5 +14,6 @@
 			{{ template | tojson }}
 		{% if not loop.last %},{% endif %}
 		{% endfor %}
-  ]
+  ],
+  "securityPolicyId": "{{ security_policy_id }}"
 }
