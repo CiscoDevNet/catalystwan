@@ -48,6 +48,7 @@ class DeviceTemplate(BaseModel):
     general_templates: List[GeneralTemplate] = Field(alias="generalTemplates")
     device_role: str = Field(default="sdwan-edge", alias="deviceRole")
     device_type: DeviceModel = Field(alias="deviceType")
+    security_policy_id: str = Field(default="", alias="securityPolicyId")
 
     def generate_payload(self) -> str:
         env = Environment(
