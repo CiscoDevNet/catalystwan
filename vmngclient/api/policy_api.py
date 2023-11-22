@@ -4,6 +4,10 @@ from typing import TYPE_CHECKING, Any, Dict, Mapping, Optional, Type, Union, ove
 
 from vmngclient.api.task_status_api import Task
 from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition, QoSMapInfo
+from vmngclient.endpoints.configuration.policy.definition.rewrite import (
+    ConfigurationPolicyRewriteRuleDefinition,
+    RewritePolicyInfo,
+)
 from vmngclient.endpoints.configuration.policy.definition.rule_set import (
     ConfigurationPolicyRuleSetDefinition,
     RuleSetInfo,
@@ -99,6 +103,7 @@ from vmngclient.endpoints.configuration.policy.vsmart_template import (
 from vmngclient.model.misc.application_protocols import ApplicationProtocol
 from vmngclient.model.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
 from vmngclient.model.policy.definitions.qos_map import QoSMap
+from vmngclient.model.policy.definitions.rewrite import RewritePolicy
 from vmngclient.model.policy.definitions.rule_set import RuleSet
 from vmngclient.model.policy.definitions.security_group import SecurityGroup
 from vmngclient.model.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy
@@ -185,9 +190,10 @@ POLICY_DEFINITION_ENDPOINTS_MAP: Mapping[type, type] = {
     ZoneBasedFWPolicy: ConfigurationPolicyZoneBasedFirewallDefinition,
     TrafficDataPolicy: ConfigurationPolicyDataDefinition,
     QoSMap: ConfigurationPolicyQoSMapDefinition,
+    RewritePolicy: ConfigurationPolicyRewriteRuleDefinition,
 }
 
-SupportedPolicyDefinitions = Union[RuleSet, SecurityGroup, ZoneBasedFWPolicy, TrafficDataPolicy, QoSMap]
+SupportedPolicyDefinitions = Union[RuleSet, SecurityGroup, ZoneBasedFWPolicy, TrafficDataPolicy, QoSMap, RewritePolicy]
 
 
 class CentralizedPolicyAPI:
@@ -593,6 +599,10 @@ class PolicyDefinitionsAPI:
     def get(self, type: Type[QoSMap]) -> DataSequence[QoSMapInfo]:
         ...
 
+    @overload
+    def get(self, type: Type[RewritePolicy]) -> DataSequence[RewritePolicyInfo]:
+        ...
+
     # get by id
 
     @overload
@@ -613,6 +623,10 @@ class PolicyDefinitionsAPI:
 
     @overload
     def get(self, type: Type[QoSMap], id: str) -> QoSMapInfo:
+        ...
+
+    @overload
+    def get(self, type: Type[RewritePolicy], id: str) -> RewritePolicyInfo:
         ...
 
     def get(self, type: Type[SupportedPolicyDefinitions], id: Optional[str] = None) -> Any:
