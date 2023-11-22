@@ -1,12 +1,15 @@
 import datetime
 from enum import Enum
-from ipaddress import IPv4Network
+from functools import wraps
+from ipaddress import IPv4Address, IPv4Network
 from typing import Any, Dict, List, MutableSequence, Optional, Protocol, Sequence, Set, Tuple, Union
 
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated, Literal
 
+from vmngclient.model.common import TLOCColorEnum
 from vmngclient.model.misc.application_protocols import ApplicationProtocol
+from vmngclient.model.policy.lists_entries import EncapEnum
 from vmngclient.typed_list import DataSequence
 
 
@@ -58,6 +61,18 @@ class DestinationRegionEntryValues(str, Enum):
     OTHER = "other-region"
 
 
+class LocalTLOCListEntryValue(BaseModel):
+    color: TLOCColorEnum
+    encap: EncapEnum
+    restrict: Optional[str] = None
+
+
+class TLOCEntryValue(BaseModel):
+    ip: IPv4Address
+    color: TLOCColorEnum
+    encap: EncapEnum
+
+
 class SequenceIpType(str, Enum):
     IPV4 = "ipv4"
     IPV6 = "ipv6"
@@ -85,9 +100,34 @@ class Optimized(str, Enum):
     FALSE = "false"
 
 
+class DNSTypeEntryValues(str, Enum):
+    HOST = "host"
+    UMBRELLA = "umbrella"
+
+
+class LossProtectionEnum(str, Enum):
+    FEC_ADAPTIVE = "fecAdaptive"
+    FEC_ALWAYS = "fecAlways"
+    PACKET_DUPLICATION = "packetDuplication"
+
+
+class ServiceChainEntryValue(BaseModel):
+    type: str = Field("SC1", regex=r"SC(1[0-6]|[1-9])")
+    vpn: str
+    restrict: Optional[str] = None
+    local: Optional[str] = None
+    tloc: Optional[TLOCEntryValue] = None
+
+
 class PacketLengthEntry(BaseModel):
     field: Literal["packetLength"] = "packetLength"
     value: str = Field(description="0-65536 range or single number")
+
+    @staticmethod
+    def from_range(packet_lengths: Tuple[int, int]) -> "PacketLengthEntry":
+        if packet_lengths[0] == packet_lengths[1]:
+            return PacketLengthEntry(value=str(packet_lengths[0]))
+        return PacketLengthEntry(value=f"{packet_lengths[0]}-{packet_lengths[1]}")
 
 
 class PLPEntry(BaseModel):
@@ -124,6 +164,11 @@ class SourceIPEntry(BaseModel):
     @staticmethod
     def from_ipv4_networks(networks: List[IPv4Network]) -> "SourceIPEntry":
         return SourceIPEntry(value=ipv4_networks_to_str(networks))
+
+
+class IPAddressEntry(BaseModel):
+    field: Literal["ipAddress"] = "ipAddress"
+    value: IPv4Address
 
 
 class SourcePortEntry(BaseModel):
@@ -214,12 +259,67 @@ class ProtocolNameEntry(BaseModel):
 
 class ForwardingClassEntry(BaseModel):
     field: Literal["forwardingClass"] = "forwardingClass"
-    value: str
+    value: str = Field(max_length=32)
 
 
 class NATPoolEntry(BaseModel):
     field: Literal["pool"] = "pool"
     value: str
+
+
+class UseVPNEntry(BaseModel):
+    field: Literal["useVpn"] = "useVpn"
+    value: str = "0"
+
+
+class FallBackEntry(BaseModel):
+    field: Literal["fallback"] = "fallback"
+    value: str = ""
+
+
+class NextHopEntry(BaseModel):
+    field: Literal["nextHop"] = "nextHop"
+    value: IPv4Address
+
+
+class NextHopLooseEntry(BaseModel):
+    field: Literal["nextHopLoose"] = "nextHopLoose"
+    value: str
+
+
+class LocalTLOCListEntry(BaseModel):
+    field: Literal["localTlocList"] = "localTlocList"
+    value: LocalTLOCListEntryValue
+
+
+class DNSTypeEntry(BaseModel):
+    field: Literal["dnsType"] = "dnsType"
+    value: DNSTypeEntryValues
+
+
+class ServiceChainEntry(BaseModel):
+    field: Literal["serviceChain"] = "serviceChain"
+    value: ServiceChainEntryValue
+
+
+class VPNEntry(BaseModel):
+    field: Literal["vpn"] = "vpn"
+    value: str
+
+
+class TLOCEntry(BaseModel):
+    field: Literal["tloc"] = "tloc"
+    value: TLOCEntryValue
+
+
+class NATVPNEntry(BaseModel):
+    __root__: List[Union[UseVPNEntry, FallBackEntry]]
+
+    @staticmethod
+    def from_nat_vpn(fallback: bool, vpn: int = 0) -> "NATVPNEntry":
+        if fallback:
+            return NATVPNEntry(__root__=[UseVPNEntry(value=str(vpn)), FallBackEntry()])
+        return NATVPNEntry(__root__=[UseVPNEntry(value=str(vpn))])
 
 
 class SourceDataPrefixListEntry(BaseModel):
@@ -296,6 +396,16 @@ class RuleSetListEntry(BaseModel):
         return RuleSetListEntry(ref=" ".join(rule_set_ids))
 
 
+class PolicerListEntry(BaseModel):
+    field: Literal["policer"] = "policer"
+    ref: str
+
+
+class TLOCListEntry(BaseModel):
+    field: Literal["tlocList"] = "tlocList"
+    ref: str
+
+
 class PrefferedColorGroupListEntry(BaseModel):
     field: Literal["preferredColorGroup"] = "preferredColorGroup"
     ref: str
@@ -305,8 +415,23 @@ class PrefferedColorGroupListEntry(BaseModel):
         allow_population_by_field_name = True
 
 
+RedirectDNSActionEntry = Union[IPAddressEntry, DNSTypeEntry]
+
+
 ActionSetEntry = Annotated[
-    Union[DSCPEntry, ForwardingClassEntry, PrefferedColorGroupListEntry],
+    Union[
+        DSCPEntry,
+        ForwardingClassEntry,
+        PrefferedColorGroupListEntry,
+        LocalTLOCListEntry,
+        NextHopEntry,
+        NextHopLooseEntry,
+        PolicerListEntry,
+        ServiceChainEntry,
+        VPNEntry,
+        TLOCListEntry,
+        TLOCEntry,
+    ],
     Field(discriminator="field"),
 ]
 
@@ -323,16 +448,78 @@ class CountAction(BaseModel):
 
 class ActionSet(BaseModel):
     type: Literal["set"] = "set"
-    parameter: Sequence[ActionSetEntry]
+    parameter: List[ActionSetEntry] = []
 
 
 class NATAction(BaseModel):
     type: Literal["nat"] = "nat"
-    parameter: NATPoolEntry
+    parameter: Union[NATPoolEntry, NATVPNEntry]
+
+    @staticmethod
+    def from_nat_pool(nat_pool: int) -> "NATAction":
+        return NATAction(parameter=NATPoolEntry(value=str(nat_pool)))
+
+    @staticmethod
+    def from_nat_vpn(fallback: bool, vpn: int = 0) -> "NATAction":
+        return NATAction(parameter=NATVPNEntry.from_nat_vpn(fallback=fallback, vpn=vpn))
 
 
 class CFlowDAction(BaseModel):
     type: Literal["cflowd"] = "cflowd"
+
+
+class RedirectDNSAction(BaseModel):
+    type: Literal["redirectDns"] = "redirectDns"
+    parameter: RedirectDNSActionEntry
+
+    @staticmethod
+    def from_ip_address(ip: IPv4Address) -> "RedirectDNSAction":
+        return RedirectDNSAction(parameter=IPAddressEntry(value=ip))
+
+    @staticmethod
+    def from_dns_type(dns_type: DNSTypeEntryValues = DNSTypeEntryValues.HOST) -> "RedirectDNSAction":
+        return RedirectDNSAction(parameter=DNSTypeEntry(value=dns_type))
+
+
+class TCPOptimizationAction(BaseModel):
+    type: Literal["tcpOptimization"] = "tcpOptimization"
+    parameter: str = ""
+
+
+class DREOptimizationAction(BaseModel):
+    type: Literal["dreOptimization"] = "dreOptimization"
+    parameter: str = ""
+
+
+class ServiceNodeGroupAction(BaseModel):
+    type: Literal["serviceNodeGroup"] = "serviceNodeGroup"
+    parameter: str = Field(default="", regex=r"^(SNG-APPQOE(3[01]|[12][0-9]|[1-9])?)?$")
+
+
+class LossProtectionAction(BaseModel):
+    type: Literal["lossProtect"] = "lossProtect"
+    parameter: LossProtectionEnum
+
+
+class LossProtectionFECAction(BaseModel):
+    type: Literal["lossProtectFec"] = "lossProtectFec"
+    parameter: LossProtectionEnum = LossProtectionEnum.FEC_ALWAYS
+    value: Optional[str] = Field(default=None, description="BETA")
+
+
+class LossProtectionPacketDuplicationAction(BaseModel):
+    type: Literal["lossProtectPktDup"] = "lossProtectPktDup"
+    parameter: LossProtectionEnum = LossProtectionEnum.PACKET_DUPLICATION
+
+
+class SecureInternetGatewayAction(BaseModel):
+    type: Literal["sig"] = "sig"
+    parameter: str = ""
+
+
+class FallBackToRoutingAction(BaseModel):
+    type: Literal["fallbackToRouting"] = "fallbackToRouting"
+    parameter: str = ""
 
 
 ActionEntry = Annotated[
@@ -342,6 +529,15 @@ ActionEntry = Annotated[
         ActionSet,
         NATAction,
         CFlowDAction,
+        RedirectDNSAction,
+        TCPOptimizationAction,
+        DREOptimizationAction,
+        ServiceNodeGroupAction,
+        LossProtectionAction,
+        LossProtectionFECAction,
+        LossProtectionPacketDuplicationAction,
+        SecureInternetGatewayAction,
+        FallBackToRoutingAction,
     ],
     Field(discriminator="field"),
 ]
@@ -384,10 +580,12 @@ MatchEntry = Annotated[
     Field(discriminator="field"),
 ]
 
-MUTUALLY_EXCLUSIVE_MATCH_FIELDS = [
+MUTUALLY_EXCLUSIVE_FIELDS = [
     {"destinationDataPrefixList", "destinationIp"},
     {"sourceDataPrefixList", "sourceIp"},
     {"protocolName", "protocolNameList", "protocol", "destinationPort", "destinationPortList"},
+    {"localTlocList", "preferredColorGroup"},
+    {"sig", "fallbackToRouting", "nat", "nextHop", "serviceChain"},
 ]
 
 
@@ -399,7 +597,7 @@ def generate_field_name_check_lookup(spec: Sequence[Set[str]]) -> Dict[str, List
     return lookup
 
 
-MUTUALLY_EXCLUSIVE_MATCH_FIELD_LOOKUP = generate_field_name_check_lookup(MUTUALLY_EXCLUSIVE_MATCH_FIELDS)
+MUTUALLY_EXCLUSIVE_FIELD_LOOKUP = generate_field_name_check_lookup(MUTUALLY_EXCLUSIVE_FIELDS)
 
 
 class Match(BaseModel):
@@ -418,7 +616,32 @@ class DefinitionSequence(BaseModel):
     sequence_ip_type: SequenceIpType = Field(alias="sequenceIpType")
     ruleset: Optional[bool] = None
     match: Match
-    actions: Sequence[Any]  # allow any for now, chenge to ActionEntry when complete
+    actions: Sequence[Any]  # allow any for now, change to ActionEntry when complete
+
+    @staticmethod
+    def check_field_collision(field: str, fields: Sequence[str]) -> None:
+        existing_fields = set(fields)
+        forbidden_fields = set(MUTUALLY_EXCLUSIVE_FIELD_LOOKUP.get(field, []))
+        colliding_fields = set(existing_fields) & set(forbidden_fields)
+        if colliding_fields:
+            raise ValueError(f"{field} is mutually exclusive with {colliding_fields}")
+
+    def check_match_can_be_inserted(self, match: MatchEntry) -> None:
+        self.check_field_collision(
+            match.field,
+            [entry.field for entry in self.match.entries],
+        )
+
+    def check_action_can_be_inserted_in_set(
+        self, action: ActionSetEntry, action_set_param: List[ActionSetEntry]
+    ) -> None:
+        self.check_field_collision(
+            action.field,
+            [param.field for param in action_set_param],
+        )
+
+    def get_match_entries_by_field(self, field: str) -> Sequence[MatchEntry]:
+        return [entry for entry in self.match.entries if entry.field == field]
 
     def insert_match(self, match: MatchEntry, insert_field_check: bool = True) -> int:
         # inserts new item or replaces item with same field name if found
@@ -427,28 +650,60 @@ class DefinitionSequence(BaseModel):
         if isinstance(self.match.entries, MutableSequence):
             for index, entry in enumerate(self.match.entries):
                 if match.field == entry.field:
-                    self.match.entries[index] == match
+                    self.match.entries[index] = match
                     return index
             self.match.entries.append(match)
             return len(self.match.entries) - 1
         else:
             raise TypeError("Match entries must be defined as MutableSequence (eg. List) to use insert_match method")
 
-    def check_match_can_be_inserted(self, match: MatchEntry) -> None:
-        existing_fields = set([entry.field for entry in self.match.entries])
-        forbidden_fields = set(MUTUALLY_EXCLUSIVE_MATCH_FIELD_LOOKUP.get(match.field, []))
-        colliding_fields = set(existing_fields) & set(forbidden_fields)
-        if colliding_fields:
-            raise ValueError(f"{match.field} is mutually exclusive with {colliding_fields}")
-
     def insert_action(self, action: ActionEntry) -> None:
         if isinstance(self.actions, MutableSequence):
             for index, entry in enumerate(self.actions):
                 if action.type == entry.type:
-                    self.actions[index] == action
+                    self.actions[index] = action
+                    return
             self.actions.append(action)
         else:
             raise TypeError("Action entries must be defined as MutableSequence (eg. List) to use insert_match method")
+
+    def remove_action(self, action_type_name: str) -> None:
+        if isinstance(self.actions, MutableSequence):
+            self.actions[:] = [action for action in self.actions if action.type != action_type_name]
+
+    def insert_action_in_set(self, action: ActionSetEntry) -> None:
+        if isinstance(self.actions, MutableSequence):
+            # Check if ActionSet entry already exist
+            action_sets = [act for act in self.actions if isinstance(act, ActionSet)]
+            if len(action_sets) < 1:
+                # if not found insert new empty ActionSet
+                action_set = ActionSet()
+                self.actions.append(action_set)
+            else:
+                action_set = action_sets[0]
+            # Now we operate on action_set parameter list
+            self.check_action_can_be_inserted_in_set(action, action_set.parameter)
+            for index, param in enumerate(action_set.parameter):
+                if action.field == param.field:
+                    action_set.parameter[index] = action
+                    return
+            action_set.parameter.append(action)
+
+    def remove_action_from_set(self, field_name: str) -> None:
+        if isinstance(self.actions, MutableSequence):
+            for action in self.actions:
+                if isinstance(action, ActionSet):
+                    action.parameter[:] = [param for param in action.parameter if param.field != field_name]
+
+
+def accept_action(method):
+    @wraps(method)
+    def wrapper(self: DefinitionSequence, *args, **kwargs):
+        if self.base_action != BaseAction.ACCEPT:
+            raise ValueError(f"{method.__name__} only allowed when base_action is {BaseAction.ACCEPT}")
+        return method(self, *args, **kwargs)
+
+    return wrapper
 
 
 class DefaultAction(BaseModel):
@@ -490,7 +745,7 @@ class PolicyDefinitionBody(BaseModel):
     default_action: Optional[DefaultAction] = Field(
         default=DefaultAction(type=DefaultActionType.DROP), alias="defaultAction"
     )
-    sequences: Sequence[DefinitionSequence] = []
+    sequences: Optional[Sequence[DefinitionSequence]] = None
 
     def _enumerate_sequences(self, from_index: int = 0) -> None:
         """Updates sequence entries with appropriate index.
