@@ -1,4 +1,3 @@
-# mypy: disable-error-code="empty-body"
 from enum import Enum
 from ipaddress import IPv4Network, IPv6Network
 from typing import Optional, Union

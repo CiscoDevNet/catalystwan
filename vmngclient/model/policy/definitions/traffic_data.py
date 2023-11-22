@@ -1,4 +1,3 @@
-# mypy: disable-error-code="empty-body"
 from ipaddress import IPv4Address, IPv4Network
 from typing import Any, List, Optional, Set, Tuple, Union, overload
 

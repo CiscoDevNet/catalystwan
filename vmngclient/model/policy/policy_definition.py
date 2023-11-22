@@ -2,7 +2,7 @@ import datetime
 from enum import Enum
 from functools import wraps
 from ipaddress import IPv4Address, IPv4Network
-from typing import Any, Dict, List, MutableSequence, Optional, Protocol, Sequence, Set, Tuple, Union
+from typing import Dict, List, MutableSequence, Optional, Protocol, Sequence, Set, Tuple, Union
 
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated, Literal
@@ -539,7 +539,7 @@ ActionEntry = Annotated[
         SecureInternetGatewayAction,
         FallBackToRoutingAction,
     ],
-    Field(discriminator="field"),
+    Field(discriminator="type"),
 ]
 
 
@@ -616,7 +616,7 @@ class DefinitionSequence(BaseModel):
     sequence_ip_type: SequenceIpType = Field(alias="sequenceIpType")
     ruleset: Optional[bool] = None
     match: Match
-    actions: Sequence[Any]  # allow any for now, change to ActionEntry when complete
+    actions: Sequence[ActionEntry]
 
     @staticmethod
     def check_field_collision(field: str, fields: Sequence[str]) -> None:
