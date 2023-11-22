@@ -73,7 +73,7 @@ class ClusterManagement(APIEndpoints):
         ...
 
     @get("/clusterManagement/vManage/details/{vmanageIP}", "data")
-    def get_v_manage_details(self, vmanageIP: str) -> DataSequence[VManageDetails]:
+    def get_vmanage_details(self, vmanageIP: str) -> DataSequence[VManageDetails]:
         ...
 
     def health_details(self):
