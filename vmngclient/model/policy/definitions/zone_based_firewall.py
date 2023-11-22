@@ -1,6 +1,5 @@
-# mypy: disable-error-code="empty-body"
 from ipaddress import IPv4Network
-from typing import Dict, List, Literal, Set, Tuple, Union
+from typing import Dict, List, Set, Tuple, Union
 
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated
@@ -17,6 +16,7 @@ from vmngclient.model.policy.policy_definition import (
     DestinationIPEntry,
     DestinationPortEntry,
     DestinationPortListEntry,
+    LogAction,
     Match,
     PolicyDefinitionBody,
     PolicyDefinitionHeader,
@@ -70,11 +70,6 @@ ZoneBasedFWPolicySequenceEntryWithRuleSets = Annotated[
 ]
 
 
-class LogAction(BaseModel):
-    type: Literal["log"] = "log"
-    parameter: str = ""
-
-
 class ZoneBasedFWPolicyMatches(Match):
     entries: List[ZoneBasedFWPolicySequenceEntry] = []
 
@@ -83,6 +78,7 @@ class ZoneBasedFWPolicySequenceWithRuleSets(DefinitionSequence):
     sequence_type: SequenceType = Field(default=SequenceType.ZONE_BASED_FW, const=True, alias="sequenceType")
     match: ZoneBasedFWPolicyMatches
     ruleset: bool = True
+    actions: List[LogAction]
 
     class Config:
         allow_population_by_field_name = True
@@ -99,6 +95,7 @@ class ZoneBasedFWPolicySequenceWithRuleSets(DefinitionSequence):
 class ZoneBasedFWPolicySequence(DefinitionSequence):
     sequence_type: SequenceType = Field(default=SequenceType.ZONE_BASED_FW, const=True, alias="sequenceType")
     match: ZoneBasedFWPolicyMatches
+    actions: List[LogAction]
 
     class Config:
         allow_population_by_field_name = True

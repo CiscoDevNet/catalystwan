@@ -7,6 +7,7 @@ from vmngclient.endpoints.certificate_management_vmanage import CertificateManag
 from vmngclient.endpoints.client import Client
 from vmngclient.endpoints.cluster_management import ClusterManagement
 from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition
+from vmngclient.endpoints.configuration.policy.definition.rewrite import ConfigurationPolicyRewriteRuleDefinition
 from vmngclient.endpoints.configuration.policy.definition.rule_set import ConfigurationPolicyRuleSetDefinition
 from vmngclient.endpoints.configuration.policy.definition.security_group import (
     ConfigurationPolicySecurityGroupDefinition,
@@ -109,6 +110,7 @@ class ConfigurationPolicyDefinitionContainer:
         self.security_group = ConfigurationPolicySecurityGroupDefinition(session)
         self.zone_based_firewall = ConfigurationPolicyZoneBasedFirewallDefinition(session)
         self.qos_map = ConfigurationPolicyQoSMapDefinition(session)
+        self.rewrite = ConfigurationPolicyRewriteRuleDefinition(session)
 
 
 class ConfigurationPolicyContainer:
