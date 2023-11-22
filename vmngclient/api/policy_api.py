@@ -269,6 +269,9 @@ class LocalizedPolicyAPI:
             return self._endpoints.get_device_list_by_policy(id)
         return self._endpoints.get_vedge_policy_device_list()
 
+    def preview(self, id: str) -> str:
+        return self._endpoints.preview_by_id(id).preview
+
 
 class SecurityPolicyAPI:
     def __init__(self, session: vManageSession):

@@ -2,9 +2,9 @@
 """
 [Draft] 'pip install vmngclient==0.17.3.dev4'
 This example demonstrates usage of PolicyAPI in vmngclient
-Code below executes equivalent of WEB-UI steps presented in
+Code below provides same results as obtained after executing workflow manually via WEB-UI according to:
 'Forwarding and QoS Configuration Guide for vEdge Routers, Cisco SD-WAN Release 20'
-https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/qos/vEdge-20-x/qos-book/forwarding-qos.html#Cisco_Concept.dita_bce41c9c-323f-4a04-af08-38604e5de0ee
+https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/qos/vEdge-20-x/qos-book/forwarding-qos.html#Cisco_Concept.dita_aa3e0d07-462e-463f-8f45-681f38f61ab0
 I.   Map Each Forwarding Class to an Output Queue
 II.  Configure Localized Policy
     A. Enable Cloud QoS
@@ -155,8 +155,17 @@ with create_vManageSession(**SESSION_PARAMS) as session:
     rw_pol.add_rule(class_map_ref=pol_dict["BULK"], plp="high", dscp=10, l2cos=4)
     pol_dict["My-Rewrite-Policy"] = api.definitions.create(rw_pol)
 
-    input("Check in browser that policies are created. Press Enter to remove created items ...")
+    loc_pol.add_rewrite_rule(pol_dict["My-Rewrite-Policy"])
+    pol_dict["My-Localized-Policy"] = api.localized.create(loc_pol)
 
+    print(api.localized.preview(pol_dict["My-Localized-Policy"]))
+    print(
+        "Check contents of My-Localized-Policy in browser: "
+        f"\u001b[36;1m{session.get_full_url('#/app/config/policy/localizedPolicy/policies')}\u001b[0m"
+    )
+    input("Press Enter to remove created items ...")
+
+    api.localized.delete(pol_dict["My-Localized-Policy"])
     api.definitions.delete(RewritePolicy, pol_dict["My-Rewrite-Policy"])
     api.definitions.delete(QoSMap, pol_dict["My-QosMap-Policy"])
     api.lists.delete(ClassMapList, pol_dict["VOICE"])
