@@ -6,7 +6,7 @@ from vmngclient.model.policy.localized import (
     LocalizedPolicyEditResponse,
     LocalizedPolicyInfo,
 )
-from vmngclient.model.policy.policy import PolicyId
+from vmngclient.model.policy.policy import PolicyId, PolicyPreview
 from vmngclient.typed_list import DataSequence
 
 
@@ -41,4 +41,8 @@ class ConfigurationVEdgeTemplatePolicy(APIEndpoints):
 
     @get("/template/policy/vedge/definition/{id}")
     def get_vedge_template(self, id: str) -> LocalizedPolicy:
+        ...
+
+    @get("/template/policy/assembly/vedge/{id}")
+    def preview_by_id(self, id: str) -> PolicyPreview:
         ...

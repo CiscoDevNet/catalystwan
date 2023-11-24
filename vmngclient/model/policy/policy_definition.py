@@ -17,7 +17,7 @@ def port_set_and_ranges_to_str(ports: Set[int] = set(), port_ranges: List[Tuple[
     if not ports and not port_ranges:
         raise ValueError("Non empty port set or port range list must be provided")
     ports_str = " ".join(f"{port_begin}-{port_end}" for port_begin, port_end in port_ranges)
-    ports_str = " " if ports_str else ""
+    ports_str += " " if ports_str else ""
     ports_str += " ".join(str(p) for p in ports)
     return ports_str
 

@@ -45,3 +45,7 @@ class PolicyInfo(PolicyEditPayload):
     last_updated_by: str = Field(alias="lastUpdatedBy")
     last_updated_on: datetime.datetime = Field(alias="lastUpdatedOn")
     policy_version: Optional[str] = Field(None, alias="policyVersion")
+
+
+class PolicyPreview(BaseModel):
+    preview: str

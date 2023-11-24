@@ -51,7 +51,7 @@ class SiteList(PolicyListHeader):
     type: Literal["site"] = "site"
     entries: List[SiteListEntry] = []
 
-    def add_sites(self, sites: List[int]):
+    def add_sites(self, sites: Set[int]):
         for site in sites:
             self.entries.append(SiteListEntry(site_id=str(site)))  # type: ignore[call-arg]
 
@@ -64,7 +64,7 @@ class VPNList(PolicyListHeader):
     type: Literal["vpn"] = "vpn"
     entries: List[VPNListEntry] = []
 
-    def add_vpns(self, vpns: List[int]):
+    def add_vpns(self, vpns: Set[int]):
         for vpn in vpns:
             self.entries.append(VPNListEntry(vpn=str(vpn)))  # type: ignore[call-arg]
 
