@@ -49,7 +49,7 @@ class DeviceDeletionResponse(BaseModel):
 
 class DeviceCategory(str, Enum):
     CONTROLLERS = "controllers"
-    VEDGES = "vedge"
+    VEDGES = "vedges"
 
 
 class DeviceDetailsResponse(BaseModel):
