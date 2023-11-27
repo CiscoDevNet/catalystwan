@@ -2,7 +2,7 @@
 from enum import Enum
 from typing import List, Optional
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.endpoints import APIEndpoints, delete, post, versions
 from vmngclient.utils.personality import Personality
@@ -28,6 +28,8 @@ class Protocol(str, Enum):
 
 
 class DeviceCreationPayload(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     device_ip: str = Field(alias="deviceIP")
     generate_csr: bool = Field(alias="generateCSR")
     password: str
@@ -36,16 +38,12 @@ class DeviceCreationPayload(BaseModel):
     protocol: Protocol = Protocol.DTLS
     username: str
 
-    class Config:
-        allow_population_by_field_name = True
-
 
 class DeviceDeletionResponse(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     local_delete_from_db: bool = Field(alias="localDeleteFromDB")
     id: str
-
-    class Config:
-        allow_population_by_field_name = True
 
 
 class ConfigurationDeviceInventory(APIEndpoints):
