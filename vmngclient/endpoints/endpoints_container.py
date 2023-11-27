@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from vmngclient.endpoints.administration_user_and_group import AdministrationUserAndGroup
+from vmngclient.endpoints.certificate_management_device import CertificateManagementDevice
 from vmngclient.endpoints.certificate_management_vmanage import CertificateManagementVManage
 from vmngclient.endpoints.client import Client
 from vmngclient.endpoints.cluster_management import ClusterManagement
@@ -171,3 +172,4 @@ class APIEndpointContainter:
         self.configuration_device_inventory = ConfigurationDeviceInventory(session)
         self.troubleshooting_tools = TroubleshootingToolsContainer(session)
         self.real_time_monitoring = RealTimeMonitoringContainer(session)
+        self.certificate_management_device = CertificateManagementDevice(session)
