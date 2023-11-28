@@ -1,6 +1,6 @@
 from typing import List
 
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 
 from vmngclient.model.policy.policy_definition import PLPEntryValues, PolicyDefinitionBody, PolicyDefinitionHeader
 

@@ -2,7 +2,7 @@ import datetime as dt
 from typing import List, Optional
 
 from attr import define, field  # type: ignore
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 
 from vmngclient.exceptions import RetrieveIntervalOutOfRange
 from vmngclient.utils.alarm_status import Severity
@@ -142,17 +142,6 @@ class Device(DataclassBase):
     @property
     def is_reachable(self) -> bool:
         return self.reachability is Reachability.REACHABLE
-
-
-@define(field_transformer=convert_attributes)
-class Reboot(DataclassBase):
-    reason: str = field(metadata={FIELD_NAME: "reboot_reason"})
-    dateTime: dt.datetime = field(metadata={FIELD_NAME: "reboot_date_time"})
-    vdeviceName: str = field(metadata={FIELD_NAME: "vdevice-name"})
-    rebootDateTimeDate: dt.datetime = field(metadata={FIELD_NAME: "reboot_date_time-date"})
-    vdeviceDataKey: str = field(metadata={FIELD_NAME: "vdevice-dataKey"})
-    lastUpdated: dt.datetime = field(metadata={FIELD_NAME: "lastupdated"})
-    vdeviceHostName: int = field(metadata={FIELD_NAME: "vdevice-host-name"})
 
 
 @define

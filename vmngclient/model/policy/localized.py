@@ -1,6 +1,6 @@
 from typing import List, Literal, Optional
 
-from pydantic import BaseModel, Field, IPvAnyAddress, validator
+from pydantic.v1 import BaseModel, Field, IPvAnyAddress, validator
 
 from vmngclient.model.policy.policy import AssemblyItem, PolicyCreationPayload, PolicyDefinition, PolicyInfo
 

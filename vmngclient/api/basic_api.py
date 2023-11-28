@@ -7,7 +7,8 @@ from typing import TYPE_CHECKING, Iterator, List, Union
 
 from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # type: ignore
 
-from vmngclient.dataclasses import BfdSessionData, Connection, Device, Reboot, WanInterface
+from vmngclient.dataclasses import BfdSessionData, Connection, Device, WanInterface
+from vmngclient.endpoints.real_time_monitoring.reboot_history import RebootEntry
 from vmngclient.exceptions import InvalidOperationError
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
@@ -208,7 +209,7 @@ class DeviceStateAPI:
 
         return [create_dataclass(Connection, item) for item in items]
 
-    def get_device_reboot_history(self, device_id):
+    def get_device_reboot_history(self, device_id) -> DataSequence[RebootEntry]:
         """Gets device reboots list.
 
         Args:
@@ -217,9 +218,8 @@ class DeviceStateAPI:
         Returns:
             list of Reboot objects
         """
-        items = self.session.get_data(f"/dataservice/device/reboothistory?deviceId={device_id}")
-
-        return [create_dataclass(Reboot, item) for item in items]
+        params = {"deviceId": device_id}
+        return self.session.endpoints.real_time_monitoring.reboot_history.create_reboot_history_list(params)
 
     def get_system_status(self, device_id: str) -> Device:
         """Get system information for a device.

@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Dict, List, Optional, Union
 
-from pydantic import BaseModel, Field, IPvAnyAddress
+from pydantic.v1 import BaseModel, Field, IPvAnyAddress
 
 
 class MTEdge(BaseModel):

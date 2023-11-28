@@ -1,5 +1,6 @@
 # mypy: disable-error-code="empty-body"
-from pydantic import BaseModel, Field, IPvAnyAddress
+
+from pydantic.v1 import BaseModel, Field, IPvAnyAddress
 
 from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, put
 from vmngclient.model.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo

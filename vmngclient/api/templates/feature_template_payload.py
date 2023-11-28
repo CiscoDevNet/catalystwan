@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 
 
 class FeatureTemplatePayload(BaseModel):

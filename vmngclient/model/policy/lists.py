@@ -1,6 +1,6 @@
 from typing import List, Literal, Optional, Set, Tuple, Union
 
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 from typing_extensions import Annotated
 
 from vmngclient.model.common import InterfaceTypeEnum

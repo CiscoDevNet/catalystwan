@@ -1,7 +1,7 @@
 from socket import getprotobyname
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 
 class ApplicationProtocolEntry(BaseModel):

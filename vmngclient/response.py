@@ -3,7 +3,8 @@ from functools import wraps
 from pprint import pformat
 from typing import Any, Callable, Dict, Optional, Sequence, Type, TypeVar, Union, cast
 
-from pydantic import BaseModel
+from pydantic import BaseModel as BaseModelV2
+from pydantic.v1 import BaseModel as BaseModelV1
 from requests import PreparedRequest, Request, Response
 from requests.cookies import RequestsCookieJar
 from requests.exceptions import JSONDecodeError
@@ -17,10 +18,10 @@ T = TypeVar("T")
 PRINTABLE_CONTENT = re.compile(r"(text\/.+)|(application\/(json|html|xhtml|xml|x-www-form-urlencoded))", re.IGNORECASE)
 
 
-class ErrorInfo(BaseModel):
-    message: str
-    details: str
-    code: str
+class ErrorInfo(BaseModelV2):
+    message: Union[str, None]
+    details: Union[str, None]
+    code: Union[str, None]
 
 
 def response_debug(response: Optional[Response], request: Union[Request, PreparedRequest, None]) -> str:
@@ -162,7 +163,7 @@ class vManageResponse(Response, APIEndpointClientResponse):
     def dataseq(self, cls: Type[T], sourcekey: Optional[str] = "data") -> DataSequence[T]:
         """Returns data contents from JSON payload parsed as DataSequence of Dataclass/BaseModel instances
         Args:
-            cls: Dataclass/BaseModel subtype (eg. Devices)
+            cls: Dataclass/BaseModelV1 subtype (eg. Devices)
             sourcekey: name of the JSON key from response payload to be parsed. If None whole JSON payload will be used
 
         Returns:
@@ -179,8 +180,10 @@ class vManageResponse(Response, APIEndpointClientResponse):
         else:
             sequence = [cast(dict, data)]
 
-        if issubclass(cls, BaseModel):
+        if issubclass(cls, BaseModelV1):
             return DataSequence(cls, [cls.parse_obj(item) for item in sequence])  # type: ignore
+        if issubclass(cls, BaseModelV2):
+            return DataSequence(cls, [cls.model_validate(item) for item in sequence])  # type: ignore
         return DataSequence(cls, [create_dataclass(cls, item) for item in sequence])
 
     def dataobj(self, cls: Type[T], sourcekey: Optional[str] = "data") -> T:
@@ -198,15 +201,22 @@ class vManageResponse(Response, APIEndpointClientResponse):
         else:
             data = self.payload.json.get(sourcekey)
 
-        if issubclass(cls, BaseModel):
+        if issubclass(cls, BaseModelV1):
             return cls.parse_obj(data)  # type: ignore
+        if issubclass(cls, BaseModelV2):
+            return cls.model_validate(data)  # type: ignore
         return create_dataclass(cls, data)
 
     def get_error_info(self) -> ErrorInfo:
         """Returns error information from JSON payload"""
 
         if self.payload.error is None:
-            raise TypeError("Payload error should not be None.")
+            return ErrorInfo(
+                message=None,
+                details=None,
+                code=None,
+            )
+
         return ErrorInfo(**self.payload.error)
 
 

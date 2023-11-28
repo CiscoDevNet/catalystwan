@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from vmngclient.endpoints.administration_user_and_group import AdministrationUserAndGroup
+from vmngclient.endpoints.certificate_management_device import CertificateManagementDevice
 from vmngclient.endpoints.certificate_management_vmanage import CertificateManagementVManage
 from vmngclient.endpoints.client import Client
 from vmngclient.endpoints.cluster_management import ClusterManagement
@@ -61,6 +62,7 @@ from vmngclient.endpoints.configuration_settings import ConfigurationSettings
 from vmngclient.endpoints.misc import MiscellaneousEndpoints
 from vmngclient.endpoints.monitoring_device_details import MonitoringDeviceDetails
 from vmngclient.endpoints.monitoring_status import MonitoringStatus
+from vmngclient.endpoints.real_time_monitoring.reboot_history import RealTimeMonitoringRebootHistory
 from vmngclient.endpoints.sdavc_cloud_connector import SDAVCCloudConnector
 from vmngclient.endpoints.tenant_backup_restore import TenantBackupRestore
 from vmngclient.endpoints.tenant_management import TenantManagement
@@ -132,6 +134,11 @@ class TroubleshootingToolsContainer:
         self.device_connectivity = TroubleshootingToolsDeviceConnectivity(session)
 
 
+class RealTimeMonitoringContainer:
+    def __init__(self, session: vManageSession):
+        self.reboot_history = RealTimeMonitoringRebootHistory(session)
+
+
 class APIEndpointContainter:
     def __init__(self, session: vManageSession):
         self.administration_user_and_group = AdministrationUserAndGroup(session)
@@ -156,3 +163,5 @@ class APIEndpointContainter:
         self.configuration_device_inventory = ConfigurationDeviceInventory(session)
         self.troubleshooting_tools = TroubleshootingToolsContainer(session)
         self.misc = MiscellaneousEndpoints(session)
+        self.real_time_monitoring = RealTimeMonitoringContainer(session)
+        self.certificate_management_device = CertificateManagementDevice(session)

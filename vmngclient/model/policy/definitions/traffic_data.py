@@ -1,7 +1,7 @@
 from ipaddress import IPv4Address, IPv4Network
 from typing import Any, List, Optional, Set, Tuple, Union, overload
 
-from pydantic import Field
+from pydantic.v1 import Field
 from typing_extensions import Annotated
 
 from vmngclient.model.common import TLOCColorEnum

@@ -6,11 +6,24 @@ from pytest import mark  # type: ignore
 from tenacity import RetryError  # type: ignore
 
 from vmngclient.api.basic_api import DevicesAPI, DeviceStateAPI
-from vmngclient.dataclasses import BfdSessionData, Connection, Device, Reboot, WanInterface
+from vmngclient.dataclasses import BfdSessionData, Connection, Device, WanInterface
+from vmngclient.endpoints.endpoints_container import APIEndpointContainter
+from vmngclient.endpoints.real_time_monitoring.reboot_history import RebootEntry
 from vmngclient.exceptions import InvalidOperationError
+from vmngclient.response import vManageResponse
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.creation_tools import create_dataclass
 from vmngclient.utils.personality import Personality
+
+
+class ResponseMock:
+    def __init__(self, json, headers={}, cookies={}):
+        self._json = json
+        self.headers = headers
+        self.cookies = cookies
+
+    def json(self):
+        return self._json
 
 
 class TestDevicesAPI(TestCase):
@@ -391,7 +404,9 @@ class TestDevicesStateAPI(TestCase):
                 "vdevice-name": "172.16.255.12",
             },
         ]
-        self.reboot_history_dataclass = [create_dataclass(Reboot, item) for item in self.reboot_history]
+        self.reboot_history_payload = DataSequence(
+            RebootEntry, [RebootEntry.model_validate(item) for item in self.reboot_history]
+        )
         self.device = [
             {  # vmanage
                 "device-model": "vmanage",
@@ -550,20 +565,22 @@ class TestDevicesStateAPI(TestCase):
     @patch("vmngclient.session.vManageSession")
     def test_get_device_reboot_history(self, mock_session):
         # Arrange
-        mock_session.get_data.return_value = self.reboot_history
+        mock_session.endpoints = APIEndpointContainter(mock_session)
+        mock_session.request.return_value = vManageResponse(ResponseMock({"data": self.reboot_history}))
         # Act
         answer = DeviceStateAPI(mock_session).get_device_reboot_history(device_id="1.1.1.11")
         # Assert
-        self.assertEqual(answer, self.reboot_history_dataclass)
+        self.assertEqual(answer, self.reboot_history_payload)
 
     @patch("vmngclient.session.vManageSession")
     def test_get_device_reboot_history_empty(self, mock_session):
         # Arrange
-        mock_session.get_data.return_value = []
+        mock_session.endpoints = APIEndpointContainter(mock_session)
+        mock_session.request.return_value = vManageResponse(ResponseMock({"data": []}))
         # Act
         answer = DeviceStateAPI(mock_session).get_device_reboot_history(device_id="1.1.1.1")
         # Assert
-        self.assertEqual(answer, [])
+        self.assertEqual(len(answer), 0)
 
     @patch("vmngclient.session.vManageSession")
     def test_get_system_status(self, mock_session):

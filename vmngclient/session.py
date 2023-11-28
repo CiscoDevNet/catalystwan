@@ -32,18 +32,22 @@ from vmngclient.vmanage_auth import vManageAuth
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
 
 
-class vManageBadRequestError(vManageClientError):
+class vManageBadResponseError(vManageClientError):
+    """Indicates that vManage returned error HTTP status code other than 400."""
+
+    def __init__(self, error_info: Optional[ErrorInfo], response: vManageResponse):
+        self.response = response
+        self.info = error_info
+        super().__init__(error_info)
+
+
+class vManageBadRequestError(vManageBadResponseError):
     """Indicates that vManage returned HTTP status code 400.
 
     A 400 Bad Request response status code indicates that the server
     could not understand the request due to invalid syntax,
     malformed request message, or missing request parameters.
     """
-
-    def __init__(self, error_info: Optional[ErrorInfo], response: vManageResponse):
-        self.response = response
-        self.info = error_info
-        super().__init__(error_info)
 
 
 class UserMode(str, Enum):
@@ -230,12 +234,13 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
             response.raise_for_status()
         except HTTPError as error:
             self.logger.debug(error)
+            error_info = response.get_error_info()
             if response.status_code == 403:
                 self.logger.info(f"User {self.username} is unauthorized for method {method} {full_url}")
-            elif response.status_code == 400:
-                raise vManageBadRequestError(response.get_error_info(), response)
+            if response.status_code == 400:
+                raise vManageBadRequestError(error_info, response)
             else:
-                raise error
+                raise vManageBadResponseError(error_info, response)
         return response
 
     def get_full_url(self, url_path: str) -> str:

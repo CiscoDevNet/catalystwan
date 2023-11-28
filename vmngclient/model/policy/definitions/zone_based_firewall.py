@@ -1,7 +1,7 @@
 from ipaddress import IPv4Network
 from typing import Dict, List, Set, Tuple, Union
 
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 from typing_extensions import Annotated
 
 from vmngclient.model.misc.application_protocols import ApplicationProtocol

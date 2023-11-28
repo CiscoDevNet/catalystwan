@@ -4,7 +4,7 @@ from functools import wraps
 from ipaddress import IPv4Address, IPv4Network
 from typing import Dict, List, MutableSequence, Optional, Protocol, Sequence, Set, Tuple, Union
 
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 from typing_extensions import Annotated, Literal
 
 from vmngclient.model.common import TLOCColorEnum

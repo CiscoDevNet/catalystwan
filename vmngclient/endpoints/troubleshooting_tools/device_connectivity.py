@@ -2,7 +2,7 @@
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.endpoints import APIEndpoints, post
 
@@ -14,33 +14,34 @@ class PingProbeType(str, Enum):
 
 
 class NPingRequest(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     host: str
     vpn: str
-    probe_type: PingProbeType = Field(dafault=PingProbeType.ICMP, alias="probeType")
+    probe_type: PingProbeType = Field(default=PingProbeType.ICMP, serialization_alias="probeType")
     count: Optional[str] = None
-    dest_port: Optional[str] = Field(None, alias="destPort")
+    dest_port: Optional[str] = Field(default=None, serialization_alias="destPort")
     df: Optional[str] = None
-    interface_ip: Optional[str] = Field(None, alias="interfaceIP")
+    interface_ip: Optional[str] = Field(default=None, serialization_alias="interfaceIP")
     mtu: Optional[str] = None
     rapid: Optional[str] = None
     size: Optional[str] = None
     source: Optional[str] = None
-    source_port: Optional[str] = Field(None, alias="sourcePort")
+    source_port: Optional[str] = Field(default=None, serialization_alias="sourcePort")
     tos: Optional[str] = None
     ttl: Optional[str] = None
 
 
 class NPingResult(BaseModel):
-    raw_output: List[str] = Field(alias="rawOutput")
-    packets_transmitted: int = Field(alias="packetsTransmitted")
-    packets_received: int = Field(alias="packetsReceived")
-    loss_percentage: float = Field(alias="lossPercentage")
-    min_round_trip: float = Field(alias="minRoundTrip")
-    max_round_trip: float = Field(alias="maxRoundTrip")
-    avg_round_trip: float = Field(alias="avgRoundTrip")
+    model_config = ConfigDict(populate_by_name=True)
+
+    raw_output: List[str] = Field(validation_alias="rawOutput")
+    packets_transmitted: int = Field(validation_alias="packetsTransmitted")
+    packets_received: int = Field(validation_alias="packetsReceived")
+    loss_percentage: float = Field(validation_alias="lossPercentage")
+    min_round_trip: float = Field(validation_alias="minRoundTrip")
+    max_round_trip: float = Field(validation_alias="maxRoundTrip")
+    avg_round_trip: float = Field(validation_alias="avgRoundTrip")
 
 
 class TroubleshootingToolsDeviceConnectivity(APIEndpoints):

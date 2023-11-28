@@ -1,7 +1,7 @@
 import datetime
 from typing import List, Optional, Protocol
 
-from pydantic import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 
 from vmngclient.model.policy.lists import AllPolicyLists
 from vmngclient.typed_list import DataSequence

@@ -2,7 +2,7 @@ from enum import Enum
 from ipaddress import IPv4Address, IPv4Network, IPv6Network
 from typing import List, Optional
 
-from pydantic import BaseModel, Field, IPvAnyAddress, root_validator, validator
+from pydantic.v1 import BaseModel, Field, IPvAnyAddress, root_validator, validator
 
 from vmngclient.model.common import InterfaceTypeEnum, check_fields_exclusive
 

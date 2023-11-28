@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Any, List, Literal, Optional, Union
 
-from pydantic import BaseModel, Field, IPvAnyAddress, root_validator
+from pydantic.v1 import BaseModel, Field, IPvAnyAddress, root_validator
 
 from vmngclient.model.policy.policy import AssemblyItem, PolicyCreationPayload, PolicyDefinition, PolicyInfo
 
