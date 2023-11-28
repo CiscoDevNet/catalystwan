@@ -288,8 +288,9 @@ def run_demo(args: CmdArguments):
             f"\u001b[36;1m{session.get_full_url('/#/app/config/policy/centralizedPolicy/policies')}\u001b[0m"
         )
         input("Press Enter to remove created items ...")
-        deactivation_task = api.centralized.deactivate(pol_dict["My-Centralized-Policy"])
-        deactivation_task.wait_for_completed()
+        if api.centralized.get(pol_dict["My-Centralized-Policy"]).is_policy_activated:
+            deactivation_task = api.centralized.deactivate(pol_dict["My-Centralized-Policy"])
+            deactivation_task.wait_for_completed()
         api.centralized.delete(pol_dict["My-Centralized-Policy"])
         api.definitions.delete(TrafficDataPolicy, pol_dict["My-Traffic-Data-Policy"])
         api.lists.delete(SiteList, pol_dict["My-Site-List"])
