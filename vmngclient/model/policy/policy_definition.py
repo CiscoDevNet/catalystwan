@@ -4,7 +4,7 @@ from functools import wraps
 from ipaddress import IPv4Address, IPv4Network
 from typing import Dict, List, MutableSequence, Optional, Protocol, Sequence, Set, Tuple, Union
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, RootModel
 from typing_extensions import Annotated, Literal
 
 from vmngclient.model.common import TLOCColorEnum
@@ -112,7 +112,7 @@ class LossProtectionEnum(str, Enum):
 
 
 class ServiceChainEntryValue(BaseModel):
-    type: str = Field("SC1", regex=r"SC(1[0-6]|[1-9])")
+    type: str = Field("SC1", pattern=r"SC(1[0-6]|[1-9])")
     vpn: str
     restrict: Optional[str] = None
     local: Optional[str] = None
@@ -312,14 +312,14 @@ class TLOCEntry(BaseModel):
     value: TLOCEntryValue
 
 
-class NATVPNEntry(BaseModel):
-    __root__: List[Union[UseVPNEntry, FallBackEntry]]
+class NATVPNEntry(RootModel):
+    root: List[Union[UseVPNEntry, FallBackEntry]]
 
     @staticmethod
     def from_nat_vpn(fallback: bool, vpn: int = 0) -> "NATVPNEntry":
         if fallback:
-            return NATVPNEntry(__root__=[UseVPNEntry(value=str(vpn)), FallBackEntry()])
-        return NATVPNEntry(__root__=[UseVPNEntry(value=str(vpn))])
+            return NATVPNEntry(root=[UseVPNEntry(value=str(vpn)), FallBackEntry()])
+        return NATVPNEntry(root=[UseVPNEntry(value=str(vpn))])
 
 
 class SourceDataPrefixListEntry(BaseModel):
@@ -410,9 +410,7 @@ class PrefferedColorGroupListEntry(BaseModel):
     field: Literal["preferredColorGroup"] = "preferredColorGroup"
     ref: str
     color_restrict: bool = Field(False, alias="colorRestrict")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 RedirectDNSActionEntry = Union[IPAddressEntry, DNSTypeEntry]
@@ -493,7 +491,7 @@ class DREOptimizationAction(BaseModel):
 
 class ServiceNodeGroupAction(BaseModel):
     type: Literal["serviceNodeGroup"] = "serviceNodeGroup"
-    parameter: str = Field(default="", regex=r"^(SNG-APPQOE(3[01]|[12][0-9]|[1-9])?)?$")
+    parameter: str = Field(default="", pattern=r"^(SNG-APPQOE(3[01]|[12][0-9]|[1-9])?)?$")
 
 
 class LossProtectionAction(BaseModel):
@@ -725,7 +723,7 @@ class PolicyReference(BaseModel):
 
 class PolicyDefinitionHeader(BaseModel):
     name: str = Field(
-        regex="^[a-zA-Z0-9_-]{1,128}$",
+        pattern="^[a-zA-Z0-9_-]{1,128}$",
         description="Can include only alpha-numeric characters, hyphen '-' or underscore '_'; maximum 128 characters",
     )
     description: str = "default description"

@@ -1,7 +1,7 @@
 from ipaddress import IPv4Address, IPv4Network
-from typing import Any, List, Optional, Set, Tuple, Union, overload
+from typing import Any, List, Literal, Optional, Set, Tuple, Union, overload
 
-from pydantic.v1 import Field
+from pydantic import ConfigDict, Field
 from typing_extensions import Annotated
 
 from vmngclient.model.common import TLOCColorEnum
@@ -95,7 +95,7 @@ TrafficDataPolicySequenceActions = Any  # TODO
 
 
 class TrafficDataPolicyHeader(PolicyDefinitionHeader):
-    type: str = Field(default="data", const=True)
+    type: Literal["data"] = "data"
 
 
 class TrafficDataPolicySequenceMatch(Match):
@@ -106,9 +106,7 @@ class TrafficDataPolicySequence(DefinitionSequence):
     sequence_type: SequenceType = Field(default=SequenceType.DATA, alias="sequenceType")
     match: TrafficDataPolicySequenceMatch = TrafficDataPolicySequenceMatch()
     actions: List[TrafficDataPolicySequenceActions] = []
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     def match_app_list(self, app_list_id: str) -> None:
         self.insert_match(AppListEntry(ref=app_list_id))
@@ -356,9 +354,7 @@ class TrafficDataPolicySequence(DefinitionSequence):
 
 class TrafficDataPolicy(TrafficDataPolicyHeader, PolicyDefinitionBody):
     sequences: List[TrafficDataPolicySequence] = []
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     def add_ipv4_sequence(
         self, name: str = "Custom", base_action: BaseAction = BaseAction.DROP, log: bool = False

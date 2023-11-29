@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Any, List, Literal, Optional, Union
 
-from pydantic.v1 import BaseModel, Field, IPvAnyAddress, root_validator
+from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, model_validator
 
 from vmngclient.model.policy.policy import AssemblyItem, PolicyCreationPayload, PolicyDefinition, PolicyInfo
 
@@ -35,9 +35,7 @@ class HighSpeedLoggingEntry(BaseModel):
     server_ip: IPvAnyAddress = Field(alias="serverIp")
     port: str
     source_interface: Optional[str] = Field(alias="sourceInterface")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class HighSpeedLoggingList(BaseModel):
@@ -47,33 +45,29 @@ class HighSpeedLoggingList(BaseModel):
 class LoggingEntry(BaseModel):
     vpn: str
     server_ip: IPvAnyAddress = Field(alias="serverIP")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class SecurityPolicySettings(BaseModel):
     logging: Optional[List[LoggingEntry]] = None
-    failure_mode: Optional[FailureMode] = Field(None, alias="failureMode")
-    zone_to_no_zone_internet: ZoneToNoZoneInternet = Field(ZoneToNoZoneInternet.DENY, alias="zoneToNozoneInternet")
-    tcp_syn_flood_limit: Optional[str] = Field(None, alias="tcpSynFloodLimit")
-    high_speed_logging: Optional[HighSpeedLoggingEntry] = Field(None, alias="highSpeedLogging")
-    audit_trail: Optional[str] = Field(None, alias="auditTrail")
-    platform_match: Optional[str] = Field(None, alias="platformMatch")
-
-    class Config:
-        allow_population_by_field_name = True
+    failure_mode: Optional[FailureMode] = Field(default=None, alias="failureMode")
+    zone_to_no_zone_internet: ZoneToNoZoneInternet = Field(
+        default=ZoneToNoZoneInternet.DENY, alias="zoneToNozoneInternet"
+    )
+    tcp_syn_flood_limit: Optional[str] = Field(default=None, alias="tcpSynFloodLimit")
+    high_speed_logging: Optional[HighSpeedLoggingEntry] = Field(default=None, alias="highSpeedLogging")
+    audit_trail: Optional[str] = Field(default=None, alias="auditTrail")
+    platform_match: Optional[str] = Field(default=None, alias="platformMatch")
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class UnifiedSecurityPolicySettings(BaseModel):
-    tcp_syn_flood_limit: Optional[str] = Field(None, alias="tcpSynFloodLimit")
-    max_incomplete_tcp_limit: Optional[str] = Field(None, alias="maxIncompleteTcpLimit")
-    max_incomplete_udp_limit: Optional[str] = Field(None, alias="maxIncompleteUdpLimit")
-    max_incomplete_icmp_limit: Optional[str] = Field(None, alias="maxIncompleteIcmpLimit")
-    high_speed_logging: Optional[HighSpeedLoggingList] = Field(None, alias="highSpeedLogging")
-
-    class Config:
-        allow_population_by_field_name = True
+    tcp_syn_flood_limit: Optional[str] = Field(default=None, alias="tcpSynFloodLimit")
+    max_incomplete_tcp_limit: Optional[str] = Field(default=None, alias="maxIncompleteTcpLimit")
+    max_incomplete_udp_limit: Optional[str] = Field(default=None, alias="maxIncompleteUdpLimit")
+    max_incomplete_icmp_limit: Optional[str] = Field(default=None, alias="maxIncompleteIcmpLimit")
+    high_speed_logging: Optional[HighSpeedLoggingList] = Field(default=None, alias="highSpeedLogging")
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class SecurityPolicyAssemblyItem(AssemblyItem):
@@ -86,12 +80,12 @@ class UnifiedSecurityPolicyAssemblyItem(AssemblyItem):
 
 class SecurityPolicyDefinition(PolicyDefinition):
     assembly: List[SecurityPolicyAssemblyItem] = []
-    settings: SecurityPolicySettings = SecurityPolicySettings()  # type: ignore[call-arg]
+    settings: SecurityPolicySettings = SecurityPolicySettings()
 
 
 class UnifiedSecurityPolicyDefinition(PolicyDefinition):
     assembly: List[UnifiedSecurityPolicyAssemblyItem] = []
-    settings: UnifiedSecurityPolicySettings = UnifiedSecurityPolicySettings()  # type: ignore[call-arg]
+    settings: UnifiedSecurityPolicySettings = UnifiedSecurityPolicySettings()
 
 
 class SecurityPolicy(PolicyCreationPayload):
@@ -99,7 +93,7 @@ class SecurityPolicy(PolicyCreationPayload):
     policy_type: str = Field("feature", alias="policyType")
     policy_use_case: str = Field("custom", alias="policyUseCase")
     policy_definition: Union[SecurityPolicyDefinition, UnifiedSecurityPolicyDefinition] = Field(
-        alias="policyDefinition"
+        default=SecurityPolicyDefinition(), alias="policyDefinition"
     )
 
     def _add_item(self, _type: Any, item_id: str) -> None:
@@ -127,38 +121,32 @@ class SecurityPolicy(PolicyCreationPayload):
     def add_ssl_decryption(self, definition_id: str) -> None:
         self._add_item("sslDecryption", definition_id)
 
-    @root_validator(pre=True)  # type: ignore[call-overload]
-    def initialize_with_policy_mode(cls, values):
+    @model_validator(mode="after")
+    def initialize_with_policy_mode(self):
         # When instatiating model by user using constructor
-        mode = values.get("policy_mode")
-        definition = values.get("policy_definition")
-        if definition is None:
-            if mode == "unified":
-                values["policy_definition"] = UnifiedSecurityPolicyDefinition()
+        if self.policy_definition is None:
+            if self.policy_mode == "unified":
+                self.policy_definition = UnifiedSecurityPolicyDefinition()
             else:
-                values["policy_definition"] = SecurityPolicyDefinition()
-        return values
+                self.policy_definition = SecurityPolicyDefinition()
+        return self
 
-    @root_validator(pre=True)  # type: ignore[call-overload]
+    @model_validator(mode="before")
+    @classmethod
     def parse_by_policy_mode(cls, values):
         # When creating model from remote json (using aliases)
         mode = values.get("policyMode")
         definition = values.get("policyDefinition")
         if isinstance(definition, str):
             if mode == "unified":
-                values["policyDefinition"] = UnifiedSecurityPolicyDefinition.parse_raw(definition)
+                values["policyDefinition"] = UnifiedSecurityPolicyDefinition.model_validate_json(definition)
             else:
-                values["policyDefinition"] = SecurityPolicyDefinition.parse_raw(definition)
-        return values
-
-    @root_validator  # type: ignore[call-overload]
-    def validate_definition(cls, values):
-        mode = values.get("policy_mode")
-        definition = values.get("policy_definition")
-        if (mode == "security" and isinstance(definition, UnifiedSecurityPolicyDefinition)) or (
-            mode == "unified" and isinstance(definition, SecurityPolicyDefinition)
-        ):
-            raise ValueError(f"Incompatible definition {type(definition)} for '{mode}' policy mode")
+                values["policyDefinition"] = SecurityPolicyDefinition.model_validate_json(definition)
+        if isinstance(definition, dict):
+            if mode == "unified":
+                values["policyDefinition"] = UnifiedSecurityPolicyDefinition.model_validate(definition)
+            else:
+                values["policyDefinition"] = SecurityPolicyDefinition.model_validate(definition)
         return values
 
 

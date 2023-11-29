@@ -1,7 +1,7 @@
 from enum import Enum
-from typing import Dict, List, Optional, Union
+from typing import List, Literal, Optional, Union
 
-from pydantic.v1 import BaseModel, Field, root_validator, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from vmngclient.model.policy.policy_definition import PolicyDefinitionHeader
 
@@ -38,24 +38,26 @@ class QoSScheduler(BaseModel):
             drops=QoSDropEnum.TAIL,
         )
 
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
-    @validator("queue")
+    @field_validator("queue")
+    @classmethod
     def check_queue(cls, queue_str: str):
         queue = int(queue_str)
         if queue < 0 or queue > 7:
             raise ValueError("queue should be in range 0-7")
         return queue_str
 
-    @validator("bandwidth_percent", "buffer_percent")
+    @field_validator("bandwidth_percent", "buffer_percent")
+    @classmethod
     def check_bandwidth_and_buffer_percent(cls, percent_str: str):
         percent = int(percent_str)
         if percent < 1 or percent > 100:
             raise ValueError("bandwidth/buffer percent should be in range 1-100")
         return percent_str
 
-    @validator("burst")
+    @field_validator("burst")
+    @classmethod
     def check_burst(cls, burst_val: Union[str, None]):
         if burst_val is not None:
             burst = int(burst_val)
@@ -66,17 +68,13 @@ class QoSScheduler(BaseModel):
 
 class QoSMapDefinition(BaseModel):
     qos_schedulers: List[QoSScheduler] = Field(alias="qosSchedulers")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class QoSMap(PolicyDefinitionHeader):
-    type: str = Field(default="qosMap", const=True)
+    type: Literal["qosMap"] = "qosMap"
     definition: QoSMapDefinition = QoSMapDefinition(qosSchedulers=[])
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     def add_scheduler(
         self,
@@ -100,12 +98,11 @@ class QoSMap(PolicyDefinitionHeader):
             )
         )
 
-    @root_validator  # type: ignore[call-overload]
-    def generate_default_control_scheduler(cls, values) -> Dict:
-        definition: QoSMapDefinition = values.get("definition")
-        if not definition.qos_schedulers:
+    @model_validator(mode="after")
+    def generate_default_control_scheduler(self):
+        if not self.definition.qos_schedulers:
             # Only when creating (not when value obtained from remote is present)
-            values["definition"] = QoSMapDefinition(  # type: ignore[call-arg]
+            self.definition = QoSMapDefinition(  # type: ignore[call-arg]
                 qos_schedulers=[QoSScheduler.get_default_control_scheduler()]
             )
-        return values
+        return self

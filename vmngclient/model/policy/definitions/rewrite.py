@@ -1,12 +1,12 @@
-from typing import List
+from typing import List, Literal
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.model.policy.policy_definition import PLPEntryValues, PolicyDefinitionBody, PolicyDefinitionHeader
 
 
 class RewritePolicyHeader(PolicyDefinitionHeader):
-    type: str = Field(default="rewriteRule", const=True)
+    type: Literal["rewriteRule"] = "rewriteRule"
 
 
 class RewritePolicyRule(BaseModel):
@@ -14,9 +14,7 @@ class RewritePolicyRule(BaseModel):
     plp: str
     dscp: str
     l2cos: str = Field(alias="layer2Cos")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class RewritePolicyDefinition(BaseModel):
@@ -31,5 +29,4 @@ class RewritePolicy(RewritePolicyHeader, PolicyDefinitionBody):
             RewritePolicyRule(class_=class_map_ref, plp=plp, dscp=str(dscp), l2cos=str(l2cos))  # type: ignore[call-arg]
         )
 
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
