@@ -1,6 +1,6 @@
 from typing import List, Literal, Optional
 
-from pydantic.v1 import BaseModel, Field, IPvAnyAddress, validator
+from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, field_validator
 
 from vmngclient.model.policy.policy import AssemblyItem, PolicyCreationPayload, PolicyDefinition, PolicyInfo
 
@@ -29,17 +29,13 @@ class LocalizedPolicySettings(BaseModel):
     log_frequency: Optional[int] = Field(None, alias="logFrequency", ge=0, le=2147483647)
     ip_visibility_cache_entries: Optional[int] = Field(None, alias="ipVisibilityCacheEntries", ge=16, le=2000000)
     ip_v6_visibility_cache_entries: Optional[int] = Field(None, alias="ipV6VisibilityCacheEntries", ge=16, le=2000000)
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class LocalizedPolicyAssemblyItem(AssemblyItem):
     type: LocalizedPolicySupportedItemType
     definition_id: str = Field(alias="definitionId")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class LocalizedPolicyDefinition(PolicyDefinition):
@@ -52,7 +48,7 @@ class LocalizedPolicy(PolicyCreationPayload):
         default=LocalizedPolicyDefinition(assembly=[], settings=LocalizedPolicySettings()),  # type: ignore[call-arg]
         alias="policyDefinition",
     )
-    policy_type: str = Field("feature", alias="policyType", const=True)
+    policy_type: str = Field("feature", alias="policyType")
 
     def _add_item(self, type: LocalizedPolicySupportedItemType, id: str) -> None:
         self.policy_definition.assembly.append(
@@ -83,13 +79,14 @@ class LocalizedPolicy(PolicyCreationPayload):
     def add_route_policy(self, definition_id: str) -> None:
         self._add_item("vedgeRoute", definition_id)
 
-    @validator("policy_definition", pre=True)
+    @field_validator("policy_definition", mode="before")
+    @classmethod
     def try_parse(cls, policy_definition):
         # this is needed because GET /template/policy/vedge contains string in policyDefinition field
         # while POST /template/policy/vedge requires a regular object
         # it makes sense to reuse that model for both requests and present parsed data to the user
         if isinstance(policy_definition, str):
-            return LocalizedPolicyDefinition.parse_raw(policy_definition)
+            return LocalizedPolicyDefinition.model_validate_json(policy_definition)
         return policy_definition
 
 

@@ -2,7 +2,7 @@ from enum import Enum
 from ipaddress import IPv4Address, IPv4Network, IPv6Network
 from typing import List, Optional
 
-from pydantic.v1 import BaseModel, Field, IPvAnyAddress, root_validator, validator
+from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, field_validator, model_validator
 
 from vmngclient.model.common import InterfaceTypeEnum, check_fields_exclusive
 
@@ -50,16 +50,14 @@ class ColorDSCPMap(BaseModel):
 
 
 class ColorGroupPreference(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     color_preference: str = Field(alias="colorPreference")
     path_preference: PathPreferenceEnum = Field(alias="pathPreference")
 
 
 class FallbackBestTunnel(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     criteria: str
     jitter_variance: Optional[str] = Field(None, alias="jitterVariance", description="jitter variance in ms")
@@ -67,39 +65,37 @@ class FallbackBestTunnel(BaseModel):
     loss_variance: Optional[str] = Field(None, alias="lossVariance", description="loss variance as percentage")
 
     # validators
-    _jitter_validator = validator("jitter_variance", allow_reuse=True)(check_jitter_ms)  # type: ignore[type-var]
-    _latency_validator = validator("latency_variance", allow_reuse=True)(check_latency_ms)  # type: ignore[type-var]
-    _loss_validator = validator("loss_variance", allow_reuse=True)(check_loss_percent)  # type: ignore[type-var]
+    _jitter_validator = field_validator("jitter_variance")(check_jitter_ms)  # type: ignore[type-var]
+    _latency_validator = field_validator("latency_variance")(check_latency_ms)  # type: ignore[type-var]
+    _loss_validator = field_validator("loss_variance")(check_loss_percent)  # type: ignore[type-var]
 
-    @root_validator  # type: ignore[call-overload]
-    def check_criteria(cls, values):
+    @model_validator(mode="after")
+    def check_criteria(self):
         expected_criteria = set()
-        if values.get("jitter_variance") is not None:
+        if self.jitter_variance is not None:
             expected_criteria.add("jitter")
-        if values.get("latency_variance") is not None:
+        if self.latency_variance is not None:
             expected_criteria.add("latency")
-        if values.get("loss_variance") is not None:
+        if self.loss_variance is not None:
             expected_criteria.add("loss")
         if len(expected_criteria) < 1:
             raise ValueError("At least one variance type needs to be present")
-        observed_criteria = set(str(values.get("criteria")).split("-"))
+        observed_criteria = set(str(self.criteria).split("-"))
         if expected_criteria != observed_criteria:
             if len(expected_criteria) == 1:
                 raise ValueError(f"Criteria must contain: {expected_criteria}")
             raise ValueError(f"Criteria must contain: {expected_criteria} separated by hyphen")
-        return values
+        return self
 
 
 class DataPrefixListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     ip_prefix: IPv4Network = Field(alias="ipPrefix")
 
 
 class SiteListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     site_id: str = Field(alias="siteId")
 
@@ -107,7 +103,8 @@ class SiteListEntry(BaseModel):
 class VPNListEntry(BaseModel):
     vpn: str = Field(description="0-65530 range or single number")
 
-    @validator("vpn")
+    @field_validator("vpn")
+    @classmethod
     def check_vpn_range(cls, vpns_str: str):
         vpns = [int(vpn) for vpn in vpns_str.split("-")]
         if len(vpns) > 2:
@@ -124,17 +121,18 @@ class ZoneListEntry(BaseModel):
     vpn: Optional[str] = Field(None, description="0-65530 single number")
     interface: Optional[InterfaceTypeEnum] = None
 
-    @validator("vpn")
+    @field_validator("vpn")
+    @classmethod
     def check_vpn_range(cls, vpn_str: str):
         vpn = int(vpn_str)
         if vpn < 0 or vpn > 65530:
             raise ValueError("VPN should be in range 0-65530")
         return vpn_str
 
-    @root_validator  # type: ignore[call-overload]
-    def check_vpn_xor_interface(cls, values):
-        check_fields_exclusive(values, {"vpn", "interface"}, True)
-        return values
+    @model_validator(mode="after")
+    def check_vpn_xor_interface(self):
+        check_fields_exclusive(self.__dict__, {"vpn", "interface"}, True)
+        return self
 
 
 class FQDNListEntry(BaseModel):
@@ -145,16 +143,17 @@ class GeoLocationListEntry(BaseModel):
     country: Optional[str] = Field(description="ISO-3166 alpha-3 country code eg: FRA")
     continent: Optional[str] = Field(description="One of 2-letter continent codes: AF, NA, OC, AN, AS, EU, SA")
 
-    @root_validator  # type: ignore[call-overload]
-    def check_country_xor_continent(cls, values):
-        check_fields_exclusive(values, {"country", "continent"}, True)
-        return values
+    @model_validator(mode="after")
+    def check_country_xor_continent(self):
+        check_fields_exclusive(self.__dict__, {"country", "continent"}, True)
+        return self
 
 
 class PortListEntry(BaseModel):
     port: str
 
-    @validator("port")
+    @field_validator("port")
+    @classmethod
     def check_port_range(cls, port_str: str):
         port = int(port_str)
         if port < 0 or port > 65535:
@@ -163,8 +162,7 @@ class PortListEntry(BaseModel):
 
 
 class ProtocolNameListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     protocol_name: str = Field(alias="protocolName")
 
@@ -173,20 +171,20 @@ class LocalAppListEntry(BaseModel):
     app_family: Optional[str] = Field(alias="appFamily")
     app: Optional[str]
 
-    @root_validator  # type: ignore[call-overload]
-    def check_app_xor_appfamily(cls, values):
-        check_fields_exclusive(values, {"app", "app_family"}, True)
-        return values
+    @model_validator(mode="after")
+    def check_app_xor_appfamily(self):
+        check_fields_exclusive(self.__dict__, {"app", "app_family"}, True)
+        return self
 
 
 class AppListEntry(BaseModel):
     app_family: Optional[str] = Field(alias="appFamily")
     app: Optional[str]
 
-    @root_validator  # type: ignore[call-overload]
-    def check_app_xor_appfamily(cls, values):
-        check_fields_exclusive(values, {"app", "app_family"}, True)
-        return values
+    @model_validator(mode="after")
+    def check_app_xor_appfamily(self):
+        check_fields_exclusive(self.__dict__, {"app", "app_family"}, True)
+        return self
 
 
 class ColorListEntry(BaseModel):
@@ -194,15 +192,13 @@ class ColorListEntry(BaseModel):
 
 
 class DataIPv6PrefixListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     ipv6_prefix: IPv6Network = Field(alias="ipv6Prefix")
 
 
 class LocalDomainListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     name_server: str = Field(
         pattern="^[^*+].*",
@@ -214,43 +210,41 @@ class LocalDomainListEntry(BaseModel):
 
 
 class IPSSignatureListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     generator_id: str = Field(alias="generatorId")
     signature_id: str = Field(alias="signatureId")
 
 
 class URLListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     pattern: str
 
 
 class CommunityListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     community: str = Field(description="Example: 1000:10000 or internet or local-AS or no advertise or no-export")
 
 
 class PolicerListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     burst: str = Field(description="bytes: integer in range 15000-10000000")
     exceed: PolicerExceedAction = PolicerExceedAction.DROP
     rate: str = Field(description="bps: integer in range 8-100000000000")
 
-    @validator("burst")
+    @field_validator("burst")
+    @classmethod
     def check_burst(cls, burst_str: str):
         burst = int(burst_str)
         if burst < 15000 or burst > 10000000:
             raise ValueError("burst should be in range 15000-10000000")
         return burst_str
 
-    @validator("rate")
+    @field_validator("rate")
+    @classmethod
     def check_rate(cls, rate_str: str):
         rate = int(rate_str)
         if rate < 8 or rate > 100000000000:
@@ -259,8 +253,7 @@ class PolicerListEntry(BaseModel):
 
 
 class ASPathListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     as_path: str = Field(alias="asPath")
 
@@ -268,7 +261,8 @@ class ASPathListEntry(BaseModel):
 class ClassMapListEntry(BaseModel):
     queue: str
 
-    @validator("queue")
+    @field_validator("queue")
+    @classmethod
     def check_queue(cls, queue_str: str):
         queue = int(queue_str)
         if queue < 0 or queue > 7:
@@ -277,24 +271,21 @@ class ClassMapListEntry(BaseModel):
 
 
 class MirrorListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     remote_dest: IPvAnyAddress = Field(alias="remoteDest")
     source: IPvAnyAddress
 
 
 class AppProbeClassListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     map: List[ColorDSCPMap]
     forwarding_class: str = Field(alias="forwardingClass")
 
 
 class SLAClassListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     latency: Optional[str] = None
     loss: Optional[str] = None
@@ -303,16 +294,15 @@ class SLAClassListEntry(BaseModel):
     fallback_best_tunnel: Optional[FallbackBestTunnel] = Field(None, alias="fallbackBestTunnel")
 
     # validators
-    _jitter_validator = validator("jitter", allow_reuse=True)(check_jitter_ms)  # type: ignore[type-var]
-    _latency_validator = validator("latency", allow_reuse=True)(check_latency_ms)  # type: ignore[type-var]
-    _loss_validator = validator("loss", allow_reuse=True)(check_loss_percent)  # type: ignore[type-var]
+    _jitter_validator = field_validator("jitter")(check_jitter_ms)  # type: ignore[type-var]
+    _latency_validator = field_validator("latency")(check_latency_ms)  # type: ignore[type-var]
+    _loss_validator = field_validator("loss")(check_loss_percent)  # type: ignore[type-var]
 
-    @root_validator  # type: ignore[call-overload]
-    def check_at_least_one_criteria_is_set(cls, values):
-        checked_values = {values.get("latency"), values.get("loss"), values.get("jitter")}
-        if not any(checked_values):
-            raise ValueError("At leas one of jitter, loss, latency entries must be set")
-        return values
+    @model_validator(mode="after")
+    def check_at_least_one_criteria_is_set(self):
+        if not any([self.latency, self.loss, self.jitter]):
+            raise ValueError("At leas one of jitter, loss or latency entries must be set")
+        return self
 
 
 class TLOCListEntry(BaseModel):
@@ -321,7 +311,8 @@ class TLOCListEntry(BaseModel):
     encap: EncapEnum
     preference: str
 
-    @validator("preference")
+    @field_validator("preference")
+    @classmethod
     def check_preference(cls, preference_str: str):
         preference = int(preference_str)
         if preference < 0 or preference > 4294967295:
@@ -330,29 +321,28 @@ class TLOCListEntry(BaseModel):
 
 
 class PreferredColorGroupListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     primary_preference: ColorGroupPreference = Field(alias="primaryPreference")
     secondary_preference: Optional[ColorGroupPreference] = Field(None, alias="secondaryPreference")
     tertiary_preference: Optional[ColorGroupPreference] = Field(None, alias="tertiaryPreference")
 
-    @root_validator  # type: ignore[call-overload]
-    def check_optional_preferences_order(cls, values):
-        if values.get("secondary_preference") is None and values.get("tertiary_preference") is not None:
+    @model_validator(mode="after")
+    def check_optional_preferences_order(self):
+        if self.secondary_preference is None and self.tertiary_preference is not None:
             raise ValueError("tertiary_preference cannot be set without secondary_preference")
-        return values
+        return self
 
 
 class PrefixListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     ip_prefix: IPv4Network = Field(alias="ipPrefix")
     ge: Optional[str]
     le: Optional[str]
 
-    @validator("ge", "le")
+    @field_validator("ge", "le")
+    @classmethod
     def check_ge_and_le(cls, ge_le_str: str):
         ge_le = int(ge_le_str)
         if ge_le < 0 or ge_le > 32:
@@ -361,14 +351,14 @@ class PrefixListEntry(BaseModel):
 
 
 class IPv6PrefixListEntry(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     ipv6_prefix: IPv6Network = Field(alias="ipv6Prefix")
     ge: Optional[str]
     le: Optional[str]
 
-    @validator("ge", "le")
+    @field_validator("ge", "le")
+    @classmethod
     def check_ge_and_le(cls, ge_le_str: str):
         ge_le = int(ge_le_str)
         if ge_le < 0 or ge_le > 128:

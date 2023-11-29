@@ -1,7 +1,7 @@
 import datetime
 from typing import Optional, Sequence
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class PolicyId(BaseModel):
@@ -11,9 +11,7 @@ class PolicyId(BaseModel):
 class AssemblyItem(BaseModel):
     definition_id: str = Field(alias="definitionId")
     type: str
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class PolicyDefinition(BaseModel):
@@ -23,16 +21,14 @@ class PolicyDefinition(BaseModel):
 class PolicyCreationPayload(BaseModel):
     policy_name: str = Field(
         alias="policyName",
-        regex="^[a-zA-Z0-9_-]{1,127}$",
+        pattern="^[a-zA-Z0-9_-]{1,127}$",
         description="Can include only alpha-numeric characters, hyphen '-' or underscore '_'; maximum 127 characters",
     )
     policy_description: str = Field("Default description", alias="policyDescription")
     policy_type: str = Field(alias="policyType")
     policy_definition: PolicyDefinition = Field(alias="policyDefinition")
     is_policy_activated: bool = Field(default=False, alias="isPolicyActivated")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class PolicyEditPayload(PolicyCreationPayload, PolicyId):

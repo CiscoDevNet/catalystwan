@@ -1,6 +1,6 @@
 from typing import List, Literal, Optional, Set, Tuple, Union
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 from typing_extensions import Annotated
 
 from vmngclient.model.common import InterfaceTypeEnum
@@ -36,7 +36,7 @@ from vmngclient.model.policy.lists_entries import (
 
 class PolicyListHeader(BaseModel):
     name: str = Field(
-        regex="^[a-zA-Z0-9_-]{1,32}$",
+        pattern="^[a-zA-Z0-9_-]{1,32}$",
         description="Can include only alpha-numeric characters, hyphen '-' or underscore '_'; maximum 32 characters",
     )
     description: Optional[str] = "Desc Not Required"

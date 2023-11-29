@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Any, List, Literal, Optional
 
-from pydantic.v1 import BaseModel, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from vmngclient.model.policy.policy import (
     AssemblyItem,
@@ -22,9 +22,7 @@ class TrafficDataApplicationEntry(BaseModel):
     direction: TrafficDataDirectionEnum = TrafficDataDirectionEnum.SERVICE
     site_lists: List[str] = Field([], alias="siteLists")
     vpn_lists: List[str] = Field([], alias="vpnLists")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     def apply_site_list(self, site_list_id: str):
         self.site_lists.append(site_list_id)
@@ -58,21 +56,20 @@ class TrafficDataApplication(CentralizedPolicyAssemblyItem):
 class CentralizedPolicyDefinition(PolicyDefinition):
     region_role_assembly: List = Field(default=[], alias="regionRoleAssembly")
     assembly: List[CentralizedPolicyAssemblyItem] = []
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class CentralizedPolicy(PolicyCreationPayload):
     policy_definition: CentralizedPolicyDefinition = Field(CentralizedPolicyDefinition(), alias="policyDefinition")
-    policy_type: str = Field("feature", const=True, alias="policyType")
+    policy_type: str = Field("feature", alias="policyType")
 
     def add_traffic_data_policy(self, traffic_data_id: str) -> TrafficDataApplication:
         item = TrafficDataApplication(definition_id=traffic_data_id)  # type: ignore[call-arg]
         self.policy_definition.assembly.append(item)
         return item
 
-    @validator("policy_definition", pre=True)
+    @field_validator("policy_definition", mode="before")
+    @classmethod
     def try_parse(cls, policy_definition):
         # this is needed because GET /template/policy/vsmart contains string in policyDefinition field
         # while POST /template/policy/vsmart requires a regular object

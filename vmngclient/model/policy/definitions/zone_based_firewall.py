@@ -1,7 +1,7 @@
 from ipaddress import IPv4Network
-from typing import Dict, List, Set, Tuple, Union
+from typing import Dict, List, Literal, Set, Tuple, Union
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import Annotated
 
 from vmngclient.model.misc.application_protocols import ApplicationProtocol
@@ -75,13 +75,11 @@ class ZoneBasedFWPolicyMatches(Match):
 
 
 class ZoneBasedFWPolicySequenceWithRuleSets(DefinitionSequence):
-    sequence_type: SequenceType = Field(default=SequenceType.ZONE_BASED_FW, const=True, alias="sequenceType")
+    sequence_type: SequenceType = Field(default=SequenceType.ZONE_BASED_FW, alias="sequenceType")
     match: ZoneBasedFWPolicyMatches
     ruleset: bool = True
     actions: List[LogAction]
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     def match_rule_set_lists(self, rule_set_ids: Set[str]) -> None:
         self.insert_match(RuleSetListEntry.from_rule_set_ids(rule_set_ids))
@@ -93,12 +91,10 @@ class ZoneBasedFWPolicySequenceWithRuleSets(DefinitionSequence):
 
 
 class ZoneBasedFWPolicySequence(DefinitionSequence):
-    sequence_type: SequenceType = Field(default=SequenceType.ZONE_BASED_FW, const=True, alias="sequenceType")
+    sequence_type: SequenceType = Field(default=SequenceType.ZONE_BASED_FW, alias="sequenceType")
     match: ZoneBasedFWPolicyMatches
-    actions: List[LogAction]
-
-    class Config:
-        allow_population_by_field_name = True
+    actions: List[LogAction] = []
+    model_config = ConfigDict(populate_by_name=True)
 
     def match_app_list(self, app_list_id: str) -> None:
         if self.base_action != BaseAction.INSPECT:
@@ -171,17 +167,13 @@ class ZoneBasedFWPolicySequence(DefinitionSequence):
 class ZoneBasedFWPolicyEntry(BaseModel):
     source_zone: str = Field(default="self", alias="sourceZone")
     destination_zone: str = Field(alias="destinationZone")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class ZoneBasedFWPolicyHeader(PolicyDefinitionHeader):
-    type: str = Field(default="zoneBasedFW", const=True)
+    type: Literal["zoneBasedFW"] = "zoneBasedFW"
     mode: str = Field(default="security")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class ZoneBasedFWPolicyDefinition(PolicyDefinitionBody):
@@ -190,8 +182,8 @@ class ZoneBasedFWPolicyDefinition(PolicyDefinitionBody):
 
 
 class ZoneBasedFWPolicy(ZoneBasedFWPolicyHeader):
-    type: str = Field(default="zoneBasedFW", const=True)
-    mode: str = Field(default="security", const=True)
+    type: Literal["zoneBasedFW"] = "zoneBasedFW"
+    mode: Literal["security"] = "security"
     definition: ZoneBasedFWPolicyDefinition = ZoneBasedFWPolicyDefinition()
 
     def add_ipv4_rule(
