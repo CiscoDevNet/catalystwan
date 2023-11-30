@@ -1,6 +1,7 @@
 import json
 import tempfile
 import unittest
+from enum import Enum
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 from unittest.mock import MagicMock
@@ -783,3 +784,33 @@ class TestAPIEndpoints(unittest.TestCase):
                 self, payload: BaseModelV1Example, category: str, params: ParamsModelV1Example
             ) -> None:  # type: ignore [empty-body]
                 ...
+
+    def test_request_decorator_format_url_with_str_enum(self):
+        class FruitEnum(str, Enum):
+            BANANA = "banana"
+            ORANGE = "orange"
+            APPLE = "apple"
+
+        class TestAPI(APIEndpoints):
+            @request("GET", "/v1/data/{fruit_type}")
+            def get_data(self, fruit_type: FruitEnum) -> None:  # type: ignore [empty-body]
+                ...
+
+        api = TestAPI(self.session_mock)
+        # Act
+        api.get_data(FruitEnum.ORANGE)
+        # Assert
+        self.session_mock.request.assert_called_once_with("GET", self.base_path + "/v1/data/orange")
+
+    def test_request_decorator_raises_when_format_url_is_not_str(self):
+        with self.assertRaises(APIEndpointError):
+
+            class FruitEnum(Enum):
+                BANANA = 1
+                ORANGE = 2
+                APPLE = 3
+
+            class TestAPI(APIEndpoints):
+                @request("POST", "/v1/data/{fruit_type}")
+                def get_data(self, fruit_type: FruitEnum) -> None:  # type: ignore [empty-body]
+                    ...
