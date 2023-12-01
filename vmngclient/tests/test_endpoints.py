@@ -793,16 +793,16 @@ class TestAPIEndpoints(unittest.TestCase):
 
         class TestAPI(APIEndpoints):
             @request("GET", "/v1/data/{fruit_type}")
-            def get_data(self, fruit_type: FruitEnum) -> None:  # type: ignore [empty-body]
+            def get_data(self, fruit_type: FruitEnum, payload: str) -> None:  # type: ignore [empty-body]
                 ...
 
         api = TestAPI(self.session_mock)
         # Act
-        api.get_data(FruitEnum.ORANGE)
+        api.get_data(FruitEnum.ORANGE, "not a fruit")
         # Assert
-        self.session_mock.request.assert_called_once_with("GET", self.base_path + "/v1/data/orange")
+        self.session_mock.request.assert_called_once_with("GET", self.base_path + "/v1/data/orange", data="not a fruit")
 
-    def test_request_decorator_raises_when_format_url_is_not_str(self):
+    def test_request_decorator_raises_when_format_url_is_not_str_subtype(self):
         with self.assertRaises(APIEndpointError):
 
             class FruitEnum(Enum):
