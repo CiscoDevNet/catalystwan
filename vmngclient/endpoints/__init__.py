@@ -136,14 +136,15 @@ class PreparedPayload:
         return result
 
 
-def dict_transform_enum_values_to_str(kwargs: Dict[str, Any]) -> Dict[str, str]:
+def dict_values_to_str(field_names: Set[str], kwargs: Dict[str, Any]) -> Dict[str, str]:
     # this is to keep compatiblity and have seme behavior for (str, Enum) mixin after 3.11 for url formatting
     result: Dict[str, str] = {}
-    for arg, val in kwargs.items():
-        if isinstance(val, Enum):
-            result[arg] = str(val.value)
+    for field_name in field_names:
+        field_value = kwargs.get(field_name)
+        if isinstance(field_value, Enum):
+            result[field_name] = str(field_value.value)
         else:
-            result[arg] = val
+            result[field_name] = str(field_value)
     return result
 
 
@@ -562,8 +563,8 @@ class request(APIEndpointsDecorator):
             _kwargs = self.merge_args(args, kwargs)
             payload = _kwargs.get("payload")
             params = _kwargs.get("params")
-            url_kwargs = dict_transform_enum_values_to_str(_kwargs)
-            formatted_url = self.url.format(**url_kwargs)
+            url_kwargs = dict_values_to_str(self.url_field_names, _kwargs)
+            formatted_url = self.url.format_map(url_kwargs)
             response = _self._request(
                 self.http_method,
                 formatted_url,
