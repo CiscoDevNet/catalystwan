@@ -48,6 +48,11 @@ class BaseModelV2Example(BaseModelV2):
     active: bool
 
 
+class BaseModelV2Example2(BaseModelV2):
+    other_id: str
+    active: bool
+
+
 class ParamsModelV2Example(BaseModelV2):
     name: str
     color: str
@@ -339,18 +344,31 @@ class TestAPIEndpoints(unittest.TestCase):
 
     @parameterized.expand(
         [
-            (BaseModelV1Example, False, TypeSpecifier(True, None, BaseModelV1Example, False, False)),
-            (List[BaseModelV1Example], False, TypeSpecifier(True, list, BaseModelV1Example, False, False)),
-            (Optional[BaseModelV1Example], False, TypeSpecifier(True, None, BaseModelV1Example, False, True)),
-            (Optional[List[BaseModelV1Example]], False, TypeSpecifier(True, list, BaseModelV1Example, False, True)),
+            (BaseModelV1Example, False, TypeSpecifier(True, None, BaseModelV1Example, None, False, False)),
+            (List[BaseModelV1Example], False, TypeSpecifier(True, list, BaseModelV1Example, None, False, False)),
+            (Optional[BaseModelV1Example], False, TypeSpecifier(True, None, BaseModelV1Example, None, False, True)),
+            (
+                Optional[List[BaseModelV1Example]],
+                False,
+                TypeSpecifier(True, list, BaseModelV1Example, None, False, True),
+            ),
             (List[Optional[BaseModelV1Example]], True, None),
-            (List[BaseModelV2Example], False, TypeSpecifier(True, list, BaseModelV2Example, False, False)),
-            (Optional[BaseModelV2Example], False, TypeSpecifier(True, None, BaseModelV2Example, False, True)),
-            (Optional[List[BaseModelV2Example]], False, TypeSpecifier(True, list, BaseModelV2Example, False, True)),
+            (List[BaseModelV2Example], False, TypeSpecifier(True, list, BaseModelV2Example, None, False, False)),
+            (Optional[BaseModelV2Example], False, TypeSpecifier(True, None, BaseModelV2Example, None, False, True)),
+            (
+                Optional[List[BaseModelV2Example]],
+                False,
+                TypeSpecifier(True, list, BaseModelV2Example, None, False, True),
+            ),
             (List[Optional[BaseModelV2Example]], True, None),
-            (JSON, False, TypeSpecifier(True, None, None, True, False)),
-            (str, False, TypeSpecifier(True, None, str, False, False)),
-            (bytes, False, TypeSpecifier(True, None, bytes, False, False)),
+            (JSON, False, TypeSpecifier(True, None, None, None, True, False)),
+            (str, False, TypeSpecifier(True, None, str, None, False, False)),
+            (bytes, False, TypeSpecifier(True, None, bytes, None, False, False)),
+            (
+                Union[BaseModelV2Example, BaseModelV2Example2],
+                False,
+                TypeSpecifier(True, None, None, [BaseModelV2Example, BaseModelV2Example2], False, False),
+            ),
             (None, True, None),
         ]
     )
@@ -814,3 +832,11 @@ class TestAPIEndpoints(unittest.TestCase):
                 @request("POST", "/v1/data/{fruit_type}")
                 def get_data(self, fruit_type: FruitEnum) -> None:  # type: ignore [empty-body]
                     ...
+
+    def test_request_decorator_accept_union_of_models(self):
+        class TestAPI(APIEndpoints):
+            @request("GET", "/v1/data")
+            def get_data(
+                self, payload: Union[BaseModelV2Example, BaseModelV2Example2]
+            ) -> None:  # type: ignore [empty-body]
+                ...

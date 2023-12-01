@@ -93,6 +93,7 @@ class TypeSpecifier:
     present: bool
     sequence_type: Optional[type] = None
     payload_type: Optional[type] = None
+    union_types: Optional[Sequence[type]] = None
     is_json: bool = False  # JSON is treated specially as it is type-alias / <typing special form>
     is_optional: bool = False
 
@@ -107,6 +108,10 @@ class TypeSpecifier:
     @classmethod
     def json(cls) -> TypeSpecifier:
         return TypeSpecifier(present=True, is_json=True)
+
+    @classmethod
+    def model_union(cls, models: Sequence[type]) -> TypeSpecifier:
+        return TypeSpecifier(present=True, union_types=models)
 
 
 @dataclass
@@ -474,12 +479,13 @@ class request(APIEndpointsDecorator):
         # Check if regular class
         if isclass(annotation):
             if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModelV1, BaseModelV2, CustomPayloadType)):
-                return TypeSpecifier(True, None, annotation, False, is_optional)
+                return TypeSpecifier(True, None, annotation, None, False, is_optional)
             else:
                 raise APIEndpointError(f"'payload' param must be annotated with supported type: {PayloadType}")
 
-        # Check if Sequence[PayloadModelType] like List or DataSequence
+        # Check for accepted alias types like List[...] and Union[...]
         elif type_origin := get_origin(annotation):
+            # Check if Sequence[PayloadModelType] like List or DataSequence
             if isclass(type_origin) and issubclass(type_origin, Sequence):
                 if (
                     (type_args := get_args(annotation))
@@ -487,7 +493,15 @@ class request(APIEndpointsDecorator):
                     and isclass(type_args[0])
                     and issubclass(type_args[0], (BaseModelV1, BaseModelV2))
                 ):
-                    return TypeSpecifier(True, type_origin, type_args[0], False, is_optional)
+                    return TypeSpecifier(True, type_origin, type_args[0], None, False, is_optional)
+            # Check if Union[PayloadModelType, ...], only unions of pydantic models allowed
+            elif type_origin == Union:
+                if (
+                    (type_args := get_args(annotation))
+                    and all(isclass(t) for t in type_args)
+                    and all(issubclass(t, (BaseModelV1, BaseModelV2)) for t in type_args)
+                ):
+                    return TypeSpecifier.model_union(models=list(type_args))
             raise APIEndpointError(f"Expected: {PayloadType} but found payload {annotation}")
         else:
             raise APIEndpointError(f"Expected: {PayloadType} but found payload {annotation}")

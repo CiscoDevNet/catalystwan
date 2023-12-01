@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from inspect import getsourcefile, getsourcelines
 from pathlib import Path, PurePath
-from typing import Any, Dict, List, Optional, Protocol, Set
+from typing import Any, Dict, List, Optional, Protocol, Sequence, Set
 from urllib.request import pathname2url
 
 from packaging.specifiers import SpecifierSet  # type: ignore
@@ -67,6 +67,16 @@ class CodeLink(MarkdownRenderer):
             )
         raise Exception("Cannot locate source for {func}")
 
+    @staticmethod
+    def from_type(type_obj: type) -> CodeLink:
+        if sourcefile := getsourcefile(type_obj):
+            return CodeLink(
+                link_text=type_obj.__name__,
+                sourcefile=create_sourcefile_link(sourcefile),
+                lineno=getsourcelines(type_obj)[1],
+            )
+        raise Exception("Cannot locate source for {func}")
+
     def __lt__(self, other: CodeLink):
         return self.link_text < other.link_text
 
@@ -114,9 +124,9 @@ class Endpoint(MarkdownRenderer):
     http_request: str
     supported_versions: str
     supported_tenancy_modes: str
-    method: CodeLink
-    payload_type: CompositeTypeLink
-    return_type: CompositeTypeLink
+    method_link: CodeLink
+    payload_type_links: Sequence[CodeLink]
+    return_type_link: CompositeTypeLink
 
     @staticmethod
     def from_meta(
@@ -124,26 +134,30 @@ class Endpoint(MarkdownRenderer):
         versions: Optional[SpecifierSet],
         tenancy_modes: Optional[Set[SessionType]],
     ) -> Endpoint:
+        if meta.payload_spec.union_types:
+            payload_links = [CodeLink.from_type(t) for t in meta.payload_spec.union_types]
+        else:
+            payload_links = [CompositeTypeLink.from_type_specifier(meta.payload_spec)]
         return Endpoint(
             http_request=meta.http_request,
             supported_versions=str(versions) if versions else "",
             supported_tenancy_modes=", ".join(sorted([tm.name for tm in tenancy_modes])) if tenancy_modes else "",
-            method=CodeLink.from_func(meta.func),
-            payload_type=CompositeTypeLink.from_type_specifier(meta.payload_spec),
-            return_type=CompositeTypeLink.from_type_specifier(meta.return_spec),
+            method_link=CodeLink.from_func(meta.func),
+            payload_type_links=payload_links,
+            return_type_link=CompositeTypeLink.from_type_specifier(meta.return_spec),
         )
 
     def __lt__(self, other: Endpoint):
-        self.method < other.method
+        self.method_link < other.method_link
 
     def md(self) -> str:
         return "|".join(
             [
                 self.http_request,
                 self.supported_versions,
-                self.method.md(),
-                self.payload_type.md(),
-                self.return_type.md(),
+                self.method_link.md(),
+                ", ".join([pt.md() for pt in self.payload_type_links]),
+                self.return_type_link.md(),
                 self.supported_tenancy_modes,
             ]
         )
