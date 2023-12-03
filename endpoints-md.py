@@ -134,8 +134,8 @@ class Endpoint(MarkdownRenderer):
         versions: Optional[SpecifierSet],
         tenancy_modes: Optional[Set[SessionType]],
     ) -> Endpoint:
-        if meta.payload_spec.union_types:
-            payload_links = [CodeLink.from_type(t) for t in meta.payload_spec.union_types]
+        if meta.payload_spec.payload_union_model_types:
+            payload_links = [CodeLink.from_type(t) for t in meta.payload_spec.payload_union_model_types]
         else:
             payload_links = [CompositeTypeLink.from_type_specifier(meta.payload_spec)]
         return Endpoint(

@@ -1,16 +1,19 @@
+# mypy: disable-error-code="annotation-unchecked"
 import json
 import tempfile
 import unittest
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Literal, Optional, Union
 from unittest.mock import MagicMock
 
 import pytest  # type: ignore
 from packaging.version import Version  # type: ignore
 from parameterized import parameterized  # type: ignore
 from pydantic import BaseModel as BaseModelV2
+from pydantic import Field as FieldV2
 from pydantic.v1 import BaseModel as BaseModelV1
+from typing_extensions import Annotated
 
 from vmngclient.endpoints import (
     BASE_PATH,
@@ -366,6 +369,11 @@ class TestAPIEndpoints(unittest.TestCase):
             (bytes, False, TypeSpecifier(True, None, bytes, None, False, False)),
             (
                 Union[BaseModelV2Example, BaseModelV2Example2],
+                False,
+                TypeSpecifier(True, None, None, [BaseModelV2Example, BaseModelV2Example2], False, False),
+            ),
+            (
+                Annotated[Union[BaseModelV2Example, BaseModelV2Example2], None],
                 False,
                 TypeSpecifier(True, None, None, [BaseModelV2Example, BaseModelV2Example2], False, False),
             ),
@@ -839,4 +847,20 @@ class TestAPIEndpoints(unittest.TestCase):
             def get_data(
                 self, payload: Union[BaseModelV2Example, BaseModelV2Example2]
             ) -> None:  # type: ignore [empty-body]
+                ...
+
+    def test_request_decorator_accept_annotated_union_of_models(self):
+        class BaseModelV2_A(BaseModelV2):
+            field: Literal["number"] = "number"
+            num: float
+
+        class BaseModelV2_B(BaseModelV2):
+            field: Literal["name"] = "name"
+            name: str
+
+        AnyBaseModel = Annotated[Union[BaseModelV2_A, BaseModelV2_B], FieldV2(discriminator="field")]
+
+        class TestAPI(APIEndpoints):
+            @request("POST", "/v1/data")
+            def create(self, payload: AnyBaseModel) -> None:  # type: ignore [empty-body]
                 ...

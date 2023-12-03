@@ -52,8 +52,6 @@ from typing import (
     Type,
     TypeVar,
     Union,
-    get_args,
-    get_origin,
     runtime_checkable,
 )
 
@@ -61,6 +59,7 @@ from packaging.specifiers import SpecifierSet  # type: ignore
 from packaging.version import Version  # type: ignore
 from pydantic import BaseModel as BaseModelV2
 from pydantic.v1 import BaseModel as BaseModelV1
+from typing_extensions import Annotated, get_args, get_origin
 
 from vmngclient.exceptions import APIEndpointError, APIRequestPayloadTypeError, APIVersionError, APIViewError
 from vmngclient.typed_list import DataSequence
@@ -93,7 +92,7 @@ class TypeSpecifier:
     present: bool
     sequence_type: Optional[type] = None
     payload_type: Optional[type] = None
-    union_types: Optional[Sequence[type]] = None
+    payload_union_model_types: Optional[Sequence[type]] = None
     is_json: bool = False  # JSON is treated specially as it is type-alias / <typing special form>
     is_optional: bool = False
 
@@ -111,7 +110,7 @@ class TypeSpecifier:
 
     @classmethod
     def model_union(cls, models: Sequence[type]) -> TypeSpecifier:
-        return TypeSpecifier(present=True, union_types=models)
+        return TypeSpecifier(present=True, payload_union_model_types=models)
 
 
 @dataclass
@@ -494,6 +493,16 @@ class request(APIEndpointsDecorator):
                     and issubclass(type_args[0], (BaseModelV1, BaseModelV2))
                 ):
                     return TypeSpecifier(True, type_origin, type_args[0], None, False, is_optional)
+            # Check if Annnotated[Union[PayloadModelType, ...]], only unions of pydantic models allowed
+            elif type_origin == Annotated:
+                if annotated_origin := get_args(annotation):
+                    if (len(annotated_origin) >= 1) and get_origin(annotated_origin[0]) == Union:
+                        if (
+                            (type_args := get_args(annotated_origin[0]))
+                            and all(isclass(t) for t in type_args)
+                            and all(issubclass(t, (BaseModelV1, BaseModelV2)) for t in type_args)
+                        ):
+                            return TypeSpecifier.model_union(models=list(type_args))
             # Check if Union[PayloadModelType, ...], only unions of pydantic models allowed
             elif type_origin == Union:
                 if (
