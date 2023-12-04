@@ -68,7 +68,7 @@ class DeviceDetailsResponse(BaseModel):
     username: str
     device_csr: Optional[str] = Field(default=None, alias="deviceCSR")
     device_csr_common_name: Optional[str] = Field(default=None, alias="deviceCSRCommonName")
-    root_cert_hash: str = Field(alias="rootCertHash")
+    root_cert_hash: Optional[str] = Field(default=None, alias="rootCertHash")
     csr: Optional[str] = Field(default=None, alias="CSR")
     csr_detail: str = Field(default=None, alias="CSRDetail")
     state: Optional[str] = Field(default=None)
