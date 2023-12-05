@@ -68,19 +68,19 @@ class DeviceDetailsResponse(BaseModel):
     username: str
     device_csr: Optional[str] = Field(default=None, alias="deviceCSR")
     device_csr_common_name: Optional[str] = Field(default=None, alias="deviceCSRCommonName")
-    root_cert_hash: str = Field(alias="rootCertHash")
+    root_cert_hash: Optional[str] = Field(default=None, alias="rootCertHash")
     csr: Optional[str] = Field(default=None, alias="CSR")
     csr_detail: str = Field(default=None, alias="CSRDetail")
     state: Optional[str] = Field(default=None)
     global_state: Optional[str] = Field(default=None, alias="globalState")
     valid: Optional[str] = Field(default=None)
-    request_token_id: str = Field(alias="requestTokenID")
+    request_token_id: Optional[str] = Field(default=None, alias="requestTokenID")
     expiration_date: str = Field(alias="expirationDate")
-    expiration_date_long: int = Field(alias="expirationDateLong")
+    expiration_date_long: Optional[int] = Field(default=None, alias="expirationDateLong")
     device_ip: str = Field(alias="deviceIP")
     activity: Optional[List[str]] = Field(default=None)
     state_vedge_list: Optional[str] = Field(default=None, alias="state_vedgeList")
-    cert_install_status: str = Field(alias="certInstallStatus")
+    cert_install_status: Optional[str] = Field(default=None, alias="certInstallStatus")
     org: Optional[str] = Field(default=None)
     personality: str
     expiration_status: Optional[str] = Field(default=None, alias="expirationStatus")
@@ -94,6 +94,15 @@ class DeviceDetailsResponse(BaseModel):
     solution: Optional[str] = Field(default=None)
     device_lock: str = Field(alias="device-lock")
     managed_by: str = Field(alias="managed-by")
+
+
+class DeviceDetailsQueryParams(BaseModel):
+    model: Optional[str] = None
+    state: Optional[List[str]] = None
+    uuid: Optional[List[str]] = None
+    device_ip: Optional[List[str]] = Field(default=None, serialization_alias="deviceIP")
+    validity: Optional[List[str]] = None
+    family: Optional[str] = None
 
 
 class ConfigurationDeviceInventory(APIEndpoints):
@@ -111,5 +120,7 @@ class ConfigurationDeviceInventory(APIEndpoints):
         ...
 
     @get("/system/device/{device_category}", "data")
-    def get_device_details(self, device_category: str) -> DataSequence[DeviceDetailsResponse]:
+    def get_device_details(
+        self, device_category: DeviceCategory, params: DeviceDetailsQueryParams = DeviceDetailsQueryParams()
+    ) -> DataSequence[DeviceDetailsResponse]:
         ...

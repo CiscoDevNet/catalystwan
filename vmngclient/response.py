@@ -2,6 +2,7 @@ import re
 from functools import wraps
 from pprint import pformat
 from typing import Any, Callable, Dict, Optional, Sequence, Type, TypeVar, Union, cast
+from urllib.parse import urlparse
 
 from pydantic import BaseModel as BaseModelV2
 from pydantic.v1 import BaseModel as BaseModelV1
@@ -16,6 +17,7 @@ from vmngclient.utils.creation_tools import create_dataclass
 
 T = TypeVar("T")
 PRINTABLE_CONTENT = re.compile(r"(text\/.+)|(application\/(json|html|xhtml|xml|x-www-form-urlencoded))", re.IGNORECASE)
+SENSITIVE_URL_PATHS = ["/dataservice/settings/configuration/smartaccountcredentials"]
 
 
 class ErrorInfo(BaseModelV2):
@@ -54,6 +56,9 @@ def response_debug(response: Optional[Response], request: Union[Request, Prepare
     if content_type := {k.lower(): v for k, v in _request.headers.items()}.get("content-type"):
         if not re.search(PRINTABLE_CONTENT, content_type):
             del request_debug["body"]
+    if urlparse(_request.url).path in SENSITIVE_URL_PATHS:
+        del request_debug["body"]
+        del request_debug["json"]
     debug_dict["request"] = {k: v for k, v in request_debug.items() if v is not None}
     if response is not None:
         response_debug = {
