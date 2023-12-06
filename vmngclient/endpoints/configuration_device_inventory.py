@@ -35,7 +35,7 @@ class DeviceCreationPayload(BaseModel):
     generate_csr: bool = Field(alias="generateCSR")
     password: str
     personality: Personality
-    port: Optional[str]
+    port: Optional[str] = Field(default=None)
     protocol: Protocol = Protocol.DTLS
     username: str
 
