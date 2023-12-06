@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, Mapping, Optional, Type, Union, overload
+from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Type, Union, overload
 
 from vmngclient.api.task_status_api import Task
 from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition, QoSMapInfo
@@ -146,7 +146,7 @@ from vmngclient.model.policy.localized import (
 )
 from vmngclient.model.policy.policy_definition import PolicyDefinitionEditResponse, PolicyDefinitionEndpoints
 from vmngclient.model.policy.policy_list import PolicyListEndpoints
-from vmngclient.model.policy.security import SecurityPolicy, SecurityPolicyEditResponse, SecurityPolicyInfo
+from vmngclient.model.policy.security import AnySecurityPolicy, AnySecurityPolicyInfo, SecurityPolicyEditResponse
 from vmngclient.typed_list import DataSequence
 
 if TYPE_CHECKING:
@@ -278,31 +278,35 @@ class SecurityPolicyAPI:
         self._session = session
         self._endpoints = ConfigurationSecurityTemplatePolicy(session)
 
-    def create(self, policy: SecurityPolicy) -> str:
+    def create(self, policy: AnySecurityPolicy) -> str:
         # POST does not return anything! we need to list all after creation and find by name to get id
         self._endpoints.create_security_template(policy)
-        all_policies_infos = self._endpoints.generate_security_template_list()
-        policy_info = all_policies_infos.filter(policy_name=policy.policy_name).first()
-        return policy_info.policy_id
+        policy_infos = [
+            info.root
+            for info in self._endpoints.generate_security_template_list()
+            if info.root.policy_name == policy.policy_name
+        ]
+        assert len(policy_infos) == 1
+        return policy_infos[0].policy_id
 
-    def edit(self, id: str, policy: SecurityPolicy) -> SecurityPolicyEditResponse:
+    def edit(self, id: str, policy: AnySecurityPolicy) -> SecurityPolicyEditResponse:
         return self._endpoints.edit_security_template(id, policy)
 
     def delete(self, id: str) -> None:
         self._endpoints.delete_security_template(id)
 
     @overload
-    def get(self) -> DataSequence[SecurityPolicyInfo]:
+    def get(self) -> List[AnySecurityPolicyInfo]:
         ...
 
     @overload
-    def get(self, id: str) -> SecurityPolicy:
+    def get(self, id: str) -> AnySecurityPolicy:
         ...
 
     def get(self, id: Optional[str] = None) -> Any:
         if id is not None:
-            return self._endpoints.get_security_template(id)
-        return self._endpoints.generate_security_template_list()
+            return self._endpoints.get_security_template(id).root
+        return [info.root for info in self._endpoints.generate_security_template_list()]
 
 
 class PolicyListsAPI:

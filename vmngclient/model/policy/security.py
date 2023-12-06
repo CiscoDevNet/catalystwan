@@ -1,22 +1,40 @@
 from enum import Enum
-from typing import Any, List, Literal, Optional, Union
+from typing import List, Literal, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, model_validator
+from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, RootModel, field_validator
+from typing_extensions import Annotated
 
-from vmngclient.model.policy.policy import AssemblyItem, PolicyCreationPayload, PolicyDefinition, PolicyInfo
+from vmngclient.model.policy.policy import (
+    AdvancedMalwareProtectionAssemblyItem,
+    DNSSecurityAssemblyItem,
+    IntrusionPreventionAssemblyItem,
+    NGFirewallAssemblyItem,
+    PolicyCreationPayload,
+    PolicyDefinition,
+    PolicyInfo,
+    SSLDecryptionAssemblyItem,
+    URLFilteringAssemblyItem,
+    ZoneBasedFWAssemblyItem,
+)
 
-SecurityPolicySupportedItemTypes = Literal[
-    "zoneBasedFW",
-    "intrusionPrevention",
-    "urlFiltering",
-    "advancedMalwareProtection",
-    "sslDecryption",
-    "dnssecurity",
+SecurityPolicyAssemblyItem = Annotated[
+    Union[
+        ZoneBasedFWAssemblyItem,
+        IntrusionPreventionAssemblyItem,
+        URLFilteringAssemblyItem,
+        AdvancedMalwareProtectionAssemblyItem,
+        DNSSecurityAssemblyItem,
+        SSLDecryptionAssemblyItem,
+    ],
+    Field(discriminator="type"),
 ]
 
-UnifiedSecurityPolicySupportedItemTypes = Literal[
-    "zoneBasedFW",
-    "dnssecurity",
+UnifiedSecurityPolicyAssemblyItem = Annotated[
+    Union[
+        NGFirewallAssemblyItem,
+        DNSSecurityAssemblyItem,
+    ],
+    Field(discriminator="type"),
 ]
 
 
@@ -70,14 +88,6 @@ class UnifiedSecurityPolicySettings(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class SecurityPolicyAssemblyItem(AssemblyItem):
-    type: SecurityPolicySupportedItemTypes
-
-
-class UnifiedSecurityPolicyAssemblyItem(AssemblyItem):
-    type: UnifiedSecurityPolicySupportedItemTypes
-
-
 class SecurityPolicyDefinition(PolicyDefinition):
     assembly: List[SecurityPolicyAssemblyItem] = []
     settings: SecurityPolicySettings = SecurityPolicySettings()
@@ -89,65 +99,72 @@ class UnifiedSecurityPolicyDefinition(PolicyDefinition):
 
 
 class SecurityPolicy(PolicyCreationPayload):
-    policy_mode: Literal["security", "unified"] = Field("security", alias="policyMode")
+    policy_mode: Literal["security"] = Field("security", alias="policyMode")
     policy_type: str = Field("feature", alias="policyType")
     policy_use_case: str = Field("custom", alias="policyUseCase")
-    policy_definition: Union[SecurityPolicyDefinition, UnifiedSecurityPolicyDefinition] = Field(
-        default=SecurityPolicyDefinition(), alias="policyDefinition"
-    )
+    policy_definition: SecurityPolicyDefinition = Field(default=SecurityPolicyDefinition(), alias="policyDefinition")
 
-    def _add_item(self, _type: Any, item_id: str) -> None:
-        if isinstance(self.policy_definition, SecurityPolicyDefinition):
-            self.policy_definition.assembly.append(
-                SecurityPolicyAssemblyItem(type=_type, definition_id=item_id)  # type: ignore[call-arg]
-            )
-        elif isinstance(self.policy_definition, UnifiedSecurityPolicyDefinition):
-            self.policy_definition.assembly.append(
-                UnifiedSecurityPolicyAssemblyItem(type=_type, definition_id=item_id)  # type: ignore[call-arg]
-            )
+    def add_item(self, item: SecurityPolicyAssemblyItem) -> None:
+        self.policy_definition.assembly.append(item)
 
     def add_zone_based_fw(self, definition_id: str) -> None:
-        self._add_item("zoneBasedFW", definition_id)
+        self.add_item(ZoneBasedFWAssemblyItem(definition_id=definition_id))
+
+    def add_dns_security(self, definition_id: str) -> None:
+        self.add_item(DNSSecurityAssemblyItem(definition_id=definition_id))
 
     def add_intrusion_prevention(self, definition_id: str) -> None:
-        self._add_item("intrusionPrevention", definition_id)
+        self.add_item(IntrusionPreventionAssemblyItem(definition_id=definition_id))
 
     def add_url_filtering(self, definition_id: str) -> None:
-        self._add_item("urlFiltering", definition_id)
+        self.add_item(URLFilteringAssemblyItem(definition_id=definition_id))
 
     def add_advanced_malware_protection(self, definition_id: str) -> None:
-        self._add_item("advancedMalwareProtection", definition_id)
+        self.add_item(AdvancedMalwareProtectionAssemblyItem(definition_id=definition_id))
 
     def add_ssl_decryption(self, definition_id: str) -> None:
-        self._add_item("sslDecryption", definition_id)
+        self.add_item(SSLDecryptionAssemblyItem(definition_id=definition_id))
 
-    @model_validator(mode="after")
-    def initialize_with_policy_mode(self):
-        # When instatiating model by user using constructor
-        if self.policy_definition is None:
-            if self.policy_mode == "unified":
-                self.policy_definition = UnifiedSecurityPolicyDefinition()
-            else:
-                self.policy_definition = SecurityPolicyDefinition()
-        return self
-
-    @model_validator(mode="before")
+    @field_validator("policy_definition", mode="before")
     @classmethod
-    def parse_by_policy_mode(cls, values):
-        # When creating model from remote json (using aliases)
-        mode = values.get("policyMode")
-        definition = values.get("policyDefinition")
-        if isinstance(definition, str):
-            if mode == "unified":
-                values["policyDefinition"] = UnifiedSecurityPolicyDefinition.model_validate_json(definition)
-            else:
-                values["policyDefinition"] = SecurityPolicyDefinition.model_validate_json(definition)
-        if isinstance(definition, dict):
-            if mode == "unified":
-                values["policyDefinition"] = UnifiedSecurityPolicyDefinition.model_validate(definition)
-            else:
-                values["policyDefinition"] = SecurityPolicyDefinition.model_validate(definition)
-        return values
+    def try_parse(cls, policy_definition):
+        if isinstance(policy_definition, str):
+            return SecurityPolicyDefinition.model_validate_json(policy_definition)
+        return policy_definition
+
+
+class UnifiedSecurityPolicy(PolicyCreationPayload):
+    policy_mode: Literal["unified"] = Field("unified", alias="policyMode")
+    policy_type: str = Field("feature", alias="policyType")
+    policy_use_case: str = Field("custom", alias="policyUseCase")
+    policy_definition: UnifiedSecurityPolicyDefinition = Field(
+        default=UnifiedSecurityPolicyDefinition(), alias="policyDefinition"
+    )
+
+    def add_item(self, item: UnifiedSecurityPolicyAssemblyItem) -> None:
+        self.policy_definition.assembly.append(item)
+
+    def add_ng_firewall(self, definition_id: str) -> NGFirewallAssemblyItem:
+        ng_fw = NGFirewallAssemblyItem(definition_id=definition_id)
+        self.add_item(ng_fw)
+        return ng_fw
+
+    def add_dns_security(self, definition_id: str) -> None:
+        self.add_item(DNSSecurityAssemblyItem(definition_id=definition_id))
+
+    @field_validator("policy_definition", mode="before")
+    @classmethod
+    def try_parse(cls, policy_definition):
+        if isinstance(policy_definition, str):
+            return UnifiedSecurityPolicyDefinition.model_validate_json(policy_definition)
+        return policy_definition
+
+
+AnySecurityPolicy = Annotated[Union[SecurityPolicy, UnifiedSecurityPolicy], Field(discriminator="policy_mode")]
+
+
+class SecurityPolicyRoot(RootModel):
+    root: AnySecurityPolicy
 
 
 class SecurityPolicyEditResponse(BaseModel):
@@ -157,3 +174,17 @@ class SecurityPolicyEditResponse(BaseModel):
 class SecurityPolicyInfo(SecurityPolicy, PolicyInfo):
     virtual_application_templates: List[str] = Field(alias="virtualApplicationTemplates")
     supported_devices: List[str] = Field(alias="supportedDevices")
+
+
+class UnifiedSecurityPolicyInfo(UnifiedSecurityPolicy, PolicyInfo):
+    virtual_application_templates: List[str] = Field(alias="virtualApplicationTemplates")
+    supported_devices: List[str] = Field(alias="supportedDevices")
+
+
+AnySecurityPolicyInfo = Annotated[
+    Union[SecurityPolicyInfo, UnifiedSecurityPolicyInfo], Field(discriminator="policy_mode")
+]
+
+
+class SecurityPolicyInfoRoot(RootModel):
+    root: AnySecurityPolicyInfo

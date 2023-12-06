@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional, Sequence
+from typing import Any, List, Literal, Optional, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -8,10 +8,49 @@ class PolicyId(BaseModel):
     policy_id: str = Field(alias="policyId")
 
 
-class AssemblyItem(BaseModel):
-    definition_id: str = Field(alias="definitionId")
-    type: str
+class NGFirewallZoneListEntry(BaseModel):
+    src_zone_list_id: str = Field(validation_alias="srcZoneListId", serialization_alias="srcZoneListId")
+    dst_zone_list_id: str = Field(validation_alias="dstZoneListId", serialization_alias="dstZoneListId")
     model_config = ConfigDict(populate_by_name=True)
+
+
+class AssemblyItem(BaseModel):
+    definition_id: str = Field(validation_alias="definitionId", serialization_alias="definitionId")
+    type: str
+    entries: Optional[Sequence[Any]] = None
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class ZoneBasedFWAssemblyItem(AssemblyItem):
+    type: Literal["zoneBasedFW"] = "zoneBasedFW"
+
+
+class NGFirewallAssemblyItem(AssemblyItem):
+    type: Literal["zoneBasedFW"] = "zoneBasedFW"
+    entries: List[NGFirewallZoneListEntry] = []
+
+    def add_zone_pair(self, src_zone_id: str, dst_zone_id: str):
+        self.entries.append(NGFirewallZoneListEntry(src_zone_list_id=src_zone_id, dst_zone_list_id=dst_zone_id))
+
+
+class DNSSecurityAssemblyItem(AssemblyItem):
+    type: Literal["DNSSecurity"] = "DNSSecurity"
+
+
+class IntrusionPreventionAssemblyItem(AssemblyItem):
+    type: Literal["intrusionPrevention"] = "intrusionPrevention"
+
+
+class URLFilteringAssemblyItem(AssemblyItem):
+    type: Literal["urlFiltering"] = "urlFiltering"
+
+
+class AdvancedMalwareProtectionAssemblyItem(AssemblyItem):
+    type: Literal["advancedMalwareProtection"] = "advancedMalwareProtection"
+
+
+class SSLDecryptionAssemblyItem(AssemblyItem):
+    type: Literal["sslDecryption"] = "sslDecryption"
 
 
 class PolicyDefinition(BaseModel):
