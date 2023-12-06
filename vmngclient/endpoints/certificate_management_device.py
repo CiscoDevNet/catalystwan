@@ -1,6 +1,6 @@
 # mypy: disable-error-code="empty-body"
 
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -65,7 +65,9 @@ class DeviceCsrGenerationResponse(BaseModel):
     expirationDate: Optional[str] = Field(default=None, alias="expirationDate")
     deviceIP: Optional[str] = Field(default=None, alias="deviceIP")
     uploadSource: Optional[str] = Field(default=None, alias="uploadSource")
-    deviceEnterpriseCertInstallTime: Optional[str] = Field(default=None, alias="deviceEnterpriseCertInstallTime")
+    deviceEnterpriseCertInstallTime: Union[str, int, None] = Field(
+        default=None, alias="deviceEnterpriseCertInstallTime"
+    )
     CSR: Optional[str] = Field(default=None, alias="CSR")
     deviceCSRGenTimeString: Optional[str] = Field(default=None, alias="deviceCSRGenTimeString")
     deviceEnterpriseCertificate: Optional[str] = Field(default=None, alias="deviceEnterpriseCertificate")
