@@ -53,7 +53,7 @@ class Device(BaseModel):
         allow_population_by_field_name = True
 
     domain_ip: Optional[str] = Field(default=None, alias="domainIp")
-    port: Optional[int] = Field(default=None, ge=1, le=65536)
+    port: Optional[int] = Field(default="12346", ge=1, le=65536)
 
 
 class EmailNotificationSettings(BaseModel):

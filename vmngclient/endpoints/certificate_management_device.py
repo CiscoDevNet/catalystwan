@@ -11,7 +11,7 @@ from vmngclient.typed_list import DataSequence
 class DeviceDeletionResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    local_delete_from_db: bool = Field(alias="localDeleteFromDB")
+    local_delete_from_db: Optional[bool] = Field(default=None, alias="localDeleteFromDB")
     id: str
 
 
