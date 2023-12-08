@@ -658,5 +658,5 @@ class PolicyAPI:
         result = {}
         protocol_map_list = self._session.endpoints.misc.get_application_protocols()
         for protocol_map in protocol_map_list:
-            result.update(protocol_map.__root__)
+            result.update(protocol_map.root)
         return result
