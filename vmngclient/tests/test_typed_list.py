@@ -3,11 +3,18 @@ import copy
 import unittest
 from unittest import TestCase
 
+from attr import define  # type: ignore
 from parameterized import parameterized
 
-from vmngclient.dataclasses import Device, User
+from vmngclient.dataclasses import DataclassBase, Device, User
 from vmngclient.exceptions import InvalidOperationError
 from vmngclient.typed_list import DataSequence, TypedList
+
+
+@define
+class FakeUser(DataclassBase):
+    name: str
+    weight: float
 
 
 class TestTypedList(TestCase):
@@ -181,6 +188,36 @@ class TestTypedList(TestCase):
         with self.assertRaises(TypeError):
             users.insert(1, "2")
 
+    @parameterized.expand(
+        [
+            (TypedList(str, ["A", "B"]), TypedList(str, ["C"]), False, TypedList(str, ["A", "B", "C"])),
+            (TypedList(int, [1, 2]), TypedList(int, [5]), False, TypedList(int, [1, 2, 5])),
+            (TypedList(str, ["Z"]), TypedList(int, [9]), True, None),
+        ]
+    )
+    def test_add(self, term1, term2, raises, expected_result):
+        if raises:
+            with self.assertRaises(TypeError):
+                observed_result = term1 + term2
+        else:
+            observed_result = term1 + term2
+            assert observed_result == expected_result
+
+    @parameterized.expand(
+        [
+            (TypedList(str, ["A", "B"]), TypedList(str, ["C"]), False, TypedList(str, ["A", "B", "C"])),
+            (TypedList(int, [1, 2]), TypedList(int, [5]), False, TypedList(int, [1, 2, 5])),
+            (TypedList(str, ["Z"]), TypedList(int, [9]), True, None),
+        ]
+    )
+    def test_iadd(self, term1, term2, raises, expected_result):
+        if raises:
+            with self.assertRaises(TypeError):
+                term1 += term2
+        else:
+            term1 += term2
+            assert term1 == expected_result
+
 
 class TestDataSequence(TestCase):
     def setUp(self):
@@ -210,6 +247,54 @@ class TestDataSequence(TestCase):
         # Arrage, Act, Assert
         with self.assertRaises(TypeError):
             DataSequence(str, ["1, 2"])
+
+    @parameterized.expand(
+        [
+            (
+                DataSequence(User, [User(username="A")]),
+                DataSequence(User, [User(username="B")]),
+                False,
+                DataSequence(User, [User(username="A"), User(username="B")]),
+            ),
+            (
+                DataSequence(User, [User(username="A")]),
+                DataSequence(FakeUser, [FakeUser(name="B", weight=99.9)]),
+                True,
+                None,
+            ),
+        ]
+    )
+    def test_add(self, term1, term2, raises, expected_result):
+        if raises:
+            with self.assertRaises(TypeError):
+                observed_result = term1 + term2
+        else:
+            observed_result = term1 + term2
+            assert observed_result == expected_result
+
+    @parameterized.expand(
+        [
+            (
+                DataSequence(User, [User(username="A")]),
+                DataSequence(User, [User(username="B")]),
+                False,
+                DataSequence(User, [User(username="A"), User(username="B")]),
+            ),
+            (
+                DataSequence(User, [User(username="A")]),
+                DataSequence(FakeUser, [FakeUser(name="B", weight=99.9)]),
+                True,
+                None,
+            ),
+        ]
+    )
+    def test_iadd(self, term1, term2, raises, expected_result):
+        if raises:
+            with self.assertRaises(TypeError):
+                term1 += term2
+        else:
+            term1 += term2
+            assert term1 == expected_result
 
     def test_single_or_default(self):
         # Arrange, Act
