@@ -69,6 +69,9 @@ class DeviceData(BaseModel):
     validity: Optional[str] = None
     version: Optional[str] = None
 
+    class Config:
+        allow_population_by_field_name = True
+
 
 class MonitoringDeviceDetails(APIEndpoints):
     def add_tier(self):
