@@ -91,6 +91,13 @@ class TypedList(MutableSequence[T], Generic[T]):
     def __delitem__(self, i):
         del self.data[i]
 
+    def __add__(self, __value: Iterable[T]) -> TypedList[T]:
+        return TypedList(self._type, self.data + [*__value.__iter__()])
+
+    def __iadd__(self, __value: Iterable[T]) -> TypedList[T]:
+        self.data = TypedList(self._type, self.data + [*__value.__iter__()]).data
+        return self
+
     def __eq__(self, __o: object) -> bool:
         if isinstance(__o, TypedList):
             if len(self) != len(__o):
@@ -174,6 +181,13 @@ class DataSequence(TypedList[T], Generic[T]):
 
             pretty_message += f"\n{element.__class__.__name__}(\n" + pprint + "\n)"  # type: ignore
         return pretty_message
+
+    def __add__(self, __value: Iterable[T]) -> DataSequence[T]:
+        return DataSequence(self._type, self.data + [*__value.__iter__()])
+
+    def __iadd__(self, __value: Iterable[T]) -> DataSequence[T]:
+        self.data = DataSequence(self._type, self.data + [*__value.__iter__()]).data
+        return self
 
     @overload
     def single_or_default(self) -> T:

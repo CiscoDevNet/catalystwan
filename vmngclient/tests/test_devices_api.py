@@ -8,6 +8,7 @@ from tenacity import RetryError  # type: ignore
 from vmngclient.api.basic_api import DevicesAPI, DeviceStateAPI
 from vmngclient.dataclasses import BfdSessionData, Connection, Device, WanInterface
 from vmngclient.endpoints.endpoints_container import APIEndpointContainter
+from vmngclient.endpoints.monitoring_device_details import DeviceData
 from vmngclient.endpoints.real_time_monitoring.reboot_history import RebootEntry
 from vmngclient.exceptions import InvalidOperationError
 from vmngclient.response import vManageResponse
@@ -113,6 +114,7 @@ class TestDevicesAPI(TestCase):
         self.edges_dataseq = DataSequence(Device, [create_dataclass(Device, self.devices[3])])
         self.system_ips_list = [device["local-system-ip"] for device in self.devices]
         self.ips_list = [device["deviceId"] for device in self.devices]
+        self.list_all_devices_resp = DataSequence(DeviceData, [DeviceData.parse_obj(dev) for dev in self.devices])
 
     @patch.object(DevicesAPI, "get")
     def test_controllers(self, mock_devices):
@@ -133,6 +135,7 @@ class TestDevicesAPI(TestCase):
     def test_orchestrators(self, mock_session, mock_response):
         # Arrange
         mock_session.get.return_value = mock_response
+        mock_session.endpoints.monitoring_device_details.list_all_devices.return_value = self.list_all_devices_resp
         mock_response.dataseq.return_value = self.devices_dataseq
 
         # Act
@@ -146,6 +149,7 @@ class TestDevicesAPI(TestCase):
     def test_edges(self, mock_session, mock_response):
         # Arrange
         mock_session.get.return_value = mock_response
+        mock_session.endpoints.monitoring_device_details.list_all_devices.return_value = self.list_all_devices_resp
         mock_response.dataseq.return_value = self.devices_dataseq
 
         # Act
@@ -159,6 +163,7 @@ class TestDevicesAPI(TestCase):
     def test_vsmarts(self, mock_session, mock_response):
         # Arrange
         mock_session.get.return_value = mock_response
+        mock_session.endpoints.monitoring_device_details.list_all_devices.return_value = self.list_all_devices_resp
         mock_response.dataseq.return_value = self.devices_dataseq
 
         # Act
@@ -196,6 +201,7 @@ class TestDevicesAPI(TestCase):
     def test_get(self, mock_session, mock_response):
         # Arrange
         mock_session.get.return_value = mock_response
+        mock_session.endpoints.monitoring_device_details.list_all_devices.return_value = self.list_all_devices_resp
         mock_response.dataseq.return_value = self.devices_dataseq
 
         # Act
@@ -217,6 +223,7 @@ class TestDevicesAPI(TestCase):
     def test_get_device_details(self, uuid, device_number, mock_session, mock_response):
         # Arrange
         mock_session.get.return_value = mock_response
+        mock_session.endpoints.monitoring_device_details.list_all_devices.return_value = self.list_all_devices_resp
         mock_response.dataseq.return_value = DataSequence(
             Device, [create_dataclass(Device, self.devices[device_number])]
         )
@@ -247,6 +254,7 @@ class TestDevicesAPI(TestCase):
     def test_get_reachable_devices_vsmarts(self, mock_session, mock_response):
         # Arrange
         mock_session.get.return_value = mock_response
+        mock_session.endpoints.monitoring_device_details.list_all_devices.return_value = self.list_all_devices_resp
         mock_response.dataseq.return_value = DataSequence(Device, [create_dataclass(Device, self.devices[1])])
 
         # Act
@@ -260,6 +268,7 @@ class TestDevicesAPI(TestCase):
     def test_get_reachable_devices_vbonds(self, mock_session, mock_response):
         # Arrange
         mock_session.get.return_value = mock_response
+        mock_session.endpoints.monitoring_device_details.list_all_devices.return_value = self.list_all_devices_resp
         mock_response.dataseq.return_value = DataSequence(Device, [create_dataclass(Device, self.devices[2])])
 
         # Act
@@ -273,6 +282,7 @@ class TestDevicesAPI(TestCase):
     def test_get_reachable_devices_vedgess(self, mock_session, mock_response):
         # Arrange
         mock_session.get.return_value = mock_response
+        mock_session.endpoints.monitoring_device_details.list_all_devices.return_value = self.list_all_devices_resp
         mock_response.dataseq.return_value = DataSequence(Device, [create_dataclass(Device, self.devices[3])])
 
         # Act
@@ -324,6 +334,7 @@ class TestDevicesAPI(TestCase):
     def test_get_by_hostname(self, hostname, device_number, mock_session, mock_response):
         # Arrange
         mock_session.get.return_value = mock_response
+        mock_session.endpoints.monitoring_device_details.list_all_devices.return_value = self.list_all_devices_resp
         mock_response.dataseq.return_value = self.devices_dataseq
 
         # Act
@@ -338,6 +349,7 @@ class TestDevicesAPI(TestCase):
     def test_get_by_id(self, device_id, device_number, mock_session, mock_response):
         # Arrange
         mock_session.get.return_value = mock_response
+        mock_session.endpoints.monitoring_device_details.list_all_devices.return_value = self.list_all_devices_resp
         mock_response.dataseq.return_value = self.devices_dataseq
 
         # Act

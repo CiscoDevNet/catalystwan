@@ -32,6 +32,47 @@ class Tier(BaseModel):
     nat_session_limit: Optional[int] = Field(alias="natSessionLimit")
 
 
+class DeviceData(BaseModel):
+    board_serial: Optional[str] = Field(None, alias="board-serial")
+    certificate_validity: Optional[str] = Field(None, alias="certificate-validity")
+    connected_vmanages: Optional[List[str]] = Field(None, alias="connectedVManages")
+    control_connections: Optional[str] = Field(None, alias="controlConnections")
+    device_groups: Optional[List[str]] = Field(None, alias="device-groups")
+    device_model: Optional[str] = Field(None, alias="device-model")
+    device_os: Optional[str] = Field(None, alias="device-os")
+    device_type: Optional[str] = Field(None, alias="device-type")
+    device_id: str = Field(alias="deviceId")
+    domain_id: Optional[str] = Field(None, alias="domain-id")
+    host_name: Optional[str] = Field(None, alias="host-name")
+    is_device_geo_data: Optional[bool] = Field(None, alias="isDeviceGeoData")
+    lastupdated: Optional[str] = None
+    latitude: Optional[str] = None
+    layout_level: Optional[int] = Field(None, alias="layoutLevel")
+    local_system_ip: Optional[str] = Field(None, alias="local-system-ip")
+    longitude: Optional[str] = None
+    max_controllers: Optional[str] = Field(None, alias="max-controllers")
+    model_sku: Optional[str] = None
+    personality: Optional[str] = None
+    platform: Optional[str] = None
+    reachability: Optional[str] = None
+    site_id: Optional[str] = Field(None, alias="site-id")
+    state: Optional[str] = None
+    state_description: Optional[str] = None
+    status: Optional[str] = None
+    status_order: Optional[str] = Field(None, alias="statusOrder")
+    system_ip: Optional[str] = Field(None, alias="system-ip")
+    testbed_mode: Optional[bool] = None
+    timezone: Optional[str] = None
+    total_cpu_count: Optional[str] = None
+    uptime_date: Optional[str] = Field(None, alias="uptime-date")
+    uuid: Optional[str] = None
+    validity: Optional[str] = None
+    version: Optional[str] = None
+
+    class Config:
+        allow_population_by_field_name = True
+
+
 class MonitoringDeviceDetails(APIEndpoints):
     def add_tier(self):
         #  POST /device/tier
@@ -137,7 +178,8 @@ class MonitoringDeviceDetails(APIEndpoints):
         #  GET /device/models
         ...
 
-    def list_all_devices(self):
+    @get("/device", "data")
+    def list_all_devices(self) -> DataSequence[DeviceData]:
         #  GET /device
         ...
 
