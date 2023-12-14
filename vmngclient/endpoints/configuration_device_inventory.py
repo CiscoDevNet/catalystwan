@@ -105,6 +105,23 @@ class DeviceDetailsQueryParams(BaseModel):
     family: Optional[str] = None
 
 
+class Validity(str, Enum):
+    VALID = "valid"
+    INVALID = "invalid"
+
+
+class SmartAccountSyncParams(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    password: str
+    username: str
+    validity_string: str = Validity.INVALID
+
+
+class ProcessId(BaseModel):
+    process_id: str = Field(alias="processId")
+
+
 class ConfigurationDeviceInventory(APIEndpoints):
     @versions(supported_versions=(">=20.9"), raises=False)
     @post("/system/device/{device_uuid}/unlock")
@@ -123,4 +140,8 @@ class ConfigurationDeviceInventory(APIEndpoints):
     def get_device_details(
         self, device_category: DeviceCategory, params: DeviceDetailsQueryParams = DeviceDetailsQueryParams()
     ) -> DataSequence[DeviceDetailsResponse]:
+        ...
+
+    @post("/system/device/smartaccount/sync")
+    def sync_devices_from_smart_account(self, payload: SmartAccountSyncParams) -> ProcessId:
         ...
