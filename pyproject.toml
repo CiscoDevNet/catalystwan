@@ -1,10 +1,6 @@
 [tool.poetry]
 name = "vmngclient"
-<<<<<<< HEAD
-version = "0.18.1.dev2"
-=======
-version = "0.20.0"
->>>>>>> fr/policy-api
+version = "0.20.0.dev0"
 description = "vManage SDK for Python"
 authors = ["kagorski <kagorski@cisco.com>"]
 readme = "README.md"
