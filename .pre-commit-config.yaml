@@ -54,7 +54,8 @@ repos:
         additional_dependencies: [
           "flake8-quotes==3.3.2"
         ]
-        args: ["--max-line-length", "120", "--inline-quotes", "double"]
+        # https://black.readthedocs.io/en/stable/faq.html#why-are-flake8-s-e203-and-w503-violated
+        args: ["--max-line-length", "120", "--inline-quotes", "double", "--extend-ignore", "E203,W503"]
         fail_fast: true
 
   - repo: local
