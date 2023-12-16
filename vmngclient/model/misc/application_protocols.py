@@ -1,7 +1,7 @@
 from socket import getprotobyname
 from typing import Dict, List, Optional
 
-from pydantic.v1 import BaseModel
+from pydantic import BaseModel, RootModel
 
 
 class ApplicationProtocolEntry(BaseModel):
@@ -12,7 +12,7 @@ class ApplicationProtocol(BaseModel):
     name: str
     protocol: Optional[str] = None
     port: Optional[str] = None
-    entries: Optional[List[ApplicationProtocolEntry]]
+    entries: Optional[List[ApplicationProtocolEntry]] = None
 
     def protocol_as_numbers(self) -> List[int]:
         if self.protocol:
@@ -23,5 +23,5 @@ class ApplicationProtocol(BaseModel):
         return " ".join(str(p) for p in self.protocol_as_numbers())
 
 
-class ApplicationProtocolMap(BaseModel):
-    __root__: Dict[str, ApplicationProtocol]
+class ApplicationProtocolMap(RootModel):
+    root: Dict[str, ApplicationProtocol]

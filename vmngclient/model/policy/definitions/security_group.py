@@ -5,7 +5,7 @@ from typing import Literal, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from vmngclient.model.common import check_any_of_exclusive_field_sets, check_fields_exclusive
-from vmngclient.model.policy.policy_definition import ListReference, PolicyDefinitionHeader, VariableName
+from vmngclient.model.policy.policy_definition import ListReference, PolicyDefinitionBase, VariableName
 
 
 class SequenceIPType(str, Enum):
@@ -49,7 +49,7 @@ class SecurityGroupIPv6Definition(BaseModel):
         return self
 
 
-class SecurityGroup(PolicyDefinitionHeader):
+class SecurityGroup(PolicyDefinitionBase):
     # TODO: cannot use sequence_ip_type discriminated unions here as this is root of model
     # EndpointAPI would need to support annotated union as payload parameter
     type: Literal["securityGroup"] = "securityGroup"

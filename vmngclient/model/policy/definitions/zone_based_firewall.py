@@ -8,7 +8,8 @@ from vmngclient.model.misc.application_protocols import ApplicationProtocol
 from vmngclient.model.policy.policy_definition import (
     AppListEntry,
     BaseAction,
-    DefinitionSequence,
+    DefinitionSequenceBase,
+    DefinitionWithSequencesCommonBase,
     DestinationDataPrefixListEntry,
     DestinationFQDNEntry,
     DestinationGeoLocationEntry,
@@ -18,8 +19,7 @@ from vmngclient.model.policy.policy_definition import (
     DestinationPortListEntry,
     LogAction,
     Match,
-    PolicyDefinitionBody,
-    PolicyDefinitionHeader,
+    PolicyDefinitionBase,
     ProtocolEntry,
     ProtocolNameEntry,
     ProtocolNameListEntry,
@@ -74,7 +74,7 @@ class ZoneBasedFWPolicyMatches(Match):
     entries: List[ZoneBasedFWPolicySequenceEntry] = []
 
 
-class ZoneBasedFWPolicySequenceWithRuleSets(DefinitionSequence):
+class ZoneBasedFWPolicySequenceWithRuleSets(DefinitionSequenceBase):
     sequence_type: SequenceType = Field(default=SequenceType.ZONE_BASED_FW, alias="sequenceType")
     match: ZoneBasedFWPolicyMatches
     ruleset: bool = True
@@ -90,7 +90,7 @@ class ZoneBasedFWPolicySequenceWithRuleSets(DefinitionSequence):
         self.insert_match(AppListEntry(ref=app_list_id))
 
 
-class ZoneBasedFWPolicySequence(DefinitionSequence):
+class ZoneBasedFWPolicySequence(DefinitionSequenceBase):
     sequence_type: SequenceType = Field(default=SequenceType.ZONE_BASED_FW, alias="sequenceType")
     match: ZoneBasedFWPolicyMatches
     actions: List[LogAction] = []
@@ -170,13 +170,13 @@ class ZoneBasedFWPolicyEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class ZoneBasedFWPolicyHeader(PolicyDefinitionHeader):
+class ZoneBasedFWPolicyHeader(PolicyDefinitionBase):
     type: Literal["zoneBasedFW"] = "zoneBasedFW"
     mode: str = Field(default="security")
     model_config = ConfigDict(populate_by_name=True)
 
 
-class ZoneBasedFWPolicyDefinition(PolicyDefinitionBody):
+class ZoneBasedFWPolicyDefinition(DefinitionWithSequencesCommonBase):
     sequences: List[Union[ZoneBasedFWPolicySequence, ZoneBasedFWPolicySequenceWithRuleSets]] = []
     entries: List[ZoneBasedFWPolicyEntry] = []
 

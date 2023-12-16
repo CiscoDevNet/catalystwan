@@ -3,7 +3,7 @@ from typing import List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from vmngclient.model.policy.policy_definition import PolicyDefinitionHeader
+from vmngclient.model.policy.policy_definition import PolicyDefinitionBase
 
 
 class QoSSchedulingEnum(str, Enum):
@@ -71,7 +71,7 @@ class QoSMapDefinition(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class QoSMap(PolicyDefinitionHeader):
+class QoSMap(PolicyDefinitionBase):
     type: Literal["qosMap"] = "qosMap"
     definition: QoSMapDefinition = QoSMapDefinition(qosSchedulers=[])
     model_config = ConfigDict(populate_by_name=True)

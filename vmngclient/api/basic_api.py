@@ -30,6 +30,8 @@ class DevicesAPI:
         session: logged in API client session
     """
 
+    max_params = 1000
+
     def __init__(self, session: vManageSession) -> None:
         self.session = session
 
@@ -149,14 +151,15 @@ class DevicesAPI:
             logger.info("Rediscovering devices...")
             api = "/dataservice/device/action/rediscoverall"
             self.session.post(url=api)
-        devices_basic_info = self.session.get_data("/dataservice/device")
+        devices = self.session.endpoints.monitoring_device_details.list_all_devices()
+        device_ids = [device.device_id for device in devices]
+        devices_sys_info = DataSequence(Device, [])
+        for i in range(0, len(device_ids), self.max_params):
+            params = {"deviceId": device_ids[i : i + self.max_params]}
+            resp = self.session.get(url="/dataservice/device/system/info", params=params)
+            devices_sys_info += resp.dataseq(Device)
 
-        parameters = {"deviceId": [device["deviceId"] for device in devices_basic_info]}
-        devices_full_info = self.session.get(url="/dataservice/device/system/info", params=parameters)
-
-        devices = devices_full_info.dataseq(Device)
-
-        return devices
+        return devices_sys_info
 
 
 class DeviceStateAPI:

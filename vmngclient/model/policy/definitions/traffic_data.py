@@ -11,7 +11,8 @@ from vmngclient.model.policy.policy_definition import (
     BaseAction,
     CFlowDAction,
     CountAction,
-    DefinitionSequence,
+    DefinitionSequenceBase,
+    DefinitionWithSequencesCommonBase,
     DestinationDataIPv6PrefixListEntry,
     DestinationDataPrefixListEntry,
     DestinationIPEntry,
@@ -41,8 +42,7 @@ from vmngclient.model.policy.policy_definition import (
     PLPEntry,
     PLPEntryValues,
     PolicerListEntry,
-    PolicyDefinitionBody,
-    PolicyDefinitionHeader,
+    PolicyDefinitionBase,
     PrefferedColorGroupListEntry,
     ProtocolEntry,
     RedirectDNSAction,
@@ -94,7 +94,7 @@ TrafficDataPolicySequenceEntry = Annotated[
 TrafficDataPolicySequenceActions = Any  # TODO
 
 
-class TrafficDataPolicyHeader(PolicyDefinitionHeader):
+class TrafficDataPolicyHeader(PolicyDefinitionBase):
     type: Literal["data"] = "data"
 
 
@@ -102,7 +102,7 @@ class TrafficDataPolicySequenceMatch(Match):
     entries: List[TrafficDataPolicySequenceEntry] = []
 
 
-class TrafficDataPolicySequence(DefinitionSequence):
+class TrafficDataPolicySequence(DefinitionSequenceBase):
     sequence_type: SequenceType = Field(default=SequenceType.DATA, alias="sequenceType")
     match: TrafficDataPolicySequenceMatch = TrafficDataPolicySequenceMatch()
     actions: List[TrafficDataPolicySequenceActions] = []
@@ -352,7 +352,7 @@ class TrafficDataPolicySequence(DefinitionSequence):
             self.remove_action(FallBackToRoutingAction().type)
 
 
-class TrafficDataPolicy(TrafficDataPolicyHeader, PolicyDefinitionBody):
+class TrafficDataPolicy(TrafficDataPolicyHeader, DefinitionWithSequencesCommonBase):
     sequences: List[TrafficDataPolicySequence] = []
     model_config = ConfigDict(populate_by_name=True)
 

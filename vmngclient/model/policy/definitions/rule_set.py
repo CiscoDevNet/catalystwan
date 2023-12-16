@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Annotated
 
 from vmngclient.model.common import check_fields_exclusive
-from vmngclient.model.policy.policy_definition import ListReference, PolicyDefinitionHeader, VariableName
+from vmngclient.model.policy.policy_definition import ListReference, PolicyDefinitionBase, VariableName
 
 
 class Reference(BaseModel):
@@ -102,7 +102,7 @@ class RuleSetDefinition(BaseModel):
     rules: List[Rule] = []
 
 
-class RuleSet(PolicyDefinitionHeader):
+class RuleSet(PolicyDefinitionBase):
     type: Literal["ruleSet"] = "ruleSet"
     definition: RuleSetDefinition = RuleSetDefinition()
 
