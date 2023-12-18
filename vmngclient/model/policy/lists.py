@@ -1,8 +1,9 @@
-from typing import List, Literal, Optional, Union
+from typing import List, Literal, Optional, Set, Tuple, Union
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 from typing_extensions import Annotated
 
+from vmngclient.model.common import InterfaceTypeEnum
 from vmngclient.model.policy.lists_entries import (
     AppListEntry,
     AppProbeClassListEntry,
@@ -35,7 +36,7 @@ from vmngclient.model.policy.lists_entries import (
 
 class PolicyListHeader(BaseModel):
     name: str = Field(
-        regex="^[a-zA-Z0-9_-]{1,32}$",
+        pattern="^[a-zA-Z0-9_-]{1,32}$",
         description="Can include only alpha-numeric characters, hyphen '-' or underscore '_'; maximum 32 characters",
     )
     description: Optional[str] = "Desc Not Required"
@@ -48,17 +49,39 @@ class DataPrefixList(PolicyListHeader):
 
 class SiteList(PolicyListHeader):
     type: Literal["site"] = "site"
-    entries: List[SiteListEntry]
+    entries: List[SiteListEntry] = []
+
+    def add_sites(self, sites: Set[int]):
+        for site in sites:
+            self.entries.append(SiteListEntry(site_id=str(site)))  # type: ignore[call-arg]
+
+    def add_site_range(self, site_range: Tuple[int, int]):
+        entry = SiteListEntry(site_id=f"{site_range[0]}-{site_range[1]}")  # type: ignore[call-arg]
+        self.entries.append(entry)
 
 
 class VPNList(PolicyListHeader):
     type: Literal["vpn"] = "vpn"
-    entries: List[VPNListEntry]
+    entries: List[VPNListEntry] = []
+
+    def add_vpns(self, vpns: Set[int]):
+        for vpn in vpns:
+            self.entries.append(VPNListEntry(vpn=str(vpn)))  # type: ignore[call-arg]
+
+    def add_vpn_range(self, vpn_range: Tuple[int, int]):
+        entry = VPNListEntry(vpn=f"{vpn_range[0]}-{vpn_range[1]}")  # type: ignore[call-arg]
+        self.entries.append(entry)
 
 
 class ZoneList(PolicyListHeader):
     type: Literal["zone"] = "zone"
-    entries: List[ZoneListEntry]
+    entries: List[ZoneListEntry] = []
+
+    def assign_vpns(self, vpns: Set[int]) -> None:
+        self.entries = [ZoneListEntry(vpn=str(vpn)) for vpn in vpns]  # type: ignore[call-arg]
+
+    def assign_interfaces(self, ifs: Set[InterfaceTypeEnum]) -> None:
+        self.entries = [ZoneListEntry(interface=interface) for interface in ifs]  # type: ignore[call-arg]
 
 
 class FQDNList(PolicyListHeader):
@@ -143,7 +166,10 @@ class ASPathList(PolicyListHeader):
 
 class ClassMapList(PolicyListHeader):
     type: Literal["class"] = "class"
-    entries: List[ClassMapListEntry]
+    entries: List[ClassMapListEntry] = []
+
+    def add_queue(self, queue: int) -> None:
+        self.entries.append(ClassMapListEntry(queue=str(queue)))
 
 
 class MirrorList(PolicyListHeader):
@@ -183,34 +209,34 @@ class IPv6PrefixList(PolicyListHeader):
 
 AllPolicyLists = Annotated[
     Union[
-        DataPrefixList,
-        SiteList,
-        VPNList,
-        ZoneList,
-        FQDNList,
-        GeoLocationList,
-        PortList,
-        ProtocolNameList,
-        LocalAppList,
         AppList,
-        ColorList,
-        DataIPv6PrefixList,
-        LocalDomainList,
-        IPSSignatureList,
-        URLWhiteList,
-        URLBlackList,
-        CommunityList,
-        ExpandedCommunityList,
-        PolicerList,
+        AppProbeClassList,
         ASPathList,
         ClassMapList,
+        ColorList,
+        CommunityList,
+        DataIPv6PrefixList,
+        DataPrefixList,
+        ExpandedCommunityList,
+        FQDNList,
+        GeoLocationList,
+        IPSSignatureList,
+        IPv6PrefixList,
+        LocalAppList,
+        LocalDomainList,
         MirrorList,
-        AppProbeClassList,
-        SLAClassList,
-        TLOCList,
+        PolicerList,
+        PortList,
         PreferredColorGroupList,
         PrefixList,
-        IPv6PrefixList,
+        ProtocolNameList,
+        SiteList,
+        SLAClassList,
+        TLOCList,
+        URLBlackList,
+        URLWhiteList,
+        VPNList,
+        ZoneList,
     ],
     Field(discriminator="type"),
 ]

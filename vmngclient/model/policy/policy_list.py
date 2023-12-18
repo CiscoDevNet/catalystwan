@@ -1,7 +1,7 @@
 import datetime
 from typing import List, Optional, Protocol
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 
 from vmngclient.model.policy.lists import AllPolicyLists
 from vmngclient.typed_list import DataSequence
@@ -31,18 +31,18 @@ class PolicyListPreview(BaseModel):
     preview: str
 
 
-class PolicyListBuilder(Protocol):
-    def create_policy_list(self, payload: BaseModel) -> PolicyListId:
+class PolicyListEndpoints(Protocol):
+    def create_policy_list(self, payload: PolicyList) -> PolicyListId:
         ...
 
     def delete_policy_list(self, id: str) -> None:
         ...
 
-    def edit_policy_list(self, id: str, payload: BaseModel) -> None:
+    def edit_policy_list(self, id: str, payload: PolicyList) -> None:
         ...
 
-    def get_lists_by_id(self, id: str) -> BaseModel:
+    def get_lists_by_id(self, id: str) -> PolicyListInfo:
         ...
 
-    def get_policy_lists(self) -> DataSequence[BaseModel]:
+    def get_policy_lists(self) -> DataSequence[PolicyListInfo]:
         ...
