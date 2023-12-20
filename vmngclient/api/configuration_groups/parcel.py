@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Any, Generic, Optional, TypeVar
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny
 
 T = TypeVar("T")
 
@@ -28,6 +28,21 @@ class Global(Generic[T], ParcelValue):
     optionType: OptionType = OptionType.GLOBAL
     value: T
 
+    def __len__(self) -> int:
+        if isinstance(self.value, str):
+            return len(self.value)
+        return -1
+
+    def __ge__(self, other: Any) -> bool:
+        if isinstance(self.value, int):
+            return self.value >= other
+        return False
+
+    def __le__(self, other: Any) -> bool:
+        if isinstance(self.value, int):
+            return self.value <= other
+        return False
+
 
 # pattern=r'^\{\{[.\/\[\]a-zA-Z0-9_-]+\}\}$', min_length=1, max_length=64
 class Variable(ParcelValue):
@@ -44,4 +59,4 @@ class MainParcel(BaseModel):
     # name: Annotated[str, StringConstraints(min_length=1, max_length=128, pattern=r'^[^&<>! "]+$')]
     name: str
     description: Optional[str] = Field(default=None, description="Set the parcel description")
-    # data: SerializeAsAny[Parcel]
+    data: SerializeAsAny[Parcel]
