@@ -58,7 +58,6 @@ class Default(ParcelValue, Generic[T]):
 
 
 class MainParcel(BaseModel):
-    # name: Annotated[str, StringConstraints(min_length=1, max_length=128, pattern=r'^[^&<>! "]+$')]
-    name: str
+    name: str = Field(min_length=1, max_length=128, pattern=r'^[^&<>! "]+$')
     description: Optional[str] = Field(default=None, description="Set the parcel description")
     data: SerializeAsAny[Parcel]
