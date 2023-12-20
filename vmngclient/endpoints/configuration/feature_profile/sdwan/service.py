@@ -4,6 +4,7 @@ from vmngclient.endpoints import APIEndpoints, delete, get, post, put, versions
 from vmngclient.model.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
     FeatureProfileCreationResponse,
+    FeatureProfileDetail,
     FeatureProfileEditPayload,
     FeatureProfileInfo,
 )
@@ -27,7 +28,9 @@ class ServiceFeatureProfile(APIEndpoints):
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @get("/v1/feature-profile/sdwan/service/{service_id}")
-    def get_service_feature_profile(self, service_id: str, params: GetServiceFeatureProfileQuery) -> FeatureProfileInfo:
+    def get_service_feature_profile(
+        self, service_id: str, params: GetServiceFeatureProfileQuery
+    ) -> FeatureProfileDetail:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)

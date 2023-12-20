@@ -4,8 +4,9 @@ from typing import List, Optional
 
 from pydantic.v1 import BaseModel, Field
 
+from vmngclient.model.common import UUID
 from vmngclient.model.configuration.common import Solution
-from vmngclient.model.profileparcel.traffic_policy import CgFpPpNameDef, UuidDef
+from vmngclient.model.profileparcel.traffic_policy import CgFpPpNameDef
 
 
 class ProfileType(str, Enum):
@@ -25,6 +26,18 @@ class FeatureProfileInfo(BaseModel):
     description: str
     created_on: datetime = Field(alias="createdOn")
     last_updated_on: datetime = Field(alias="lastUpdatedOn")
+
+
+class FeatureProfileDetail(BaseModel):
+    profile_id: str = Field(alias="profileId")
+    profile_name: str = Field(alias="profileName")
+    solution: Solution
+    profile_type: ProfileType = Field(alias="profileType")
+    created_by: str = Field(alias="createdBy")
+    last_updated_by: str = Field(alias="lastUpdatedBy")
+    description: str
+    created_on: datetime = Field(alias="createdOn")
+    last_updated_on: datetime = Field(alias="lastUpdatedOn")
     associated_profile_parcels: List[str] = Field(alias="associatedProfileParcels")
     rid: int = Field(alias="@rid")
     profile_parcel_count: int = Field(alias="profileParcelCount")
@@ -32,7 +45,7 @@ class FeatureProfileInfo(BaseModel):
 
 
 class FromFeatureProfile(BaseModel):
-    copy_: UuidDef = Field(alias="copy")
+    copy_: UUID = Field(alias="copy")
 
 
 class FeatureProfileCreationPayload(BaseModel):
@@ -47,4 +60,4 @@ class FeatureProfileEditPayload(BaseModel):
 
 
 class FeatureProfileCreationResponse(BaseModel):
-    id: UuidDef
+    id: UUID
