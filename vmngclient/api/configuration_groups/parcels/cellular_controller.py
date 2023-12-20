@@ -15,13 +15,13 @@ class ControllerConfig(Parcel):
     slot: Union[Variable, Global[int], Default[int], None] = Field(
         default=None, description="Set primary SIM slot", ge=0, le=1
     )
-    maxRetry: Union[Variable, Global[int], Default, None] = Field(
+    maxRetry: Union[Variable, Global[int], Default[None], None] = Field(
         default=None, description="Set SIM failover retries", ge=0, le=65535
     )
-    failovertimer: Union[Variable, Global[int], Default, None] = Field(
+    failovertimer: Union[Variable, Global[int], Default[None], None] = Field(
         default=None, description="Set SIM failover timeout in minutes", ge=3, le=7
     )
-    autoSim: Union[Variable, Global[bool], Default, None] = Field(
+    autoSim: Union[Variable, Global[bool], Default[None], None] = Field(
         default=None, description="Enable/Disable Firmware Auto Sim"
     )
 
