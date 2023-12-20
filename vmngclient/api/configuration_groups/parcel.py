@@ -24,6 +24,9 @@ class ParcelValue(BaseModel):
     optionType: OptionType
 
 
+# https://github.com/pydantic/pydantic/discussions/6090
+# TODO positional arguments
+# Usage: Global[str](value="test")
 class Global(ParcelValue, Generic[T]):
     optionType: OptionType = OptionType.GLOBAL
     value: T
