@@ -24,7 +24,7 @@ class ParcelValue(BaseModel):
     optionType: OptionType
 
 
-class Global(Generic[T], ParcelValue):
+class Global(ParcelValue, Generic[T]):
     optionType: OptionType = OptionType.GLOBAL
     value: T
 
@@ -44,13 +44,12 @@ class Global(Generic[T], ParcelValue):
         return False
 
 
-# pattern=r'^\{\{[.\/\[\]a-zA-Z0-9_-]+\}\}$', min_length=1, max_length=64
 class Variable(ParcelValue):
     optionType: OptionType = OptionType.VARIABLE
-    value: str
+    value: str = Field(pattern=r"^\{\{[.\/\[\]a-zA-Z0-9_-]+\}\}$", min_length=1, max_length=64)
 
 
-class Default(Generic[T], ParcelValue):
+class Default(ParcelValue, Generic[T]):
     optionType: OptionType = OptionType.DEFAULT
     value: Any
 
