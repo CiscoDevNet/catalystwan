@@ -127,7 +127,7 @@ class APIEndpointRequestMeta:
 class PreparedPayload:
     """Holds data prepared for sending in request"""
 
-    data: Union[str, bytes, None] = None
+    data: Union[Dict, str, bytes, None] = None
     headers: Optional[Mapping[str, Any]] = None
     files: Optional[Dict[str, Tuple[str, BufferedReader]]] = None
 
