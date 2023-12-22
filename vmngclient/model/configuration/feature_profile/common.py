@@ -1,12 +1,13 @@
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional
+from typing import Generic, List, Optional, TypeVar
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.model.common import UUID
 from vmngclient.model.configuration.common import Solution
-from vmngclient.model.profileparcel.traffic_policy import CgFpPpNameDef
+
+T = TypeVar("T")
 
 
 class ProfileType(str, Enum):
@@ -49,15 +50,35 @@ class FromFeatureProfile(BaseModel):
 
 
 class FeatureProfileCreationPayload(BaseModel):
-    name: CgFpPpNameDef
+    name: str
     description: str
     from_feature_profile: Optional[FromFeatureProfile] = Field(alias="fromFeatureProfile", default=None)
 
 
 class FeatureProfileEditPayload(BaseModel):
-    name: CgFpPpNameDef
+    name: str
     description: str
 
 
 class FeatureProfileCreationResponse(BaseModel):
     id: UUID
+
+
+class ParcelCreationResponse(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    id: UUID = Field(alias="parcelId")
+
+
+class ParcelType(str, Enum):
+    APPQOE = "appqoe"
+
+
+class Parcel(BaseModel, Generic[T]):
+    parcel_id: str = Field(alias="parcelId")
+    parcel_type: ParcelType = Field(alias="parcelType")
+    created_by: str = Field(alias="createdBy")
+    last_updated_by: str = Field(alias="lastUpdatedBy")
+    created_on: int = Field(alias="createdOn")
+    last_updated_on: int = Field(alias="lastUpdatedOn")
+    payload: T

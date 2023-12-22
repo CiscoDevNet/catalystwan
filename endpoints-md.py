@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from inspect import getsourcefile, getsourcelines
 from pathlib import Path, PurePath
-from typing import Any, Dict, List, Optional, Protocol, Sequence, Set
+from typing import Any, Dict, Generic, List, Optional, Protocol, Sequence, Set
 from urllib.request import pathname2url
 
 from packaging.specifiers import SpecifierSet  # type: ignore
@@ -103,6 +103,8 @@ class CompositeTypeLink(CodeLink, MarkdownRenderer):
                 return CompositeTypeLink.text_only("JSON")
             if payloadtype := typespec.payload_type:
                 if payloadtype.__module__ == "builtins":
+                    return CompositeTypeLink.text_only(payloadtype.__name__)
+                if issubclass(payloadtype, Generic):  # type: ignore
                     return CompositeTypeLink.text_only(payloadtype.__name__)
                 elif sourcefile := getsourcefile(payloadtype):
                     return CompositeTypeLink(

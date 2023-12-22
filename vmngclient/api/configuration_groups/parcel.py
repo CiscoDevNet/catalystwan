@@ -1,17 +1,13 @@
 from enum import Enum
 from typing import Any, Generic, Optional, TypeVar
 
-from pydantic.v1 import BaseModel, Extra, Field
-from pydantic.v1.generics import GenericModel
+from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny
 
 T = TypeVar("T")
 
 
 class Parcel(BaseModel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True, populate_by_name=True)
 
 
 class OptionType(str, Enum):
@@ -21,32 +17,51 @@ class OptionType(str, Enum):
 
 
 class ParcelValue(BaseModel):
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(
+        extra="forbid",
+    )
 
     optionType: OptionType
 
 
-class Global(GenericModel, Generic[T], ParcelValue):
+# https://github.com/pydantic/pydantic/discussions/6090
+# TODO positional arguments
+# Usage: Global[str](value="test")
+class Global(ParcelValue, Generic[T]):
     optionType: OptionType = OptionType.GLOBAL
     value: T
 
+    def __len__(self) -> int:
+        if isinstance(self.value, str):
+            return len(self.value)
+        return -1
 
-class Variable(GenericModel, ParcelValue):
+    def __ge__(self, other: Any) -> bool:
+        if isinstance(self.value, int):
+            return self.value >= other
+        return False
+
+    def __le__(self, other: Any) -> bool:
+        if isinstance(self.value, int):
+            return self.value <= other
+        return False
+
+
+class Variable(ParcelValue):
     optionType: OptionType = OptionType.VARIABLE
-    value: str
+    value: str = Field(pattern=r"^\{\{[.\/\[\]a-zA-Z0-9_-]+\}\}$", min_length=1, max_length=64)
 
 
-class Default(GenericModel, Generic[T], ParcelValue):
+class Default(ParcelValue, Generic[T]):
     optionType: OptionType = OptionType.DEFAULT
     value: Any
 
 
+class DefaultWitoutValue(ParcelValue):
+    optionType: OptionType = OptionType.DEFAULT
+
+
 class MainParcel(BaseModel):
-    # TODO add constr or Annotated[constr] in Pydantic v2
-    # F722 syntax error in forward annotation
-    # https://github.com/pydantic/pydantic/issues/2872
-    # https://github.com/pydantic/pydantic/issues/156
-    name: str = Field(regex=r'^[^&<>! "]+$', min_length=1, max_length=128)
-    description: Optional[str]
-    data: Parcel
+    name: str = Field(min_length=1, max_length=128, pattern=r'^[^&<>! "]+$')
+    description: Optional[str] = Field(default=None, description="Set the parcel description")
+    data: SerializeAsAny[Parcel]

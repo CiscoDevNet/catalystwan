@@ -11,7 +11,6 @@ from vmngclient.model.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
     FeatureProfileCreationResponse,
 )
-from vmngclient.model.profileparcel.traffic_policy import CgFpPpNameDef
 
 
 class SDRoutingFeatureProfilesAPI:
@@ -26,7 +25,7 @@ class FeatureProfileAPI(Protocol):
         """
         ...
 
-    def create(self, name: CgFpPpNameDef, description: str) -> FeatureProfileCreationResponse:
+    def create(self, name: str, description: str) -> FeatureProfileCreationResponse:
         """
         Creates feature profile
         """
@@ -54,7 +53,7 @@ class SDRoutingCLIFeatureProfileAPI(FeatureProfileAPI):
         """
         self.full_config_parcel = SDRoutingFullConfigParcelAPI(session=self.session, fp_id=fp_id)
 
-    def create(self, name: CgFpPpNameDef, description: str) -> FeatureProfileCreationResponse:
+    def create(self, name: str, description: str) -> FeatureProfileCreationResponse:
         """
         Creates CLI feature profile
         """
