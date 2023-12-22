@@ -44,8 +44,8 @@ class DeviceCreationPayload(BaseModel):
 class DeviceDeletionResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    local_delete_from_db: bool = Field(alias="localDeleteFromDB")
-    id: str
+    local_delete_from_db: Optional[bool] = Field(default=None, alias="localDeleteFromDB")
+    id: Optional[str] = Field(default=None)
 
 
 class DeviceCategory(str, Enum):

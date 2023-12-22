@@ -1,4 +1,5 @@
 # mypy: disable-error-code="empty-body"
+
 from enum import Enum
 from typing import List, Optional, Union
 
@@ -12,7 +13,7 @@ class DeviceDeletionResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     local_delete_from_db: Optional[bool] = Field(default=None, alias="localDeleteFromDB")
-    id: str
+    id: Optional[str] = Field(default=None)
 
 
 class TargetDevice(BaseModel):
@@ -97,7 +98,7 @@ class VedgeListValidityPayload(BaseModel):
 
     chasis_number: str = Field(alias="chasisNumber")
     serial_number: str = Field(alias="serialNumber")
-    validity: Validity
+    validity: Validity = Field(default=Validity.INVALID)
 
 
 class VedgeListValidityResponse(BaseModel):
