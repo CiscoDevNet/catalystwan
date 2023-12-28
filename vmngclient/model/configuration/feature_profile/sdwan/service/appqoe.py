@@ -4,7 +4,6 @@ from typing import List, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.api.configuration_groups.parcel import Default, DefaultWitoutValue, Global, Variable
-from vmngclient.model.configuration.feature_profile.common import Parcel
 
 
 class VirtualApplicationType(str, Enum):
@@ -211,16 +210,3 @@ class AppqoeParcelCreationPayload(BaseModel):
     description: Optional[str] = None
     data: AppqoeData
     metadata: Optional[dict] = None
-
-
-class Header(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    generated_on: int = Field(alias="generatedOn")
-
-
-class AppqoeParcelInfo(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-
-    header: Header
-    data: List[Parcel[AppqoeParcelCreationPayload]]

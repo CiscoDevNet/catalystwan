@@ -72,6 +72,7 @@ class ParcelCreationResponse(BaseModel):
 
 class ParcelType(str, Enum):
     APPQOE = "appqoe"
+    LAN_VPN = "lan/vpn"
 
 
 class Parcel(BaseModel, Generic[T]):
@@ -82,3 +83,16 @@ class Parcel(BaseModel, Generic[T]):
     created_on: int = Field(alias="createdOn")
     last_updated_on: int = Field(alias="lastUpdatedOn")
     payload: T
+
+
+class Header(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    generated_on: int = Field(alias="generatedOn")
+
+
+class ParcelInfo(BaseModel, Generic[T]):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    header: Header
+    data: List[Parcel[T]]
