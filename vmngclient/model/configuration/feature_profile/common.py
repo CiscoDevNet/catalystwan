@@ -73,6 +73,7 @@ class ParcelCreationResponse(BaseModel):
 class ParcelType(str, Enum):
     APPQOE = "appqoe"
     LAN_VPN = "lan/vpn"
+    LAN_VPN_INTERFACE_ETHERNET = "lan/vpn/interface/ethernet"
 
 
 class Parcel(BaseModel, Generic[T]):
