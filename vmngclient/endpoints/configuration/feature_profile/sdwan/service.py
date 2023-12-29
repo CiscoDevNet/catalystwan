@@ -25,6 +25,7 @@ from vmngclient.model.configuration.feature_profile.sdwan.service.lan.gre import
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.ipsec import InterfaceIpsecCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.svi import InterfaceSviCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.vpn import LanVpnCreationPayload
+from vmngclient.model.configuration.feature_profile.sdwan.service.tracker import TrackerParcelCreationPayload
 from vmngclient.typed_list import DataSequence
 
 
@@ -444,4 +445,31 @@ class ServiceFeatureProfile(APIEndpoints):
     def delete_lan_vpn_interface_svi_parcel_association_with_dhcp_server_parcel(
         self, service_id: str, lan_vpn_id: str, interface_svi_id: str, dhcp_server_id: str
     ) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/tracker")
+    def get_tracker_parcels(self, service_id: str) -> ParcelInfo[TrackerParcelCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/tracker")
+    def create_tracker_parcel(self, service_id: str, payload: TrackerParcelCreationPayload) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/tracker/{tracker_id}")
+    def get_tracker_parcel(self, service_id: str, tracker_id: str) -> Parcel[TrackerParcelCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/service/{service_id}/tracker/{tracker_id}")
+    def edit_tracker_parcel(
+        self, service_id: str, tracker_id: str, payload: TrackerParcelCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sdwan/service/{service_id}/tracker/{tracker_id}")
+    def delete_tracker_parcel(self, service_id: str, tracker_id: str) -> None:
         ...
