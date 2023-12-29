@@ -79,6 +79,7 @@ class ParcelType(str, Enum):
     LAN_VPN_INTERFACE_SVI = "lan/vpn/interface/svi"
     DHCP_SERVER = "dhcp-server"
     TRACKER = "tracker"
+    TRACKER_GROUP = "trackergroup"
 
 
 class Parcel(BaseModel, Generic[T]):

@@ -25,7 +25,10 @@ from vmngclient.model.configuration.feature_profile.sdwan.service.lan.gre import
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.ipsec import InterfaceIpsecCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.svi import InterfaceSviCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.vpn import LanVpnCreationPayload
-from vmngclient.model.configuration.feature_profile.sdwan.service.tracker import TrackerParcelCreationPayload
+from vmngclient.model.configuration.feature_profile.sdwan.service.tracker import (
+    TrackerGroupParcelCreationPayload,
+    TrackerParcelCreationPayload,
+)
 from vmngclient.typed_list import DataSequence
 
 
@@ -472,4 +475,35 @@ class ServiceFeatureProfile(APIEndpoints):
     @versions(supported_versions=(">=20.13"), raises=False)
     @delete("/v1/feature-profile/sdwan/service/{service_id}/tracker/{tracker_id}")
     def delete_tracker_parcel(self, service_id: str, tracker_id: str) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/trackergroup")
+    def get_tracker_group_parcels(self, service_id: str) -> ParcelInfo[TrackerGroupParcelCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/trackergroup")
+    def create_tracke_group_parcel(
+        self, service_id: str, payload: TrackerGroupParcelCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/trackergroup/{tracker_group_id}")
+    def get_tracker_group_parcel(
+        self, service_id: str, tracker_group_id: str
+    ) -> Parcel[TrackerGroupParcelCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/service/{service_id}/trackergroup/{tracker_group_id}")
+    def edit_tracker_group_parcel(
+        self, service_id: str, tracker_group_id: str, payload: TrackerGroupParcelCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sdwan/service/{service_id}/trackergroup/{tracker_group_id}")
+    def delete_tracker_group_parcel(self, service_id: str, tracker_group_id: str) -> None:
         ...

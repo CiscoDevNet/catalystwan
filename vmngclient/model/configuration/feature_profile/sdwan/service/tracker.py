@@ -1,9 +1,9 @@
 from enum import Enum
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
+from vmngclient.api.configuration_groups.parcel import Default, Global, RefId, Variable
 
 
 class EndpointProtocol(str, Enum):
@@ -51,4 +51,33 @@ class TrackerParcelCreationPayload(BaseModel):
     name: str
     description: Optional[str] = None
     data: TrackerData
+    metadata: Optional[dict] = None
+
+
+class TrackerRef(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    tracker_ref: RefId[str] = Field(alias="trackerRef")
+
+
+class CombineBoolean(str, Enum):
+    AND = "and"
+    OR = "or"
+
+
+class TrackerGroupData(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    tracker_refs: List[TrackerRef] = Field(alias="trackerRefs")
+    combine_boolean: Union[Global[CombineBoolean], Variable, Default[CombineBoolean]] = Field(
+        alias="combineBoolean", default=Default[CombineBoolean](value=CombineBoolean.OR)
+    )
+
+
+class TrackerGroupParcelCreationPayload(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    name: str
+    description: Optional[str] = None
+    data: TrackerGroupData
     metadata: Optional[dict] = None
