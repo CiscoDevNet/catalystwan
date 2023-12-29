@@ -335,3 +335,113 @@ class ServiceFeatureProfile(APIEndpoints):
         self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str, dhcp_server_id: str
     ) -> None:
         ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}"
+        "/interface/ipsec/{interface_ipsec_id}/dhcp-server"
+    )
+    def get_dhcp_server_parcels_associated_with_lan_vpn_interface_ipsec_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_ipsec_id: str
+    ) -> ParcelInfo[DhcpSeverParcelCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/"
+        "interface/ipsec/{interface_ipsec_id}/dhcp-server"
+    )
+    def associate_lan_vpn_interface_ipsec_parcel_with_dhcp_server_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_ipsec_id: str, payload: DhcpServerAssociationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/"
+        "interface/ipsec/{interface_ipsec_id}/dhcp-server/{dhcp_server_id}"
+    )
+    def get_dhcp_server_parcel_associated_with_lan_vpn_interface_ipsec_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_ipsec_id: str, dhcp_server_id: str
+    ) -> Parcel[DhcpSeverParcelCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/"
+        "interface/ipsec/{interface_ipsec_id}/dhcp-server/{dhcp_server_id}"
+    )
+    def edit_lan_vpn_interface_ipsec_parcel_association_with_dhcp_server_parcel(
+        self,
+        service_id: str,
+        lan_vpn_id: str,
+        interface_ipsec_id: str,
+        dhcp_server_id: str,
+        payload: DhcpServerAssociationPayload,
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/"
+        "interface/ipsec/{interface_ipsec_id}/dhcp-server/{dhcp_server_id}"
+    )
+    def delete_lan_vpn_interface_ipsec_parcel_association_with_dhcp_server_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_ipsec_id: str, dhcp_server_id: str
+    ) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}"
+        "/interface/svi/{interface_svi_id}/dhcp-server"
+    )
+    def get_dhcp_server_parcels_associated_with_lan_vpn_interface_svi_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_svi_id: str
+    ) -> ParcelInfo[DhcpSeverParcelCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/"
+        "interface/svi/{interface_svi_id}/dhcp-server"
+    )
+    def associate_lan_vpn_interface_svi_parcel_with_dhcp_server_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_svi_id: str, payload: DhcpServerAssociationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/"
+        "interface/svi/{interface_svi_id}/dhcp-server/{dhcp_server_id}"
+    )
+    def get_dhcp_server_parcel_associated_with_lan_vpn_interface_svi_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_svi_id: str, dhcp_server_id: str
+    ) -> Parcel[DhcpSeverParcelCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/"
+        "interface/svi/{interface_svi_id}/dhcp-server/{dhcp_server_id}"
+    )
+    def edit_lan_vpn_interface_svi_parcel_association_with_dhcp_server_parcel(
+        self,
+        service_id: str,
+        lan_vpn_id: str,
+        interface_svi_id: str,
+        dhcp_server_id: str,
+        payload: DhcpServerAssociationPayload,
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/"
+        "interface/svi/{interface_svi_id}/dhcp-server/{dhcp_server_id}"
+    )
+    def delete_lan_vpn_interface_svi_parcel_association_with_dhcp_server_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_svi_id: str, dhcp_server_id: str
+    ) -> None:
+        ...
