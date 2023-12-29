@@ -1,4 +1,9 @@
 from enum import Enum
+from typing import Optional, Union
+
+from pydantic import BaseModel, ConfigDict, Field
+
+from vmngclient.api.configuration_groups.parcel import DefaultWitoutValue, Global, RefId, Variable
 
 
 class IkeMode(str, Enum):
@@ -53,3 +58,43 @@ class PfsGroup(str, Enum):
 class TunnelApplication(str, Enum):
     NONE = "none"
     SIG = "sig"
+
+
+class Arp(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    ip_address: Union[Variable, Global[str], DefaultWitoutValue]
+    mac_address: Union[Global[str], Variable]
+
+
+class VrrpTrackerAction(str, Enum):
+    DECREMENT = "Decrement"
+    SHUTDOWN = "Shutdown"
+
+
+class VrrpTrackingObject(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    tracker_id: Union[DefaultWitoutValue, RefId[str]] = Field(alias="trackerId")
+    tracker_action: Union[Global[VrrpTrackerAction], Variable] = Field(alias="trackerAction")
+    decrement_value: Optional[Union[Variable, Global[int]]] = Field(alias="decrementValue", default=None)
+
+
+class VrrpIPv6Address(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    ipv6_link_local: Union[Global[str], Variable] = Field(alias="ipv6LinkLocal")
+    prefix: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = None
+
+
+class StaticIPv4Address(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    ip_address: Union[Variable, Global[str], DefaultWitoutValue] = Field(alias="ipAddress")
+    subnet_mask: Union[Variable, Global[str], DefaultWitoutValue] = Field(alias="subnetMask")
+
+
+class StaticIPv6Address(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    address: Union[Global[str], Variable]

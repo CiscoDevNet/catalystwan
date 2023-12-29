@@ -4,6 +4,13 @@ from typing import List, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.api.configuration_groups.parcel import Default, DefaultWitoutValue, Global, RefId, Variable
+from vmngclient.model.configuration.feature_profile.sdwan.service.lan.common import (
+    Arp,
+    StaticIPv4Address,
+    StaticIPv6Address,
+    VrrpIPv6Address,
+    VrrpTrackingObject,
+)
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.vpn import Direction
 
 
@@ -19,13 +26,6 @@ class InterfaceDynamicIPv4Address(BaseModel):
     dynamic: DynamicDhcpDistance
 
 
-class StaticIPv4Address(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    ip_address: Union[Variable, Global[str], DefaultWitoutValue] = Field(alias="ipAddress")
-    subnet_mask: Union[Variable, Global[str], DefaultWitoutValue] = Field(alias="subnetMask")
-
-
 class StaticIPv4AddressConfig(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
@@ -37,12 +37,6 @@ class InterfaceStaticIPv4Address(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     static: StaticIPv4AddressConfig
-
-
-class StaticIPv6Address(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    address: Union[Global[str], Variable]
 
 
 class DynamicIPv6Dhcp(BaseModel):
@@ -132,13 +126,6 @@ class AclQos(BaseModel):
     ipv6_acl_ingress: Optional[RefId[str]] = Field(alias="ipv6AclIngress", default=None)
 
 
-class VrrpIPv6Address(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    ipv6_link_local: Union[Global[str], Variable] = Field(alias="ipv6LinkLocal")
-    prefix: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = None
-
-
 class VrrpIPv6(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
@@ -147,19 +134,6 @@ class VrrpIPv6(BaseModel):
     timer: Union[Variable, Global[int], Default[int]] = Default[int](value=1000)
     track_omp: Union[Global[bool], Default[bool]] = Field(alias="trackOmp", default=Default[bool](value=False))
     ipv6: List[VrrpIPv6Address]
-
-
-class TrackerAction(str, Enum):
-    DECREMENT = "Decrement"
-    SHUTDOWN = "Shutdown"
-
-
-class VrrpTrackingObject(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    tracker_id: Union[DefaultWitoutValue, RefId[str]] = Field(alias="trackerId")
-    tracker_action: Union[Global[TrackerAction], Variable] = Field(alias="trackerAction")
-    decrement_value: Optional[Union[Variable, Global[int]]] = Field(alias="decrementValue", default=None)
 
 
 class VrrpIPv4(BaseModel):
@@ -178,13 +152,6 @@ class VrrpIPv4(BaseModel):
         alias="tlocPrefChangeValue", default=None
     )
     tracking_object: Optional[List[VrrpTrackingObject]] = Field(alias="trackingObject", default=None)
-
-
-class Arp(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
-
-    ip_address: Union[Variable, Global[str], DefaultWitoutValue]
-    mac_address: Union[Global[str], Variable]
 
 
 class Trustsec(BaseModel):

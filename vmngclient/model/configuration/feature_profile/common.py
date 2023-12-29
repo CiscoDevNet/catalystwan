@@ -76,6 +76,7 @@ class ParcelType(str, Enum):
     LAN_VPN_INTERFACE_ETHERNET = "lan/vpn/interface/ethernet"
     LAN_VPN_INTERFACE_GRE = "lan/vpn/interface/gre"
     LAN_VPN_INTERFACE_IPSEC = "lan/vpn/interface/ipsec"
+    LAN_VPN_INTERFACE_SVI = "lan/vpn/interface/svi"
 
 
 class Parcel(BaseModel, Generic[T]):
