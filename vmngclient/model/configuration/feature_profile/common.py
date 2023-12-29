@@ -1,9 +1,10 @@
 from datetime import datetime
 from enum import Enum
-from typing import Generic, List, Optional, TypeVar
+from typing import Generic, List, Optional, TypeVar, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from vmngclient.api.configuration_groups.parcel import Global, Variable
 from vmngclient.model.common import UUID
 from vmngclient.model.configuration.common import Solution
 
@@ -80,6 +81,7 @@ class ParcelType(str, Enum):
     DHCP_SERVER = "dhcp-server"
     TRACKER = "tracker"
     TRACKER_GROUP = "trackergroup"
+    ROUTING_BGP = "routing/bgp"
 
 
 class Parcel(BaseModel, Generic[T]):
@@ -109,3 +111,8 @@ class ParcelAssociationPayload(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     parcel_id: str = Field(alias="parcelId")
+
+
+class Prefix(BaseModel):
+    address: Union[Variable, Global[str]]
+    mask: Union[Variable, Global[str]]

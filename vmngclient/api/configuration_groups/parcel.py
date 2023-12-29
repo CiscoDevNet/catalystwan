@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Generic, Optional, TypeVar, Union
+from typing import Any, Generic, Optional, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny
 
@@ -62,7 +62,7 @@ class DefaultWitoutValue(ParcelValue):
 
 
 class RefId(BaseModel, Generic[T]):
-    ref_id: Union[Global[T], Default[T]] = Field(alias="refId")
+    ref_id: Global[T] = Field(alias="refId")
 
 
 class MainParcel(BaseModel):

@@ -4,6 +4,7 @@ from typing import List, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.api.configuration_groups.parcel import Default, DefaultWitoutValue, Global, RefId, Variable
+from vmngclient.model.configuration.feature_profile.common import Prefix
 
 
 class DnsIPv4(BaseModel):
@@ -57,11 +58,6 @@ class Region(str, Enum):
     CORE_AND_ACCESS = "core-and-access"
     CORE = "core"
     ACCESS = "access"
-
-
-class Prefix(BaseModel):
-    address: Union[Variable, Global[str]]
-    mask: Union[Variable, Global[str]]
 
 
 class RoutePrefix(BaseModel):

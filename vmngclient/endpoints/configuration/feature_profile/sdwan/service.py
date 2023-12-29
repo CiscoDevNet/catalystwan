@@ -17,6 +17,7 @@ from vmngclient.model.configuration.feature_profile.sdwan.service import (
     GetServiceFeatureProfilesQuery,
 )
 from vmngclient.model.configuration.feature_profile.sdwan.service.appqoe import AppqoeParcelCreationPayload
+from vmngclient.model.configuration.feature_profile.sdwan.service.bgp import BgpCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.dhcp_server import DhcpSeverParcelCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.ethernet import InterfaceEthernetCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.gre import InterfaceGreCreationPayload
@@ -482,7 +483,7 @@ class ServiceFeatureProfile(APIEndpoints):
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @post("/v1/feature-profile/sdwan/service/{service_id}/trackergroup")
-    def create_tracke_group_parcel(
+    def create_tracker_group_parcel(
         self, service_id: str, payload: TrackerGroupParcelCreationPayload
     ) -> ParcelCreationResponse:
         ...
@@ -634,4 +635,31 @@ class ServiceFeatureProfile(APIEndpoints):
     def get_tracker_group_parcels_associated_with_lan_vpn_interface_ipsec_parcel(
         self, service_id: str, lan_vpn_id: str, interface_ipsec_id: str
     ) -> ParcelInfo[TrackerGroupParcelCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/routing/bgp")
+    def get_routing_bgp_parcels(self, service_id: str) -> ParcelInfo[BgpCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/routing/bgp")
+    def create_routing_bgp_parcel(self, service_id: str, payload: BgpCreationPayload) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/routing/bgp/{routing_bgp_id}")
+    def get_routing_bgp_parcel(self, service_id: str, routing_bgp_id: str) -> Parcel[BgpCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/service/{service_id}/routing/bgp/{routing_bgp_id}")
+    def edit_routing_bgp_parcel(
+        self, service_id: str, routing_bgp_id: str, payload: BgpCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sdwan/service/{service_id}/routing/bgp/{routing_bgp_id}")
+    def delete_routing_bgp_parcel(self, service_id: str, routing_bgp_id: str) -> None:
         ...
