@@ -8,6 +8,7 @@ from vmngclient.model.configuration.feature_profile.common import (
     FeatureProfileEditPayload,
     FeatureProfileInfo,
     Parcel,
+    ParcelAssociationPayload,
     ParcelCreationResponse,
     ParcelInfo,
 )
@@ -16,10 +17,7 @@ from vmngclient.model.configuration.feature_profile.sdwan.service import (
     GetServiceFeatureProfilesQuery,
 )
 from vmngclient.model.configuration.feature_profile.sdwan.service.appqoe import AppqoeParcelCreationPayload
-from vmngclient.model.configuration.feature_profile.sdwan.service.dhcp_server import (
-    DhcpServerAssociationPayload,
-    DhcpSeverParcelCreationPayload,
-)
+from vmngclient.model.configuration.feature_profile.sdwan.service.dhcp_server import DhcpSeverParcelCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.ethernet import InterfaceEthernetCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.gre import InterfaceGreCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.ipsec import InterfaceIpsecCreationPayload
@@ -301,7 +299,7 @@ class ServiceFeatureProfile(APIEndpoints):
         "interface/ethernet/{interface_ethernet_id}/dhcp-server"
     )
     def associate_lan_vpn_interface_ethernet_parcel_with_dhcp_server_parcel(
-        self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str, payload: DhcpServerAssociationPayload
+        self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str, payload: ParcelAssociationPayload
     ) -> ParcelCreationResponse:
         ...
 
@@ -326,7 +324,7 @@ class ServiceFeatureProfile(APIEndpoints):
         lan_vpn_id: str,
         interface_ethernet_id: str,
         dhcp_server_id: str,
-        payload: DhcpServerAssociationPayload,
+        payload: ParcelAssociationPayload,
     ) -> ParcelCreationResponse:
         ...
 
@@ -356,7 +354,7 @@ class ServiceFeatureProfile(APIEndpoints):
         "interface/ipsec/{interface_ipsec_id}/dhcp-server"
     )
     def associate_lan_vpn_interface_ipsec_parcel_with_dhcp_server_parcel(
-        self, service_id: str, lan_vpn_id: str, interface_ipsec_id: str, payload: DhcpServerAssociationPayload
+        self, service_id: str, lan_vpn_id: str, interface_ipsec_id: str, payload: ParcelAssociationPayload
     ) -> ParcelCreationResponse:
         ...
 
@@ -381,7 +379,7 @@ class ServiceFeatureProfile(APIEndpoints):
         lan_vpn_id: str,
         interface_ipsec_id: str,
         dhcp_server_id: str,
-        payload: DhcpServerAssociationPayload,
+        payload: ParcelAssociationPayload,
     ) -> ParcelCreationResponse:
         ...
 
@@ -411,7 +409,7 @@ class ServiceFeatureProfile(APIEndpoints):
         "interface/svi/{interface_svi_id}/dhcp-server"
     )
     def associate_lan_vpn_interface_svi_parcel_with_dhcp_server_parcel(
-        self, service_id: str, lan_vpn_id: str, interface_svi_id: str, payload: DhcpServerAssociationPayload
+        self, service_id: str, lan_vpn_id: str, interface_svi_id: str, payload: ParcelAssociationPayload
     ) -> ParcelCreationResponse:
         ...
 
@@ -436,7 +434,7 @@ class ServiceFeatureProfile(APIEndpoints):
         lan_vpn_id: str,
         interface_svi_id: str,
         dhcp_server_id: str,
-        payload: DhcpServerAssociationPayload,
+        payload: ParcelAssociationPayload,
     ) -> ParcelCreationResponse:
         ...
 
@@ -506,4 +504,134 @@ class ServiceFeatureProfile(APIEndpoints):
     @versions(supported_versions=(">=20.13"), raises=False)
     @delete("/v1/feature-profile/sdwan/service/{service_id}/trackergroup/{tracker_group_id}")
     def delete_tracker_group_parcel(self, service_id: str, tracker_group_id: str) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}"
+        "/interface/ethernet/{interface_ethernet_id}/tracker"
+    )
+    def get_tracker_parcels_associated_with_lan_vpn_interface_ethernet_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str
+    ) -> ParcelInfo[TrackerParcelCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/"
+        "interface/ethernet/{interface_ethernet_id}/tracker"
+    )
+    def associate_lan_vpn_interface_ethernet_parcel_with_tracker_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str, payload: ParcelAssociationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/"
+        "interface/ethernet/{interface_ethernet_id}/tracker/{tracker_id}"
+    )
+    def get_tracker_parcel_associated_with_lan_vpn_interface_ethernet_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str, tracker_id: str
+    ) -> Parcel[TrackerParcelCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/"
+        "interface/ethernet/{interface_ethernet_id}/tracker/{tracker_id}"
+    )
+    def edit_lan_vpn_interface_ethernet_parcel_association_with_tracker_parcel(
+        self,
+        service_id: str,
+        lan_vpn_id: str,
+        interface_ethernet_id: str,
+        tracker_id: str,
+        payload: ParcelAssociationPayload,
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/"
+        "interface/ethernet/{interface_ethernet_id}/tracker/{tracker_id}"
+    )
+    def delete_lan_vpn_interface_ethernet_parcel_association_with_tracker_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str, tracker_id: str
+    ) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}"
+        "/interface/ipsec/{interface_ipsec_id}/tracker"
+    )
+    def get_tracker_parcels_associated_with_lan_vpn_interface_ipsec_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_ipsec_id: str
+    ) -> ParcelInfo[TrackerParcelCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}"
+        "/interface/ethernet/{interface_ethernet_id}/trackergroup"
+    )
+    def get_tracker_group_parcels_associated_with_lan_vpn_interface_ethernet_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str
+    ) -> ParcelInfo[TrackerGroupParcelCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/"
+        "interface/ethernet/{interface_ethernet_id}/trackergroup"
+    )
+    def associate_lan_vpn_interface_ethernet_parcel_with_tracker_group_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str, payload: ParcelAssociationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/"
+        "interface/ethernet/{interface_ethernet_id}/trackergroup/{tracker_group_id}"
+    )
+    def get_tracker_group_parcel_associated_with_lan_vpn_interface_ethernet_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str, tracker_group_id: str
+    ) -> Parcel[TrackerGroupParcelCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/"
+        "interface/ethernet/{interface_ethernet_id}/trackergroup/{tracker_group_id}"
+    )
+    def edit_lan_vpn_interface_ethernet_parcel_association_with_tracker_group_parcel(
+        self,
+        service_id: str,
+        lan_vpn_id: str,
+        interface_ethernet_id: str,
+        tracker_group_id: str,
+        payload: ParcelAssociationPayload,
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/"
+        "interface/ethernet/{interface_ethernet_id}/trackergroup/{tracker_group_id}"
+    )
+    def delete_lan_vpn_interface_ethernet_parcel_association_with_tracker_group_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str, tracker_group_id: str
+    ) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}"
+        "/interface/ipsec/{interface_ipsec_id}/trackergroup"
+    )
+    def get_tracker_group_parcels_associated_with_lan_vpn_interface_ipsec_parcel(
+        self, service_id: str, lan_vpn_id: str, interface_ipsec_id: str
+    ) -> ParcelInfo[TrackerGroupParcelCreationPayload]:
         ...

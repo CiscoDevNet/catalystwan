@@ -81,3 +81,9 @@ class TrackerGroupParcelCreationPayload(BaseModel):
     description: Optional[str] = None
     data: TrackerGroupData
     metadata: Optional[dict] = None
+
+
+class TrackerAssociationPayload(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    parcel_id: str = Field(alias="parcelId")
