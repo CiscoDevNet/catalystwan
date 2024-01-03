@@ -26,6 +26,7 @@ from vmngclient.model.configuration.feature_profile.sdwan.service.lan.ipsec impo
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.svi import InterfaceSviCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.vpn import LanVpnCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.multicast import MulticastCreationPayload
+from vmngclient.model.configuration.feature_profile.sdwan.service.ospf import OspfCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.tracker import (
     TrackerGroupParcelCreationPayload,
     TrackerParcelCreationPayload,
@@ -722,4 +723,31 @@ class ServiceFeatureProfile(APIEndpoints):
     @versions(supported_versions=(">=20.13"), raises=False)
     @delete("/v1/feature-profile/sdwan/service/{service_id}/routing/multicast/{routing_multicast_id}")
     def delete_routing_multicast_parcel(self, service_id: str, routing_multicast_id: str) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/routing/ospf")
+    def get_routing_ospf_parcels(self, service_id: str) -> ParcelInfo[OspfCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/routing/ospf")
+    def create_routing_ospf_parcel(self, service_id: str, payload: OspfCreationPayload) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/routing/ospf/{routing_ospf_id}")
+    def get_routing_ospf_parcel(self, service_id: str, routing_ospf_id: str) -> Parcel[OspfCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/service/{service_id}/routing/ospf/{routing_ospf_id}")
+    def edit_routing_ospf_parcel(
+        self, service_id: str, routing_ospf_id: str, payload: OspfCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sdwan/service/{service_id}/routing/ospf/{routing_ospf_id}")
+    def delete_routing_ospf_parcel(self, service_id: str, routing_ospf_id: str) -> None:
         ...
