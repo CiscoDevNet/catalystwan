@@ -82,6 +82,7 @@ class ParcelType(str, Enum):
     TRACKER = "tracker"
     TRACKER_GROUP = "trackergroup"
     ROUTING_BGP = "routing/bgp"
+    ROUTING_EIGRP = "routing/eigrp"
 
 
 class Parcel(BaseModel, Generic[T]):

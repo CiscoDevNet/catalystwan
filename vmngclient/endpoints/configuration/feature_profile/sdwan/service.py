@@ -19,6 +19,7 @@ from vmngclient.model.configuration.feature_profile.sdwan.service import (
 from vmngclient.model.configuration.feature_profile.sdwan.service.appqoe import AppqoeParcelCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.bgp import BgpCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.dhcp_server import DhcpSeverParcelCreationPayload
+from vmngclient.model.configuration.feature_profile.sdwan.service.eigrp import EigrpCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.ethernet import InterfaceEthernetCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.gre import InterfaceGreCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.ipsec import InterfaceIpsecCreationPayload
@@ -662,4 +663,31 @@ class ServiceFeatureProfile(APIEndpoints):
     @versions(supported_versions=(">=20.13"), raises=False)
     @delete("/v1/feature-profile/sdwan/service/{service_id}/routing/bgp/{routing_bgp_id}")
     def delete_routing_bgp_parcel(self, service_id: str, routing_bgp_id: str) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/routing/eigrp")
+    def get_routing_eigrp_parcels(self, service_id: str) -> ParcelInfo[EigrpCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/routing/eigrp")
+    def create_routing_eigrp_parcel(self, service_id: str, payload: EigrpCreationPayload) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/routing/eigrp/{routing_eigrp_id}")
+    def get_routing_eigrp_parcel(self, service_id: str, routing_eigrp_id: str) -> Parcel[EigrpCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/service/{service_id}/routing/eigrp/{routing_eigrp_id}")
+    def edit_routing_eigrp_parcel(
+        self, service_id: str, routing_eigrp_id: str, payload: EigrpCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sdwan/service/{service_id}/routing/eigrp/{routing_eigrp_id}")
+    def delete_routing_eigrp_parcel(self, service_id: str, routing_eigrp_id: str) -> None:
         ...
