@@ -51,7 +51,9 @@ class OspfInterfaceParametres(BaseModel):
     network: Optional[Union[Global[NetworkType], Variable, Default[NetworkType]]] = Default[NetworkType](
         value=NetworkType.BROADCAST
     )
-    passive_interface: Optional[Union[Global[bool], Variable, Default[bool]]] = None
+    passive_interface: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
+        alias="passiveInterface", default=None
+    )
     authentication_type: Optional[Union[Global[AuthenticationType], Variable, DefaultWitoutValue]] = Field(
         alias="type", default=None
     )
