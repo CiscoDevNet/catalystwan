@@ -35,6 +35,7 @@ from vmngclient.model.configuration.feature_profile.sdwan.service.tracker import
     TrackerGroupParcelCreationPayload,
     TrackerParcelCreationPayload,
 )
+from vmngclient.model.configuration.feature_profile.sdwan.service.wireless_lan import WirelessLanCreationPayload
 from vmngclient.typed_list import DataSequence
 
 
@@ -1065,4 +1066,31 @@ class ServiceFeatureProfile(APIEndpoints):
     def delete_lan_vpn_parcel_association_with_routing_ospfv3_ipv6_parcel(
         self, service_id: str, lan_vpn_id: str, routing_ospfv3_ipv6_id: str
     ) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/wirelesslan")
+    def get_wirelesslan_parcels(self, service_id: str) -> ParcelInfo[WirelessLanCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/wirelesslan")
+    def create_wirelesslan_parcel(self, service_id: str, payload: WirelessLanCreationPayload) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/wirelesslan/{wirelesslan_id}")
+    def get_wirelesslan_parcel(self, service_id: str, wirelesslan_id: str) -> Parcel[WirelessLanCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/service/{service_id}/wirelesslan/{wirelesslan_id}")
+    def edit_wirelesslan_parcel(
+        self, service_id: str, wirelesslan_id: str, payload: WirelessLanCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sdwan/service/{service_id}/wirelesslan/{wirelesslan_id}")
+    def delete_wirelesslan_parcel(self, service_id: str, wirelesslan_id: str) -> None:
         ...
