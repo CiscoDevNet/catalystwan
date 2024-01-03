@@ -817,3 +817,42 @@ class ServiceFeatureProfile(APIEndpoints):
     @delete("/v1/feature-profile/sdwan/service/{service_id}/routing/ospfv3/ipv6/{routing_ospf_id}")
     def delete_routing_ospfv3_ipv6_parcel(self, service_id: str, routing_ospf_id: str) -> None:
         ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/bgp")
+    def get_routing_bgp_parcels_associated_with_lan_vpn_parcel(
+        self, service_id: str, lan_vpn_id: str
+    ) -> ParcelInfo[BgpCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/bgp")
+    def associate_lan_vpn_parcel_with_routing_bgp_parcel(
+        self, service_id: str, lan_vpn_id: str, payload: ParcelAssociationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/bgp/{routing_bgp_id}")
+    def get_routing_bgp_parcel_associated_with_lan_vpn_parcel(
+        self, service_id: str, lan_vpn_id: str, routing_bgp_id: str
+    ) -> Parcel[BgpCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/bgp/{routing_bgp_id}")
+    def edit_lan_vpn_parcel_association_with_routing_bgp_parcel(
+        self,
+        service_id: str,
+        lan_vpn_id: str,
+        routing_bgp_id: str,
+        payload: ParcelAssociationPayload,
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/bgp/{routing_bgp_id}")
+    def delete_lan_vpn_parcel_association_with_routing_bgp_parcel(
+        self, service_id: str, lan_vpn_id: str, routing_bgp_id: str
+    ) -> None:
+        ...
