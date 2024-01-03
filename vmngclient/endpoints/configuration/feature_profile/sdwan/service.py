@@ -856,3 +856,213 @@ class ServiceFeatureProfile(APIEndpoints):
         self, service_id: str, lan_vpn_id: str, routing_bgp_id: str
     ) -> None:
         ...
+
+    @get("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/eigrp")
+    def get_routing_eigrp_parcels_associated_with_lan_vpn_parcel(
+        self, service_id: str, lan_vpn_id: str
+    ) -> ParcelInfo[EigrpCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/eigrp")
+    def associate_lan_vpn_parcel_with_routing_eigrp_parcel(
+        self, service_id: str, lan_vpn_id: str, payload: ParcelAssociationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/eigrp/{routing_eigrp_id}")
+    def get_routing_eigrp_parcel_associated_with_lan_vpn_parcel(
+        self, service_id: str, lan_vpn_id: str, routing_eigrp_id: str
+    ) -> Parcel[EigrpCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/eigrp/{routing_eigrp_id}")
+    def edit_lan_vpn_parcel_association_with_routing_eigrp_parcel(
+        self,
+        service_id: str,
+        lan_vpn_id: str,
+        routing_eigrp_id: str,
+        payload: ParcelAssociationPayload,
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/eigrp/{routing_eigrp_id}")
+    def delete_lan_vpn_parcel_association_with_routing_eigrp_parcel(
+        self, service_id: str, lan_vpn_id: str, routing_eigrp_id: str
+    ) -> None:
+        ...
+
+    @get("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/multicast")
+    def get_routing_multicast_parcels_associated_with_lan_vpn_parcel(
+        self, service_id: str, lan_vpn_id: str
+    ) -> ParcelInfo[MulticastCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/multicast")
+    def associate_lan_vpn_parcel_with_routing_multicast_parcel(
+        self, service_id: str, lan_vpn_id: str, payload: ParcelAssociationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/multicast/{routing_multicast_id}")
+    def get_routing_multicast_parcel_associated_with_lan_vpn_parcel(
+        self, service_id: str, lan_vpn_id: str, routing_multicast_id: str
+    ) -> Parcel[MulticastCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/multicast/{routing_multicast_id}")
+    def edit_lan_vpn_parcel_association_with_routing_multicast_parcel(
+        self,
+        service_id: str,
+        lan_vpn_id: str,
+        routing_multicast_id: str,
+        payload: ParcelAssociationPayload,
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/multicast/{routing_multicast_id}"
+    )
+    def delete_lan_vpn_parcel_association_with_routing_multicast_parcel(
+        self, service_id: str, lan_vpn_id: str, routing_multicast_id: str
+    ) -> None:
+        ...
+
+    @get("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/ospf")
+    def get_routing_ospf_parcels_associated_with_lan_vpn_parcel(
+        self, service_id: str, lan_vpn_id: str
+    ) -> ParcelInfo[OspfCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/ospf")
+    def associate_lan_vpn_parcel_with_routing_ospf_parcel(
+        self, service_id: str, lan_vpn_id: str, payload: ParcelAssociationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/ospf/{routing_ospf_id}")
+    def get_routing_ospf_parcel_associated_with_lan_vpn_parcel(
+        self, service_id: str, lan_vpn_id: str, routing_ospf_id: str
+    ) -> Parcel[OspfCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/ospf/{routing_ospf_id}")
+    def edit_lan_vpn_parcel_association_with_routing_ospf_parcel(
+        self,
+        service_id: str,
+        lan_vpn_id: str,
+        routing_ospf_id: str,
+        payload: ParcelAssociationPayload,
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/ospf/{routing_ospf_id}")
+    def delete_lan_vpn_parcel_association_with_routing_ospf_parcel(
+        self, service_id: str, lan_vpn_id: str, routing_ospf_id: str
+    ) -> None:
+        ...
+
+    @get("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/ospfv3/ipv4")
+    def get_routing_ospfv3_ipv4_parcels_associated_with_lan_vpn_parcel(
+        self, service_id: str, lan_vpn_id: str
+    ) -> ParcelInfo[Ospfv3IPv4CreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/ospfv3/ipv4")
+    def associate_lan_vpn_parcel_with_routing_ospfv3_ipv4_parcel(
+        self, service_id: str, lan_vpn_id: str, payload: ParcelAssociationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}"
+        "/routing/ospfv3/ipv4/{routing_ospfv3_ipv4_id}"
+    )
+    def get_routing_ospfv3_ipv4_parcel_associated_with_lan_vpn_parcel(
+        self, service_id: str, lan_vpn_id: str, routing_ospfv3_ipv4_id: str
+    ) -> Parcel[Ospfv3IPv4CreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}"
+        "/routing/ospfv3/ipv4/{routing_ospfv3_ipv4_id}"
+    )
+    def edit_lan_vpn_parcel_association_with_routing_ospfv3_ipv4_parcel(
+        self,
+        service_id: str,
+        lan_vpn_id: str,
+        routing_ospfv3_ipv4_id: str,
+        payload: ParcelAssociationPayload,
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}"
+        "/routing/ospfv3/ipv4/{routing_ospfv3_ipv4_id}"
+    )
+    def delete_lan_vpn_parcel_association_with_routing_ospfv3_ipv4_parcel(
+        self, service_id: str, lan_vpn_id: str, routing_ospfv3_ipv4_id: str
+    ) -> None:
+        ...
+
+    @get("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/ospfv3/ipv6")
+    def get_routing_ospfv3_ipv6_parcels_associated_with_lan_vpn_parcel(
+        self, service_id: str, lan_vpn_id: str
+    ) -> ParcelInfo[Ospfv3IPv6CreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}/routing/ospfv3/ipv6")
+    def associate_lan_vpn_parcel_with_routing_ospfv3_ipv6_parcel(
+        self, service_id: str, lan_vpn_id: str, payload: ParcelAssociationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}"
+        "/routing/ospfv3/ipv6/{routing_ospfv3_ipv6_id}"
+    )
+    def get_routing_ospfv3_ipv6_parcel_associated_with_lan_vpn_parcel(
+        self, service_id: str, lan_vpn_id: str, routing_ospfv3_ipv6_id: str
+    ) -> Parcel[Ospfv3IPv6CreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}"
+        "/routing/ospfv3/ipv6/{routing_ospfv3_ipv6_id}"
+    )
+    def edit_lan_vpn_parcel_association_with_routing_ospfv3_ipv6_parcel(
+        self,
+        service_id: str,
+        lan_vpn_id: str,
+        routing_ospfv3_ipv6_id: str,
+        payload: ParcelAssociationPayload,
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete(
+        "/v1/feature-profile/sdwan/service/{service_id}/lan/vpn/{lan_vpn_id}"
+        "/routing/ospfv3/ipv6/{routing_ospfv3_ipv6_id}"
+    )
+    def delete_lan_vpn_parcel_association_with_routing_ospfv3_ipv6_parcel(
+        self, service_id: str, lan_vpn_id: str, routing_ospfv3_ipv6_id: str
+    ) -> None:
+        ...
