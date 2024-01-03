@@ -40,7 +40,7 @@ class IpsecSha1Auth(BaseModel):
     auth_key: Union[Global[str], Variable] = Field(alias="authKey")
 
 
-class Ospfv3IPv4InterfaceParametres(BaseModel):
+class Ospfv3InterfaceParametres(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     name: Optional[Union[Global[str], Variable]] = Field(alias="ifName")
@@ -58,6 +58,14 @@ class Ospfv3IPv4InterfaceParametres(BaseModel):
         alias="passiveInterface", default=None
     )
     authentication_config: Optional[Union[NoAuth, IpsecSha1Auth]] = Field(alias="authenticationConfig", default=None)
+
+
+class SummaryRouteIPv6(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    network: Union[Global[str], Variable]
+    no_advertise: Union[Global[bool], Variable, Default[bool]] = Field(alias="noAdvertise")
+    cost: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = None
 
 
 class SummaryRoute(BaseModel):
@@ -104,7 +112,18 @@ class Ospfv3IPv4Area(BaseModel):
     area_type_config: Optional[Union[StubArea, NssaArea, NormalArea, DefaultArea]] = Field(
         alias="areaTypeConfig", default=None
     )
-    interfaces: List[Ospfv3IPv4InterfaceParametres]
+    interfaces: List[Ospfv3InterfaceParametres]
+    ranges: Optional[List[SummaryRoute]] = None
+
+
+class Ospfv3IPv6Area(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    area_number: Union[Global[int], Variable] = Field(alias="areaNum")
+    area_type_config: Optional[Union[StubArea, NssaArea, NormalArea, DefaultArea]] = Field(
+        alias="areaTypeConfig", default=None
+    )
+    interfaces: List[Ospfv3InterfaceParametres]
     ranges: Optional[List[SummaryRoute]] = None
 
 
@@ -130,6 +149,14 @@ class RedistributeProtocol(str, Enum):
     EIGRP = "eigrp"
 
 
+class RedistributeProtocolIPv6(str, Enum):
+    STATIC = "static"
+    CONNECTED = "connected"
+    BGP = "bgp"
+    OMP = "omp"
+    EIGRP = "eigrp"
+
+
 class MetricType(str, Enum):
     TYPE1 = "type1"
     TYPE2 = "type2"
@@ -140,6 +167,13 @@ class RedistributedRoute(BaseModel):
 
     protocol: Union[Global[RedistributeProtocol], Variable]
     nat_dia: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(alias="natDia", default=None)
+    route_policy: Optional[Union[DefaultWitoutValue, RefId[str]]] = Field(alias="routePolicy", default=None)
+
+
+class RedistributedRouteIPv6(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    protocol: Union[Global[RedistributeProtocolIPv6], Variable]
     route_policy: Optional[Union[DefaultWitoutValue, RefId[str]]] = Field(alias="routePolicy", default=None)
 
 
@@ -160,7 +194,7 @@ class SpfTimers(BaseModel):
     max_hold: Optional[Union[Global[int], Variable, Default[int]]] = None
 
 
-class AdvancedOspfv3IPv4Attributes(BaseModel):
+class AdvancedOspfv3Attributes(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     reference_bandwidth: Optional[Union[Global[int], Variable, Default[int]]] = Field(
@@ -175,7 +209,7 @@ class AdvancedOspfv3IPv4Attributes(BaseModel):
     filter: Optional[Union[Global[bool], Variable, Default[bool]]] = None
 
 
-class BasicOspfv3IPv4Attributes(BaseModel):
+class BasicOspfv3Attributes(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     router_id: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(alias="routerId", default=None)
@@ -194,11 +228,21 @@ class BasicOspfv3IPv4Attributes(BaseModel):
 class Ospfv3IPv4Data(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    basic: Optional[BasicOspfv3IPv4Attributes] = None
-    advanced: Optional[AdvancedOspfv3IPv4Attributes] = None
+    basic: Optional[BasicOspfv3Attributes] = None
+    advanced: Optional[AdvancedOspfv3Attributes] = None
     redistribute: Optional[RedistributedRoute] = None
     max_metric_router_lsa: Optional[MaxMetricRouterLsa] = Field(alias="maxMetricRouterLsa", default=None)
     area: List[Ospfv3IPv4Area]
+
+
+class Ospfv3IPv6Data(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    basic: Optional[BasicOspfv3Attributes] = None
+    advanced: Optional[AdvancedOspfv3Attributes] = None
+    redistribute: Optional[RedistributedRouteIPv6] = None
+    max_metric_router_lsa: Optional[MaxMetricRouterLsa] = Field(alias="maxMetricRouterLsa", default=None)
+    area: List[Ospfv3IPv6Area]
 
 
 class Ospfv3IPv4CreationPayload(BaseModel):
@@ -207,3 +251,12 @@ class Ospfv3IPv4CreationPayload(BaseModel):
     name: str
     description: Optional[str] = None
     data: Ospfv3IPv4Data
+
+
+class Ospfv3IPv6CreationPayload(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    name: str
+    description: Optional[str] = None
+    data: Ospfv3IPv6Data
+    metadata: Optional[dict] = None

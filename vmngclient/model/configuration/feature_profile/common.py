@@ -86,6 +86,7 @@ class ParcelType(str, Enum):
     ROUTING_MULTICAST = "routing/multicast"
     ROUTING_OSPF = "routing/ospf"
     ROUTING_OSPFV3_IPV4 = "routing/ospfv3/ipv4"
+    ROUTING_OSPFV3_IPV6 = "routing/ospfv3/ipv6"
 
 
 class Parcel(BaseModel, Generic[T]):
