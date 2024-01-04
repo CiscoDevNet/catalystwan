@@ -139,3 +139,6 @@ class WANIPv6StaticRoute(Parcel):
         if prefix is not None:
             self.prefix = prefix
         self.gateway = IPv6StaticRouteNAT(nat=nat)
+
+class WANService(Parcel):
+    service_type: Global[Literal["TE"]] = Field(alias="serviceType")
