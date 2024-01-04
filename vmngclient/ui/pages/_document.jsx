@@ -93,7 +93,7 @@ const Document = () => {
         <script dangerouslySetInnerHTML={{ __html: toastScript }} />
         <script
           type="module"
-          data-id="ystestmgr-ui"
+          data-id="vmngclient-ui"
           data-version="0.0.1"
           data-theme="hbr-theme-magnetic"
           src="/harbor-elements/harbor-elements.esm.js"
