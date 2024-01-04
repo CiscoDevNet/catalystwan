@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@harbor/elements": "1.1.8",
     "@reduxjs/toolkit": "^2.0.1",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/typography": "^0.5.10",
@@ -20,9 +19,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "copy-hbr-elements": "ncp ./node_modules/@harbor/elements/dist/harbor-elements ./public/harbor-elements",
-    "start": "npm run copy-hbr-elements && next dev",
-    "build": "npm run copy-hbr-elements && next build && next export",
+    "start": "npm run next dev",
+    "build": "npm run next build && next export",
     "lint": "next lint"
   },
   "devDependencies": {

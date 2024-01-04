@@ -88,40 +88,9 @@ const Document = () => {
     >
       <Head>
         <link rel="shortcut icon" href="/logo.svg" />
-        <script dangerouslySetInnerHTML={{ __html: globalScript }} />
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-        <script dangerouslySetInnerHTML={{ __html: toastScript }} />
-        <script
-          type="module"
-          data-id="vmngclient-ui"
-          data-version="0.0.1"
-          data-theme="hbr-theme-magnetic"
-          src="/harbor-elements/harbor-elements.esm.js"
-          async
-        ></script>
-        <link rel="stylesheet" href="/harbor-elements/harbor-elements.css" />
-        <link
-          rel="stylesheet"
-          title="hbr-theme-magnetic"
-          href="/harbor-elements/styles/themes/magnetic.css"
-        />
-        <link
-          rel="stylesheet"
-          title="hbr-theme-magnetic"
-          href="/harbor-elements/styles/tokens/magnetic.css"
-        />
-
-        <link
-          rel="stylesheet"
-          href="/harbor-elements/styles/themes/magnetic.dark.css"
-        />
-        <link
-          rel="stylesheet"
-          href="/harbor-elements/styles/tokens/magnetic.dark.css"
-        />
-        <link rel="stylesheet" href="/fonts/magnetic/fonts.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
       </Head>
-      <body className="bg-white dark:bg-slate-900 flex h-full flex-col hbr-theme-magnetic">
+      <body>
         <Main />
         <NextScript />
       </body>
