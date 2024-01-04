@@ -31,6 +31,7 @@ from vmngclient.model.configuration.feature_profile.sdwan.service.ospfv3 import 
     Ospfv3IPv4CreationPayload,
     Ospfv3IPv6CreationPayload,
 )
+from vmngclient.model.configuration.feature_profile.sdwan.service.switchport import SwitchportCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.tracker import (
     TrackerGroupParcelCreationPayload,
     TrackerParcelCreationPayload,
@@ -1093,4 +1094,31 @@ class ServiceFeatureProfile(APIEndpoints):
     @versions(supported_versions=(">=20.13"), raises=False)
     @delete("/v1/feature-profile/sdwan/service/{service_id}/wirelesslan/{wirelesslan_id}")
     def delete_wirelesslan_parcel(self, service_id: str, wirelesslan_id: str) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/switchport")
+    def get_switchport_parcels(self, service_id: str) -> ParcelInfo[SwitchportCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/switchport")
+    def create_switchport_parcel(self, service_id: str, payload: SwitchportCreationPayload) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/switchport/{switchport_id}")
+    def get_switchport_parcel(self, service_id: str, switchport_id: str) -> Parcel[SwitchportCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/service/{service_id}/switchport/{switchport_id}")
+    def edit_switchport_parcel(
+        self, service_id: str, switchport_id: str, payload: SwitchportCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sdwan/service/{service_id}/switchport/{switchport_id}")
+    def delete_switchport_parcel(self, service_id: str, switchport_id: str) -> None:
         ...
