@@ -91,6 +91,8 @@ class ParcelType(str, Enum):
     SWITCHPORT = "switchport"
     IPV4_ACL = "ipv4-acl"
     IPV6_ACL = "ipv6-acl"
+    OBJECT_TRACKER = "objecttracker"
+    OBJECT_TRACKER_GROUP = "objecttrackergroup"
 
 
 class Parcel(BaseModel, Generic[T]):

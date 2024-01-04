@@ -30,6 +30,10 @@ from vmngclient.model.configuration.feature_profile.sdwan.service.lan.ipsec impo
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.svi import InterfaceSviCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.vpn import LanVpnCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.multicast import MulticastCreationPayload
+from vmngclient.model.configuration.feature_profile.sdwan.service.object_tracker import (
+    ObjectTrackerCreationPayload,
+    ObjectTrackerGroupCreationPayload,
+)
 from vmngclient.model.configuration.feature_profile.sdwan.service.ospf import OspfCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.ospfv3 import (
     Ospfv3IPv4CreationPayload,
@@ -1179,4 +1183,64 @@ class ServiceFeatureProfile(APIEndpoints):
     @versions(supported_versions=(">=20.13"), raises=False)
     @delete("/v1/feature-profile/sdwan/service/{service_id}/ipv6-acl/{ipv6_acl_id}")
     def delete_ipv6_acl_parcel(self, service_id: str, ipv6_acl_id: str) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/objecttracker")
+    def get_objecttracker_parcels(self, service_id: str) -> ParcelInfo[ObjectTrackerCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/objecttracker")
+    def create_objecttracker_parcel(
+        self, service_id: str, payload: ObjectTrackerCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/objecttracker/{objecttracker_id}")
+    def get_objecttracker_parcel(self, service_id: str, objecttracker_id: str) -> Parcel[ObjectTrackerCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/service/{service_id}/objecttracker/{objecttracker_id}")
+    def edit_objecttracker_parcel(
+        self, service_id: str, objecttracker_id: str, payload: ObjectTrackerCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sdwan/service/{service_id}/objecttracker/{objecttracker_id}")
+    def delete_objecttracker_parcel(self, service_id: str, objecttracker_id: str) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/objecttrackergroup")
+    def get_objecttrackergroup_parcels(self, service_id: str) -> ParcelInfo[ObjectTrackerGroupCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/objecttrackergroup")
+    def create_objecttrackergroup_parcel(
+        self, service_id: str, payload: ObjectTrackerGroupCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/objecttrackergroup/{objecttrackergroup_id}")
+    def get_objecttrackergroup_parcel(
+        self, service_id: str, objecttrackergroup_id: str
+    ) -> Parcel[ObjectTrackerGroupCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/service/{service_id}/objecttrackergroup/{objecttrackergroup_id}")
+    def edit_objecttrackergroup_parcel(
+        self, service_id: str, objecttrackergroup_id: str, payload: ObjectTrackerGroupCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sdwan/service/{service_id}/objecttrackergroup/{objecttrackergroup_id}")
+    def delete_objecttrackergroup_parcel(self, service_id: str, objecttrackergroup_id: str) -> None:
         ...
