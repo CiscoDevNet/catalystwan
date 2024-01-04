@@ -39,6 +39,7 @@ from vmngclient.model.configuration.feature_profile.sdwan.service.ospfv3 import 
     Ospfv3IPv4CreationPayload,
     Ospfv3IPv6CreationPayload,
 )
+from vmngclient.model.configuration.feature_profile.sdwan.service.route_policy import RoutePolicyCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.switchport import SwitchportCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.tracker import (
     TrackerGroupParcelCreationPayload,
@@ -1243,4 +1244,33 @@ class ServiceFeatureProfile(APIEndpoints):
     @versions(supported_versions=(">=20.13"), raises=False)
     @delete("/v1/feature-profile/sdwan/service/{service_id}/objecttrackergroup/{objecttrackergroup_id}")
     def delete_objecttrackergroup_parcel(self, service_id: str, objecttrackergroup_id: str) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/route-policy")
+    def get_route_policy_parcels(self, service_id: str) -> ParcelInfo[RoutePolicyCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/route-policy")
+    def create_route_policy_parcel(
+        self, service_id: str, payload: RoutePolicyCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/route-policy/{route_policy_id}")
+    def get_route_policy_parcel(self, service_id: str, route_policy_id: str) -> Parcel[RoutePolicyCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/service/{service_id}/route-policy/{route_policy_id}")
+    def edit_route_policy_parcel(
+        self, service_id: str, route_policy_id: str, payload: RoutePolicyCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sdwan/service/{service_id}/route-policy/{route_policy_id}")
+    def delete_route_policy_parcel(self, service_id: str, route_policy_id: str) -> None:
         ...

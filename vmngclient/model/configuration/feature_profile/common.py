@@ -93,6 +93,7 @@ class ParcelType(str, Enum):
     IPV6_ACL = "ipv6-acl"
     OBJECT_TRACKER = "objecttracker"
     OBJECT_TRACKER_GROUP = "objecttrackergroup"
+    ROUTE_POLICY = "route-policy"
 
 
 class Parcel(BaseModel, Generic[T]):
