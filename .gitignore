@@ -130,3 +130,18 @@ dmypy.json
 
 # Poetry lock
 poetry.lock
+
+# Dependency directories
+node_modules
+
+# Optional npm cache directory
+.npm
+
+# Next dir
+.next
+
+# harbor-elements
+harbor-elements
+
+# VS CODE
+.vscode
