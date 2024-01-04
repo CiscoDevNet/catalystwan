@@ -40,6 +40,9 @@ from vmngclient.model.configuration.feature_profile.sdwan.service.ospfv3 import 
     Ospfv3IPv6CreationPayload,
 )
 from vmngclient.model.configuration.feature_profile.sdwan.service.route_policy import RoutePolicyCreationPayload
+from vmngclient.model.configuration.feature_profile.sdwan.service.service_insertion_attachment import (
+    ServiceInsertionAttachmentCreationPayload,
+)
 from vmngclient.model.configuration.feature_profile.sdwan.service.switchport import SwitchportCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.tracker import (
     TrackerGroupParcelCreationPayload,
@@ -1273,4 +1276,36 @@ class ServiceFeatureProfile(APIEndpoints):
     @versions(supported_versions=(">=20.13"), raises=False)
     @delete("/v1/feature-profile/sdwan/service/{service_id}/route-policy/{route_policy_id}")
     def delete_route_policy_parcel(self, service_id: str, route_policy_id: str) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/service-insertion-attachment")
+    def create_service_insertion_attachment_parcel(
+        self, service_id: str, payload: ServiceInsertionAttachmentCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get(
+        "/v1/feature-profile/sdwan/service/{service_id}/service-insertion-attachment/{service_insertion_attachment_id}"
+    )
+    def get_service_insertion_attachment_parcel(
+        self, service_id: str, service_insertion_attachment_id: str
+    ) -> Parcel[ServiceInsertionAttachmentCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put(
+        "/v1/feature-profile/sdwan/service/{service_id}/service-insertion-attachment/{service_insertion_attachment_id}"
+    )
+    def edit_service_insertion_attachment_parcel(
+        self, service_id: str, service_insertion_attachment_id: str, payload: ServiceInsertionAttachmentCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete(
+        "/v1/feature-profile/sdwan/service/{service_id}/service-insertion-attachment/{service_insertion_attachmen_id}"
+    )
+    def delete_service_insertion_attachment_parcel(self, service_id: str, service_insertion_attachmen_id: str) -> None:
         ...

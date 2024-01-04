@@ -94,6 +94,7 @@ class ParcelType(str, Enum):
     OBJECT_TRACKER = "objecttracker"
     OBJECT_TRACKER_GROUP = "objecttrackergroup"
     ROUTE_POLICY = "route-policy"
+    SERVICE_INSERTION_ATTACHMENT = "service-insertion-attachment"
 
 
 class Parcel(BaseModel, Generic[T]):
