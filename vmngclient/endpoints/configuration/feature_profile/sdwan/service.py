@@ -16,6 +16,10 @@ from vmngclient.model.configuration.feature_profile.sdwan.service import (
     GetServiceFeatureProfileQuery,
     GetServiceFeatureProfilesQuery,
 )
+from vmngclient.model.configuration.feature_profile.sdwan.service.acl import (
+    IPv4AclCreationPayload,
+    IPv6AclCreationPayload,
+)
 from vmngclient.model.configuration.feature_profile.sdwan.service.appqoe import AppqoeParcelCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.bgp import BgpCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.dhcp_server import DhcpSeverParcelCreationPayload
@@ -1121,4 +1125,58 @@ class ServiceFeatureProfile(APIEndpoints):
     @versions(supported_versions=(">=20.13"), raises=False)
     @delete("/v1/feature-profile/sdwan/service/{service_id}/switchport/{switchport_id}")
     def delete_switchport_parcel(self, service_id: str, switchport_id: str) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/ipv4-acl")
+    def get_ipv4_acl_parcels(self, service_id: str) -> ParcelInfo[IPv4AclCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/ipv4-acl")
+    def create_ipv4_acl_parcel(self, service_id: str, payload: IPv4AclCreationPayload) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/ipv4-acl/{ipv4_acl_id}")
+    def get_ipv4_acl_parcel(self, service_id: str, ipv4_acl_id: str) -> Parcel[IPv4AclCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/service/{service_id}/ipv4-acl/{ipv4_acl_id}")
+    def edit_ipv4_acl_parcel(
+        self, service_id: str, ipv4_acl_id: str, payload: IPv4AclCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sdwan/service/{service_id}/ipv4-acl/{ipv4_acl_id}")
+    def delete_ipv4_acl_parcel(self, service_id: str, ipv4_acl_id: str) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/ipv6-acl")
+    def get_ipv6_acl_parcels(self, service_id: str) -> ParcelInfo[IPv6AclCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @post("/v1/feature-profile/sdwan/service/{service_id}/ipv6-acl")
+    def create_ipv6_acl_parcel(self, service_id: str, payload: IPv6AclCreationPayload) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/service/{service_id}/ipv6-acl/{ipv6_acl_id}")
+    def get_ipv6_acl_parcel(self, service_id: str, ipv6_acl_id: str) -> Parcel[IPv6AclCreationPayload]:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/service/{service_id}/ipv6-acl/{ipv6_acl_id}")
+    def edit_ipv6_acl_parcel(
+        self, service_id: str, ipv6_acl_id: str, payload: IPv6AclCreationPayload
+    ) -> ParcelCreationResponse:
+        ...
+
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sdwan/service/{service_id}/ipv6-acl/{ipv6_acl_id}")
+    def delete_ipv6_acl_parcel(self, service_id: str, ipv6_acl_id: str) -> None:
         ...

@@ -89,6 +89,8 @@ class ParcelType(str, Enum):
     ROUTING_OSPFV3_IPV6 = "routing/ospfv3/ipv6"
     WIRELESSLAN = "wirelesslan"
     SWITCHPORT = "switchport"
+    IPV4_ACL = "ipv4-acl"
+    IPV6_ACL = "ipv6-acl"
 
 
 class Parcel(BaseModel, Generic[T]):
