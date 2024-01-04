@@ -57,6 +57,14 @@ class Default(ParcelValue, Generic[T]):
     value: Any
 
 
+class DefaultWitoutValue(ParcelValue):
+    optionType: OptionType = OptionType.DEFAULT
+
+
+class RefId(BaseModel, Generic[T]):
+    ref_id: Global[T] = Field(alias="refId")
+
+
 class MainParcel(BaseModel):
     name: str = Field(min_length=1, max_length=128, pattern=r'^[^&<>! "]+$')
     description: Optional[str] = Field(default=None, description="Set the parcel description")

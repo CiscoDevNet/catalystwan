@@ -87,3 +87,6 @@ class TLOCColorEnum(str, Enum):
     PRIVATE4 = "private4"
     PRIVATE5 = "private5"
     PRIVATE6 = "private6"
+
+
+UUID = str
