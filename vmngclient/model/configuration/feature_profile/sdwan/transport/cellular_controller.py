@@ -27,5 +27,15 @@ class ControllerConfig(Parcel):
 
 
 class CellularControllerParcel(Parcel):
+    name: str
     config_type: Default[ConfigTypeValue] = Field(default=Default(value=ConfigTypeValue.NON_E_SIM), alias="configType")
     controller_config: ControllerConfig = Field(alias="controllerConfig")
+
+    @staticmethod
+    def add_controller_config(
+        id: Union[Variable, Global[str]],
+        maxRetry: Union[Variable, Global[int], Default[None], None] = None,
+        failovertimer: Union[Variable, Global[int], Default[None], None] = None,
+        autoSim: Union[Variable, Global[bool], Default[None], None] = None,
+    ):
+        return ControllerConfig(id=id, maxRetry=maxRetry, failovertimer=failovertimer, autoSim=autoSim)
