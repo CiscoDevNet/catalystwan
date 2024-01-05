@@ -1,10 +1,10 @@
 import "../styles/globals.css";
-import "../styles/main.css"
+import "../styles/main.css";
 import "bootstrap/dist/css/bootstrap.min.css"; // Import bootstrap CSS
 import { Provider } from "react-redux";
 import store from "../src/store";
 import { useEffect } from "react";
-import Header from "../src/Header";
+import Layout from "../src/Layout";
 
 const MyApp = ({ Component, pageProps }) => {
   useEffect(() => {
@@ -13,8 +13,9 @@ const MyApp = ({ Component, pageProps }) => {
 
   return (
     <Provider store={store}>
-      <Header />
-      <Component {...pageProps} />
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
     </Provider>
   );
 };

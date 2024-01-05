@@ -37,18 +37,124 @@
     min-height: calc(100vh - 135px - 1.5rem);
 }
 
-.dashboard-inner-container{
+.dashboard-inner-container {
     background-color: #ebf2f6;
     border-radius: 0.3rem;
-    padding-left: 0!important;
-    padding-right: 0!important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
     min-height: calc(100vh - 135px - 9rem);
 }
 
-.ml-sm-auto, .mx-sm-auto {
-    margin-left: auto!important;
+.ml-sm-auto,
+.mx-sm-auto {
+    margin-left: auto !important;
 }
 
-.mr-sm-auto, .mx-sm-auto {
-    margin-right: auto!important;
+.mr-sm-auto,
+.mx-sm-auto {
+    margin-right: auto !important;
+}
+
+.container-div {
+    position: relative;
+    width: 83.33%;
+    background-color: #ebf2f6;
+    border-radius: 0.3rem;
+    padding: 0 0.84rem;
+}
+
+.mt-4 {
+    margin-top: 1.5rem !important;
+}
+
+.main-content {
+    height: calc(100vh - 135px - 7rem);
+    flex-direction: column;
+    box-sizing: border-box;
+    display: flex;
+    place-content: center;
+    align-items: center;
+}
+
+.heading {
+    font-weight: 400;
+    font-size: 2.5rem;
+    color: #002235;
+}
+
+.heading-div {
+    margin-bottom: 3rem;
+    flex-direction: column;
+    box-sizing: border-box;
+    display: flex;
+}
+
+
+
+.workflows-container {
+    flex-direction: row;
+    box-sizing: border-box;
+    display: flex;
+    place-content: flex-start;
+    align-items: flex-start;
+    flex: 1 1 100%;
+    max-width: 100%;
+    gap: 4rem;
+}
+
+.workflow-container {
+    flex-direction: column;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    height: 13rem;
+    width: 13rem;
+    border: 1px solid #b6c0c7;
+    border-radius: 0.37rem;
+    cursor: pointer;
+    padding: 1rem;
+    justify-content: center;
+}
+
+.workflow-container:hover {
+    border-color: #4e92df;
+    box-shadow: 0 16px 26px rgba(28,65,86,.15);
+    background-color: #478cca;
+}
+
+.workflow-container:hover .workflow-icon {
+    filter: brightness(0) invert(1);
+}
+
+.workflow-header {
+    flex-direction: column;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+}
+
+.workflow-content {
+    flex-direction: row;
+    box-sizing: border-box;
+    display: flex;
+}
+
+.workflow-item {
+    height: 13rem;
+    width: 13rem;
+    border: 1px solid #b6c0c7;
+    border-radius: 0.37rem;
+    cursor: pointer;
+    padding: 1rem;
+}
+
+.main-text{
+    filter: brightness(0) invert(1);
+    text-align: center!important;
+    font-weight: 400;
+}
+
+.secondary-text{
+    font-size: .8rem;
+    color: #96a8b4;
 }

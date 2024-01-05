@@ -19,8 +19,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "npm run next dev",
-    "build": "npm run next build && next export",
+    "start": "next dev",
+    "build": "next build && next export",
     "lint": "next lint"
   },
   "devDependencies": {
