@@ -205,7 +205,7 @@ class AppqoeData(BaseModel):
     service_node: Optional[ServiceNodeRole] = Field(alias="serviceNode")
 
 
-class AppqoeParcelCreationPayload(BaseModel):
+class AppqoeCreationPayload(BaseModel):
     name: str
     description: Optional[str] = None
     data: AppqoeData

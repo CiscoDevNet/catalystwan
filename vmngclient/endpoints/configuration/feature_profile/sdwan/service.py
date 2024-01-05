@@ -20,9 +20,9 @@ from vmngclient.model.configuration.feature_profile.sdwan.service.acl import (
     IPv4AclCreationPayload,
     IPv6AclCreationPayload,
 )
-from vmngclient.model.configuration.feature_profile.sdwan.service.appqoe import AppqoeParcelCreationPayload
+from vmngclient.model.configuration.feature_profile.sdwan.service.appqoe import AppqoeCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.bgp import BgpCreationPayload
-from vmngclient.model.configuration.feature_profile.sdwan.service.dhcp_server import DhcpSeverParcelCreationPayload
+from vmngclient.model.configuration.feature_profile.sdwan.service.dhcp_server import DhcpSeverCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.eigrp import EigrpCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.ethernet import InterfaceEthernetCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.gre import InterfaceGreCreationPayload
@@ -45,8 +45,8 @@ from vmngclient.model.configuration.feature_profile.sdwan.service.service_insert
 )
 from vmngclient.model.configuration.feature_profile.sdwan.service.switchport import SwitchportCreationPayload
 from vmngclient.model.configuration.feature_profile.sdwan.service.tracker import (
-    TrackerGroupParcelCreationPayload,
-    TrackerParcelCreationPayload,
+    TrackerCreationPayload,
+    TrackerGroupCreationPayload,
 )
 from vmngclient.model.configuration.feature_profile.sdwan.service.wireless_lan import WirelessLanCreationPayload
 from vmngclient.typed_list import DataSequence
@@ -84,23 +84,23 @@ class ServiceFeatureProfile(APIEndpoints):
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @get("/v1/feature-profile/sdwan/service/{service_id}/appqoe")
-    def get_appqoe_parcels(self, service_id: str) -> ParcelInfo[AppqoeParcelCreationPayload]:
+    def get_appqoe_parcels(self, service_id: str) -> ParcelInfo[AppqoeCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @post("/v1/feature-profile/sdwan/service/{service_id}/appqoe")
-    def create_appqoe_parcel(self, service_id: str, payload: AppqoeParcelCreationPayload) -> ParcelCreationResponse:
+    def create_appqoe_parcel(self, service_id: str, payload: AppqoeCreationPayload) -> ParcelCreationResponse:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @get("/v1/feature-profile/sdwan/service/{service_id}/appqoe/{appqoe_id}")
-    def get_appqoe_parcel(self, service_id: str, appqoe_id: str) -> Parcel[AppqoeParcelCreationPayload]:
+    def get_appqoe_parcel(self, service_id: str, appqoe_id: str) -> Parcel[AppqoeCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @put("/v1/feature-profile/sdwan/service/{service_id}/appqoe/{appqoe_id}")
     def edit_appqoe_parcel(
-        self, service_id: str, appqoe_id: str, payload: AppqoeParcelCreationPayload
+        self, service_id: str, appqoe_id: str, payload: AppqoeCreationPayload
     ) -> ParcelCreationResponse:
         ...
 
@@ -278,25 +278,23 @@ class ServiceFeatureProfile(APIEndpoints):
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @get("/v1/feature-profile/sdwan/service/{service_id}/dhcp-server")
-    def get_dhcp_server_parcels(self, service_id: str) -> ParcelInfo[DhcpSeverParcelCreationPayload]:
+    def get_dhcp_server_parcels(self, service_id: str) -> ParcelInfo[DhcpSeverCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @post("/v1/feature-profile/sdwan/service/{service_id}/dhcp-server")
-    def create_dhcp_server_parcel(
-        self, service_id: str, payload: DhcpSeverParcelCreationPayload
-    ) -> ParcelCreationResponse:
+    def create_dhcp_server_parcel(self, service_id: str, payload: DhcpSeverCreationPayload) -> ParcelCreationResponse:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @get("/v1/feature-profile/sdwan/service/{service_id}/dhcp-server/{dhcp_server_id}")
-    def get_dhcp_server_parcel(self, service_id: str, dhcp_server_id: str) -> Parcel[DhcpSeverParcelCreationPayload]:
+    def get_dhcp_server_parcel(self, service_id: str, dhcp_server_id: str) -> Parcel[DhcpSeverCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @put("/v1/feature-profile/sdwan/service/{service_id}/dhcp-server/{dhcp_server_id}")
     def edit_dhcp_server_parcel(
-        self, service_id: str, dhcp_server_id: str, payload: DhcpSeverParcelCreationPayload
+        self, service_id: str, dhcp_server_id: str, payload: DhcpSeverCreationPayload
     ) -> ParcelCreationResponse:
         ...
 
@@ -312,7 +310,7 @@ class ServiceFeatureProfile(APIEndpoints):
     )
     def get_dhcp_server_parcels_associated_with_lan_vpn_interface_ethernet_parcel(
         self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str
-    ) -> ParcelInfo[DhcpSeverParcelCreationPayload]:
+    ) -> ParcelInfo[DhcpSeverCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
@@ -332,7 +330,7 @@ class ServiceFeatureProfile(APIEndpoints):
     )
     def get_dhcp_server_parcel_associated_with_lan_vpn_interface_ethernet_parcel(
         self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str, dhcp_server_id: str
-    ) -> Parcel[DhcpSeverParcelCreationPayload]:
+    ) -> Parcel[DhcpSeverCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
@@ -367,7 +365,7 @@ class ServiceFeatureProfile(APIEndpoints):
     )
     def get_dhcp_server_parcels_associated_with_lan_vpn_interface_ipsec_parcel(
         self, service_id: str, lan_vpn_id: str, interface_ipsec_id: str
-    ) -> ParcelInfo[DhcpSeverParcelCreationPayload]:
+    ) -> ParcelInfo[DhcpSeverCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
@@ -387,7 +385,7 @@ class ServiceFeatureProfile(APIEndpoints):
     )
     def get_dhcp_server_parcel_associated_with_lan_vpn_interface_ipsec_parcel(
         self, service_id: str, lan_vpn_id: str, interface_ipsec_id: str, dhcp_server_id: str
-    ) -> Parcel[DhcpSeverParcelCreationPayload]:
+    ) -> Parcel[DhcpSeverCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
@@ -422,7 +420,7 @@ class ServiceFeatureProfile(APIEndpoints):
     )
     def get_dhcp_server_parcels_associated_with_lan_vpn_interface_svi_parcel(
         self, service_id: str, lan_vpn_id: str, interface_svi_id: str
-    ) -> ParcelInfo[DhcpSeverParcelCreationPayload]:
+    ) -> ParcelInfo[DhcpSeverCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
@@ -442,7 +440,7 @@ class ServiceFeatureProfile(APIEndpoints):
     )
     def get_dhcp_server_parcel_associated_with_lan_vpn_interface_svi_parcel(
         self, service_id: str, lan_vpn_id: str, interface_svi_id: str, dhcp_server_id: str
-    ) -> Parcel[DhcpSeverParcelCreationPayload]:
+    ) -> Parcel[DhcpSeverCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
@@ -472,23 +470,23 @@ class ServiceFeatureProfile(APIEndpoints):
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @get("/v1/feature-profile/sdwan/service/{service_id}/tracker")
-    def get_tracker_parcels(self, service_id: str) -> ParcelInfo[TrackerParcelCreationPayload]:
+    def get_tracker_parcels(self, service_id: str) -> ParcelInfo[TrackerCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @post("/v1/feature-profile/sdwan/service/{service_id}/tracker")
-    def create_tracker_parcel(self, service_id: str, payload: TrackerParcelCreationPayload) -> ParcelCreationResponse:
+    def create_tracker_parcel(self, service_id: str, payload: TrackerCreationPayload) -> ParcelCreationResponse:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @get("/v1/feature-profile/sdwan/service/{service_id}/tracker/{tracker_id}")
-    def get_tracker_parcel(self, service_id: str, tracker_id: str) -> Parcel[TrackerParcelCreationPayload]:
+    def get_tracker_parcel(self, service_id: str, tracker_id: str) -> Parcel[TrackerCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @put("/v1/feature-profile/sdwan/service/{service_id}/tracker/{tracker_id}")
     def edit_tracker_parcel(
-        self, service_id: str, tracker_id: str, payload: TrackerParcelCreationPayload
+        self, service_id: str, tracker_id: str, payload: TrackerCreationPayload
     ) -> ParcelCreationResponse:
         ...
 
@@ -499,27 +497,25 @@ class ServiceFeatureProfile(APIEndpoints):
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @get("/v1/feature-profile/sdwan/service/{service_id}/trackergroup")
-    def get_tracker_group_parcels(self, service_id: str) -> ParcelInfo[TrackerGroupParcelCreationPayload]:
+    def get_tracker_group_parcels(self, service_id: str) -> ParcelInfo[TrackerGroupCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @post("/v1/feature-profile/sdwan/service/{service_id}/trackergroup")
     def create_tracker_group_parcel(
-        self, service_id: str, payload: TrackerGroupParcelCreationPayload
+        self, service_id: str, payload: TrackerGroupCreationPayload
     ) -> ParcelCreationResponse:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @get("/v1/feature-profile/sdwan/service/{service_id}/trackergroup/{tracker_group_id}")
-    def get_tracker_group_parcel(
-        self, service_id: str, tracker_group_id: str
-    ) -> Parcel[TrackerGroupParcelCreationPayload]:
+    def get_tracker_group_parcel(self, service_id: str, tracker_group_id: str) -> Parcel[TrackerGroupCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @put("/v1/feature-profile/sdwan/service/{service_id}/trackergroup/{tracker_group_id}")
     def edit_tracker_group_parcel(
-        self, service_id: str, tracker_group_id: str, payload: TrackerGroupParcelCreationPayload
+        self, service_id: str, tracker_group_id: str, payload: TrackerGroupCreationPayload
     ) -> ParcelCreationResponse:
         ...
 
@@ -535,7 +531,7 @@ class ServiceFeatureProfile(APIEndpoints):
     )
     def get_tracker_parcels_associated_with_lan_vpn_interface_ethernet_parcel(
         self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str
-    ) -> ParcelInfo[TrackerParcelCreationPayload]:
+    ) -> ParcelInfo[TrackerCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
@@ -555,7 +551,7 @@ class ServiceFeatureProfile(APIEndpoints):
     )
     def get_tracker_parcel_associated_with_lan_vpn_interface_ethernet_parcel(
         self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str, tracker_id: str
-    ) -> Parcel[TrackerParcelCreationPayload]:
+    ) -> Parcel[TrackerCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
@@ -590,7 +586,7 @@ class ServiceFeatureProfile(APIEndpoints):
     )
     def get_tracker_parcels_associated_with_lan_vpn_interface_ipsec_parcel(
         self, service_id: str, lan_vpn_id: str, interface_ipsec_id: str
-    ) -> ParcelInfo[TrackerParcelCreationPayload]:
+    ) -> ParcelInfo[TrackerCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
@@ -600,7 +596,7 @@ class ServiceFeatureProfile(APIEndpoints):
     )
     def get_tracker_group_parcels_associated_with_lan_vpn_interface_ethernet_parcel(
         self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str
-    ) -> ParcelInfo[TrackerGroupParcelCreationPayload]:
+    ) -> ParcelInfo[TrackerGroupCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
@@ -620,7 +616,7 @@ class ServiceFeatureProfile(APIEndpoints):
     )
     def get_tracker_group_parcel_associated_with_lan_vpn_interface_ethernet_parcel(
         self, service_id: str, lan_vpn_id: str, interface_ethernet_id: str, tracker_group_id: str
-    ) -> Parcel[TrackerGroupParcelCreationPayload]:
+    ) -> Parcel[TrackerGroupCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
@@ -655,7 +651,7 @@ class ServiceFeatureProfile(APIEndpoints):
     )
     def get_tracker_group_parcels_associated_with_lan_vpn_interface_ipsec_parcel(
         self, service_id: str, lan_vpn_id: str, interface_ipsec_id: str
-    ) -> ParcelInfo[TrackerGroupParcelCreationPayload]:
+    ) -> ParcelInfo[TrackerGroupCreationPayload]:
         ...
 
     @versions(supported_versions=(">=20.13"), raises=False)

@@ -45,7 +45,7 @@ class TrackerData(BaseModel):
     )
 
 
-class TrackerParcelCreationPayload(BaseModel):
+class TrackerCreationPayload(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     name: str
@@ -74,7 +74,7 @@ class TrackerGroupData(BaseModel):
     )
 
 
-class TrackerGroupParcelCreationPayload(BaseModel):
+class TrackerGroupCreationPayload(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     name: str
