@@ -123,3 +123,23 @@ class ParcelAssociationPayload(BaseModel):
 class Prefix(BaseModel):
     address: Union[Variable, Global[str]]
     mask: Union[Variable, Global[str]]
+
+
+class SchemaType(str, Enum):
+    POST = "post"
+    PUT = "put"
+
+
+class SchemaTypeQuery(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    schema_type: SchemaType = Field(alias="schemaType")
+
+
+class ParcelId(BaseModel):
+    id: str = Field(alias="parcelId")
+
+
+class GetFeatureProfilesPayload(BaseModel):
+    limit: Optional[int]
+    offset: Optional[int]
