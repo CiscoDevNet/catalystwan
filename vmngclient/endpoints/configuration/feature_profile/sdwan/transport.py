@@ -4,11 +4,13 @@ from typing import Optional
 
 from vmngclient.api.configuration_groups.parcel import MainParcel
 from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, versions
-from vmngclient.endpoints.configuration.common import GetFeatureProfilesPayload, ParcelId, SchemaTypeQuery
 from vmngclient.model.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
     FeatureProfileCreationResponse,
     FeatureProfileInfo,
+    GetFeatureProfilesPayload,
+    ParcelId,
+    SchemaTypeQuery,
 )
 from vmngclient.typed_list import DataSequence
 
