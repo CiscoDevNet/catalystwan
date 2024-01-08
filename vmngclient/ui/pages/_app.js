@@ -1,5 +1,6 @@
 import "../styles/globals.css";
 import "../styles/main.css";
+import "../styles/forms.css";
 import "bootstrap/dist/css/bootstrap.min.css"; // Import bootstrap CSS
 import { Provider } from "react-redux";
 import store from "../src/store";

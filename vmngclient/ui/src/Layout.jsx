@@ -21,7 +21,11 @@ export default function Layout({ children }) {
           }}
         />
       </div>
-      <main>{children}</main>
+      <div className="main-container mt-4">
+        <div className="text-center container-div">
+          <main>{children}</main>
+        </div>
+      </div>
     </div>
   );
 }
