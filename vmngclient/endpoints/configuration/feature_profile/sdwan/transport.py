@@ -4,7 +4,7 @@ from typing import Optional
 
 from vmngclient.api.configuration_groups.parcel import MainParcel
 from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, versions
-from vmngclient.model.configuration.feature_profile.common import (
+from vmngclient.models.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
     FeatureProfileCreationResponse,
     FeatureProfileInfo,

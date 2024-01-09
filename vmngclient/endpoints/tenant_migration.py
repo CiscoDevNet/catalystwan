@@ -5,7 +5,7 @@ from urllib.parse import parse_qsl, urlsplit
 from pydantic.v1 import BaseModel, Field
 
 from vmngclient.endpoints import APIEndpoints, CustomPayloadType, PreparedPayload, get, post, versions, view
-from vmngclient.model.tenant import TenantExport
+from vmngclient.models.tenant import TenantExport
 from vmngclient.utils.session_type import ProviderView, SingleTenantView
 
 

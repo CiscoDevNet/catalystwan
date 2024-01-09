@@ -3,7 +3,7 @@ from typing import Any, List, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from vmngclient.model.policy.policy import (
+from vmngclient.models.policy.policy import (
     AssemblyItem,
     PolicyCreationPayload,
     PolicyDefinition,

@@ -100,14 +100,14 @@ from vmngclient.endpoints.configuration.policy.vsmart_template import (
     ConfigurationVSmartTemplatePolicy,
     VSmartConnectivityStatus,
 )
-from vmngclient.model.misc.application_protocols import ApplicationProtocol
-from vmngclient.model.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
-from vmngclient.model.policy.definitions.qos_map import QoSMap
-from vmngclient.model.policy.definitions.rewrite import RewritePolicy
-from vmngclient.model.policy.definitions.rule_set import RuleSet
-from vmngclient.model.policy.definitions.security_group import SecurityGroup
-from vmngclient.model.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy
-from vmngclient.model.policy.lists import (
+from vmngclient.models.misc.application_protocols import ApplicationProtocol
+from vmngclient.models.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
+from vmngclient.models.policy.definitions.qos_map import QoSMap
+from vmngclient.models.policy.definitions.rewrite import RewritePolicy
+from vmngclient.models.policy.definitions.rule_set import RuleSet
+from vmngclient.models.policy.definitions.security_group import SecurityGroup
+from vmngclient.models.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy
+from vmngclient.models.policy.lists import (
     AllPolicyLists,
     AppList,
     AppProbeClassList,
@@ -138,15 +138,15 @@ from vmngclient.model.policy.lists import (
     VPNList,
     ZoneList,
 )
-from vmngclient.model.policy.localized import (
+from vmngclient.models.policy.localized import (
     LocalizedPolicy,
     LocalizedPolicyDeviceInfo,
     LocalizedPolicyEditResponse,
     LocalizedPolicyInfo,
 )
-from vmngclient.model.policy.policy_definition import PolicyDefinitionEditResponse, PolicyDefinitionEndpoints
-from vmngclient.model.policy.policy_list import PolicyListEndpoints
-from vmngclient.model.policy.security import AnySecurityPolicy, AnySecurityPolicyInfo, SecurityPolicyEditResponse
+from vmngclient.models.policy.policy_definition import PolicyDefinitionEditResponse, PolicyDefinitionEndpoints
+from vmngclient.models.policy.policy_list import PolicyListEndpoints
+from vmngclient.models.policy.security import AnySecurityPolicy, AnySecurityPolicyInfo, SecurityPolicyEditResponse
 from vmngclient.typed_list import DataSequence
 
 if TYPE_CHECKING:

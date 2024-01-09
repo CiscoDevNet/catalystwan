@@ -3,7 +3,7 @@ from typing import List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from vmngclient.model.policy.policy_definition import PolicyDefinitionBase
+from vmngclient.models.policy.policy_definition import PolicyDefinitionBase
 
 
 class QoSSchedulingEnum(str, Enum):

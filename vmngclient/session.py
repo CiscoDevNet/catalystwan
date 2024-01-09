@@ -24,7 +24,7 @@ from vmngclient.exceptions import (
     TenantSubdomainNotFound,
     vManageClientError,
 )
-from vmngclient.model.tenant import Tenant
+from vmngclient.models.tenant import Tenant
 from vmngclient.response import ErrorInfo, response_history_debug, vManageResponse
 from vmngclient.utils.session_type import SessionType
 from vmngclient.version import NullVersion, parse_api_version
