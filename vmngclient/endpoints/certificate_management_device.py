@@ -105,6 +105,10 @@ class VedgeListValidityResponse(BaseModel):
     id: str
 
 
+class SaveVedgeListResponse(BaseModel):
+    id: str
+
+
 class CertificateManagementDevice(APIEndpoints):
     @delete("/certificate/{uuid}")
     def delete_configuration(self, uuid: str) -> DeviceDeletionResponse:
@@ -116,4 +120,8 @@ class CertificateManagementDevice(APIEndpoints):
 
     @post("/certificate/save/vedge/list")
     def change_vedge_list_validity(self, payload: List[VedgeListValidityPayload]) -> VedgeListValidityResponse:
+        ...
+
+    @post("/certificate/vedge/list?action={action}")
+    def send_to_controllers(self, action: str = "push") -> SaveVedgeListResponse:
         ...
