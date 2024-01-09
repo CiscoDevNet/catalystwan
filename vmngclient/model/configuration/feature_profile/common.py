@@ -1,12 +1,14 @@
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional
+from typing import Generic, List, Optional, TypeVar, Union
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
+from vmngclient.api.configuration_groups.parcel import Global, Variable
 from vmngclient.model.common import UUID
 from vmngclient.model.configuration.common import Solution
-from vmngclient.model.profileparcel.traffic_policy import CgFpPpNameDef
+
+T = TypeVar("T")
 
 
 class ProfileType(str, Enum):
@@ -49,15 +51,95 @@ class FromFeatureProfile(BaseModel):
 
 
 class FeatureProfileCreationPayload(BaseModel):
-    name: CgFpPpNameDef
+    name: str
     description: str
     from_feature_profile: Optional[FromFeatureProfile] = Field(alias="fromFeatureProfile", default=None)
 
 
 class FeatureProfileEditPayload(BaseModel):
-    name: CgFpPpNameDef
+    name: str
     description: str
 
 
 class FeatureProfileCreationResponse(BaseModel):
     id: UUID
+
+
+class ParcelCreationResponse(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    id: UUID = Field(alias="parcelId")
+
+
+class ParcelType(str, Enum):
+    APPQOE = "appqoe"
+    LAN_VPN = "lan/vpn"
+    LAN_VPN_INTERFACE_ETHERNET = "lan/vpn/interface/ethernet"
+    LAN_VPN_INTERFACE_GRE = "lan/vpn/interface/gre"
+    LAN_VPN_INTERFACE_IPSEC = "lan/vpn/interface/ipsec"
+    LAN_VPN_INTERFACE_SVI = "lan/vpn/interface/svi"
+    DHCP_SERVER = "dhcp-server"
+    TRACKER = "tracker"
+    TRACKER_GROUP = "trackergroup"
+    ROUTING_BGP = "routing/bgp"
+    ROUTING_EIGRP = "routing/eigrp"
+    ROUTING_MULTICAST = "routing/multicast"
+    ROUTING_OSPF = "routing/ospf"
+    ROUTING_OSPFV3_IPV4 = "routing/ospfv3/ipv4"
+    ROUTING_OSPFV3_IPV6 = "routing/ospfv3/ipv6"
+    WIRELESSLAN = "wirelesslan"
+    SWITCHPORT = "switchport"
+
+
+class Parcel(BaseModel, Generic[T]):
+    parcel_id: str = Field(alias="parcelId")
+    parcel_type: ParcelType = Field(alias="parcelType")
+    created_by: str = Field(alias="createdBy")
+    last_updated_by: str = Field(alias="lastUpdatedBy")
+    created_on: int = Field(alias="createdOn")
+    last_updated_on: int = Field(alias="lastUpdatedOn")
+    payload: T
+
+
+class Header(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    generated_on: int = Field(alias="generatedOn")
+
+
+class ParcelInfo(BaseModel, Generic[T]):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    header: Header
+    data: List[Parcel[T]]
+
+
+class ParcelAssociationPayload(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+
+    parcel_id: str = Field(alias="parcelId")
+
+
+class Prefix(BaseModel):
+    address: Union[Variable, Global[str]]
+    mask: Union[Variable, Global[str]]
+
+
+class SchemaType(str, Enum):
+    POST = "post"
+    PUT = "put"
+
+
+class SchemaTypeQuery(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    schema_type: SchemaType = Field(alias="schemaType")
+
+
+class ParcelId(BaseModel):
+    id: str = Field(alias="parcelId")
+
+
+class GetFeatureProfilesPayload(BaseModel):
+    limit: Optional[int]
+    offset: Optional[int]

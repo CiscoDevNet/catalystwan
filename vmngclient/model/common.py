@@ -1,9 +1,6 @@
 from enum import Enum
 from typing import Dict, List, Set, Tuple
 
-from pydantic.v1 import constr
-from typing_extensions import Annotated
-
 
 def check_fields_exclusive(values: Dict, field_names: Set[str], at_least_one: bool = False) -> bool:
     """Helper method to check fields are mutually exclusive
@@ -92,4 +89,4 @@ class TLOCColorEnum(str, Enum):
     PRIVATE6 = "private6"
 
 
-UUID = Annotated[str, constr(regex=r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")]
+UUID = str
