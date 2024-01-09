@@ -15,27 +15,43 @@ class ControllerConfig(Parcel):
     slot: Union[Variable, Global[int], Default[int], None] = Field(
         default=None, description="Set primary SIM slot", ge=0, le=1
     )
-    maxRetry: Union[Variable, Global[int], Default[None], None] = Field(
-        default=None, description="Set SIM failover retries", ge=0, le=65535
+    max_retry: Union[Variable, Global[int], Default[None], None] = Field(
+        default=None,
+        description="Set SIM failover retries",
+        ge=0,
+        le=65535,
+        serialization_alias="maxRetry",
+        validation_alias="maxRetry",
     )
-    failovertimer: Union[Variable, Global[int], Default[None], None] = Field(
-        default=None, description="Set SIM failover timeout in minutes", ge=3, le=7
+    failover_timer: Union[Variable, Global[int], Default[None], None] = Field(
+        default=None,
+        description="Set SIM failover timeout in minutes",
+        ge=3,
+        le=7,
+        serialization_alias="failovertimer",
+        validation_alias="failovertimer",
     )
-    autoSim: Union[Variable, Global[bool], Default[None], None] = Field(
-        default=None, description="Enable/Disable Firmware Auto Sim"
+    auto_sim: Union[Variable, Global[bool], Default[None], None] = Field(
+        default=None,
+        description="Enable/Disable Firmware Auto Sim",
+        serialization_alias="autoSim",
+        validation_alias="autoSim",
     )
 
 
-class CellularControllerParcel(Parcel):
-    name: str
-    config_type: Default[ConfigTypeValue] = Field(default=Default(value=ConfigTypeValue.NON_E_SIM), alias="configType")
+class CellularController(Parcel):
+    config_type: Default[ConfigTypeValue] = Field(
+        default=Default(value=ConfigTypeValue.NON_E_SIM),
+        serialization_alias="configType",
+        validation_alias="configType",
+    )
     controller_config: ControllerConfig = Field(alias="controllerConfig")
 
     @staticmethod
     def add_controller_config(
         id: Union[Variable, Global[str]],
-        maxRetry: Union[Variable, Global[int], Default[None], None] = None,
-        failovertimer: Union[Variable, Global[int], Default[None], None] = None,
-        autoSim: Union[Variable, Global[bool], Default[None], None] = None,
+        max_retry: Union[Variable, Global[int], Default[None], None] = None,
+        failover_timer: Union[Variable, Global[int], Default[None], None] = None,
+        auto_sim: Union[Variable, Global[bool], Default[None], None] = None,
     ):
-        return ControllerConfig(id=id, maxRetry=maxRetry, failovertimer=failovertimer, autoSim=autoSim)
+        return ControllerConfig(id=id, max_retry=max_retry, failover_timer=failover_timer, auto_sim=auto_sim)
