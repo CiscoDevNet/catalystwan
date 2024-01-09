@@ -4,9 +4,9 @@ from typing import Any, List, Literal, Optional, Set, Tuple, Union, overload
 from pydantic import ConfigDict, Field
 from typing_extensions import Annotated
 
-from vmngclient.model.common import TLOCColorEnum
-from vmngclient.model.policy.lists_entries import EncapEnum
-from vmngclient.model.policy.policy_definition import (
+from vmngclient.models.common import TLOCColorEnum
+from vmngclient.models.policy.lists_entries import EncapEnum
+from vmngclient.models.policy.policy_definition import (
     AppListEntry,
     BaseAction,
     CFlowDAction,

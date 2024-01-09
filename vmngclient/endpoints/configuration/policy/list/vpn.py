@@ -2,8 +2,8 @@
 
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.lists import VPNList
-from vmngclient.model.policy.policy_list import (
+from vmngclient.models.policy.lists import VPNList
+from vmngclient.models.policy.policy_list import (
     InfoTag,
     PolicyListEndpoints,
     PolicyListId,

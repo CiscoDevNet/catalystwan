@@ -6,12 +6,12 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.api.configuration_groups.parcel import MainParcel
 from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, put, versions
-from vmngclient.model.configuration.feature_profile.common import (
+from vmngclient.models.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
     FeatureProfileCreationResponse,
     FeatureProfileInfo,
 )
-from vmngclient.model.feature_profile_parcel import FullConfigParcel
+from vmngclient.models.feature_profile_parcel import FullConfigParcel
 from vmngclient.typed_list import DataSequence
 
 

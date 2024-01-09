@@ -5,8 +5,8 @@ from typing import List, Optional
 from pydantic.v1 import BaseModel, Field
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put, versions
-from vmngclient.model.configuration.common import Solution
-from vmngclient.model.configuration.feature_profile.common import ProfileType
+from vmngclient.models.configuration.common import Solution
+from vmngclient.models.configuration.feature_profile.common import ProfileType
 from vmngclient.typed_list import DataSequence
 
 

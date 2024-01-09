@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 from vmngclient.api.parcel_api import SDRoutingFullConfigParcelAPI
 from vmngclient.endpoints.configuration_feature_profile import SDRoutingConfigurationFeatureProfile
-from vmngclient.model.configuration.feature_profile.common import (
+from vmngclient.models.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
     FeatureProfileCreationResponse,
 )

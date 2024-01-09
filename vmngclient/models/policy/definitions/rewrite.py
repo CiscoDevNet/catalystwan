@@ -2,7 +2,7 @@ from typing import List, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.model.policy.policy_definition import (
+from vmngclient.models.policy.policy_definition import (
     DefinitionWithSequencesCommonBase,
     PLPEntryValues,
     PolicyDefinitionBase,

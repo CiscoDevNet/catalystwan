@@ -4,7 +4,7 @@ from typing import List, Literal, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, RootModel, field_validator
 from typing_extensions import Annotated
 
-from vmngclient.model.policy.policy import (
+from vmngclient.models.policy.policy import (
     AdvancedMalwareProtectionAssemblyItem,
     DNSSecurityAssemblyItem,
     IntrusionPreventionAssemblyItem,

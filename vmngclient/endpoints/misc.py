@@ -1,6 +1,6 @@
 # mypy: disable-error-code="empty-body"
 from vmngclient.endpoints import APIEndpointClient, APIEndpoints, get
-from vmngclient.model.misc.application_protocols import ApplicationProtocolMap
+from vmngclient.models.misc.application_protocols import ApplicationProtocolMap
 from vmngclient.typed_list import DataSequence
 
 
