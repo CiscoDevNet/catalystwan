@@ -7,9 +7,6 @@ from vmngclient.endpoints.certificate_management_device import CertificateManage
 from vmngclient.endpoints.certificate_management_vmanage import CertificateManagementVManage
 from vmngclient.endpoints.client import Client
 from vmngclient.endpoints.cluster_management import ClusterManagement
-from vmngclient.endpoints.configuration.feature_profile.sdwan.service import (
-    ServiceFeatureProfile as SDWANServiceFeatureProfile,
-)
 from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition
 from vmngclient.endpoints.configuration.policy.definition.rewrite import ConfigurationPolicyRewriteRuleDefinition
 from vmngclient.endpoints.configuration.policy.definition.rule_set import ConfigurationPolicyRuleSetDefinition
@@ -129,7 +126,7 @@ class ConfigurationPolicyContainer:
 
 class ConfigurationSDWANFeatureProfileContainer:
     def __init__(self, session: vManageSession):
-        self.service = SDWANServiceFeatureProfile(client=session)
+        pass
 
 
 class ConfigurationFeatureProfileContainer:
