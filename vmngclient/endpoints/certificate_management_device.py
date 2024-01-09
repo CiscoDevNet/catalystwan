@@ -97,7 +97,7 @@ class VedgeListValidityPayload(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     chasis_number: str = Field(alias="chasisNumber")
-    serial_number: str = Field(alias="serialNumber")
+    serial_number: Optional[str] = Field(default=None, alias="serialNumber")
     validity: Validity = Field(default=Validity.INVALID)
 
 
@@ -114,6 +114,6 @@ class CertificateManagementDevice(APIEndpoints):
     def generate_csr(self, payload: TargetDevice) -> DataSequence[DeviceCsrGenerationResponse]:
         ...
 
-    @post("/certificate/save/vedge/list", "data")
+    @post("/certificate/save/vedge/list")
     def change_vedge_list_validity(self, payload: List[VedgeListValidityPayload]) -> VedgeListValidityResponse:
         ...
