@@ -5,8 +5,8 @@ from typing import Generic, List, Optional, TypeVar, Union
 from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.api.configuration_groups.parcel import Global, Variable
-from vmngclient.model.common import UUID
-from vmngclient.model.configuration.common import Solution
+from vmngclient.models.common import UUID
+from vmngclient.models.configuration.common import Solution
 
 T = TypeVar("T")
 

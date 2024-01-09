@@ -1,9 +1,9 @@
 # mypy: disable-error-code="empty-body"
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.definitions.traffic_data import TrafficDataPolicy, TrafficDataPolicyHeader
-from vmngclient.model.policy.policy import PolicyId
-from vmngclient.model.policy.policy_definition import (
+from vmngclient.models.policy.definitions.traffic_data import TrafficDataPolicy, TrafficDataPolicyHeader
+from vmngclient.models.policy.policy import PolicyId
+from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
     PolicyDefinitionId,

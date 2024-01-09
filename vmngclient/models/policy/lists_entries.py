@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, field_validator, model_validator
 
-from vmngclient.model.common import InterfaceTypeEnum, check_fields_exclusive
+from vmngclient.models.common import InterfaceTypeEnum, check_fields_exclusive
 
 
 def check_jitter_ms(jitter_str: str) -> str:

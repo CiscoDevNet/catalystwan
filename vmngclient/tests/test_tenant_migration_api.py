@@ -8,7 +8,7 @@ from packaging.version import Version  # type: ignore
 from vmngclient.api.task_status_api import Task
 from vmngclient.api.tenant_migration_api import ImportTask, TenantMigrationAPI
 from vmngclient.endpoints.tenant_migration import ImportInfo, MigrationInfo
-from vmngclient.model.tenant import Tenant, TenantExport
+from vmngclient.models.tenant import Tenant, TenantExport
 
 
 class TestTenantMigrationAPI(unittest.TestCase):

@@ -3,8 +3,8 @@ from typing import List, Literal, Optional, Set, Tuple, Union
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated
 
-from vmngclient.model.common import InterfaceTypeEnum
-from vmngclient.model.policy.lists_entries import (
+from vmngclient.models.common import InterfaceTypeEnum
+from vmngclient.models.policy.lists_entries import (
     AppListEntry,
     AppProbeClassListEntry,
     ASPathListEntry,

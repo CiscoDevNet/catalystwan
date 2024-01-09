@@ -4,8 +4,8 @@ from typing import List, Literal, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Annotated
 
-from vmngclient.model.common import check_fields_exclusive
-from vmngclient.model.policy.policy_definition import ListReference, PolicyDefinitionBase, VariableName
+from vmngclient.models.common import check_fields_exclusive
+from vmngclient.models.policy.policy_definition import ListReference, PolicyDefinitionBase, VariableName
 
 
 class Reference(BaseModel):

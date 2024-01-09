@@ -4,8 +4,8 @@ from typing import Dict, List, Literal, Set, Tuple, Union
 from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import Annotated
 
-from vmngclient.model.misc.application_protocols import ApplicationProtocol
-from vmngclient.model.policy.policy_definition import (
+from vmngclient.models.misc.application_protocols import ApplicationProtocol
+from vmngclient.models.policy.policy_definition import (
     AppListEntry,
     BaseAction,
     DefinitionSequenceBase,

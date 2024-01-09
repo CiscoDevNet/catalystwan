@@ -3,8 +3,8 @@
 from pydantic.v1 import BaseModel, Field, IPvAnyAddress
 
 from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
-from vmngclient.model.policy.policy import PolicyId
+from vmngclient.models.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
+from vmngclient.models.policy.policy import PolicyId
 from vmngclient.typed_list import DataSequence
 
 

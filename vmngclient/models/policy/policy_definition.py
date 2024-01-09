@@ -7,9 +7,9 @@ from typing import Any, Dict, List, MutableSequence, Optional, Protocol, Sequenc
 from pydantic import BaseModel, ConfigDict, Field, RootModel
 from typing_extensions import Annotated, Literal
 
-from vmngclient.model.common import TLOCColorEnum
-from vmngclient.model.misc.application_protocols import ApplicationProtocol
-from vmngclient.model.policy.lists_entries import EncapEnum
+from vmngclient.models.common import TLOCColorEnum
+from vmngclient.models.misc.application_protocols import ApplicationProtocol
+from vmngclient.models.policy.lists_entries import EncapEnum
 from vmngclient.typed_list import DataSequence
 
 

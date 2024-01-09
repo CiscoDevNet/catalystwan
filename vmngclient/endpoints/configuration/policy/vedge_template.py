@@ -1,12 +1,12 @@
 # mypy: disable-error-code="empty-body"
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.localized import (
+from vmngclient.models.policy.localized import (
     LocalizedPolicy,
     LocalizedPolicyDeviceInfo,
     LocalizedPolicyEditResponse,
     LocalizedPolicyInfo,
 )
-from vmngclient.model.policy.policy import PolicyId, PolicyPreview
+from vmngclient.models.policy.policy import PolicyId, PolicyPreview
 from vmngclient.typed_list import DataSequence
 
 

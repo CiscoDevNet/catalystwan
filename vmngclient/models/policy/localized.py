@@ -2,7 +2,7 @@ from typing import List, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, field_validator
 
-from vmngclient.model.policy.policy import AssemblyItem, PolicyCreationPayload, PolicyDefinition, PolicyInfo
+from vmngclient.models.policy.policy import AssemblyItem, PolicyCreationPayload, PolicyDefinition, PolicyInfo
 
 LocalizedPolicySupportedItemType = Literal[
     "qosMap",

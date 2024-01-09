@@ -1,10 +1,11 @@
 # mypy: disable-error-code="empty-body"
 from enum import Enum
-from typing import List, Optional
+from pathlib import Path
+from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.endpoints import APIEndpoints, delete, get, post, versions
+from vmngclient.endpoints import APIEndpoints, CustomPayloadType, PreparedPayload, delete, get, post, versions
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.personality import Personality
 
@@ -43,8 +44,8 @@ class DeviceCreationPayload(BaseModel):
 class DeviceDeletionResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    local_delete_from_db: bool = Field(alias="localDeleteFromDB")
-    id: str
+    local_delete_from_db: Optional[bool] = Field(default=None, alias="localDeleteFromDB")
+    id: Optional[str] = Field(default=None)
 
 
 class DeviceCategory(str, Enum):
@@ -105,6 +106,44 @@ class DeviceDetailsQueryParams(BaseModel):
     family: Optional[str] = None
 
 
+class Validity(str, Enum):
+    VALID = "valid"
+    INVALID = "invalid"
+
+
+class SmartAccountSyncParams(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    password: str
+    username: str
+    validity_string: str = Validity.INVALID
+
+
+class ProcessId(BaseModel):
+    process_id: str = Field(alias="processId")
+
+
+class SerialFilePayload(CustomPayloadType):
+    def __init__(self, image_path: str, validity: Validity = Validity.INVALID):
+        self.image_path = image_path
+        self.validity = validity
+        self.data = open(self.image_path, "rb")
+        self.fields = {"validity": self.validity, "upload": True}
+
+    def prepared(self) -> PreparedPayload:
+        return PreparedPayload(files={"file": (Path(self.data.name).name, self.data)}, data=self.fields)
+
+
+class UploadSerialFileResponse(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    vedge_list_upload_msg: Optional[str] = Field(default=None, alias="vedgeListUploadMsg")
+    vedge_list_upload_status: Optional[str] = Field(default=None, alias="vedgeListUploadStatus")
+    id: Optional[str] = None
+    vedge_list_status_code: Optional[str] = Field(default=None, alias="vedgeListStatusCode")
+    activity_list: Optional[Union[List, str]] = Field(default=None, alias="activityList")
+
+
 class ConfigurationDeviceInventory(APIEndpoints):
     @versions(supported_versions=(">=20.9"), raises=False)
     @post("/system/device/{device_uuid}/unlock")
@@ -119,8 +158,19 @@ class ConfigurationDeviceInventory(APIEndpoints):
     def delete_device(self, uuid: str) -> DeviceDeletionResponse:
         ...
 
+    # Covers:
+    # url = "/dataservice/system/device/controllers"
+    # url = "/dataservice/system/device/vedges"
     @get("/system/device/{device_category}", "data")
     def get_device_details(
         self, device_category: DeviceCategory, params: DeviceDetailsQueryParams = DeviceDetailsQueryParams()
     ) -> DataSequence[DeviceDetailsResponse]:
+        ...
+
+    @post("/system/device/smartaccount/sync")
+    def sync_devices_from_smart_account(self, payload: SmartAccountSyncParams) -> ProcessId:
+        ...
+
+    @post("/system/device/fileupload")
+    def upload_wan_edge_list(self, payload: SerialFilePayload) -> UploadSerialFileResponse:
         ...

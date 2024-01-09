@@ -1,5 +1,6 @@
 # mypy: disable-error-code="empty-body"
 
+from enum import Enum
 from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -11,8 +12,8 @@ from vmngclient.typed_list import DataSequence
 class DeviceDeletionResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    local_delete_from_db: bool = Field(alias="localDeleteFromDB")
-    id: str
+    local_delete_from_db: Optional[bool] = Field(default=None, alias="localDeleteFromDB")
+    id: Optional[str] = Field(default=None)
 
 
 class TargetDevice(BaseModel):
@@ -87,6 +88,27 @@ class DeviceCsrGenerationResponse(BaseModel):
     site_id: Optional[str] = Field(default=None, alias="site-id")
 
 
+class Validity(str, Enum):
+    VALID = "valid"
+    INVALID = "invalid"
+
+
+class VedgeListValidityPayload(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    chasis_number: str = Field(alias="chasisNumber")
+    serial_number: Optional[str] = Field(default=None, alias="serialNumber")
+    validity: Validity = Field(default=Validity.INVALID)
+
+
+class VedgeListValidityResponse(BaseModel):
+    id: str
+
+
+class SaveVedgeListResponse(BaseModel):
+    id: str
+
+
 class CertificateManagementDevice(APIEndpoints):
     @delete("/certificate/{uuid}")
     def delete_configuration(self, uuid: str) -> DeviceDeletionResponse:
@@ -94,4 +116,12 @@ class CertificateManagementDevice(APIEndpoints):
 
     @post("/certificate/generate/csr", "data")
     def generate_csr(self, payload: TargetDevice) -> DataSequence[DeviceCsrGenerationResponse]:
+        ...
+
+    @post("/certificate/save/vedge/list")
+    def change_vedge_list_validity(self, payload: List[VedgeListValidityPayload]) -> VedgeListValidityResponse:
+        ...
+
+    @post("/certificate/vedge/list?action={action}")
+    def send_to_controllers(self, action: str = "push") -> SaveVedgeListResponse:
         ...
