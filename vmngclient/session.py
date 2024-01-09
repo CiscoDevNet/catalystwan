@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import time
 from enum import Enum
+from importlib import metadata
 from pathlib import Path
 from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
 from urllib.parse import urljoin, urlparse, urlunparse
@@ -30,6 +31,7 @@ from vmngclient.version import NullVersion, parse_api_version
 from vmngclient.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
+USER_AGENT = f"{__package__}/{metadata.version(__package__)}"
 
 
 class vManageBadResponseError(vManageClientError):
@@ -206,6 +208,7 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
             [Optional[Response], Union[Request, PreparedRequest, None]], str
         ] = response_history_debug
         super(vManageSession, self).__init__()
+        self.headers.update({"User-Agent": USER_AGENT})
         self.__prepare_session(verify, auth)
         self.api = APIContainer(self)
         self.endpoints = APIEndpointContainter(self)
