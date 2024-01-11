@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, field_validator, model_validator
 
-from vmngclient.models.common import InterfaceTypeEnum, check_fields_exclusive
+from vmngclient.models.common import InterfaceTypeEnum, TLOCColorEnum, check_fields_exclusive
 
 
 def check_jitter_ms(jitter_str: str) -> str:
@@ -45,24 +45,39 @@ class PathPreferenceEnum(str, Enum):
 
 
 class ColorDSCPMap(BaseModel):
-    color: str
+    color: TLOCColorEnum
     dscp: int = Field(ge=0, le=63)
 
 
 class ColorGroupPreference(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    color_preference: str = Field(alias="colorPreference")
-    path_preference: PathPreferenceEnum = Field(alias="pathPreference")
+    color_preference: str = Field(serialization_alias="colorPreference", validation_alias="colorPreference")
+    path_preference: PathPreferenceEnum = Field(serialization_alias="pathPreference", validation_alias="pathPreference")
 
 
 class FallbackBestTunnel(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     criteria: str
-    jitter_variance: Optional[str] = Field(None, alias="jitterVariance", description="jitter variance in ms")
-    latency_variance: Optional[str] = Field(None, alias="latencyVariance", description="latency variance in ms")
-    loss_variance: Optional[str] = Field(None, alias="lossVariance", description="loss variance as percentage")
+    jitter_variance: Optional[str] = Field(
+        None,
+        serialization_alias="jitterVariance",
+        validation_alias="jitterVariance",
+        description="jitter variance in ms",
+    )
+    latency_variance: Optional[str] = Field(
+        None,
+        serialization_alias="latencyVariance",
+        validation_alias="latencyVariance",
+        description="latency variance in ms",
+    )
+    loss_variance: Optional[str] = Field(
+        None,
+        serialization_alias="lossVariance",
+        validation_alias="lossVariance",
+        description="loss variance as percentage",
+    )
 
     # validators
     _jitter_validator = field_validator("jitter_variance")(check_jitter_ms)  # type: ignore[type-var]
@@ -91,13 +106,13 @@ class FallbackBestTunnel(BaseModel):
 class DataPrefixListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    ip_prefix: IPv4Network = Field(alias="ipPrefix")
+    ip_prefix: IPv4Network = Field(serialization_alias="ipPrefix", validation_alias="ipPrefix")
 
 
 class SiteListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    site_id: str = Field(alias="siteId")
+    site_id: str = Field(serialization_alias="siteId", validation_alias="siteId")
 
 
 class VPNListEntry(BaseModel):
@@ -118,7 +133,7 @@ class VPNListEntry(BaseModel):
 
 
 class ZoneListEntry(BaseModel):
-    vpn: Optional[str] = Field(None, description="0-65530 single number")
+    vpn: Optional[str] = Field(default=None, description="0-65530 single number")
     interface: Optional[InterfaceTypeEnum] = None
 
     @field_validator("vpn")
@@ -140,8 +155,10 @@ class FQDNListEntry(BaseModel):
 
 
 class GeoLocationListEntry(BaseModel):
-    country: Optional[str] = Field(description="ISO-3166 alpha-3 country code eg: FRA")
-    continent: Optional[str] = Field(description="One of 2-letter continent codes: AF, NA, OC, AN, AS, EU, SA")
+    country: Optional[str] = Field(default=None, description="ISO-3166 alpha-3 country code eg: FRA")
+    continent: Optional[str] = Field(
+        default=None, description="One of 2-letter continent codes: AF, NA, OC, AN, AS, EU, SA"
+    )
 
     @model_validator(mode="after")
     def check_country_xor_continent(self):
@@ -164,12 +181,14 @@ class PortListEntry(BaseModel):
 class ProtocolNameListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    protocol_name: str = Field(alias="protocolName")
+    protocol_name: str = Field(serialization_alias="protocolName", validation_alias="protocolName")
 
 
 class LocalAppListEntry(BaseModel):
-    app_family: Optional[str] = Field(alias="appFamily")
-    app: Optional[str]
+    model_config = ConfigDict(populate_by_name=True)
+
+    app_family: Optional[str] = Field(default=None, serialization_alias="appFamily", validation_alias="appFamily")
+    app: Optional[str] = None
 
     @model_validator(mode="after")
     def check_app_xor_appfamily(self):
@@ -178,8 +197,10 @@ class LocalAppListEntry(BaseModel):
 
 
 class AppListEntry(BaseModel):
-    app_family: Optional[str] = Field(alias="appFamily")
-    app: Optional[str]
+    model_config = ConfigDict(populate_by_name=True)
+
+    app_family: Optional[str] = Field(default=None, serialization_alias="appFamily", validation_alias="appFamily")
+    app: Optional[str] = None
 
     @model_validator(mode="after")
     def check_app_xor_appfamily(self):
@@ -188,13 +209,13 @@ class AppListEntry(BaseModel):
 
 
 class ColorListEntry(BaseModel):
-    color: str
+    color: TLOCColorEnum
 
 
 class DataIPv6PrefixListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    ipv6_prefix: IPv6Network = Field(alias="ipv6Prefix")
+    ipv6_prefix: IPv6Network = Field(serialization_alias="ipv6Prefix", validation_alias="ipv6Prefix")
 
 
 class LocalDomainListEntry(BaseModel):
@@ -202,7 +223,8 @@ class LocalDomainListEntry(BaseModel):
 
     name_server: str = Field(
         pattern="^[^*+].*",
-        alias="nameServer",
+        serialization_alias="nameServer",
+        validation_alias="nameServer",
         max_length=240,
         description="Must be valid std regex."
         "String cannot start with a '*' or a '+', be empty, or be more than 240 characters",
@@ -212,8 +234,8 @@ class LocalDomainListEntry(BaseModel):
 class IPSSignatureListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    generator_id: str = Field(alias="generatorId")
-    signature_id: str = Field(alias="signatureId")
+    generator_id: str = Field(serialization_alias="generatorId", validation_alias="generatorId")
+    signature_id: str = Field(serialization_alias="signatureId", validation_alias="signatureId")
 
 
 class URLListEntry(BaseModel):
@@ -255,7 +277,7 @@ class PolicerListEntry(BaseModel):
 class ASPathListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    as_path: str = Field(alias="asPath")
+    as_path: str = Field(serialization_alias="asPath", validation_alias="asPath")
 
 
 class ClassMapListEntry(BaseModel):
@@ -273,15 +295,18 @@ class ClassMapListEntry(BaseModel):
 class MirrorListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    remote_dest: IPvAnyAddress = Field(alias="remoteDest")
+    remote_dest: IPvAnyAddress = Field(serialization_alias="remoteDest", validation_alias="remoteDest")
     source: IPvAnyAddress
 
 
 class AppProbeClassListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    map: List[ColorDSCPMap]
-    forwarding_class: str = Field(alias="forwardingClass")
+    forwarding_class: str = Field(serialization_alias="forwardingClass", validation_alias="forwardingClass")
+    map: List[ColorDSCPMap] = []
+
+    def add_color_mapping(self, color: TLOCColorEnum, dscp: int) -> None:
+        self.map.append(ColorDSCPMap(color=color, dscp=dscp))
 
 
 class SLAClassListEntry(BaseModel):
@@ -290,8 +315,10 @@ class SLAClassListEntry(BaseModel):
     latency: Optional[str] = None
     loss: Optional[str] = None
     jitter: Optional[str] = None
-    app_probe_class: Optional[str] = Field(alias="appProbeClass")
-    fallback_best_tunnel: Optional[FallbackBestTunnel] = Field(None, alias="fallbackBestTunnel")
+    app_probe_class: Optional[str] = Field(serialization_alias="appProbeClass", validation_alias="appProbeClass")
+    fallback_best_tunnel: Optional[FallbackBestTunnel] = Field(
+        None, serialization_alias="fallbackBestTunnel", validation_alias="fallbackBestTunnel"
+    )
 
     # validators
     _jitter_validator = field_validator("jitter")(check_jitter_ms)  # type: ignore[type-var]
@@ -323,9 +350,15 @@ class TLOCListEntry(BaseModel):
 class PreferredColorGroupListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    primary_preference: ColorGroupPreference = Field(alias="primaryPreference")
-    secondary_preference: Optional[ColorGroupPreference] = Field(None, alias="secondaryPreference")
-    tertiary_preference: Optional[ColorGroupPreference] = Field(None, alias="tertiaryPreference")
+    primary_preference: ColorGroupPreference = Field(
+        serialization_alias="primaryPreference", validation_alias="primaryPreference"
+    )
+    secondary_preference: Optional[ColorGroupPreference] = Field(
+        None, serialization_alias="secondaryPreference", validation_alias="secondaryPreference"
+    )
+    tertiary_preference: Optional[ColorGroupPreference] = Field(
+        None, serialization_alias="tertiaryPreference", validation_alias="tertiaryPreference"
+    )
 
     @model_validator(mode="after")
     def check_optional_preferences_order(self):
@@ -337,30 +370,32 @@ class PreferredColorGroupListEntry(BaseModel):
 class PrefixListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    ip_prefix: IPv4Network = Field(alias="ipPrefix")
-    ge: Optional[str]
-    le: Optional[str]
+    ip_prefix: IPv4Network = Field(serialization_alias="ipPrefix", validation_alias="ipPrefix")
+    ge: Optional[str] = None
+    le: Optional[str] = None
 
-    @field_validator("ge", "le")
+    @field_validator("ge", "le", check_fields=False)
     @classmethod
-    def check_ge_and_le(cls, ge_le_str: str):
-        ge_le = int(ge_le_str)
-        if ge_le < 0 or ge_le > 32:
-            raise ValueError("ge,le should be in range 0-32")
+    def check_ge_and_le(cls, ge_le_str: Optional[str]):
+        if ge_le_str is not None:
+            ge_le = int(ge_le_str)
+            if ge_le < 0 or ge_le > 32:
+                raise ValueError("ge, le should be in range 0-32")
         return ge_le_str
 
 
 class IPv6PrefixListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    ipv6_prefix: IPv6Network = Field(alias="ipv6Prefix")
-    ge: Optional[str]
-    le: Optional[str]
+    ipv6_prefix: IPv6Network = Field(serialization_alias="ipv6Prefix", validation_alias="ipv6Prefix")
+    ge: Optional[str] = None
+    le: Optional[str] = None
 
-    @field_validator("ge", "le")
+    @field_validator("ge", "le", check_fields=False)
     @classmethod
-    def check_ge_and_le(cls, ge_le_str: str):
-        ge_le = int(ge_le_str)
-        if ge_le < 0 or ge_le > 128:
-            raise ValueError("ge,le should be in range 0-128")
+    def check_ge_and_le(cls, ge_le_str: Optional[str]):
+        if ge_le_str is not None:
+            ge_le = int(ge_le_str)
+            if ge_le < 0 or ge_le > 128:
+                raise ValueError("ge, le should be in range 0-128")
         return ge_le_str
