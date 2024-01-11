@@ -117,27 +117,26 @@ class AlarmData(DataclassBase):
         return result
 
 
-@define
-class Device(DataclassBase):
+class Device(BaseModel):
     uuid: str
-    personality: Personality = field(converter=Personality)
-    id: str = field(metadata={FIELD_NAME: "deviceId"})
-    hostname: str = field(metadata={FIELD_NAME: "host-name"})
-    reachability: Reachability = field(converter=Reachability)
-    local_system_ip: str = field(metadata={FIELD_NAME: "local-system-ip"})
-    status: Optional[str] = field(default=None)
-    memUsage: Optional[float] = field(default=None)
-    mem_state: Optional[str] = field(default=None, metadata={FIELD_NAME: "memState"})
-    cpu_state: Optional[str] = field(default=None, metadata={FIELD_NAME: "cpuState"})
-    cpu_load: Optional[float] = field(default=None, metadata={FIELD_NAME: "cpuLoad"})
-    state_description: Optional[str] = field(default=None)
-    connected_vManages: List[str] = field(factory=list, metadata={FIELD_NAME: "connectedVManages"})
-    model: Optional[str] = field(default=None, metadata={FIELD_NAME: "device-model"})
-    board_serial: Optional[str] = field(default=None, metadata={FIELD_NAME: "board-serial"})
-    vedgeCertificateState: Optional[str] = field(default=None, metadata={FIELD_NAME: "vedgeCertificateState"})  # TODO
-    chasis_number: Optional[str] = field(default=None, metadata={FIELD_NAME: "chasisNumber"})
-    site_id: Optional[str] = field(default=None, metadata={FIELD_NAME: "site-id"})
-    site_name: Optional[str] = field(default=None, metadata={FIELD_NAME: "site-name"})
+    personality: Personality
+    id: str = Field(..., alias="deviceId")
+    hostname: Optional[str] = Field(None, alias="host-name")
+    reachability: Optional[Reachability] = None
+    local_system_ip: Optional[str] = Field(None, alias="local-system-ip")
+    status: Optional[str] = None
+    memUsage: Optional[float] = None
+    mem_state: Optional[str] = Field(None, alias="memState")
+    cpu_state: Optional[str] = Field(None, alias="cpuState")
+    cpu_load: Optional[float] = Field(None, alias="cpuLoad")
+    state_description: Optional[str] = None
+    connected_vManages: List[str] = []
+    model: Optional[str] = Field(None, alias="device-model")
+    board_serial: Optional[str] = Field(None, alias="board-serial")
+    vedgeCertificateState: Optional[str] = Field(None, alias="vedgeCertificateState")  # TODO
+    chasis_number: Optional[str] = Field(None, alias="chasisNumber")
+    site_id: Optional[str] = Field(None, alias="site-id")
+    site_name: Optional[str] = Field(None, alias="site-name")
 
     @property
     def is_reachable(self) -> bool:
