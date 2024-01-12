@@ -3,10 +3,10 @@ from typing import List, Optional, Protocol
 
 from pydantic import BaseModel, Field
 
-from vmngclient.models.policy.lists import AllPolicyLists
+from vmngclient.models.policy.lists import AnyPolicyList
 from vmngclient.typed_list import DataSequence
 
-PolicyList = AllPolicyLists
+PolicyList = AnyPolicyList
 
 
 class InfoTag(BaseModel):

@@ -89,4 +89,11 @@ class TLOCColorEnum(str, Enum):
     PRIVATE6 = "private6"
 
 
+class WellKnownBGPCommunitiesEnum(str, Enum):
+    INTERNET = "internet"
+    LOCAL_AS = "local-as"
+    NO_ADVERTISE = "no-advertise"
+    NO_EXPORT = "no-export"
+
+
 UUID = str

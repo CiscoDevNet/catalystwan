@@ -38,6 +38,7 @@ from vmngclient.endpoints.configuration.policy.list.port import ConfigurationPol
 from vmngclient.endpoints.configuration.policy.list.preferred_color_group import ConfigurationPreferredColorGroupList
 from vmngclient.endpoints.configuration.policy.list.prefix import ConfigurationPolicyPrefixList
 from vmngclient.endpoints.configuration.policy.list.protocol_name import ConfigurationPolicyProtocolNameList
+from vmngclient.endpoints.configuration.policy.list.region import ConfigurationPolicyRegionList
 from vmngclient.endpoints.configuration.policy.list.site import ConfigurationPolicySiteList
 from vmngclient.endpoints.configuration.policy.list.sla import ConfigurationPolicySLAClassList
 from vmngclient.endpoints.configuration.policy.list.tloc import ConfigurationPolicyTLOCList
@@ -96,6 +97,7 @@ class ConfigurationPolicyListContainer:
         self.preferred_color_group = ConfigurationPreferredColorGroupList(session)
         self.prefix = ConfigurationPolicyPrefixList(session)
         self.protocol_name = ConfigurationPolicyProtocolNameList(session)
+        self.region = ConfigurationPolicyRegionList(session)
         self.site = ConfigurationPolicySiteList(session)
         self.sla = ConfigurationPolicySLAClassList(session)
         self.tloc = ConfigurationPolicyTLOCList(session)
