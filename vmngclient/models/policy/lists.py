@@ -28,6 +28,7 @@ from vmngclient.models.policy.lists_entries import (
     PreferredColorGroupListEntry,
     PrefixListEntry,
     ProtocolNameListEntry,
+    RegionListEntry,
     SiteListEntry,
     SLAClassListEntry,
     TLOCListEntry,
@@ -295,6 +296,19 @@ class IPv6PrefixList(PolicyListBase):
     entries: List[IPv6PrefixListEntry] = []
 
 
+class RegionList(PolicyListBase):
+    type: Literal["region"] = "region"
+    entries: List[RegionListEntry] = []
+
+    def add_regions(self, regions: Set[int]):
+        for region in regions:
+            self._add_entry(RegionListEntry(region_id=str(region)))
+
+    def add_region_range(self, region_range: Tuple[int, int]):
+        entry = RegionListEntry(region_id=f"{region_range[0]}-{region_range[1]}")
+        self._add_entry(entry)
+
+
 AnyPolicyList = Annotated[
     Union[
         AppList,
@@ -318,6 +332,7 @@ AnyPolicyList = Annotated[
         PreferredColorGroupList,
         PrefixList,
         ProtocolNameList,
+        RegionList,
         SiteList,
         SLAClassList,
         TLOCList,

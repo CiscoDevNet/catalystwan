@@ -444,3 +444,22 @@ class IPv6PrefixListEntry(BaseModel):
             if ge_le < 0 or ge_le > 128:
                 raise ValueError("ge, le should be in range 0-128")
         return ge_le_str
+
+
+class RegionListEntry(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    region_id: str = Field(serialization_alias="regionId", validation_alias="regionId")
+
+    @field_validator("region_id")
+    @classmethod
+    def check_region_id(cls, region_id_str: str):
+        regions = [int(region_id) for region_id in region_id_str.split("-")]
+        if len(regions) > 2:
+            raise ValueError("region_id range should consist two integers separated by hyphen")
+        for vpn in regions:
+            if vpn < 0 or vpn > 63:
+                raise ValueError("region_id should be in range 0-63")
+        if len(regions) == 2 and regions[0] >= regions[1]:
+            raise ValueError("Second region in range should be greater than first")
+        return region_id_str

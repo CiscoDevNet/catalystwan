@@ -81,6 +81,7 @@ from vmngclient.endpoints.configuration.policy.list.protocol_name import (
     ConfigurationPolicyProtocolNameList,
     ProtocolNameListInfo,
 )
+from vmngclient.endpoints.configuration.policy.list.region import ConfigurationPolicyRegionList, RegionListInfo
 from vmngclient.endpoints.configuration.policy.list.site import ConfigurationPolicySiteList, SiteListInfo
 from vmngclient.endpoints.configuration.policy.list.sla import ConfigurationPolicySLAClassList, SLAClassListInfo
 from vmngclient.endpoints.configuration.policy.list.tloc import ConfigurationPolicyTLOCList, TLOCListInfo
@@ -130,6 +131,7 @@ from vmngclient.models.policy.lists import (
     PreferredColorGroupList,
     PrefixList,
     ProtocolNameList,
+    RegionList,
     SiteList,
     SLAClassList,
     TLOCList,
@@ -175,6 +177,7 @@ POLICY_LIST_ENDPOINTS_MAP: Mapping[type, type] = {
     PreferredColorGroupList: ConfigurationPreferredColorGroupList,
     PrefixList: ConfigurationPolicyPrefixList,
     ProtocolNameList: ConfigurationPolicyProtocolNameList,
+    RegionList: ConfigurationPolicyRegionList,
     SiteList: ConfigurationPolicySiteList,
     SLAClassList: ConfigurationPolicySLAClassList,
     TLOCList: ConfigurationPolicyTLOCList,
@@ -416,6 +419,10 @@ class PolicyListsAPI:
         ...
 
     @overload
+    def get(self, type: Type[RegionList]) -> DataSequence[RegionListInfo]:
+        ...
+
+    @overload
     def get(self, type: Type[SiteList]) -> DataSequence[SiteListInfo]:
         ...
 
@@ -527,6 +534,10 @@ class PolicyListsAPI:
 
     @overload
     def get(self, type: Type[ProtocolNameList], id: str) -> ProtocolNameListInfo:
+        ...
+
+    @overload
+    def get(self, type: Type[RegionList], id: str) -> RegionListInfo:
         ...
 
     @overload
