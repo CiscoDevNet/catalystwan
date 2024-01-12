@@ -108,7 +108,7 @@ from vmngclient.models.policy.definitions.rule_set import RuleSet
 from vmngclient.models.policy.definitions.security_group import SecurityGroup
 from vmngclient.models.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy
 from vmngclient.models.policy.lists import (
-    AllPolicyLists,
+    AnyPolicyList,
     AppList,
     AppProbeClassList,
     ASPathList,
@@ -193,7 +193,7 @@ POLICY_DEFINITION_ENDPOINTS_MAP: Mapping[type, type] = {
     RewritePolicy: ConfigurationPolicyRewriteRuleDefinition,
 }
 
-SupportedPolicyDefinitions = Union[RuleSet, SecurityGroup, ZoneBasedFWPolicy, TrafficDataPolicy, QoSMap, RewritePolicy]
+AnyPolicyDefinition = Union[RuleSet, SecurityGroup, ZoneBasedFWPolicy, TrafficDataPolicy, QoSMap, RewritePolicy]
 
 
 class CentralizedPolicyAPI:
@@ -319,15 +319,15 @@ class PolicyListsAPI:
             raise TypeError(f"Unsupported policy list type: {payload_type}")
         return endpoints_class(self._session)
 
-    def create(self, policy_list: AllPolicyLists) -> str:
+    def create(self, policy_list: AnyPolicyList) -> str:
         endpoints = self.__get_list_endpoints_instance(type(policy_list))
         return endpoints.create_policy_list(payload=policy_list).list_id
 
-    def edit(self, id: str, policy_list: AllPolicyLists) -> None:
+    def edit(self, id: str, policy_list: AnyPolicyList) -> None:
         endpoints = self.__get_list_endpoints_instance(type(policy_list))
         endpoints.edit_policy_list(id=id, payload=policy_list)
 
-    def delete(self, type: Type[AllPolicyLists], id: str) -> None:
+    def delete(self, type: Type[AnyPolicyList], id: str) -> None:
         endpoints = self.__get_list_endpoints_instance(type)
         endpoints.delete_policy_list(id=id)
 
@@ -557,7 +557,7 @@ class PolicyListsAPI:
     def get(self, type: Type[ZoneList], id: str) -> ZoneListInfo:
         ...
 
-    def get(self, type: Type[AllPolicyLists], id: Optional[str] = None) -> Any:
+    def get(self, type: Type[AnyPolicyList], id: Optional[str] = None) -> Any:
         endpoints = self.__get_list_endpoints_instance(type)
         if id is not None:
             return endpoints.get_lists_by_id(id=id)
@@ -574,15 +574,15 @@ class PolicyDefinitionsAPI:
             raise TypeError(f"Unsupported policy definition type: {payload_type}")
         return endpoints_class(self._session)
 
-    def create(self, policy_definition: SupportedPolicyDefinitions) -> str:
+    def create(self, policy_definition: AnyPolicyDefinition) -> str:
         endpoints = self.__get_definition_endpoints_instance(type(policy_definition))
         return endpoints.create_policy_definition(payload=policy_definition).definition_id
 
-    def edit(self, id: str, policy_definition: SupportedPolicyDefinitions) -> PolicyDefinitionEditResponse:
+    def edit(self, id: str, policy_definition: AnyPolicyDefinition) -> PolicyDefinitionEditResponse:
         endpoints = self.__get_definition_endpoints_instance(type(policy_definition))
         return endpoints.edit_policy_definition(id=id, payload=policy_definition)
 
-    def delete(self, type: Type[SupportedPolicyDefinitions], id: str) -> None:
+    def delete(self, type: Type[AnyPolicyDefinition], id: str) -> None:
         endpoints = self.__get_definition_endpoints_instance(type)
         endpoints.delete_policy_definition(id=id)
 
@@ -636,7 +636,7 @@ class PolicyDefinitionsAPI:
     def get(self, type: Type[RewritePolicy], id: str) -> RewritePolicyInfo:
         ...
 
-    def get(self, type: Type[SupportedPolicyDefinitions], id: Optional[str] = None) -> Any:
+    def get(self, type: Type[AnyPolicyDefinition], id: Optional[str] = None) -> Any:
         endpoints = self.__get_definition_endpoints_instance(type)
         if id is not None:
             return endpoints.get_policy_definition(id=id)

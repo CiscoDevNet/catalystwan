@@ -1,4 +1,4 @@
-from ipaddress import IPv4Network, IPv6Network
+from ipaddress import IPv4Address, IPv4Network, IPv6Network
 from typing import Any, List, Literal, Optional, Set, Tuple, Union
 
 from pydantic import BaseModel, Field
@@ -14,6 +14,7 @@ from vmngclient.models.policy.lists_entries import (
     CommunityListEntry,
     DataIPv6PrefixListEntry,
     DataPrefixListEntry,
+    EncapEnum,
     FQDNListEntry,
     GeoLocationListEntry,
     IPSSignatureListEntry,
@@ -44,9 +45,10 @@ class PolicyListBase(BaseModel):
     description: Optional[str] = "Desc Not Required"
     entries: List[Any]
 
-    def _add_entry(self, entry: Any, only_single: bool = False) -> None:
-        if self.entries and only_single:
+    def _add_entry(self, entry: Any, single: bool = False) -> None:
+        if self.entries and single:
             self.entries[0] = entry
+            del self.entries[1:]
         else:
             self.entries.append(entry)
 
@@ -193,7 +195,7 @@ class PolicerList(PolicyListBase):
     def police(self, burst: int, rate: int, exceed: PolicerExceedAction = PolicerExceedAction.DROP) -> None:
         # Policer list must have only single entry!
         entry = PolicerListEntry(burst=str(burst), exceed=exceed, rate=str(rate))
-        self._add_entry(entry, only_single=True)
+        self._add_entry(entry, single=True)
 
 
 class ASPathList(PolicyListBase):
@@ -205,10 +207,10 @@ class ClassMapList(PolicyListBase):
     type: Literal["class"] = "class"
     entries: List[ClassMapListEntry] = []
 
-    def set_queue(self, queue: int) -> None:
+    def assign_queue(self, queue: int) -> None:
         # Class map list must have only one entry!
         entry = ClassMapListEntry(queue=str(queue))
-        self._add_entry(entry, only_single=True)
+        self._add_entry(entry, single=True)
 
 
 class MirrorList(PolicyListBase):
@@ -220,10 +222,10 @@ class AppProbeClassList(PolicyListBase):
     type: Literal["appProbe"] = "appProbe"
     entries: List[AppProbeClassListEntry] = []
 
-    def assign_forwarding_class(self, forwarding_class: str) -> AppProbeClassListEntry:
+    def assign_forwarding_class(self, name: str) -> AppProbeClassListEntry:
         # App probe class list must have only one entry!
-        entry = AppProbeClassListEntry(forwarding_class=forwarding_class)
-        self._add_entry(entry, only_single=True)
+        entry = AppProbeClassListEntry(forwarding_class=name)
+        self._add_entry(entry, single=True)
         return entry
 
 
@@ -231,10 +233,46 @@ class SLAClassList(PolicyListBase):
     type: Literal["sla"] = "sla"
     entries: List[SLAClassListEntry] = []
 
+    def assign_app_probe_class(
+        self,
+        app_probe_class_id: str,
+        latency: Optional[int] = None,
+        loss: Optional[int] = None,
+        jitter: Optional[int] = None,
+    ) -> SLAClassListEntry:
+        # SLA class list must have only one entry!
+        _latency = str(latency) if latency is not None else None
+        _loss = str(loss) if loss is not None else None
+        _jitter = str(jitter) if jitter is not None else None
+        entry = SLAClassListEntry(latency=_latency, loss=_loss, jitter=_jitter, app_probe_class=app_probe_class_id)
+        self._add_entry(entry, single=True)
+        return entry
+
+    def add_fallback_jitter_criteria(self, jitter_variance: int) -> None:
+        if not self.entries:
+            raise ValueError("Assign app probe class before configuring best fallback tunnel")
+        self.entries[0].add_fallback_jitter_criteria(jitter_variance)
+
+    def add_fallback_latency_criteria(self, latency_variance: int) -> None:
+        if not self.entries:
+            raise ValueError("Assign app probe class before configuring best fallback tunnel")
+        self.entries[0].add_fallback_latency_criteria(latency_variance)
+
+    def add_fallback_loss_criteria(self, loss_variance: int) -> None:
+        if not self.entries:
+            raise ValueError("Assign app probe class before configuring best fallback tunnel")
+        self.entries[0].add_fallback_loss_criteria(loss_variance)
+
 
 class TLOCList(PolicyListBase):
     type: Literal["tloc"] = "tloc"
     entries: List[TLOCListEntry] = []
+
+    def add_tloc(
+        self, tloc: IPv4Address, color: TLOCColorEnum, encap: EncapEnum, preference: Optional[int] = None
+    ) -> None:
+        _preference = str(preference) if preference is not None else None
+        self.entries.append(TLOCListEntry(tloc=tloc, color=color, encap=encap, preference=_preference))
 
 
 class PreferredColorGroupList(PolicyListBase):
@@ -257,7 +295,7 @@ class IPv6PrefixList(PolicyListBase):
     entries: List[IPv6PrefixListEntry] = []
 
 
-AllPolicyLists = Annotated[
+AnyPolicyList = Annotated[
     Union[
         AppList,
         AppProbeClassList,

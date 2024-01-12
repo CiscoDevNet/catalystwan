@@ -1,6 +1,6 @@
 from enum import Enum
 from ipaddress import IPv4Address, IPv4Network, IPv6Network
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, field_validator, model_validator
 
@@ -61,23 +61,24 @@ class FallbackBestTunnel(BaseModel):
 
     criteria: str
     jitter_variance: Optional[str] = Field(
-        None,
+        default=None,
         serialization_alias="jitterVariance",
         validation_alias="jitterVariance",
         description="jitter variance in ms",
     )
     latency_variance: Optional[str] = Field(
-        None,
+        default=None,
         serialization_alias="latencyVariance",
         validation_alias="latencyVariance",
         description="latency variance in ms",
     )
     loss_variance: Optional[str] = Field(
-        None,
+        default=None,
         serialization_alias="lossVariance",
         validation_alias="lossVariance",
         description="loss variance as percentage",
     )
+    _criteria_priority: List[Literal["jitter", "latency", "loss"]] = []
 
     # validators
     _jitter_validator = field_validator("jitter_variance")(check_jitter_ms)  # type: ignore[type-var]
@@ -95,12 +96,37 @@ class FallbackBestTunnel(BaseModel):
             expected_criteria.add("loss")
         if len(expected_criteria) < 1:
             raise ValueError("At least one variance type needs to be present")
-        observed_criteria = set(str(self.criteria).split("-"))
+        self._criteria_priority = str(self.criteria).split("-")
+        observed_criteria = set(self._criteria_priority)
         if expected_criteria != observed_criteria:
             if len(expected_criteria) == 1:
                 raise ValueError(f"Criteria must contain: {expected_criteria}")
             raise ValueError(f"Criteria must contain: {expected_criteria} separated by hyphen")
         return self
+
+    def _update_criteria_field(self) -> None:
+        self.criteria = f"{'-'.join(self._criteria_priority)}"
+
+    def add_jitter_criteria(self, jitter_variance: int) -> None:
+        if self.jitter_variance is None:
+            self._criteria_priority.append("jitter")
+        self.jitter_variance = str(jitter_variance)
+        self._update_criteria_field()
+        self.check_criteria
+
+    def add_latency_criteria(self, latency_variance: int) -> None:
+        if self.latency_variance is None:
+            self._criteria_priority.append("latency")
+        self.latency_variance = str(latency_variance)
+        self._update_criteria_field()
+        self.check_criteria
+
+    def add_loss_criteria(self, loss_variance: int) -> None:
+        if self.loss_variance is None:
+            self._criteria_priority.append("loss")
+        self.loss_variance = str(loss_variance)
+        self._update_criteria_field()
+        self.check_criteria
 
 
 class DataPrefixListEntry(BaseModel):
@@ -317,7 +343,7 @@ class SLAClassListEntry(BaseModel):
     jitter: Optional[str] = None
     app_probe_class: Optional[str] = Field(serialization_alias="appProbeClass", validation_alias="appProbeClass")
     fallback_best_tunnel: Optional[FallbackBestTunnel] = Field(
-        None, serialization_alias="fallbackBestTunnel", validation_alias="fallbackBestTunnel"
+        default=None, serialization_alias="fallbackBestTunnel", validation_alias="fallbackBestTunnel"
     )
 
     # validators
@@ -328,23 +354,42 @@ class SLAClassListEntry(BaseModel):
     @model_validator(mode="after")
     def check_at_least_one_criteria_is_set(self):
         if not any([self.latency, self.loss, self.jitter]):
-            raise ValueError("At leas one of jitter, loss or latency entries must be set")
+            raise ValueError("At least one of: jitter, loss or latency entries must be set")
         return self
+
+    def add_fallback_jitter_criteria(self, jitter_variance: int) -> None:
+        if self.fallback_best_tunnel:
+            self.fallback_best_tunnel.add_jitter_criteria(jitter_variance)
+        else:
+            self.fallback_best_tunnel = FallbackBestTunnel(criteria="jitter", jitter_variance=str(jitter_variance))
+
+    def add_fallback_latency_criteria(self, latency_variance: int) -> None:
+        if self.fallback_best_tunnel:
+            self.fallback_best_tunnel.add_latency_criteria(latency_variance)
+        else:
+            self.fallback_best_tunnel = FallbackBestTunnel(criteria="latency", latency_variance=str(latency_variance))
+
+    def add_fallback_loss_criteria(self, loss_variance: int) -> None:
+        if self.fallback_best_tunnel:
+            self.fallback_best_tunnel.add_loss_criteria(loss_variance)
+        else:
+            self.fallback_best_tunnel = FallbackBestTunnel(criteria="loss", loss_variance=str(loss_variance))
 
 
 class TLOCListEntry(BaseModel):
     tloc: IPv4Address
-    color: str
+    color: TLOCColorEnum
     encap: EncapEnum
-    preference: str
+    preference: Optional[str] = None
 
     @field_validator("preference")
     @classmethod
     def check_preference(cls, preference_str: str):
-        preference = int(preference_str)
-        if preference < 0 or preference > 4294967295:
-            raise ValueError("preference should be in range 0-4294967295")
-        return preference_str
+        if preference_str is not None:
+            preference = int(preference_str)
+            if preference < 0 or preference > 4294967295:
+                raise ValueError("preference should be in range 0-4294967295")
+            return preference_str
 
 
 class PreferredColorGroupListEntry(BaseModel):
@@ -354,10 +399,10 @@ class PreferredColorGroupListEntry(BaseModel):
         serialization_alias="primaryPreference", validation_alias="primaryPreference"
     )
     secondary_preference: Optional[ColorGroupPreference] = Field(
-        None, serialization_alias="secondaryPreference", validation_alias="secondaryPreference"
+        default=None, serialization_alias="secondaryPreference", validation_alias="secondaryPreference"
     )
     tertiary_preference: Optional[ColorGroupPreference] = Field(
-        None, serialization_alias="tertiaryPreference", validation_alias="tertiaryPreference"
+        default=None, serialization_alias="tertiaryPreference", validation_alias="tertiaryPreference"
     )
 
     @model_validator(mode="after")

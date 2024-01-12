@@ -69,7 +69,7 @@ def run_demo(args: CmdArguments):
             ["VOICE", "CRITICAL_DATA", "BULK", "DEFAULT", "INTERACTIVE_VIDEO", "CONTROL_SIGNALING"]
         ):
             class_map = ClassMapList(name=name)
-            class_map.set_queue(i)
+            class_map.assign_queue(i)
             pol_dict[name] = api.lists.create(class_map)
 
         """ II.A. Configure Localized Policy: Enable Cloud QoS

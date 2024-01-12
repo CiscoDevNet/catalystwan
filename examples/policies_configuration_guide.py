@@ -25,7 +25,7 @@ python examples/policies_configuration_guide.py 127.0.0.1 433 admin p4s$w0rD
 import logging
 import sys
 from dataclasses import dataclass
-from ipaddress import IPv4Network, IPv6Network
+from ipaddress import IPv4Address, IPv4Network, IPv6Network
 from typing import List, Tuple
 
 from vmngclient.api.policy_api import PolicyAPI
@@ -59,6 +59,7 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, str]]:
 
     color_list = ColorList(name="MyColors")
     color_list.add_color("biz-internet")
+    color_list.add_color("public-internet")
     color_list_id = api.lists.create(color_list)
     created_items.append((ColorList, color_list_id))
 
@@ -95,10 +96,10 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, str]]:
     # Configure Policer
     from vmngclient.models.policy.lists import PolicerList
 
-    policer_list = PolicerList(name="MyPolicers")
-    policer_list.police(2**17, 8, "remark")
-    policer_list_id = api.lists.create(policer_list)
-    created_items.append((PolicerList, policer_list_id))
+    policer = PolicerList(name="MyPolicer")
+    policer.police(2**17, 8, "remark")
+    policer_id = api.lists.create(policer)
+    created_items.append((PolicerList, policer_id))
 
     # Configure Prefix
     from vmngclient.models.policy.lists import PrefixList
@@ -121,19 +122,45 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, str]]:
     # Configure App Probe Class
     from vmngclient.models.policy.lists import AppProbeClassList, ClassMapList
 
-    class_map_list = ClassMapList(name="BulkClass")
-    class_map_list.set_queue(1)
-    class_map_list_id = api.lists.create(class_map_list)
-    created_items.append((ClassMapList, class_map_list_id))
+    class_map = ClassMapList(name="MyClassMap")
+    class_map.assign_queue(1)
+    class_map_id = api.lists.create(class_map)
+    created_items.append((ClassMapList, class_map_id))
 
-    app_probe_class_list = AppProbeClassList(name="MyAppProbeClasses")
-    app_probe_class_list.assign_forwarding_class("BulkClass").add_color_mapping("3g", 5)
-    app_probe_class_list_id = api.lists.create(app_probe_class_list)
-    created_items.append((AppProbeClassList, app_probe_class_list_id))
+    app_probe_class = AppProbeClassList(name="MyAppProbeClass")
+    app_probe_class.assign_forwarding_class("MyClassMap").add_color_mapping("3g", 5)
+    app_probe_class_id = api.lists.create(app_probe_class)
+    created_items.append((AppProbeClassList, app_probe_class_id))
 
     # Configure SLA Class
+    from vmngclient.models.policy.lists import SLAClassList
+
+    sla_class = SLAClassList(name="MySLAClass")
+    sla_class.assign_app_probe_class(app_probe_class_id, latency=10, loss=1, jitter=5)
+    sla_class.add_fallback_jitter_criteria(10)
+    sla_class.add_fallback_loss_criteria(5)
+    sla_class_id = api.lists.create(sla_class)
+    created_items.append((SLAClassList, sla_class_id))
+
     # Configure TLOC
+    from vmngclient.models.policy.lists import TLOCList
+
+    tloc_list = TLOCList(name="MyTLOCList")
+    tloc_list.add_tloc(IPv4Address("10.0.0.55"), color="blue", encap="gre")
+    tloc_list.add_tloc(IPv4Address("10.0.0.56"), color="silver", encap="ipsec", preference=5678)
+    tloc_list_id = api.lists.create(tloc_list)
+    created_items.append((TLOCList, tloc_list_id))
+
+    # Configure Region
     # Configure VPN
+    from vmngclient.models.policy.lists import VPNList
+
+    vpn_list = VPNList(name="MyVPNList")
+    vpn_list.add_vpns({100, 200})
+    vpn_list.add_vpn_range((1000, 2000))
+    vpn_list_id = api.lists.create(vpn_list)
+    created_items.append((VPNList, vpn_list_id))
+
     return created_items
 
 
@@ -146,7 +173,7 @@ def run_demo(args: CmdArguments):
         groups_of_iterest = configure_groups_of_interest(api)
         """Cleanup"""
         input("press enter to delete created items...")
-        for item in groups_of_iterest:
+        for item in reversed(groups_of_iterest):
             api.lists.delete(*item)
 
 
