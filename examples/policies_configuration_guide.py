@@ -152,6 +152,14 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, str]]:
     created_items.append((TLOCList, tloc_list_id))
 
     # Configure Region
+    from vmngclient.models.policy.lists import RegionList
+
+    region_list = RegionList(name="MyRegions")
+    region_list.add_regions({1, 2})
+    region_list.add_region_range((3, 6))
+    region_list_id = api.lists.create(region_list)
+    created_items.append((RegionList, region_list_id))
+
     # Configure VPN
     from vmngclient.models.policy.lists import VPNList
 
