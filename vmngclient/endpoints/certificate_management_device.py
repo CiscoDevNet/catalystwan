@@ -109,6 +109,10 @@ class SaveVedgeListResponse(BaseModel):
     id: str
 
 
+class SaveVsmartListResponse(BaseModel):  # TODO unify all process id responses
+    id: str
+
+
 class CertificateManagementDevice(APIEndpoints):
     @delete("/certificate/{uuid}")
     def delete_configuration(self, uuid: str) -> DeviceDeletionResponse:
@@ -124,4 +128,8 @@ class CertificateManagementDevice(APIEndpoints):
 
     @post("/certificate/vedge/list?action={action}")
     def send_to_controllers(self, action: str = "push") -> SaveVedgeListResponse:
+        ...
+
+    @post("/certificate/vsmart/list")
+    def send_to_vbond(self) -> SaveVsmartListResponse:
         ...

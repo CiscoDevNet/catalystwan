@@ -46,6 +46,7 @@ class DeviceDeletionResponse(BaseModel):
 
     local_delete_from_db: Optional[bool] = Field(default=None, alias="localDeleteFromDB")
     id: Optional[str] = Field(default=None)
+    status: Optional[str] = Field(default=None)
 
 
 class DeviceCategory(str, Enum):
@@ -65,8 +66,8 @@ class DeviceDetailsResponse(BaseModel):
     device_model: str = Field(alias="deviceModel")
     device_state: str = Field(alias="deviceState")
     validity: str
-    platform_family: str = Field(alias="platformFamily")
-    username: str
+    platform_family: Optional[str] = Field(default=None, alias="platformFamily")
+    username: Optional[str] = Field(default=None)
     device_csr: Optional[str] = Field(default=None, alias="deviceCSR")
     device_csr_common_name: Optional[str] = Field(default=None, alias="deviceCSRCommonName")
     root_cert_hash: Optional[str] = Field(default=None, alias="rootCertHash")
@@ -78,7 +79,7 @@ class DeviceDetailsResponse(BaseModel):
     request_token_id: Optional[str] = Field(default=None, alias="requestTokenID")
     expiration_date: str = Field(alias="expirationDate")
     expiration_date_long: Optional[int] = Field(default=None, alias="expirationDateLong")
-    device_ip: str = Field(alias="deviceIP")
+    device_ip: Optional[str] = Field(default=None, alias="deviceIP")
     activity: Optional[List[str]] = Field(default=None)
     state_vedge_list: Optional[str] = Field(default=None, alias="state_vedgeList")
     cert_install_status: Optional[str] = Field(default=None, alias="certInstallStatus")
@@ -88,7 +89,7 @@ class DeviceDetailsResponse(BaseModel):
     life_cycle_required: bool = Field(alias="lifeCycleRequired")
     hardware_cert_serial_number: str = Field(alias="hardwareCertSerialNumber")
     subject_serial_number: str = Field(alias="subjectSerialNumber")
-    resource_group: str = Field(alias="resourceGroup")
+    resource_group: Optional[str] = Field(default=None, alias="resourceGroup")
     id: str
     tags: Optional[List[str]] = Field(default=None)
     draft_mode: Optional[str] = Field(default=None, alias="draftMode")
@@ -134,6 +135,23 @@ class SerialFilePayload(CustomPayloadType):
         return PreparedPayload(files={"file": (Path(self.data.name).name, self.data)}, data=self.fields)
 
 
+class ConfigType(str, Enum):
+    CLOUDINIT = "cloudinit"
+    ENCODEDSTRING = "encodedstring"
+
+
+class GenerateBoostrapConfigurationQueryParams(BaseModel):
+    configtype: Optional[ConfigType] = Field(default=ConfigType.CLOUDINIT)
+    incl_def_root_cert: Optional[bool] = Field(default=False)
+    version: Optional[str] = Field(default="v1")
+
+
+class BoostrapConfiguration(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    bootstrap_config: Optional[str] = Field(default=None, alias="bootstrapConfig")
+
+
 class UploadSerialFileResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
@@ -173,4 +191,10 @@ class ConfigurationDeviceInventory(APIEndpoints):
 
     @post("/system/device/fileupload")
     def upload_wan_edge_list(self, payload: SerialFilePayload) -> UploadSerialFileResponse:
+        ...
+
+    @get("/system/device/bootstrap/device/{uuid}")
+    def generate_bootstrap_configuration(
+        self, uuid: str, params: GenerateBoostrapConfigurationQueryParams = GenerateBoostrapConfigurationQueryParams()
+    ) -> BoostrapConfiguration:
         ...
