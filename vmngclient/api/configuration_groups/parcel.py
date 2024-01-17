@@ -1,26 +1,13 @@
-from copy import deepcopy
 from enum import Enum
 from typing import Any, Generic, Optional, TypeVar
 
-from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny, model_validator
+from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny
 
 T = TypeVar("T")
 
 
 class Parcel(BaseModel):
     model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True, populate_by_name=True)
-
-    @model_validator(mode="before")
-    @classmethod
-    def validate_attributes(cls, data: Any):
-        copied_data = deepcopy(data)
-        supported_types = [str, int]
-
-        for key, value in data.items():
-            for t in supported_types:
-                if isinstance(value, t):
-                    copied_data[key] = Global[t](value=value)  # type: ignore
-        return copied_data
 
 
 class OptionType(str, Enum):
@@ -68,10 +55,6 @@ class Variable(ParcelValue):
 class Default(ParcelValue, Generic[T]):
     optionType: OptionType = OptionType.DEFAULT
     value: Any
-
-
-class DefaultWitoutValue(ParcelValue):
-    optionType: OptionType = OptionType.DEFAULT
 
 
 class RefId(BaseModel, Generic[T]):
