@@ -7,6 +7,7 @@ from vmngclient.endpoints.certificate_management_device import CertificateManage
 from vmngclient.endpoints.certificate_management_vmanage import CertificateManagementVManage
 from vmngclient.endpoints.client import Client
 from vmngclient.endpoints.cluster_management import ClusterManagement
+from vmngclient.endpoints.configuration.device.software_update import ConfigurationDeviceSoftwareUpdate
 from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition
 from vmngclient.endpoints.configuration.policy.definition.rewrite import ConfigurationPolicyRewriteRuleDefinition
 from vmngclient.endpoints.configuration.policy.definition.rule_set import ConfigurationPolicyRuleSetDefinition
@@ -49,10 +50,10 @@ from vmngclient.endpoints.configuration.policy.list.zone import ConfigurationPol
 from vmngclient.endpoints.configuration.policy.security_template import ConfigurationSecurityTemplatePolicy
 from vmngclient.endpoints.configuration.policy.vedge_template import ConfigurationVEdgeTemplatePolicy
 from vmngclient.endpoints.configuration.policy.vsmart_template import ConfigurationVSmartTemplatePolicy
+from vmngclient.endpoints.configuration.software_actions import ConfigurationSoftwareActions
 from vmngclient.endpoints.configuration_dashboard_status import ConfigurationDashboardStatus
 from vmngclient.endpoints.configuration_device_actions import ConfigurationDeviceActions
 from vmngclient.endpoints.configuration_device_inventory import ConfigurationDeviceInventory
-from vmngclient.endpoints.configuration_device_software_update import ConfigurationDeviceSoftwareUpdate
 from vmngclient.endpoints.configuration_device_template import ConfigurationDeviceTemplate
 from vmngclient.endpoints.configuration_feature_profile import (
     ConfigurationFeatureProfile,
@@ -60,7 +61,6 @@ from vmngclient.endpoints.configuration_feature_profile import (
 )
 from vmngclient.endpoints.configuration_group import ConfigurationGroup
 from vmngclient.endpoints.configuration_settings import ConfigurationSettings
-from vmngclient.endpoints.configuration_software_actions import ConfigurationSoftwareActions
 from vmngclient.endpoints.misc import MiscellaneousEndpoints
 from vmngclient.endpoints.monitoring_device_details import MonitoringDeviceDetails
 from vmngclient.endpoints.monitoring_status import MonitoringStatus
