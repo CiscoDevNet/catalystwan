@@ -60,6 +60,7 @@ from vmngclient.endpoints.configuration_feature_profile import (
 )
 from vmngclient.endpoints.configuration_group import ConfigurationGroup
 from vmngclient.endpoints.configuration_settings import ConfigurationSettings
+from vmngclient.endpoints.configuration_software_actions import ConfigurationSoftwareActions
 from vmngclient.endpoints.misc import MiscellaneousEndpoints
 from vmngclient.endpoints.monitoring_device_details import MonitoringDeviceDetails
 from vmngclient.endpoints.monitoring_status import MonitoringStatus
@@ -164,6 +165,7 @@ class APIEndpointContainter:
         self.configuration_device_software_update = ConfigurationDeviceSoftwareUpdate(session)
         self.configuration_device_template = ConfigurationDeviceTemplate(session)
         self.configuration_settings = ConfigurationSettings(session)
+        self.configuration_software_actions = ConfigurationSoftwareActions(session)
         self.monitoring_device_details = MonitoringDeviceDetails(session)
         self.monitoring_status = MonitoringStatus(session)
         self.sdavc_cloud_connector = SDAVCCloudConnector(session)
