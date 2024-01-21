@@ -11,7 +11,6 @@ from vmngclient.models.policy.policy_definition import (
     BaseAction,
     CFlowDAction,
     CountAction,
-    DefinitionSequenceBase,
     DefinitionWithSequencesCommonBase,
     DestinationDataIPv6PrefixListEntry,
     DestinationDataPrefixListEntry,
@@ -43,12 +42,12 @@ from vmngclient.models.policy.policy_definition import (
     PLPEntryValues,
     PolicerListEntry,
     PolicyDefinitionBase,
+    PolicyDefinitionSequenceBase,
     PrefferedColorGroupListEntry,
     ProtocolEntry,
     RedirectDNSAction,
     SecureInternetGatewayAction,
     SequenceIpType,
-    SequenceType,
     ServiceChainEntry,
     ServiceChainEntryValue,
     ServiceNodeGroupAction,
@@ -102,91 +101,93 @@ class TrafficDataPolicySequenceMatch(Match):
     entries: List[TrafficDataPolicySequenceEntry] = []
 
 
-class TrafficDataPolicySequence(DefinitionSequenceBase):
-    sequence_type: SequenceType = Field(default=SequenceType.DATA, alias="sequenceType")
+class TrafficDataPolicySequence(PolicyDefinitionSequenceBase):
+    sequence_type: Literal["data"] = Field(
+        default="data", serialization_alias="sequenceType", validation_alias="sequenceType"
+    )
     match: TrafficDataPolicySequenceMatch = TrafficDataPolicySequenceMatch()
     actions: List[TrafficDataPolicySequenceActions] = []
     model_config = ConfigDict(populate_by_name=True)
 
     def match_app_list(self, app_list_id: str) -> None:
-        self.insert_match(AppListEntry(ref=app_list_id))
+        self._insert_match(AppListEntry(ref=app_list_id))
 
     def match_dns_app_list(self, dns_app_list_id: str) -> None:
-        self.insert_match(DNSAppListEntry(ref=dns_app_list_id))
+        self._insert_match(DNSAppListEntry(ref=dns_app_list_id))
 
     def match_dns_request(self) -> None:
-        self.insert_match(DNSEntry(value=DNSEntryValues.REQUEST))
+        self._insert_match(DNSEntry(value=DNSEntryValues.REQUEST))
 
     def match_dns_response(self) -> None:
-        self.insert_match(DNSEntry(value=DNSEntryValues.RESPONSE))
+        self._insert_match(DNSEntry(value=DNSEntryValues.RESPONSE))
 
     def match_dscp(self, dscp: int) -> None:
-        self.insert_match(DSCPEntry(value=str(dscp)))
+        self._insert_match(DSCPEntry(value=str(dscp)))
 
     def match_packet_lengths(self, packet_lengths: Tuple[int, int]) -> None:
-        self.insert_match(PacketLengthEntry.from_range(packet_lengths))
+        self._insert_match(PacketLengthEntry.from_range(packet_lengths))
 
     def match_low_plp(self) -> None:
-        self.insert_match(PLPEntry(value=PLPEntryValues.LOW))
+        self._insert_match(PLPEntry(value=PLPEntryValues.LOW))
 
     def match_high_plp(self) -> None:
-        self.insert_match(PLPEntry(value=PLPEntryValues.HIGH))
+        self._insert_match(PLPEntry(value=PLPEntryValues.HIGH))
 
     def match_protocols(self, protocols: Set[int]) -> None:
-        self.insert_match(ProtocolEntry.from_protocol_set(protocols))
+        self._insert_match(ProtocolEntry.from_protocol_set(protocols))
 
     def match_source_data_prefix_list(self, data_prefix_list_id: str) -> None:
-        self.insert_match(SourceDataPrefixListEntry(ref=data_prefix_list_id))
+        self._insert_match(SourceDataPrefixListEntry(ref=data_prefix_list_id))
 
     def match_source_ip(self, networks: List[IPv4Network]) -> None:
-        self.insert_match(SourceIPEntry.from_ipv4_networks(networks))
+        self._insert_match(SourceIPEntry.from_ipv4_networks(networks))
 
     def match_source_port(self, ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> None:
-        self.insert_match(SourcePortEntry.from_port_set_and_ranges(ports, port_ranges))
+        self._insert_match(SourcePortEntry.from_port_set_and_ranges(ports, port_ranges))
 
     def match_destination_data_prefix_list(self, data_prefix_list_id: str) -> None:
-        self.insert_match(DestinationDataPrefixListEntry(ref=data_prefix_list_id))
+        self._insert_match(DestinationDataPrefixListEntry(ref=data_prefix_list_id))
 
     def match_destination_ip(self, networks: List[IPv4Network]) -> None:
-        self.insert_match(DestinationIPEntry.from_ipv4_networks(networks))
+        self._insert_match(DestinationIPEntry.from_ipv4_networks(networks))
 
     def match_primary_destination_region(self) -> None:
-        self.insert_match(DestinationRegionEntry(value=DestinationRegionEntryValues.PRIMARY))
+        self._insert_match(DestinationRegionEntry(value=DestinationRegionEntryValues.PRIMARY))
 
     def match_secondary_destination_region(self) -> None:
-        self.insert_match(DestinationRegionEntry(value=DestinationRegionEntryValues.SECONDARY))
+        self._insert_match(DestinationRegionEntry(value=DestinationRegionEntryValues.SECONDARY))
 
     def match_other_destination_region(self) -> None:
-        self.insert_match(DestinationRegionEntry(value=DestinationRegionEntryValues.OTHER))
+        self._insert_match(DestinationRegionEntry(value=DestinationRegionEntryValues.OTHER))
 
     def match_destination_ports(self, ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> None:
-        self.insert_match(DestinationPortEntry.from_port_set_and_ranges(ports, port_ranges))
+        self._insert_match(DestinationPortEntry.from_port_set_and_ranges(ports, port_ranges))
 
     def match_tcp(self) -> None:
-        self.insert_match(TCPEntry())
+        self._insert_match(TCPEntry())
 
     def match_traffic_to_access(self) -> None:
-        self.insert_match(TrafficToEntry(value=TrafficToEntryValues.ACCESS))
+        self._insert_match(TrafficToEntry(value=TrafficToEntryValues.ACCESS))
 
     def match_traffic_to_core(self) -> None:
-        self.insert_match(TrafficToEntry(value=TrafficToEntryValues.CORE))
+        self._insert_match(TrafficToEntry(value=TrafficToEntryValues.CORE))
 
     def match_traffic_to_service(self) -> None:
-        self.insert_match(TrafficToEntry(value=TrafficToEntryValues.SERVICE))
+        self._insert_match(TrafficToEntry(value=TrafficToEntryValues.SERVICE))
 
     def associate_count_action(self, counter_name: str) -> None:
-        self.insert_action(CountAction(parameter=counter_name))
+        self._insert_action(CountAction(parameter=counter_name))
 
     def associate_log_action(self) -> None:
-        self.insert_action(LogAction())
+        self._insert_action(LogAction())
 
     @accept_action
     def associate_dscp_action(self, dscp: int) -> None:
-        self.insert_action_in_set(DSCPEntry(value=str(dscp)))
+        self._insert_action_in_set(DSCPEntry(value=str(dscp)))
 
     @accept_action
     def associate_forwarding_class_action(self, fwclass: str) -> None:
-        self.insert_action_in_set(ForwardingClassEntry(value=fwclass))
+        self._insert_action_in_set(ForwardingClassEntry(value=fwclass))
 
     @accept_action
     def associate_local_tloc_action(self, color: TLOCColorEnum, encap: EncapEnum, restrict: bool = False) -> None:
@@ -197,17 +198,15 @@ class TrafficDataPolicySequence(DefinitionSequenceBase):
                 restrict="" if restrict else None,
             )
         )
-        self.insert_action_in_set(tloc_entry)
+        self._insert_action_in_set(tloc_entry)
 
     @accept_action
     def associate_preffered_color_group(self, color_group_list_id: str, restrict: bool = False) -> None:
-        self.insert_action_in_set(
-            PrefferedColorGroupListEntry(ref=color_group_list_id, color_restrict=restrict)  # type: ignore[call-arg]
-        )
+        self._insert_action_in_set(PrefferedColorGroupListEntry(ref=color_group_list_id, color_restrict=restrict))
 
     @accept_action
     def associate_cflowd_action(self) -> None:
-        self.insert_action(CFlowDAction())
+        self._insert_action(CFlowDAction())
 
     @overload
     def associate_nat_action(self, *, nat_pool: int) -> None:
@@ -223,16 +222,16 @@ class TrafficDataPolicySequence(DefinitionSequenceBase):
             nat_action = NATAction.from_nat_pool(nat_pool=nat_pool)
         else:
             nat_action = NATAction.from_nat_vpn(fallback=vpn_fallback, vpn=vpn)
-        self.insert_action(nat_action)
+        self._insert_action(nat_action)
 
     @accept_action
     def associate_next_hop_action(self, next_hop: IPv4Address, loose: bool = False) -> None:
-        self.insert_action_in_set(NextHopEntry(value=next_hop))
-        self.insert_action_in_set(NextHopLooseEntry(value="true" if loose else "false"))
+        self._insert_action_in_set(NextHopEntry(value=next_hop))
+        self._insert_action_in_set(NextHopLooseEntry(value="true" if loose else "false"))
 
     @accept_action
     def associate_policer_list_action(self, policer_list_id: str) -> None:
-        self.insert_action_in_set(PolicerListEntry(ref=policer_list_id))
+        self._insert_action_in_set(PolicerListEntry(ref=policer_list_id))
 
     @overload
     def associate_redirect_dns_action(self, *, ip: IPv4Address) -> None:
@@ -248,11 +247,11 @@ class TrafficDataPolicySequence(DefinitionSequenceBase):
             redirect_dns_action = RedirectDNSAction.from_ip_address(ip)
         else:
             redirect_dns_action = RedirectDNSAction.from_dns_type(dns_type)
-        self.insert_action(redirect_dns_action)
+        self._insert_action(redirect_dns_action)
 
     @accept_action
     def associate_local_service_chain_action(self, sc_type: str, vpn: int, restrict: bool = False) -> None:
-        self.insert_action_in_set(
+        self._insert_action_in_set(
             ServiceChainEntry(
                 value=ServiceChainEntryValue(
                     type=sc_type,
@@ -267,7 +266,7 @@ class TrafficDataPolicySequence(DefinitionSequenceBase):
     def associate_remote_service_chain_action(
         self, sc_type: str, vpn: int, ip: IPv4Address, color: TLOCColorEnum, encap: EncapEnum, restrict: bool = False
     ) -> None:
-        self.insert_action_in_set(
+        self._insert_action_in_set(
             ServiceChainEntry(
                 value=ServiceChainEntryValue(
                     type=sc_type,
@@ -287,36 +286,36 @@ class TrafficDataPolicySequence(DefinitionSequenceBase):
         self, tcp: bool = False, dre: bool = False, service_node_group: Optional[str] = None
     ) -> None:
         if tcp:
-            self.insert_action(TCPOptimizationAction())
+            self._insert_action(TCPOptimizationAction())
         else:
-            self.remove_action(TCPOptimizationAction().type)
+            self._remove_action(TCPOptimizationAction().type)
         if dre:
-            self.insert_action(DREOptimizationAction())
+            self._insert_action(DREOptimizationAction())
         else:
-            self.remove_action(DREOptimizationAction().type)
+            self._remove_action(DREOptimizationAction().type)
         if service_node_group is not None:
-            self.insert_action(ServiceNodeGroupAction(parameter=service_node_group))
+            self._insert_action(ServiceNodeGroupAction(parameter=service_node_group))
         else:
-            self.remove_action(ServiceNodeGroupAction().type)
+            self._remove_action(ServiceNodeGroupAction().type)
 
     @accept_action
     def associate_loss_correction_fec_action(self, adaptive: bool = False, threshold: Optional[int] = None) -> None:
-        self.remove_action(LossProtectionPacketDuplicationAction().type)
+        self._remove_action(LossProtectionPacketDuplicationAction().type)
         fec_type = LossProtectionEnum.FEC_ADAPTIVE if adaptive else LossProtectionEnum.FEC_ALWAYS
         fec_value = str(threshold) if adaptive and threshold is not None else None
-        self.insert_action(LossProtectionAction(parameter=fec_type))
-        self.insert_action(LossProtectionFECAction(parameter=fec_type, value=fec_value))
+        self._insert_action(LossProtectionAction(parameter=fec_type))
+        self._insert_action(LossProtectionFECAction(parameter=fec_type, value=fec_value))
 
     @accept_action
     def associate_loss_correction_packet_duplication_action(self) -> None:
-        self.remove_action(LossProtectionFECAction().type)
-        self.insert_action(LossProtectionAction(parameter=LossProtectionEnum.PACKET_DUPLICATION))
-        self.insert_action(LossProtectionPacketDuplicationAction())
+        self._remove_action(LossProtectionFECAction().type)
+        self._insert_action(LossProtectionAction(parameter=LossProtectionEnum.PACKET_DUPLICATION))
+        self._insert_action(LossProtectionPacketDuplicationAction())
 
     @accept_action
     def associate_vpn_action(self, vpn: int) -> None:
         # TLOC or Next Hop is mandatory when configuring VPN. Please populate Action > TLOC or Action > Next Hop
-        self.insert_action_in_set(VPNEntry(value=str(vpn)))
+        self._insert_action_in_set(VPNEntry(value=str(vpn)))
 
     @overload
     def associate_tloc_action(self, *, tloc_list_id: str) -> None:
@@ -330,9 +329,9 @@ class TrafficDataPolicySequence(DefinitionSequenceBase):
     def associate_tloc_action(self, *, tloc_list_id=None, ip=None, color=None, encap=None) -> None:
         # VPN is mandatory when configuring TLOC. Please populate Action > VPN.
         if tloc_list_id is not None:
-            self.insert_action_in_set(TLOCListEntry(ref=tloc_list_id))
+            self._insert_action_in_set(TLOCListEntry(ref=tloc_list_id))
         else:
-            self.insert_action_in_set(
+            self._insert_action_in_set(
                 TLOCEntry(
                     value=TLOCEntryValue(
                         ip=ip,
@@ -345,11 +344,11 @@ class TrafficDataPolicySequence(DefinitionSequenceBase):
     @accept_action
     def associate_secure_internet_gateway_action(self, fallback_to_routing: bool = False) -> None:
         # Secure Internet Gateway cannot be enabled with NAT Pool or NAT VPN or Next Hop.
-        self.insert_action(SecureInternetGatewayAction())
+        self._insert_action(SecureInternetGatewayAction())
         if fallback_to_routing:
-            self.insert_action(FallBackToRoutingAction())
+            self._insert_action(FallBackToRoutingAction())
         else:
-            self.remove_action(FallBackToRoutingAction().type)
+            self._remove_action(FallBackToRoutingAction().type)
 
 
 class TrafficDataPolicy(TrafficDataPolicyHeader, DefinitionWithSequencesCommonBase):
@@ -359,8 +358,7 @@ class TrafficDataPolicy(TrafficDataPolicyHeader, DefinitionWithSequencesCommonBa
     def add_ipv4_sequence(
         self, name: str = "Custom", base_action: BaseAction = BaseAction.DROP, log: bool = False
     ) -> TrafficDataPolicySequence:
-        seq = TrafficDataPolicySequence(  # type: ignore[call-arg]
-            sequence_id=0,  # sequence id will be autogenerated in add method
+        seq = TrafficDataPolicySequence(
             sequence_name=name,
             base_action=base_action,
             sequence_ip_type=SequenceIpType.IPV4,

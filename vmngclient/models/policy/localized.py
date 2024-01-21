@@ -19,22 +19,48 @@ LocalizedPolicySupportedItemType = Literal[
 
 
 class LocalizedPolicySettings(BaseModel):
-    flow_visibility: Optional[bool] = Field(None, alias="flowVisibility")
-    flow_visibility_ipv6: Optional[bool] = Field(None, alias="flowVisibilityIPv6")
-    app_visibility: Optional[bool] = Field(None, alias="appVisibility")
-    app_visibility_ipv6: Optional[bool] = Field(None, alias="appVisibilityIPv6")
-    cloud_qos: Optional[bool] = Field(None, alias="cloudQos")
-    cloud_qos_service_side: Optional[bool] = Field(None, alias="cloudQosServiceSide")
-    implicit_acl_logging: Optional[bool] = Field(None, alias="implicitAclLogging")
-    log_frequency: Optional[int] = Field(None, alias="logFrequency", ge=0, le=2147483647)
-    ip_visibility_cache_entries: Optional[int] = Field(None, alias="ipVisibilityCacheEntries", ge=16, le=2000000)
-    ip_v6_visibility_cache_entries: Optional[int] = Field(None, alias="ipV6VisibilityCacheEntries", ge=16, le=2000000)
+    flow_visibility: Optional[bool] = Field(
+        default=None, serialization_alias="flowVisibility", validation_alias="flowVisibility"
+    )
+    flow_visibility_ipv6: Optional[bool] = Field(
+        default=None, serialization_alias="flowVisibilityIPv6", validation_alias="flowVisibilityIPv6"
+    )
+    app_visibility: Optional[bool] = Field(
+        default=None, serialization_alias="appVisibility", validation_alias="appVisibility"
+    )
+    app_visibility_ipv6: Optional[bool] = Field(
+        default=None, serialization_alias="appVisibilityIPv6", validation_alias="appVisibilityIPv6"
+    )
+    cloud_qos: Optional[bool] = Field(default=None, serialization_alias="cloudQos", validation_alias="cloudQos")
+    cloud_qos_service_side: Optional[bool] = Field(
+        default=None, serialization_alias="cloudQosServiceSide", validation_alias="cloudQosServiceSide"
+    )
+    implicit_acl_logging: Optional[bool] = Field(
+        default=None, serialization_alias="implicitAclLogging", validation_alias="implicitAclLogging"
+    )
+    log_frequency: Optional[int] = Field(
+        default=None, serialization_alias="logFrequency", validation_alias="logFrequency", ge=0, le=2147483647
+    )
+    ip_visibility_cache_entries: Optional[int] = Field(
+        default=None,
+        serialization_alias="ipVisibilityCacheEntries",
+        validation_alias="ipVisibilityCacheEntries",
+        ge=16,
+        le=2000000,
+    )
+    ip_v6_visibility_cache_entries: Optional[int] = Field(
+        default=None,
+        serialization_alias="ipV6VisibilityCacheEntries",
+        validation_alias="ipV6VisibilityCacheEntries",
+        ge=16,
+        le=2000000,
+    )
     model_config = ConfigDict(populate_by_name=True)
 
 
 class LocalizedPolicyAssemblyItem(AssemblyItem):
     type: LocalizedPolicySupportedItemType
-    definition_id: str = Field(alias="definitionId")
+    definition_id: str = Field(serialization_alias="definitionId", validation_alias="definitionId")
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -45,15 +71,14 @@ class LocalizedPolicyDefinition(PolicyDefinition):
 
 class LocalizedPolicy(PolicyCreationPayload):
     policy_definition: LocalizedPolicyDefinition = Field(
-        default=LocalizedPolicyDefinition(assembly=[], settings=LocalizedPolicySettings()),  # type: ignore[call-arg]
-        alias="policyDefinition",
+        default=LocalizedPolicyDefinition(assembly=[], settings=LocalizedPolicySettings()),
+        serialization_alias="policyDefinition",
+        validation_alias="policyDefinition",
     )
-    policy_type: str = Field("feature", alias="policyType")
+    policy_type: str = Field("feature", serialization_alias="policyType", validation_alias="policyType")
 
     def _add_item(self, type: LocalizedPolicySupportedItemType, id: str) -> None:
-        self.policy_definition.assembly.append(
-            LocalizedPolicyAssemblyItem(type=type, definition_id=id)  # type: ignore[call-arg]
-        )
+        self.policy_definition.assembly.append(LocalizedPolicyAssemblyItem(type=type, definition_id=id))
 
     def add_qos_map(self, definition_id: str) -> None:
         self._add_item("qosMap", definition_id)
@@ -95,12 +120,14 @@ class LocalizedPolicyInfo(PolicyInfo, LocalizedPolicy):
 
 
 class LocalizedPolicyEditResponse(BaseModel):
-    master_templates_affected: List[str] = Field(default=[], alias="masterTemplatesAffected")
+    master_templates_affected: List[str] = Field(
+        default=[], serialization_alias="masterTemplatesAffected", validation_alias="masterTemplatesAffected"
+    )
 
 
 class LocalizedPolicyDeviceInfo(BaseModel):
-    local_system_ip: IPvAnyAddress = Field(alias="local-system-ip")
-    host_name: str = Field(alias="host-name")
-    site_id: Optional[str] = Field(None, alias="site-id")
+    local_system_ip: IPvAnyAddress = Field(serialization_alias="local-system-ip", validation_alias="local-system-ip")
+    host_name: str = Field(serialization_alias="host-name", validation_alias="host-name")
+    site_id: Optional[str] = Field(None, serialization_alias="site-id", validation_alias="site-id")
     uuid: str
-    layout_level: int = Field(alias="layoutLevel")
+    layout_level: int = Field(serialization_alias="layoutLevel", validation_alias="layoutLevel")

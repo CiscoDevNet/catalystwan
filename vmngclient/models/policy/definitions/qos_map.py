@@ -18,17 +18,19 @@ class QoSDropEnum(str, Enum):
 
 class QoSScheduler(BaseModel):
     queue: str
-    class_map_ref: str = Field(alias="classMapRef")
-    bandwidth_percent: str = Field("1", alias="bandwidthPercent")
-    buffer_percent: str = Field("1", alias="bufferPercent")
+    class_map_ref: str = Field(serialization_alias="classMapRef", validation_alias="classMapRef")
+    bandwidth_percent: str = Field("1", serialization_alias="bandwidthPercent", validation_alias="bandwidthPercent")
+    buffer_percent: str = Field("1", serialization_alias="bufferPercent", validation_alias="bufferPercent")
     burst: Optional[str] = None
     scheduling: QoSSchedulingEnum = QoSSchedulingEnum.WRR
     drops: QoSDropEnum = QoSDropEnum.TAIL
-    temp_key_values: Optional[str] = Field(None, alias="tempKeyValues")
+    temp_key_values: Optional[str] = Field(
+        default=None, serialization_alias="tempKeyValues", validation_alias="tempKeyValues"
+    )
 
     @staticmethod
     def get_default_control_scheduler() -> "QoSScheduler":
-        return QoSScheduler(  # type: ignore[call-arg]
+        return QoSScheduler(
             queue="0",
             class_map_ref="",
             bandwidth_percent="100",
@@ -67,13 +69,13 @@ class QoSScheduler(BaseModel):
 
 
 class QoSMapDefinition(BaseModel):
-    qos_schedulers: List[QoSScheduler] = Field(alias="qosSchedulers")
+    qos_schedulers: List[QoSScheduler] = Field(serialization_alias="qosSchedulers", validation_alias="qosSchedulers")
     model_config = ConfigDict(populate_by_name=True)
 
 
 class QoSMap(PolicyDefinitionBase):
     type: Literal["qosMap"] = "qosMap"
-    definition: QoSMapDefinition = QoSMapDefinition(qosSchedulers=[])
+    definition: QoSMapDefinition = QoSMapDefinition(qos_schedulers=[])
     model_config = ConfigDict(populate_by_name=True)
 
     def add_scheduler(
@@ -87,7 +89,7 @@ class QoSMap(PolicyDefinitionBase):
         burst: Optional[int] = None,
     ) -> None:
         self.definition.qos_schedulers.append(
-            QoSScheduler(  # type: ignore[call-arg]
+            QoSScheduler(
                 queue=str(queue),
                 class_map_ref=class_map_ref,
                 bandwidth_percent=str(bandwidth),
@@ -102,7 +104,5 @@ class QoSMap(PolicyDefinitionBase):
     def generate_default_control_scheduler(self):
         if not self.definition.qos_schedulers:
             # Only when creating (not when value obtained from remote is present)
-            self.definition = QoSMapDefinition(  # type: ignore[call-arg]
-                qos_schedulers=[QoSScheduler.get_default_control_scheduler()]
-            )
+            self.definition = QoSMapDefinition(qos_schedulers=[QoSScheduler.get_default_control_scheduler()])
         return self

@@ -5,22 +5,26 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Annotated
 
 from vmngclient.models.common import check_fields_exclusive
-from vmngclient.models.policy.policy_definition import ListReference, PolicyDefinitionBase, VariableName
-
-
-class Reference(BaseModel):
-    ref: str
+from vmngclient.models.policy.policy_definition import PolicyDefinitionBase, Reference, VariableName
 
 
 class RuleBase(BaseModel):
     rule: str = ""
     order: str = ""
     action: str = "permit"
-    source_security_group: Optional[Reference] = Field(alias="sourceSecurityGroup")
-    destination_security_group: Optional[Reference] = Field(alias="destinationSecurityGroup")
-    protocol: Optional[str]
-    protocol_name: Optional[str] = Field(alias="protocolName")
-    protocol_name_list: Optional[Reference] = Field(alias="protocolNameList")
+    source_security_group: Optional[Reference] = Field(
+        default=None, serialization_alias="sourceSecurityGroup", validation_alias="sourceSecurityGroup"
+    )
+    destination_security_group: Optional[Reference] = Field(
+        default=None, serialization_alias="destinationSecurityGroup", validation_alias="destinationSecurityGroup"
+    )
+    protocol: Optional[str] = None
+    protocol_name: Optional[str] = Field(
+        default=None, serialization_alias="protocolName", validation_alias="protocolName"
+    )
+    protocol_name_list: Optional[Reference] = Field(
+        default=None, serialization_alias="protocolNameList", validation_alias="protocolNameList"
+    )
     model_config = ConfigDict(populate_by_name=True)
 
     @model_validator(mode="after")
@@ -30,23 +34,53 @@ class RuleBase(BaseModel):
 
 
 class IPv4Rule(RuleBase):
-    sequence_ip_type: Literal["ipv4"] = Field("ipv4", alias="sequenceIpType")
-    source_ip: Union[IPv4Network, VariableName, None] = Field(None, alias="sourceIP")
-    source_data_prefix_list: Optional[ListReference] = Field(None, alias="sourceDataPrefixList")
-    source_fqdn: Optional[str] = Field(None, alias="sourceFqdn")
-    source_fqdn_list: Optional[ListReference] = Field(None, alias="sourceFqdnList")
-    source_geo_location: Optional[str] = Field(None, alias="sourceGeoLocation")
-    source_geo_location_list: Optional[ListReference] = Field(None, alias="sourceGeoLocationList")
-    source_port: Optional[str] = Field(None, alias="sourcePort")
-    source_port_list: Optional[ListReference] = Field(None, alias="sourcePortList")
-    destination_ip: Union[IPv4Network, VariableName, None] = Field(None, alias="destinationIP")
-    destination_data_prefix_list: Optional[ListReference] = Field(None, alias="destinationDataPrefixList")
-    destination_fqdn: Optional[str] = Field(None, alias="destinationFqdn")
-    destination_fqdn_list: Optional[ListReference] = Field(None, alias="destinationFqdnList")
-    destination_geo_location: Optional[str] = Field(None, alias="destinationGeoLocation")
-    destination_geo_location_list: Optional[ListReference] = Field(None, alias="destinationGeoLocationList")
-    destination_port: Optional[str] = Field(None, alias="destinationPort")
-    destination_port_list: Optional[ListReference] = Field(None, alias="destinationPortList")
+    sequence_ip_type: Literal["ipv4"] = Field(
+        default="ipv4", serialization_alias="sequenceIpType", validation_alias="sequenceIpType"
+    )
+    source_ip: Union[IPv4Network, VariableName, None] = Field(
+        default=None, serialization_alias="sourceIP", validation_alias="sourceIP"
+    )
+    source_data_prefix_list: Optional[Reference] = Field(
+        default=None, serialization_alias="sourceDataPrefixList", validation_alias="sourceDataPrefixList"
+    )
+    source_fqdn: Optional[str] = Field(default=None, serialization_alias="sourceFqdn", validation_alias="sourceFqdn")
+    source_fqdn_list: Optional[Reference] = Field(
+        default=None, serialization_alias="sourceFqdnList", validation_alias="sourceFqdnList"
+    )
+    source_geo_location: Optional[str] = Field(
+        default=None, serialization_alias="sourceGeoLocation", validation_alias="sourceGeoLocation"
+    )
+    source_geo_location_list: Optional[Reference] = Field(
+        default=None, serialization_alias="sourceGeoLocationList", validation_alias="sourceGeoLocationList"
+    )
+    source_port: Optional[str] = Field(default=None, serialization_alias="sourcePort", validation_alias="sourcePort")
+    source_port_list: Optional[Reference] = Field(
+        default=None, serialization_alias="sourcePortList", validation_alias="sourcePortList"
+    )
+    destination_ip: Union[IPv4Network, VariableName, None] = Field(
+        default=None, serialization_alias="destinationIP", validation_alias="destinationIP"
+    )
+    destination_data_prefix_list: Optional[Reference] = Field(
+        default=None, serialization_alias="destinationDataPrefixList", validation_alias="destinationDataPrefixList"
+    )
+    destination_fqdn: Optional[str] = Field(
+        default=None, serialization_alias="destinationFqdn", validation_alias="destinationFqdn"
+    )
+    destination_fqdn_list: Optional[Reference] = Field(
+        default=None, serialization_alias="destinationFqdnList", validation_alias="destinationFqdnList"
+    )
+    destination_geo_location: Optional[str] = Field(
+        default=None, serialization_alias="destinationGeoLocation", validation_alias="destinationGeoLocation"
+    )
+    destination_geo_location_list: Optional[Reference] = Field(
+        default=None, serialization_alias="destinationGeoLocationList", validation_alias="destinationGeoLocationList"
+    )
+    destination_port: Optional[str] = Field(
+        default=None, serialization_alias="destinationPort", validation_alias="destinationPort"
+    )
+    destination_port_list: Optional[Reference] = Field(
+        default=None, serialization_alias="destinationPortList", validation_alias="destinationPortList"
+    )
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
     @model_validator(mode="after")
@@ -75,11 +109,23 @@ class IPv4Rule(RuleBase):
 
 
 class IPv6Rule(RuleBase):
-    sequence_ip_type: Literal["ipv6"] = Field("ipv6", alias="sequenceIpType")
-    source_ipv6: Union[IPv6Network, VariableName, None] = Field(None, alias="sourceIPV6")
-    source_ipv6_data_prefix_list: Optional[ListReference] = Field(None, alias="sourceIPV6DataPrefixList")
-    destination_ipv6: Union[IPv6Network, VariableName, None] = Field(None, alias="destinationIPV6")
-    destination_ipv6_data_prefix_list: Optional[ListReference] = Field(None, alias="destinationIPV6DataPrefixList")
+    sequence_ip_type: Literal["ipv6"] = Field(
+        default="ipv6", serialization_alias="sequenceIpType", validation_alias="sequenceIpType"
+    )
+    source_ipv6: Union[IPv6Network, VariableName, None] = Field(
+        default=None, serialization_alias="sourceIPV6", validation_alias="sourceIPV6"
+    )
+    source_ipv6_data_prefix_list: Optional[Reference] = Field(
+        default=None, serialization_alias="sourceIPV6DataPrefixList", validation_alias="sourceIPV6DataPrefixList"
+    )
+    destination_ipv6: Union[IPv6Network, VariableName, None] = Field(
+        default=None, serialization_alias="destinationIPV6", validation_alias="destinationIPV6"
+    )
+    destination_ipv6_data_prefix_list: Optional[Reference] = Field(
+        default=None,
+        serialization_alias="destinationIPV6DataPrefixList",
+        validation_alias="destinationIPV6DataPrefixList",
+    )
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
     @model_validator(mode="after")
@@ -171,28 +217,37 @@ class RuleSet(PolicyDefinitionBase):
             raise ValueError("Source IP and variable name cannot be set at the same time")
         if destination_ip is not None and destination_ip_variable is not None:
             raise ValueError("Destination IP and variable name cannot be set at the same time")
-        ipv4_rule = IPv4Rule(  # type: ignore[call-arg]
+        ipv4_rule = IPv4Rule(
             action=action,
-            source_security_group=source_security_group_id,
-            source_ip=source_ip or source_ip_variable,
-            source_data_prefix_list=source_data_prefix_list_id,
+            source_security_group=Reference(ref=source_security_group_id) if source_security_group_id else None,
+            source_ip=source_ip or (VariableName(vip_variable_name=source_ip_variable) if source_ip_variable else None),
+            source_data_prefix_list=Reference(ref=source_data_prefix_list_id) if source_data_prefix_list_id else None,
             source_fqdn=source_fqdn,
-            source_fqdn_list=source_fqdn_list_id,
+            source_fqdn_list=Reference(ref=source_fqdn_list_id) if source_fqdn_list_id else None,
             source_geo_location=source_geo_location,
-            source_geo_location_list=source_geo_location_list_id,
+            source_geo_location_list=Reference(ref=source_geo_location_list_id)
+            if source_geo_location_list_id
+            else None,
             source_port=source_port,
-            source_port_list=source_port_list_id,
-            destination_security_group=destination_security_group_id,
-            destination_ip=destination_ip or destination_ip_variable,
-            destination_data_prefix_list=destination_data_prefix_list_id,
+            source_port_list=Reference(ref=source_port_list_id) if source_port_list_id else None,
+            destination_security_group=Reference(ref=destination_security_group_id)
+            if destination_security_group_id
+            else None,
+            destination_ip=destination_ip
+            or (VariableName(vip_variable_name=destination_ip_variable) if destination_ip_variable else None),
+            destination_data_prefix_list=Reference(ref=destination_data_prefix_list_id)
+            if destination_data_prefix_list_id
+            else None,
             destination_fqdn=destination_fqdn,
-            destination_fqdn_list=destination_fqdn_list_id,
+            destination_fqdn_list=Reference(ref=destination_fqdn_list_id) if destination_fqdn_list_id else None,
             destination_geo_location=destination_geo_location,
-            destination_geo_location_list=destination_geo_location_list_id,
+            destination_geo_location_list=Reference(ref=destination_geo_location_list_id)
+            if destination_geo_location_list_id
+            else None,
             destination_port=destination_port,
-            destination_port_list=destination_port_list_id,
+            destination_port_list=Reference(ref=destination_port_list_id) if destination_port_list_id else None,
             protocol=" ".join(str(p) for p in protocols) if protocols else None,
             protocol_name=" ".join(p for p in protocol_names) if protocol_names else None,
-            protocol_name_list=protocol_name_list_id,
+            protocol_name_list=Reference(ref=protocol_name_list_id) if protocol_name_list_id else None,
         )
         self.add(ipv4_rule)

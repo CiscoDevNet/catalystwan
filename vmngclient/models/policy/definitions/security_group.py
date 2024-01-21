@@ -5,7 +5,7 @@ from typing import Literal, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from vmngclient.models.common import check_any_of_exclusive_field_sets, check_fields_exclusive
-from vmngclient.models.policy.policy_definition import ListReference, PolicyDefinitionBase, VariableName
+from vmngclient.models.policy.policy_definition import PolicyDefinitionBase, Reference, VariableName
 
 
 class SequenceIPType(str, Enum):
@@ -15,13 +15,13 @@ class SequenceIPType(str, Enum):
 
 class SecurityGroupIPv4Definition(BaseModel):
     data_prefix: Union[IPv4Network, VariableName, None] = Field(None, alias="dataPrefix")
-    data_prefix_list: Optional[ListReference] = Field(None, alias="dataPrefixList")
+    data_prefix_list: Optional[Reference] = Field(None, alias="dataPrefixList")
     fqdn: Optional[str] = None
-    fqdn_list: Optional[ListReference] = Field(None, alias="fqdnList")
+    fqdn_list: Optional[Reference] = Field(None, alias="fqdnList")
     geo_location: Optional[str] = Field(None, alias="geoLocation")
-    geo_location_list: Optional[ListReference] = Field(None, alias="geoLocationList")
+    geo_location_list: Optional[Reference] = Field(None, alias="geoLocationList")
     port: Optional[str] = None
-    port_list: Optional[ListReference] = Field(None, alias="portList")
+    port_list: Optional[Reference] = Field(None, alias="portList")
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
     @model_validator(mode="after")
@@ -40,7 +40,7 @@ class SecurityGroupIPv4Definition(BaseModel):
 
 class SecurityGroupIPv6Definition(BaseModel):
     data_ipv6_prefix: Union[IPv6Network, VariableName, None] = Field(None, alias="dataIPV6Prefix")
-    data_ipv6_prefix_list: Optional[ListReference] = Field(None, alias="dataIPV6PrefixList")
+    data_ipv6_prefix_list: Optional[Reference] = Field(None, alias="dataIPV6PrefixList")
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
     @model_validator(mode="after")
