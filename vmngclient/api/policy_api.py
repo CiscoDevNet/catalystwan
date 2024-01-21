@@ -3,6 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Type, Union, overload
 
 from vmngclient.api.task_status_api import Task
+from vmngclient.endpoints.configuration.policy.definition.control import (
+    ConfigurationPolicyControlDefinition,
+    ControlPolicyInfo,
+)
 from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition, QoSMapInfo
 from vmngclient.endpoints.configuration.policy.definition.rewrite import (
     ConfigurationPolicyRewriteRuleDefinition,
@@ -103,6 +107,7 @@ from vmngclient.endpoints.configuration.policy.vsmart_template import (
 )
 from vmngclient.models.misc.application_protocols import ApplicationProtocol
 from vmngclient.models.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
+from vmngclient.models.policy.definitions.control import ControlPolicy
 from vmngclient.models.policy.definitions.qos_map import QoSMap
 from vmngclient.models.policy.definitions.rewrite import RewritePolicy
 from vmngclient.models.policy.definitions.rule_set import RuleSet
@@ -194,9 +199,12 @@ POLICY_DEFINITION_ENDPOINTS_MAP: Mapping[type, type] = {
     TrafficDataPolicy: ConfigurationPolicyDataDefinition,
     QoSMap: ConfigurationPolicyQoSMapDefinition,
     RewritePolicy: ConfigurationPolicyRewriteRuleDefinition,
+    ControlPolicy: ConfigurationPolicyControlDefinition,
 }
 
-AnyPolicyDefinition = Union[RuleSet, SecurityGroup, ZoneBasedFWPolicy, TrafficDataPolicy, QoSMap, RewritePolicy]
+AnyPolicyDefinition = Union[
+    RuleSet, SecurityGroup, ZoneBasedFWPolicy, TrafficDataPolicy, QoSMap, RewritePolicy, ControlPolicy
+]
 
 
 class CentralizedPolicyAPI:
@@ -621,6 +629,10 @@ class PolicyDefinitionsAPI:
     def get(self, type: Type[RewritePolicy]) -> DataSequence[RewritePolicyInfo]:
         ...
 
+    @overload
+    def get(self, type: Type[ControlPolicy]) -> DataSequence[ControlPolicyInfo]:
+        ...
+
     # get by id
 
     @overload
@@ -645,6 +657,10 @@ class PolicyDefinitionsAPI:
 
     @overload
     def get(self, type: Type[RewritePolicy], id: str) -> RewritePolicyInfo:
+        ...
+
+    @overload
+    def get(self, type: Type[ControlPolicy], id: str) -> ControlPolicyInfo:
         ...
 
     def get(self, type: Type[AnyPolicyDefinition], id: Optional[str] = None) -> Any:

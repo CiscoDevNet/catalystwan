@@ -34,12 +34,6 @@ class VariableName(BaseModel):
     vip_variable_name: str = Field(serialization_alias="vipVariableName", validation_alias="vipVariableName")
 
 
-class DefaultActionType(str, Enum):
-    DROP = "drop"
-    ACCEPT = "accept"
-    REJECT = "reject"
-
-
 class PLPEntryValues(str, Enum):
     LOW = "low"
     HIGH = "high"
@@ -111,11 +105,12 @@ class SequenceIpType(str, Enum):
     ALL = "all"
 
 
-class BaseAction(str, Enum):
+class ActionTypeEnum(str, Enum):
     DROP = "drop"
     ACCEPT = "accept"
     PASS = "pass"
     INSPECT = "inspect"
+    REJECT = "reject"
 
 
 SequenceType = Literal[
@@ -842,8 +837,8 @@ class Action(BaseModel):
 class PolicyDefinitionSequenceBase(BaseModel):
     sequence_id: int = Field(default=0, serialization_alias="sequenceId", validation_alias="sequenceId")
     sequence_name: str = Field(serialization_alias="sequenceName", validation_alias="sequenceName")
-    base_action: BaseAction = Field(
-        default=BaseAction.DROP, serialization_alias="baseAction", validation_alias="baseAction"
+    base_action: ActionTypeEnum = Field(
+        default=ActionTypeEnum.DROP, serialization_alias="baseAction", validation_alias="baseAction"
     )
     sequence_type: SequenceType = Field(serialization_alias="sequenceType", validation_alias="sequenceType")
     sequence_ip_type: SequenceIpType = Field(serialization_alias="sequenceIpType", validation_alias="sequenceIpType")
@@ -932,15 +927,15 @@ class PolicyDefinitionSequenceBase(BaseModel):
 def accept_action(method):
     @wraps(method)
     def wrapper(self: PolicyDefinitionSequenceBase, *args, **kwargs):
-        if self.base_action != BaseAction.ACCEPT:
-            raise ValueError(f"{method.__name__} only allowed when base_action is {BaseAction.ACCEPT}")
+        if self.base_action != ActionTypeEnum.ACCEPT:
+            raise ValueError(f"{method.__name__} only allowed when base_action is {ActionTypeEnum.ACCEPT}")
         return method(self, *args, **kwargs)
 
     return wrapper
 
 
 class DefaultAction(BaseModel):
-    type: DefaultActionType
+    type: ActionTypeEnum
 
 
 class InfoTag(BaseModel):
@@ -958,7 +953,7 @@ class PolicyReference(BaseModel):
 
 class DefinitionWithSequencesCommonBase(BaseModel):
     default_action: Optional[DefaultAction] = Field(
-        default=DefaultAction(type=DefaultActionType.DROP),
+        default=DefaultAction(type=ActionTypeEnum.DROP),
         serialization_alias="defaultAction",
         validation_alias="defaultAction",
     )

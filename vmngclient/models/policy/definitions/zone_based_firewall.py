@@ -6,8 +6,8 @@ from typing_extensions import Annotated
 
 from vmngclient.models.misc.application_protocols import ApplicationProtocol
 from vmngclient.models.policy.policy_definition import (
+    ActionTypeEnum,
     AppListEntry,
-    BaseAction,
     DefinitionWithSequencesCommonBase,
     DestinationDataPrefixListEntry,
     DestinationFQDNEntry,
@@ -87,7 +87,7 @@ class ZoneBasedFWPolicySequenceWithRuleSets(PolicyDefinitionSequenceBase):
         self._insert_match(RuleSetListEntry.from_rule_set_ids(rule_set_ids))
 
     def match_app_list(self, app_list_id: str) -> None:
-        if self.base_action != BaseAction.INSPECT:
+        if self.base_action != ActionTypeEnum.INSPECT:
             raise ValueError("Action must be Inspect when Application/Application Family List is selected.")
         self._insert_match(AppListEntry(ref=app_list_id))
 
@@ -101,7 +101,7 @@ class ZoneBasedFWPolicySequence(PolicyDefinitionSequenceBase):
     model_config = ConfigDict(populate_by_name=True)
 
     def match_app_list(self, app_list_id: str) -> None:
-        if self.base_action != BaseAction.INSPECT:
+        if self.base_action != ActionTypeEnum.INSPECT:
             raise ValueError("Action must be Inspect when Application/Application Family List is selected.")
         self._insert_match(AppListEntry(ref=app_list_id))
 
@@ -191,7 +191,7 @@ class ZoneBasedFWPolicy(ZoneBasedFWPolicyHeader):
     definition: ZoneBasedFWPolicyDefinition = ZoneBasedFWPolicyDefinition()
 
     def add_ipv4_rule(
-        self, name: str, base_action: BaseAction = BaseAction.DROP, log: bool = False
+        self, name: str, base_action: ActionTypeEnum = ActionTypeEnum.DROP, log: bool = False
     ) -> ZoneBasedFWPolicySequence:
         """Adds new IPv4 Rule to Zone Based Firewall Policy
 
@@ -215,7 +215,7 @@ class ZoneBasedFWPolicy(ZoneBasedFWPolicyHeader):
         return sequence
 
     def add_ipv4_rule_sets(
-        self, name: str, base_action: BaseAction = BaseAction.DROP, log: bool = False
+        self, name: str, base_action: ActionTypeEnum = ActionTypeEnum.DROP, log: bool = False
     ) -> ZoneBasedFWPolicySequenceWithRuleSets:
         sequence = ZoneBasedFWPolicySequenceWithRuleSets(
             sequence_name=name,

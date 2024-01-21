@@ -7,8 +7,8 @@ from typing_extensions import Annotated
 from vmngclient.models.common import TLOCColorEnum
 from vmngclient.models.policy.lists_entries import EncapEnum
 from vmngclient.models.policy.policy_definition import (
+    ActionTypeEnum,
     AppListEntry,
-    BaseAction,
     CFlowDAction,
     CountAction,
     DefinitionWithSequencesCommonBase,
@@ -356,7 +356,7 @@ class TrafficDataPolicy(TrafficDataPolicyHeader, DefinitionWithSequencesCommonBa
     model_config = ConfigDict(populate_by_name=True)
 
     def add_ipv4_sequence(
-        self, name: str = "Custom", base_action: BaseAction = BaseAction.DROP, log: bool = False
+        self, name: str = "Custom", base_action: ActionTypeEnum = ActionTypeEnum.DROP, log: bool = False
     ) -> TrafficDataPolicySequence:
         seq = TrafficDataPolicySequence(
             sequence_name=name,
