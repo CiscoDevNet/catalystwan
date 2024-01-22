@@ -15,8 +15,7 @@ from vmngclient.typed_list import DataSequence
 
 
 def port_set_and_ranges_to_str(ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> str:
-    if not ports and not port_ranges:
-        raise ValueError("Non empty port set or port range list must be provided")
+    assert ports or port_ranges
     ports_str = " ".join(f"{port_begin}-{port_end}" for port_begin, port_end in port_ranges)
     ports_str += " " if ports_str else ""
     ports_str += " ".join(str(p) for p in ports)
@@ -852,8 +851,7 @@ class PolicyDefinitionSequenceBase(BaseModel):
         existing_fields = set(fields)
         forbidden_fields = set(MUTUALLY_EXCLUSIVE_FIELD_LOOKUP.get(field, []))
         colliding_fields = set(existing_fields) & set(forbidden_fields)
-        if colliding_fields:
-            raise ValueError(f"{field} is mutually exclusive with {colliding_fields}")
+        assert not colliding_fields, f"{field} is mutually exclusive with {colliding_fields}"
 
     def _check_match_can_be_inserted(self, match: MatchEntry) -> None:
         self._check_field_collision(
@@ -928,8 +926,9 @@ class PolicyDefinitionSequenceBase(BaseModel):
 def accept_action(method):
     @wraps(method)
     def wrapper(self: PolicyDefinitionSequenceBase, *args, **kwargs):
-        if self.base_action != ActionTypeEnum.ACCEPT:
-            raise ValueError(f"{method.__name__} only allowed when base_action is {ActionTypeEnum.ACCEPT}")
+        assert (
+            self.base_action == ActionTypeEnum.ACCEPT
+        ), f"{method.__name__} only allowed when base_action is {ActionTypeEnum.ACCEPT}"
         return method(self, *args, **kwargs)
 
     return wrapper

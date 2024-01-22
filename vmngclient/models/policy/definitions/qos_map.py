@@ -46,26 +46,20 @@ class QoSScheduler(BaseModel):
     @field_validator("queue")
     @classmethod
     def check_queue(cls, queue_str: str):
-        queue = int(queue_str)
-        if queue < 0 or queue > 7:
-            raise ValueError("queue should be in range 0-7")
+        assert 0 <= int(queue_str) <= 7
         return queue_str
 
     @field_validator("bandwidth_percent", "buffer_percent")
     @classmethod
     def check_bandwidth_and_buffer_percent(cls, percent_str: str):
-        percent = int(percent_str)
-        if percent < 1 or percent > 100:
-            raise ValueError("bandwidth/buffer percent should be in range 1-100")
+        assert 1 <= int(percent_str) <= 100
         return percent_str
 
     @field_validator("burst")
     @classmethod
     def check_burst(cls, burst_val: Union[str, None]):
         if burst_val is not None:
-            burst = int(burst_val)
-            if burst < 5000 or burst > 10_000_000:
-                raise ValueError("burst should be in range 5000-10000000")
+            assert 5000 <= int(burst_val) <= 10_000_000
         return burst_val
 
 

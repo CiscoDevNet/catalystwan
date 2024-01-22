@@ -251,18 +251,15 @@ class SLAClassList(PolicyListBase):
         return entry
 
     def add_fallback_jitter_criteria(self, jitter_variance: int) -> None:
-        if not self.entries:
-            raise ValueError("Assign app probe class before configuring best fallback tunnel")
+        assert self.entries, "Assign app probe class before configuring best fallback tunnel"
         self.entries[0].add_fallback_jitter_criteria(jitter_variance)
 
     def add_fallback_latency_criteria(self, latency_variance: int) -> None:
-        if not self.entries:
-            raise ValueError("Assign app probe class before configuring best fallback tunnel")
+        assert self.entries, "Assign app probe class before configuring best fallback tunnel"
         self.entries[0].add_fallback_latency_criteria(latency_variance)
 
     def add_fallback_loss_criteria(self, loss_variance: int) -> None:
-        if not self.entries:
-            raise ValueError("Assign app probe class before configuring best fallback tunnel")
+        assert self.entries, "Assign app probe class before configuring best fallback tunnel"
         self.entries[0].add_fallback_loss_criteria(loss_variance)
 
 

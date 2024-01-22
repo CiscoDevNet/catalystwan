@@ -9,23 +9,17 @@ from vmngclient.models.common import InterfaceTypeEnum, TLOCColorEnum, check_fie
 
 
 def check_jitter_ms(jitter_str: str) -> str:
-    jitter = int(jitter_str)
-    if jitter < 1 or jitter > 1000:
-        raise ValueError("jitter should be in range 1-1000")
+    assert 1 <= int(jitter_str) <= 1000
     return jitter_str
 
 
 def check_latency_ms(latency_str: str) -> str:
-    latency = int(latency_str)
-    if latency < 1 or latency > 1000:
-        raise ValueError("latency should be in range 1-1000")
+    assert 1 <= int(latency_str) <= 1000
     return latency_str
 
 
 def check_loss_percent(loss_str: str) -> str:
-    loss = int(loss_str)
-    if loss < 0 or loss > 100:
-        raise ValueError("loss should be in range 0-100")
+    assert 0 <= int(loss_str) <= 100
     return loss_str
 
 
@@ -95,14 +89,10 @@ class FallbackBestTunnel(BaseModel):
             expected_criteria.add("latency")
         if self.loss_variance is not None:
             expected_criteria.add("loss")
-        if len(expected_criteria) < 1:
-            raise ValueError("At least one variance type needs to be present")
+        assert expected_criteria, "At least one variance type needs to be present"
         self._criteria_priority = str(self.criteria).split("-")
         observed_criteria = set(self._criteria_priority)
-        if expected_criteria != observed_criteria:
-            if len(expected_criteria) == 1:
-                raise ValueError(f"Criteria must contain: {expected_criteria}")
-            raise ValueError(f"Criteria must contain: {expected_criteria} separated by hyphen")
+        assert expected_criteria == observed_criteria
         return self
 
     def _update_criteria_field(self) -> None:
@@ -149,13 +139,11 @@ class VPNListEntry(BaseModel):
     @classmethod
     def check_vpn_range(cls, vpns_str: str):
         vpns = [int(vpn) for vpn in vpns_str.split("-")]
-        if len(vpns) > 2:
-            raise ValueError("VPN range should consist two integers separated by hyphen")
+        assert len(vpns) <= 2
         for vpn in vpns:
-            if vpn < 0 or vpn > 65530:
-                raise ValueError("VPN should be in range 0-65530")
-        if len(vpns) == 2 and vpns[0] >= vpns[1]:
-            raise ValueError("Second VPN in range should be greater than first")
+            assert 0 <= vpn <= 65530
+        if len(vpns) == 2:
+            assert vpns[0] <= vpns[1]
         return vpns_str
 
 
@@ -166,9 +154,7 @@ class ZoneListEntry(BaseModel):
     @field_validator("vpn")
     @classmethod
     def check_vpn_range(cls, vpn_str: str):
-        vpn = int(vpn_str)
-        if vpn < 0 or vpn > 65530:
-            raise ValueError("VPN should be in range 0-65530")
+        assert 0 <= int(vpn_str) <= 65530
         return vpn_str
 
     @model_validator(mode="after")
@@ -199,9 +185,7 @@ class PortListEntry(BaseModel):
     @field_validator("port")
     @classmethod
     def check_port_range(cls, port_str: str):
-        port = int(port_str)
-        if port < 0 or port > 65535:
-            raise ValueError("Port should be in range 0-65535")
+        assert 0 <= int(port_str) <= 65535
         return port_str
 
 
@@ -287,17 +271,13 @@ class PolicerListEntry(BaseModel):
     @field_validator("burst")
     @classmethod
     def check_burst(cls, burst_str: str):
-        burst = int(burst_str)
-        if burst < 15000 or burst > 10000000:
-            raise ValueError("burst should be in range 15000-10000000")
+        assert 15000 <= int(burst_str) <= 10_000_000
         return burst_str
 
     @field_validator("rate")
     @classmethod
     def check_rate(cls, rate_str: str):
-        rate = int(rate_str)
-        if rate < 8 or rate > 100000000000:
-            raise ValueError("rate should be in range 8-10000000")
+        assert 8 <= int(rate_str) <= 100_000_000_000
         return rate_str
 
 
@@ -313,9 +293,7 @@ class ClassMapListEntry(BaseModel):
     @field_validator("queue")
     @classmethod
     def check_queue(cls, queue_str: str):
-        queue = int(queue_str)
-        if queue < 0 or queue > 7:
-            raise ValueError("queue should be in range 0-7")
+        assert 0 <= int(queue_str) <= 7
         return queue_str
 
 
@@ -354,8 +332,7 @@ class SLAClassListEntry(BaseModel):
 
     @model_validator(mode="after")
     def check_at_least_one_criteria_is_set(self):
-        if not any([self.latency, self.loss, self.jitter]):
-            raise ValueError("At least one of: jitter, loss or latency entries must be set")
+        assert any([self.latency, self.loss, self.jitter])
         return self
 
     def add_fallback_jitter_criteria(self, jitter_variance: int) -> None:
@@ -387,9 +364,7 @@ class TLOCListEntry(BaseModel):
     @classmethod
     def check_preference(cls, preference_str: str):
         if preference_str is not None:
-            preference = int(preference_str)
-            if preference < 0 or preference > 4294967295:
-                raise ValueError("preference should be in range 0-4294967295")
+            assert 0 <= int(preference_str) <= 2**32 - 1
             return preference_str
 
 
@@ -408,8 +383,7 @@ class PreferredColorGroupListEntry(BaseModel):
 
     @model_validator(mode="after")
     def check_optional_preferences_order(self):
-        if self.secondary_preference is None and self.tertiary_preference is not None:
-            raise ValueError("tertiary_preference cannot be set without secondary_preference")
+        assert not (self.secondary_preference is None and self.tertiary_preference is not None)
         return self
 
 
@@ -424,9 +398,7 @@ class PrefixListEntry(BaseModel):
     @classmethod
     def check_ge_and_le(cls, ge_le_str: Optional[str]):
         if ge_le_str is not None:
-            ge_le = int(ge_le_str)
-            if ge_le < 0 or ge_le > 32:
-                raise ValueError("ge, le should be in range 0-32")
+            assert 0 <= int(ge_le_str) <= 32
         return ge_le_str
 
 
@@ -441,9 +413,7 @@ class IPv6PrefixListEntry(BaseModel):
     @classmethod
     def check_ge_and_le(cls, ge_le_str: Optional[str]):
         if ge_le_str is not None:
-            ge_le = int(ge_le_str)
-            if ge_le < 0 or ge_le > 128:
-                raise ValueError("ge, le should be in range 0-128")
+            assert 0 <= int(ge_le_str) <= 128
         return ge_le_str
 
 
@@ -458,11 +428,9 @@ class RegionListEntry(BaseModel):
     @classmethod
     def check_region_id(cls, region_id_str: str):
         regions = [int(region_id) for region_id in region_id_str.split("-")]
-        if len(regions) > 2:
-            raise ValueError("region_id range should consist two integers separated by hyphen")
-        for vpn in regions:
-            if vpn < 0 or vpn > 63:
-                raise ValueError("region_id should be in range 0-63")
-        if len(regions) == 2 and regions[0] >= regions[1]:
-            raise ValueError("Second region in range should be greater than first")
+        assert len(regions) <= 2
+        for region in regions:
+            assert 0 <= region <= 63
+        if len(regions) == 2:
+            assert regions[0] <= regions[1]
         return region_id_str
