@@ -1,4 +1,6 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.models.policy.lists import PreferredColorGroupList
 from vmngclient.models.policy.policy_list import (
@@ -25,7 +27,7 @@ class ConfigurationPreferredColorGroupList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/preferredcolorgroup/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/preferredcolorgroup")
@@ -33,11 +35,11 @@ class ConfigurationPreferredColorGroupList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/preferredcolorgroup/{id}")
-    def edit_policy_list(self, id: str, payload: PreferredColorGroupListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: PreferredColorGroupListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/preferredcolorgroup/{id}")
-    def get_lists_by_id(self, id: str) -> PreferredColorGroupListInfo:
+    def get_lists_by_id(self, id: UUID) -> PreferredColorGroupListInfo:
         ...
 
     @get("/template/policy/list/preferredcolorgroup", "data")
@@ -53,5 +55,5 @@ class ConfigurationPreferredColorGroupList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/preferredcolorgroup/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

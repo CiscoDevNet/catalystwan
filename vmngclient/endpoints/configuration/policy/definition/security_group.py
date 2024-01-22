@@ -1,4 +1,6 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.models.policy.definitions.security_group import SecurityGroup
 from vmngclient.models.policy.policy_definition import (
@@ -25,7 +27,7 @@ class ConfigurationPolicySecurityGroupDefinition(APIEndpoints, PolicyDefinitionE
         ...
 
     @delete("/template/policy/definition/securitygroup/{id}")
-    def delete_policy_definition(self, id: str) -> None:
+    def delete_policy_definition(self, id: UUID) -> None:
         ...
 
     def edit_multiple_policy_definition(self):
@@ -33,7 +35,7 @@ class ConfigurationPolicySecurityGroupDefinition(APIEndpoints, PolicyDefinitionE
         ...
 
     @put("/template/policy/definition/securitygroup/{id}")
-    def edit_policy_definition(self, id: str, payload: SecurityGroupEditPayload) -> PolicyDefinitionEditResponse:
+    def edit_policy_definition(self, id: UUID, payload: SecurityGroupEditPayload) -> PolicyDefinitionEditResponse:
         ...
 
     @get("/template/policy/definition/securitygroup", "data")
@@ -41,7 +43,7 @@ class ConfigurationPolicySecurityGroupDefinition(APIEndpoints, PolicyDefinitionE
         ...
 
     @get("/template/policy/definition/securitygroup/{id}")
-    def get_policy_definition(self, id: str) -> SecurityGroupInfo:
+    def get_policy_definition(self, id: UUID) -> SecurityGroupInfo:
         ...
 
     @post("/template/policy/definition/securitygroup/preview")
@@ -49,7 +51,7 @@ class ConfigurationPolicySecurityGroupDefinition(APIEndpoints, PolicyDefinitionE
         ...
 
     @get("/template/policy/definition/securitygroup/preview/{id}")
-    def preview_policy_definition_by_id(self, id: str) -> PolicyDefinitionPreview:
+    def preview_policy_definition_by_id(self, id: UUID) -> PolicyDefinitionPreview:
         ...
 
     def save_policy_definition_in_bulk(self):

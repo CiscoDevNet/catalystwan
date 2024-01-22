@@ -1,4 +1,6 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.models.policy.localized import (
     LocalizedPolicy,
@@ -20,11 +22,11 @@ class ConfigurationVEdgeTemplatePolicy(APIEndpoints):
         ...
 
     @delete("/template/policy/vedge/{id}")
-    def delete_vedge_template(self, id: str) -> None:
+    def delete_vedge_template(self, id: UUID) -> None:
         ...
 
     @put("/template/policy/vedge/{id}")
-    def edit_vedge_template(self, id: str, payload: LocalizedPolicy) -> LocalizedPolicyEditResponse:
+    def edit_vedge_template(self, id: UUID, payload: LocalizedPolicy) -> LocalizedPolicyEditResponse:
         ...
 
     @get("/template/policy/vedge", "data")
@@ -32,7 +34,7 @@ class ConfigurationVEdgeTemplatePolicy(APIEndpoints):
         ...
 
     @get("/template/policy/vedge/devices/{id}", "data")
-    def get_device_list_by_policy(self, id: str) -> DataSequence[LocalizedPolicyDeviceInfo]:
+    def get_device_list_by_policy(self, id: UUID) -> DataSequence[LocalizedPolicyDeviceInfo]:
         ...
 
     @get("/template/policy/vedge/devices", "data")
@@ -40,9 +42,9 @@ class ConfigurationVEdgeTemplatePolicy(APIEndpoints):
         ...
 
     @get("/template/policy/vedge/definition/{id}")
-    def get_vedge_template(self, id: str) -> LocalizedPolicy:
+    def get_vedge_template(self, id: UUID) -> LocalizedPolicy:
         ...
 
     @get("/template/policy/assembly/vedge/{id}")
-    def preview_by_id(self, id: str) -> PolicyPreview:
+    def preview_by_id(self, id: UUID) -> PolicyPreview:
         ...

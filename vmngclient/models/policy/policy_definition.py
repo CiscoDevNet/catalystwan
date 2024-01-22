@@ -3,19 +3,19 @@ from enum import Enum
 from functools import wraps
 from ipaddress import IPv4Address, IPv4Network
 from typing import Any, Dict, List, MutableSequence, Optional, Protocol, Sequence, Set, Tuple, Union
+from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, RootModel
+from pydantic import BaseModel, ConfigDict, Field, RootModel, model_validator
 from typing_extensions import Annotated, Literal
 
-from vmngclient.models.common import TLOCColorEnum
+from vmngclient.models.common import TLOCColorEnum, check_fields_exclusive
 from vmngclient.models.misc.application_protocols import ApplicationProtocol
 from vmngclient.models.policy.lists_entries import EncapEnum
 from vmngclient.typed_list import DataSequence
 
 
 def port_set_and_ranges_to_str(ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> str:
-    if not ports and not port_ranges:
-        raise ValueError("Non empty port set or port range list must be provided")
+    assert ports or port_ranges
     ports_str = " ".join(f"{port_begin}-{port_end}" for port_begin, port_end in port_ranges)
     ports_str += " " if ports_str else ""
     ports_str += " ".join(str(p) for p in ports)
@@ -26,17 +26,12 @@ def ipv4_networks_to_str(networks: List[IPv4Network]) -> str:
     return " ".join(str(net) for net in networks)
 
 
-class ListReference(BaseModel):
-    ref: str
+class Reference(BaseModel):
+    ref: UUID
 
 
 class VariableName(BaseModel):
-    vip_variable_name: str = Field(alias="vipVariableName")
-
-
-class DefaultActionType(str, Enum):
-    DROP = "drop"
-    ACCEPT = "accept"
+    vip_variable_name: str = Field(serialization_alias="vipVariableName", validation_alias="vipVariableName")
 
 
 class PLPEntryValues(str, Enum):
@@ -61,6 +56,37 @@ class DestinationRegionEntryValues(str, Enum):
     OTHER = "other-region"
 
 
+class OriginProtocolEnum(str, Enum):
+    AGGREGATE = "aggregate"
+    BGP = "bgp"
+    BGP_EXTERNAL = "bgp-external"
+    BGP_INTERNAL = "bgp-internal"
+    CONNECTED = "connected"
+    EIGRP = "eigrp"
+    OSPF = "ospf"
+    OSPF_INTER_AREA = "ospf-inter-area"
+    OSPF_INTRA_AREA = "ospf-intra-area"
+    OSPF_EXTERNAL_1 = "ospf-external1"
+    OSPF_EXTERNAL_2 = "ospf-external2"
+    RIP = "rip"
+    STATIC = "static"
+    EIGRP_SUMMARY = "eigrp-summary"
+    EIGRP_INTERNAL = "eigrp-internal"
+    EIGRP_EXTERNAL = "eigrp-external"
+    LISP = "lisp"
+    NAT_DIA = "nat-dia"
+    NATPOOL = "natpool"
+    ISIS = "isis"
+    ISIS_LEVEL_1 = "isis-level1"
+    ISIS_LEVEL_2 = "isis-level2"
+
+
+class PathTypeEnum(str, Enum):
+    HIERARCHICAL = "hierarchical-path"
+    DIRECT = "direct-path"
+    TRANSPORT_GATEWAY = "transport-gateway-path"
+
+
 class LocalTLOCListEntryValue(BaseModel):
     color: TLOCColorEnum
     encap: EncapEnum
@@ -79,20 +105,24 @@ class SequenceIpType(str, Enum):
     ALL = "all"
 
 
-class BaseAction(str, Enum):
+class ActionTypeEnum(str, Enum):
     DROP = "drop"
     ACCEPT = "accept"
     PASS = "pass"
     INSPECT = "inspect"
+    REJECT = "reject"
 
 
-class SequenceType(str, Enum):
-    APPLICATION_FIREWALL = "applicationFirewall"
-    DATA = "data"
-    SERVICE_CHAINING = "serviceChaining"
-    TRAFFIC_ENGINEERING = "trafficEngineering"
-    QOS = "qos"
-    ZONE_BASED_FW = "zoneBasedFW"
+SequenceType = Literal[
+    "applicationFirewall",
+    "data",
+    "serviceChaining",
+    "trafficEngineering",
+    "qos",
+    "zoneBasedFW",
+    "tloc",
+    "route",
+]
 
 
 class Optimized(str, Enum):
@@ -109,6 +139,40 @@ class LossProtectionEnum(str, Enum):
     FEC_ADAPTIVE = "fecAdaptive"
     FEC_ALWAYS = "fecAlways"
     PACKET_DUPLICATION = "packetDuplication"
+
+
+class MultiRegionRoleEnum(str, Enum):
+    BORDER = "border-router"
+    EDGE = "edge-router"
+
+
+class ServiceTypeEnum(str, Enum):
+    FIREWALL = "FW"
+    INTRUSION_DETECTION_PREVENTION = "IDP"
+    INTRUSION_DETECTION_SYSTEM = "IDS"
+    NET_SERVICE_1 = "netsvc1"
+    NET_SERVICE_2 = "netsvc2"
+    NET_SERVICE_3 = "netsvc3"
+    NET_SERVICE_4 = "netsvc4"
+
+
+class TLOCActionEnum(str, Enum):
+    STRICT = "strict"
+    PRIMARY = "primary"
+    BACKUP = "backup"
+    EQUAL_COST_MULTI_PATH = "ecmp"
+
+
+class CarrierEnum(str, Enum):
+    DEFAULT = "default"
+    CARRIER_1 = "carrier1"
+    CARRIER_2 = "carrier2"
+    CARRIER_3 = "carrier3"
+    CARRIER_4 = "carrier4"
+    CARRIER_5 = "carrier5"
+    CARRIER_6 = "carrier6"
+    CARRIER_7 = "carrier7"
+    CARRIER_8 = "carrier8"
 
 
 class ServiceChainEntryValue(BaseModel):
@@ -287,6 +351,46 @@ class NextHopLooseEntry(BaseModel):
     value: str
 
 
+class OMPTagEntry(BaseModel):
+    field: Literal["ompTag"] = "ompTag"
+    value: str = Field(description="Number in range 0-4294967295")
+
+
+class OriginEntry(BaseModel):
+    field: Literal["origin"] = "origin"
+    value: OriginProtocolEnum
+
+
+class OriginatorEntry(BaseModel):
+    field: Literal["originator"] = "originator"
+    value: IPv4Address
+
+
+class PreferenceEntry(BaseModel):
+    field: Literal["preference"] = "preference"
+    value: str = Field(description="Number in range 0-4294967295")
+
+
+class PathTypeEntry(BaseModel):
+    field: Literal["pathType"] = "pathType"
+    value: PathTypeEnum
+
+
+class RegionEntry(BaseModel):
+    field: Literal["regionId"] = "regionId"
+    value: str
+
+
+class RoleEntry(BaseModel):
+    field: Literal["role"] = "role"
+    value: MultiRegionRoleEnum
+
+
+class SiteEntry(BaseModel):
+    field: Literal["siteId"] = "siteId"
+    value: str = Field(description="Site ID numeric value")
+
+
 class LocalTLOCListEntry(BaseModel):
     field: Literal["localTlocList"] = "localTlocList"
     value: LocalTLOCListEntryValue
@@ -312,6 +416,31 @@ class TLOCEntry(BaseModel):
     value: TLOCEntryValue
 
 
+class CommunityEntry(BaseModel):
+    field: Literal["community"] = "community"
+    value: str = Field(description="Example: 1000:10000 or internet or local-AS or no advertise or no-export")
+
+
+class CommunityAdditiveEntry(BaseModel):
+    field: Literal["communityAdditive"] = "communityAdditive"
+    value: Literal["true"] = "true"
+
+
+class CarrierEntry(BaseModel):
+    field: Literal["carrier"] = "carrier"
+    value: CarrierEnum
+
+
+class DomainIDEntry(BaseModel):
+    field: Literal["domainId"] = "domainId"
+    value: str = Field(description="Number in range 1-4294967295")
+
+
+class GroupIDEntry(BaseModel):
+    field: Literal["groupId"] = "groupId"
+    value: str = Field(description="Number in range 0-4294967295")
+
+
 class NATVPNEntry(RootModel):
     root: List[Union[UseVPNEntry, FallBackEntry]]
 
@@ -324,67 +453,67 @@ class NATVPNEntry(RootModel):
 
 class SourceDataPrefixListEntry(BaseModel):
     field: Literal["sourceDataPrefixList"] = "sourceDataPrefixList"
-    ref: str
+    ref: UUID
 
 
 class DestinationDataPrefixListEntry(BaseModel):
     field: Literal["destinationDataPrefixList"] = "destinationDataPrefixList"
-    ref: str
+    ref: UUID
 
 
 class SourceDataIPv6PrefixListEntry(BaseModel):
     field: Literal["sourceDataIpv6PrefixList"] = "sourceDataIpv6PrefixList"
-    ref: str
+    ref: UUID
 
 
 class DestinationDataIPv6PrefixListEntry(BaseModel):
     field: Literal["destinationDataIpv6PrefixList"] = "destinationDataIpv6PrefixList"
-    ref: str
+    ref: UUID
 
 
 class DNSAppListEntry(BaseModel):
     field: Literal["dnsAppList"] = "dnsAppList"
-    ref: str
+    ref: UUID
 
 
 class AppListEntry(BaseModel):
     field: Literal["appList"] = "appList"
-    ref: str
+    ref: UUID
 
 
 class SourceFQDNListEntry(BaseModel):
     field: Literal["sourceFqdnList"] = "sourceFqdnList"
-    ref: str
+    ref: UUID
 
 
 class DestinationFQDNListEntry(BaseModel):
     field: Literal["destinationFqdnList"] = "destinationFqdnList"
-    ref: str
+    ref: UUID
 
 
 class SourceGeoLocationListEntry(BaseModel):
     field: Literal["sourceGeoLocationList"] = "sourceGeoLocationList"
-    ref: str
+    ref: UUID
 
 
 class DestinationGeoLocationListEntry(BaseModel):
     field: Literal["destinationGeoLocationList"] = "destinationGeoLocationList"
-    ref: str
+    ref: UUID
 
 
 class ProtocolNameListEntry(BaseModel):
     field: Literal["protocolNameList"] = "protocolNameList"
-    ref: str
+    ref: UUID
 
 
 class SourcePortListEntry(BaseModel):
     field: Literal["sourcePortList"] = "sourcePortList"
-    ref: str
+    ref: UUID
 
 
 class DestinationPortListEntry(BaseModel):
     field: Literal["destinationPortList"] = "destinationPortList"
-    ref: str
+    ref: UUID
 
 
 class RuleSetListEntry(BaseModel):
@@ -392,46 +521,90 @@ class RuleSetListEntry(BaseModel):
     ref: str
 
     @staticmethod
-    def from_rule_set_ids(rule_set_ids: Set[str]) -> "RuleSetListEntry":
-        return RuleSetListEntry(ref=" ".join(rule_set_ids))
+    def from_rule_set_ids(rule_set_ids: Set[UUID]) -> "RuleSetListEntry":
+        return RuleSetListEntry(ref=" ".join(str(rule_set_ids)))
 
 
 class PolicerListEntry(BaseModel):
     field: Literal["policer"] = "policer"
-    ref: str
+    ref: UUID
 
 
 class TLOCListEntry(BaseModel):
     field: Literal["tlocList"] = "tlocList"
-    ref: str
+    ref: UUID
 
 
 class PrefferedColorGroupListEntry(BaseModel):
     field: Literal["preferredColorGroup"] = "preferredColorGroup"
-    ref: str
-    color_restrict: bool = Field(False, alias="colorRestrict")
+    ref: UUID
+    color_restrict: bool = Field(False, serialization_alias="colorRestrict", validation_alias="colorRestrict")
     model_config = ConfigDict(populate_by_name=True)
 
 
+class ColorListEntry(BaseModel):
+    field: Literal["colorList"] = "colorList"
+    ref: UUID
+
+
+class CommunityListEntry(BaseModel):
+    field: Literal["community"] = "community"
+    ref: UUID
+
+
+class ExpandedCommunityListEntry(BaseModel):
+    field: Literal["expandedCommunity"] = "expandedCommunity"
+    ref: UUID
+
+
+class SiteListEntry(BaseModel):
+    field: Literal["siteList"] = "siteList"
+    ref: UUID
+
+
+class VPNListEntry(BaseModel):
+    field: Literal["vpnList"] = "vpnList"
+    ref: UUID
+
+
+class PrefixListEntry(BaseModel):
+    field: Literal["prefixList"] = "prefixList"
+    ref: UUID
+
+
+class RegionListEntry(BaseModel):
+    field: Literal["regionList"] = "regionList"
+    ref: UUID
+
+
+class ServiceEntryValue(BaseModel):
+    type: ServiceTypeEnum
+    vpn: str
+    tloc: Optional[TLOCEntryValue] = None
+    tloc_list: Optional[TLOCListEntry]
+
+    @model_validator(mode="after")
+    def tloc_xor_tloc_list(self):
+        check_fields_exclusive(self.__dict__, {"tloc", "tloc_list"}, True)
+        return self
+
+
+class ServiceEntry(BaseModel):
+    field: Literal["service"] = "service"
+    value: ServiceEntryValue
+
+
+class TLOCActionEntry(BaseModel):
+    field: Literal["tlocAction"] = "tlocAction"
+    value: TLOCActionEnum
+
+
+class AffinityEntry(BaseModel):
+    field: Literal["affinity"] = "affinity"
+    value: str = Field(description="Number in range 0-63")
+
+
 RedirectDNSActionEntry = Union[IPAddressEntry, DNSTypeEntry]
-
-
-ActionSetEntry = Annotated[
-    Union[
-        DSCPEntry,
-        ForwardingClassEntry,
-        PrefferedColorGroupListEntry,
-        LocalTLOCListEntry,
-        NextHopEntry,
-        NextHopLooseEntry,
-        PolicerListEntry,
-        ServiceChainEntry,
-        VPNEntry,
-        TLOCListEntry,
-        TLOCEntry,
-    ],
-    Field(discriminator="field"),
-]
 
 
 class LogAction(BaseModel):
@@ -442,11 +615,6 @@ class LogAction(BaseModel):
 class CountAction(BaseModel):
     type: Literal["count"] = "count"
     parameter: str
-
-
-class ActionSet(BaseModel):
-    type: Literal["set"] = "set"
-    parameter: List[ActionSetEntry] = []
 
 
 class NATAction(BaseModel):
@@ -520,60 +688,116 @@ class FallBackToRoutingAction(BaseModel):
     parameter: str = ""
 
 
+class ExportToAction(BaseModel):
+    type: Literal["exportTo"] = "exportTo"
+    parameter: VPNListEntry
+
+
+ActionSetEntry = Annotated[
+    Union[
+        AffinityEntry,
+        CommunityAdditiveEntry,
+        CommunityEntry,
+        DSCPEntry,
+        ForwardingClassEntry,
+        LocalTLOCListEntry,
+        NextHopEntry,
+        NextHopLooseEntry,
+        OMPTagEntry,
+        PolicerListEntry,
+        PreferenceEntry,
+        PrefferedColorGroupListEntry,
+        ServiceChainEntry,
+        ServiceEntry,
+        TLOCActionEntry,
+        TLOCEntry,
+        TLOCListEntry,
+        VPNEntry,
+    ],
+    Field(discriminator="field"),
+]
+
+
+class ActionSet(BaseModel):
+    type: Literal["set"] = "set"
+    parameter: List[ActionSetEntry] = []
+
+
 ActionEntry = Annotated[
     Union[
-        LogAction,
-        CountAction,
         ActionSet,
-        NATAction,
         CFlowDAction,
-        RedirectDNSAction,
-        TCPOptimizationAction,
+        CountAction,
         DREOptimizationAction,
-        ServiceNodeGroupAction,
+        FallBackToRoutingAction,
+        LogAction,
         LossProtectionAction,
         LossProtectionFECAction,
         LossProtectionPacketDuplicationAction,
+        NATAction,
+        RedirectDNSAction,
         SecureInternetGatewayAction,
-        FallBackToRoutingAction,
+        ServiceNodeGroupAction,
+        TCPOptimizationAction,
+        ExportToAction,
     ],
     Field(discriminator="type"),
 ]
 
-
 MatchEntry = Annotated[
     Union[
-        PacketLengthEntry,
-        PLPEntry,
-        ProtocolEntry,
-        DSCPEntry,
-        SourceIPEntry,
-        SourcePortEntry,
+        AppListEntry,
+        CarrierEntry,
+        ColorListEntry,
+        CommunityListEntry,
+        DestinationDataIPv6PrefixListEntry,
+        DestinationDataPrefixListEntry,
+        DestinationFQDNEntry,
+        DestinationFQDNListEntry,
+        DestinationGeoLocationEntry,
+        DestinationGeoLocationListEntry,
         DestinationIPEntry,
         DestinationPortEntry,
-        TCPEntry,
-        DNSEntry,
-        TrafficToEntry,
-        SourceFQDNEntry,
-        DestinationFQDNEntry,
-        SourceGeoLocationEntry,
-        DestinationGeoLocationEntry,
-        SourceDataPrefixListEntry,
-        DestinationDataPrefixListEntry,
-        SourceDataIPv6PrefixListEntry,
-        DestinationDataIPv6PrefixListEntry,
-        DestinationRegionEntry,
-        DNSAppListEntry,
-        AppListEntry,
-        SourceFQDNListEntry,
-        DestinationFQDNListEntry,
-        SourceGeoLocationListEntry,
-        DestinationGeoLocationListEntry,
-        SourcePortListEntry,
         DestinationPortListEntry,
-        ProtocolNameListEntry,
+        DestinationRegionEntry,
+        DomainIDEntry,
+        DNSAppListEntry,
+        DNSEntry,
+        DSCPEntry,
+        ExpandedCommunityListEntry,
+        GroupIDEntry,
+        OMPTagEntry,
+        OriginatorEntry,
+        OriginEntry,
+        PacketLengthEntry,
+        PathTypeEntry,
+        PLPEntry,
+        PreferenceEntry,
+        PrefixListEntry,
+        ProtocolEntry,
         ProtocolNameEntry,
+        ProtocolNameListEntry,
+        RegionEntry,
+        RegionListEntry,
+        RoleEntry,
         RuleSetListEntry,
+        SiteEntry,
+        SiteListEntry,
+        SiteListEntry,
+        SourceDataIPv6PrefixListEntry,
+        SourceDataPrefixListEntry,
+        SourceFQDNEntry,
+        SourceFQDNListEntry,
+        SourceGeoLocationEntry,
+        SourceGeoLocationListEntry,
+        SourceIPEntry,
+        SourcePortEntry,
+        SourcePortListEntry,
+        TCPEntry,
+        TLOCEntry,
+        TLOCListEntry,
+        TrafficToEntry,
+        VPNListEntry,
     ],
     Field(discriminator="field"),
 ]
@@ -584,10 +808,14 @@ MUTUALLY_EXCLUSIVE_FIELDS = [
     {"protocolName", "protocolNameList", "protocol", "destinationPort", "destinationPortList"},
     {"localTlocList", "preferredColorGroup"},
     {"sig", "fallbackToRouting", "nat", "nextHop", "serviceChain"},
+    {"regionId", "regionList"},
+    {"siteId", "siteList"},
+    {"tloc", "tlocList"},
+    {"service", "tlocAction"},
 ]
 
 
-def generate_field_name_check_lookup(spec: Sequence[Set[str]]) -> Dict[str, List[str]]:
+def _generate_field_name_check_lookup(spec: Sequence[Set[str]]) -> Dict[str, List[str]]:
     lookup: Dict[str, List[str]] = {}
     for exclusive_set in spec:
         for field in exclusive_set:
@@ -595,7 +823,7 @@ def generate_field_name_check_lookup(spec: Sequence[Set[str]]) -> Dict[str, List
     return lookup
 
 
-MUTUALLY_EXCLUSIVE_FIELD_LOOKUP = generate_field_name_check_lookup(MUTUALLY_EXCLUSIVE_FIELDS)
+MUTUALLY_EXCLUSIVE_FIELD_LOOKUP = _generate_field_name_check_lookup(MUTUALLY_EXCLUSIVE_FIELDS)
 
 
 class Match(BaseModel):
@@ -606,45 +834,46 @@ class Action(BaseModel):
     pass
 
 
-class DefinitionSequenceBase(BaseModel):
-    sequence_id: int = Field(alias="sequenceId")
-    sequence_name: str = Field(alias="sequenceName")
-    base_action: BaseAction = Field(default=BaseAction.DROP, alias="baseAction")
-    sequence_type: SequenceType = Field(alias="sequenceType")
-    sequence_ip_type: SequenceIpType = Field(alias="sequenceIpType")
+class PolicyDefinitionSequenceBase(BaseModel):
+    sequence_id: int = Field(default=0, serialization_alias="sequenceId", validation_alias="sequenceId")
+    sequence_name: str = Field(serialization_alias="sequenceName", validation_alias="sequenceName")
+    base_action: ActionTypeEnum = Field(
+        default=ActionTypeEnum.DROP, serialization_alias="baseAction", validation_alias="baseAction"
+    )
+    sequence_type: SequenceType = Field(serialization_alias="sequenceType", validation_alias="sequenceType")
+    sequence_ip_type: SequenceIpType = Field(serialization_alias="sequenceIpType", validation_alias="sequenceIpType")
     ruleset: Optional[bool] = None
     match: Match
     actions: Sequence[ActionEntry]
 
     @staticmethod
-    def check_field_collision(field: str, fields: Sequence[str]) -> None:
+    def _check_field_collision(field: str, fields: Sequence[str]) -> None:
         existing_fields = set(fields)
         forbidden_fields = set(MUTUALLY_EXCLUSIVE_FIELD_LOOKUP.get(field, []))
         colliding_fields = set(existing_fields) & set(forbidden_fields)
-        if colliding_fields:
-            raise ValueError(f"{field} is mutually exclusive with {colliding_fields}")
+        assert not colliding_fields, f"{field} is mutually exclusive with {colliding_fields}"
 
-    def check_match_can_be_inserted(self, match: MatchEntry) -> None:
-        self.check_field_collision(
+    def _check_match_can_be_inserted(self, match: MatchEntry) -> None:
+        self._check_field_collision(
             match.field,
             [entry.field for entry in self.match.entries],
         )
 
-    def check_action_can_be_inserted_in_set(
+    def _check_action_can_be_inserted_in_set(
         self, action: ActionSetEntry, action_set_param: List[ActionSetEntry]
     ) -> None:
-        self.check_field_collision(
+        self._check_field_collision(
             action.field,
             [param.field for param in action_set_param],
         )
 
-    def get_match_entries_by_field(self, field: str) -> Sequence[MatchEntry]:
+    def _get_match_entries_by_field(self, field: str) -> Sequence[MatchEntry]:
         return [entry for entry in self.match.entries if entry.field == field]
 
-    def insert_match(self, match: MatchEntry, insert_field_check: bool = True) -> int:
+    def _insert_match(self, match: MatchEntry, insert_field_check: bool = True) -> int:
         # inserts new item or replaces item with same field name if found
         if insert_field_check:
-            self.check_match_can_be_inserted(match)
+            self._check_match_can_be_inserted(match)
         if isinstance(self.match.entries, MutableSequence):
             for index, entry in enumerate(self.match.entries):
                 if match.field == entry.field:
@@ -653,9 +882,9 @@ class DefinitionSequenceBase(BaseModel):
             self.match.entries.append(match)
             return len(self.match.entries) - 1
         else:
-            raise TypeError("Match entries must be defined as MutableSequence (eg. List) to use insert_match method")
+            raise TypeError("Match entries must be defined as MutableSequence (eg. List) to use _insert_match method")
 
-    def insert_action(self, action: ActionEntry) -> None:
+    def _insert_action(self, action: ActionEntry) -> None:
         if isinstance(self.actions, MutableSequence):
             for index, entry in enumerate(self.actions):
                 if action.type == entry.type:
@@ -663,13 +892,13 @@ class DefinitionSequenceBase(BaseModel):
                     return
             self.actions.append(action)
         else:
-            raise TypeError("Action entries must be defined as MutableSequence (eg. List) to use insert_match method")
+            raise TypeError("Action entries must be defined as MutableSequence (eg. List) to use _insert_match method")
 
-    def remove_action(self, action_type_name: str) -> None:
+    def _remove_action(self, action_type_name: str) -> None:
         if isinstance(self.actions, MutableSequence):
             self.actions[:] = [action for action in self.actions if action.type != action_type_name]
 
-    def insert_action_in_set(self, action: ActionSetEntry) -> None:
+    def _insert_action_in_set(self, action: ActionSetEntry) -> None:
         if isinstance(self.actions, MutableSequence):
             # Check if ActionSet entry already exist
             action_sets = [act for act in self.actions if isinstance(act, ActionSet)]
@@ -680,14 +909,14 @@ class DefinitionSequenceBase(BaseModel):
             else:
                 action_set = action_sets[0]
             # Now we operate on action_set parameter list
-            self.check_action_can_be_inserted_in_set(action, action_set.parameter)
+            self._check_action_can_be_inserted_in_set(action, action_set.parameter)
             for index, param in enumerate(action_set.parameter):
                 if action.field == param.field:
                     action_set.parameter[index] = action
                     return
             action_set.parameter.append(action)
 
-    def remove_action_from_set(self, field_name: str) -> None:
+    def _remove_action_from_set(self, field_name: str) -> None:
         if isinstance(self.actions, MutableSequence):
             for action in self.actions:
                 if isinstance(action, ActionSet):
@@ -696,36 +925,39 @@ class DefinitionSequenceBase(BaseModel):
 
 def accept_action(method):
     @wraps(method)
-    def wrapper(self: DefinitionSequenceBase, *args, **kwargs):
-        if self.base_action != BaseAction.ACCEPT:
-            raise ValueError(f"{method.__name__} only allowed when base_action is {BaseAction.ACCEPT}")
+    def wrapper(self: PolicyDefinitionSequenceBase, *args, **kwargs):
+        assert (
+            self.base_action == ActionTypeEnum.ACCEPT
+        ), f"{method.__name__} only allowed when base_action is {ActionTypeEnum.ACCEPT}"
         return method(self, *args, **kwargs)
 
     return wrapper
 
 
 class DefaultAction(BaseModel):
-    type: DefaultActionType
+    type: ActionTypeEnum
 
 
 class InfoTag(BaseModel):
-    info_tag: Optional[str] = Field("", alias="infoTag")
+    info_tag: Optional[str] = Field("", serialization_alias="infoTag", validation_alias="infoTag")
 
 
 class PolicyDefinitionId(BaseModel):
-    definition_id: str = Field(alias="definitionId")
+    definition_id: UUID = Field(serialization_alias="definitionId", validation_alias="definitionId")
 
 
 class PolicyReference(BaseModel):
-    id: str
+    id: UUID
     property: str
 
 
 class DefinitionWithSequencesCommonBase(BaseModel):
     default_action: Optional[DefaultAction] = Field(
-        default=DefaultAction(type=DefaultActionType.DROP), alias="defaultAction"
+        default=DefaultAction(type=ActionTypeEnum.DROP),
+        serialization_alias="defaultAction",
+        validation_alias="defaultAction",
     )
-    sequences: Optional[Sequence[DefinitionSequenceBase]] = None
+    sequences: Optional[Sequence[PolicyDefinitionSequenceBase]] = None
 
     def _enumerate_sequences(self, from_index: int = 0) -> None:
         """Updates sequence entries with appropriate index.
@@ -755,7 +987,7 @@ class DefinitionWithSequencesCommonBase(BaseModel):
         else:
             raise TypeError("sequences be defined as MutableSequence (eg. List) to use pop method")
 
-    def add(self, item: DefinitionSequenceBase) -> int:
+    def add(self, item: PolicyDefinitionSequenceBase) -> int:
         """Adds new sequence item as last in table, index will be autogenerated.
 
         Args:
@@ -786,9 +1018,9 @@ class PolicyDefinitionBase(BaseModel):
 
 
 class PolicyDefinitionInfo(PolicyDefinitionBase):
-    last_updated: datetime.datetime = Field(alias="lastUpdated")
+    last_updated: datetime.datetime = Field(serialization_alias="lastUpdated", validation_alias="lastUpdated")
     owner: str
-    reference_count: int = Field(alias="referenceCount")
+    reference_count: int = Field(serialization_alias="referenceCount", validation_alias="referenceCount")
     references: List[PolicyReference]
 
 
@@ -797,7 +1029,9 @@ class PolicyDefinitionCreationPayload(PolicyDefinitionBase):
 
 
 class PolicyDefinitionGetResponse(PolicyDefinitionCreationPayload, PolicyDefinitionId):
-    is_activated_by_vsmart: bool = Field(alias="isActivatedByVsmart")
+    is_activated_by_vsmart: bool = Field(
+        serialization_alias="isActivatedByVsmart", validation_alias="isActivatedByVsmart"
+    )
 
 
 class PolicyDefinitionEditPayload(PolicyDefinitionCreationPayload, PolicyDefinitionId):
@@ -805,7 +1039,9 @@ class PolicyDefinitionEditPayload(PolicyDefinitionCreationPayload, PolicyDefinit
 
 
 class PolicyDefinitionEditResponse(BaseModel):
-    master_templates_affected: List[str] = Field(default=[], alias="masterTemplatesAffected")
+    master_templates_affected: List[str] = Field(
+        default=[], serialization_alias="masterTemplatesAffected", validation_alias="masterTemplatesAffected"
+    )
 
 
 class PolicyDefinitionPreview(BaseModel):
@@ -816,14 +1052,14 @@ class PolicyDefinitionEndpoints(Protocol):
     def create_policy_definition(self, payload: BaseModel) -> PolicyDefinitionId:
         ...
 
-    def delete_policy_definition(self, id: str) -> None:
+    def delete_policy_definition(self, id: UUID) -> None:
         ...
 
-    def edit_policy_definition(self, id: str, payload: BaseModel) -> PolicyDefinitionEditResponse:
+    def edit_policy_definition(self, id: UUID, payload: BaseModel) -> PolicyDefinitionEditResponse:
         ...
 
     def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
         ...
 
-    def get_policy_definition(self, id: str) -> PolicyDefinitionGetResponse:
+    def get_policy_definition(self, id: UUID) -> PolicyDefinitionGetResponse:
         ...
