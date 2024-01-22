@@ -1,5 +1,6 @@
 from ipaddress import IPv4Address, IPv4Network, IPv6Network
 from typing import Any, List, Literal, Optional, Set, Tuple, Union
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated
@@ -236,7 +237,7 @@ class SLAClassList(PolicyListBase):
 
     def assign_app_probe_class(
         self,
-        app_probe_class_id: str,
+        app_probe_class_id: UUID,
         latency: Optional[int] = None,
         loss: Optional[int] = None,
         jitter: Optional[int] = None,

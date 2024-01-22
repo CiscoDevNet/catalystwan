@@ -3,6 +3,7 @@ from enum import Enum
 from functools import wraps
 from ipaddress import IPv4Address, IPv4Network
 from typing import Any, Dict, List, MutableSequence, Optional, Protocol, Sequence, Set, Tuple, Union
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, RootModel, model_validator
 from typing_extensions import Annotated, Literal
@@ -27,7 +28,7 @@ def ipv4_networks_to_str(networks: List[IPv4Network]) -> str:
 
 
 class Reference(BaseModel):
-    ref: str
+    ref: UUID
 
 
 class VariableName(BaseModel):
@@ -453,67 +454,67 @@ class NATVPNEntry(RootModel):
 
 class SourceDataPrefixListEntry(BaseModel):
     field: Literal["sourceDataPrefixList"] = "sourceDataPrefixList"
-    ref: str
+    ref: UUID
 
 
 class DestinationDataPrefixListEntry(BaseModel):
     field: Literal["destinationDataPrefixList"] = "destinationDataPrefixList"
-    ref: str
+    ref: UUID
 
 
 class SourceDataIPv6PrefixListEntry(BaseModel):
     field: Literal["sourceDataIpv6PrefixList"] = "sourceDataIpv6PrefixList"
-    ref: str
+    ref: UUID
 
 
 class DestinationDataIPv6PrefixListEntry(BaseModel):
     field: Literal["destinationDataIpv6PrefixList"] = "destinationDataIpv6PrefixList"
-    ref: str
+    ref: UUID
 
 
 class DNSAppListEntry(BaseModel):
     field: Literal["dnsAppList"] = "dnsAppList"
-    ref: str
+    ref: UUID
 
 
 class AppListEntry(BaseModel):
     field: Literal["appList"] = "appList"
-    ref: str
+    ref: UUID
 
 
 class SourceFQDNListEntry(BaseModel):
     field: Literal["sourceFqdnList"] = "sourceFqdnList"
-    ref: str
+    ref: UUID
 
 
 class DestinationFQDNListEntry(BaseModel):
     field: Literal["destinationFqdnList"] = "destinationFqdnList"
-    ref: str
+    ref: UUID
 
 
 class SourceGeoLocationListEntry(BaseModel):
     field: Literal["sourceGeoLocationList"] = "sourceGeoLocationList"
-    ref: str
+    ref: UUID
 
 
 class DestinationGeoLocationListEntry(BaseModel):
     field: Literal["destinationGeoLocationList"] = "destinationGeoLocationList"
-    ref: str
+    ref: UUID
 
 
 class ProtocolNameListEntry(BaseModel):
     field: Literal["protocolNameList"] = "protocolNameList"
-    ref: str
+    ref: UUID
 
 
 class SourcePortListEntry(BaseModel):
     field: Literal["sourcePortList"] = "sourcePortList"
-    ref: str
+    ref: UUID
 
 
 class DestinationPortListEntry(BaseModel):
     field: Literal["destinationPortList"] = "destinationPortList"
-    ref: str
+    ref: UUID
 
 
 class RuleSetListEntry(BaseModel):
@@ -521,60 +522,60 @@ class RuleSetListEntry(BaseModel):
     ref: str
 
     @staticmethod
-    def from_rule_set_ids(rule_set_ids: Set[str]) -> "RuleSetListEntry":
-        return RuleSetListEntry(ref=" ".join(rule_set_ids))
+    def from_rule_set_ids(rule_set_ids: Set[UUID]) -> "RuleSetListEntry":
+        return RuleSetListEntry(ref=" ".join(str(rule_set_ids)))
 
 
 class PolicerListEntry(BaseModel):
     field: Literal["policer"] = "policer"
-    ref: str
+    ref: UUID
 
 
 class TLOCListEntry(BaseModel):
     field: Literal["tlocList"] = "tlocList"
-    ref: str
+    ref: UUID
 
 
 class PrefferedColorGroupListEntry(BaseModel):
     field: Literal["preferredColorGroup"] = "preferredColorGroup"
-    ref: str
+    ref: UUID
     color_restrict: bool = Field(False, serialization_alias="colorRestrict", validation_alias="colorRestrict")
     model_config = ConfigDict(populate_by_name=True)
 
 
 class ColorListEntry(BaseModel):
     field: Literal["colorList"] = "colorList"
-    ref: str
+    ref: UUID
 
 
 class CommunityListEntry(BaseModel):
     field: Literal["community"] = "community"
-    ref: str
+    ref: UUID
 
 
 class ExpandedCommunityListEntry(BaseModel):
     field: Literal["expandedCommunity"] = "expandedCommunity"
-    ref: str
+    ref: UUID
 
 
 class SiteListEntry(BaseModel):
     field: Literal["siteList"] = "siteList"
-    ref: str
+    ref: UUID
 
 
 class VPNListEntry(BaseModel):
     field: Literal["vpnList"] = "vpnList"
-    ref: str
+    ref: UUID
 
 
 class PrefixListEntry(BaseModel):
     field: Literal["prefixList"] = "prefixList"
-    ref: str
+    ref: UUID
 
 
 class RegionListEntry(BaseModel):
     field: Literal["regionList"] = "regionList"
-    ref: str
+    ref: UUID
 
 
 class ServiceEntryValue(BaseModel):
@@ -943,11 +944,11 @@ class InfoTag(BaseModel):
 
 
 class PolicyDefinitionId(BaseModel):
-    definition_id: str = Field(serialization_alias="definitionId", validation_alias="definitionId")
+    definition_id: UUID = Field(serialization_alias="definitionId", validation_alias="definitionId")
 
 
 class PolicyReference(BaseModel):
-    id: str
+    id: UUID
     property: str
 
 
@@ -1052,14 +1053,14 @@ class PolicyDefinitionEndpoints(Protocol):
     def create_policy_definition(self, payload: BaseModel) -> PolicyDefinitionId:
         ...
 
-    def delete_policy_definition(self, id: str) -> None:
+    def delete_policy_definition(self, id: UUID) -> None:
         ...
 
-    def edit_policy_definition(self, id: str, payload: BaseModel) -> PolicyDefinitionEditResponse:
+    def edit_policy_definition(self, id: UUID, payload: BaseModel) -> PolicyDefinitionEditResponse:
         ...
 
     def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
         ...
 
-    def get_policy_definition(self, id: str) -> PolicyDefinitionGetResponse:
+    def get_policy_definition(self, id: UUID) -> PolicyDefinitionGetResponse:
         ...

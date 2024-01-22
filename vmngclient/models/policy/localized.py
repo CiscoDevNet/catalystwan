@@ -1,4 +1,5 @@
 from typing import List, Literal, Optional
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, field_validator
 
@@ -60,7 +61,7 @@ class LocalizedPolicySettings(BaseModel):
 
 class LocalizedPolicyAssemblyItem(AssemblyItem):
     type: LocalizedPolicySupportedItemType
-    definition_id: str = Field(serialization_alias="definitionId", validation_alias="definitionId")
+    definition_id: UUID = Field(serialization_alias="definitionId", validation_alias="definitionId")
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -77,31 +78,31 @@ class LocalizedPolicy(PolicyCreationPayload):
     )
     policy_type: str = Field("feature", serialization_alias="policyType", validation_alias="policyType")
 
-    def _add_item(self, type: LocalizedPolicySupportedItemType, id: str) -> None:
+    def _add_item(self, type: LocalizedPolicySupportedItemType, id: UUID) -> None:
         self.policy_definition.assembly.append(LocalizedPolicyAssemblyItem(type=type, definition_id=id))
 
-    def add_qos_map(self, definition_id: str) -> None:
+    def add_qos_map(self, definition_id: UUID) -> None:
         self._add_item("qosMap", definition_id)
 
-    def add_rewrite_rule(self, definition_id: str) -> None:
+    def add_rewrite_rule(self, definition_id: UUID) -> None:
         self._add_item("rewriteRule", definition_id)
 
-    def add_vpn_qos_map(self, definition_id: str) -> None:
+    def add_vpn_qos_map(self, definition_id: UUID) -> None:
         self._add_item("vpnQoSMap", definition_id)
 
-    def add_access_control_list(self, definition_id: str) -> None:
+    def add_access_control_list(self, definition_id: UUID) -> None:
         self._add_item("acl", definition_id)
 
-    def add_access_control_list_ipv6(self, definition_id: str) -> None:
+    def add_access_control_list_ipv6(self, definition_id: UUID) -> None:
         self._add_item("aclv6", definition_id)
 
-    def add_device_access_policy(self, definition_id: str) -> None:
+    def add_device_access_policy(self, definition_id: UUID) -> None:
         self._add_item("deviceAccessPolicy", definition_id)
 
-    def add_device_access_policy_ipv6(self, definition_id: str) -> None:
+    def add_device_access_policy_ipv6(self, definition_id: UUID) -> None:
         self._add_item("deviceAccessPolicyv6", definition_id)
 
-    def add_route_policy(self, definition_id: str) -> None:
+    def add_route_policy(self, definition_id: UUID) -> None:
         self._add_item("vedgeRoute", definition_id)
 
     @field_validator("policy_definition", mode="before")
@@ -129,5 +130,5 @@ class LocalizedPolicyDeviceInfo(BaseModel):
     local_system_ip: IPvAnyAddress = Field(serialization_alias="local-system-ip", validation_alias="local-system-ip")
     host_name: str = Field(serialization_alias="host-name", validation_alias="host-name")
     site_id: Optional[str] = Field(None, serialization_alias="site-id", validation_alias="site-id")
-    uuid: str
+    uuid: UUID
     layout_level: int = Field(serialization_alias="layoutLevel", validation_alias="layoutLevel")

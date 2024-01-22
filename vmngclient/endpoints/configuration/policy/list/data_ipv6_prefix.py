@@ -1,4 +1,6 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.models.policy.lists import DataIPv6PrefixList
 from vmngclient.models.policy.policy_list import (
@@ -25,7 +27,7 @@ class ConfigurationPolicyDataIPv6PrefixList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/dataipv6prefix/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/dataipv6prefix")
@@ -33,11 +35,11 @@ class ConfigurationPolicyDataIPv6PrefixList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/dataipv6prefix/{id}")
-    def edit_policy_list(self, id: str, payload: DataIPv6PrefixListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: DataIPv6PrefixListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/dataipv6prefix/{id}")
-    def get_lists_by_id(self, id: str) -> DataIPv6PrefixListInfo:
+    def get_lists_by_id(self, id: UUID) -> DataIPv6PrefixListInfo:
         ...
 
     @get("/template/policy/list/dataipv6prefix", "data")
@@ -53,5 +55,5 @@ class ConfigurationPolicyDataIPv6PrefixList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/dataipv6prefix/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

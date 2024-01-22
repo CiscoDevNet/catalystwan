@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import List, Literal, Optional, Union
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -18,7 +19,7 @@ class QoSDropEnum(str, Enum):
 
 class QoSScheduler(BaseModel):
     queue: str
-    class_map_ref: str = Field(serialization_alias="classMapRef", validation_alias="classMapRef")
+    class_map_ref: Union[UUID, Literal[""]] = Field(serialization_alias="classMapRef", validation_alias="classMapRef")
     bandwidth_percent: str = Field("1", serialization_alias="bandwidthPercent", validation_alias="bandwidthPercent")
     buffer_percent: str = Field("1", serialization_alias="bufferPercent", validation_alias="bufferPercent")
     burst: Optional[str] = None
@@ -81,7 +82,7 @@ class QoSMap(PolicyDefinitionBase):
     def add_scheduler(
         self,
         queue: int,
-        class_map_ref: str,
+        class_map_ref: UUID,
         bandwidth: int = 1,
         buffer: int = 1,
         scheduling: QoSSchedulingEnum = QoSSchedulingEnum.WRR,

@@ -1,4 +1,6 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.models.policy.lists import LocalDomainList
 from vmngclient.models.policy.policy_list import (
@@ -25,7 +27,7 @@ class ConfigurationPolicyLocalDomainList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/localdomain/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/localdomain")
@@ -33,11 +35,11 @@ class ConfigurationPolicyLocalDomainList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/localdomain/{id}")
-    def edit_policy_list(self, id: str, payload: LocalDomainListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: LocalDomainListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/localdomain/{id}")
-    def get_lists_by_id(self, id: str) -> LocalDomainListInfo:
+    def get_lists_by_id(self, id: UUID) -> LocalDomainListInfo:
         ...
 
     @get("/template/policy/list/localdomain", "data")
@@ -53,5 +55,5 @@ class ConfigurationPolicyLocalDomainList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/localdomain/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

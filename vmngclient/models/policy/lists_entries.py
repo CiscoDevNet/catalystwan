@@ -1,6 +1,7 @@
 from enum import Enum
 from ipaddress import IPv4Address, IPv4Network, IPv6Network
 from typing import List, Literal, Optional
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, field_validator, model_validator
 
@@ -81,9 +82,9 @@ class FallbackBestTunnel(BaseModel):
     _criteria_priority: List[Literal["jitter", "latency", "loss"]] = []
 
     # validators
-    _jitter_validator = field_validator("jitter_variance")(check_jitter_ms)  # type: ignore[type-var]
-    _latency_validator = field_validator("latency_variance")(check_latency_ms)  # type: ignore[type-var]
-    _loss_validator = field_validator("loss_variance")(check_loss_percent)  # type: ignore[type-var]
+    _jitter_validator = field_validator("jitter_variance")(check_jitter_ms)
+    _latency_validator = field_validator("latency_variance")(check_latency_ms)
+    _loss_validator = field_validator("loss_variance")(check_loss_percent)
 
     @model_validator(mode="after")
     def check_criteria(self):
@@ -341,15 +342,15 @@ class SLAClassListEntry(BaseModel):
     latency: Optional[str] = None
     loss: Optional[str] = None
     jitter: Optional[str] = None
-    app_probe_class: Optional[str] = Field(serialization_alias="appProbeClass", validation_alias="appProbeClass")
+    app_probe_class: Optional[UUID] = Field(serialization_alias="appProbeClass", validation_alias="appProbeClass")
     fallback_best_tunnel: Optional[FallbackBestTunnel] = Field(
         default=None, serialization_alias="fallbackBestTunnel", validation_alias="fallbackBestTunnel"
     )
 
     # validators
-    _jitter_validator = field_validator("jitter")(check_jitter_ms)  # type: ignore[type-var]
-    _latency_validator = field_validator("latency")(check_latency_ms)  # type: ignore[type-var]
-    _loss_validator = field_validator("loss")(check_loss_percent)  # type: ignore[type-var]
+    _jitter_validator = field_validator("jitter")(check_jitter_ms)
+    _latency_validator = field_validator("latency")(check_latency_ms)
+    _loss_validator = field_validator("loss")(check_loss_percent)
 
     @model_validator(mode="after")
     def check_at_least_one_criteria_is_set(self):
@@ -449,7 +450,9 @@ class IPv6PrefixListEntry(BaseModel):
 class RegionListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    region_id: str = Field(serialization_alias="regionId", validation_alias="regionId")
+    region_id: str = Field(
+        serialization_alias="regionId", validation_alias="regionId", description="Number in range 0-63"
+    )
 
     @field_validator("region_id")
     @classmethod

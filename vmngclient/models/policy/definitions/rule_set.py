@@ -1,5 +1,6 @@
 from ipaddress import IPv4Network, IPv6Network
 from typing import List, Literal, Optional, Union
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Annotated
@@ -189,29 +190,29 @@ class RuleSet(PolicyDefinitionBase):
     def add_ipv4_rule(
         self,
         action: str = "permit",
-        source_security_group_id: Optional[str] = None,
+        source_security_group_id: Optional[UUID] = None,
         source_ip: Optional[IPv4Network] = None,
         source_ip_variable: Optional[str] = None,
-        source_data_prefix_list_id: Optional[str] = None,
+        source_data_prefix_list_id: Optional[UUID] = None,
         source_fqdn: Optional[str] = None,
-        source_fqdn_list_id: Optional[str] = None,
+        source_fqdn_list_id: Optional[UUID] = None,
         source_geo_location: Optional[str] = None,
-        source_geo_location_list_id: Optional[str] = None,
+        source_geo_location_list_id: Optional[UUID] = None,
         source_port: Optional[str] = None,
-        source_port_list_id: Optional[str] = None,
-        destination_security_group_id: Optional[str] = None,
+        source_port_list_id: Optional[UUID] = None,
+        destination_security_group_id: Optional[UUID] = None,
         destination_ip: Optional[IPv4Network] = None,
         destination_ip_variable: Optional[str] = None,
-        destination_data_prefix_list_id: Optional[str] = None,
+        destination_data_prefix_list_id: Optional[UUID] = None,
         destination_fqdn: Optional[str] = None,
-        destination_fqdn_list_id: Optional[str] = None,
+        destination_fqdn_list_id: Optional[UUID] = None,
         destination_geo_location: Optional[str] = None,
-        destination_geo_location_list_id: Optional[str] = None,
+        destination_geo_location_list_id: Optional[UUID] = None,
         destination_port: Optional[str] = None,
-        destination_port_list_id: Optional[str] = None,
+        destination_port_list_id: Optional[UUID] = None,
         protocols: Optional[List[int]] = None,
         protocol_names: Optional[str] = None,
-        protocol_name_list_id: Optional[str] = None,
+        protocol_name_list_id: Optional[UUID] = None,
     ) -> None:
         if source_ip is not None and source_ip_variable is not None:
             raise ValueError("Source IP and variable name cannot be set at the same time")

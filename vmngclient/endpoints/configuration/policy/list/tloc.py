@@ -1,4 +1,6 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.models.policy.lists import TLOCList
 from vmngclient.models.policy.policy_list import (
@@ -25,7 +27,7 @@ class ConfigurationPolicyTLOCList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/tloc/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/tloc")
@@ -33,11 +35,11 @@ class ConfigurationPolicyTLOCList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/tloc/{id}")
-    def edit_policy_list(self, id: str, payload: TLOCListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: TLOCListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/tloc/{id}")
-    def get_lists_by_id(self, id: str) -> TLOCListInfo:
+    def get_lists_by_id(self, id: UUID) -> TLOCListInfo:
         ...
 
     @get("/template/policy/list/tloc", "data")
@@ -53,5 +55,5 @@ class ConfigurationPolicyTLOCList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/tloc/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

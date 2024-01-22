@@ -1,5 +1,6 @@
 from ipaddress import IPv4Address
 from typing import Any, List, Literal, Union, overload
+from uuid import UUID
 
 from pydantic import ConfigDict, Field
 from typing_extensions import Annotated
@@ -123,13 +124,13 @@ class ControlPolicyRouteSequence(PolicyDefinitionSequenceBase):
     actions: List[ControlPolicyRouteSequenceActions] = []
     model_config = ConfigDict(populate_by_name=True)
 
-    def match_color_list(self, color_list_id: str) -> None:
+    def match_color_list(self, color_list_id: UUID) -> None:
         self._insert_match(ColorListEntry(ref=color_list_id))
 
-    def match_community_list(self, community_list_id: str) -> None:
+    def match_community_list(self, community_list_id: UUID) -> None:
         self._insert_match(CommunityListEntry(ref=community_list_id))
 
-    def match_expanded_community_list(self, expanded_community_list_id: str) -> None:
+    def match_expanded_community_list(self, expanded_community_list_id: UUID) -> None:
         self._insert_match(ExpandedCommunityListEntry(ref=expanded_community_list_id))
 
     def match_omp_tag(self, omp_tag: int) -> None:
@@ -150,7 +151,7 @@ class ControlPolicyRouteSequence(PolicyDefinitionSequenceBase):
     def match_region(self, region_id: int) -> None:
         self._insert_match(RegionEntry(value=str(region_id)))
 
-    def match_region_list(self, region_list_id: str) -> None:
+    def match_region_list(self, region_list_id: UUID) -> None:
         self._insert_match(RegionListEntry(ref=region_list_id))
 
     def match_role(self, role: MultiRegionRoleEnum) -> None:
@@ -159,19 +160,19 @@ class ControlPolicyRouteSequence(PolicyDefinitionSequenceBase):
     def match_site(self, site: int) -> None:
         self._insert_match(SiteEntry(value=str(site)))
 
-    def match_site_list(self, site_list_id: str) -> None:
+    def match_site_list(self, site_list_id: UUID) -> None:
         self._insert_match(SiteListEntry(ref=site_list_id))
 
-    def match_tloc_list(self, tloc_list_id: str) -> None:
+    def match_tloc_list(self, tloc_list_id: UUID) -> None:
         self._insert_match(TLOCListEntry(ref=tloc_list_id))
 
     def match_tloc(self, ip: IPv4Address, color: TLOCColorEnum, encap: EncapEnum) -> None:
         self._insert_match(TLOCEntry(value=TLOCEntryValue(ip=ip, color=color, encap=encap)))
 
-    def match_vpn_list(self, vpn_list_id: str) -> None:
+    def match_vpn_list(self, vpn_list_id: UUID) -> None:
         self._insert_match(VPNListEntry(ref=vpn_list_id))
 
-    def match_prefix_list(self, prefix_list_id: str) -> None:
+    def match_prefix_list(self, prefix_list_id: UUID) -> None:
         self._insert_match(PrefixListEntry(ref=prefix_list_id))
 
     @accept_action
@@ -191,7 +192,7 @@ class ControlPolicyRouteSequence(PolicyDefinitionSequenceBase):
         self._insert_action_in_set(PreferenceEntry(value=str(preference)))
 
     @overload
-    def associate_service_action(self, service_type: ServiceTypeEnum, vpn: int, *, tloc_list_id: str) -> None:
+    def associate_service_action(self, service_type: ServiceTypeEnum, vpn: int, *, tloc_list_id: UUID) -> None:
         ...
 
     @overload
@@ -222,7 +223,7 @@ class ControlPolicyRouteSequence(PolicyDefinitionSequenceBase):
         self._insert_action_in_set(AffinityEntry(value=str(affinity)))
 
     @accept_action
-    def associate_export_to_action(self, vpn_list_id: str) -> None:
+    def associate_export_to_action(self, vpn_list_id: UUID) -> None:
         self._insert_action(ExportToAction(parameter=VPNListEntry(ref=vpn_list_id)))
 
 
@@ -240,7 +241,7 @@ class ControlPolicyTLOCSequence(PolicyDefinitionSequenceBase):
     def match_carrier(self, carrier: CarrierEnum) -> None:
         self._insert_match(CarrierEntry(value=carrier))
 
-    def match_color_list(self, color_list_id: str) -> None:
+    def match_color_list(self, color_list_id: UUID) -> None:
         self._insert_match(ColorListEntry(ref=color_list_id))
 
     def match_domain_id(self, domain_id: int) -> None:
@@ -261,16 +262,16 @@ class ControlPolicyTLOCSequence(PolicyDefinitionSequenceBase):
     def match_site(self, site: int) -> None:
         self._insert_match(SiteEntry(value=str(site)))
 
-    def match_site_list(self, site_list_id: str) -> None:
+    def match_site_list(self, site_list_id: UUID) -> None:
         self._insert_match(SiteListEntry(ref=site_list_id))
 
     def match_region(self, region_id: int) -> None:
         self._insert_match(RegionEntry(value=str(region_id)))
 
-    def match_region_list(self, region_list_id: str) -> None:
+    def match_region_list(self, region_list_id: UUID) -> None:
         self._insert_match(RegionListEntry(ref=region_list_id))
 
-    def match_tloc_list(self, tloc_list_id: str) -> None:
+    def match_tloc_list(self, tloc_list_id: UUID) -> None:
         self._insert_match(TLOCListEntry(ref=tloc_list_id))
 
     def match_tloc(self, ip: IPv4Address, color: TLOCColorEnum, encap: EncapEnum) -> None:

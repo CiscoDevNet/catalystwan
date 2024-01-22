@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import List, Literal, Optional, Union
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, RootModel, field_validator
 from typing_extensions import Annotated
@@ -99,30 +100,30 @@ class UnifiedSecurityPolicyDefinition(PolicyDefinition):
 
 
 class SecurityPolicy(PolicyCreationPayload):
-    policy_mode: Literal["security"] = Field("security", alias="policyMode")
-    policy_type: str = Field("feature", alias="policyType")
-    policy_use_case: str = Field("custom", alias="policyUseCase")
+    policy_mode: Literal["security"] = Field(default="security", alias="policyMode")
+    policy_type: str = Field(default="feature", alias="policyType")
+    policy_use_case: str = Field(default="custom", alias="policyUseCase")
     policy_definition: SecurityPolicyDefinition = Field(default=SecurityPolicyDefinition(), alias="policyDefinition")
 
     def add_item(self, item: SecurityPolicyAssemblyItem) -> None:
         self.policy_definition.assembly.append(item)
 
-    def add_zone_based_fw(self, definition_id: str) -> None:
+    def add_zone_based_fw(self, definition_id: UUID) -> None:
         self.add_item(ZoneBasedFWAssemblyItem(definition_id=definition_id))
 
-    def add_dns_security(self, definition_id: str) -> None:
+    def add_dns_security(self, definition_id: UUID) -> None:
         self.add_item(DNSSecurityAssemblyItem(definition_id=definition_id))
 
-    def add_intrusion_prevention(self, definition_id: str) -> None:
+    def add_intrusion_prevention(self, definition_id: UUID) -> None:
         self.add_item(IntrusionPreventionAssemblyItem(definition_id=definition_id))
 
-    def add_url_filtering(self, definition_id: str) -> None:
+    def add_url_filtering(self, definition_id: UUID) -> None:
         self.add_item(URLFilteringAssemblyItem(definition_id=definition_id))
 
-    def add_advanced_malware_protection(self, definition_id: str) -> None:
+    def add_advanced_malware_protection(self, definition_id: UUID) -> None:
         self.add_item(AdvancedMalwareProtectionAssemblyItem(definition_id=definition_id))
 
-    def add_ssl_decryption(self, definition_id: str) -> None:
+    def add_ssl_decryption(self, definition_id: UUID) -> None:
         self.add_item(SSLDecryptionAssemblyItem(definition_id=definition_id))
 
     @field_validator("policy_definition", mode="before")
@@ -144,12 +145,12 @@ class UnifiedSecurityPolicy(PolicyCreationPayload):
     def add_item(self, item: UnifiedSecurityPolicyAssemblyItem) -> None:
         self.policy_definition.assembly.append(item)
 
-    def add_ng_firewall(self, definition_id: str) -> NGFirewallAssemblyItem:
+    def add_ng_firewall(self, definition_id: UUID) -> NGFirewallAssemblyItem:
         ng_fw = NGFirewallAssemblyItem(definition_id=definition_id)
         self.add_item(ng_fw)
         return ng_fw
 
-    def add_dns_security(self, definition_id: str) -> None:
+    def add_dns_security(self, definition_id: UUID) -> None:
         self.add_item(DNSSecurityAssemblyItem(definition_id=definition_id))
 
     @field_validator("policy_definition", mode="before")

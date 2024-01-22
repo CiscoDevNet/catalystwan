@@ -1,5 +1,6 @@
 from ipaddress import IPv4Network
 from typing import Dict, List, Literal, Set, Tuple, Union
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import Annotated
@@ -83,10 +84,10 @@ class ZoneBasedFWPolicySequenceWithRuleSets(PolicyDefinitionSequenceBase):
     actions: List[LogAction] = []
     model_config = ConfigDict(populate_by_name=True)
 
-    def match_rule_set_lists(self, rule_set_ids: Set[str]) -> None:
+    def match_rule_set_lists(self, rule_set_ids: Set[UUID]) -> None:
         self._insert_match(RuleSetListEntry.from_rule_set_ids(rule_set_ids))
 
-    def match_app_list(self, app_list_id: str) -> None:
+    def match_app_list(self, app_list_id: UUID) -> None:
         if self.base_action != ActionTypeEnum.INSPECT:
             raise ValueError("Action must be Inspect when Application/Application Family List is selected.")
         self._insert_match(AppListEntry(ref=app_list_id))
@@ -100,12 +101,12 @@ class ZoneBasedFWPolicySequence(PolicyDefinitionSequenceBase):
     actions: List[LogAction] = []
     model_config = ConfigDict(populate_by_name=True)
 
-    def match_app_list(self, app_list_id: str) -> None:
+    def match_app_list(self, app_list_id: UUID) -> None:
         if self.base_action != ActionTypeEnum.INSPECT:
             raise ValueError("Action must be Inspect when Application/Application Family List is selected.")
         self._insert_match(AppListEntry(ref=app_list_id))
 
-    def match_destination_data_prefix_list(self, data_prefix_list_id: str) -> None:
+    def match_destination_data_prefix_list(self, data_prefix_list_id: UUID) -> None:
         self._insert_match(DestinationDataPrefixListEntry(ref=data_prefix_list_id))
 
     def match_destination_fqdn(self, fqdn: str) -> None:
@@ -114,7 +115,7 @@ class ZoneBasedFWPolicySequence(PolicyDefinitionSequenceBase):
     def match_destination_geo_location(self, geo_location: str) -> None:
         self._insert_match(DestinationGeoLocationEntry(value=geo_location))
 
-    def match_destination_geo_location_list(self, geo_location_list_id: str) -> None:
+    def match_destination_geo_location_list(self, geo_location_list_id: UUID) -> None:
         self._insert_match(DestinationGeoLocationListEntry(ref=geo_location_list_id))
 
     def match_destination_ip(self, networks: List[IPv4Network]) -> None:
@@ -123,7 +124,7 @@ class ZoneBasedFWPolicySequence(PolicyDefinitionSequenceBase):
     def match_destination_ports(self, ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> None:
         self._insert_match(DestinationPortEntry.from_port_set_and_ranges(ports, port_ranges))
 
-    def match_destination_port_list(self, port_list_id: str) -> None:
+    def match_destination_port_list(self, port_list_id: UUID) -> None:
         self._insert_match(DestinationPortListEntry(ref=port_list_id))
 
     def match_protocols(self, protocols: Set[int]) -> None:
@@ -140,23 +141,23 @@ class ZoneBasedFWPolicySequence(PolicyDefinitionSequenceBase):
         self._insert_match(DestinationPortEntry.from_application_protocols(app_protocols), False)
         self._insert_match(ProtocolEntry.from_application_protocols(app_protocols), False)
 
-    def match_protocol_name_list(self, protocol_name_list_id: str) -> None:
+    def match_protocol_name_list(self, protocol_name_list_id: UUID) -> None:
         self._insert_match(ProtocolNameListEntry(ref=protocol_name_list_id))
 
-    def match_source_data_prefix_list(self, data_prefix_list_id: str) -> None:
+    def match_source_data_prefix_list(self, data_prefix_list_id: UUID) -> None:
         self._insert_match(SourceDataPrefixListEntry(ref=data_prefix_list_id))
 
     def match_source_fqdn(self, fqdn: str) -> None:
         self._insert_match(SourceFQDNEntry(value=fqdn))
 
-    def match_source_fqdn_list(self, fqdn_list_id: str) -> None:
+    def match_source_fqdn_list(self, fqdn_list_id: UUID) -> None:
         self._insert_match(SourceFQDNListEntry(ref=fqdn_list_id))
 
     def match_source_geo_location(self, geo_location: str) -> None:
         self._insert_match(SourceGeoLocationEntry(value=geo_location))
 
-    def match_source_geo_location_list(self, geo_location_list: str) -> None:
-        self._insert_match(SourceGeoLocationListEntry(ref=geo_location_list))
+    def match_source_geo_location_list(self, geo_location_list_id: UUID) -> None:
+        self._insert_match(SourceGeoLocationListEntry(ref=geo_location_list_id))
 
     def match_source_ip(self, networks: List[IPv4Network]) -> None:
         self._insert_match(SourceIPEntry.from_ipv4_networks(networks))
@@ -164,13 +165,15 @@ class ZoneBasedFWPolicySequence(PolicyDefinitionSequenceBase):
     def match_source_port(self, ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> None:
         self._insert_match(SourcePortEntry.from_port_set_and_ranges(ports, port_ranges))
 
-    def match_source_port_list(self, port_list_id: str) -> None:
+    def match_source_port_list(self, port_list_id: UUID) -> None:
         self._insert_match(SourcePortListEntry(ref=port_list_id))
 
 
 class ZoneBasedFWPolicyEntry(BaseModel):
-    source_zone: str = Field(default="self", serialization_alias="sourceZone", validation_alias="sourceZone")
-    destination_zone: str = Field(serialization_alias="destinationZone", validation_alias="destinationZone")
+    source_zone_id: Union[UUID, Literal["self"]] = Field(
+        default="self", serialization_alias="sourceZone", validation_alias="sourceZone"
+    )
+    destination_zone_id: UUID = Field(serialization_alias="destinationZone", validation_alias="destinationZone")
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -228,9 +231,9 @@ class ZoneBasedFWPolicy(ZoneBasedFWPolicyHeader):
         self.definition.add(sequence)
         return sequence
 
-    def add_zone_pair(self, source_zone_id: str, destination_zone_id: str) -> None:
+    def add_zone_pair(self, source_zone_id: UUID, destination_zone_id: UUID) -> None:
         entry = ZoneBasedFWPolicyEntry(
-            source_zone=source_zone_id,
-            destination_zone=destination_zone_id,
+            source_zone_id=source_zone_id,
+            destination_zone_id=destination_zone_id,
         )
         self.definition.entries.append(entry)

@@ -1,5 +1,6 @@
 from ipaddress import IPv4Address, IPv4Network
 from typing import Any, List, Literal, Optional, Set, Tuple, Union, overload
+from uuid import UUID
 
 from pydantic import ConfigDict, Field
 from typing_extensions import Annotated
@@ -109,10 +110,10 @@ class TrafficDataPolicySequence(PolicyDefinitionSequenceBase):
     actions: List[TrafficDataPolicySequenceActions] = []
     model_config = ConfigDict(populate_by_name=True)
 
-    def match_app_list(self, app_list_id: str) -> None:
+    def match_app_list(self, app_list_id: UUID) -> None:
         self._insert_match(AppListEntry(ref=app_list_id))
 
-    def match_dns_app_list(self, dns_app_list_id: str) -> None:
+    def match_dns_app_list(self, dns_app_list_id: UUID) -> None:
         self._insert_match(DNSAppListEntry(ref=dns_app_list_id))
 
     def match_dns_request(self) -> None:
@@ -136,7 +137,7 @@ class TrafficDataPolicySequence(PolicyDefinitionSequenceBase):
     def match_protocols(self, protocols: Set[int]) -> None:
         self._insert_match(ProtocolEntry.from_protocol_set(protocols))
 
-    def match_source_data_prefix_list(self, data_prefix_list_id: str) -> None:
+    def match_source_data_prefix_list(self, data_prefix_list_id: UUID) -> None:
         self._insert_match(SourceDataPrefixListEntry(ref=data_prefix_list_id))
 
     def match_source_ip(self, networks: List[IPv4Network]) -> None:
@@ -145,7 +146,7 @@ class TrafficDataPolicySequence(PolicyDefinitionSequenceBase):
     def match_source_port(self, ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> None:
         self._insert_match(SourcePortEntry.from_port_set_and_ranges(ports, port_ranges))
 
-    def match_destination_data_prefix_list(self, data_prefix_list_id: str) -> None:
+    def match_destination_data_prefix_list(self, data_prefix_list_id: UUID) -> None:
         self._insert_match(DestinationDataPrefixListEntry(ref=data_prefix_list_id))
 
     def match_destination_ip(self, networks: List[IPv4Network]) -> None:
@@ -201,7 +202,7 @@ class TrafficDataPolicySequence(PolicyDefinitionSequenceBase):
         self._insert_action_in_set(tloc_entry)
 
     @accept_action
-    def associate_preffered_color_group(self, color_group_list_id: str, restrict: bool = False) -> None:
+    def associate_preffered_color_group(self, color_group_list_id: UUID, restrict: bool = False) -> None:
         self._insert_action_in_set(PrefferedColorGroupListEntry(ref=color_group_list_id, color_restrict=restrict))
 
     @accept_action
@@ -230,7 +231,7 @@ class TrafficDataPolicySequence(PolicyDefinitionSequenceBase):
         self._insert_action_in_set(NextHopLooseEntry(value="true" if loose else "false"))
 
     @accept_action
-    def associate_policer_list_action(self, policer_list_id: str) -> None:
+    def associate_policer_list_action(self, policer_list_id: UUID) -> None:
         self._insert_action_in_set(PolicerListEntry(ref=policer_list_id))
 
     @overload
@@ -318,7 +319,7 @@ class TrafficDataPolicySequence(PolicyDefinitionSequenceBase):
         self._insert_action_in_set(VPNEntry(value=str(vpn)))
 
     @overload
-    def associate_tloc_action(self, *, tloc_list_id: str) -> None:
+    def associate_tloc_action(self, *, tloc_list_id: UUID) -> None:
         ...
 
     @overload

@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Any, List, Literal, Optional
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -20,14 +21,14 @@ class TrafficDataDirectionEnum(str, Enum):
 
 class TrafficDataApplicationEntry(BaseModel):
     direction: TrafficDataDirectionEnum = TrafficDataDirectionEnum.SERVICE
-    site_lists: List[str] = Field([], serialization_alias="siteLists", validation_alias="siteLists")
-    vpn_lists: List[str] = Field([], serialization_alias="vpnLists", validation_alias="vpnLists")
+    site_lists: List[UUID] = Field([], serialization_alias="siteLists", validation_alias="siteLists")
+    vpn_lists: List[UUID] = Field([], serialization_alias="vpnLists", validation_alias="vpnLists")
     model_config = ConfigDict(populate_by_name=True)
 
-    def apply_site_list(self, site_list_id: str):
+    def apply_site_list(self, site_list_id: UUID):
         self.site_lists.append(site_list_id)
 
-    def apply_vpn_list(self, vpn_list_id: str):
+    def apply_vpn_list(self, vpn_list_id: UUID):
         self.vpn_lists.append(vpn_list_id)
 
 
@@ -41,8 +42,8 @@ class TrafficDataApplication(CentralizedPolicyAssemblyItem):
 
     def apply(
         self,
-        site_list_ids: List[str],
-        vpn_list_ids: List[str],
+        site_list_ids: List[UUID],
+        vpn_list_ids: List[UUID],
         direction: TrafficDataDirectionEnum = TrafficDataDirectionEnum.SERVICE,
     ) -> None:
         entry = TrafficDataApplicationEntry(
@@ -67,7 +68,7 @@ class CentralizedPolicy(PolicyCreationPayload):
     )
     policy_type: str = Field("feature", serialization_alias="policyType", validation_alias="policyType")
 
-    def add_traffic_data_policy(self, traffic_data_id: str) -> TrafficDataApplication:
+    def add_traffic_data_policy(self, traffic_data_id: UUID) -> TrafficDataApplication:
         item = TrafficDataApplication(definition_id=traffic_data_id)
         self.policy_definition.assembly.append(item)
         return item
