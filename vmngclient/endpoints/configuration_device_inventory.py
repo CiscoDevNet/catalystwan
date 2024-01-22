@@ -2,6 +2,7 @@
 from enum import Enum
 from pathlib import Path
 from typing import List, Optional, Union
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -165,7 +166,7 @@ class UploadSerialFileResponse(BaseModel):
 class ConfigurationDeviceInventory(APIEndpoints):
     @versions(supported_versions=(">=20.9"), raises=False)
     @post("/system/device/{device_uuid}/unlock")
-    def unlock(self, device_uuid: str, payload: DeviceUnlockPayload) -> DeviceUnlockResponse:
+    def unlock(self, device_uuid: UUID, payload: DeviceUnlockPayload) -> DeviceUnlockResponse:
         ...
 
     @post("/system/device")
@@ -173,7 +174,7 @@ class ConfigurationDeviceInventory(APIEndpoints):
         ...
 
     @delete("/system/device/{uuid}")
-    def delete_device(self, uuid: str) -> DeviceDeletionResponse:
+    def delete_device(self, uuid: UUID) -> DeviceDeletionResponse:
         ...
 
     # Covers:
@@ -195,6 +196,6 @@ class ConfigurationDeviceInventory(APIEndpoints):
 
     @get("/system/device/bootstrap/device/{uuid}")
     def generate_bootstrap_configuration(
-        self, uuid: str, params: GenerateBoostrapConfigurationQueryParams = GenerateBoostrapConfigurationQueryParams()
+        self, uuid: UUID, params: GenerateBoostrapConfigurationQueryParams = GenerateBoostrapConfigurationQueryParams()
     ) -> BoostrapConfiguration:
         ...

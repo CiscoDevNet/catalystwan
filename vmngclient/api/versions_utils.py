@@ -83,9 +83,9 @@ class RepositoryAPI:
             information
         """
 
-        url = "/dataservice/system/device/controllers"
+        url = "/dataservice/system/device/controllers"  # get_device_details
         controllers_versions_info = self.session.get_data(url)
-        url = "/dataservice/system/device/vedges"
+        url = "/dataservice/system/device/vedges"  # get_device_details
         edges_versions_info = self.session.get_data(url)
         devices_versions_repository = {}
         for device in controllers_versions_info + edges_versions_info:
@@ -116,7 +116,6 @@ class RepositoryAPI:
         return None
 
     def _create_callback(self, encoder: MultipartEncoder):
-
         bar = ProgressBar(expected_size=encoder._calculate_length(), filled_char="=")
 
         def callback(monitor: MultipartEncoderMonitor):
@@ -135,7 +134,7 @@ class RepositoryAPI:
         Returns:
             str: Response status code
         """
-        url = "/dataservice/device/action/software/package"
+        url = "/dataservice/device/action/software/package"  # upload_software_to_manager
         encoder = MultipartEncoder(
             fields={"file": (PurePath(image_path).name, open(image_path, "rb"), "application/x-gzip")}
         )
@@ -160,7 +159,7 @@ class RepositoryAPI:
         for image in self.get_all_software_images():
             if image_name in image["availableFiles"]:
                 version_id = image["versionId"]
-                url = f"/dataservice/device/action/software/{version_id}"
+                url = f"/dataservice/device/action/software/{version_id}"  # delete_software_from_software_repository
                 delete = self.session.delete(url)
                 return delete.status_code
         raise ImageNotInRepositoryError(f"Image: {image_name} is not the vManage software repository")
@@ -292,5 +291,4 @@ class DeviceVersions:
         return self._get_devices_chosen_version(devices, "available_versions")
 
     def get_device_list(self, devices: DataSequence[Device]) -> List[DeviceVersionPayload]:
-
         return [DeviceVersionPayload(device.uuid, device.id) for device in devices]  # type: ignore

@@ -1,6 +1,7 @@
 # mypy: disable-error-code="empty-body"
 from enum import Enum
 from typing import List, Optional
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -8,12 +9,12 @@ from vmngclient.endpoints import APIEndpoints, get, post
 from vmngclient.typed_list import DataSequence
 
 
-class ProcessId(BaseModel):
-    id: str
+class ActionId(BaseModel):
+    id: UUID
 
 
 class GroupId(BaseModel):
-    group_id: str = Field(default="all", serialization_alias="groupIP")
+    group_id: str = Field(default="all", serialization_alias="groupID", validation_alias="groupID")
 
 
 class DeviceType(str, Enum):
@@ -25,26 +26,26 @@ class DeviceType(str, Enum):
 class ZTPUpgradeSettings(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    version_id: str = Field(alias="versionId")
-    platform_family: str = Field(alias="platformFamily")
-    enable_upgrade: bool = Field(alias="enableUpgrade")
-    version_name: str = Field(alias="versionName")
+    enable_upgrade: bool = Field(serialization_alias="enableUpgrade", validation_alias="enableUpgrade")
+    platform_family: str = Field(serialization_alias="platformFamily", validation_alias="platformFamily")
+    version_id: str = Field(serialization_alias="versionId", validation_alias="versionId")
+    version_name: str = Field(serialization_alias="versionName", validation_alias="versionName")
 
 
 class Device(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
+    device_id: str = Field(serialization_alias="deviceId", validation_alias="deviceId")
+    device_ip: str = Field(serialization_alias="deviceIP", validation_alias="deviceIP")
     version: str
-    device_ip: str = Field(alias="deviceIP")
-    device_id: str = Field(alias="deviceId")
 
 
 class PartitionActionPayload(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     action: str
+    device_type: DeviceType = Field(serialization_alias="deviceType", validation_alias="deviceType")
     devices: List[Device]
-    device_type: DeviceType = Field(alias="deviceType")
 
 
 class Data(BaseModel):
@@ -52,60 +53,76 @@ class Data(BaseModel):
 
     family: str
     version: str
-    version_id: str = Field(alias="versionId")
+    version_id: str = Field(serialization_alias="versionId", validation_alias="versionId")
 
 
 class InstallInput(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    v_edge_vpn: int = Field(alias="vEdgeVPN")
-    v_smart_vpn: int = Field(alias="vSmartVPN")
     data: List[Data]
-    version_type: str = Field(alias="versionType")
     reboot: bool
     sync: bool
+    v_edge_vpn: int = Field(serialization_alias="vEdgeVPN", validation_alias="vEdgeVPN")
+    v_smart_vpn: int = Field(serialization_alias="vSmartVPN", validation_alias="vSmartVPN")
+    version_type: str = Field(serialization_alias="versionType", validation_alias="versionType")
 
 
 class InstallDevice(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    device_ip: str = Field(alias="deviceIP")
-    device_id: str = Field(alias="deviceId")
-    is_nutella_migration: Optional[bool] = Field(alias="isNutellaMigration")
+    device_id: str = Field(serialization_alias="deviceId", validation_alias="deviceId")
+    device_ip: str = Field(serialization_alias="deviceIP", validation_alias="deviceIP")
+    is_nutella_migration: Optional[bool] = Field(
+        default=None, serialization_alias="isNutellaMigration", validation_alias="isNutellaMigration"
+    )
 
 
 class InstallActionPayload(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     action: str
-    input: InstallInput
+    device_type: str = Field(serialization_alias="deviceType", validation_alias="deviceType")
     devices: List[InstallDevice]
-    device_type: str = Field(alias="deviceType")
+    input: InstallInput
 
 
 class InstalledDeviceData(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    device_model: Optional[str] = Field(None, alias="device-model")
-    device_os: Optional[str] = Field(None, alias="device-os")
-    local_system_ip: Optional[str] = Field(None, alias="local-system-ip")
-    system_ip: Optional[str] = Field(None, alias="system-ip")
-    site_id: Optional[str] = Field(None, alias="site-id")
-    uuid: Optional[str]
-    platform: Optional[str]
-    is_schedule_upgrade_supported: Optional[bool] = Field(None, alias="isScheduleUpgradeSupported")
+    available_versions: Optional[List[str]] = Field(
+        None, serialization_alias="availableVersions", validation_alias="availableVersions"
+    )
+    current_partition: Optional[str] = Field(
+        None, serialization_alias="current-partition", validation_alias="current-partition"
+    )
+    default_version: Optional[str] = Field(
+        None, serialization_alias="defaultVersion", validation_alias="defaultVersion"
+    )
+    device_model: Optional[str] = Field(None, serialization_alias="device-model", validation_alias="device-model")
+    device_os: Optional[str] = Field(None, serialization_alias="device-os", validation_alias="device-os")
+    device_type: Optional[str] = Field(None, serialization_alias="device-type", validation_alias="device-type")
+    host_name: Optional[str] = Field(None, serialization_alias="host-name", validation_alias="host-name")
+    is_multi_step_upgrade_supported: Optional[bool] = Field(
+        None, serialization_alias="isMultiStepUpgradeSupported", validation_alias="isMultiStepUpgradeSupported"
+    )
+    is_schedule_upgrade_supported: Optional[bool] = Field(
+        None, serialization_alias="isScheduleUpgradeSupported", validation_alias="isScheduleUpgradeSupported"
+    )
+    layout_level: Optional[int] = Field(None, serialization_alias="layoutLevel", validation_alias="layoutLevel")
+    local_system_ip: Optional[str] = Field(
+        None, serialization_alias="local-system-ip", validation_alias="local-system-ip"
+    )
     personality: Optional[str]
-    device_type: Optional[str] = Field(None, alias="device-type")
+    platform: Optional[str]
+    platform_family: Optional[str] = Field(
+        None, serialization_alias="platformFamily", validation_alias="platformFamily"
+    )
     reachability: Optional[str]
-    available_versions: Optional[List[str]] = Field(None, alias="availableVersions")
-    host_name: Optional[str] = Field(None, alias="host-name")
-    version: Optional[str]
-    layout_level: Optional[int] = Field(None, alias="layoutLevel")
-    uptime_date: Optional[int] = Field(None, alias="uptime-date")
-    is_multi_step_upgrade_supported: Optional[bool] = Field(None, alias="isMultiStepUpgradeSupported")
-    default_version: Optional[str] = Field(None, alias="defaultVersion")
-    platform_family: Optional[str] = Field(None, alias="platformFamily")
-    current_partition: Optional[str] = Field(None, alias="current-partition")
+    site_id: Optional[str] = Field(None, serialization_alias="site-id", validation_alias="site-id")
+    system_ip: Optional[str] = Field(None, serialization_alias="system-ip", validation_alias="system-ip")
+    uptime_date: Optional[int] = Field(None, serialization_alias="uptime-date", validation_alias="uptime-date")
+    uuid: Optional[str] = Field(None)
+    version: Optional[str] = Field(None)
 
 
 class ConfigurationDeviceActions(APIEndpoints):
@@ -183,8 +200,8 @@ class ConfigurationDeviceActions(APIEndpoints):
         # POST /device/action/cancel
         ...
 
-    def process_change_partition(self):
-        # POST /device/action/changepartition
+    @post("device/action/changepartition", "data")
+    def process_mark_change_partition(self, payload: PartitionActionPayload) -> ActionId:
         ...
 
     def process_deactivate_smu(self):
@@ -200,7 +217,7 @@ class ConfigurationDeviceActions(APIEndpoints):
         ...
 
     @post("/device/action/install", "data")
-    def process_install_operation(self, payload: InstallActionPayload) -> ProcessId:
+    def process_install_operation(self, payload: InstallActionPayload) -> ActionId:
         ...
 
     def process_lxc_activate(self):
@@ -231,7 +248,7 @@ class ConfigurationDeviceActions(APIEndpoints):
         # POST /device/action/reboot
         ...
 
-    def process_remove_partition(self):
+    def process_remove_partition(self):  # TODO
         # POST /device/action/removepartition
         ...
 

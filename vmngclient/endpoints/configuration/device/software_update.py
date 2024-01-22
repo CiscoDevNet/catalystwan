@@ -1,3 +1,4 @@
+# mypy: disable-error-code="empty-body"
 from vmngclient.endpoints import APIEndpoints, post
 from vmngclient.utils.upgrades_helper import SoftwarePackageUploadPayload
 

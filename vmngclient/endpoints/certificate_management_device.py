@@ -2,6 +2,7 @@
 
 from enum import Enum
 from typing import List, Optional, Union
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -13,7 +14,7 @@ class DeviceDeletionResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     local_delete_from_db: Optional[bool] = Field(default=None, alias="localDeleteFromDB")
-    id: Optional[str] = Field(default=None)
+    id: Optional[UUID] = Field(default=None)
 
 
 class TargetDevice(BaseModel):
@@ -46,7 +47,7 @@ class DeviceCsrGenerationResponse(BaseModel):
     CSRDetail: Optional[str] = Field(default=None, alias="CSRDetail")
     managementSystemIP: Optional[str] = Field(default=None, alias="managementSystemIP")
     deviceCSRGenTime: Optional[int] = Field(default=None, alias="deviceCSRGenTime")
-    volatileUUID: Optional[str] = Field(default=None, alias="volatileUUID")
+    volatileUUID: Optional[UUID] = Field(default=None, alias="volatileUUID")
     deviceLifeCycleNeeded: Optional[bool] = Field(default=None, alias="deviceLifeCycleNeeded")
     deviceState: Optional[str] = Field(default=None, alias="deviceState")
     expirationDateLong: Optional[int] = Field(default=None, alias="expirationDateLong")
@@ -101,16 +102,8 @@ class VedgeListValidityPayload(BaseModel):
     validity: Validity = Field(default=Validity.INVALID)
 
 
-class VedgeListValidityResponse(BaseModel):
-    id: str
-
-
-class SaveVedgeListResponse(BaseModel):
-    id: str
-
-
-class SaveVsmartListResponse(BaseModel):  # TODO unify all process id responses
-    id: str
+class CertActionResponse(BaseModel):
+    id: UUID
 
 
 class CertificateManagementDevice(APIEndpoints):
@@ -123,13 +116,13 @@ class CertificateManagementDevice(APIEndpoints):
         ...
 
     @post("/certificate/save/vedge/list")
-    def change_vedge_list_validity(self, payload: List[VedgeListValidityPayload]) -> VedgeListValidityResponse:
+    def change_vedge_list_validity(self, payload: List[VedgeListValidityPayload]) -> CertActionResponse:
         ...
 
     @post("/certificate/vedge/list?action={action}")
-    def send_to_controllers(self, action: str = "push") -> SaveVedgeListResponse:
+    def send_to_controllers(self, action: str = "push") -> CertActionResponse:
         ...
 
     @post("/certificate/vsmart/list")
-    def send_to_vbond(self) -> SaveVsmartListResponse:
+    def send_to_vbond(self) -> CertActionResponse:
         ...

@@ -39,14 +39,13 @@ class PartitionManagerAPI:
     """
 
     def __init__(self, session: vManageSession) -> None:
-
         self.session = session
         self.repository = RepositoryAPI(self.session)
         self.device_version = DeviceVersions(self.session)
 
     def set_default_partition(self, devices: DataSequence[Device], partition: Optional[str] = None) -> Task:
         """
-        Set defualt software versions for devices
+        Set default software versions for devices
 
         Args:
             devices (DataSequence[Device]): devices
@@ -62,7 +61,7 @@ class PartitionManagerAPI:
         else:
             payload_devices = self.device_version.get_devices_current_version(devices)
 
-        url = "/dataservice/device/action/defaultpartition"
+        url = "/dataservice/device/action/defaultpartition"  # process_mark_default_partition
         payload = {
             "action": "defaultpartition",
             "devices": [asdict(device) for device in payload_devices],  # type: ignore
@@ -97,7 +96,7 @@ class PartitionManagerAPI:
             for device in payload_devices
         ]
 
-        url = "/dataservice/device/action/removepartition"
+        url = "/dataservice/device/action/removepartition"  # process_remove_partition
         payload = {
             "action": "removepartition",
             "devices": [asdict(device) for device in remove_partition_payload],  # type: ignore
@@ -112,7 +111,6 @@ class PartitionManagerAPI:
         devices_versions_repository = self.repository.get_devices_versions_repository()
         invalid_devices = []
         for device in payload_devices:
-
             if device["version"] in (
                 devices_versions_repository[device["deviceId"]].current_version,
                 devices_versions_repository[device["deviceId"]].default_version,

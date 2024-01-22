@@ -2,6 +2,7 @@
 
 from enum import Enum
 from typing import List, Optional, Union
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -37,70 +38,115 @@ class RemoteServerProtocol(str, Enum):
 class RemoteServer(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    remote_server_name: str = Field(alias="remoteServerName")
-    remote_server_url: str = Field(alias="remoteServerUrl")
-    remote_server_protocol: RemoteServerProtocol = Field(default=RemoteServerProtocol.FTP, alias="remoteServerProtocol")
-    remote_server_port: int = Field(default=21, alias="remoteServerPort")
-    remote_server_vpn: int = Field(ge=0, le=65527, alias="remoteServerVPN")
-    remote_server_user: str = Field(alias="remoteServerUser")
-    remote_server_password: str = Field(alias="remoteServerPassword")
-    image_location_prefix: str = Field(default="/", alias="imageLocationPrefix")
+    image_location_prefix: str = Field(
+        default="/", serialization_alias="imageLocationPrefix", validation_alias="imageLocationPrefix"
+    )
+    remote_server_name: str = Field(serialization_alias="remoteServerName", validation_alias="remoteServerName")
+    remote_server_password: str = Field(
+        serialization_alias="remoteServerPassword", validation_alias="remoteServerPassword"
+    )
+    remote_server_port: int = Field(
+        default=21, serialization_alias="remoteServerPort", validation_alias="remoteServerPort"
+    )
+    remote_server_protocol: RemoteServerProtocol = Field(
+        default=RemoteServerProtocol.FTP,
+        serialization_alias="remoteServerProtocol",
+        validation_alias="remoteServerProtocol",
+    )
+    remote_server_url: str = Field(serialization_alias="remoteServerUrl", validation_alias="remoteServerUrl")
+    remote_server_user: str = Field(serialization_alias="remoteServerUser", validation_alias="remoteServerUser")
+    remote_server_vpn: int = Field(
+        ge=0, le=65527, serialization_alias="remoteServerVPN", validation_alias="remoteServerVPN"
+    )
 
 
 class RemoteServerInfo(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    image_location_prefix: Optional[str] = Field(default=None, alias="imageLocationPrefix")
-    remote_server_protocol: Optional[RemoteServerProtocol] = Field(default=None, alias="remoteServerProtocol")
-    remote_server_port: Optional[int] = Field(default=None, alias="remoteServerPort")
-    remote_server_id: Optional[str] = Field(default=None, alias="remoteServerId")
-    remote_server_name: Optional[str] = Field(default=None, alias="remoteServerName")
-    remote_server_vpn: Optional[int] = Field(default=None, alias="remoteServerVPN")
-    remote_server_url: Optional[str] = Field(default=None, alias="remoteServerUrl")
-    updated_on: Optional[int] = Field(default=None, alias="updatedOn")
-    remote_server_user: Optional[str] = Field(default=None, alias="remoteServerUser")
-
-
-class AddSoftwarePayload(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
-
-    remote_server_id: str = Field(default=None, alias="remoteServerId")
-    filename: str = Field(default=None, alias="fileName")
-
-
-class SoftwareImageDetails(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
-
-    available_files: Optional[str] = Field(default=None, alias="availableFiles")
-    version_type_name: Optional[str] = Field(default=None, alias="versionTypeName")
-    version_name: Optional[str] = Field(default=None, alias="versionName")
-    platform_family: Optional[List[str]] = Field(default=None, alias="platformFamily")
-    smu_compatible_version: Optional[str] = Field(default=None, alias="smuCompatibleVersion")
-    rid: Optional[int] = Field(default=None, alias="@rid")
-    cw_version: Optional[str] = Field(default=None, alias="cwVersion")
-    vnf_properties_json: Optional[str] = Field(default=None, alias="vnfPropertiesJson")
-    image_properties_json: Optional[str] = Field(default=None, alias="imagePropertiesJson")
-    vendor: Optional[str] = Field(default=None, alias="vendor")
-    image_type: Optional[str] = Field(default=None, alias="imageType")
-    version_type: Optional[str] = Field(default=None, alias="versionType")
-    network_function_type: Optional[str] = Field(default=None, alias="networkFunctionType")
-    updated_on: Optional[int] = Field(default=None, alias="updatedOn")
-    checksum_map: Optional[str] = Field(default=None, alias="checksumMap")
-    version_id_map: Optional[str] = Field(default=None, alias="versionIdMap")
-    version_id: Optional[str] = Field(default=None, alias="versionId")
-    system_properties_xml: Optional[str] = Field(default=None, alias="systemPropertiesXml")
-    available_smu_versions: Optional[Union[List[str], str]] = Field(default=None, alias="availableSmuVersions")
-    controller_version_name: Optional[str] = Field(default=None, alias="controllerVersionName")
-    file_name_map: Optional[str] = Field(default=None, alias="fileNameMap")
-    arch: Optional[str] = Field(default=None, alias="arch")
-    version_url: Optional[str] = Field(default=None, alias="versionURL")
+    image_location_prefix: Optional[str] = Field(
+        default=None, serialization_alias="imageLocationPrefix", validation_alias="imageLocationPrefix"
+    )
+    remote_server_id: Optional[str] = Field(
+        default=None, serialization_alias="remoteServerId", validation_alias="remoteServerId"
+    )
+    remote_server_name: Optional[str] = Field(
+        default=None, serialization_alias="remoteServerName", validation_alias="remoteServerName"
+    )
+    remote_server_port: Optional[int] = Field(
+        default=None, serialization_alias="remoteServerPort", validation_alias="remoteServerPort"
+    )
+    remote_server_protocol: Optional[RemoteServerProtocol] = Field(
+        default=None, serialization_alias="remoteServerProtocol", validation_alias="remoteServerProtocol"
+    )
+    remote_server_url: Optional[str] = Field(
+        default=None, serialization_alias="remoteServerUrl", validation_alias="remoteServerUrl"
+    )
+    remote_server_user: Optional[str] = Field(
+        default=None, serialization_alias="remoteServerUser", validation_alias="remoteServerUser"
+    )
+    remote_server_vpn: Optional[int] = Field(
+        default=None, serialization_alias="remoteServerVPN", validation_alias="remoteServerVPN"
+    )
+    updated_on: Optional[int] = Field(default=None, serialization_alias="updatedOn", validation_alias="updatedOn")
 
 
 class SoftwareRemoteServer(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    remote_server_id: str = Field(alias="remoteServerId")
-    filename: str = Field(alias="fileName")
+    filename: str = Field(default=None, serialization_alias="fileName", validation_alias="fileName")
+    remote_server_id: str = Field(default=None, serialization_alias="remoteServerId", validation_alias="remoteServerId")
+
+
+class SoftwareImageDetails(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    arch: Optional[str] = Field(default=None)
+    available_files: Optional[str] = Field(
+        default=None, serialization_alias="availableFiles", validation_alias="availableFiles"
+    )
+    available_smu_versions: Optional[Union[List[str], str]] = Field(
+        default=None, serialization_alias="availableSmuVersions", validation_alias="availableSmuVersions"
+    )
+    checksum_map: Optional[str] = Field(default=None, serialization_alias="checksumMap", validation_alias="checksumMap")
+    controller_version_name: Optional[str] = Field(
+        default=None, serialization_alias="controllerVersionName", validation_alias="controllerVersionName"
+    )
+    cw_version: Optional[str] = Field(default=None, serialization_alias="cwVersion", validation_alias="cwVersion")
+    file_name_map: Optional[str] = Field(
+        default=None, serialization_alias="fileNameMap", validation_alias="fileNameMap"
+    )
+    image_properties_json: Optional[str] = Field(
+        default=None, serialization_alias="imagePropertiesJson", validation_alias="imagePropertiesJson"
+    )
+    image_type: Optional[str] = Field(default=None, serialization_alias="imageType", validation_alias="imageType")
+    network_function_type: Optional[str] = Field(
+        default=None, serialization_alias="networkFunctionType", validation_alias="networkFunctionType"
+    )
+    platform_family: Optional[List[str]] = Field(
+        default=None, serialization_alias="platformFamily", validation_alias="platformFamily"
+    )
+    rid: Optional[int] = Field(default=None, serialization_alias="@rid", validation_alias="@rid")
+    smu_compatible_version: Optional[str] = Field(
+        default=None, serialization_alias="smuCompatibleVersion", validation_alias="smuCompatibleVersion"
+    )
+    system_properties_xml: Optional[str] = Field(
+        default=None, serialization_alias="systemPropertiesXml", validation_alias="systemPropertiesXml"
+    )
+    updated_on: Optional[int] = Field(default=None, serialization_alias="updatedOn", validation_alias="updatedOn")
+    vendor: Optional[str] = Field(default=None)
+    version_id: Optional[str] = Field(default=None, serialization_alias="versionId", validation_alias="versionId")
+    version_id_map: Optional[str] = Field(
+        default=None, serialization_alias="versionIdMap", validation_alias="versionIdMap"
+    )
+    version_name: Optional[str] = Field(default=None, serialization_alias="versionName", validation_alias="versionName")
+    version_type: Optional[str] = Field(default=None, serialization_alias="versionType", validation_alias="versionType")
+    version_type_name: Optional[str] = Field(
+        default=None, serialization_alias="versionTypeName", validation_alias="versionTypeName"
+    )
+    version_url: Optional[str] = Field(default=None, serialization_alias="versionURL", validation_alias="versionURL")
+    vnf_properties_json: Optional[str] = Field(
+        default=None, serialization_alias="vnfPropertiesJson", validation_alias="vnfPropertiesJson"
+    )
 
 
 class ConfigurationSoftwareActions(APIEndpoints):
@@ -113,15 +159,15 @@ class ConfigurationSoftwareActions(APIEndpoints):
         ...
 
     @get("/device/action/remote-server/{id}", "data")
-    def get_remote_server(self, id: str) -> RemoteServerInfo:
+    def get_remote_server(self, id: UUID) -> RemoteServerInfo:
         ...
 
     @put("/device/action/remote-server/{id}")
-    def update_remote_server(self, id: str) -> None:
+    def update_remote_server(self, id: UUID) -> None:
         ...
 
     @delete("/device/action/remote-server/{id}")
-    def remove_remote_server(self, id: str) -> None:
+    def remove_remote_server(self, id: UUID) -> None:
         ...
 
     @get("/device/action/software", "data")
@@ -129,11 +175,11 @@ class ConfigurationSoftwareActions(APIEndpoints):
         ...
 
     @post("/device/action/software")
-    def add_new_software_from_remote_server(self, payload: SoftwareRemoteServer) -> None:
+    def upload_software_from_remote_server(self, payload: SoftwareRemoteServer) -> None:
         ...
 
     @delete("/device/action/software/{id}")
-    def delete_software_from_software_repository(self, id: str) -> None:
+    def delete_software_from_software_repository(self, id: UUID) -> None:
         ...
 
     @get("/device/action/software/images?imageType={image_type}", "data")

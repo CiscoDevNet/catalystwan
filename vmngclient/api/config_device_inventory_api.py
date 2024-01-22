@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from uuid import UUID
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
@@ -21,7 +22,7 @@ class ConfigurationDeviceInventoryAPI:
         self.session = session
         self.endpoint = ConfigurationDeviceInventory(session)
 
-    def unlock(self, device_uuid: str, device_type: str, device_details: list) -> Task:
+    def unlock(self, device_uuid: UUID, device_type: str, device_details: list) -> Task:
         """
         Unlocks device from config-group
         """
@@ -39,7 +40,7 @@ class ConfigurationDeviceInventoryAPI:
 
     def generate_bootstrap_cfg(
         self,
-        device_uuid: str,
+        device_uuid: UUID,
         configtype: ConfigType = ConfigType.CLOUDINIT,
         incl_def_root_cert: bool = False,
         version: str = "v1",
