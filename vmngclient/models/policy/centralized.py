@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Any, List, Literal, Optional
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -20,14 +21,14 @@ class TrafficDataDirectionEnum(str, Enum):
 
 class TrafficDataApplicationEntry(BaseModel):
     direction: TrafficDataDirectionEnum = TrafficDataDirectionEnum.SERVICE
-    site_lists: List[str] = Field([], alias="siteLists")
-    vpn_lists: List[str] = Field([], alias="vpnLists")
+    site_lists: List[UUID] = Field([], serialization_alias="siteLists", validation_alias="siteLists")
+    vpn_lists: List[UUID] = Field([], serialization_alias="vpnLists", validation_alias="vpnLists")
     model_config = ConfigDict(populate_by_name=True)
 
-    def apply_site_list(self, site_list_id: str):
+    def apply_site_list(self, site_list_id: UUID):
         self.site_lists.append(site_list_id)
 
-    def apply_vpn_list(self, vpn_list_id: str):
+    def apply_vpn_list(self, vpn_list_id: UUID):
         self.vpn_lists.append(vpn_list_id)
 
 
@@ -41,11 +42,11 @@ class TrafficDataApplication(CentralizedPolicyAssemblyItem):
 
     def apply(
         self,
-        site_list_ids: List[str],
-        vpn_list_ids: List[str],
+        site_list_ids: List[UUID],
+        vpn_list_ids: List[UUID],
         direction: TrafficDataDirectionEnum = TrafficDataDirectionEnum.SERVICE,
     ) -> None:
-        entry = TrafficDataApplicationEntry(  # type: ignore[call-arg]
+        entry = TrafficDataApplicationEntry(
             direction=direction,
             site_lists=site_list_ids,
             vpn_lists=vpn_list_ids,
@@ -54,17 +55,21 @@ class TrafficDataApplication(CentralizedPolicyAssemblyItem):
 
 
 class CentralizedPolicyDefinition(PolicyDefinition):
-    region_role_assembly: List = Field(default=[], alias="regionRoleAssembly")
+    region_role_assembly: List = Field(
+        default=[], serialization_alias="regionRoleAssembly", validation_alias="regionRoleAssembly"
+    )
     assembly: List[CentralizedPolicyAssemblyItem] = []
     model_config = ConfigDict(populate_by_name=True)
 
 
 class CentralizedPolicy(PolicyCreationPayload):
-    policy_definition: CentralizedPolicyDefinition = Field(CentralizedPolicyDefinition(), alias="policyDefinition")
-    policy_type: str = Field("feature", alias="policyType")
+    policy_definition: CentralizedPolicyDefinition = Field(
+        CentralizedPolicyDefinition(), serialization_alias="policyDefinition", validation_alias="policyDefinition"
+    )
+    policy_type: str = Field("feature", serialization_alias="policyType", validation_alias="policyType")
 
-    def add_traffic_data_policy(self, traffic_data_id: str) -> TrafficDataApplication:
-        item = TrafficDataApplication(definition_id=traffic_data_id)  # type: ignore[call-arg]
+    def add_traffic_data_policy(self, traffic_data_id: UUID) -> TrafficDataApplication:
+        item = TrafficDataApplication(definition_id=traffic_data_id)
         self.policy_definition.assembly.append(item)
         return item
 
@@ -80,7 +85,7 @@ class CentralizedPolicy(PolicyCreationPayload):
 
 
 class CentralizedPolicyEditPayload(PolicyEditPayload, CentralizedPolicy):
-    rid: Optional[str] = Field(default=None, alias="@rid")
+    rid: Optional[str] = Field(default=None, serialization_alias="@rid", validation_alias="@rid")
 
 
 class CentralizedPolicyInfo(PolicyInfo, CentralizedPolicyEditPayload):

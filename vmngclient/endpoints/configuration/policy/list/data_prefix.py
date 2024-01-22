@@ -1,4 +1,6 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.models.policy.lists import DataPrefixList
 from vmngclient.models.policy.policy_list import (
@@ -25,7 +27,7 @@ class ConfigurationPolicyDataPrefixList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/dataprefix/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/dataprefix")
@@ -33,11 +35,11 @@ class ConfigurationPolicyDataPrefixList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/dataprefix/{id}")
-    def edit_policy_list(self, id: str, payload: DataPrefixListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: DataPrefixListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/dataprefix/{id}")
-    def get_lists_by_id(self, id: str) -> DataPrefixListInfo:
+    def get_lists_by_id(self, id: UUID) -> DataPrefixListInfo:
         ...
 
     @get("/template/policy/list/dataprefix", "data")
@@ -53,5 +55,5 @@ class ConfigurationPolicyDataPrefixList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/dataprefix/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

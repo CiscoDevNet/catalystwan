@@ -26,7 +26,8 @@ import logging
 import sys
 from dataclasses import dataclass
 from ipaddress import IPv4Address, IPv4Network, IPv6Network
-from typing import List, Tuple
+from typing import List, Optional, Tuple
+from uuid import UUID
 
 from vmngclient.api.policy_api import PolicyAPI
 
@@ -39,11 +40,11 @@ class CmdArguments:
     port: int
     user: str
     password: str
-    device_template: str = None
+    device_template: Optional[str] = None
 
 
-def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, str]]:
-    created_items: List[Tuple[type, str]] = []
+def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, UUID]]:
+    created_items: List[Tuple[type, UUID]] = []
 
     # Configure Application
     from vmngclient.models.policy.lists import AppList
