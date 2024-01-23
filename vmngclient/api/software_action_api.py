@@ -100,16 +100,14 @@ class SoftwareActionAPI:
 
         Args:
             devices (List[Device]): For those devices software will be activated
-            install_spec (InstallSpecification): specification of devices
-            on which the action is to be performed
             reboot (bool): reboot device after action end
             sync (bool, optional): Synchronize settings. Defaults to True.
-            software_image (str): path to software image
+            image (str): path to software image
             image_version (str): version of software image
             downgrade_check (bool): perform a downgrade check when applicable
 
             Notice: Have to pass one of those arguments (image_version,
-            software_image)
+            image)
 
         Raises:
             ValueError: Raise error if downgrade in certain cases
@@ -123,7 +121,7 @@ class SoftwareActionAPI:
         elif image_version and not image:
             version = cast(str, image_version)
         else:
-            raise VersionDeclarationError("You can not provide software_image and image version at the same time")
+            raise VersionDeclarationError("You can not provide image and image version at the same time")
         install_specification = get_install_specification(devices.first())
 
         url = "/dataservice/device/action/install"

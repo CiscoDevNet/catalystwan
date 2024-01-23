@@ -32,7 +32,7 @@ class DeviceCsrGenerationResponse(BaseModel):
     configStatusMessageDetails: Optional[str] = Field(default=None, alias="configStatusMessageDetails")
     isPrestagingSupported: Optional[bool] = Field(default=None, alias="isPrestagingSupported")
     expirationStatus: Optional[str] = Field(default=None, alias="expirationStatus")
-    uuid: Optional[str] = Field(default=None, alias="uuid")
+    uuid: Optional[UUID] = Field(default=None, alias="uuid")
     certificateDetail: Optional[str] = Field(default=None, alias="certificateDetail")
     createdAt: Optional[str] = Field(default=None, alias="createdAt")
     password: Optional[str] = Field(default=None, alias="password")
