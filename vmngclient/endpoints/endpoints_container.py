@@ -15,6 +15,9 @@ from vmngclient.endpoints.configuration.policy.definition.security_group import 
     ConfigurationPolicySecurityGroupDefinition,
 )
 from vmngclient.endpoints.configuration.policy.definition.traffic_data import ConfigurationPolicyDataDefinition
+from vmngclient.endpoints.configuration.policy.definition.vpn_membership import (
+    ConfigurationPolicyVPNMembershipGroupDefinition,
+)
 from vmngclient.endpoints.configuration.policy.definition.zone_based_firewall import (
     ConfigurationPolicyZoneBasedFirewallDefinition,
 )
@@ -117,6 +120,7 @@ class ConfigurationPolicyDefinitionContainer:
         self.qos_map = ConfigurationPolicyQoSMapDefinition(session)
         self.rewrite = ConfigurationPolicyRewriteRuleDefinition(session)
         self.control = ConfigurationPolicyControlDefinition(session)
+        self.vpn_membership = ConfigurationPolicyVPNMembershipGroupDefinition(session)
 
 
 class ConfigurationPolicyContainer:
