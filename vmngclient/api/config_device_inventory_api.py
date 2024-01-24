@@ -22,7 +22,7 @@ class ConfigurationDeviceInventoryAPI:
         self.session = session
         self.endpoint = ConfigurationDeviceInventory(session)
 
-    def unlock(self, device_uuid: UUID, device_type: str, device_details: list) -> Task:
+    def unlock(self, device_uuid: str, device_type: str, device_details: list) -> Task:
         """
         Unlocks device from config-group
         """
@@ -51,6 +51,6 @@ class ConfigurationDeviceInventoryAPI:
         params = GenerateBoostrapConfigurationQueryParams(
             configtype=configtype, incl_def_root_cert=incl_def_root_cert, version=version
         )
-        bootstrap_cfg_string = self.endpoint.generate_bootstrap_configuration(uuid=device_uuid, params=params)
+        reponse = self.endpoint.generate_bootstrap_configuration(uuid=device_uuid, params=params)
 
-        return BoostrapConfigurationDetails(bootstrapConfig=bootstrap_cfg_string.bootstrap_config)
+        return BoostrapConfigurationDetails(bootstrap_config=reponse.bootstrap_config)

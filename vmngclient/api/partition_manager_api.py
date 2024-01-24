@@ -61,7 +61,7 @@ class PartitionManagerAPI:
         else:
             payload_devices = self.device_version.get_devices_current_version(devices)
 
-        url = "/dataservice/device/action/defaultpartition"  # process_mark_default_partition
+        url = "/dataservice/device/action/defaultpartition"
         payload = {
             "action": "defaultpartition",
             "devices": [asdict(device) for device in payload_devices],  # type: ignore
@@ -96,7 +96,7 @@ class PartitionManagerAPI:
             for device in payload_devices
         ]
 
-        url = "/dataservice/device/action/removepartition"  # process_remove_partition
+        url = "/dataservice/device/action/removepartition"
         payload = {
             "action": "removepartition",
             "devices": [asdict(device) for device in remove_partition_payload],  # type: ignore

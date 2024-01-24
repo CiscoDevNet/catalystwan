@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 class BoostrapConfigurationDetails(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    bootstrap_config: str = Field(alias="bootstrapConfig")
+    bootstrap_config: str = Field(serialization_alias="bootstrapConfig", validation_alias="bootstrapConfig")
 
     uuid: Optional[str] = Field(default=None)
     otp: Optional[str] = Field(default=None)

@@ -83,9 +83,9 @@ class RepositoryAPI:
             information
         """
 
-        url = "/dataservice/system/device/controllers"  # get_device_details
+        url = "/dataservice/system/device/controllers"
         controllers_versions_info = self.session.get_data(url)
-        url = "/dataservice/system/device/vedges"  # get_device_details
+        url = "/dataservice/system/device/vedges"
         edges_versions_info = self.session.get_data(url)
         devices_versions_repository = {}
         for device in controllers_versions_info + edges_versions_info:
@@ -134,7 +134,7 @@ class RepositoryAPI:
         Returns:
             str: Response status code
         """
-        url = "/dataservice/device/action/software/package"  # upload_software_to_manager
+        url = "/dataservice/device/action/software/package"
         encoder = MultipartEncoder(
             fields={"file": (PurePath(image_path).name, open(image_path, "rb"), "application/x-gzip")}
         )
@@ -159,7 +159,7 @@ class RepositoryAPI:
         for image in self.get_all_software_images():
             if image_name in image["availableFiles"]:
                 version_id = image["versionId"]
-                url = f"/dataservice/device/action/software/{version_id}"  # delete_software_from_software_repository
+                url = f"/dataservice/device/action/software/{version_id}"
                 delete = self.session.delete(url)
                 return delete.status_code
         raise ImageNotInRepositoryError(f"Image: {image_name} is not the vManage software repository")
