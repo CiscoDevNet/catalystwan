@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Set
 
 from pydantic.v1 import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, delete, get, post, put
+from vmngclient.endpoints import APIEndpoints, delete, get, post, put, versions
 from vmngclient.typed_list import DataSequence
 
 
@@ -15,6 +15,7 @@ class User(BaseModel):
     locale: Optional[str]
     description: Optional[str]
     resource_group: Optional[str] = Field(alias="resGroupName")
+    resource_domain: Optional[str] = Field(alias="resourceDomainName") 
 
 
 class UserUpdateRequest(BaseModel):
@@ -27,7 +28,10 @@ class UserUpdateRequest(BaseModel):
     group: Optional[List[str]]
     locale: Optional[str]
     description: Optional[str]
-    resource_group: Optional[str] = Field(alias="resGroupName")
+    if versions("<=20.13"):
+        resource_group: Optional[str] = Field(alias="resGroupName")
+    else:
+        resource_domain: Optional[str] = Field(alias="resourceDomainName") 
 
 
 class UserRole(BaseModel):
