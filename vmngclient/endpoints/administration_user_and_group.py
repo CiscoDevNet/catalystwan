@@ -15,6 +15,7 @@ class User(BaseModel):
     locale: Optional[str]
     description: Optional[str]
     resource_group: Optional[str] = Field(alias="resGroupName")
+    resource_domain: Optional[str] = Field(alias="resourceDomainName")
 
 
 class UserUpdateRequest(BaseModel):
@@ -28,6 +29,7 @@ class UserUpdateRequest(BaseModel):
     locale: Optional[str]
     description: Optional[str]
     resource_group: Optional[str] = Field(alias="resGroupName")
+    resource_domain: Optional[str] = Field(alias="resourceDomainName")
 
 
 class UserRole(BaseModel):
