@@ -15,7 +15,7 @@ class User(BaseModel):
     locale: Optional[str]
     description: Optional[str]
     resource_group: Optional[str] = Field(alias="resGroupName")
-    resource_domain: Optional[str] = Field(alias="resourceDomainName") 
+    resource_domain: Optional[str] = Field(alias="resourceDomainName")
 
 
 class UserUpdateRequest(BaseModel):
@@ -28,10 +28,16 @@ class UserUpdateRequest(BaseModel):
     group: Optional[List[str]]
     locale: Optional[str]
     description: Optional[str]
-    if versions("<=20.13"):
-        resource_group: Optional[str] = Field(alias="resGroupName")
-    else:
-        resource_domain: Optional[str] = Field(alias="resourceDomainName") 
+
+
+@versions("<=20.13")
+class UserUpdateRequestV1(UserUpdateRequest):
+    resource_group: Optional[str] = Field(alias="resGroupName")
+
+
+@versions(">=20.14")
+class UserUpdateRequestV2(UserUpdateRequest):
+    resource_domain: Optional[str] = Field(alias="resourceDomainName")
 
 
 class UserRole(BaseModel):
