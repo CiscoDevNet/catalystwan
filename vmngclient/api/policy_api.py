@@ -8,6 +8,16 @@ from vmngclient.endpoints.configuration.policy.definition.control import (
     ConfigurationPolicyControlDefinition,
     ControlPolicyInfo,
 )
+from vmngclient.endpoints.configuration.policy.definition.hub_and_spoke import (
+    ConfigurationPolicyHubAndSpokeDefinition,
+    HubAndSpokePolicyGetResponse,
+    HubAndSpokePolicyInfo,
+)
+from vmngclient.endpoints.configuration.policy.definition.mesh import (
+    ConfigurationPolicyMeshDefinition,
+    MeshPolicyGetResponse,
+    MeshPolicyInfo,
+)
 from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition, QoSMapInfo
 from vmngclient.endpoints.configuration.policy.definition.rewrite import (
     ConfigurationPolicyRewriteRuleDefinition,
@@ -114,6 +124,8 @@ from vmngclient.endpoints.configuration.policy.vsmart_template import (
 from vmngclient.models.misc.application_protocols import ApplicationProtocol
 from vmngclient.models.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
 from vmngclient.models.policy.definitions.control import ControlPolicy
+from vmngclient.models.policy.definitions.hub_and_spoke import HubAndSpokePolicy
+from vmngclient.models.policy.definitions.mesh import MeshPolicy
 from vmngclient.models.policy.definitions.qos_map import QoSMap
 from vmngclient.models.policy.definitions.rewrite import RewritePolicy
 from vmngclient.models.policy.definitions.rule_set import RuleSet
@@ -208,6 +220,8 @@ POLICY_DEFINITION_ENDPOINTS_MAP: Mapping[type, type] = {
     RewritePolicy: ConfigurationPolicyRewriteRuleDefinition,
     ControlPolicy: ConfigurationPolicyControlDefinition,
     VPNMembershipGroup: ConfigurationPolicyVPNMembershipGroupDefinition,
+    HubAndSpokePolicy: ConfigurationPolicyHubAndSpokeDefinition,
+    MeshPolicy: ConfigurationPolicyMeshDefinition,
 }
 
 AnyPolicyDefinition = Union[
@@ -219,6 +233,8 @@ AnyPolicyDefinition = Union[
     RewritePolicy,
     ControlPolicy,
     VPNMembershipGroup,
+    HubAndSpokePolicy,
+    MeshPolicy,
 ]
 
 
@@ -652,6 +668,14 @@ class PolicyDefinitionsAPI:
     def get(self, type: Type[VPNMembershipGroup]) -> DataSequence[VPNMembershipGroupInfo]:
         ...
 
+    @overload
+    def get(self, type: Type[HubAndSpokePolicy]) -> DataSequence[HubAndSpokePolicyInfo]:
+        ...
+
+    @overload
+    def get(self, type: Type[MeshPolicy]) -> DataSequence[MeshPolicyInfo]:
+        ...
+
     # get by id
 
     @overload
@@ -684,6 +708,14 @@ class PolicyDefinitionsAPI:
 
     @overload
     def get(self, type: Type[VPNMembershipGroup], id: UUID) -> VPNMembershipGroupGetResponse:
+        ...
+
+    @overload
+    def get(self, type: Type[HubAndSpokePolicy], id: UUID) -> HubAndSpokePolicyGetResponse:
+        ...
+
+    @overload
+    def get(self, type: Type[MeshPolicy], id: UUID) -> MeshPolicyGetResponse:
         ...
 
     def get(self, type: Type[AnyPolicyDefinition], id: Optional[UUID] = None) -> Any:
