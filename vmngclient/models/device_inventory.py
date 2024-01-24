@@ -1,5 +1,6 @@
 import re
 from typing import Optional
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -9,7 +10,7 @@ class BoostrapConfigurationDetails(BaseModel):
 
     bootstrap_config: str = Field(serialization_alias="bootstrapConfig", validation_alias="bootstrapConfig")
 
-    uuid: Optional[str] = Field(default=None)
+    uuid: Optional[UUID] = Field(default=None)
     otp: Optional[str] = Field(default=None)
     vbond: Optional[str] = Field(default=None)
     org: Optional[str] = Field(default=None)
