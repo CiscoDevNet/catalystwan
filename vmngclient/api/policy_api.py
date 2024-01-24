@@ -27,6 +27,11 @@ from vmngclient.endpoints.configuration.policy.definition.traffic_data import (
     TrafficDataPolicyGetResponse,
     TrafficDataPolicyInfo,
 )
+from vmngclient.endpoints.configuration.policy.definition.vpn_membership import (
+    ConfigurationPolicyVPNMembershipGroupDefinition,
+    VPNMembershipGroupGetResponse,
+    VPNMembershipGroupInfo,
+)
 from vmngclient.endpoints.configuration.policy.definition.zone_based_firewall import (
     ConfigurationPolicyZoneBasedFirewallDefinition,
     ZoneBasedFWPolicyGetResponse,
@@ -113,6 +118,7 @@ from vmngclient.models.policy.definitions.qos_map import QoSMap
 from vmngclient.models.policy.definitions.rewrite import RewritePolicy
 from vmngclient.models.policy.definitions.rule_set import RuleSet
 from vmngclient.models.policy.definitions.security_group import SecurityGroup
+from vmngclient.models.policy.definitions.vpn_membership import VPNMembershipGroup
 from vmngclient.models.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy
 from vmngclient.models.policy.lists import (
     AnyPolicyList,
@@ -201,10 +207,18 @@ POLICY_DEFINITION_ENDPOINTS_MAP: Mapping[type, type] = {
     QoSMap: ConfigurationPolicyQoSMapDefinition,
     RewritePolicy: ConfigurationPolicyRewriteRuleDefinition,
     ControlPolicy: ConfigurationPolicyControlDefinition,
+    VPNMembershipGroup: ConfigurationPolicyVPNMembershipGroupDefinition,
 }
 
 AnyPolicyDefinition = Union[
-    RuleSet, SecurityGroup, ZoneBasedFWPolicy, TrafficDataPolicy, QoSMap, RewritePolicy, ControlPolicy
+    RuleSet,
+    SecurityGroup,
+    ZoneBasedFWPolicy,
+    TrafficDataPolicy,
+    QoSMap,
+    RewritePolicy,
+    ControlPolicy,
+    VPNMembershipGroup,
 ]
 
 
@@ -634,6 +648,10 @@ class PolicyDefinitionsAPI:
     def get(self, type: Type[ControlPolicy]) -> DataSequence[ControlPolicyInfo]:
         ...
 
+    @overload
+    def get(self, type: Type[VPNMembershipGroup]) -> DataSequence[VPNMembershipGroupInfo]:
+        ...
+
     # get by id
 
     @overload
@@ -662,6 +680,10 @@ class PolicyDefinitionsAPI:
 
     @overload
     def get(self, type: Type[ControlPolicy], id: UUID) -> ControlPolicyInfo:
+        ...
+
+    @overload
+    def get(self, type: Type[VPNMembershipGroup], id: UUID) -> VPNMembershipGroupGetResponse:
         ...
 
     def get(self, type: Type[AnyPolicyDefinition], id: Optional[UUID] = None) -> Any:
