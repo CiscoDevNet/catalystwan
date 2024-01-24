@@ -12,15 +12,15 @@ class Site(BaseModel):
     vpn_list: List[UUID] = Field(validation_alias="vpnList", serialization_alias="vpnList")
 
 
-class VPNMembershipPolicyDefinition(BaseModel):
+class VPNMembershipGroupDefinition(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
     sites: List[Site] = []
 
 
-class VPNMembershipPolicy(PolicyDefinitionBase):
+class VPNMembershipGroup(PolicyDefinitionBase):
     model_config = ConfigDict(populate_by_name=True)
     type: Literal["vpnMembershipGroup"] = "vpnMembershipGroup"
-    definition: VPNMembershipPolicyDefinition = VPNMembershipPolicyDefinition()
+    definition: VPNMembershipGroupDefinition = VPNMembershipGroupDefinition()
 
     def add_site(self, site_list: UUID, vpn_lists: List[UUID]) -> Site:
         site = Site(site_list=site_list, vpn_list=vpn_lists)
