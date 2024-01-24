@@ -28,16 +28,17 @@ class UserUpdateRequest(BaseModel):
     group: Optional[List[str]]
     locale: Optional[str]
     description: Optional[str]
-
-
-@versions("<=20.13")
-class UserUpdateRequestV1(UserUpdateRequest):
     resource_group: Optional[str] = Field(alias="resGroupName")
-
-
-@versions(">=20.14")
-class UserUpdateRequestV2(UserUpdateRequest):
     resource_domain: Optional[str] = Field(alias="resourceDomainName")
+    version: str
+
+    @versions("<=20.13")
+    def get_resource_group(self):
+        return self.resource_group
+
+    @versions(">=20.14")
+    def get_resource_domain(self):
+        return self.resource_domain
 
 
 class UserRole(BaseModel):
