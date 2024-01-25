@@ -30,6 +30,27 @@ from typing import List, Optional, Tuple
 from uuid import UUID
 
 from vmngclient.api.policy_api import PolicyAPI
+from vmngclient.models.policy.centralized import CentralizedPolicy
+from vmngclient.models.policy.definitions.vpn_membership import VPNMembershipGroup
+from vmngclient.models.policy.lists import (
+    AppList,
+    AppProbeClassList,
+    ClassMapList,
+    ColorList,
+    CommunityList,
+    DataIPv6PrefixList,
+    DataPrefixList,
+    ExpandedCommunityList,
+    PolicerList,
+    PolicyListBase,
+    PrefixList,
+    RegionList,
+    SiteList,
+    SLAClassList,
+    TLOCList,
+    VPNList,
+)
+from vmngclient.models.policy.policy_definition import PolicyDefinitionBase
 
 logger = logging.getLogger(__name__)
 
@@ -47,8 +68,6 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, UUID]]:
     created_items: List[Tuple[type, UUID]] = []
 
     # Configure Application
-    from vmngclient.models.policy.lists import AppList
-
     app_list = AppList(name="MyApplications")
     app_list.add_app("abc-news")
     app_list.add_app_family("application-service")
@@ -56,8 +75,6 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, UUID]]:
     created_items.append((AppList, app_list_id))
 
     # Configure Color
-    from vmngclient.models.policy.lists import ColorList
-
     color_list = ColorList(name="MyColors")
     color_list.add_color("biz-internet")
     color_list.add_color("public-internet")
@@ -65,8 +82,6 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, UUID]]:
     created_items.append((ColorList, color_list_id))
 
     # Configure Community
-    from vmngclient.models.policy.lists import CommunityList, ExpandedCommunityList
-
     community_list = CommunityList(name="MyCommunities")
     community_list.add_community(1000, 10000)
     community_list.add_well_known_community("no-advertise")
@@ -80,8 +95,6 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, UUID]]:
     created_items.append((ExpandedCommunityList, expanded_community_list_id))
 
     # Configure Data Prefix
-    from vmngclient.models.policy.lists import DataIPv6PrefixList, DataPrefixList
-
     data_prefix_list = DataPrefixList(name="MyDataPrefixes")
     data_prefix_list.add_prefix(IPv4Network("12.0.0.0/16"))
     data_prefix_list.add_prefix(IPv4Network("12.1.0.0/16"))
@@ -95,16 +108,12 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, UUID]]:
     created_items.append((DataIPv6PrefixList, data_ipv6_prefix_list_id))
 
     # Configure Policer
-    from vmngclient.models.policy.lists import PolicerList
-
     policer = PolicerList(name="MyPolicer")
     policer.police(2**17, 8, "remark")
     policer_id = api.lists.create(policer)
     created_items.append((PolicerList, policer_id))
 
     # Configure Prefix
-    from vmngclient.models.policy.lists import PrefixList
-
     prefix_list = PrefixList(name="MyPrefixes")
     prefix_list.add_prefix(IPv4Network("10.0.0.0/16"))
     prefix_list.add_prefix(IPv4Network("11.0.0.0/16"), ge=2)
@@ -112,8 +121,6 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, UUID]]:
     created_items.append((PrefixList, prefix_list_id))
 
     # Configure Site
-    from vmngclient.models.policy.lists import SiteList
-
     site_list = SiteList(name="MySites")
     site_list.add_site_range((300, 400))
     site_list.add_sites({200, 202})
@@ -121,8 +128,6 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, UUID]]:
     created_items.append((SiteList, site_list_id))
 
     # Configure App Probe Class
-    from vmngclient.models.policy.lists import AppProbeClassList, ClassMapList
-
     class_map = ClassMapList(name="MyClassMap")
     class_map.assign_queue(1)
     class_map_id = api.lists.create(class_map)
@@ -134,8 +139,6 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, UUID]]:
     created_items.append((AppProbeClassList, app_probe_class_id))
 
     # Configure SLA Class
-    from vmngclient.models.policy.lists import SLAClassList
-
     sla_class = SLAClassList(name="MySLAClass")
     sla_class.assign_app_probe_class(app_probe_class_id, latency=10, loss=1, jitter=5)
     sla_class.add_fallback_jitter_criteria(10)
@@ -144,8 +147,6 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, UUID]]:
     created_items.append((SLAClassList, sla_class_id))
 
     # Configure TLOC
-    from vmngclient.models.policy.lists import TLOCList
-
     tloc_list = TLOCList(name="MyTLOCList")
     tloc_list.add_tloc(IPv4Address("10.0.0.55"), color="blue", encap="gre")
     tloc_list.add_tloc(IPv4Address("10.0.0.56"), color="silver", encap="ipsec", preference=5678)
@@ -153,8 +154,6 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, UUID]]:
     created_items.append((TLOCList, tloc_list_id))
 
     # Configure Region
-    from vmngclient.models.policy.lists import RegionList
-
     region_list = RegionList(name="MyRegions")
     region_list.add_regions({1, 2})
     region_list.add_region_range((3, 6))
@@ -162,8 +161,6 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, UUID]]:
     created_items.append((RegionList, region_list_id))
 
     # Configure VPN
-    from vmngclient.models.policy.lists import VPNList
-
     vpn_list = VPNList(name="MyVPNList")
     vpn_list.add_vpns({100, 200})
     vpn_list.add_vpn_range((1000, 2000))
@@ -173,17 +170,44 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, UUID]]:
     return created_items
 
 
+def create_vpn_membership_policy(api: PolicyAPI) -> Tuple[type, UUID]:
+    site_list = api.lists.get(SiteList).first().list_id
+    vpn_list = api.lists.get(VPNList).first().list_id
+    policy = VPNMembershipGroup(name="MyVPNMembershipPolicy")
+    policy.add_site(site_list, [vpn_list])
+    policy_id = api.definitions.create(policy)
+    return (VPNMembershipGroup, policy_id)
+
+
+def delete_created_items(api: PolicyAPI, items: List[Tuple[type, UUID]]) -> None:
+    # TODO: we can expose get_any(), edit_any(), create_any(), delete_any() in PolicyAPI using similiar logic
+    for _type, _uuid in reversed(items):
+        if issubclass(_type, PolicyListBase):
+            api.lists.delete(_type, _uuid)
+        elif issubclass(_type, PolicyDefinitionBase):
+            api.definitions.delete(_type, _uuid)
+        elif _type == CentralizedPolicy:
+            api.centralized.delete(_uuid)
+        else:
+            logger.warning(f"Cannot find api method to delete item {_type} {_uuid}")
+
+
 def run_demo(args: CmdArguments):
     from vmngclient.session import create_vManageSession
 
     with create_vManageSession(url=args.url, port=args.port, username=args.user, password=args.password) as session:
         api = session.api.policy
         """1. Configure Groups of Interest for Centralized Policy"""
-        groups_of_iterest = configure_groups_of_interest(api)
+        configured_items = configure_groups_of_interest(api)
+        """2. Configure Topology and VPN Membership"""
+        # TODO
+        """3. Import Existing Topology"""
+        # TODO
+        """4. Create VPN Membership Policy"""
+        configured_items.append(create_vpn_membership_policy(api))
         """Cleanup"""
         input("press enter to delete created items...")
-        for item in reversed(groups_of_iterest):
-            api.lists.delete(*item)
+        delete_created_items(api, configured_items)
 
 
 def load_arguments() -> CmdArguments:

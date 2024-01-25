@@ -8,6 +8,8 @@ from vmngclient.endpoints.certificate_management_vmanage import CertificateManag
 from vmngclient.endpoints.client import Client
 from vmngclient.endpoints.cluster_management import ClusterManagement
 from vmngclient.endpoints.configuration.policy.definition.control import ConfigurationPolicyControlDefinition
+from vmngclient.endpoints.configuration.policy.definition.hub_and_spoke import ConfigurationPolicyHubAndSpokeDefinition
+from vmngclient.endpoints.configuration.policy.definition.mesh import ConfigurationPolicyMeshDefinition
 from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition
 from vmngclient.endpoints.configuration.policy.definition.rewrite import ConfigurationPolicyRewriteRuleDefinition
 from vmngclient.endpoints.configuration.policy.definition.rule_set import ConfigurationPolicyRuleSetDefinition
@@ -15,6 +17,9 @@ from vmngclient.endpoints.configuration.policy.definition.security_group import 
     ConfigurationPolicySecurityGroupDefinition,
 )
 from vmngclient.endpoints.configuration.policy.definition.traffic_data import ConfigurationPolicyDataDefinition
+from vmngclient.endpoints.configuration.policy.definition.vpn_membership import (
+    ConfigurationPolicyVPNMembershipGroupDefinition,
+)
 from vmngclient.endpoints.configuration.policy.definition.zone_based_firewall import (
     ConfigurationPolicyZoneBasedFirewallDefinition,
 )
@@ -117,6 +122,9 @@ class ConfigurationPolicyDefinitionContainer:
         self.qos_map = ConfigurationPolicyQoSMapDefinition(session)
         self.rewrite = ConfigurationPolicyRewriteRuleDefinition(session)
         self.control = ConfigurationPolicyControlDefinition(session)
+        self.vpn_membership = ConfigurationPolicyVPNMembershipGroupDefinition(session)
+        self.hub_and_spoke = ConfigurationPolicyHubAndSpokeDefinition(session)
+        self.mesh = ConfigurationPolicyMeshDefinition(session)
 
 
 class ConfigurationPolicyContainer:
