@@ -14,7 +14,21 @@ class User(BaseModel):
     group: List[str]
     locale: Optional[str]
     description: Optional[str]
+    """
+    for vmanage versions 20.5 to 20.12, resource group field is used during user creation.
+    if you do no enter any value, it will set it to "global"
+    endpoint: POST https://<vmanage-ip>/dataservice/admin/user
+    example payload:
+    {"locale":"en_US","group":["netadmin"],"description":"test","userName":"test","password":"<>"}
+    """
     resource_group: Optional[str] = Field(default=None, alias="resGroupName")
+    """
+    for vmanage versions 20.13 and above, resource domain field is used during user creation.
+    if you do no enter any value, it will set it to "all"
+    endpoint: POST https://<vmanage-ip>/dataservice/admin/user
+    example payload:
+    {"description":"test","group":["netadmin"],"locale":"en_US","userName":"test","password":"<>"}
+    """
     resource_domain: Optional[str] = Field(default=None, alias="resourceDomainName")
 
 
@@ -28,7 +42,21 @@ class UserUpdateRequest(BaseModel):
     group: Optional[List[str]]
     locale: Optional[str]
     description: Optional[str]
+    """
+    for vmanage versions 20.5 to 20.12, resource group field is used during user update.
+    if you do no enter any value, it will set it to "global"
+    endpoint: PUT https://<vmanage-ip>/dataservice/admin/user/test
+    example payload:
+    {"locale":"en_US","group":["netadmin"],"userName":"test","description":"testers","status":"active"}
+    """
     resource_group: Optional[str] = Field(default=None, alias="resGroupName")
+    """
+    for vmanage versions 20.13 and above, resource domain field is used during user update.
+    if you do no enter any value, it will set it to "all"
+    endpoint: POST https://<vmanage-ip>/dataservice/admin/user
+    example payload:
+    {"description":"testers","group":["netadmin"],"locale":"en_US","userName":"test","password":"<>"}
+    """
     resource_domain: Optional[str] = Field(default=None, alias="resourceDomainName")
 
 
