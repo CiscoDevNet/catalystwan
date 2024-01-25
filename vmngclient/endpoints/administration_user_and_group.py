@@ -28,7 +28,7 @@ class UserUpdateRequest(BaseModel):
     group: Optional[List[str]]
     locale: Optional[str]
     description: Optional[str]
-    resource_group: Optional[str] = Field(default=None, alias="resourceDomainName")
+    resource_group: Optional[str] = Field(default=None, alias="resGroupName")
     resource_domain: Optional[str] = Field(default=None, alias="resourceDomainName")
 
 
