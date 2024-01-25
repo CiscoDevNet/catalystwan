@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Set
 
 from pydantic.v1 import BaseModel, Field
 
-from vmngclient.endpoints import APIEndpoints, delete, get, post, put
+from vmngclient.endpoints import APIEndpoints, delete, get, post, put, versions
 from vmngclient.typed_list import DataSequence
 
 
@@ -14,8 +14,8 @@ class User(BaseModel):
     group: List[str]
     locale: Optional[str]
     description: Optional[str]
-    resource_group: Optional[str] = Field(alias="resGroupName")
-    resource_domain: Optional[str] = Field(alias="resourceDomainName")
+    resource_group: Optional[str] = Field(default=None, alias="resGroupName")
+    resource_domain: Optional[str] = Field(default=None, alias="resourceDomainName")
 
 
 class UserUpdateRequest(BaseModel):
@@ -28,8 +28,8 @@ class UserUpdateRequest(BaseModel):
     group: Optional[List[str]]
     locale: Optional[str]
     description: Optional[str]
-    resource_group: Optional[str] = Field(alias="resGroupName")
-    resource_domain: Optional[str] = Field(alias="resourceDomainName")
+    resource_group: Optional[str] = Field(default=None, alias="resourceDomainName")
+    resource_domain: Optional[str] = Field(default=None, alias="resourceDomainName")
 
 
 class UserRole(BaseModel):
@@ -232,26 +232,32 @@ class AdministrationUserAndGroup(APIEndpoints):
     def reset_user(self, payload: UserResetRequest) -> None:
         ...
 
+    @versions(">20.4, <20.13")
     @get("/admin/resourcegroup")
     def find_resource_groups(self) -> DataSequence[ResourceGroup]:
         ...
 
+    @versions(">20.4, <20.13")
     @post("/admin/resourcegroup/switch")
     def switch_resource_group(self, payload: ResourceGroupSwitchRequest) -> None:
         ...
 
+    @versions(">20.4, <20.13")
     @put("/admin/resourcegroup/{group_id}")
     def update_resource_group(self, group_id: str, payload: ResourceGroupUpdateRequest) -> None:
         ...
 
+    @versions(">20.4, <20.13")
     @delete("/admin/resourcegroup/{group_id}", json={})
     def delete_resource_group(self, group_id: str) -> None:
         ...
 
+    @versions(">20.4, <20.13")
     @post("/admin/resourcegroup")
     def create_resource_group(self, payload: ResourceGroup) -> None:
         ...
 
+    @versions(">20.4, <20.13")
     def resource_group_name(self):
         # GET /admin/user/resourceGroupName
         ...
