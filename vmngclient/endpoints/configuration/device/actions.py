@@ -49,7 +49,7 @@ class PartitionDevice(BaseModel):
 class PartitionActionPayload(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    action: str
+    action: PartitionActionType
     device_type: DeviceType = Field(serialization_alias="deviceType", validation_alias="deviceType")
     devices: List[PartitionDevice]
 
