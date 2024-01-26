@@ -66,11 +66,12 @@ class InstallInput(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     data: Optional[List[InstallData]] = Field(default=None)
+    family: Optional[str]
     reboot: bool
     sync: bool
     v_edge_vpn: int = Field(serialization_alias="vEdgeVPN", validation_alias="vEdgeVPN")
     v_smart_vpn: int = Field(serialization_alias="vSmartVPN", validation_alias="vSmartVPN")
-    version: Optional[str] = Field(default=None)
+    version: str = Field(default=None)
     version_type: str = Field(serialization_alias="versionType", validation_alias="versionType")
 
 
