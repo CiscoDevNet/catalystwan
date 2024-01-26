@@ -23,6 +23,12 @@ class DeviceType(str, Enum):
     VMANAGE = "vmanage"
 
 
+class PartitionActionType(str, Enum):
+    REMOVE = "removepartition"
+    DEFAULT = "defaultpartition"
+    CHANGE = "changepartition"
+
+
 class ZTPUpgradeSettings(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
@@ -32,7 +38,7 @@ class ZTPUpgradeSettings(BaseModel):
     version_name: str = Field(serialization_alias="versionName", validation_alias="versionName")
 
 
-class Device(BaseModel):
+class PartitionDevice(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     device_id: str = Field(serialization_alias="deviceId", validation_alias="deviceId")
@@ -45,10 +51,10 @@ class PartitionActionPayload(BaseModel):
 
     action: str
     device_type: DeviceType = Field(serialization_alias="deviceType", validation_alias="deviceType")
-    devices: List[Device]
+    devices: List[PartitionDevice]
 
 
-class Data(BaseModel):
+class InstallData(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     family: str
@@ -59,11 +65,12 @@ class Data(BaseModel):
 class InstallInput(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    data: List[Data]
+    data: Optional[List[InstallData]] = Field(default=None)
     reboot: bool
     sync: bool
     v_edge_vpn: int = Field(serialization_alias="vEdgeVPN", validation_alias="vEdgeVPN")
     v_smart_vpn: int = Field(serialization_alias="vSmartVPN", validation_alias="vSmartVPN")
+    version: Optional[str] = Field(default=None)
     version_type: str = Field(serialization_alias="versionType", validation_alias="versionType")
 
 
@@ -209,7 +216,7 @@ class ConfigurationDeviceActions(APIEndpoints):
         ...
 
     @post("/device/action/defaultpartition")
-    def process_mark_default_partition(self, payload: List[PartitionActionPayload]) -> None:
+    def process_mark_default_partition(self, payload: PartitionActionPayload) -> ActionId:
         ...
 
     def process_delete_amp_api_key(self):
@@ -248,8 +255,8 @@ class ConfigurationDeviceActions(APIEndpoints):
         # POST /device/action/reboot
         ...
 
-    def process_remove_partition(self):  # TODO
-        # POST /device/action/removepartition
+    @post("/device/action/removepartition")
+    def process_remove_partition(self, payload: PartitionActionPayload) -> ActionId:
         ...
 
     def process_remove_software_image(self):

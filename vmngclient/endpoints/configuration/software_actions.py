@@ -29,6 +29,11 @@ class ImageType(str, Enum):
     NA = "na"
 
 
+class SoftwareImageQuery(BaseModel):
+    image_type: ImageType = Field(default=ImageType.SOFTWARE, alias="imageType")
+    vnf_type: Optional[ImageType] = Field(default=None, alias="vnfType")
+
+
 class RemoteServerProtocol(str, Enum):
     FTP = "FTP"
     HTTP = "HTTP"
@@ -95,6 +100,10 @@ class SoftwareRemoteServer(BaseModel):
 
     filename: str = Field(default=None, serialization_alias="fileName", validation_alias="fileName")
     remote_server_id: str = Field(default=None, serialization_alias="remoteServerId", validation_alias="remoteServerId")
+    smu_defect_id: Optional[str] = Field(
+        default=None, serialization_alias="smuDefectId", validation_alias="smuDefectId"
+    )
+    smu_type: Optional[str] = Field(default=None, serialization_alias="smuType", validation_alias="smuType")
 
 
 class SoftwareImageDetails(BaseModel):
@@ -158,12 +167,12 @@ class ConfigurationSoftwareActions(APIEndpoints):
     def add_new_remote_server(self, payload: RemoteServer) -> None:
         ...
 
-    @get("/device/action/remote-server/{id}", "data")
+    @get("/device/action/remote-server/{id}")
     def get_remote_server(self, id: UUID) -> RemoteServerInfo:
         ...
 
     @put("/device/action/remote-server/{id}")
-    def update_remote_server(self, id: UUID) -> None:
+    def update_remote_server(self, id: UUID, payload: SoftwareRemoteServer) -> None:
         ...
 
     @delete("/device/action/remote-server/{id}")
@@ -178,10 +187,10 @@ class ConfigurationSoftwareActions(APIEndpoints):
     def upload_software_from_remote_server(self, payload: SoftwareRemoteServer) -> None:
         ...
 
-    @delete("/device/action/software/{id}")
-    def delete_software_from_software_repository(self, id: UUID) -> None:
+    @delete("/device/action/software/{version_id}")
+    def delete_software_from_software_repository(self, version_id: UUID) -> None:
         ...
 
-    @get("/device/action/software/images?imageType={image_type}", "data")
-    def get_list_of_all_images(self, image_type: str = ImageType.SOFTWARE) -> DataSequence[SoftwareImageDetails]:
+    @get("/device/action/software/images", "data")
+    def get_list_of_all_images(self, params: SoftwareImageQuery) -> DataSequence[SoftwareImageDetails]:
         ...
