@@ -122,6 +122,7 @@ SequenceType = Literal[
     "zoneBasedFW",
     "tloc",
     "route",
+    "acl",
 ]
 
 
@@ -577,6 +578,11 @@ class RegionListEntry(BaseModel):
     ref: UUID
 
 
+class ClassMapListEntry(BaseModel):
+    field: Literal["class"] = "class"
+    ref: UUID
+
+
 class ServiceEntryValue(BaseModel):
     type: ServiceTypeEnum
     vpn: str
@@ -693,6 +699,21 @@ class ExportToAction(BaseModel):
     parameter: VPNListEntry
 
 
+class MirrorAction(BaseModel):
+    type: Literal["mirror"] = "mirror"
+    parameter: Reference
+
+
+class ClassMapAction(BaseModel):
+    type: Literal["class"] = "class"
+    parameter: Reference
+
+
+class PolicerAction(BaseModel):
+    type: Literal["policer"] = "policer"
+    parameter: Reference
+
+
 ActionSetEntry = Annotated[
     Union[
         AffinityEntry,
@@ -727,6 +748,7 @@ ActionEntry = Annotated[
     Union[
         ActionSet,
         CFlowDAction,
+        ClassMapAction,
         CountAction,
         DREOptimizationAction,
         FallBackToRoutingAction,
@@ -734,7 +756,9 @@ ActionEntry = Annotated[
         LossProtectionAction,
         LossProtectionFECAction,
         LossProtectionPacketDuplicationAction,
+        MirrorAction,
         NATAction,
+        PolicerAction,
         RedirectDNSAction,
         SecureInternetGatewayAction,
         ServiceNodeGroupAction,
@@ -748,6 +772,7 @@ MatchEntry = Annotated[
     Union[
         AppListEntry,
         CarrierEntry,
+        ClassMapListEntry,
         ColorListEntry,
         CommunityListEntry,
         DestinationDataIPv6PrefixListEntry,
@@ -760,9 +785,9 @@ MatchEntry = Annotated[
         DestinationPortEntry,
         DestinationPortListEntry,
         DestinationRegionEntry,
-        DomainIDEntry,
         DNSAppListEntry,
         DNSEntry,
+        DomainIDEntry,
         DSCPEntry,
         ExpandedCommunityListEntry,
         GroupIDEntry,
