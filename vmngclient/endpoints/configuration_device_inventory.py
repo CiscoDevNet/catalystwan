@@ -56,7 +56,8 @@ class DeviceCategory(str, Enum):
 
 
 class DeviceDetailsResponse(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
+    # Field "model_sku" has conflict with protected namespace "model_"
+    model_config = ConfigDict(populate_by_name=True, protected_namespaces=())
 
     device_type: Optional[str] = Field(default=None, alias="deviceType")
     serial_number: Optional[str] = Field(default=None, alias="serialNumber")
@@ -110,16 +111,16 @@ class DeviceDetailsResponse(BaseModel):
     domain_id: Optional[str] = Field(default=None, alias="domain-id")
     local_system_ip: Optional[str] = Field(default=None, alias="local-system-ip")
     system_ip: Optional[str] = Field(default=None, alias="system-ip")
-    model_sku: Optional[str] = Field(default=None, alias="model_sku")
+    model_sku: Optional[str] = Field(default=None)
     site_id: Optional[str] = Field(default=None, alias="site-id")
     host_name: Optional[str] = Field(default=None, alias="host-name")
     sp_organization_name: Optional[str] = Field(default=None, alias="sp-organization-name")
-    version: Optional[str] = Field(default=None, alias="version")
-    vbond: Optional[str] = Field(default=None, alias="vbond")
+    version: Optional[str] = Field(default=None)
+    vbond: Optional[str] = Field(default=None)
     vmanage_system_ip: Optional[str] = Field(default=None, alias="vmanage-system-ip")
     vmanage_connection_state: Optional[str] = Field(default=None, alias="vmanageConnectionState")
     last_updated: Optional[int] = Field(default=None, alias="lastupdated")
-    reachability: Optional[str] = Field(default=None, alias="reachability")
+    reachability: Optional[str] = Field(default=None)
     uptime_date: Optional[int] = Field(default=None, alias="uptime-date")
     default_version: Optional[str] = Field(default=None, alias="defaultVersion")
     organization_name: Optional[str] = Field(default=None, alias="organization-name")

@@ -59,10 +59,10 @@ class SoftwareActionAPI:
         Args:
             devices (List[Device]): For those devices software will be activated
             version_to_activate (Optional[str]): version to be set as current version
-            software_image (Optional[str]): path to software image
+            image (Optional[str]): path to software image
 
             Notice: Have to pass one of those arguments (version_to_activate,
-            software_image)
+            image)
 
         Returns:
             str: Activate software action id

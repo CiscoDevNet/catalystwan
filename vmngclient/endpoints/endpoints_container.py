@@ -7,7 +7,6 @@ from vmngclient.endpoints.certificate_management_device import CertificateManage
 from vmngclient.endpoints.certificate_management_vmanage import CertificateManagementVManage
 from vmngclient.endpoints.client import Client
 from vmngclient.endpoints.cluster_management import ClusterManagement
-from vmngclient.endpoints.configuration.device.actions import ConfigurationDeviceActions
 from vmngclient.endpoints.configuration.device.software_update import ConfigurationDeviceSoftwareUpdate
 from vmngclient.endpoints.configuration.policy.definition.control import ConfigurationPolicyControlDefinition
 from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition
@@ -54,6 +53,7 @@ from vmngclient.endpoints.configuration.policy.vedge_template import Configurati
 from vmngclient.endpoints.configuration.policy.vsmart_template import ConfigurationVSmartTemplatePolicy
 from vmngclient.endpoints.configuration.software_actions import ConfigurationSoftwareActions
 from vmngclient.endpoints.configuration_dashboard_status import ConfigurationDashboardStatus
+from vmngclient.endpoints.configuration_device_actions import ConfigurationDeviceActions
 from vmngclient.endpoints.configuration_device_inventory import ConfigurationDeviceInventory
 from vmngclient.endpoints.configuration_device_template import ConfigurationDeviceTemplate
 from vmngclient.endpoints.configuration_feature_profile import (
