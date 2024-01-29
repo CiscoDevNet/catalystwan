@@ -1,7 +1,7 @@
 import datetime
 from enum import Enum
 from functools import wraps
-from ipaddress import IPv4Address, IPv4Network
+from ipaddress import IPv4Address, IPv4Network, IPv6Network
 from typing import Any, Dict, List, MutableSequence, Optional, Protocol, Sequence, Set, Tuple, Union
 from uuid import UUID
 
@@ -22,7 +22,7 @@ def port_set_and_ranges_to_str(ports: Set[int] = set(), port_ranges: List[Tuple[
     return ports_str
 
 
-def ipv4_networks_to_str(networks: List[IPv4Network]) -> str:
+def networks_to_str(networks: Sequence[Union[IPv4Network, IPv6Network]]) -> str:
     return " ".join(str(net) for net in networks)
 
 
@@ -224,11 +224,20 @@ class DSCPEntry(BaseModel):
 
 class SourceIPEntry(BaseModel):
     field: Literal["sourceIp"] = "sourceIp"
-    value: str = Field(description="IP network specifier separate by space")
+    value: str = Field(description="IP network specifiers separate by space")
 
     @staticmethod
     def from_ipv4_networks(networks: List[IPv4Network]) -> "SourceIPEntry":
-        return SourceIPEntry(value=ipv4_networks_to_str(networks))
+        return SourceIPEntry(value=networks_to_str(networks))
+
+
+class SourceIPv6Entry(BaseModel):
+    field: Literal["sourceIpv6"] = "sourceIpv6"
+    value: str = Field(description="IPv6 network specifiers separate by space")
+
+    @staticmethod
+    def from_ipv6_networks(networks: List[IPv6Network]) -> "SourceIPv6Entry":
+        return SourceIPv6Entry(value=networks_to_str(networks))
 
 
 class IPAddressEntry(BaseModel):
@@ -251,7 +260,16 @@ class DestinationIPEntry(BaseModel):
 
     @staticmethod
     def from_ipv4_networks(networks: List[IPv4Network]) -> "DestinationIPEntry":
-        return DestinationIPEntry(value=ipv4_networks_to_str(networks))
+        return DestinationIPEntry(value=networks_to_str(networks))
+
+
+class DestinationIPv6Entry(BaseModel):
+    field: Literal["destinationIpv6"] = "destinationIpv6"
+    value: str
+
+    @staticmethod
+    def from_ipv6_networks(networks: List[IPv6Network]) -> "DestinationIPv6Entry":
+        return DestinationIPv6Entry(value=networks_to_str(networks))
 
 
 class DestinationPortEntry(BaseModel):
@@ -442,6 +460,16 @@ class GroupIDEntry(BaseModel):
     value: str = Field(description="Number in range 0-4294967295")
 
 
+class NextHeaderEntry(BaseModel):
+    field: Literal["nextHeader"] = "nextHeader"
+    value: str = Field(description="0-63 single numbers separate by space")
+
+
+class TrafficClassEntry(BaseModel):
+    field: Literal["trafficClass"] = "trafficClass"
+    value: str = Field(description="Number in range 0-63")
+
+
 class NATVPNEntry(RootModel):
     root: List[Union[UseVPNEntry, FallBackEntry]]
 
@@ -457,13 +485,13 @@ class SourceDataPrefixListEntry(BaseModel):
     ref: UUID
 
 
-class DestinationDataPrefixListEntry(BaseModel):
-    field: Literal["destinationDataPrefixList"] = "destinationDataPrefixList"
+class SourceDataIPv6PrefixListEntry(BaseModel):
+    field: Literal["sourceDataIpv6PrefixList"] = "sourceDataIpv6PrefixList"
     ref: UUID
 
 
-class SourceDataIPv6PrefixListEntry(BaseModel):
-    field: Literal["sourceDataIpv6PrefixList"] = "sourceDataIpv6PrefixList"
+class DestinationDataPrefixListEntry(BaseModel):
+    field: Literal["destinationDataPrefixList"] = "destinationDataPrefixList"
     ref: UUID
 
 
@@ -733,6 +761,7 @@ ActionSetEntry = Annotated[
         TLOCActionEntry,
         TLOCEntry,
         TLOCListEntry,
+        TrafficClassEntry,
         VPNEntry,
     ],
     Field(discriminator="field"),
@@ -782,6 +811,7 @@ MatchEntry = Annotated[
         DestinationGeoLocationEntry,
         DestinationGeoLocationListEntry,
         DestinationIPEntry,
+        DestinationIPv6Entry,
         DestinationPortEntry,
         DestinationPortListEntry,
         DestinationRegionEntry,
@@ -791,6 +821,7 @@ MatchEntry = Annotated[
         DSCPEntry,
         ExpandedCommunityListEntry,
         GroupIDEntry,
+        NextHeaderEntry,
         OMPTagEntry,
         OriginatorEntry,
         OriginEntry,
@@ -816,11 +847,13 @@ MatchEntry = Annotated[
         SourceGeoLocationEntry,
         SourceGeoLocationListEntry,
         SourceIPEntry,
+        SourceIPv6Entry,
         SourcePortEntry,
         SourcePortListEntry,
         TCPEntry,
         TLOCEntry,
         TLOCListEntry,
+        TrafficClassEntry,
         TrafficToEntry,
         VPNListEntry,
     ],
@@ -829,7 +862,9 @@ MatchEntry = Annotated[
 
 MUTUALLY_EXCLUSIVE_FIELDS = [
     {"destinationDataPrefixList", "destinationIp"},
+    {"destinationDataIpv6PrefixList", "destinationIpv6"},
     {"sourceDataPrefixList", "sourceIp"},
+    {"sourceDataIpv6PrefixList", "sourceIpv6"},
     {"protocolName", "protocolNameList", "protocol", "destinationPort", "destinationPortList"},
     {"localTlocList", "preferredColorGroup"},
     {"sig", "fallbackToRouting", "nat", "nextHop", "serviceChain"},
