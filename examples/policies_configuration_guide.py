@@ -30,7 +30,6 @@ from typing import List, Optional, Tuple
 from uuid import UUID
 
 from vmngclient.api.policy_api import PolicyAPI
-from vmngclient.models.policy.centralized import CentralizedPolicy
 from vmngclient.models.policy.definitions.vpn_membership import VPNMembershipGroup
 from vmngclient.models.policy.lists import (
     AppList,
@@ -42,7 +41,6 @@ from vmngclient.models.policy.lists import (
     DataPrefixList,
     ExpandedCommunityList,
     PolicerList,
-    PolicyListBase,
     PrefixList,
     RegionList,
     SiteList,
@@ -50,7 +48,6 @@ from vmngclient.models.policy.lists import (
     TLOCList,
     VPNList,
 )
-from vmngclient.models.policy.policy_definition import PolicyDefinitionBase
 
 logger = logging.getLogger(__name__)
 
@@ -180,16 +177,8 @@ def create_vpn_membership_policy(api: PolicyAPI) -> Tuple[type, UUID]:
 
 
 def delete_created_items(api: PolicyAPI, items: List[Tuple[type, UUID]]) -> None:
-    # TODO: we can expose get_any(), edit_any(), create_any(), delete_any() in PolicyAPI using similiar logic
     for _type, _uuid in reversed(items):
-        if issubclass(_type, PolicyListBase):
-            api.lists.delete(_type, _uuid)
-        elif issubclass(_type, PolicyDefinitionBase):
-            api.definitions.delete(_type, _uuid)
-        elif _type == CentralizedPolicy:
-            api.centralized.delete(_uuid)
-        else:
-            logger.warning(f"Cannot find api method to delete item {_type} {_uuid}")
+        api.delete_any(_type, _uuid)
 
 
 def run_demo(args: CmdArguments):

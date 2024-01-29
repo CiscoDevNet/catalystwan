@@ -175,6 +175,7 @@ from vmngclient.models.policy.lists import (
     LocalDomainList,
     MirrorList,
     PolicerList,
+    PolicyListBase,
     PortList,
     PreferredColorGroupList,
     PrefixList,
@@ -194,9 +195,19 @@ from vmngclient.models.policy.localized import (
     LocalizedPolicyEditResponse,
     LocalizedPolicyInfo,
 )
-from vmngclient.models.policy.policy_definition import PolicyDefinitionEditResponse, PolicyDefinitionEndpoints
+from vmngclient.models.policy.policy_definition import (
+    PolicyDefinitionBase,
+    PolicyDefinitionEditResponse,
+    PolicyDefinitionEndpoints,
+)
 from vmngclient.models.policy.policy_list import PolicyListEndpoints
-from vmngclient.models.policy.security import AnySecurityPolicy, AnySecurityPolicyInfo, SecurityPolicyEditResponse
+from vmngclient.models.policy.security import (
+    AnySecurityPolicy,
+    AnySecurityPolicyInfo,
+    SecurityPolicy,
+    SecurityPolicyEditResponse,
+    UnifiedSecurityPolicy,
+)
 from vmngclient.typed_list import DataSequence
 
 if TYPE_CHECKING:
@@ -799,6 +810,20 @@ class PolicyAPI:
         self.security = SecurityPolicyAPI(session)
         self.definitions = PolicyDefinitionsAPI(session)
         self.lists = PolicyListsAPI(session)
+
+    def delete_any(self, _type: Any, id: UUID) -> None:
+        if issubclass(_type, PolicyListBase):
+            self.lists.delete(_type, id)
+        elif issubclass(_type, PolicyDefinitionBase):
+            self.definitions.delete(_type, id)
+        elif _type == CentralizedPolicy:
+            self.centralized.delete(id)
+        elif _type == LocalizedPolicy:
+            self.localized.delete(id)
+        elif _type in [SecurityPolicy, UnifiedSecurityPolicy]:
+            self.security.delete(id)
+        else:
+            raise TypeError(f"Cannot find API method to delete item type: {_type}, {id}")
 
     def get_protocol_map(self) -> Dict[str, ApplicationProtocol]:
         result = {}
