@@ -253,7 +253,7 @@ api.get_vsmart_mapping()
 ```python
 from pathlib import Path
 from vmngclient.session import create_vManageSession
-from vmngclient.model.tenant import TenantExport
+from vmngclient.models.tenant import TenantExport
 from vmngclient.workflows.tenant_migration import migration_workflow
 
 tenant = TenantExport(

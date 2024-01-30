@@ -3,63 +3,57 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from vmngclient.endpoints.administration_user_and_group import AdministrationUserAndGroup
+from vmngclient.endpoints.certificate_management_device import CertificateManagementDevice
 from vmngclient.endpoints.certificate_management_vmanage import CertificateManagementVManage
 from vmngclient.endpoints.client import Client
 from vmngclient.endpoints.cluster_management import ClusterManagement
-from vmngclient.endpoints.configuration.policy.definition_builder.data import ConfigurationPolicyDataDefinitionBuilder
-from vmngclient.endpoints.configuration.policy.definition_builder.rule_set import (
-    ConfigurationPolicyRuleSetDefinitionBuilder,
+from vmngclient.endpoints.configuration.policy.definition.control import ConfigurationPolicyControlDefinition
+from vmngclient.endpoints.configuration.policy.definition.hub_and_spoke import ConfigurationPolicyHubAndSpokeDefinition
+from vmngclient.endpoints.configuration.policy.definition.mesh import ConfigurationPolicyMeshDefinition
+from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition
+from vmngclient.endpoints.configuration.policy.definition.rewrite import ConfigurationPolicyRewriteRuleDefinition
+from vmngclient.endpoints.configuration.policy.definition.rule_set import ConfigurationPolicyRuleSetDefinition
+from vmngclient.endpoints.configuration.policy.definition.security_group import (
+    ConfigurationPolicySecurityGroupDefinition,
 )
-from vmngclient.endpoints.configuration.policy.definition_builder.security_group import (
-    ConfigurationPolicySecurityGroupDefinitionBuilder,
+from vmngclient.endpoints.configuration.policy.definition.traffic_data import ConfigurationPolicyDataDefinition
+from vmngclient.endpoints.configuration.policy.definition.vpn_membership import (
+    ConfigurationPolicyVPNMembershipGroupDefinition,
 )
-from vmngclient.endpoints.configuration.policy.definition_builder.zone_based_firewall import (
-    ConfigurationPolicyZoneBasedFirewallDefinitionBuilder,
+from vmngclient.endpoints.configuration.policy.definition.zone_based_firewall import (
+    ConfigurationPolicyZoneBasedFirewallDefinition,
 )
-from vmngclient.endpoints.configuration.policy.list_builder.app import ConfigurationPolicyApplicationListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.app_probe import ConfigurationPolicyAppProbeClassListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.as_path import ConfigurationPolicyASPathListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.class_map import (
-    ConfigurationPolicyForwardingClassListBuilder,
-)
-from vmngclient.endpoints.configuration.policy.list_builder.color import ConfigurationPolicyColorListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.community import ConfigurationPolicyCommunityListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.data_ipv6_prefix import (
-    ConfigurationPolicyDataIPv6PrefixListBuilder,
-)
-from vmngclient.endpoints.configuration.policy.list_builder.data_prefix import ConfigurationPolicyDataPrefixListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.expanded_community import (
-    ConfigurationPolicyExpandedCommunityListBuilder,
-)
-from vmngclient.endpoints.configuration.policy.list_builder.fqdn import ConfigurationPolicyFQDNListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.geo_location import (
-    ConfigurationPolicyGeoLocationListBuilder,
-)
-from vmngclient.endpoints.configuration.policy.list_builder.ips_signature import (
-    ConfigurationPolicyIPSSignatureListBuilder,
-)
-from vmngclient.endpoints.configuration.policy.list_builder.ipv6_prefix import ConfigurationPolicyIPv6PrefixListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.local_app import ConfigurationPolicyLocalAppListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.local_domain import (
-    ConfigurationPolicyLocalDomainListBuilder,
-)
-from vmngclient.endpoints.configuration.policy.list_builder.mirror import ConfigurationPolicyMirrorListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.policer import ConfigurationPolicyPolicerClassListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.port import ConfigurationPolicyPortListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.preferred_color_group import (
-    ConfigurationPreferredColorGroupListBuilder,
-)
-from vmngclient.endpoints.configuration.policy.list_builder.prefix import ConfigurationPolicyPrefixListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.protocol_name import (
-    ConfigurationPolicyProtocolNameListBuilder,
-)
-from vmngclient.endpoints.configuration.policy.list_builder.site import ConfigurationPolicySiteListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.sla import ConfigurationPolicySLAClassListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.tloc import ConfigurationPolicyTLOCListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.url_black_list import ConfigurationPolicyURLBlackListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.url_white_list import ConfigurationPolicyURLWhiteListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.vpn import ConfigurationPolicyVPNListBuilder
-from vmngclient.endpoints.configuration.policy.list_builder.zone import ConfigurationPolicyZoneListBuilder
+from vmngclient.endpoints.configuration.policy.list.app import ConfigurationPolicyApplicationList
+from vmngclient.endpoints.configuration.policy.list.app_probe import ConfigurationPolicyAppProbeClassList
+from vmngclient.endpoints.configuration.policy.list.as_path import ConfigurationPolicyASPathList
+from vmngclient.endpoints.configuration.policy.list.class_map import ConfigurationPolicyForwardingClassList
+from vmngclient.endpoints.configuration.policy.list.color import ConfigurationPolicyColorList
+from vmngclient.endpoints.configuration.policy.list.community import ConfigurationPolicyCommunityList
+from vmngclient.endpoints.configuration.policy.list.data_ipv6_prefix import ConfigurationPolicyDataIPv6PrefixList
+from vmngclient.endpoints.configuration.policy.list.data_prefix import ConfigurationPolicyDataPrefixList
+from vmngclient.endpoints.configuration.policy.list.expanded_community import ConfigurationPolicyExpandedCommunityList
+from vmngclient.endpoints.configuration.policy.list.fqdn import ConfigurationPolicyFQDNList
+from vmngclient.endpoints.configuration.policy.list.geo_location import ConfigurationPolicyGeoLocationList
+from vmngclient.endpoints.configuration.policy.list.ips_signature import ConfigurationPolicyIPSSignatureList
+from vmngclient.endpoints.configuration.policy.list.ipv6_prefix import ConfigurationPolicyIPv6PrefixList
+from vmngclient.endpoints.configuration.policy.list.local_app import ConfigurationPolicyLocalAppList
+from vmngclient.endpoints.configuration.policy.list.local_domain import ConfigurationPolicyLocalDomainList
+from vmngclient.endpoints.configuration.policy.list.mirror import ConfigurationPolicyMirrorList
+from vmngclient.endpoints.configuration.policy.list.policer import ConfigurationPolicyPolicerClassList
+from vmngclient.endpoints.configuration.policy.list.port import ConfigurationPolicyPortList
+from vmngclient.endpoints.configuration.policy.list.preferred_color_group import ConfigurationPreferredColorGroupList
+from vmngclient.endpoints.configuration.policy.list.prefix import ConfigurationPolicyPrefixList
+from vmngclient.endpoints.configuration.policy.list.protocol_name import ConfigurationPolicyProtocolNameList
+from vmngclient.endpoints.configuration.policy.list.region import ConfigurationPolicyRegionList
+from vmngclient.endpoints.configuration.policy.list.site import ConfigurationPolicySiteList
+from vmngclient.endpoints.configuration.policy.list.sla import ConfigurationPolicySLAClassList
+from vmngclient.endpoints.configuration.policy.list.tloc import ConfigurationPolicyTLOCList
+from vmngclient.endpoints.configuration.policy.list.url_black_list import ConfigurationPolicyURLBlackList
+from vmngclient.endpoints.configuration.policy.list.url_white_list import ConfigurationPolicyURLWhiteList
+from vmngclient.endpoints.configuration.policy.list.vpn import ConfigurationPolicyVPNList
+from vmngclient.endpoints.configuration.policy.list.zone import ConfigurationPolicyZoneList
+from vmngclient.endpoints.configuration.policy.security_template import ConfigurationSecurityTemplatePolicy
+from vmngclient.endpoints.configuration.policy.vedge_template import ConfigurationVEdgeTemplatePolicy
 from vmngclient.endpoints.configuration.policy.vsmart_template import ConfigurationVSmartTemplatePolicy
 from vmngclient.endpoints.configuration_dashboard_status import ConfigurationDashboardStatus
 from vmngclient.endpoints.configuration_device_actions import ConfigurationDeviceActions
@@ -72,6 +66,7 @@ from vmngclient.endpoints.configuration_feature_profile import (
 )
 from vmngclient.endpoints.configuration_group import ConfigurationGroup
 from vmngclient.endpoints.configuration_settings import ConfigurationSettings
+from vmngclient.endpoints.misc import MiscellaneousEndpoints
 from vmngclient.endpoints.monitoring_device_details import MonitoringDeviceDetails
 from vmngclient.endpoints.monitoring_status import MonitoringStatus
 from vmngclient.endpoints.real_time_monitoring.reboot_history import RealTimeMonitoringRebootHistory
@@ -85,56 +80,76 @@ if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
 
-class ConfigurationPolicyListBuilderContainer:
+class ConfigurationPolicyListContainer:
     def __init__(self, session: vManageSession):
-        self.data_prefix = ConfigurationPolicyDataPrefixListBuilder(session)
-        self.geo_location = ConfigurationPolicyGeoLocationListBuilder(session)
-        self.fqdn = ConfigurationPolicyFQDNListBuilder(session)
-        self.site = ConfigurationPolicySiteListBuilder(session)
-        self.vpn = ConfigurationPolicyVPNListBuilder(session)
-        self.zone = ConfigurationPolicyZoneListBuilder(session)
-        self.port = ConfigurationPolicyPortListBuilder(session)
-        self.protocol_name = ConfigurationPolicyProtocolNameListBuilder(session)
-        self.local_app = ConfigurationPolicyLocalAppListBuilder(session)
-        self.app = ConfigurationPolicyApplicationListBuilder(session)
-        self.color = ConfigurationPolicyColorListBuilder(session)
-        self.data_ipv6_prefix = ConfigurationPolicyDataIPv6PrefixListBuilder(session)
-        self.local_domain = ConfigurationPolicyLocalDomainListBuilder(session)
-        self.ips_signature = ConfigurationPolicyIPSSignatureListBuilder(session)
-        self.url_white_list = ConfigurationPolicyURLWhiteListBuilder(session)
-        self.url_black_list = ConfigurationPolicyURLBlackListBuilder(session)
-        self.community = ConfigurationPolicyCommunityListBuilder(session)
-        self.expanded_community = ConfigurationPolicyExpandedCommunityListBuilder(session)
-        self.policer = ConfigurationPolicyPolicerClassListBuilder(session)
-        self.as_path = ConfigurationPolicyASPathListBuilder(session)
-        self.class_map = ConfigurationPolicyForwardingClassListBuilder(session)
-        self.mirror = ConfigurationPolicyMirrorListBuilder(session)
-        self.app_probe = ConfigurationPolicyAppProbeClassListBuilder(session)
-        self.sla = ConfigurationPolicySLAClassListBuilder(session)
-        self.tloc = ConfigurationPolicyTLOCListBuilder(session)
-        self.preferred_color_group = ConfigurationPreferredColorGroupListBuilder(session)
-        self.prefix = ConfigurationPolicyPrefixListBuilder(session)
-        self.ipv6_prefix = ConfigurationPolicyIPv6PrefixListBuilder(session)
+        self.app = ConfigurationPolicyApplicationList(session)
+        self.app_probe = ConfigurationPolicyAppProbeClassList(session)
+        self.as_path = ConfigurationPolicyASPathList(session)
+        self.class_map = ConfigurationPolicyForwardingClassList(session)
+        self.color = ConfigurationPolicyColorList(session)
+        self.community = ConfigurationPolicyCommunityList(session)
+        self.data_ipv6_prefix = ConfigurationPolicyDataIPv6PrefixList(session)
+        self.data_prefix = ConfigurationPolicyDataPrefixList(session)
+        self.expanded_community = ConfigurationPolicyExpandedCommunityList(session)
+        self.fqdn = ConfigurationPolicyFQDNList(session)
+        self.geo_location = ConfigurationPolicyGeoLocationList(session)
+        self.ips_signature = ConfigurationPolicyIPSSignatureList(session)
+        self.ipv6_prefix = ConfigurationPolicyIPv6PrefixList(session)
+        self.local_app = ConfigurationPolicyLocalAppList(session)
+        self.local_domain = ConfigurationPolicyLocalDomainList(session)
+        self.mirror = ConfigurationPolicyMirrorList(session)
+        self.policer = ConfigurationPolicyPolicerClassList(session)
+        self.port = ConfigurationPolicyPortList(session)
+        self.preferred_color_group = ConfigurationPreferredColorGroupList(session)
+        self.prefix = ConfigurationPolicyPrefixList(session)
+        self.protocol_name = ConfigurationPolicyProtocolNameList(session)
+        self.region = ConfigurationPolicyRegionList(session)
+        self.site = ConfigurationPolicySiteList(session)
+        self.sla = ConfigurationPolicySLAClassList(session)
+        self.tloc = ConfigurationPolicyTLOCList(session)
+        self.url_black_list = ConfigurationPolicyURLBlackList(session)
+        self.url_white_list = ConfigurationPolicyURLWhiteList(session)
+        self.vpn = ConfigurationPolicyVPNList(session)
+        self.zone = ConfigurationPolicyZoneList(session)
 
 
-class ConfigurationPolicyDefinitionBuilderContainer:
+class ConfigurationPolicyDefinitionContainer:
     def __init__(self, session: vManageSession):
-        self.data = ConfigurationPolicyDataDefinitionBuilder(session)
-        self.zone_based_firewall = ConfigurationPolicyZoneBasedFirewallDefinitionBuilder(session)
-        self.security_group = ConfigurationPolicySecurityGroupDefinitionBuilder(session)
-        self.rule_set = ConfigurationPolicyRuleSetDefinitionBuilder(session)
+        self.data = ConfigurationPolicyDataDefinition(session)
+        self.rule_set = ConfigurationPolicyRuleSetDefinition(session)
+        self.security_group = ConfigurationPolicySecurityGroupDefinition(session)
+        self.zone_based_firewall = ConfigurationPolicyZoneBasedFirewallDefinition(session)
+        self.qos_map = ConfigurationPolicyQoSMapDefinition(session)
+        self.rewrite = ConfigurationPolicyRewriteRuleDefinition(session)
+        self.control = ConfigurationPolicyControlDefinition(session)
+        self.vpn_membership = ConfigurationPolicyVPNMembershipGroupDefinition(session)
+        self.hub_and_spoke = ConfigurationPolicyHubAndSpokeDefinition(session)
+        self.mesh = ConfigurationPolicyMeshDefinition(session)
 
 
 class ConfigurationPolicyContainer:
     def __init__(self, session: vManageSession):
-        self.list_builder = ConfigurationPolicyListBuilderContainer(session)
-        self.definition_builder = ConfigurationPolicyDefinitionBuilderContainer(session)
+        self.list = ConfigurationPolicyListContainer(session)
+        self.definition = ConfigurationPolicyDefinitionContainer(session)
         self.vsmart_template = ConfigurationVSmartTemplatePolicy(session)
+        self.vedge_template = ConfigurationVEdgeTemplatePolicy(session)
+        self.security_template = ConfigurationSecurityTemplatePolicy(session)
+
+
+class ConfigurationSDWANFeatureProfileContainer:
+    def __init__(self, session: vManageSession):
+        pass
+
+
+class ConfigurationFeatureProfileContainer:
+    def __init__(self, session: vManageSession):
+        self.sdwan = ConfigurationSDWANFeatureProfileContainer(session=session)
 
 
 class ConfigurationContainer:
     def __init__(self, session: vManageSession):
         self.policy = ConfigurationPolicyContainer(session)
+        self.feature_profile = ConfigurationFeatureProfileContainer(session=session)
 
 
 class TroubleshootingToolsContainer:
@@ -170,4 +185,6 @@ class APIEndpointContainter:
         self.sd_routing_configuration_feature_profile = SDRoutingConfigurationFeatureProfile(session)
         self.configuration_device_inventory = ConfigurationDeviceInventory(session)
         self.troubleshooting_tools = TroubleshootingToolsContainer(session)
+        self.misc = MiscellaneousEndpoints(session)
         self.real_time_monitoring = RealTimeMonitoringContainer(session)
+        self.certificate_management_device = CertificateManagementDevice(session)

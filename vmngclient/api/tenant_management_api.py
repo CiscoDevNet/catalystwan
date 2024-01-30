@@ -12,7 +12,7 @@ from vmngclient.endpoints.tenant_management import (
     vSmartTenantCapacity,
     vSmartTenantMap,
 )
-from vmngclient.model.tenant import Tenant
+from vmngclient.models.tenant import Tenant
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession

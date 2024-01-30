@@ -1,15 +1,20 @@
+# mypy: disable-error-code="annotation-unchecked"
 import json
 import tempfile
 import unittest
+from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Literal, Optional, Union
 from unittest.mock import MagicMock
+from uuid import UUID, uuid4
 
 import pytest  # type: ignore
 from packaging.version import Version  # type: ignore
 from parameterized import parameterized  # type: ignore
 from pydantic import BaseModel as BaseModelV2
+from pydantic import Field as FieldV2
 from pydantic.v1 import BaseModel as BaseModelV1
+from typing_extensions import Annotated
 
 from vmngclient.endpoints import (
     BASE_PATH,
@@ -44,6 +49,11 @@ class BaseModelV2Example(BaseModelV2):
     id: str
     size: int
     capacity: float
+    active: bool
+
+
+class BaseModelV2Example2(BaseModelV2):
+    other_id: str
     active: bool
 
 
@@ -338,18 +348,36 @@ class TestAPIEndpoints(unittest.TestCase):
 
     @parameterized.expand(
         [
-            (BaseModelV1Example, False, TypeSpecifier(True, None, BaseModelV1Example, False, False)),
-            (List[BaseModelV1Example], False, TypeSpecifier(True, list, BaseModelV1Example, False, False)),
-            (Optional[BaseModelV1Example], False, TypeSpecifier(True, None, BaseModelV1Example, False, True)),
-            (Optional[List[BaseModelV1Example]], False, TypeSpecifier(True, list, BaseModelV1Example, False, True)),
+            (BaseModelV1Example, False, TypeSpecifier(True, None, BaseModelV1Example, None, False, False)),
+            (List[BaseModelV1Example], False, TypeSpecifier(True, list, BaseModelV1Example, None, False, False)),
+            (Optional[BaseModelV1Example], False, TypeSpecifier(True, None, BaseModelV1Example, None, False, True)),
+            (
+                Optional[List[BaseModelV1Example]],
+                False,
+                TypeSpecifier(True, list, BaseModelV1Example, None, False, True),
+            ),
             (List[Optional[BaseModelV1Example]], True, None),
-            (List[BaseModelV2Example], False, TypeSpecifier(True, list, BaseModelV2Example, False, False)),
-            (Optional[BaseModelV2Example], False, TypeSpecifier(True, None, BaseModelV2Example, False, True)),
-            (Optional[List[BaseModelV2Example]], False, TypeSpecifier(True, list, BaseModelV2Example, False, True)),
+            (List[BaseModelV2Example], False, TypeSpecifier(True, list, BaseModelV2Example, None, False, False)),
+            (Optional[BaseModelV2Example], False, TypeSpecifier(True, None, BaseModelV2Example, None, False, True)),
+            (
+                Optional[List[BaseModelV2Example]],
+                False,
+                TypeSpecifier(True, list, BaseModelV2Example, None, False, True),
+            ),
             (List[Optional[BaseModelV2Example]], True, None),
-            (JSON, False, TypeSpecifier(True, None, None, True, False)),
-            (str, False, TypeSpecifier(True, None, str, False, False)),
-            (bytes, False, TypeSpecifier(True, None, bytes, False, False)),
+            (JSON, False, TypeSpecifier(True, None, None, None, True, False)),
+            (str, False, TypeSpecifier(True, None, str, None, False, False)),
+            (bytes, False, TypeSpecifier(True, None, bytes, None, False, False)),
+            (
+                Union[BaseModelV2Example, BaseModelV2Example2],
+                False,
+                TypeSpecifier(True, None, None, [BaseModelV2Example, BaseModelV2Example2], False, False),
+            ),
+            (
+                Annotated[Union[BaseModelV2Example, BaseModelV2Example2], None],
+                False,
+                TypeSpecifier(True, None, None, [BaseModelV2Example, BaseModelV2Example2], False, False),
+            ),
             (None, True, None),
         ]
     )
@@ -782,4 +810,74 @@ class TestAPIEndpoints(unittest.TestCase):
             def get_data(
                 self, payload: BaseModelV1Example, category: str, params: ParamsModelV1Example
             ) -> None:  # type: ignore [empty-body]
+                ...
+
+    def test_request_decorator_format_url_with_str_enum(self):
+        class FruitEnum(str, Enum):
+            BANANA = "banana"
+            ORANGE = "orange"
+            APPLE = "apple"
+
+        class TestAPI(APIEndpoints):
+            @request("GET", "/v1/data/{fruit_type}")
+            def get_data(self, fruit_type: FruitEnum, payload: str) -> None:  # type: ignore [empty-body]
+                ...
+
+        api = TestAPI(self.session_mock)
+        # Act
+        api.get_data(FruitEnum.ORANGE, "not a fruit")
+        # Assert
+        self.session_mock.request.assert_called_once_with("GET", self.base_path + "/v1/data/orange", data="not a fruit")
+
+    def test_request_decorator_format_url_with_uuid(self):
+        test_uuid = uuid4()
+
+        class TestAPI(APIEndpoints):
+            @request("GET", "/v1/data/{id}")
+            def get_data(self, id: UUID, payload: str) -> None:  # type: ignore [empty-body]
+                ...
+
+        api = TestAPI(self.session_mock)
+        # Act
+        api.get_data(test_uuid, "not a fruit")
+        # Assert
+        self.session_mock.request.assert_called_once_with(
+            "GET", self.base_path + f"/v1/data/{test_uuid}", data="not a fruit"
+        )
+
+    def test_request_decorator_raises_when_format_url_is_not_uuid_or_str_subtype(self):
+        with self.assertRaises(APIEndpointError):
+
+            class FruitEnum(Enum):
+                BANANA = 1
+                ORANGE = 2
+                APPLE = 3
+
+            class TestAPI(APIEndpoints):
+                @request("POST", "/v1/data/{fruit_type}")
+                def get_data(self, fruit_type: FruitEnum) -> None:  # type: ignore [empty-body]
+                    ...
+
+    def test_request_decorator_accept_union_of_models(self):
+        class TestAPI(APIEndpoints):
+            @request("GET", "/v1/data")
+            def get_data(
+                self, payload: Union[BaseModelV2Example, BaseModelV2Example2]
+            ) -> None:  # type: ignore [empty-body]
+                ...
+
+    def test_request_decorator_accept_annotated_union_of_models(self):
+        class BaseModelV2_A(BaseModelV2):
+            field: Literal["number"] = "number"
+            num: float
+
+        class BaseModelV2_B(BaseModelV2):
+            field: Literal["name"] = "name"
+            name: str
+
+        AnyBaseModel = Annotated[Union[BaseModelV2_A, BaseModelV2_B], FieldV2(discriminator="field")]
+
+        class TestAPI(APIEndpoints):
+            @request("POST", "/v1/data")
+            def create(self, payload: AnyBaseModel) -> None:  # type: ignore [empty-body]
                 ...

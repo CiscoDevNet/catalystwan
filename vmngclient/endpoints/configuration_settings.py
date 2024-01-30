@@ -43,7 +43,7 @@ class Organization(BaseModel):
     class Config:
         allow_population_by_field_name = True
 
-    org: str
+    org: Optional[str] = Field(default=None)
     domain_id: Optional[str] = Field(alias="domain-id")
     control_connection_up: Optional[bool] = Field(alias="controlConnectionUp")
 
@@ -52,8 +52,8 @@ class Device(BaseModel):
     class Config:
         allow_population_by_field_name = True
 
-    domain_ip: str = Field(alias="domainIp")
-    port: int = Field(ge=1, le=65536)
+    domain_ip: Optional[str] = Field(default=None, alias="domainIp")
+    port: Optional[str] = Field(default="12346")
 
 
 class EmailNotificationSettings(BaseModel):

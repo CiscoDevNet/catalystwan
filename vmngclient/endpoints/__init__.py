@@ -31,6 +31,7 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import dataclass, fields
+from enum import Enum
 from inspect import _empty, isclass, signature
 from io import BufferedReader
 from string import Formatter
@@ -51,15 +52,15 @@ from typing import (
     Type,
     TypeVar,
     Union,
-    get_args,
-    get_origin,
     runtime_checkable,
 )
+from uuid import UUID
 
 from packaging.specifiers import SpecifierSet  # type: ignore
 from packaging.version import Version  # type: ignore
 from pydantic import BaseModel as BaseModelV2
 from pydantic.v1 import BaseModel as BaseModelV1
+from typing_extensions import Annotated, get_args, get_origin
 
 from vmngclient.exceptions import APIEndpointError, APIRequestPayloadTypeError, APIVersionError, APIViewError
 from vmngclient.typed_list import DataSequence
@@ -92,6 +93,7 @@ class TypeSpecifier:
     present: bool
     sequence_type: Optional[type] = None
     payload_type: Optional[type] = None
+    payload_union_model_types: Optional[Sequence[type]] = None
     is_json: bool = False  # JSON is treated specially as it is type-alias / <typing special form>
     is_optional: bool = False
 
@@ -106,6 +108,10 @@ class TypeSpecifier:
     @classmethod
     def json(cls) -> TypeSpecifier:
         return TypeSpecifier(present=True, is_json=True)
+
+    @classmethod
+    def model_union(cls, models: Sequence[type]) -> TypeSpecifier:
+        return TypeSpecifier(present=True, payload_union_model_types=models)
 
 
 @dataclass
@@ -122,7 +128,7 @@ class APIEndpointRequestMeta:
 class PreparedPayload:
     """Holds data prepared for sending in request"""
 
-    data: Union[str, bytes, None] = None
+    data: Union[Dict, str, bytes, None] = None
     headers: Optional[Mapping[str, Any]] = None
     files: Optional[Dict[str, Tuple[str, BufferedReader]]] = None
 
@@ -133,6 +139,18 @@ class PreparedPayload:
             if value := getattr(self, f.name):
                 result[f.name] = value
         return result
+
+
+def dict_values_to_str(field_names: Set[str], kwargs: Dict[str, Any]) -> Dict[str, str]:
+    # this is to keep compatiblity and have seme behavior for (str, Enum) mixin after 3.11 for url formatting
+    result: Dict[str, str] = {}
+    for field_name in field_names:
+        field_value = kwargs.get(field_name)
+        if isinstance(field_value, Enum):
+            result[field_name] = str(field_value.value)
+        else:
+            result[field_name] = str(field_value)
+    return result
 
 
 class APIEndpointClientResponse(Protocol):
@@ -461,12 +479,13 @@ class request(APIEndpointsDecorator):
         # Check if regular class
         if isclass(annotation):
             if issubclass(annotation, (bytes, str, dict, BinaryIO, BaseModelV1, BaseModelV2, CustomPayloadType)):
-                return TypeSpecifier(True, None, annotation, False, is_optional)
+                return TypeSpecifier(True, None, annotation, None, False, is_optional)
             else:
                 raise APIEndpointError(f"'payload' param must be annotated with supported type: {PayloadType}")
 
-        # Check if Sequence[PayloadModelType] like List or DataSequence
+        # Check for accepted alias types like List[...] and Union[...]
         elif type_origin := get_origin(annotation):
+            # Check if Sequence[PayloadModelType] like List or DataSequence
             if isclass(type_origin) and issubclass(type_origin, Sequence):
                 if (
                     (type_args := get_args(annotation))
@@ -474,7 +493,25 @@ class request(APIEndpointsDecorator):
                     and isclass(type_args[0])
                     and issubclass(type_args[0], (BaseModelV1, BaseModelV2))
                 ):
-                    return TypeSpecifier(True, type_origin, type_args[0], False, is_optional)
+                    return TypeSpecifier(True, type_origin, type_args[0], None, False, is_optional)
+            # Check if Annnotated[Union[PayloadModelType, ...]], only unions of pydantic models allowed
+            elif type_origin == Annotated:
+                if annotated_origin := get_args(annotation):
+                    if (len(annotated_origin) >= 1) and get_origin(annotated_origin[0]) == Union:
+                        if (
+                            (type_args := get_args(annotated_origin[0]))
+                            and all(isclass(t) for t in type_args)
+                            and all(issubclass(t, (BaseModelV1, BaseModelV2)) for t in type_args)
+                        ):
+                            return TypeSpecifier.model_union(models=list(type_args))
+            # Check if Union[PayloadModelType, ...], only unions of pydantic models allowed
+            elif type_origin == Union:
+                if (
+                    (type_args := get_args(annotation))
+                    and all(isclass(t) for t in type_args)
+                    and all(issubclass(t, (BaseModelV1, BaseModelV2)) for t in type_args)
+                ):
+                    return TypeSpecifier.model_union(models=list(type_args))
             raise APIEndpointError(f"Expected: {PayloadType} but found payload {annotation}")
         else:
             raise APIEndpointError(f"Expected: {PayloadType} but found payload {annotation}")
@@ -501,8 +538,8 @@ class request(APIEndpointsDecorator):
             raise APIEndpointError(f"Missing parameters: {missing} to format url: {self.url}")
 
         for parameter in [parameters.get(name) for name in self.url_field_names]:
-            if not (isclass(parameter.annotation) and parameter.annotation == str):
-                raise APIEndpointError(f"Parameter {parameter} used for url formatting must have 'str' type annotation")
+            if not (isclass(parameter.annotation) and issubclass(parameter.annotation, (str, UUID))):
+                raise APIEndpointError(f"Parameter {parameter} used for url formatting must be 'str' sub-type or UUID")
 
         no_purpose_params = {
             parameters.get(name) for name in general_purpose_arg_names.difference(self.url_field_names)
@@ -550,7 +587,8 @@ class request(APIEndpointsDecorator):
             _kwargs = self.merge_args(args, kwargs)
             payload = _kwargs.get("payload")
             params = _kwargs.get("params")
-            formatted_url = self.url.format(**_kwargs)
+            url_kwargs = dict_values_to_str(self.url_field_names, _kwargs)
+            formatted_url = self.url.format_map(url_kwargs)
             response = _self._request(
                 self.http_method,
                 formatted_url,
