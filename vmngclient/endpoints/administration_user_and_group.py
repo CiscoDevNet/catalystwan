@@ -48,31 +48,25 @@ class UserUpdateRequest(BaseModel):
         serialization_alias="showConfirmPassword", validation_alias="showConfirmPassword", default=False
     )
     current_user_password: Optional[str] = Field(
-        default=None, serialization_alias="currentUserPassword", validation_alias="currentUserPassword"
+        default=None,
+        serialization_alias="currentUserPassword",
+        validation_alias="currentUserPassword",
     )
     password: Optional[str] = None
     group: Optional[List[str]] = None
     locale: Optional[str] = None
     description: Optional[str] = None
-    """
-    for vmanage versions 20.5 to 20.12, resource group field is used during user update.
-    if you do no enter any value, it will set it to "global"
-    endpoint: PUT https://<vmanage-ip>/dataservice/admin/user/test
-    example payload:
-    {"locale":"en_US","group":["netadmin"],"userName":"test","description":"testers","status":"active"}
-    """
     resource_group: Optional[str] = Field(
-        default=None, serialization_alias="resGroupName", validation_alias="resGroupName"
+        default=None,
+        serialization_alias="resGroupName",
+        validation_alias="resGroupName",
+        description="can be set only for >=20.5, <20.13 where default value is 'global'",
     )
-    """
-    for vmanage versions 20.13 and above, resource domain field is used during user update.
-    if you do no enter any value, it will set it to "all"
-    endpoint: POST https://<vmanage-ip>/dataservice/admin/user
-    example payload:
-    {"description":"testers","group":["netadmin"],"locale":"en_US","userName":"test","password":"<>"}
-    """
     resource_domain: Optional[str] = Field(
-        default=None, serialization_alias="resourceDomainName", validation_alias="resourceDomainName"
+        default=None,
+        serialization_alias="resourceDomainName",
+        validation_alias="resourceDomainName",
+        description="can be set only for >=20.13 where default value is 'all'",
     )
 
 
