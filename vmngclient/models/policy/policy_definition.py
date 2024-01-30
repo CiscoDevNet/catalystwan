@@ -124,6 +124,7 @@ SequenceType = Literal[
     "route",
     "acl",
     "aclv6",
+    "deviceaccesspolicy",
 ]
 
 
