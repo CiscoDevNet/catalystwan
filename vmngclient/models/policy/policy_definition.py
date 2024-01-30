@@ -87,6 +87,11 @@ class PathTypeEnum(str, Enum):
     TRANSPORT_GATEWAY = "transport-gateway-path"
 
 
+class DeviceAccessProtocolEnum(int, Enum):
+    SSH = 22
+    SNMP = 161
+
+
 class LocalTLOCListEntryValue(BaseModel):
     color: TLOCColorEnum
     encap: EncapEnum

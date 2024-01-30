@@ -1,4 +1,3 @@
-from enum import Enum
 from ipaddress import IPv4Network
 from typing import Any, List, Literal, Optional, Set, Tuple, Union
 from uuid import UUID
@@ -14,6 +13,7 @@ from vmngclient.models.policy.policy_definition import (
     DestinationDataPrefixListEntry,
     DestinationIPEntry,
     DestinationPortEntry,
+    DeviceAccessProtocolEnum,
     Match,
     PolicyDefinitionBase,
     PolicyDefinitionSequenceBase,
@@ -36,11 +36,6 @@ DeviceAccessPolicySequenceMatchEntry = Annotated[
 ]
 
 DeviceAccessPolicySequenceActions = Any  # TODO
-
-
-class DeviceAccessProtocolEnum(int, Enum):
-    SSH = 161
-    SNMP = 50
 
 
 class DeviceAccessPolicyHeader(PolicyDefinitionBase):
