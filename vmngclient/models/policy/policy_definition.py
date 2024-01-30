@@ -125,6 +125,7 @@ SequenceType = Literal[
     "acl",
     "aclv6",
     "deviceaccesspolicy",
+    "deviceaccesspolicyv6",
 ]
 
 
