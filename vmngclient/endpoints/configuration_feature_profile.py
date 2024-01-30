@@ -4,7 +4,7 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import MainParcel
+from vmngclient.api.configuration_groups.parcel import _ParcelBase
 from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, put, versions
 from vmngclient.models.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
@@ -86,13 +86,13 @@ class ConfigurationFeatureProfile(APIEndpoints):
 
     @versions(supported_versions=(">=20.9"), raises=False)
     @post("/v1/feature-profile/sdwan/system/{system_id}/aaa")
-    def create_aaa_profile_parcel_for_system(self, system_id: str, payload: MainParcel) -> ParcelId:
+    def create_aaa_profile_parcel_for_system(self, system_id: str, payload: _ParcelBase) -> ParcelId:
         ...
 
     @versions(supported_versions=(">=20.9"), raises=False)
     @post("/v1/feature-profile/sdwan/transport/{transport_id}/cellular-controller")
     def create_cellular_controller_profile_parcel_for_transport(
-        self, transport_id: str, payload: MainParcel
+        self, transport_id: str, payload: _ParcelBase
     ) -> ParcelId:
         ...
 
