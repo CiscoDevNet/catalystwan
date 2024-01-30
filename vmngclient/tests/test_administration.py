@@ -50,13 +50,20 @@ class TestUsersAPI(unittest.TestCase):
         self.session = session_mock
         self.session.api_version = None
         self.session.session_type = None
-        self.session.password = "P4s$w0rD"
+        self.session.password = "<>"
         self.api = UsersAPI(self.session)
         self.api._endpoints = MagicMock()
 
     def test_get(self):
         # Arrange
-        expected_users = [User(userName="new_user", password="new_user", group=["netadmin"], description="new user")]
+        expected_users = [
+            User(
+                username="new_user",
+                password="new_user",  # pragma: allowlist secret
+                group=["netadmin"],
+                description="new user",
+            )
+        ]
         self.api._endpoints.find_users = MagicMock(return_value=expected_users)
         # Act
         observed_users = self.api.get()
@@ -76,7 +83,9 @@ class TestUsersAPI(unittest.TestCase):
     def test_get_auth_type(self):
         # Arrange
         expected_auth_type = "local"
-        self.api._endpoints.find_user_auth_type = MagicMock(return_value=UserAuthType(userAuthType=expected_auth_type))
+        self.api._endpoints.find_user_auth_type = MagicMock(
+            return_value=UserAuthType(user_auth_type=expected_auth_type)
+        )
         # Act
         observed_auth_type = self.api.get_auth_type()
         # Assert
@@ -85,7 +94,7 @@ class TestUsersAPI(unittest.TestCase):
 
     def test_create(self):
         # Arrange
-        user = User(userName="new_user", password="new_user", group=["netadmin"], description="new user")
+        user = User(username="new_user", password="new_user", group=["netadmin"], description="new user")
         self.api._endpoints.create_user = MagicMock()
         # Act
         self.api.create(user)
@@ -95,7 +104,11 @@ class TestUsersAPI(unittest.TestCase):
     def test_update(self):
         # Arrange
         user_update = UserUpdateRequest(
-            userName="new_user", password="new_user", group=["netadmin"], description="new user", resGroupName="global"
+            username="new_user",
+            password="new_user",  # pragma: allowlist secret
+            group=["netadmin"],
+            description="new user",
+            resource_group="global",
         )
         self.api._endpoints.update_user = MagicMock()
         # Act
@@ -106,20 +119,20 @@ class TestUsersAPI(unittest.TestCase):
     def test_update_password(self):
         # Arrange
         username = "new_user"
-        new_password = "PaSsWoRd"
+        new_password = "PaSsWoRd"  # pragma: allowlist secret
         self.api._endpoints.update_password = MagicMock()
         # Act
         self.api.update_password(username, new_password)
         # Assert
         self.api._endpoints.update_password.assert_called_once_with(
             username,
-            UserUpdateRequest(userName=username, password=new_password, currentUserPassword=self.session.password),
+            UserUpdateRequest(username=username, password=new_password, current_user_password=self.session.password),
         )
 
     def test_reset(self):
         # Arrange
         username = "new_user"
-        user_reset_request = UserResetRequest(userName=username)
+        user_reset_request = UserResetRequest(username=username)
         self.api._endpoints.reset_user = MagicMock()
         # Act
         self.api.reset(username)
@@ -142,7 +155,7 @@ class TestUserGroupsAPI(unittest.TestCase):
         self.session = session_mock
         self.session.api_version = None
         self.session.session_type = None
-        self.session.password = "P4s$w0rD"
+        self.session.password = "<>"
         self.api = UserGroupsAPI(self.session)
         self.api._endpoints = MagicMock()
 
@@ -163,7 +176,7 @@ class TestUserGroupsAPI(unittest.TestCase):
     def test_create(self):
         # Arrange
         user_group = UserGroup(
-            groupName="new_group", tasks=[UserGroupTask(enabled=True, feature="Alarms", read=True, write=False)]
+            group_name="new_group", tasks=[UserGroupTask(enabled=True, feature="Alarms", read=True, write=False)]
         )
         self.api._endpoints.create_user_group = MagicMock()
         # Act
@@ -174,7 +187,7 @@ class TestUserGroupsAPI(unittest.TestCase):
     def test_update(self):
         # Arrange
         user_group = UserGroup(
-            groupName="new_group", tasks=[UserGroupTask(enabled=True, feature="Alarms", read=True, write=False)]
+            group_name="new_group", tasks=[UserGroupTask(enabled=True, feature="Alarms", read=True, write=False)]
         )
         self.api._endpoints.update_user_group = MagicMock()
         # Act
@@ -198,7 +211,7 @@ class TestResourceGroupsAPI(unittest.TestCase):
         self.session = session_mock
         self.session.api_version = None
         self.session.session_type = None
-        self.session.password = "P4s$w0rD"
+        self.session.password = "<>"
         self.api = ResourceGroupsAPI(self.session)
         self.api._endpoints = MagicMock()
 
@@ -206,7 +219,7 @@ class TestResourceGroupsAPI(unittest.TestCase):
         # Arrange
         expected_resource_groups = [
             ResourceGroup(
-                id="0:RESGROUP:14567:XD$eD", name="new_resource_group1", desc="New Resource Group #1", siteIds=[200]
+                id="0:RESGROUP:14567:XD$eD", name="new_resource_group1", desc="New Resource Group #1", site_ids=[200]
             )
         ]
         self.api._endpoints.find_resource_groups = MagicMock(return_value=expected_resource_groups)
@@ -218,7 +231,7 @@ class TestResourceGroupsAPI(unittest.TestCase):
 
     def test_create(self):
         # Arrange
-        resource_group = ResourceGroup(name="new_resource_group3", desc="New Resource Group #3", siteIds=[200])
+        resource_group = ResourceGroup(name="new_resource_group3", desc="New Resource Group #3", site_ids=[200])
         self.api._endpoints.create_resource_group = MagicMock()
         # Act
         self.api.create(resource_group)
@@ -228,7 +241,7 @@ class TestResourceGroupsAPI(unittest.TestCase):
     def test_update(self):
         # Arrange
         resource_group_update = ResourceGroupUpdateRequest(
-            id="0:RESGROUP:14567:XD$eD", name="new_resource_group1", desc="New Resource Group #1", siteIds=[101, 102]
+            id="0:RESGROUP:14567:XD$eD", name="new_resource_group1", desc="New Resource Group #1", site_ids=[101, 102]
         )
         self.api._endpoints.update_resource_group = MagicMock()
         # Act
@@ -246,7 +259,7 @@ class TestResourceGroupsAPI(unittest.TestCase):
         self.api.switch(resource_group_name)
         # Assert
         self.api._endpoints.switch_resource_group.assert_called_once_with(
-            ResourceGroupSwitchRequest(resourceGroupName=resource_group_name)
+            ResourceGroupSwitchRequest(resource_group_name=resource_group_name)
         )
 
     def test_delete(self):
@@ -304,7 +317,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
     def setUp(self) -> None:
         self.cloud_connector_data = {
             "clientId": "12345",
-            "clientSecret": "secret",
+            "clientSecret": "secret",  # pragma: allowlist secret
             "orgName": "organization",
             "telemetryEnabled": True,
         }

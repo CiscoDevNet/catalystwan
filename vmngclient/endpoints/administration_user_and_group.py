@@ -2,18 +2,19 @@
 from datetime import datetime
 from typing import Dict, List, Optional, Set
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put, versions
 from vmngclient.typed_list import DataSequence
 
 
 class User(BaseModel):
-    username: str = Field(alias="userName")
-    password: Optional[str]
+    model_config = ConfigDict(populate_by_name=True)
+    username: str = Field(serialization_alias="userName", validation_alias="userName")
+    password: Optional[str] = None
     group: List[str]
-    locale: Optional[str]
-    description: Optional[str]
+    locale: Optional[str] = None
+    description: Optional[str] = None
     """
     for vmanage versions 20.5 to 20.12, resource group field is used during user creation.
     if you do no enter any value, it will set it to "global"
@@ -21,7 +22,9 @@ class User(BaseModel):
     example payload:
     {"locale":"en_US","group":["netadmin"],"description":"test","userName":"test","password":"<>"}
     """
-    resource_group: Optional[str] = Field(default=None, alias="resGroupName")
+    resource_group: Optional[str] = Field(
+        default=None, serialization_alias="resGroupName", validation_alias="resGroupName"
+    )
     """
     for vmanage versions 20.13 and above, resource domain field is used during user creation.
     if you do no enter any value, it will set it to "all"
@@ -29,19 +32,28 @@ class User(BaseModel):
     example payload:
     {"description":"test","group":["netadmin"],"locale":"en_US","userName":"test","password":"<>"}
     """
-    resource_domain: Optional[str] = Field(default=None, alias="resourceDomainName")
+    resource_domain: Optional[str] = Field(
+        default=None, serialization_alias="resourceDomainName", validation_alias="resourceDomainName"
+    )
 
 
 class UserUpdateRequest(BaseModel):
-    username: str = Field(alias="userName")
-    current_password: bool = Field(alias="currentPassword", default=False)
-    show_password: bool = Field(alias="showPassword", default=False)
-    show_confirm_password: bool = Field(alias="showConfirmPassword", default=False)
-    current_user_password: Optional[str] = Field(alias="currentUserPassword")
-    password: Optional[str]
-    group: Optional[List[str]]
-    locale: Optional[str]
-    description: Optional[str]
+    model_config = ConfigDict(populate_by_name=True)
+    username: str = Field(serialization_alias="userName", validation_alias="userName")
+    current_password: bool = Field(
+        serialization_alias="currentPassword", validation_alias="currentPassword", default=False
+    )
+    show_password: bool = Field(serialization_alias="showPassword", validation_alias="showPassword", default=False)
+    show_confirm_password: bool = Field(
+        serialization_alias="showConfirmPassword", validation_alias="showConfirmPassword", default=False
+    )
+    current_user_password: Optional[str] = Field(
+        default=None, serialization_alias="currentUserPassword", validation_alias="currentUserPassword"
+    )
+    password: Optional[str] = None
+    group: Optional[List[str]] = None
+    locale: Optional[str] = None
+    description: Optional[str] = None
     """
     for vmanage versions 20.5 to 20.12, resource group field is used during user update.
     if you do no enter any value, it will set it to "global"
@@ -49,7 +61,9 @@ class UserUpdateRequest(BaseModel):
     example payload:
     {"locale":"en_US","group":["netadmin"],"userName":"test","description":"testers","status":"active"}
     """
-    resource_group: Optional[str] = Field(default=None, alias="resGroupName")
+    resource_group: Optional[str] = Field(
+        default=None, serialization_alias="resGroupName", validation_alias="resGroupName"
+    )
     """
     for vmanage versions 20.13 and above, resource domain field is used during user update.
     if you do no enter any value, it will set it to "all"
@@ -57,15 +71,19 @@ class UserUpdateRequest(BaseModel):
     example payload:
     {"description":"testers","group":["netadmin"],"locale":"en_US","userName":"test","password":"<>"}
     """
-    resource_domain: Optional[str] = Field(default=None, alias="resourceDomainName")
+    resource_domain: Optional[str] = Field(
+        default=None, serialization_alias="resourceDomainName", validation_alias="resourceDomainName"
+    )
 
 
 class UserRole(BaseModel):
-    is_admin: bool = Field(alias="isAdmin")
+    model_config = ConfigDict(populate_by_name=True)
+    is_admin: bool = Field(serialization_alias="isAdmin", validation_alias="isAdmin")
 
 
 class UserAuthType(BaseModel):
-    user_auth_type: str = Field(alias="userAuthType")
+    model_config = ConfigDict(populate_by_name=True)
+    user_auth_type: str = Field(serialization_alias="userAuthType", validation_alias="userAuthType")
 
 
 class UserGroupTask(BaseModel):
@@ -76,7 +94,8 @@ class UserGroupTask(BaseModel):
 
 
 class UserGroup(BaseModel):
-    group_name: str = Field(alias="groupName")
+    model_config = ConfigDict(populate_by_name=True)
+    group_name: str = Field(serialization_alias="groupName", validation_alias="groupName")
     tasks: List[UserGroupTask]
 
     def __map_task_index_by_feature(self) -> Dict[str, int]:
@@ -113,23 +132,31 @@ class UserGroup(BaseModel):
 
 
 class UserResetRequest(BaseModel):
-    username: str = Field(alias="userName")
+    model_config = ConfigDict(populate_by_name=True)
+    username: str = Field(serialization_alias="userName", validation_alias="userName")
 
 
 class ActiveSession(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     uuid: str
-    source_ip: Optional[str] = Field(alias="sourceIp")
-    remote_host: Optional[str] = Field(alias="remoteHost")
-    raw_username: Optional[str] = Field(alias="rawUserName")
-    raw_id: Optional[str] = Field(alias="rawId")
-    tenant_domain: Optional[str] = Field(alias="tenantDomain")
+    source_ip: Optional[str] = Field(default=None, serialization_alias="sourceIp", validation_alias="sourceIp")
+    remote_host: Optional[str] = Field(default=None, serialization_alias="remoteHost", validation_alias="remoteHost")
+    raw_username: Optional[str] = Field(default=None, serialization_alias="rawUserName", validation_alias="rawUserName")
+    raw_id: Optional[str] = Field(default=None, serialization_alias="rawId", validation_alias="rawId")
+    tenant_domain: Optional[str] = Field(
+        default=None, serialization_alias="tenantDomain", validation_alias="tenantDomain"
+    )
     user_group: Optional[str] = Field(
-        alias="userGroup"
+        default=None, serialization_alias="userGroup", validation_alias="userGroup"
     )  # workaround: should be List[str] but JSON array is quoted in response
-    user_mode: Optional[str] = Field(alias="userMode")
-    create_date_time: Optional[datetime] = Field(alias="createDateTime")
-    tenant_id: Optional[str] = Field(alias="tenantId")
-    last_accessed_time: Optional[datetime] = Field(alias="lastAccessedTime")
+    user_mode: Optional[str] = Field(default=None, serialization_alias="userMode", validation_alias="userMode")
+    create_date_time: Optional[datetime] = Field(
+        default=None, serialization_alias="createDateTime", validation_alias="createDateTime"
+    )
+    tenant_id: Optional[str] = Field(default=None, serialization_alias="tenantId", validation_alias="tenantId")
+    last_accessed_time: Optional[datetime] = Field(
+        default=None, serialization_alias="lastAccessedTime", validation_alias="lastAccessedTime"
+    )
 
 
 class SessionsDeleteRequest(BaseModel):
@@ -146,7 +173,7 @@ class SessionsDeleteRequest(BaseModel):
 
 
 class InvalidateSessionMessage(BaseModel):
-    message: Optional[str]
+    message: Optional[str] = None
 
 
 class ProfilePasswordUpdateRequest(BaseModel):
@@ -155,24 +182,31 @@ class ProfilePasswordUpdateRequest(BaseModel):
 
 
 class ResourceGroup(BaseModel):
-    id: Optional[str]
+    model_config = ConfigDict(populate_by_name=True)
+    id: Optional[str] = None
     name: str
     desc: str
-    site_ids: List[int] = Field(alias="siteIds")
-    device_ips: Optional[List[str]] = Field(alias="deviceIPs")
-    mgmt_sytem_ips_map: Optional[Dict[str, str]] = Field(alias="mgmtSytemIpsMap")
-    uuid_sytem_ips_map: Optional[Dict[str, str]] = Field(alias="uuidSytemIpsMap")
+    site_ids: List[int] = Field(serialization_alias="siteIds", validation_alias="siteIds")
+    device_ips: Optional[List[str]] = Field(default=None, serialization_alias="deviceIPs", validation_alias="deviceIPs")
+    mgmt_sytem_ips_map: Optional[Dict[str, str]] = Field(
+        default=None, serialization_alias="mgmtSytemIpsMap", validation_alias="mgmtSytemIpsMap"
+    )
+    uuid_sytem_ips_map: Optional[Dict[str, str]] = Field(
+        default=None, serialization_alias="uuidSytemIpsMap", validation_alias="uuidSytemIpsMap"
+    )
 
 
 class ResourceGroupUpdateRequest(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     id: str
     name: str
     desc: str
-    site_ids: List[int] = Field(alias="siteIds")
+    site_ids: List[int] = Field(serialization_alias="siteIds", validation_alias="siteIds")
 
 
 class ResourceGroupSwitchRequest(BaseModel):
-    resource_group_name: str = Field(alias="resourceGroupName")
+    model_config = ConfigDict(populate_by_name=True)
+    resource_group_name: str = Field(serialization_alias="resourceGroupName", validation_alias="resourceGroupName")
 
 
 class AdministrationUserAndGroup(APIEndpoints):
