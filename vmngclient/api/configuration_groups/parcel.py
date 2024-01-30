@@ -12,13 +12,13 @@ class _ParcelBase(BaseModel):
         min_length=1,
         max_length=128,
         pattern=r'^[^&<>! "]+$',
-        serialization_alias="parcel_name",
-        validation_alias="parcel_name",
+        serialization_alias="name",
+        validation_alias="name",
     )
     parcel_description: Optional[str] = Field(
         default=None,
-        serialization_alias="parcel_description",
-        validation_alias="parcel_description",
+        serialization_alias="description",
+        validation_alias="description",
         description="Set the parcel description",
     )
     data: Optional[Any] = None
@@ -27,7 +27,6 @@ class _ParcelBase(BaseModel):
     @model_serializer(mode="wrap")
     def envelope_parcel_data(self, handler) -> Dict[str, Any]:
         model_dict = handler(self)
-
         model_dict[self._parcel_data_key] = {}
         remove_keys = []
 
@@ -35,8 +34,8 @@ class _ParcelBase(BaseModel):
             field_info = self.model_fields.get(key)
             if field_info and isinstance(field_info.validation_alias, AliasPath):
                 aliases = field_info.validation_alias.convert_to_aliases()
-                if aliases and aliases[0] == self._parcel_data_key:
-                    model_dict[self._parcel_data_key][key] = model_dict[key]
+                if aliases and aliases[0] == self._parcel_data_key and len(aliases) == 2:
+                    model_dict[self._parcel_data_key][aliases[1]] = model_dict[key]
                     remove_keys.append(key)
         for key in remove_keys:
             del model_dict[key]
