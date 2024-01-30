@@ -15,25 +15,17 @@ class User(BaseModel):
     group: List[str]
     locale: Optional[str] = None
     description: Optional[str] = None
-    """
-    for vmanage versions 20.5 to 20.12, resource group field is used during user creation.
-    if you do no enter any value, it will set it to "global"
-    endpoint: POST https://<vmanage-ip>/dataservice/admin/user
-    example payload:
-    {"locale":"en_US","group":["netadmin"],"description":"test","userName":"test","password":"<>"}
-    """
     resource_group: Optional[str] = Field(
-        default=None, serialization_alias="resGroupName", validation_alias="resGroupName"
+        default=None,
+        serialization_alias="resGroupName",
+        validation_alias="resGroupName",
+        description="can be set only for >=20.5, <20.13 where default value is 'global'",
     )
-    """
-    for vmanage versions 20.13 and above, resource domain field is used during user creation.
-    if you do no enter any value, it will set it to "all"
-    endpoint: POST https://<vmanage-ip>/dataservice/admin/user
-    example payload:
-    {"description":"test","group":["netadmin"],"locale":"en_US","userName":"test","password":"<>"}
-    """
     resource_domain: Optional[str] = Field(
-        default=None, serialization_alias="resourceDomainName", validation_alias="resourceDomainName"
+        default=None,
+        serialization_alias="resourceDomainName",
+        validation_alias="resourceDomainName",
+        description="can be set only for >=20.13 where default value is 'all'",
     )
 
 
