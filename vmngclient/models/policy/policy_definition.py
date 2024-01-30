@@ -123,6 +123,7 @@ SequenceType = Literal[
     "tloc",
     "route",
     "acl",
+    "aclv6",
 ]
 
 

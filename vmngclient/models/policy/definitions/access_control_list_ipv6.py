@@ -57,7 +57,7 @@ AclIPv6PolicySequenceActions = Any  # TODO
 
 
 class AclIPv6PolicyHeader(PolicyDefinitionBase):
-    type: Literal["acl"] = "acl"
+    type: Literal["aclv6"] = "aclv6"
 
 
 class AclIPv6PolicySequenceMatch(Match):
@@ -65,8 +65,8 @@ class AclIPv6PolicySequenceMatch(Match):
 
 
 class AclIPv6PolicySequence(PolicyDefinitionSequenceBase):
-    sequence_type: Literal["acl"] = Field(
-        default="acl", serialization_alias="sequenceType", validation_alias="sequenceType"
+    sequence_type: Literal["aclv6"] = Field(
+        default="aclv6", serialization_alias="sequenceType", validation_alias="sequenceType"
     )
     base_action: ActionTypeEnum = Field(
         default=ActionTypeEnum.ACCEPT, serialization_alias="baseAction", validation_alias="baseAction"
