@@ -47,6 +47,7 @@ AclIPv6PolicySequenceMatchEntry = Annotated[
         PLPEntry,
         SourceDataIPv6PrefixListEntry,
         SourceIPv6Entry,
+        SourcePortEntry,
         TCPEntry,
         TrafficClassEntry,
     ],
@@ -102,7 +103,7 @@ class AclIPv6PolicySequence(PolicyDefinitionSequenceBase):
     def match_destination_ip(self, networks: List[IPv6Network]) -> None:
         self._insert_match(DestinationIPv6Entry.from_ipv6_networks(networks))
 
-    def match_destination_ports(self, ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> None:
+    def match_destination_port(self, ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> None:
         self._insert_match(DestinationPortEntry.from_port_set_and_ranges(ports, port_ranges))
 
     def match_tcp(self) -> None:

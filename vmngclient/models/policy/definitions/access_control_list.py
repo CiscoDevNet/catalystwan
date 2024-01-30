@@ -14,6 +14,7 @@ from vmngclient.models.policy.policy_definition import (
     DefinitionWithSequencesCommonBase,
     DestinationDataPrefixListEntry,
     DestinationIPEntry,
+    DestinationPortEntry,
     DSCPEntry,
     LogAction,
     Match,
@@ -40,6 +41,7 @@ AclPolicySequenceMatchEntry = Annotated[
         ClassMapListEntry,
         DestinationDataPrefixListEntry,
         DestinationIPEntry,
+        DestinationPortEntry,
         DSCPEntry,
         PacketLengthEntry,
         PLPEntry,
@@ -103,6 +105,9 @@ class AclPolicySequence(PolicyDefinitionSequenceBase):
 
     def match_destination_ip(self, networks: List[IPv4Network]) -> None:
         self._insert_match(DestinationIPEntry.from_ipv4_networks(networks))
+
+    def match_destination_port(self, ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> None:
+        self._insert_match(DestinationPortEntry.from_port_set_and_ranges(ports, port_ranges))
 
     def match_tcp(self) -> None:
         self._insert_match(TCPEntry())
