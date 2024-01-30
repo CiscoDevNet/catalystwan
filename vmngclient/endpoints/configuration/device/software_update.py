@@ -1,5 +1,6 @@
+# mypy: disable-error-code="empty-body"
 from vmngclient.endpoints import APIEndpoints, post
-from vmngclient.utils.upgrades_helper import SoftwarePackageUpdatePayload
+from vmngclient.utils.upgrades_helper import SoftwarePackageUploadPayload
 
 
 class ConfigurationDeviceSoftwareUpdate(APIEndpoints):
@@ -20,7 +21,7 @@ class ConfigurationDeviceSoftwareUpdate(APIEndpoints):
         ...
 
     @post("/device/action/software/package")
-    def install_pkg(self, payload: SoftwarePackageUpdatePayload) -> None:
+    def upload_software_to_manager(self, payload: SoftwarePackageUploadPayload) -> None:
         ...
 
     def process_software_image(self):
