@@ -1,16 +1,20 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from uuid import UUID
 
 if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
 from vmngclient.api.task_status_api import Task
 from vmngclient.endpoints.configuration_device_inventory import (
+    ConfigType,
     ConfigurationDeviceInventory,
     DeviceUnlockPayload,
+    GenerateBoostrapConfigurationQueryParams,
     UnlockDeviceDetail,
 )
+from vmngclient.models.device_inventory import BoostrapConfigurationDetails
 
 
 class ConfigurationDeviceInventoryAPI:
@@ -33,3 +37,20 @@ class ConfigurationDeviceInventoryAPI:
 
         task_id = self.endpoint.unlock(device_uuid=device_uuid, payload=payload).parentTaskId
         return Task(self.session, task_id=task_id)
+
+    def generate_bootstrap_cfg(
+        self,
+        device_uuid: UUID,
+        configtype: ConfigType = ConfigType.CLOUDINIT,
+        incl_def_root_cert: bool = False,
+        version: str = "v1",
+    ) -> BoostrapConfigurationDetails:
+        """
+        Returns handy model of generated bootstrap config
+        """
+        params = GenerateBoostrapConfigurationQueryParams(
+            configtype=configtype, incl_def_root_cert=incl_def_root_cert, version=version
+        )
+        reponse = self.endpoint.generate_bootstrap_configuration(uuid=device_uuid, params=params)
+
+        return BoostrapConfigurationDetails(bootstrap_config=reponse.bootstrap_config)

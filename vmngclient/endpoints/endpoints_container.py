@@ -7,6 +7,7 @@ from vmngclient.endpoints.certificate_management_device import CertificateManage
 from vmngclient.endpoints.certificate_management_vmanage import CertificateManagementVManage
 from vmngclient.endpoints.client import Client
 from vmngclient.endpoints.cluster_management import ClusterManagement
+from vmngclient.endpoints.configuration.device.software_update import ConfigurationDeviceSoftwareUpdate
 from vmngclient.endpoints.configuration.policy.definition.control import ConfigurationPolicyControlDefinition
 from vmngclient.endpoints.configuration.policy.definition.hub_and_spoke import ConfigurationPolicyHubAndSpokeDefinition
 from vmngclient.endpoints.configuration.policy.definition.mesh import ConfigurationPolicyMeshDefinition
@@ -55,10 +56,10 @@ from vmngclient.endpoints.configuration.policy.list.zone import ConfigurationPol
 from vmngclient.endpoints.configuration.policy.security_template import ConfigurationSecurityTemplatePolicy
 from vmngclient.endpoints.configuration.policy.vedge_template import ConfigurationVEdgeTemplatePolicy
 from vmngclient.endpoints.configuration.policy.vsmart_template import ConfigurationVSmartTemplatePolicy
+from vmngclient.endpoints.configuration.software_actions import ConfigurationSoftwareActions
 from vmngclient.endpoints.configuration_dashboard_status import ConfigurationDashboardStatus
 from vmngclient.endpoints.configuration_device_actions import ConfigurationDeviceActions
 from vmngclient.endpoints.configuration_device_inventory import ConfigurationDeviceInventory
-from vmngclient.endpoints.configuration_device_software_update import ConfigurationDeviceSoftwareUpdate
 from vmngclient.endpoints.configuration_device_template import ConfigurationDeviceTemplate
 from vmngclient.endpoints.configuration_feature_profile import (
     ConfigurationFeatureProfile,
@@ -174,6 +175,7 @@ class APIEndpointContainter:
         self.configuration_device_software_update = ConfigurationDeviceSoftwareUpdate(session)
         self.configuration_device_template = ConfigurationDeviceTemplate(session)
         self.configuration_settings = ConfigurationSettings(session)
+        self.configuration_software_actions = ConfigurationSoftwareActions(session)
         self.monitoring_device_details = MonitoringDeviceDetails(session)
         self.monitoring_status = MonitoringStatus(session)
         self.sdavc_cloud_connector = SDAVCCloudConnector(session)
