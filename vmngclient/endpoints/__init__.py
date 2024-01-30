@@ -54,6 +54,7 @@ from typing import (
     Union,
     runtime_checkable,
 )
+from uuid import UUID
 
 from packaging.specifiers import SpecifierSet  # type: ignore
 from packaging.version import Version  # type: ignore
@@ -537,8 +538,8 @@ class request(APIEndpointsDecorator):
             raise APIEndpointError(f"Missing parameters: {missing} to format url: {self.url}")
 
         for parameter in [parameters.get(name) for name in self.url_field_names]:
-            if not (isclass(parameter.annotation) and issubclass(parameter.annotation, str)):
-                raise APIEndpointError(f"Parameter {parameter} used for url formatting must be 'str' sub-type")
+            if not (isclass(parameter.annotation) and issubclass(parameter.annotation, (str, UUID))):
+                raise APIEndpointError(f"Parameter {parameter} used for url formatting must be 'str' sub-type or UUID")
 
         no_purpose_params = {
             parameters.get(name) for name in general_purpose_arg_names.difference(self.url_field_names)

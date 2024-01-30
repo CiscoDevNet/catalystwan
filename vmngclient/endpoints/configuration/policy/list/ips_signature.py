@@ -1,4 +1,6 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.models.policy.lists import IPSSignatureList
 from vmngclient.models.policy.policy_list import (
@@ -25,7 +27,7 @@ class ConfigurationPolicyIPSSignatureList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/ipssignature/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/ipssignature")
@@ -33,11 +35,11 @@ class ConfigurationPolicyIPSSignatureList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/ipssignature/{id}")
-    def edit_policy_list(self, id: str, payload: IPSSignatureListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: IPSSignatureListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/ipssignature/{id}")
-    def get_lists_by_id(self, id: str) -> IPSSignatureListInfo:
+    def get_lists_by_id(self, id: UUID) -> IPSSignatureListInfo:
         ...
 
     @get("/template/policy/list/ipssignature", "data")
@@ -53,5 +55,5 @@ class ConfigurationPolicyIPSSignatureList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/ipssignature/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

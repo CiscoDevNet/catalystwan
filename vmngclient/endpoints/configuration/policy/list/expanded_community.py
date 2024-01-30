@@ -1,4 +1,6 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.models.policy.lists import ExpandedCommunityList
 from vmngclient.models.policy.policy_list import (
@@ -25,7 +27,7 @@ class ConfigurationPolicyExpandedCommunityList(APIEndpoints, PolicyListEndpoints
         ...
 
     @delete("/template/policy/list/expandedcommunity/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/expandedcommunity")
@@ -33,11 +35,11 @@ class ConfigurationPolicyExpandedCommunityList(APIEndpoints, PolicyListEndpoints
         ...
 
     @put("/template/policy/list/expandedcommunity/{id}")
-    def edit_policy_list(self, id: str, payload: ExpandedCommunityListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: ExpandedCommunityListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/expandedcommunity/{id}")
-    def get_lists_by_id(self, id: str) -> ExpandedCommunityListInfo:
+    def get_lists_by_id(self, id: UUID) -> ExpandedCommunityListInfo:
         ...
 
     @get("/template/policy/list/expandedcommunity", "data")
@@ -53,5 +55,5 @@ class ConfigurationPolicyExpandedCommunityList(APIEndpoints, PolicyListEndpoints
         ...
 
     @get("/template/policy/list/expandedcommunity/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

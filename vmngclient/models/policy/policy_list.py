@@ -1,12 +1,13 @@
 import datetime
 from typing import List, Optional, Protocol
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from vmngclient.models.policy.lists import AllPolicyLists
+from vmngclient.models.policy.lists import AnyPolicyList
 from vmngclient.typed_list import DataSequence
 
-PolicyList = AllPolicyLists
+PolicyList = AnyPolicyList
 
 
 class InfoTag(BaseModel):
@@ -14,7 +15,7 @@ class InfoTag(BaseModel):
 
 
 class PolicyListId(BaseModel):
-    list_id: str = Field(alias="listId")
+    list_id: UUID = Field(alias="listId")
 
 
 class PolicyListInfo(PolicyListId, InfoTag):
@@ -35,13 +36,13 @@ class PolicyListEndpoints(Protocol):
     def create_policy_list(self, payload: PolicyList) -> PolicyListId:
         ...
 
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
-    def edit_policy_list(self, id: str, payload: PolicyList) -> None:
+    def edit_policy_list(self, id: UUID, payload: PolicyList) -> None:
         ...
 
-    def get_lists_by_id(self, id: str) -> PolicyListInfo:
+    def get_lists_by_id(self, id: UUID) -> PolicyListInfo:
         ...
 
     def get_policy_lists(self) -> DataSequence[PolicyListInfo]:

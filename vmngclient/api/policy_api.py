@@ -1,8 +1,43 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Type, Union, overload
+from uuid import UUID
 
 from vmngclient.api.task_status_api import Task
+from vmngclient.endpoints.configuration.policy.definition.access_control_list import (
+    AclPolicyGetResponse,
+    AclPolicyInfo,
+    ConfigurationPolicyAclDefinition,
+)
+from vmngclient.endpoints.configuration.policy.definition.access_control_list_ipv6 import (
+    AclIPv6PolicyGetResponse,
+    AclIPv6PolicyInfo,
+    ConfigurationPolicyAclIPv6Definition,
+)
+from vmngclient.endpoints.configuration.policy.definition.control import (
+    ConfigurationPolicyControlDefinition,
+    ControlPolicyInfo,
+)
+from vmngclient.endpoints.configuration.policy.definition.device_access import (
+    ConfigurationPolicyDeviceAccessDefinition,
+    DeviceAccessPolicyGetResponse,
+    DeviceAccessPolicyInfo,
+)
+from vmngclient.endpoints.configuration.policy.definition.device_access_ipv6 import (
+    ConfigurationPolicyDeviceAccessIPv6Definition,
+    DeviceAccessIPv6PolicyGetResponse,
+    DeviceAccessIPv6PolicyInfo,
+)
+from vmngclient.endpoints.configuration.policy.definition.hub_and_spoke import (
+    ConfigurationPolicyHubAndSpokeDefinition,
+    HubAndSpokePolicyGetResponse,
+    HubAndSpokePolicyInfo,
+)
+from vmngclient.endpoints.configuration.policy.definition.mesh import (
+    ConfigurationPolicyMeshDefinition,
+    MeshPolicyGetResponse,
+    MeshPolicyInfo,
+)
 from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition, QoSMapInfo
 from vmngclient.endpoints.configuration.policy.definition.rewrite import (
     ConfigurationPolicyRewriteRuleDefinition,
@@ -21,6 +56,11 @@ from vmngclient.endpoints.configuration.policy.definition.traffic_data import (
     TrafficDataPolicy,
     TrafficDataPolicyGetResponse,
     TrafficDataPolicyInfo,
+)
+from vmngclient.endpoints.configuration.policy.definition.vpn_membership import (
+    ConfigurationPolicyVPNMembershipGroupDefinition,
+    VPNMembershipGroupGetResponse,
+    VPNMembershipGroupInfo,
 )
 from vmngclient.endpoints.configuration.policy.definition.zone_based_firewall import (
     ConfigurationPolicyZoneBasedFirewallDefinition,
@@ -81,6 +121,7 @@ from vmngclient.endpoints.configuration.policy.list.protocol_name import (
     ConfigurationPolicyProtocolNameList,
     ProtocolNameListInfo,
 )
+from vmngclient.endpoints.configuration.policy.list.region import ConfigurationPolicyRegionList, RegionListInfo
 from vmngclient.endpoints.configuration.policy.list.site import ConfigurationPolicySiteList, SiteListInfo
 from vmngclient.endpoints.configuration.policy.list.sla import ConfigurationPolicySLAClassList, SLAClassListInfo
 from vmngclient.endpoints.configuration.policy.list.tloc import ConfigurationPolicyTLOCList, TLOCListInfo
@@ -102,13 +143,21 @@ from vmngclient.endpoints.configuration.policy.vsmart_template import (
 )
 from vmngclient.models.misc.application_protocols import ApplicationProtocol
 from vmngclient.models.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
+from vmngclient.models.policy.definitions.access_control_list import AclPolicy
+from vmngclient.models.policy.definitions.access_control_list_ipv6 import AclIPv6Policy
+from vmngclient.models.policy.definitions.control import ControlPolicy
+from vmngclient.models.policy.definitions.device_access import DeviceAccessPolicy
+from vmngclient.models.policy.definitions.device_access_ipv6 import DeviceAccessIPv6Policy
+from vmngclient.models.policy.definitions.hub_and_spoke import HubAndSpokePolicy
+from vmngclient.models.policy.definitions.mesh import MeshPolicy
 from vmngclient.models.policy.definitions.qos_map import QoSMap
 from vmngclient.models.policy.definitions.rewrite import RewritePolicy
 from vmngclient.models.policy.definitions.rule_set import RuleSet
 from vmngclient.models.policy.definitions.security_group import SecurityGroup
+from vmngclient.models.policy.definitions.vpn_membership import VPNMembershipGroup
 from vmngclient.models.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy
 from vmngclient.models.policy.lists import (
-    AllPolicyLists,
+    AnyPolicyList,
     AppList,
     AppProbeClassList,
     ASPathList,
@@ -130,6 +179,7 @@ from vmngclient.models.policy.lists import (
     PreferredColorGroupList,
     PrefixList,
     ProtocolNameList,
+    RegionList,
     SiteList,
     SLAClassList,
     TLOCList,
@@ -175,6 +225,7 @@ POLICY_LIST_ENDPOINTS_MAP: Mapping[type, type] = {
     PreferredColorGroupList: ConfigurationPreferredColorGroupList,
     PrefixList: ConfigurationPolicyPrefixList,
     ProtocolNameList: ConfigurationPolicyProtocolNameList,
+    RegionList: ConfigurationPolicyRegionList,
     SiteList: ConfigurationPolicySiteList,
     SLAClassList: ConfigurationPolicySLAClassList,
     TLOCList: ConfigurationPolicyTLOCList,
@@ -191,9 +242,32 @@ POLICY_DEFINITION_ENDPOINTS_MAP: Mapping[type, type] = {
     TrafficDataPolicy: ConfigurationPolicyDataDefinition,
     QoSMap: ConfigurationPolicyQoSMapDefinition,
     RewritePolicy: ConfigurationPolicyRewriteRuleDefinition,
+    ControlPolicy: ConfigurationPolicyControlDefinition,
+    VPNMembershipGroup: ConfigurationPolicyVPNMembershipGroupDefinition,
+    HubAndSpokePolicy: ConfigurationPolicyHubAndSpokeDefinition,
+    MeshPolicy: ConfigurationPolicyMeshDefinition,
+    AclPolicy: ConfigurationPolicyAclDefinition,
+    AclIPv6Policy: ConfigurationPolicyAclIPv6Definition,
+    DeviceAccessPolicy: ConfigurationPolicyDeviceAccessDefinition,
+    DeviceAccessIPv6Policy: ConfigurationPolicyDeviceAccessIPv6Definition,
 }
 
-SupportedPolicyDefinitions = Union[RuleSet, SecurityGroup, ZoneBasedFWPolicy, TrafficDataPolicy, QoSMap, RewritePolicy]
+AnyPolicyDefinition = Union[
+    RuleSet,
+    SecurityGroup,
+    ZoneBasedFWPolicy,
+    TrafficDataPolicy,
+    QoSMap,
+    RewritePolicy,
+    ControlPolicy,
+    VPNMembershipGroup,
+    HubAndSpokePolicy,
+    MeshPolicy,
+    AclPolicy,
+    AclIPv6Policy,
+    DeviceAccessPolicy,
+    DeviceAccessIPv6Policy,
+]
 
 
 class CentralizedPolicyAPI:
@@ -201,15 +275,15 @@ class CentralizedPolicyAPI:
         self._session = session
         self._endpoints = ConfigurationVSmartTemplatePolicy(session)
 
-    def activate(self, id: str) -> Task:
+    def activate(self, id: UUID) -> Task:
         task_id = self._endpoints.activate_policy(id).id
         return Task(self._session, task_id)
 
-    def deactivate(self, id: str) -> Task:
+    def deactivate(self, id: UUID) -> Task:
         task_id = self._endpoints.deactivate_policy(id).id
         return Task(self._session, task_id)
 
-    def create(self, policy: CentralizedPolicy) -> str:
+    def create(self, policy: CentralizedPolicy) -> UUID:
         return self._endpoints.create_vsmart_template(policy).policy_id
 
     def edit(self, policy: CentralizedPolicyEditPayload, lock_checks: bool = True) -> None:
@@ -217,7 +291,7 @@ class CentralizedPolicyAPI:
             self._endpoints.edit_vsmart_template(policy.policy_id, policy)
         self._endpoints.edit_template_without_lock_checks(policy.policy_id, policy)
 
-    def delete(self, id: str) -> None:
+    def delete(self, id: UUID) -> None:
         self._endpoints.delete_vsmart_template(id)
 
     @overload
@@ -225,10 +299,10 @@ class CentralizedPolicyAPI:
         ...
 
     @overload
-    def get(self, id: str) -> CentralizedPolicy:
+    def get(self, id: UUID) -> CentralizedPolicy:
         ...
 
-    def get(self, id: Optional[str] = None) -> Any:
+    def get(self, id: Optional[UUID] = None) -> Any:
         if id is not None:
             return self._endpoints.get_template_by_policy_id(id)
         return self._endpoints.generate_vsmart_policy_template_list()
@@ -242,13 +316,13 @@ class LocalizedPolicyAPI:
         self._session = session
         self._endpoints = ConfigurationVEdgeTemplatePolicy(session)
 
-    def create(self, policy: LocalizedPolicy) -> str:
+    def create(self, policy: LocalizedPolicy) -> UUID:
         return self._endpoints.create_vedge_template(policy).policy_id
 
-    def edit(self, id: str, policy: LocalizedPolicy) -> LocalizedPolicyEditResponse:
+    def edit(self, id: UUID, policy: LocalizedPolicy) -> LocalizedPolicyEditResponse:
         return self._endpoints.edit_vedge_template(id, policy)
 
-    def delete(self, id: str) -> None:
+    def delete(self, id: UUID) -> None:
         self._endpoints.delete_vedge_template(id)
 
     @overload
@@ -256,20 +330,20 @@ class LocalizedPolicyAPI:
         ...
 
     @overload
-    def get(self, id: str) -> LocalizedPolicy:
+    def get(self, id: UUID) -> LocalizedPolicy:
         ...
 
-    def get(self, id: Optional[str] = None) -> Any:
+    def get(self, id: Optional[UUID] = None) -> Any:
         if id is not None:
             return self._endpoints.get_vedge_template(id)
         return self._endpoints.generate_policy_template_list()
 
-    def list_devices(self, id: Optional[str] = None) -> DataSequence[LocalizedPolicyDeviceInfo]:
+    def list_devices(self, id: Optional[UUID] = None) -> DataSequence[LocalizedPolicyDeviceInfo]:
         if id is not None:
             return self._endpoints.get_device_list_by_policy(id)
         return self._endpoints.get_vedge_policy_device_list()
 
-    def preview(self, id: str) -> str:
+    def preview(self, id: UUID) -> str:
         return self._endpoints.preview_by_id(id).preview
 
 
@@ -278,7 +352,7 @@ class SecurityPolicyAPI:
         self._session = session
         self._endpoints = ConfigurationSecurityTemplatePolicy(session)
 
-    def create(self, policy: AnySecurityPolicy) -> str:
+    def create(self, policy: AnySecurityPolicy) -> UUID:
         # POST does not return anything! we need to list all after creation and find by name to get id
         self._endpoints.create_security_template(policy)
         policy_infos = [
@@ -289,10 +363,10 @@ class SecurityPolicyAPI:
         assert len(policy_infos) == 1
         return policy_infos[0].policy_id
 
-    def edit(self, id: str, policy: AnySecurityPolicy) -> SecurityPolicyEditResponse:
+    def edit(self, id: UUID, policy: AnySecurityPolicy) -> SecurityPolicyEditResponse:
         return self._endpoints.edit_security_template(id, policy)
 
-    def delete(self, id: str) -> None:
+    def delete(self, id: UUID) -> None:
         self._endpoints.delete_security_template(id)
 
     @overload
@@ -300,10 +374,10 @@ class SecurityPolicyAPI:
         ...
 
     @overload
-    def get(self, id: str) -> AnySecurityPolicy:
+    def get(self, id: UUID) -> AnySecurityPolicy:
         ...
 
-    def get(self, id: Optional[str] = None) -> Any:
+    def get(self, id: Optional[UUID] = None) -> Any:
         if id is not None:
             return self._endpoints.get_security_template(id).root
         return [info.root for info in self._endpoints.generate_security_template_list()]
@@ -319,15 +393,15 @@ class PolicyListsAPI:
             raise TypeError(f"Unsupported policy list type: {payload_type}")
         return endpoints_class(self._session)
 
-    def create(self, policy_list: AllPolicyLists) -> str:
+    def create(self, policy_list: AnyPolicyList) -> UUID:
         endpoints = self.__get_list_endpoints_instance(type(policy_list))
         return endpoints.create_policy_list(payload=policy_list).list_id
 
-    def edit(self, id: str, policy_list: AllPolicyLists) -> None:
+    def edit(self, id: UUID, policy_list: AnyPolicyList) -> None:
         endpoints = self.__get_list_endpoints_instance(type(policy_list))
         endpoints.edit_policy_list(id=id, payload=policy_list)
 
-    def delete(self, type: Type[AllPolicyLists], id: str) -> None:
+    def delete(self, type: Type[AnyPolicyList], id: UUID) -> None:
         endpoints = self.__get_list_endpoints_instance(type)
         endpoints.delete_policy_list(id=id)
 
@@ -416,6 +490,10 @@ class PolicyListsAPI:
         ...
 
     @overload
+    def get(self, type: Type[RegionList]) -> DataSequence[RegionListInfo]:
+        ...
+
+    @overload
     def get(self, type: Type[SiteList]) -> DataSequence[SiteListInfo]:
         ...
 
@@ -446,118 +524,122 @@ class PolicyListsAPI:
     # get by id
 
     @overload
-    def get(self, type: Type[AppList], id: str) -> AppListInfo:
+    def get(self, type: Type[AppList], id: UUID) -> AppListInfo:
         ...
 
     @overload
-    def get(self, type: Type[AppProbeClassList], id: str) -> AppProbeClassListInfo:
+    def get(self, type: Type[AppProbeClassList], id: UUID) -> AppProbeClassListInfo:
         ...
 
     @overload
-    def get(self, type: Type[ASPathList], id: str) -> ASPathListInfo:
+    def get(self, type: Type[ASPathList], id: UUID) -> ASPathListInfo:
         ...
 
     @overload
-    def get(self, type: Type[ClassMapList], id: str) -> ClassMapListInfo:
+    def get(self, type: Type[ClassMapList], id: UUID) -> ClassMapListInfo:
         ...
 
     @overload
-    def get(self, type: Type[ColorList], id: str) -> ColorListInfo:
+    def get(self, type: Type[ColorList], id: UUID) -> ColorListInfo:
         ...
 
     @overload
-    def get(self, type: Type[CommunityList], id: str) -> CommunityListInfo:
+    def get(self, type: Type[CommunityList], id: UUID) -> CommunityListInfo:
         ...
 
     @overload
-    def get(self, type: Type[DataIPv6PrefixList], id: str) -> DataIPv6PrefixListInfo:
+    def get(self, type: Type[DataIPv6PrefixList], id: UUID) -> DataIPv6PrefixListInfo:
         ...
 
     @overload
-    def get(self, type: Type[DataPrefixList], id: str) -> DataPrefixListInfo:
+    def get(self, type: Type[DataPrefixList], id: UUID) -> DataPrefixListInfo:
         ...
 
     @overload
-    def get(self, type: Type[ExpandedCommunityList], id: str) -> ExpandedCommunityListInfo:
+    def get(self, type: Type[ExpandedCommunityList], id: UUID) -> ExpandedCommunityListInfo:
         ...
 
     @overload
-    def get(self, type: Type[FQDNList], id: str) -> FQDNListInfo:
+    def get(self, type: Type[FQDNList], id: UUID) -> FQDNListInfo:
         ...
 
     @overload
-    def get(self, type: Type[GeoLocationList], id: str) -> GeoLocationListInfo:
+    def get(self, type: Type[GeoLocationList], id: UUID) -> GeoLocationListInfo:
         ...
 
     @overload
-    def get(self, type: Type[IPSSignatureList], id: str) -> IPSSignatureListInfo:
+    def get(self, type: Type[IPSSignatureList], id: UUID) -> IPSSignatureListInfo:
         ...
 
     @overload
-    def get(self, type: Type[IPv6PrefixList], id: str) -> IPv6PrefixListInfo:
+    def get(self, type: Type[IPv6PrefixList], id: UUID) -> IPv6PrefixListInfo:
         ...
 
     @overload
-    def get(self, type: Type[LocalAppList], id: str) -> LocalAppListInfo:
+    def get(self, type: Type[LocalAppList], id: UUID) -> LocalAppListInfo:
         ...
 
     @overload
-    def get(self, type: Type[LocalDomainList], id: str) -> LocalDomainListInfo:
+    def get(self, type: Type[LocalDomainList], id: UUID) -> LocalDomainListInfo:
         ...
 
     @overload
-    def get(self, type: Type[MirrorList], id: str) -> MirrorListInfo:
+    def get(self, type: Type[MirrorList], id: UUID) -> MirrorListInfo:
         ...
 
     @overload
-    def get(self, type: Type[PolicerList], id: str) -> PolicerListInfo:
+    def get(self, type: Type[PolicerList], id: UUID) -> PolicerListInfo:
         ...
 
     @overload
-    def get(self, type: Type[PortList], id: str) -> PortListInfo:
+    def get(self, type: Type[PortList], id: UUID) -> PortListInfo:
         ...
 
     @overload
-    def get(self, type: Type[PreferredColorGroupList], id: str) -> PreferredColorGroupListInfo:
+    def get(self, type: Type[PreferredColorGroupList], id: UUID) -> PreferredColorGroupListInfo:
         ...
 
     @overload
-    def get(self, type: Type[PrefixList], id: str) -> PrefixListInfo:
+    def get(self, type: Type[PrefixList], id: UUID) -> PrefixListInfo:
         ...
 
     @overload
-    def get(self, type: Type[ProtocolNameList], id: str) -> ProtocolNameListInfo:
+    def get(self, type: Type[ProtocolNameList], id: UUID) -> ProtocolNameListInfo:
         ...
 
     @overload
-    def get(self, type: Type[SiteList], id: str) -> SiteListInfo:
+    def get(self, type: Type[RegionList], id: UUID) -> RegionListInfo:
         ...
 
     @overload
-    def get(self, type: Type[SLAClassList], id: str) -> SLAClassListInfo:
+    def get(self, type: Type[SiteList], id: UUID) -> SiteListInfo:
         ...
 
     @overload
-    def get(self, type: Type[TLOCList], id: str) -> TLOCListInfo:
+    def get(self, type: Type[SLAClassList], id: UUID) -> SLAClassListInfo:
         ...
 
     @overload
-    def get(self, type: Type[URLBlackList], id: str) -> URLBlackListInfo:
+    def get(self, type: Type[TLOCList], id: UUID) -> TLOCListInfo:
         ...
 
     @overload
-    def get(self, type: Type[URLWhiteList], id: str) -> URLWhiteListInfo:
+    def get(self, type: Type[URLBlackList], id: UUID) -> URLBlackListInfo:
         ...
 
     @overload
-    def get(self, type: Type[VPNList], id: str) -> VPNListInfo:
+    def get(self, type: Type[URLWhiteList], id: UUID) -> URLWhiteListInfo:
         ...
 
     @overload
-    def get(self, type: Type[ZoneList], id: str) -> ZoneListInfo:
+    def get(self, type: Type[VPNList], id: UUID) -> VPNListInfo:
         ...
 
-    def get(self, type: Type[AllPolicyLists], id: Optional[str] = None) -> Any:
+    @overload
+    def get(self, type: Type[ZoneList], id: UUID) -> ZoneListInfo:
+        ...
+
+    def get(self, type: Type[AnyPolicyList], id: Optional[UUID] = None) -> Any:
         endpoints = self.__get_list_endpoints_instance(type)
         if id is not None:
             return endpoints.get_lists_by_id(id=id)
@@ -574,15 +656,15 @@ class PolicyDefinitionsAPI:
             raise TypeError(f"Unsupported policy definition type: {payload_type}")
         return endpoints_class(self._session)
 
-    def create(self, policy_definition: SupportedPolicyDefinitions) -> str:
+    def create(self, policy_definition: AnyPolicyDefinition) -> UUID:
         endpoints = self.__get_definition_endpoints_instance(type(policy_definition))
         return endpoints.create_policy_definition(payload=policy_definition).definition_id
 
-    def edit(self, id: str, policy_definition: SupportedPolicyDefinitions) -> PolicyDefinitionEditResponse:
+    def edit(self, id: UUID, policy_definition: AnyPolicyDefinition) -> PolicyDefinitionEditResponse:
         endpoints = self.__get_definition_endpoints_instance(type(policy_definition))
         return endpoints.edit_policy_definition(id=id, payload=policy_definition)
 
-    def delete(self, type: Type[SupportedPolicyDefinitions], id: str) -> None:
+    def delete(self, type: Type[AnyPolicyDefinition], id: UUID) -> None:
         endpoints = self.__get_definition_endpoints_instance(type)
         endpoints.delete_policy_definition(id=id)
 
@@ -610,33 +692,97 @@ class PolicyDefinitionsAPI:
     def get(self, type: Type[RewritePolicy]) -> DataSequence[RewritePolicyInfo]:
         ...
 
+    @overload
+    def get(self, type: Type[ControlPolicy]) -> DataSequence[ControlPolicyInfo]:
+        ...
+
+    @overload
+    def get(self, type: Type[VPNMembershipGroup]) -> DataSequence[VPNMembershipGroupInfo]:
+        ...
+
+    @overload
+    def get(self, type: Type[HubAndSpokePolicy]) -> DataSequence[HubAndSpokePolicyInfo]:
+        ...
+
+    @overload
+    def get(self, type: Type[MeshPolicy]) -> DataSequence[MeshPolicyInfo]:
+        ...
+
+    @overload
+    def get(self, type: Type[AclPolicy]) -> DataSequence[AclPolicyInfo]:
+        ...
+
+    @overload
+    def get(self, type: Type[AclIPv6Policy]) -> DataSequence[AclIPv6PolicyInfo]:
+        ...
+
+    @overload
+    def get(self, type: Type[DeviceAccessPolicy]) -> DataSequence[DeviceAccessPolicyInfo]:
+        ...
+
+    @overload
+    def get(self, type: Type[DeviceAccessIPv6Policy]) -> DataSequence[DeviceAccessIPv6PolicyInfo]:
+        ...
+
     # get by id
 
     @overload
-    def get(self, type: Type[TrafficDataPolicy], id: str) -> TrafficDataPolicyGetResponse:
+    def get(self, type: Type[TrafficDataPolicy], id: UUID) -> TrafficDataPolicyGetResponse:
         ...
 
     @overload
-    def get(self, type: Type[RuleSet], id: str) -> RuleSetInfo:
+    def get(self, type: Type[RuleSet], id: UUID) -> RuleSetInfo:
         ...
 
     @overload
-    def get(self, type: Type[SecurityGroup], id: str) -> SecurityGroupInfo:
+    def get(self, type: Type[SecurityGroup], id: UUID) -> SecurityGroupInfo:
         ...
 
     @overload
-    def get(self, type: Type[ZoneBasedFWPolicy], id: str) -> ZoneBasedFWPolicyGetResponse:
+    def get(self, type: Type[ZoneBasedFWPolicy], id: UUID) -> ZoneBasedFWPolicyGetResponse:
         ...
 
     @overload
-    def get(self, type: Type[QoSMap], id: str) -> QoSMapInfo:
+    def get(self, type: Type[QoSMap], id: UUID) -> QoSMapInfo:
         ...
 
     @overload
-    def get(self, type: Type[RewritePolicy], id: str) -> RewritePolicyInfo:
+    def get(self, type: Type[RewritePolicy], id: UUID) -> RewritePolicyInfo:
         ...
 
-    def get(self, type: Type[SupportedPolicyDefinitions], id: Optional[str] = None) -> Any:
+    @overload
+    def get(self, type: Type[ControlPolicy], id: UUID) -> ControlPolicyInfo:
+        ...
+
+    @overload
+    def get(self, type: Type[VPNMembershipGroup], id: UUID) -> VPNMembershipGroupGetResponse:
+        ...
+
+    @overload
+    def get(self, type: Type[HubAndSpokePolicy], id: UUID) -> HubAndSpokePolicyGetResponse:
+        ...
+
+    @overload
+    def get(self, type: Type[MeshPolicy], id: UUID) -> MeshPolicyGetResponse:
+        ...
+
+    @overload
+    def get(self, type: Type[AclPolicy], id: UUID) -> AclPolicyGetResponse:
+        ...
+
+    @overload
+    def get(self, type: Type[AclIPv6Policy], id: UUID) -> AclIPv6PolicyGetResponse:
+        ...
+
+    @overload
+    def get(self, type: Type[DeviceAccessPolicy], id: UUID) -> DeviceAccessPolicyGetResponse:
+        ...
+
+    @overload
+    def get(self, type: Type[DeviceAccessIPv6Policy], id: UUID) -> DeviceAccessIPv6PolicyGetResponse:
+        ...
+
+    def get(self, type: Type[AnyPolicyDefinition], id: Optional[UUID] = None) -> Any:
         endpoints = self.__get_definition_endpoints_instance(type)
         if id is not None:
             return endpoints.get_policy_definition(id=id)

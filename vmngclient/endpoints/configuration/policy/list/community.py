@@ -1,4 +1,6 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.models.policy.lists import CommunityList
 from vmngclient.models.policy.policy_list import (
@@ -25,7 +27,7 @@ class ConfigurationPolicyCommunityList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/community/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/community")
@@ -33,11 +35,11 @@ class ConfigurationPolicyCommunityList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/community/{id}")
-    def edit_policy_list(self, id: str, payload: CommunityListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: CommunityListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/community/{id}")
-    def get_lists_by_id(self, id: str) -> CommunityListInfo:
+    def get_lists_by_id(self, id: UUID) -> CommunityListInfo:
         ...
 
     @get("/template/policy/list/community", "data")
@@ -53,5 +55,5 @@ class ConfigurationPolicyCommunityList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/community/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

@@ -1,4 +1,5 @@
 from typing import List, Literal
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -14,10 +15,10 @@ class RewritePolicyHeader(PolicyDefinitionBase):
 
 
 class RewritePolicyRule(BaseModel):
-    class_: str = Field(alias="class")
+    class_: UUID = Field(serialization_alias="class", validation_alias="class")
     plp: str
     dscp: str
-    l2cos: str = Field(alias="layer2Cos")
+    l2cos: str = Field(serialization_alias="layer2Cos", validation_alias="layer2Cos")
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -28,9 +29,7 @@ class RewritePolicyDefinition(BaseModel):
 class RewritePolicy(RewritePolicyHeader, DefinitionWithSequencesCommonBase):
     definition: RewritePolicyDefinition = RewritePolicyDefinition()
 
-    def add_rule(self, class_map_ref: str, dscp: int, l2cos: int, plp: PLPEntryValues) -> None:
-        self.definition.rules.append(
-            RewritePolicyRule(class_=class_map_ref, plp=plp, dscp=str(dscp), l2cos=str(l2cos))  # type: ignore[call-arg]
-        )
+    def add_rule(self, class_map_ref: UUID, dscp: int, l2cos: int, plp: PLPEntryValues) -> None:
+        self.definition.rules.append(RewritePolicyRule(class_=class_map_ref, plp=plp, dscp=str(dscp), l2cos=str(l2cos)))
 
     model_config = ConfigDict(populate_by_name=True)

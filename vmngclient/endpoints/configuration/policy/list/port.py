@@ -1,4 +1,6 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
 from vmngclient.models.policy.lists import PortList
 from vmngclient.models.policy.policy_list import (
@@ -25,7 +27,7 @@ class ConfigurationPolicyPortList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/port/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/port")
@@ -33,11 +35,11 @@ class ConfigurationPolicyPortList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/port/{id}")
-    def edit_policy_list(self, id: str, payload: PortListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: PortListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/port/{id}")
-    def get_lists_by_id(self, id: str) -> PortListInfo:
+    def get_lists_by_id(self, id: UUID) -> PortListInfo:
         ...
 
     @get("/template/policy/list/port", "data")
@@ -53,5 +55,5 @@ class ConfigurationPolicyPortList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/port/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...
