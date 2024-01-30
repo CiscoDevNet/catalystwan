@@ -8,7 +8,15 @@ from vmngclient.endpoints.certificate_management_vmanage import CertificateManag
 from vmngclient.endpoints.client import Client
 from vmngclient.endpoints.cluster_management import ClusterManagement
 from vmngclient.endpoints.configuration.device.software_update import ConfigurationDeviceSoftwareUpdate
+from vmngclient.endpoints.configuration.policy.definition.access_control_list import ConfigurationPolicyAclDefinition
+from vmngclient.endpoints.configuration.policy.definition.access_control_list_ipv6 import (
+    ConfigurationPolicyAclIPv6Definition,
+)
 from vmngclient.endpoints.configuration.policy.definition.control import ConfigurationPolicyControlDefinition
+from vmngclient.endpoints.configuration.policy.definition.device_access import ConfigurationPolicyDeviceAccessDefinition
+from vmngclient.endpoints.configuration.policy.definition.device_access_ipv6 import (
+    ConfigurationPolicyDeviceAccessIPv6Definition,
+)
 from vmngclient.endpoints.configuration.policy.definition.hub_and_spoke import ConfigurationPolicyHubAndSpokeDefinition
 from vmngclient.endpoints.configuration.policy.definition.mesh import ConfigurationPolicyMeshDefinition
 from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition
@@ -126,6 +134,10 @@ class ConfigurationPolicyDefinitionContainer:
         self.vpn_membership = ConfigurationPolicyVPNMembershipGroupDefinition(session)
         self.hub_and_spoke = ConfigurationPolicyHubAndSpokeDefinition(session)
         self.mesh = ConfigurationPolicyMeshDefinition(session)
+        self.acl = ConfigurationPolicyAclDefinition(session)
+        self.acl_ipv6 = ConfigurationPolicyAclIPv6Definition(session)
+        self.device_access = ConfigurationPolicyDeviceAccessDefinition(session)
+        self.device_access_ipv6 = ConfigurationPolicyDeviceAccessIPv6Definition(session)
 
 
 class ConfigurationPolicyContainer:

@@ -4,9 +4,29 @@ from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Type, Unio
 from uuid import UUID
 
 from vmngclient.api.task_status_api import Task
+from vmngclient.endpoints.configuration.policy.definition.access_control_list import (
+    AclPolicyGetResponse,
+    AclPolicyInfo,
+    ConfigurationPolicyAclDefinition,
+)
+from vmngclient.endpoints.configuration.policy.definition.access_control_list_ipv6 import (
+    AclIPv6PolicyGetResponse,
+    AclIPv6PolicyInfo,
+    ConfigurationPolicyAclIPv6Definition,
+)
 from vmngclient.endpoints.configuration.policy.definition.control import (
     ConfigurationPolicyControlDefinition,
     ControlPolicyInfo,
+)
+from vmngclient.endpoints.configuration.policy.definition.device_access import (
+    ConfigurationPolicyDeviceAccessDefinition,
+    DeviceAccessPolicyGetResponse,
+    DeviceAccessPolicyInfo,
+)
+from vmngclient.endpoints.configuration.policy.definition.device_access_ipv6 import (
+    ConfigurationPolicyDeviceAccessIPv6Definition,
+    DeviceAccessIPv6PolicyGetResponse,
+    DeviceAccessIPv6PolicyInfo,
 )
 from vmngclient.endpoints.configuration.policy.definition.hub_and_spoke import (
     ConfigurationPolicyHubAndSpokeDefinition,
@@ -123,7 +143,11 @@ from vmngclient.endpoints.configuration.policy.vsmart_template import (
 )
 from vmngclient.models.misc.application_protocols import ApplicationProtocol
 from vmngclient.models.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
+from vmngclient.models.policy.definitions.access_control_list import AclPolicy
+from vmngclient.models.policy.definitions.access_control_list_ipv6 import AclIPv6Policy
 from vmngclient.models.policy.definitions.control import ControlPolicy
+from vmngclient.models.policy.definitions.device_access import DeviceAccessPolicy
+from vmngclient.models.policy.definitions.device_access_ipv6 import DeviceAccessIPv6Policy
 from vmngclient.models.policy.definitions.hub_and_spoke import HubAndSpokePolicy
 from vmngclient.models.policy.definitions.mesh import MeshPolicy
 from vmngclient.models.policy.definitions.qos_map import QoSMap
@@ -222,6 +246,10 @@ POLICY_DEFINITION_ENDPOINTS_MAP: Mapping[type, type] = {
     VPNMembershipGroup: ConfigurationPolicyVPNMembershipGroupDefinition,
     HubAndSpokePolicy: ConfigurationPolicyHubAndSpokeDefinition,
     MeshPolicy: ConfigurationPolicyMeshDefinition,
+    AclPolicy: ConfigurationPolicyAclDefinition,
+    AclIPv6Policy: ConfigurationPolicyAclIPv6Definition,
+    DeviceAccessPolicy: ConfigurationPolicyDeviceAccessDefinition,
+    DeviceAccessIPv6Policy: ConfigurationPolicyDeviceAccessIPv6Definition,
 }
 
 AnyPolicyDefinition = Union[
@@ -235,6 +263,10 @@ AnyPolicyDefinition = Union[
     VPNMembershipGroup,
     HubAndSpokePolicy,
     MeshPolicy,
+    AclPolicy,
+    AclIPv6Policy,
+    DeviceAccessPolicy,
+    DeviceAccessIPv6Policy,
 ]
 
 
@@ -676,6 +708,22 @@ class PolicyDefinitionsAPI:
     def get(self, type: Type[MeshPolicy]) -> DataSequence[MeshPolicyInfo]:
         ...
 
+    @overload
+    def get(self, type: Type[AclPolicy]) -> DataSequence[AclPolicyInfo]:
+        ...
+
+    @overload
+    def get(self, type: Type[AclIPv6Policy]) -> DataSequence[AclIPv6PolicyInfo]:
+        ...
+
+    @overload
+    def get(self, type: Type[DeviceAccessPolicy]) -> DataSequence[DeviceAccessPolicyInfo]:
+        ...
+
+    @overload
+    def get(self, type: Type[DeviceAccessIPv6Policy]) -> DataSequence[DeviceAccessIPv6PolicyInfo]:
+        ...
+
     # get by id
 
     @overload
@@ -716,6 +764,22 @@ class PolicyDefinitionsAPI:
 
     @overload
     def get(self, type: Type[MeshPolicy], id: UUID) -> MeshPolicyGetResponse:
+        ...
+
+    @overload
+    def get(self, type: Type[AclPolicy], id: UUID) -> AclPolicyGetResponse:
+        ...
+
+    @overload
+    def get(self, type: Type[AclIPv6Policy], id: UUID) -> AclIPv6PolicyGetResponse:
+        ...
+
+    @overload
+    def get(self, type: Type[DeviceAccessPolicy], id: UUID) -> DeviceAccessPolicyGetResponse:
+        ...
+
+    @overload
+    def get(self, type: Type[DeviceAccessIPv6Policy], id: UUID) -> DeviceAccessIPv6PolicyGetResponse:
         ...
 
     def get(self, type: Type[AnyPolicyDefinition], id: Optional[UUID] = None) -> Any:

@@ -161,7 +161,7 @@ class TrafficDataPolicySequence(PolicyDefinitionSequenceBase):
     def match_other_destination_region(self) -> None:
         self._insert_match(DestinationRegionEntry(value=DestinationRegionEntryValues.OTHER))
 
-    def match_destination_ports(self, ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> None:
+    def match_destination_port(self, ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> None:
         self._insert_match(DestinationPortEntry.from_port_set_and_ranges(ports, port_ranges))
 
     def match_tcp(self) -> None:
