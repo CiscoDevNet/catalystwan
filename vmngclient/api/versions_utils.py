@@ -116,7 +116,6 @@ class RepositoryAPI:
         return None
 
     def _create_callback(self, encoder: MultipartEncoder):
-
         bar = ProgressBar(expected_size=encoder._calculate_length(), filled_char="=")
 
         def callback(monitor: MultipartEncoderMonitor):
@@ -292,5 +291,4 @@ class DeviceVersions:
         return self._get_devices_chosen_version(devices, "available_versions")
 
     def get_device_list(self, devices: DataSequence[Device]) -> List[DeviceVersionPayload]:
-
         return [DeviceVersionPayload(device.uuid, device.id) for device in devices]  # type: ignore
