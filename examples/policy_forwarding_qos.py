@@ -115,9 +115,9 @@ def run_demo(args: CmdArguments):
             10. Click Save Policy.
         """
         logger.info("II.B. Configure Localized Policy: Configure QoS Scheduler")
-        from vmngclient.models.policy.definitions.qos_map import QoSMap
+        from vmngclient.models.policy.definitions.qos_map import QoSMapPolicy
 
-        qos_map = QoSMap(name="My-QosMap-Policy")
+        qos_map = QoSMapPolicy(name="My-QosMap-Policy")
         qos_map.add_scheduler(queue=1, class_map_ref=pol_dict["CRITICAL_DATA"], bandwidth=30, buffer=30)
         qos_map.add_scheduler(queue=2, class_map_ref=pol_dict["BULK"], bandwidth=10, buffer=10)
         qos_map.add_scheduler(queue=3, class_map_ref=pol_dict["DEFAULT"], bandwidth=20, buffer=20)
@@ -297,7 +297,7 @@ def run_demo(args: CmdArguments):
         api.lists.delete(VPNList, pol_dict["My-VPN-List"])
         api.localized.delete(pol_dict["My-Localized-Policy"])
         api.definitions.delete(RewritePolicy, pol_dict["My-Rewrite-Policy"])
-        api.definitions.delete(QoSMap, pol_dict["My-QosMap-Policy"])
+        api.definitions.delete(QoSMapPolicy, pol_dict["My-QosMap-Policy"])
         api.lists.delete(ClassMapList, pol_dict["VOICE"])
         api.lists.delete(ClassMapList, pol_dict["CRITICAL_DATA"])
         api.lists.delete(ClassMapList, pol_dict["BULK"])

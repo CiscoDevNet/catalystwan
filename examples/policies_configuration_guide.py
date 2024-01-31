@@ -30,7 +30,7 @@ from typing import List, Optional, Tuple
 from uuid import UUID
 
 from vmngclient.api.policy_api import PolicyAPI
-from vmngclient.models.policy.definitions.vpn_membership import VPNMembershipGroup
+from vmngclient.models.policy.definitions.vpn_membership import VPNMembershipPolicy
 from vmngclient.models.policy.lists import (
     AppList,
     AppProbeClassList,
@@ -170,10 +170,10 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[Tuple[type, UUID]]:
 def create_vpn_membership_policy(api: PolicyAPI) -> Tuple[type, UUID]:
     site_list = api.lists.get(SiteList).first().list_id
     vpn_list = api.lists.get(VPNList).first().list_id
-    policy = VPNMembershipGroup(name="MyVPNMembershipPolicy")
+    policy = VPNMembershipPolicy(name="MyVPNMembershipPolicy")
     policy.add_site(site_list, [vpn_list])
     policy_id = api.definitions.create(policy)
-    return (VPNMembershipGroup, policy_id)
+    return (VPNMembershipPolicy, policy_id)
 
 
 def delete_created_items(api: PolicyAPI, items: List[Tuple[type, UUID]]) -> None:

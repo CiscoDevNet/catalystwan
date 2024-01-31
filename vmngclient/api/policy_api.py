@@ -38,7 +38,10 @@ from vmngclient.endpoints.configuration.policy.definition.mesh import (
     MeshPolicyGetResponse,
     MeshPolicyInfo,
 )
-from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition, QoSMapInfo
+from vmngclient.endpoints.configuration.policy.definition.qos_map import (
+    ConfigurationPolicyQoSMapDefinition,
+    QoSMapPolicyInfo,
+)
 from vmngclient.endpoints.configuration.policy.definition.rewrite import (
     ConfigurationPolicyRewriteRuleDefinition,
     RewritePolicyInfo,
@@ -59,8 +62,8 @@ from vmngclient.endpoints.configuration.policy.definition.traffic_data import (
 )
 from vmngclient.endpoints.configuration.policy.definition.vpn_membership import (
     ConfigurationPolicyVPNMembershipGroupDefinition,
-    VPNMembershipGroupGetResponse,
-    VPNMembershipGroupInfo,
+    VPNMembershipPolicyGetResponse,
+    VPNMembershipPolicyInfo,
 )
 from vmngclient.endpoints.configuration.policy.definition.zone_based_firewall import (
     ConfigurationPolicyZoneBasedFirewallDefinition,
@@ -150,11 +153,11 @@ from vmngclient.models.policy.definitions.device_access import DeviceAccessPolic
 from vmngclient.models.policy.definitions.device_access_ipv6 import DeviceAccessIPv6Policy
 from vmngclient.models.policy.definitions.hub_and_spoke import HubAndSpokePolicy
 from vmngclient.models.policy.definitions.mesh import MeshPolicy
-from vmngclient.models.policy.definitions.qos_map import QoSMap
+from vmngclient.models.policy.definitions.qos_map import QoSMapPolicy
 from vmngclient.models.policy.definitions.rewrite import RewritePolicy
 from vmngclient.models.policy.definitions.rule_set import RuleSet
 from vmngclient.models.policy.definitions.security_group import SecurityGroup
-from vmngclient.models.policy.definitions.vpn_membership import VPNMembershipGroup
+from vmngclient.models.policy.definitions.vpn_membership import VPNMembershipPolicy
 from vmngclient.models.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy
 from vmngclient.models.policy.lists import (
     AnyPolicyList,
@@ -251,10 +254,10 @@ POLICY_DEFINITION_ENDPOINTS_MAP: Mapping[type, type] = {
     SecurityGroup: ConfigurationPolicySecurityGroupDefinition,
     ZoneBasedFWPolicy: ConfigurationPolicyZoneBasedFirewallDefinition,
     TrafficDataPolicy: ConfigurationPolicyDataDefinition,
-    QoSMap: ConfigurationPolicyQoSMapDefinition,
+    QoSMapPolicy: ConfigurationPolicyQoSMapDefinition,
     RewritePolicy: ConfigurationPolicyRewriteRuleDefinition,
     ControlPolicy: ConfigurationPolicyControlDefinition,
-    VPNMembershipGroup: ConfigurationPolicyVPNMembershipGroupDefinition,
+    VPNMembershipPolicy: ConfigurationPolicyVPNMembershipGroupDefinition,
     HubAndSpokePolicy: ConfigurationPolicyHubAndSpokeDefinition,
     MeshPolicy: ConfigurationPolicyMeshDefinition,
     AclPolicy: ConfigurationPolicyAclDefinition,
@@ -268,10 +271,10 @@ AnyPolicyDefinition = Union[
     SecurityGroup,
     ZoneBasedFWPolicy,
     TrafficDataPolicy,
-    QoSMap,
+    QoSMapPolicy,
     RewritePolicy,
     ControlPolicy,
-    VPNMembershipGroup,
+    VPNMembershipPolicy,
     HubAndSpokePolicy,
     MeshPolicy,
     AclPolicy,
@@ -696,7 +699,7 @@ class PolicyDefinitionsAPI:
         ...
 
     @overload
-    def get(self, type: Type[QoSMap]) -> DataSequence[QoSMapInfo]:
+    def get(self, type: Type[QoSMapPolicy]) -> DataSequence[QoSMapPolicyInfo]:
         ...
 
     @overload
@@ -708,7 +711,7 @@ class PolicyDefinitionsAPI:
         ...
 
     @overload
-    def get(self, type: Type[VPNMembershipGroup]) -> DataSequence[VPNMembershipGroupInfo]:
+    def get(self, type: Type[VPNMembershipPolicy]) -> DataSequence[VPNMembershipPolicyInfo]:
         ...
 
     @overload
@@ -754,7 +757,7 @@ class PolicyDefinitionsAPI:
         ...
 
     @overload
-    def get(self, type: Type[QoSMap], id: UUID) -> QoSMapInfo:
+    def get(self, type: Type[QoSMapPolicy], id: UUID) -> QoSMapPolicyInfo:
         ...
 
     @overload
@@ -766,7 +769,7 @@ class PolicyDefinitionsAPI:
         ...
 
     @overload
-    def get(self, type: Type[VPNMembershipGroup], id: UUID) -> VPNMembershipGroupGetResponse:
+    def get(self, type: Type[VPNMembershipPolicy], id: UUID) -> VPNMembershipPolicyGetResponse:
         ...
 
     @overload

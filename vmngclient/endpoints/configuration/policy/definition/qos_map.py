@@ -2,7 +2,7 @@
 from uuid import UUID
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.models.policy.definitions.qos_map import QoSMap
+from vmngclient.models.policy.definitions.qos_map import QoSMapPolicy
 from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
@@ -13,17 +13,17 @@ from vmngclient.models.policy.policy_definition import (
 from vmngclient.typed_list import DataSequence
 
 
-class QoSMapEditPayload(QoSMap, PolicyDefinitionId):
+class QoSMapPolicyEditPayload(QoSMapPolicy, PolicyDefinitionId):
     pass
 
 
-class QoSMapInfo(QoSMap, PolicyDefinitionId, PolicyDefinitionInfo):
+class QoSMapPolicyInfo(QoSMapPolicy, PolicyDefinitionId, PolicyDefinitionInfo):
     pass
 
 
 class ConfigurationPolicyQoSMapDefinition(APIEndpoints, PolicyDefinitionEndpoints):
     @post("/template/policy/definition/qosmap")
-    def create_policy_definition(self, payload: QoSMap) -> PolicyDefinitionId:
+    def create_policy_definition(self, payload: QoSMapPolicy) -> PolicyDefinitionId:
         ...
 
     @delete("/template/policy/definition/qosmap/{id}")
@@ -35,19 +35,19 @@ class ConfigurationPolicyQoSMapDefinition(APIEndpoints, PolicyDefinitionEndpoint
         ...
 
     @put("/template/policy/definition/qosmap/{id}")
-    def edit_policy_definition(self, id: UUID, payload: QoSMapEditPayload) -> PolicyDefinitionEditResponse:
+    def edit_policy_definition(self, id: UUID, payload: QoSMapPolicyEditPayload) -> PolicyDefinitionEditResponse:
         ...
 
     @get("/template/policy/definition/qosmap", "data")
-    def get_definitions(self) -> DataSequence[QoSMapInfo]:
+    def get_definitions(self) -> DataSequence[QoSMapPolicyInfo]:
         ...
 
     @get("/template/policy/definition/qosmap/{id}")
-    def get_policy_definition(self, id: UUID) -> QoSMapInfo:
+    def get_policy_definition(self, id: UUID) -> QoSMapPolicyInfo:
         ...
 
     @post("/template/policy/definition/qosmap/preview")
-    def preview_policy_definition(self, payload: QoSMap) -> PolicyDefinitionPreview:
+    def preview_policy_definition(self, payload: QoSMapPolicy) -> PolicyDefinitionPreview:
         ...
 
     @get("/template/policy/definition/qosmap/preview/{id}")
