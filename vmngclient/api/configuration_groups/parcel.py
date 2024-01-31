@@ -1,13 +1,45 @@
 from enum import Enum
-from typing import Any, Generic, Optional, TypeVar
+from typing import Any, Dict, Generic, Optional, TypeVar
 
-from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny
+from pydantic import AliasPath, BaseModel, ConfigDict, Field, PrivateAttr, model_serializer
 
 T = TypeVar("T")
 
 
-class Parcel(BaseModel):
+class _ParcelBase(BaseModel):
     model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True, populate_by_name=True)
+    parcel_name: str = Field(
+        min_length=1,
+        max_length=128,
+        pattern=r'^[^&<>! "]+$',
+        serialization_alias="name",
+        validation_alias="name",
+    )
+    parcel_description: Optional[str] = Field(
+        default=None,
+        serialization_alias="description",
+        validation_alias="description",
+        description="Set the parcel description",
+    )
+    data: Optional[Any] = None
+    _parcel_data_key: str = PrivateAttr(default="data")
+
+    @model_serializer(mode="wrap")
+    def envelope_parcel_data(self, handler) -> Dict[str, Any]:
+        model_dict = handler(self)
+        model_dict[self._parcel_data_key] = {}
+        remove_keys = []
+
+        for key in model_dict.keys():
+            field_info = self.model_fields.get(key)
+            if field_info and isinstance(field_info.validation_alias, AliasPath):
+                aliases = field_info.validation_alias.convert_to_aliases()
+                if aliases and aliases[0] == self._parcel_data_key and len(aliases) == 2:
+                    model_dict[self._parcel_data_key][aliases[1]] = model_dict[key]
+                    remove_keys.append(key)
+        for key in remove_keys:
+            del model_dict[key]
+        return model_dict
 
 
 class OptionType(str, Enum):
@@ -16,19 +48,18 @@ class OptionType(str, Enum):
     VARIABLE = "variable"
 
 
-class ParcelValue(BaseModel):
+class ParcelAttribute(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
 
-    optionType: OptionType
+    option_type: OptionType = Field(serialization_alias="optionType", validation_alias="optionType")
 
 
 # https://github.com/pydantic/pydantic/discussions/6090
-# TODO positional arguments
 # Usage: Global[str](value="test")
-class Global(ParcelValue, Generic[T]):
-    optionType: OptionType = OptionType.GLOBAL
+class Global(ParcelAttribute, Generic[T]):
+    option_type: OptionType = OptionType.GLOBAL
     value: T
 
     def __len__(self) -> int:
@@ -47,25 +78,23 @@ class Global(ParcelValue, Generic[T]):
         return False
 
 
-class Variable(ParcelValue):
-    optionType: OptionType = OptionType.VARIABLE
+class Variable(ParcelAttribute):
+    option_type: OptionType = OptionType.VARIABLE
     value: str = Field(pattern=r"^\{\{[.\/\[\]a-zA-Z0-9_-]+\}\}$", min_length=1, max_length=64)
 
 
-class Default(ParcelValue, Generic[T]):
-    optionType: OptionType = OptionType.DEFAULT
+class Default(ParcelAttribute, Generic[T]):
+    option_type: OptionType = OptionType.DEFAULT
     value: Any
 
 
-class DefaultWitoutValue(ParcelValue):
-    optionType: OptionType = OptionType.DEFAULT
+def as_global(value: Any):
+    return Global[type(value)](value=value)  # type: ignore
 
 
-class RefId(BaseModel, Generic[T]):
-    ref_id: Global[T] = Field(alias="refId")
+def as_variable(value: str):
+    return Variable(value=value)
 
 
-class MainParcel(BaseModel):
-    name: str = Field(min_length=1, max_length=128, pattern=r'^[^&<>! "]+$')
-    description: Optional[str] = Field(default=None, description="Set the parcel description")
-    data: SerializeAsAny[Parcel]
+def as_default(value: Any):
+    return Default[type(value)](value=value)  # type: ignore

@@ -2,7 +2,6 @@
 
 from typing import Optional
 
-from vmngclient.api.configuration_groups.parcel import MainParcel
 from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, versions
 from vmngclient.models.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
@@ -12,6 +11,7 @@ from vmngclient.models.configuration.feature_profile.common import (
     ParcelId,
     SchemaTypeQuery,
 )
+from vmngclient.models.configuration.feature_profile.sdwan.transport.cellular_controller import CellularController
 from vmngclient.typed_list import DataSequence
 
 
@@ -43,6 +43,6 @@ class TransportFeatureProfile(APIEndpoints):
     @versions(supported_versions=(">=20.9"), raises=False)
     @post("/v1/feature-profile/sdwan/transport/{transport_id}/cellular-controller")
     def create_cellular_controller_profile_parcel_for_transport(
-        self, transport_id: str, payload: MainParcel
+        self, transport_id: str, payload: CellularController
     ) -> ParcelId:
         ...

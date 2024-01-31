@@ -1,16 +1,17 @@
 from enum import Enum
 from typing import Union
 
-from pydantic import Field
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, Global, Parcel, Variable
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
 
 
 class ConfigTypeValue(Enum):
     NON_E_SIM = "non-eSim"
 
 
-class ControllerConfig(Parcel):
+class ControllerConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True, populate_by_name=True)
     id: Union[Variable, Global[str]] = Field(min_length=1, max_length=5, description="Cellular ID")
     slot: Union[Variable, Global[int], Default[int], None] = Field(
         default=None, description="Set primary SIM slot", ge=0, le=1
@@ -39,13 +40,11 @@ class ControllerConfig(Parcel):
     )
 
 
-class CellularController(Parcel):
+class CellularController(_ParcelBase):
     config_type: Default[ConfigTypeValue] = Field(
-        default=Default(value=ConfigTypeValue.NON_E_SIM),
-        serialization_alias="configType",
-        validation_alias="configType",
+        default=Default(value=ConfigTypeValue.NON_E_SIM), validation_alias=AliasPath("data", "configType")
     )
-    controller_config: ControllerConfig = Field(alias="controllerConfig")
+    controller_config: ControllerConfig = Field(validation_alias=AliasPath("data", "controllerConfig"))
 
     @staticmethod
     def add_controller_config(
