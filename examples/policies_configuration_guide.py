@@ -30,8 +30,7 @@ from typing import List, Optional, Tuple
 from uuid import UUID
 
 from vmngclient.api.policy_api import PolicyAPI
-from vmngclient.models.policy.definitions.vpn_membership import VPNMembershipPolicy
-from vmngclient.models.policy.lists import (
+from vmngclient.models.policy import (
     AppList,
     AppProbeClassList,
     ClassMapList,
@@ -47,6 +46,7 @@ from vmngclient.models.policy.lists import (
     SLAClassList,
     TLOCList,
     VPNList,
+    VPNMembershipPolicy,
 )
 
 logger = logging.getLogger(__name__)
