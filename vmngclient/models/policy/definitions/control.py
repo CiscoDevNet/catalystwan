@@ -1,5 +1,5 @@
 from ipaddress import IPv4Address
-from typing import Any, List, Literal, Union, overload
+from typing import Any, List, Literal, Optional, Union, overload
 from uuid import UUID
 
 from pydantic import ConfigDict, Field
@@ -148,14 +148,19 @@ class ControlPolicyRouteSequence(PolicyDefinitionSequenceBase):
     def match_preference(self, preference: int) -> None:
         self._insert_match(PreferenceEntry(value=str(preference)))
 
-    def match_region(self, region_id: int) -> None:
+    def match_region(self, region_id: int, role: Optional[MultiRegionRoleEnum] = None) -> None:
         self._insert_match(RegionEntry(value=str(region_id)))
+        if role is not None:
+            self._insert_match(RoleEntry(value=role))
+        else:
+            self._remove_match(RoleEntry)
 
-    def match_region_list(self, region_list_id: UUID) -> None:
+    def match_region_list(self, region_list_id: UUID, role: Optional[MultiRegionRoleEnum] = None) -> None:
         self._insert_match(RegionListEntry(ref=region_list_id))
-
-    def match_role(self, role: MultiRegionRoleEnum) -> None:
-        self._insert_match(RoleEntry(value=role))
+        if role is not None:
+            self._insert_match(RoleEntry(value=role))
+        else:
+            self._remove_match(RoleEntry)
 
     def match_site(self, site: int) -> None:
         self._insert_match(SiteEntry(value=str(site)))
@@ -265,11 +270,19 @@ class ControlPolicyTLOCSequence(PolicyDefinitionSequenceBase):
     def match_site_list(self, site_list_id: UUID) -> None:
         self._insert_match(SiteListEntry(ref=site_list_id))
 
-    def match_region(self, region_id: int) -> None:
+    def match_region(self, region_id: int, role: Optional[MultiRegionRoleEnum] = None) -> None:
         self._insert_match(RegionEntry(value=str(region_id)))
+        if role is not None:
+            self._insert_match(RoleEntry(value=role))
+        else:
+            self._remove_match(RoleEntry)
 
-    def match_region_list(self, region_list_id: UUID) -> None:
+    def match_region_list(self, region_list_id: UUID, role: Optional[MultiRegionRoleEnum] = None) -> None:
         self._insert_match(RegionListEntry(ref=region_list_id))
+        if role is not None:
+            self._insert_match(RoleEntry(value=role))
+        else:
+            self._remove_match(RoleEntry)
 
     def match_tloc_list(self, tloc_list_id: UUID) -> None:
         self._insert_match(TLOCListEntry(ref=tloc_list_id))

@@ -2,7 +2,7 @@ import datetime
 from enum import Enum
 from functools import wraps
 from ipaddress import IPv4Address, IPv4Network, IPv6Network
-from typing import Dict, List, MutableSequence, Optional, Protocol, Sequence, Set, Tuple, Union
+from typing import Any, Dict, List, MutableSequence, Optional, Protocol, Sequence, Set, Tuple, Union
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, RootModel, model_validator
@@ -620,10 +620,13 @@ class ClassMapListEntry(BaseModel):
 
 
 class ServiceEntryValue(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     type: ServiceTypeEnum
     vpn: str
     tloc: Optional[TLOCEntryValue] = None
-    tloc_list: Optional[TLOCListEntry]
+    tloc_list: Optional[TLOCListEntry] = Field(
+        default=None, validation_alias="tlocList", serialization_alias="tlocList"
+    )
 
     @model_validator(mode="after")
     def tloc_xor_tloc_list(self):
@@ -937,6 +940,10 @@ class PolicyDefinitionSequenceBase(BaseModel):
 
     def _get_match_entries_by_field(self, field: str) -> Sequence[MatchEntry]:
         return [entry for entry in self.match.entries if entry.field == field]
+
+    def _remove_match(self, match_type: Any) -> None:
+        if isinstance(self.match.entries, MutableSequence):
+            self.match.entries[:] = [entry for entry in self.match.entries if type(entry) != match_type]
 
     def _insert_match(self, match: MatchEntry, insert_field_check: bool = True) -> int:
         # inserts new item or replaces item with same field name if found
