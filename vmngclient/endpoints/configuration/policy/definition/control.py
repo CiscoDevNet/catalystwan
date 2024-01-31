@@ -6,6 +6,7 @@ from vmngclient.models.policy.definitions.control import ControlPolicy
 from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
+    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
@@ -17,7 +18,7 @@ class ControlPolicyEditPayload(ControlPolicy, PolicyDefinitionId):
     pass
 
 
-class ControlPolicyInfo(ControlPolicy, PolicyDefinitionId, PolicyDefinitionInfo):
+class ControlPolicyGetResponse(ControlPolicy, PolicyDefinitionGetResponse):
     pass
 
 
@@ -39,11 +40,11 @@ class ConfigurationPolicyControlDefinition(APIEndpoints, PolicyDefinitionEndpoin
         ...
 
     @get("/template/policy/definition/control", "data")
-    def get_definitions(self) -> DataSequence[ControlPolicyInfo]:
+    def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
         ...
 
     @get("/template/policy/definition/control/{id}")
-    def get_policy_definition(self, id: UUID) -> ControlPolicyInfo:
+    def get_policy_definition(self, id: UUID) -> ControlPolicyGetResponse:
         ...
 
     @post("/template/policy/definition/control/preview")

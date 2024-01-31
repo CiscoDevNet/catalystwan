@@ -6,6 +6,7 @@ from vmngclient.models.policy.definitions.rewrite import RewritePolicy
 from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
+    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
@@ -17,7 +18,7 @@ class RewritePolicyEditPayload(RewritePolicy, PolicyDefinitionId):
     pass
 
 
-class RewritePolicyInfo(RewritePolicy, PolicyDefinitionId, PolicyDefinitionInfo):
+class RewritePolicyGetResponse(RewritePolicy, PolicyDefinitionGetResponse):
     pass
 
 
@@ -39,11 +40,11 @@ class ConfigurationPolicyRewriteRuleDefinition(APIEndpoints, PolicyDefinitionEnd
         ...
 
     @get("/template/policy/definition/rewriterule", "data")
-    def get_definitions(self) -> DataSequence[RewritePolicyInfo]:
+    def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
         ...
 
     @get("/template/policy/definition/rewriterule/{id}")
-    def get_policy_definition(self, id: UUID) -> RewritePolicyInfo:
+    def get_policy_definition(self, id: UUID) -> RewritePolicyGetResponse:
         ...
 
     @post("/template/policy/definition/rewriterule/preview")

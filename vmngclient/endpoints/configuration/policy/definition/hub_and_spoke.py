@@ -6,6 +6,7 @@ from vmngclient.models.policy.definitions.hub_and_spoke import HubAndSpokePolicy
 from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
+    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
@@ -17,11 +18,7 @@ class HubAndSpokePolicyEditPayload(HubAndSpokePolicy, PolicyDefinitionId):
     pass
 
 
-class HubAndSpokePolicyInfo(PolicyDefinitionId, PolicyDefinitionInfo):
-    pass
-
-
-class HubAndSpokePolicyGetResponse(HubAndSpokePolicy, PolicyDefinitionId, PolicyDefinitionInfo):
+class HubAndSpokePolicyGetResponse(HubAndSpokePolicy, PolicyDefinitionGetResponse):
     pass
 
 
@@ -43,7 +40,7 @@ class ConfigurationPolicyHubAndSpokeDefinition(APIEndpoints, PolicyDefinitionEnd
         ...
 
     @get("/template/policy/definition/hubandspoke", "data")
-    def get_definitions(self) -> DataSequence[HubAndSpokePolicyInfo]:
+    def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
         ...
 
     @get("/template/policy/definition/hubandspoke/{id}")

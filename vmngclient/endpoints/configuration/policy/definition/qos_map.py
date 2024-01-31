@@ -6,6 +6,7 @@ from vmngclient.models.policy.definitions.qos_map import QoSMapPolicy
 from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
+    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
@@ -17,7 +18,7 @@ class QoSMapPolicyEditPayload(QoSMapPolicy, PolicyDefinitionId):
     pass
 
 
-class QoSMapPolicyInfo(QoSMapPolicy, PolicyDefinitionId, PolicyDefinitionInfo):
+class QoSMapPolicyGetResponse(QoSMapPolicy, PolicyDefinitionGetResponse):
     pass
 
 
@@ -39,11 +40,11 @@ class ConfigurationPolicyQoSMapDefinition(APIEndpoints, PolicyDefinitionEndpoint
         ...
 
     @get("/template/policy/definition/qosmap", "data")
-    def get_definitions(self) -> DataSequence[QoSMapPolicyInfo]:
+    def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
         ...
 
     @get("/template/policy/definition/qosmap/{id}")
-    def get_policy_definition(self, id: UUID) -> QoSMapPolicyInfo:
+    def get_policy_definition(self, id: UUID) -> QoSMapPolicyGetResponse:
         ...
 
     @post("/template/policy/definition/qosmap/preview")

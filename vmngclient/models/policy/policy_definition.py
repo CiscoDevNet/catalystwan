@@ -2,7 +2,7 @@ import datetime
 from enum import Enum
 from functools import wraps
 from ipaddress import IPv4Address, IPv4Network, IPv6Network
-from typing import Any, Dict, List, MutableSequence, Optional, Protocol, Sequence, Set, Tuple, Union
+from typing import Dict, List, MutableSequence, Optional, Protocol, Sequence, Set, Tuple, Union
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, RootModel, model_validator
@@ -1082,28 +1082,19 @@ class PolicyDefinitionBase(BaseModel):
     type: str
     mode: Optional[str] = None
     optimized: Optional[Optimized] = Optimized.FALSE
-    definition: Any = None
 
 
-class PolicyDefinitionInfo(PolicyDefinitionBase):
+class PolicyDefinitionInfo(PolicyDefinitionBase, PolicyDefinitionId):
     last_updated: datetime.datetime = Field(serialization_alias="lastUpdated", validation_alias="lastUpdated")
     owner: str
     reference_count: int = Field(serialization_alias="referenceCount", validation_alias="referenceCount")
     references: List[PolicyReference]
 
 
-class PolicyDefinitionCreationPayload(PolicyDefinitionBase):
-    definition: DefinitionWithSequencesCommonBase
-
-
-class PolicyDefinitionGetResponse(PolicyDefinitionCreationPayload, PolicyDefinitionId):
+class PolicyDefinitionGetResponse(PolicyDefinitionInfo):
     is_activated_by_vsmart: bool = Field(
         serialization_alias="isActivatedByVsmart", validation_alias="isActivatedByVsmart"
     )
-
-
-class PolicyDefinitionEditPayload(PolicyDefinitionCreationPayload, PolicyDefinitionId):
-    pass
 
 
 class PolicyDefinitionEditResponse(BaseModel):

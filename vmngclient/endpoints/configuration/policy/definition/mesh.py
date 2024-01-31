@@ -6,6 +6,7 @@ from vmngclient.models.policy.definitions.mesh import MeshPolicy
 from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
+    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
@@ -17,11 +18,7 @@ class MeshPolicyEditPayload(MeshPolicy, PolicyDefinitionId):
     pass
 
 
-class MeshPolicyInfo(PolicyDefinitionId, PolicyDefinitionInfo):
-    pass
-
-
-class MeshPolicyGetResponse(MeshPolicy, PolicyDefinitionId, PolicyDefinitionInfo):
+class MeshPolicyGetResponse(MeshPolicy, PolicyDefinitionGetResponse):
     pass
 
 
@@ -43,7 +40,7 @@ class ConfigurationPolicyMeshDefinition(APIEndpoints, PolicyDefinitionEndpoints)
         ...
 
     @get("/template/policy/definition/mesh", "data")
-    def get_definitions(self) -> DataSequence[MeshPolicyInfo]:
+    def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
         ...
 
     @get("/template/policy/definition/mesh/{id}")

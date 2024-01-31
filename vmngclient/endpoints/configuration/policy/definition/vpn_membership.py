@@ -6,6 +6,7 @@ from vmngclient.models.policy.definitions.vpn_membership import VPNMembershipPol
 from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
+    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
@@ -17,11 +18,7 @@ class VPNMembershipPolicyEditPayload(VPNMembershipPolicy, PolicyDefinitionId):
     pass
 
 
-class VPNMembershipPolicyInfo(PolicyDefinitionId, PolicyDefinitionInfo):
-    pass
-
-
-class VPNMembershipPolicyGetResponse(VPNMembershipPolicy, PolicyDefinitionId, PolicyDefinitionInfo):
+class VPNMembershipPolicyGetResponse(VPNMembershipPolicy, PolicyDefinitionGetResponse):
     pass
 
 
@@ -43,7 +40,7 @@ class ConfigurationPolicyVPNMembershipGroupDefinition(APIEndpoints, PolicyDefini
         ...
 
     @get("/template/policy/definition/vpnmembershipgroup", "data")
-    def get_definitions(self) -> DataSequence[VPNMembershipPolicyInfo]:
+    def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
         ...
 
     @get("/template/policy/definition/vpnmembershipgroup/{id}")

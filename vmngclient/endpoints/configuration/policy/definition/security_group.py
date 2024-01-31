@@ -6,6 +6,7 @@ from vmngclient.models.policy.definitions.security_group import SecurityGroup
 from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
+    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
@@ -17,7 +18,7 @@ class SecurityGroupEditPayload(SecurityGroup, PolicyDefinitionId):
     pass
 
 
-class SecurityGroupInfo(SecurityGroup, PolicyDefinitionId, PolicyDefinitionInfo):
+class SecurityGroupGetResponse(SecurityGroup, PolicyDefinitionGetResponse):
     pass
 
 
@@ -39,11 +40,11 @@ class ConfigurationPolicySecurityGroupDefinition(APIEndpoints, PolicyDefinitionE
         ...
 
     @get("/template/policy/definition/securitygroup", "data")
-    def get_definitions(self) -> DataSequence[SecurityGroupInfo]:
+    def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
         ...
 
     @get("/template/policy/definition/securitygroup/{id}")
-    def get_policy_definition(self, id: UUID) -> SecurityGroupInfo:
+    def get_policy_definition(self, id: UUID) -> SecurityGroupGetResponse:
         ...
 
     @post("/template/policy/definition/securitygroup/preview")
