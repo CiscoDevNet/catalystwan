@@ -11,10 +11,8 @@ from vmngclient.models.configuration.feature_profile.common import (
     FeatureProfileEditPayload,
     FeatureProfileInfo,
     GetFeatureProfilesPayload,
-    Parcel,
     ParcelCreationResponse,
     ParcelId,
-    ParcelSequence,
     SchemaTypeQuery,
 )
 from vmngclient.models.configuration.feature_profile.sdwan.transport.cellular_controller import CellularController
@@ -59,20 +57,20 @@ class TransportFeatureProfile(APIEndpoints):
     def create_management_vpn_parcel(self, profile_id: str, payload: _ParcelBase) -> ParcelCreationResponse:
         ...
 
-    @versions(supported_versions=(">=20.13"), raises=False)
-    @get("/v1/feature-profile/sdwan/transport/{profile_id}/management/vpn")
-    def get_management_vpn_parcels(self, profile_id: str) -> ParcelSequence[ManagementVPN]:
-        ...
+    # @versions(supported_versions=(">=20.13"), raises=False)
+    # @get("/v1/feature-profile/sdwan/transport/{profile_id}/management/vpn")
+    # def get_management_vpn_parcels(self, profile_id: str) -> ParcelSequence[ManagementVPN]:
+    #     ...
 
-    @versions(supported_versions=(">=20.13"), raises=False)
-    @get("/v1/feature-profile/sdwan/transport/{profile_id}/management/vpn/{parcel_id}")
-    def get_management_vpn_parcel(self, profile_id: str, parcel_id: str) -> Parcel[ManagementVPN]:
-        ...
+    # @versions(supported_versions=(">=20.13"), raises=False)
+    # @get("/v1/feature-profile/sdwan/transport/{profile_id}/management/vpn/{parcel_id}")
+    # def get_management_vpn_parcel(self, profile_id: str, parcel_id: str) -> Parcel[ManagementVPN]:
+    #     ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
     @put("/v1/feature-profile/sdwan/transport/{profile_id}/management/vpn/{parcel_id}")
     def edit_management_vpn_parcel(
-        self, profile_id: str, parcel_id: str, payload: _ParcelBase
+        self, profile_id: str, parcel_id: str, payload: ManagementVPN
     ) -> ParcelCreationResponse:
         ...
 
