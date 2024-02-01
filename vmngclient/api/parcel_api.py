@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from vmngclient.session import vManageSession
 
 from vmngclient.endpoints.configuration_feature_profile import ParcelId, SDRoutingConfigurationFeatureProfile
-from vmngclient.model.feature_profile_parcel import FullConfig, FullConfigParcel
+from vmngclient.models.feature_profile_parcel import FullConfig, FullConfigParcel
 
 
 class ParcelAPI(Protocol):

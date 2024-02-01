@@ -1,7 +1,9 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.lists import FQDNList
-from vmngclient.model.policy.policy_list import (
+from vmngclient.models.policy.lists import FQDNList
+from vmngclient.models.policy.policy_list import (
     InfoTag,
     PolicyListEndpoints,
     PolicyListId,
@@ -25,7 +27,7 @@ class ConfigurationPolicyFQDNList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/fqdn/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/fqdn")
@@ -33,11 +35,11 @@ class ConfigurationPolicyFQDNList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/fqdn/{id}")
-    def edit_policy_list(self, id: str, payload: FQDNListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: FQDNListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/fqdn/{id}")
-    def get_lists_by_id(self, id: str) -> FQDNListInfo:
+    def get_lists_by_id(self, id: UUID) -> FQDNListInfo:
         ...
 
     @get("/template/policy/list/fqdn", "data")
@@ -53,5 +55,5 @@ class ConfigurationPolicyFQDNList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/fqdn/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

@@ -2,16 +2,16 @@
 from enum import Enum
 from typing import Optional
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import MainParcel
+from vmngclient.api.configuration_groups.parcel import _ParcelBase
 from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, put, versions
-from vmngclient.model.configuration.feature_profile.common import (
+from vmngclient.models.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
     FeatureProfileCreationResponse,
     FeatureProfileInfo,
 )
-from vmngclient.model.feature_profile_parcel import FullConfigParcel
+from vmngclient.models.feature_profile_parcel import FullConfigParcel
 from vmngclient.typed_list import DataSequence
 
 
@@ -21,8 +21,7 @@ class SchemaType(str, Enum):
 
 
 class SchemaTypeQuery(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     schema_type: SchemaType = Field(alias="schemaType")
 
@@ -40,6 +39,11 @@ class ConfigurationFeatureProfile(APIEndpoints):
     @versions(supported_versions=(">=20.9"), raises=False)
     @get("/v1/feature-profile/sdwan/system/aaa/schema", resp_json_key="request")
     def get_sdwan_system_aaa_parcel_schema(self, params: SchemaTypeQuery) -> JSON:
+        ...
+
+    @versions(supported_versions=(">=20.9"), raises=False)
+    @get("/v1/feature-profile/sdwan/transport/cellular-controller/schema", resp_json_key="request")
+    def get_sdwan_transport_cellular_controller_parcel_schema(self, params: SchemaTypeQuery) -> JSON:
         ...
 
     @versions(supported_versions=(">=20.9"), raises=False)
@@ -82,7 +86,14 @@ class ConfigurationFeatureProfile(APIEndpoints):
 
     @versions(supported_versions=(">=20.9"), raises=False)
     @post("/v1/feature-profile/sdwan/system/{system_id}/aaa")
-    def create_aaa_profile_parcel_for_system(self, system_id: str, payload: MainParcel) -> ParcelId:
+    def create_aaa_profile_parcel_for_system(self, system_id: str, payload: _ParcelBase) -> ParcelId:
+        ...
+
+    @versions(supported_versions=(">=20.9"), raises=False)
+    @post("/v1/feature-profile/sdwan/transport/{transport_id}/cellular-controller")
+    def create_cellular_controller_profile_parcel_for_transport(
+        self, transport_id: str, payload: _ParcelBase
+    ) -> ParcelId:
         ...
 
 

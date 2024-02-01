@@ -1,7 +1,9 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.definitions.rule_set import RuleSet
-from vmngclient.model.policy.policy_definition import (
+from vmngclient.models.policy.definitions.rule_set import RuleSet
+from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
     PolicyDefinitionId,
@@ -25,7 +27,7 @@ class ConfigurationPolicyRuleSetDefinition(APIEndpoints, PolicyDefinitionEndpoin
         ...
 
     @delete("/template/policy/definition/ruleset/{id}")
-    def delete_policy_definition(self, id: str) -> None:
+    def delete_policy_definition(self, id: UUID) -> None:
         ...
 
     def edit_multiple_policy_definition(self):
@@ -33,7 +35,7 @@ class ConfigurationPolicyRuleSetDefinition(APIEndpoints, PolicyDefinitionEndpoin
         ...
 
     @put("/template/policy/definition/ruleset/{id}")
-    def edit_policy_definition(self, id: str, payload: RuleSetEditPayload) -> PolicyDefinitionEditResponse:
+    def edit_policy_definition(self, id: UUID, payload: RuleSetEditPayload) -> PolicyDefinitionEditResponse:
         ...
 
     @get("/template/policy/definition/ruleset", "data")
@@ -41,7 +43,7 @@ class ConfigurationPolicyRuleSetDefinition(APIEndpoints, PolicyDefinitionEndpoin
         ...
 
     @get("/template/policy/definition/ruleset/{id}")
-    def get_policy_definition(self, id: str) -> RuleSetInfo:
+    def get_policy_definition(self, id: UUID) -> RuleSetInfo:
         ...
 
     @post("/template/policy/definition/ruleset/preview")
@@ -49,7 +51,7 @@ class ConfigurationPolicyRuleSetDefinition(APIEndpoints, PolicyDefinitionEndpoin
         ...
 
     @get("/template/policy/definition/ruleset/preview/{id}")
-    def preview_policy_definition_by_id(self, id: str) -> PolicyDefinitionPreview:
+    def preview_policy_definition_by_id(self, id: UUID) -> PolicyDefinitionPreview:
         ...
 
     def save_policy_definition_in_bulk(self):

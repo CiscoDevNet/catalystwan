@@ -1,6 +1,8 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.security import (
+from vmngclient.models.policy.security import (
     AnySecurityPolicy,
     SecurityPolicyEditResponse,
     SecurityPolicyInfoRoot,
@@ -15,11 +17,11 @@ class ConfigurationSecurityTemplatePolicy(APIEndpoints):
         ...
 
     @delete("/template/policy/security/{id}")
-    def delete_security_template(self, id: str, payload: JSON = {}) -> None:
+    def delete_security_template(self, id: UUID, payload: JSON = {}) -> None:
         ...
 
     @put("/template/policy/security/{id}")
-    def edit_security_template(self, id: str, payload: AnySecurityPolicy) -> SecurityPolicyEditResponse:
+    def edit_security_template(self, id: UUID, payload: AnySecurityPolicy) -> SecurityPolicyEditResponse:
         # PUT /template/policy/security/{policyId}
         ...
 
@@ -44,7 +46,7 @@ class ConfigurationSecurityTemplatePolicy(APIEndpoints):
         ...
 
     @get("/template/policy/security/definition/{id}")
-    def get_security_template(self, id: str) -> SecurityPolicyRoot:
+    def get_security_template(self, id: UUID) -> SecurityPolicyRoot:
         ...
 
     def get_security_templates_for_device(self):

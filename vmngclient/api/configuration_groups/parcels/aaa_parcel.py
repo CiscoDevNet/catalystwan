@@ -1,9 +1,9 @@
 from enum import Enum
 from typing import List, Optional, Union
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, Global, Parcel
+from vmngclient.api.configuration_groups.parcel import Default, Global, _ParcelBase
 
 
 class ServerAuthOrder(str, Enum):
@@ -12,13 +12,13 @@ class ServerAuthOrder(str, Enum):
     TACACS = "tacacs"
 
 
-class User(Parcel):
+class User(BaseModel):
     name: str
     password: str
     privilege: str
 
 
-class RadiusServer(Parcel):
+class RadiusServer(BaseModel):
     class Config:
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
@@ -33,7 +33,7 @@ class RadiusServer(Parcel):
     retransmit: int = 3
 
 
-class Radius(Parcel):
+class Radius(BaseModel):
     class Config:
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
@@ -46,7 +46,7 @@ class Radius(Parcel):
 
 # TODO Get model from schema
 # Created only for demo purpouses
-class AAAParcel(Parcel):
+class AAAParcel(_ParcelBase):
     user: Optional[Global[List[User]]] = Field(default=None)
     authentication_group: Union[Global[bool], Default[bool]] = Field(
         default=Default(value=False), alias="authenticationGroup"

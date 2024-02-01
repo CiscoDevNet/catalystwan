@@ -1,7 +1,9 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.lists import SLAClassList
-from vmngclient.model.policy.policy_list import (
+from vmngclient.models.policy.lists import SLAClassList
+from vmngclient.models.policy.policy_list import (
     InfoTag,
     PolicyListEndpoints,
     PolicyListId,
@@ -25,7 +27,7 @@ class ConfigurationPolicySLAClassList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/sla/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/sla")
@@ -33,11 +35,11 @@ class ConfigurationPolicySLAClassList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/sla/{id}")
-    def edit_policy_list(self, id: str, payload: SLAClassListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: SLAClassListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/sla/{id}")
-    def get_lists_by_id(self, id: str) -> SLAClassListInfo:
+    def get_lists_by_id(self, id: UUID) -> SLAClassListInfo:
         ...
 
     @get("/template/policy/list/sla", "data")
@@ -53,5 +55,5 @@ class ConfigurationPolicySLAClassList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/sla/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

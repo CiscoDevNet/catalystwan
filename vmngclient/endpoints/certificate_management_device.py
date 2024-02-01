@@ -1,6 +1,8 @@
 # mypy: disable-error-code="empty-body"
 
+from enum import Enum
 from typing import List, Optional, Union
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -11,8 +13,8 @@ from vmngclient.typed_list import DataSequence
 class DeviceDeletionResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    local_delete_from_db: bool = Field(alias="localDeleteFromDB")
-    id: str
+    local_delete_from_db: Optional[bool] = Field(default=None, alias="localDeleteFromDB")
+    id: Optional[UUID] = Field(default=None)
 
 
 class TargetDevice(BaseModel):
@@ -30,7 +32,7 @@ class DeviceCsrGenerationResponse(BaseModel):
     configStatusMessageDetails: Optional[str] = Field(default=None, alias="configStatusMessageDetails")
     isPrestagingSupported: Optional[bool] = Field(default=None, alias="isPrestagingSupported")
     expirationStatus: Optional[str] = Field(default=None, alias="expirationStatus")
-    uuid: Optional[str] = Field(default=None, alias="uuid")
+    uuid: Optional[UUID] = Field(default=None, alias="uuid")
     certificateDetail: Optional[str] = Field(default=None, alias="certificateDetail")
     createdAt: Optional[str] = Field(default=None, alias="createdAt")
     password: Optional[str] = Field(default=None, alias="password")
@@ -45,7 +47,7 @@ class DeviceCsrGenerationResponse(BaseModel):
     CSRDetail: Optional[str] = Field(default=None, alias="CSRDetail")
     managementSystemIP: Optional[str] = Field(default=None, alias="managementSystemIP")
     deviceCSRGenTime: Optional[int] = Field(default=None, alias="deviceCSRGenTime")
-    volatileUUID: Optional[str] = Field(default=None, alias="volatileUUID")
+    volatileUUID: Optional[UUID] = Field(default=None, alias="volatileUUID")
     deviceLifeCycleNeeded: Optional[bool] = Field(default=None, alias="deviceLifeCycleNeeded")
     deviceState: Optional[str] = Field(default=None, alias="deviceState")
     expirationDateLong: Optional[int] = Field(default=None, alias="expirationDateLong")
@@ -87,6 +89,23 @@ class DeviceCsrGenerationResponse(BaseModel):
     site_id: Optional[str] = Field(default=None, alias="site-id")
 
 
+class Validity(str, Enum):
+    VALID = "valid"
+    INVALID = "invalid"
+
+
+class VedgeListValidityPayload(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    chasis_number: str = Field(alias="chasisNumber")
+    serial_number: Optional[str] = Field(default=None, alias="serialNumber")
+    validity: Validity = Field(default=Validity.INVALID)
+
+
+class CertActionResponse(BaseModel):
+    id: UUID
+
+
 class CertificateManagementDevice(APIEndpoints):
     @delete("/certificate/{uuid}")
     def delete_configuration(self, uuid: str) -> DeviceDeletionResponse:
@@ -94,4 +113,16 @@ class CertificateManagementDevice(APIEndpoints):
 
     @post("/certificate/generate/csr", "data")
     def generate_csr(self, payload: TargetDevice) -> DataSequence[DeviceCsrGenerationResponse]:
+        ...
+
+    @post("/certificate/save/vedge/list")
+    def change_vedge_list_validity(self, payload: List[VedgeListValidityPayload]) -> CertActionResponse:
+        ...
+
+    @post("/certificate/vedge/list?action={action}")
+    def send_to_controllers(self, action: str = "push") -> CertActionResponse:
+        ...
+
+    @post("/certificate/vsmart/list")
+    def send_to_vbond(self) -> CertActionResponse:
         ...

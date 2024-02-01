@@ -39,14 +39,13 @@ class PartitionManagerAPI:
     """
 
     def __init__(self, session: vManageSession) -> None:
-
         self.session = session
         self.repository = RepositoryAPI(self.session)
         self.device_version = DeviceVersions(self.session)
 
     def set_default_partition(self, devices: DataSequence[Device], partition: Optional[str] = None) -> Task:
         """
-        Set defualt software versions for devices
+        Set default software versions for devices
 
         Args:
             devices (DataSequence[Device]): devices
@@ -112,7 +111,6 @@ class PartitionManagerAPI:
         devices_versions_repository = self.repository.get_devices_versions_repository()
         invalid_devices = []
         for device in payload_devices:
-
             if device["version"] in (
                 devices_versions_repository[device["deviceId"]].current_version,
                 devices_versions_repository[device["deviceId"]].default_version,

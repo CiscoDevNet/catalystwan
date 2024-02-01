@@ -6,6 +6,7 @@ from typing import Optional
 from pydantic.v1 import BaseModel
 
 from vmngclient.endpoints import APIEndpoints, get
+from vmngclient.typed_list import DataSequence
 
 
 class TenancyModeEnum(str, Enum):
@@ -18,6 +19,12 @@ class TenancyMode(BaseModel):
     deploymentmode: str
     domain: Optional[str] = None
     clusterid: Optional[str] = None
+
+
+class VManageDetails(BaseModel):
+    service: str
+    enabled: bool
+    status: str
 
 
 class ClusterManagement(APIEndpoints):
@@ -65,8 +72,8 @@ class ClusterManagement(APIEndpoints):
         # GET /clusterManagement/tenantList
         ...
 
-    def get_v_manage_details(self):
-        # GET /clusterManagement/vManage/details/{vmanageIP}
+    @get("/clusterManagement/vManage/details/{vmanageIP}", "data")
+    def get_vmanage_details(self, vmanageIP: str) -> DataSequence[VManageDetails]:
         ...
 
     def health_details(self):

@@ -4,7 +4,7 @@ from typing import Dict, List, Optional
 from pydantic.v1 import BaseModel, Field
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put, versions, view
-from vmngclient.model.tenant import Tenant
+from vmngclient.models.tenant import Tenant
 from vmngclient.typed_list import DataSequence
 from vmngclient.utils.session_type import ProviderAsTenantView, ProviderView
 
