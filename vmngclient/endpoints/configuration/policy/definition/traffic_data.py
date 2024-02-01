@@ -3,11 +3,11 @@
 from uuid import UUID
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.models.policy.definitions.traffic_data import TrafficDataPolicy, TrafficDataPolicyHeader
-from vmngclient.models.policy.policy import PolicyId
+from vmngclient.models.policy.definitions.traffic_data import TrafficDataPolicy
 from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
+    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
@@ -15,15 +15,11 @@ from vmngclient.models.policy.policy_definition import (
 from vmngclient.typed_list import DataSequence
 
 
-class TrafficDataPolicyGetResponse(TrafficDataPolicy, PolicyDefinitionId):
-    pass
-
-
 class TrafficDataPolicyEditPayload(TrafficDataPolicy, PolicyDefinitionId):
     pass
 
 
-class TrafficDataPolicyInfo(TrafficDataPolicyHeader, PolicyDefinitionInfo, PolicyId):
+class TrafficDataPolicyGetResponse(TrafficDataPolicy, PolicyDefinitionGetResponse):
     pass
 
 

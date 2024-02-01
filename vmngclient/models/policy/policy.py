@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, List, Literal, Optional, Sequence
+from typing import List, Literal, Optional, Sequence
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -15,18 +15,17 @@ class NGFirewallZoneListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class AssemblyItem(BaseModel):
+class AssemblyItemBase(BaseModel):
     definition_id: UUID = Field(serialization_alias="definitionId", validation_alias="definitionId")
     type: str
-    entries: Optional[Sequence[Any]] = None
     model_config = ConfigDict(populate_by_name=True)
 
 
-class ZoneBasedFWAssemblyItem(AssemblyItem):
+class ZoneBasedFWAssemblyItem(AssemblyItemBase):
     type: Literal["zoneBasedFW"] = "zoneBasedFW"
 
 
-class NGFirewallAssemblyItem(AssemblyItem):
+class NGFirewallAssemblyItem(AssemblyItemBase):
     type: Literal["zoneBasedFW"] = "zoneBasedFW"
     entries: List[NGFirewallZoneListEntry] = []
 
@@ -34,28 +33,28 @@ class NGFirewallAssemblyItem(AssemblyItem):
         self.entries.append(NGFirewallZoneListEntry(src_zone_list_id=src_zone_id, dst_zone_list_id=dst_zone_id))
 
 
-class DNSSecurityAssemblyItem(AssemblyItem):
+class DNSSecurityAssemblyItem(AssemblyItemBase):
     type: Literal["DNSSecurity"] = "DNSSecurity"
 
 
-class IntrusionPreventionAssemblyItem(AssemblyItem):
+class IntrusionPreventionAssemblyItem(AssemblyItemBase):
     type: Literal["intrusionPrevention"] = "intrusionPrevention"
 
 
-class URLFilteringAssemblyItem(AssemblyItem):
+class URLFilteringAssemblyItem(AssemblyItemBase):
     type: Literal["urlFiltering"] = "urlFiltering"
 
 
-class AdvancedMalwareProtectionAssemblyItem(AssemblyItem):
+class AdvancedMalwareProtectionAssemblyItem(AssemblyItemBase):
     type: Literal["advancedMalwareProtection"] = "advancedMalwareProtection"
 
 
-class SSLDecryptionAssemblyItem(AssemblyItem):
+class SSLDecryptionAssemblyItem(AssemblyItemBase):
     type: Literal["sslDecryption"] = "sslDecryption"
 
 
 class PolicyDefinition(BaseModel):
-    assembly: Sequence[AssemblyItem]
+    assembly: Sequence[AssemblyItemBase] = []
 
 
 class PolicyCreationPayload(BaseModel):
@@ -66,7 +65,7 @@ class PolicyCreationPayload(BaseModel):
         description="Can include only alpha-numeric characters, hyphen '-' or underscore '_'; maximum 127 characters",
     )
     policy_description: str = Field(
-        "Default description", serialization_alias="policyDescription", validation_alias="policyDescription"
+        default="default description", serialization_alias="policyDescription", validation_alias="policyDescription"
     )
     policy_type: str = Field(serialization_alias="policyType", validation_alias="policyType")
     policy_definition: PolicyDefinition = Field(

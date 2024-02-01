@@ -1,6 +1,6 @@
 from enum import Enum
 from ipaddress import IPv4Address, IPv4Network, IPv6Network
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Set
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, field_validator, model_validator
@@ -49,6 +49,12 @@ class ColorGroupPreference(BaseModel):
 
     color_preference: str = Field(serialization_alias="colorPreference", validation_alias="colorPreference")
     path_preference: PathPreferenceEnum = Field(serialization_alias="pathPreference", validation_alias="pathPreference")
+
+    @staticmethod
+    def from_color_set_and_path(
+        color_preference: Set[TLOCColorEnum], path_preference: PathPreferenceEnum
+    ) -> "ColorGroupPreference":
+        return ColorGroupPreference(color_preference=" ".join(color_preference), path_preference=path_preference)
 
 
 class FallbackBestTunnel(BaseModel):

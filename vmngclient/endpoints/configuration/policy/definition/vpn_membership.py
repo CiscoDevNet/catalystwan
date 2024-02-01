@@ -2,10 +2,11 @@
 from uuid import UUID
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.models.policy.definitions.vpn_membership import VPNMembershipGroup
+from vmngclient.models.policy.definitions.vpn_membership import VPNMembershipPolicy
 from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
+    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
@@ -13,21 +14,17 @@ from vmngclient.models.policy.policy_definition import (
 from vmngclient.typed_list import DataSequence
 
 
-class VPNMembershipGroupEditPayload(VPNMembershipGroup, PolicyDefinitionId):
+class VPNMembershipPolicyEditPayload(VPNMembershipPolicy, PolicyDefinitionId):
     pass
 
 
-class VPNMembershipGroupInfo(PolicyDefinitionId, PolicyDefinitionInfo):
-    pass
-
-
-class VPNMembershipGroupGetResponse(VPNMembershipGroup, PolicyDefinitionId, PolicyDefinitionInfo):
+class VPNMembershipPolicyGetResponse(VPNMembershipPolicy, PolicyDefinitionGetResponse):
     pass
 
 
 class ConfigurationPolicyVPNMembershipGroupDefinition(APIEndpoints, PolicyDefinitionEndpoints):
     @post("/template/policy/definition/vpnmembershipgroup")
-    def create_policy_definition(self, payload: VPNMembershipGroup) -> PolicyDefinitionId:
+    def create_policy_definition(self, payload: VPNMembershipPolicy) -> PolicyDefinitionId:
         ...
 
     @delete("/template/policy/definition/vpnmembershipgroup/{id}")
@@ -39,19 +36,19 @@ class ConfigurationPolicyVPNMembershipGroupDefinition(APIEndpoints, PolicyDefini
         ...
 
     @put("/template/policy/definition/vpnmembershipgroup/{id}")
-    def edit_policy_definition(self, id: UUID, payload: VPNMembershipGroupEditPayload) -> PolicyDefinitionEditResponse:
+    def edit_policy_definition(self, id: UUID, payload: VPNMembershipPolicyEditPayload) -> PolicyDefinitionEditResponse:
         ...
 
     @get("/template/policy/definition/vpnmembershipgroup", "data")
-    def get_definitions(self) -> DataSequence[VPNMembershipGroupInfo]:
+    def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
         ...
 
     @get("/template/policy/definition/vpnmembershipgroup/{id}")
-    def get_policy_definition(self, id: UUID) -> VPNMembershipGroupGetResponse:
+    def get_policy_definition(self, id: UUID) -> VPNMembershipPolicyGetResponse:
         ...
 
     @post("/template/policy/definition/vpnmembershipgroup/preview")
-    def preview_policy_definition(self, payload: VPNMembershipGroup) -> PolicyDefinitionPreview:
+    def preview_policy_definition(self, payload: VPNMembershipPolicy) -> PolicyDefinitionPreview:
         ...
 
     @get("/template/policy/definition/vpnmembershipgroup/preview/{id}")

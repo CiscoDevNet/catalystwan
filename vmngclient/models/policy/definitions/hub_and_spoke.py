@@ -51,11 +51,15 @@ class HubAndSpokePolicy(PolicyDefinitionBase):
         return HubAndSpokePolicy(name=name, definition=HubAndSpokePolicyDefinition(vpn_list=vpn_list))
 
     def add_hub_and_spoke(
-        self, name: str, hub_lists: List[UUID], spoke_lists: List[UUID], advertise_tloc_list: Optional[UUID] = None
+        self,
+        name: str,
+        hub_site_lists: List[UUID],
+        spoke_site_lists: List[UUID],
+        advertise_tloc_list: Optional[UUID] = None,
     ) -> HubAndSpokePolicySubDefinition:
         # supports basic configuration with equal preference
-        hubs = [Hub(site_list=hub_site_id) for hub_site_id in hub_lists]
-        spokes = [Spoke(site_list=spoke_site_id, hubs=hubs.copy()) for spoke_site_id in spoke_lists]
+        hubs = [Hub(site_list=hub_site_id) for hub_site_id in hub_site_lists]
+        spokes = [Spoke(site_list=spoke_site_id, hubs=hubs.copy()) for spoke_site_id in spoke_site_lists]
         sub_definition = HubAndSpokePolicySubDefinition(
             name=name,
             equal_preference=True,

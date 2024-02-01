@@ -68,7 +68,7 @@ class QoSMapDefinition(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class QoSMap(PolicyDefinitionBase):
+class QoSMapPolicy(PolicyDefinitionBase):
     type: Literal["qosMap"] = "qosMap"
     definition: QoSMapDefinition = QoSMapDefinition(qos_schedulers=[])
     model_config = ConfigDict(populate_by_name=True)

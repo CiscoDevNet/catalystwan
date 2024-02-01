@@ -2,10 +2,11 @@
 from uuid import UUID
 
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.models.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy, ZoneBasedFWPolicyHeader
+from vmngclient.models.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy
 from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
+    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
@@ -13,15 +14,11 @@ from vmngclient.models.policy.policy_definition import (
 from vmngclient.typed_list import DataSequence
 
 
-class ZoneBasedFWPolicyGetResponse(ZoneBasedFWPolicy, PolicyDefinitionId):
-    pass
-
-
 class ZoneBasedFWPolicyEditPayload(ZoneBasedFWPolicy, PolicyDefinitionId):
     pass
 
 
-class ZoneBasedFWPolicyInfo(ZoneBasedFWPolicyHeader, PolicyDefinitionInfo):
+class ZoneBasedFWPolicyGetResponse(ZoneBasedFWPolicy, PolicyDefinitionGetResponse):
     pass
 
 
@@ -43,7 +40,7 @@ class ConfigurationPolicyZoneBasedFirewallDefinition(APIEndpoints, PolicyDefinit
         ...
 
     @get("/template/policy/definition/zonebasedfw", "data")
-    def get_definitions(self) -> DataSequence[ZoneBasedFWPolicyInfo]:
+    def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
         ...
 
     @get("/template/policy/definition/zonebasedfw/{id}")

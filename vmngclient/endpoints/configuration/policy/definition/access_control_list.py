@@ -6,6 +6,7 @@ from vmngclient.models.policy.definitions.access_control_list import AclPolicy
 from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
+    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
@@ -17,11 +18,7 @@ class AclPolicyEditPayload(AclPolicy, PolicyDefinitionId):
     pass
 
 
-class AclPolicyInfo(AclPolicy, PolicyDefinitionId, PolicyDefinitionInfo):
-    pass
-
-
-class AclPolicyGetResponse(AclPolicy, PolicyDefinitionId, PolicyDefinitionInfo):
+class AclPolicyGetResponse(AclPolicy, PolicyDefinitionGetResponse):
     pass
 
 
@@ -43,7 +40,7 @@ class ConfigurationPolicyAclDefinition(APIEndpoints, PolicyDefinitionEndpoints):
         ...
 
     @get("/template/policy/definition/acl", "data")
-    def get_definitions(self) -> DataSequence[AclPolicyInfo]:
+    def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
         ...
 
     @get("/template/policy/definition/acl/{id}")

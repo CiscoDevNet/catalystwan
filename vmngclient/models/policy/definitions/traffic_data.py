@@ -125,7 +125,7 @@ class TrafficDataPolicySequence(PolicyDefinitionSequenceBase):
     def match_dscp(self, dscp: int) -> None:
         self._insert_match(DSCPEntry(value=str(dscp)))
 
-    def match_packet_lengths(self, packet_lengths: Tuple[int, int]) -> None:
+    def match_packet_length(self, packet_lengths: Tuple[int, int]) -> None:
         self._insert_match(PacketLengthEntry.from_range(packet_lengths))
 
     def match_low_plp(self) -> None:

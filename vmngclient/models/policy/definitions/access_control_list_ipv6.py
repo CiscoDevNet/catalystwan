@@ -79,7 +79,7 @@ class AclIPv6PolicySequence(PolicyDefinitionSequenceBase):
     def match_next_header(self, next_header: int) -> None:
         self._insert_match(NextHeaderEntry(value=str(next_header)))
 
-    def match_packet_lengths(self, packet_lengths: Tuple[int, int]) -> None:
+    def match_packet_length(self, packet_lengths: Tuple[int, int]) -> None:
         self._insert_match(PacketLengthEntry.from_range(packet_lengths))
 
     def match_low_plp(self) -> None:

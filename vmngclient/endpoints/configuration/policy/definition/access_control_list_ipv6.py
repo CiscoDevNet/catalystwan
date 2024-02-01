@@ -6,6 +6,7 @@ from vmngclient.models.policy.definitions.access_control_list_ipv6 import AclIPv
 from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
+    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
@@ -17,11 +18,7 @@ class AclIPv6PolicyEditPayload(AclIPv6Policy, PolicyDefinitionId):
     pass
 
 
-class AclIPv6PolicyInfo(AclIPv6Policy, PolicyDefinitionId, PolicyDefinitionInfo):
-    pass
-
-
-class AclIPv6PolicyGetResponse(AclIPv6Policy, PolicyDefinitionId, PolicyDefinitionInfo):
+class AclIPv6PolicyGetResponse(AclIPv6Policy, PolicyDefinitionGetResponse):
     pass
 
 
@@ -43,7 +40,7 @@ class ConfigurationPolicyAclIPv6Definition(APIEndpoints, PolicyDefinitionEndpoin
         ...
 
     @get("/template/policy/definition/aclv6", "data")
-    def get_definitions(self) -> DataSequence[AclIPv6PolicyInfo]:
+    def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
         ...
 
     @get("/template/policy/definition/aclv6/{id}")

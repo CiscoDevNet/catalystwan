@@ -6,6 +6,7 @@ from vmngclient.models.policy.definitions.device_access import DeviceAccessPolic
 from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
+    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
@@ -17,11 +18,7 @@ class DeviceAccessPolicyEditPayload(DeviceAccessPolicy, PolicyDefinitionId):
     pass
 
 
-class DeviceAccessPolicyInfo(DeviceAccessPolicy, PolicyDefinitionId, PolicyDefinitionInfo):
-    pass
-
-
-class DeviceAccessPolicyGetResponse(DeviceAccessPolicy, PolicyDefinitionId, PolicyDefinitionInfo):
+class DeviceAccessPolicyGetResponse(DeviceAccessPolicy, PolicyDefinitionGetResponse):
     pass
 
 
@@ -43,7 +40,7 @@ class ConfigurationPolicyDeviceAccessDefinition(APIEndpoints, PolicyDefinitionEn
         ...
 
     @get("/template/policy/definition/deviceaccesspolicy", "data")
-    def get_definitions(self) -> DataSequence[DeviceAccessPolicyInfo]:
+    def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
         ...
 
     @get("/template/policy/definition/deviceaccesspolicy/{id}")

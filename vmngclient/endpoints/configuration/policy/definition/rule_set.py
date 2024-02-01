@@ -6,6 +6,7 @@ from vmngclient.models.policy.definitions.rule_set import RuleSet
 from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
+    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
@@ -17,7 +18,7 @@ class RuleSetEditPayload(RuleSet, PolicyDefinitionId):
     pass
 
 
-class RuleSetInfo(RuleSet, PolicyDefinitionId, PolicyDefinitionInfo):
+class RuleSetGetResponse(RuleSet, PolicyDefinitionGetResponse):
     pass
 
 
@@ -39,11 +40,11 @@ class ConfigurationPolicyRuleSetDefinition(APIEndpoints, PolicyDefinitionEndpoin
         ...
 
     @get("/template/policy/definition/ruleset", "data")
-    def get_definitions(self) -> DataSequence[RuleSetInfo]:
+    def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
         ...
 
     @get("/template/policy/definition/ruleset/{id}")
-    def get_policy_definition(self, id: UUID) -> RuleSetInfo:
+    def get_policy_definition(self, id: UUID) -> RuleSetGetResponse:
         ...
 
     @post("/template/policy/definition/ruleset/preview")

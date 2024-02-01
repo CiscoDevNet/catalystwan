@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, field_validator
 
-from vmngclient.models.policy.policy import AssemblyItem, PolicyCreationPayload, PolicyDefinition, PolicyInfo
+from vmngclient.models.policy.policy import AssemblyItemBase, PolicyCreationPayload, PolicyDefinition, PolicyInfo
 
 LocalizedPolicySupportedItemType = Literal[
     "qosMap",
@@ -59,7 +59,7 @@ class LocalizedPolicySettings(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class LocalizedPolicyAssemblyItem(AssemblyItem):
+class LocalizedPolicyAssemblyItem(AssemblyItemBase):
     type: LocalizedPolicySupportedItemType
     definition_id: UUID = Field(serialization_alias="definitionId", validation_alias="definitionId")
     model_config = ConfigDict(populate_by_name=True)

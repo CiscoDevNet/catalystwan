@@ -7,8 +7,6 @@ from pydantic import BaseModel, Field
 from vmngclient.models.policy.lists import AnyPolicyList
 from vmngclient.typed_list import DataSequence
 
-PolicyList = AnyPolicyList
-
 
 class InfoTag(BaseModel):
     info_tag: Optional[str] = Field("", alias="infoTag")
@@ -33,13 +31,13 @@ class PolicyListPreview(BaseModel):
 
 
 class PolicyListEndpoints(Protocol):
-    def create_policy_list(self, payload: PolicyList) -> PolicyListId:
+    def create_policy_list(self, payload: AnyPolicyList) -> PolicyListId:
         ...
 
     def delete_policy_list(self, id: UUID) -> None:
         ...
 
-    def edit_policy_list(self, id: UUID, payload: PolicyList) -> None:
+    def edit_policy_list(self, id: UUID, payload: AnyPolicyList) -> None:
         ...
 
     def get_lists_by_id(self, id: UUID) -> PolicyListInfo:

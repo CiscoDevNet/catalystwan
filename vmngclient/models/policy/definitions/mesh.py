@@ -7,6 +7,7 @@ from vmngclient.models.policy.policy_definition import PolicyDefinitionBase
 
 
 class Region(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     name: str
     site_lists: List[UUID] = Field(validation_alias="siteLists", serialization_alias="siteLists")
 

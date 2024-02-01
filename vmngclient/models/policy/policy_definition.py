@@ -620,10 +620,13 @@ class ClassMapListEntry(BaseModel):
 
 
 class ServiceEntryValue(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     type: ServiceTypeEnum
     vpn: str
     tloc: Optional[TLOCEntryValue] = None
-    tloc_list: Optional[TLOCListEntry]
+    tloc_list: Optional[TLOCListEntry] = Field(
+        default=None, validation_alias="tlocList", serialization_alias="tlocList"
+    )
 
     @model_validator(mode="after")
     def tloc_xor_tloc_list(self):
@@ -712,7 +715,7 @@ class LossProtectionAction(BaseModel):
 class LossProtectionFECAction(BaseModel):
     type: Literal["lossProtectFec"] = "lossProtectFec"
     parameter: LossProtectionEnum = LossProtectionEnum.FEC_ALWAYS
-    value: Optional[str] = Field(default=None, description="BETA")
+    value: Optional[str] = Field(default=None, description="BETA number in range 1-5")
 
 
 class LossProtectionPacketDuplicationAction(BaseModel):
@@ -938,6 +941,10 @@ class PolicyDefinitionSequenceBase(BaseModel):
     def _get_match_entries_by_field(self, field: str) -> Sequence[MatchEntry]:
         return [entry for entry in self.match.entries if entry.field == field]
 
+    def _remove_match(self, match_type: Any) -> None:
+        if isinstance(self.match.entries, MutableSequence):
+            self.match.entries[:] = [entry for entry in self.match.entries if type(entry) != match_type]
+
     def _insert_match(self, match: MatchEntry, insert_field_check: bool = True) -> int:
         # inserts new item or replaces item with same field name if found
         if insert_field_check:
@@ -1082,28 +1089,19 @@ class PolicyDefinitionBase(BaseModel):
     type: str
     mode: Optional[str] = None
     optimized: Optional[Optimized] = Optimized.FALSE
-    definition: Any = None
 
 
-class PolicyDefinitionInfo(PolicyDefinitionBase):
+class PolicyDefinitionInfo(PolicyDefinitionBase, PolicyDefinitionId):
     last_updated: datetime.datetime = Field(serialization_alias="lastUpdated", validation_alias="lastUpdated")
     owner: str
     reference_count: int = Field(serialization_alias="referenceCount", validation_alias="referenceCount")
     references: List[PolicyReference]
 
 
-class PolicyDefinitionCreationPayload(PolicyDefinitionBase):
-    definition: DefinitionWithSequencesCommonBase
-
-
-class PolicyDefinitionGetResponse(PolicyDefinitionCreationPayload, PolicyDefinitionId):
+class PolicyDefinitionGetResponse(PolicyDefinitionInfo):
     is_activated_by_vsmart: bool = Field(
         serialization_alias="isActivatedByVsmart", validation_alias="isActivatedByVsmart"
     )
-
-
-class PolicyDefinitionEditPayload(PolicyDefinitionCreationPayload, PolicyDefinitionId):
-    pass
 
 
 class PolicyDefinitionEditResponse(BaseModel):
