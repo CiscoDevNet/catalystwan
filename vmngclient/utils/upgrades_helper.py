@@ -65,7 +65,7 @@ def validate_personality_homogeneity(devices: DataSequence[Device]):
         )
 
 
-class SoftwarePackageUpdatePayload(CustomPayloadType):
+class SoftwarePackageUploadPayload(CustomPayloadType):
     def __init__(self, image_path: str):
         encoder = MultipartEncoder(
             fields={"file": (PurePath(image_path).name, open(image_path, "rb"), "application/x-gzip")}

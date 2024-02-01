@@ -1,7 +1,9 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.lists import GeoLocationList
-from vmngclient.model.policy.policy_list import (
+from vmngclient.models.policy.lists import GeoLocationList
+from vmngclient.models.policy.policy_list import (
     InfoTag,
     PolicyListEndpoints,
     PolicyListId,
@@ -25,7 +27,7 @@ class ConfigurationPolicyGeoLocationList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/geolocation/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/geolocation")
@@ -33,11 +35,11 @@ class ConfigurationPolicyGeoLocationList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/geolocation/{id}")
-    def edit_policy_list(self, id: str, payload: GeoLocationListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: GeoLocationListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/geolocation/{id}")
-    def get_lists_by_id(self, id: str) -> GeoLocationListInfo:
+    def get_lists_by_id(self, id: UUID) -> GeoLocationListInfo:
         ...
 
     @get("/template/policy/list/geolocation", "data")
@@ -53,5 +55,5 @@ class ConfigurationPolicyGeoLocationList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/geolocation/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

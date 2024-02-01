@@ -1,7 +1,9 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.lists import SiteList
-from vmngclient.model.policy.policy_list import (
+from vmngclient.models.policy.lists import SiteList
+from vmngclient.models.policy.policy_list import (
     InfoTag,
     PolicyListEndpoints,
     PolicyListId,
@@ -29,7 +31,7 @@ class ConfigurationPolicySiteList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/site/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/site")
@@ -37,11 +39,11 @@ class ConfigurationPolicySiteList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/site/{id}")
-    def edit_policy_list(self, id: str, payload: SiteListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: SiteListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/site/{id}")
-    def get_lists_by_id(self, id: str) -> SiteListInfo:
+    def get_lists_by_id(self, id: UUID) -> SiteListInfo:
         ...
 
     @get("/template/policy/list/site", "data")
@@ -57,5 +59,5 @@ class ConfigurationPolicySiteList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/site/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

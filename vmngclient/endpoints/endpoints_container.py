@@ -7,12 +7,20 @@ from vmngclient.endpoints.certificate_management_device import CertificateManage
 from vmngclient.endpoints.certificate_management_vmanage import CertificateManagementVManage
 from vmngclient.endpoints.client import Client
 from vmngclient.endpoints.cluster_management import ClusterManagement
-from vmngclient.endpoints.configuration.feature_profile.sdwan.service import (
-    ServiceFeatureProfile as SDWANServiceFeatureProfile,
+from vmngclient.endpoints.configuration.device.software_update import ConfigurationDeviceSoftwareUpdate
+from vmngclient.endpoints.configuration.disaster_recovery import ConfigurationDisasterRecovery
+from vmngclient.endpoints.configuration.feature_profile.sdwan.transport import TransportFeatureProfile
+from vmngclient.endpoints.configuration.policy.definition.access_control_list import ConfigurationPolicyAclDefinition
+from vmngclient.endpoints.configuration.policy.definition.access_control_list_ipv6 import (
+    ConfigurationPolicyAclIPv6Definition,
 )
-from vmngclient.endpoints.configuration.feature_profile.sdwan.transport import (
-    TransportFeatureProfile as SDWANTransportFeatureProfile,
+from vmngclient.endpoints.configuration.policy.definition.control import ConfigurationPolicyControlDefinition
+from vmngclient.endpoints.configuration.policy.definition.device_access import ConfigurationPolicyDeviceAccessDefinition
+from vmngclient.endpoints.configuration.policy.definition.device_access_ipv6 import (
+    ConfigurationPolicyDeviceAccessIPv6Definition,
 )
+from vmngclient.endpoints.configuration.policy.definition.hub_and_spoke import ConfigurationPolicyHubAndSpokeDefinition
+from vmngclient.endpoints.configuration.policy.definition.mesh import ConfigurationPolicyMeshDefinition
 from vmngclient.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition
 from vmngclient.endpoints.configuration.policy.definition.rewrite import ConfigurationPolicyRewriteRuleDefinition
 from vmngclient.endpoints.configuration.policy.definition.rule_set import ConfigurationPolicyRuleSetDefinition
@@ -20,6 +28,9 @@ from vmngclient.endpoints.configuration.policy.definition.security_group import 
     ConfigurationPolicySecurityGroupDefinition,
 )
 from vmngclient.endpoints.configuration.policy.definition.traffic_data import ConfigurationPolicyDataDefinition
+from vmngclient.endpoints.configuration.policy.definition.vpn_membership import (
+    ConfigurationPolicyVPNMembershipGroupDefinition,
+)
 from vmngclient.endpoints.configuration.policy.definition.zone_based_firewall import (
     ConfigurationPolicyZoneBasedFirewallDefinition,
 )
@@ -44,6 +55,7 @@ from vmngclient.endpoints.configuration.policy.list.port import ConfigurationPol
 from vmngclient.endpoints.configuration.policy.list.preferred_color_group import ConfigurationPreferredColorGroupList
 from vmngclient.endpoints.configuration.policy.list.prefix import ConfigurationPolicyPrefixList
 from vmngclient.endpoints.configuration.policy.list.protocol_name import ConfigurationPolicyProtocolNameList
+from vmngclient.endpoints.configuration.policy.list.region import ConfigurationPolicyRegionList
 from vmngclient.endpoints.configuration.policy.list.site import ConfigurationPolicySiteList
 from vmngclient.endpoints.configuration.policy.list.sla import ConfigurationPolicySLAClassList
 from vmngclient.endpoints.configuration.policy.list.tloc import ConfigurationPolicyTLOCList
@@ -54,10 +66,10 @@ from vmngclient.endpoints.configuration.policy.list.zone import ConfigurationPol
 from vmngclient.endpoints.configuration.policy.security_template import ConfigurationSecurityTemplatePolicy
 from vmngclient.endpoints.configuration.policy.vedge_template import ConfigurationVEdgeTemplatePolicy
 from vmngclient.endpoints.configuration.policy.vsmart_template import ConfigurationVSmartTemplatePolicy
+from vmngclient.endpoints.configuration.software_actions import ConfigurationSoftwareActions
 from vmngclient.endpoints.configuration_dashboard_status import ConfigurationDashboardStatus
 from vmngclient.endpoints.configuration_device_actions import ConfigurationDeviceActions
 from vmngclient.endpoints.configuration_device_inventory import ConfigurationDeviceInventory
-from vmngclient.endpoints.configuration_device_software_update import ConfigurationDeviceSoftwareUpdate
 from vmngclient.endpoints.configuration_device_template import ConfigurationDeviceTemplate
 from vmngclient.endpoints.configuration_feature_profile import (
     ConfigurationFeatureProfile,
@@ -102,6 +114,7 @@ class ConfigurationPolicyListContainer:
         self.preferred_color_group = ConfigurationPreferredColorGroupList(session)
         self.prefix = ConfigurationPolicyPrefixList(session)
         self.protocol_name = ConfigurationPolicyProtocolNameList(session)
+        self.region = ConfigurationPolicyRegionList(session)
         self.site = ConfigurationPolicySiteList(session)
         self.sla = ConfigurationPolicySLAClassList(session)
         self.tloc = ConfigurationPolicyTLOCList(session)
@@ -119,6 +132,14 @@ class ConfigurationPolicyDefinitionContainer:
         self.zone_based_firewall = ConfigurationPolicyZoneBasedFirewallDefinition(session)
         self.qos_map = ConfigurationPolicyQoSMapDefinition(session)
         self.rewrite = ConfigurationPolicyRewriteRuleDefinition(session)
+        self.control = ConfigurationPolicyControlDefinition(session)
+        self.vpn_membership = ConfigurationPolicyVPNMembershipGroupDefinition(session)
+        self.hub_and_spoke = ConfigurationPolicyHubAndSpokeDefinition(session)
+        self.mesh = ConfigurationPolicyMeshDefinition(session)
+        self.acl = ConfigurationPolicyAclDefinition(session)
+        self.acl_ipv6 = ConfigurationPolicyAclIPv6Definition(session)
+        self.device_access = ConfigurationPolicyDeviceAccessDefinition(session)
+        self.device_access_ipv6 = ConfigurationPolicyDeviceAccessIPv6Definition(session)
 
 
 class ConfigurationPolicyContainer:
@@ -132,8 +153,7 @@ class ConfigurationPolicyContainer:
 
 class ConfigurationSDWANFeatureProfileContainer:
     def __init__(self, session: vManageSession):
-        self.service = SDWANServiceFeatureProfile(client=session)
-        self.transport = SDWANTransportFeatureProfile(client=session)
+        self.transport = TransportFeatureProfile(client=session)
 
 
 class ConfigurationFeatureProfileContainer:
@@ -169,6 +189,8 @@ class APIEndpointContainter:
         self.configuration_device_software_update = ConfigurationDeviceSoftwareUpdate(session)
         self.configuration_device_template = ConfigurationDeviceTemplate(session)
         self.configuration_settings = ConfigurationSettings(session)
+        self.configuration_software_actions = ConfigurationSoftwareActions(session)
+        self.configuration_disaster_recovery = ConfigurationDisasterRecovery(session)
         self.monitoring_device_details = MonitoringDeviceDetails(session)
         self.monitoring_status = MonitoringStatus(session)
         self.sdavc_cloud_connector = SDAVCCloudConnector(session)

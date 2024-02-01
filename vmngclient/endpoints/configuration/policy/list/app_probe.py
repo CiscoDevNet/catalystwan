@@ -1,7 +1,9 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.lists import AppProbeClassList
-from vmngclient.model.policy.policy_list import (
+from vmngclient.models.policy.lists import AppProbeClassList
+from vmngclient.models.policy.policy_list import (
     InfoTag,
     PolicyListEndpoints,
     PolicyListId,
@@ -25,7 +27,7 @@ class ConfigurationPolicyAppProbeClassList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/appprobe/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/appprobe")
@@ -33,11 +35,11 @@ class ConfigurationPolicyAppProbeClassList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/appprobe/{id}")
-    def edit_policy_list(self, id: str, payload: AppProbeClassListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: AppProbeClassListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/appprobe/{id}")
-    def get_lists_by_id(self, id: str) -> AppProbeClassListInfo:
+    def get_lists_by_id(self, id: UUID) -> AppProbeClassListInfo:
         ...
 
     @get("/template/policy/list/appprobe", "data")
@@ -53,5 +55,5 @@ class ConfigurationPolicyAppProbeClassList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/appprobe/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

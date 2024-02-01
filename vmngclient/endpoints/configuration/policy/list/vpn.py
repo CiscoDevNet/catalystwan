@@ -1,9 +1,11 @@
 # mypy: disable-error-code="empty-body"
 
 
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.lists import VPNList
-from vmngclient.model.policy.policy_list import (
+from vmngclient.models.policy.lists import VPNList
+from vmngclient.models.policy.policy_list import (
     InfoTag,
     PolicyListEndpoints,
     PolicyListId,
@@ -27,7 +29,7 @@ class ConfigurationPolicyVPNList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/vpn/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/vpn")
@@ -35,11 +37,11 @@ class ConfigurationPolicyVPNList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/vpn/{id}")
-    def edit_policy_list(self, id: str, payload: VPNListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: VPNListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/vpn/{id}")
-    def get_lists_by_id(self, id: str) -> VPNListInfo:
+    def get_lists_by_id(self, id: UUID) -> VPNListInfo:
         ...
 
     @get("/template/policy/list/vpn", "data")
@@ -55,5 +57,5 @@ class ConfigurationPolicyVPNList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/vpn/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

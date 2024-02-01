@@ -1,7 +1,9 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.lists import MirrorList
-from vmngclient.model.policy.policy_list import (
+from vmngclient.models.policy.lists import MirrorList
+from vmngclient.models.policy.policy_list import (
     InfoTag,
     PolicyListEndpoints,
     PolicyListId,
@@ -25,7 +27,7 @@ class ConfigurationPolicyMirrorList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/mirror/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/mirror")
@@ -33,11 +35,11 @@ class ConfigurationPolicyMirrorList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/mirror/{id}")
-    def edit_policy_list(self, id: str, payload: MirrorListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: MirrorListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/mirror/{id}")
-    def get_lists_by_id(self, id: str) -> MirrorListInfo:
+    def get_lists_by_id(self, id: UUID) -> MirrorListInfo:
         ...
 
     @get("/template/policy/list/mirror", "data")
@@ -53,5 +55,5 @@ class ConfigurationPolicyMirrorList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/mirror/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

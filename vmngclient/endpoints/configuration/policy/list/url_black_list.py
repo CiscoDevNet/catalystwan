@@ -1,7 +1,9 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.lists import URLBlackList
-from vmngclient.model.policy.policy_list import (
+from vmngclient.models.policy.lists import URLBlackList
+from vmngclient.models.policy.policy_list import (
     InfoTag,
     PolicyListEndpoints,
     PolicyListId,
@@ -25,7 +27,7 @@ class ConfigurationPolicyURLBlackList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/urlblacklist/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/urlblacklist")
@@ -33,11 +35,11 @@ class ConfigurationPolicyURLBlackList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/urlblacklist/{id}")
-    def edit_policy_list(self, id: str, payload: URLBlackListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: URLBlackListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/urlblacklist/{id}")
-    def get_lists_by_id(self, id: str) -> URLBlackListInfo:
+    def get_lists_by_id(self, id: UUID) -> URLBlackListInfo:
         ...
 
     @get("/template/policy/list/urlblacklist", "data")
@@ -53,5 +55,5 @@ class ConfigurationPolicyURLBlackList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/urlblacklist/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

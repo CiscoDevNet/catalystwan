@@ -1,7 +1,9 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.lists import URLWhiteList
-from vmngclient.model.policy.policy_list import (
+from vmngclient.models.policy.lists import URLWhiteList
+from vmngclient.models.policy.policy_list import (
     InfoTag,
     PolicyListEndpoints,
     PolicyListId,
@@ -25,7 +27,7 @@ class ConfigurationPolicyURLWhiteList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @delete("/template/policy/list/urlwhitelist/{id}")
-    def delete_policy_list(self, id: str) -> None:
+    def delete_policy_list(self, id: UUID) -> None:
         ...
 
     @delete("/template/policy/list/urlwhitelist")
@@ -33,11 +35,11 @@ class ConfigurationPolicyURLWhiteList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/urlwhitelist/{id}")
-    def edit_policy_list(self, id: str, payload: URLWhiteListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: URLWhiteListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/urlwhitelist/{id}")
-    def get_lists_by_id(self, id: str) -> URLWhiteListInfo:
+    def get_lists_by_id(self, id: UUID) -> URLWhiteListInfo:
         ...
 
     @get("/template/policy/list/urlwhitelist", "data")
@@ -53,5 +55,5 @@ class ConfigurationPolicyURLWhiteList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @get("/template/policy/list/urlwhitelist/preview/{id}")
-    def preview_policy_list_by_id(self, id: str) -> PolicyListPreview:
+    def preview_policy_list_by_id(self, id: UUID) -> PolicyListPreview:
         ...

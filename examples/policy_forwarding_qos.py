@@ -62,14 +62,14 @@ def run_demo(args: CmdArguments):
                 +-------------------+-------+
         """
         logger.info("I. Map Each Forwarding Class to an Output Queue")
-        from vmngclient.model.policy.lists import ClassMapList
+        from vmngclient.models.policy.lists import ClassMapList
 
         pol_dict = {}  # this variable will hold a dictionary of created policy references by names used in examples
         for i, name in enumerate(
             ["VOICE", "CRITICAL_DATA", "BULK", "DEFAULT", "INTERACTIVE_VIDEO", "CONTROL_SIGNALING"]
         ):
             class_map = ClassMapList(name=name)
-            class_map.add_queue(i)
+            class_map.assign_queue(i)
             pol_dict[name] = api.lists.create(class_map)
 
         """ II.A. Configure Localized Policy: Enable Cloud QoS
@@ -83,7 +83,7 @@ def run_demo(args: CmdArguments):
             and select the Cloud QoS Service side checkbox to enable QoS on the service side.
         """
         logger.info("II.A. Configure Localized Policy: Enable Cloud QoS")
-        from vmngclient.model.policy.localized import LocalizedPolicy
+        from vmngclient.models.policy.localized import LocalizedPolicy
 
         loc_pol = LocalizedPolicy(policy_name="My-Localized-Policy", policy_description="desc text")
         loc_pol.policy_definition.settings.cloud_qos = True
@@ -115,7 +115,7 @@ def run_demo(args: CmdArguments):
             10. Click Save Policy.
         """
         logger.info("II.B. Configure Localized Policy: Configure QoS Scheduler")
-        from vmngclient.model.policy.definitions.qos_map import QoSMap
+        from vmngclient.models.policy.definitions.qos_map import QoSMap
 
         qos_map = QoSMap(name="My-QosMap-Policy")
         qos_map.add_scheduler(queue=1, class_map_ref=pol_dict["CRITICAL_DATA"], bandwidth=30, buffer=30)
@@ -160,7 +160,7 @@ def run_demo(args: CmdArguments):
             13. Click Save Policy Changes to save the changes to the localized master policy.
         """
         logger.info("II.C. Configure Localized Policy: Create Re-write Policy")
-        from vmngclient.model.policy.definitions.rewrite import RewritePolicy
+        from vmngclient.models.policy.definitions.rewrite import RewritePolicy
 
         rw_pol = RewritePolicy(name="My-Rewrite-Policy")
         rw_pol.add_rule(class_map_ref=pol_dict["BULK"], plp="low", dscp=10, l2cos=1)
@@ -234,8 +234,8 @@ def run_demo(args: CmdArguments):
                 b. Click Save Data Policy.
         """
         logger.info("V. Define Centralized Traffic Data QoS Policy to Classify Traffic into Proper Queue")
-        from vmngclient.model.policy.centralized import CentralizedPolicy
-        from vmngclient.model.policy.definitions.traffic_data import TrafficDataPolicy
+        from vmngclient.models.policy.centralized import CentralizedPolicy
+        from vmngclient.models.policy.definitions.traffic_data import TrafficDataPolicy
 
         centralized_pol = CentralizedPolicy(policy_name="My-Centralized-Policy")
         data_pol = TrafficDataPolicy(name="My-Traffic-Data-Policy")
@@ -258,7 +258,7 @@ def run_demo(args: CmdArguments):
         logger.info("VI. Apply Centralized Policy ...")
         pol_application = centralized_pol.add_traffic_data_policy(pol_dict["My-Traffic-Data-Policy"])
 
-        from vmngclient.model.policy.lists import SiteList, VPNList
+        from vmngclient.models.policy.lists import SiteList, VPNList
 
         site_list = SiteList(name="My-Site-List")
         site_list.add_sites({4, 5})

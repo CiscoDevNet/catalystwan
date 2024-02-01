@@ -105,7 +105,7 @@ class UsersAPI:
             new_password (str): New password for given user
         """
         update_password_request = UserUpdateRequest(
-            userName=username, password=new_password, currentUserPassword=self.session.password
+            username=username, password=new_password, current_user_password=self.session.password
         )  # type: ignore
         self._endpoints.update_password(username, update_password_request)
 
@@ -115,7 +115,7 @@ class UsersAPI:
         Args:
             username (str): Name of the user to be unlocked
         """
-        self._endpoints.reset_user(UserResetRequest(userName=username))
+        self._endpoints.reset_user(UserResetRequest(username=username))
 
     def delete(self, username: str):
         """Deletes given user
@@ -204,7 +204,7 @@ class ResourceGroupsAPI:
         Args:
             resource_group_name (str): Name of resource group to switch view
         """
-        switch_request = ResourceGroupSwitchRequest(resourceGroupName=resource_group_name)
+        switch_request = ResourceGroupSwitchRequest(resource_group_name=resource_group_name)
         self._endpoints.switch_resource_group(switch_request)
 
     def delete(self, resource_group_id: str):

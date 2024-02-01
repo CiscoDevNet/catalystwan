@@ -15,7 +15,7 @@ from vmngclient.endpoints.tenant_management import (
     vSmartTenantCapacity,
     vSmartTenantMap,
 )
-from vmngclient.model.tenant import Tenant
+from vmngclient.models.tenant import Tenant
 from vmngclient.typed_list import DataSequence
 
 
@@ -96,13 +96,13 @@ class TenantManagementAPITest(unittest.TestCase):
 
     def test_delete(self):
         tenant_id_list = ["1"]
-        password = "password"
+        password = "password"  # pragma: allowlist secret
         task = self.api.delete(tenant_id_list, password)
         self.assertIsInstance(task, Task)
 
     def test_delete_auto_password(self):
         tenant_id_list = ["1"]
-        self.session.password = "p4s$w0rD"
+        self.session.password = "p4s$w0rD"  # pragma: allowlist secret
         task = self.api.delete(tenant_id_list)
         self.assertIsInstance(task, Task)
 

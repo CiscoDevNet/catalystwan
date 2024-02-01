@@ -6,6 +6,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Dict, List, Literal, Optional, Union
 from unittest.mock import MagicMock
+from uuid import UUID, uuid4
 
 import pytest  # type: ignore
 from packaging.version import Version  # type: ignore
@@ -828,7 +829,23 @@ class TestAPIEndpoints(unittest.TestCase):
         # Assert
         self.session_mock.request.assert_called_once_with("GET", self.base_path + "/v1/data/orange", data="not a fruit")
 
-    def test_request_decorator_raises_when_format_url_is_not_str_subtype(self):
+    def test_request_decorator_format_url_with_uuid(self):
+        test_uuid = uuid4()
+
+        class TestAPI(APIEndpoints):
+            @request("GET", "/v1/data/{id}")
+            def get_data(self, id: UUID, payload: str) -> None:  # type: ignore [empty-body]
+                ...
+
+        api = TestAPI(self.session_mock)
+        # Act
+        api.get_data(test_uuid, "not a fruit")
+        # Assert
+        self.session_mock.request.assert_called_once_with(
+            "GET", self.base_path + f"/v1/data/{test_uuid}", data="not a fruit"
+        )
+
+    def test_request_decorator_raises_when_format_url_is_not_uuid_or_str_subtype(self):
         with self.assertRaises(APIEndpointError):
 
             class FruitEnum(Enum):

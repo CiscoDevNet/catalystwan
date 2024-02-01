@@ -10,7 +10,7 @@ from packaging.version import Version  # type: ignore
 from vmngclient.api.task_status_api import Task, TaskResult
 from vmngclient.endpoints.tenant_migration import ImportInfo, MigrationFile, MigrationTokenQueryParams
 from vmngclient.exceptions import TenantMigrationExportFileNotFound
-from vmngclient.model.tenant import TenantExport
+from vmngclient.models.tenant import TenantExport
 
 logger = logging.getLogger(__name__)
 

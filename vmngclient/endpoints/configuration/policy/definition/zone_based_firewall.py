@@ -1,7 +1,9 @@
 # mypy: disable-error-code="empty-body"
+from uuid import UUID
+
 from vmngclient.endpoints import APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy, ZoneBasedFWPolicyHeader
-from vmngclient.model.policy.policy_definition import (
+from vmngclient.models.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy, ZoneBasedFWPolicyHeader
+from vmngclient.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,
     PolicyDefinitionId,
@@ -29,7 +31,7 @@ class ConfigurationPolicyZoneBasedFirewallDefinition(APIEndpoints, PolicyDefinit
         ...
 
     @delete("/template/policy/definition/zonebasedfw/{id}")
-    def delete_policy_definition(self, id: str) -> None:
+    def delete_policy_definition(self, id: UUID) -> None:
         ...
 
     def edit_multiple_policy_definition(self):
@@ -37,7 +39,7 @@ class ConfigurationPolicyZoneBasedFirewallDefinition(APIEndpoints, PolicyDefinit
         ...
 
     @put("/template/policy/definition/zonebasedfw/{id}")
-    def edit_policy_definition(self, id: str, payload: ZoneBasedFWPolicyEditPayload) -> PolicyDefinitionEditResponse:
+    def edit_policy_definition(self, id: UUID, payload: ZoneBasedFWPolicyEditPayload) -> PolicyDefinitionEditResponse:
         ...
 
     @get("/template/policy/definition/zonebasedfw", "data")
@@ -45,7 +47,7 @@ class ConfigurationPolicyZoneBasedFirewallDefinition(APIEndpoints, PolicyDefinit
         ...
 
     @get("/template/policy/definition/zonebasedfw/{id}")
-    def get_policy_definition(self, id: str) -> ZoneBasedFWPolicyGetResponse:
+    def get_policy_definition(self, id: UUID) -> ZoneBasedFWPolicyGetResponse:
         ...
 
     @post("/template/policy/definition/zonebasedfw/preview")
@@ -53,7 +55,7 @@ class ConfigurationPolicyZoneBasedFirewallDefinition(APIEndpoints, PolicyDefinit
         ...
 
     @get("/template/policy/definition/zonebasedfw/preview/{id}")
-    def preview_policy_definition_by_id(self, id: str) -> PolicyDefinitionPreview:
+    def preview_policy_definition_by_id(self, id: UUID) -> PolicyDefinitionPreview:
         ...
 
     def save_policy_definition_in_bulk(self):

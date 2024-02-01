@@ -1,14 +1,14 @@
 from typing import List, Literal, Optional, Union
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, Global, Parcel, Variable
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable, as_global
 
 IPV4Address = str
 IPv6Address = str
 
 
-class DNSIPv4(Parcel):
+class DNSIPv4(BaseModel):
     primary_dns_address_ipv4: Union[Default[None], Global[str], Variable] = Field(
         default=Default[None](value=None), alias="primaryDnsAddressIpv4"
     )
@@ -17,7 +17,7 @@ class DNSIPv4(Parcel):
     )
 
 
-class DNSIPv6(Parcel):
+class DNSIPv6(BaseModel):
     primary_dns_address_ipv6: Union[Default[None], Global[str], Variable] = Field(
         default=Default[None](value=None), alias="primaryDnsAddressIpv6"
     )
@@ -26,28 +26,24 @@ class DNSIPv6(Parcel):
     )
 
 
-class HostMapping(Parcel):
+class HostMapping(BaseModel):
     host_name: Union[Global[str], Variable] = Field(alias="hostName")
-    list_of_ips: Union[Global[list[str]], Variable] = Field(alias="listOfIp")
+    list_of_ips: Union[Global[List[str]], Variable] = Field(alias="listOfIp")
 
 
-class NextHop(Parcel):
+class NextHop(BaseModel):
     address: Union[Global[str], Variable] = Field()
-    distance: Union[Default[int], Global[int], Default[int]] = Field(
-        default=Default[int](value=1)
-    )
+    distance: Union[Default[int], Global[int], Default[int]] = Field(default=Default[int](value=1))
 
 
-class IPv4Prefix(Parcel):
+class IPv4Prefix(BaseModel):
     ip_address: Union[Global[IPV4Address], Variable] = Field()
     subnet_mask: Union[Global[str], Variable] = Field()
 
 
-class WANIPv4StaticRoute(Parcel):
+class WANIPv4StaticRoute(BaseModel):
     prefix: IPv4Prefix = Field()
-    gateway: Global[Literal["nextHop", "null0", "dhcp"]] = Field(
-        default=Global(value="nextHop"), alias="gateway"
-    )
+    gateway: Global[Literal["nextHop", "null0", "dhcp"]] = Field(default=Global(value="nextHop"), alias="gateway")
     next_hops: Optional[List[NextHop]] = Field(default_factory=list, alias="nextHop")
     distance: Optional[Global[int]] = Field(default=None, alias="distance")
 
@@ -57,7 +53,7 @@ class WANIPv4StaticRoute(Parcel):
         next_hops: Optional[List[NextHop]] = None,
     ):
         if prefix is not None:
-            self.prefix = prefix
+            self.prefix = as_global(prefix)
         self.gateway = Global[Literal["nextHop", "null0", "dhcp"]](value="nextHop")
         self.next_hops = next_hops or []
         self.distance = None
@@ -87,27 +83,25 @@ class WANIPv4StaticRoute(Parcel):
         self.distance = None
 
 
-class NextHopContainer(Parcel):
-    next_hop: list[NextHop] = Field(default=[], alias="nextHop")
+class NextHopContainer(BaseModel):
+    next_hop: List[NextHop] = Field(default=[], alias="nextHop")
 
 
-class Ipv6StaticRouteNull0(Parcel):
+class Ipv6StaticRouteNull0(BaseModel):
     null0: Union[Default[bool], Global[bool]] = Field(default=Default[bool](value=True))
 
 
-class IPv6StaticRouteNextHop(Parcel):
+class IPv6StaticRouteNextHop(BaseModel):
     next_hop_container: Optional[NextHopContainer] = Field(default=None)
 
 
-class IPv6StaticRouteNAT(Parcel):
+class IPv6StaticRouteNAT(BaseModel):
     nat: Union[Variable, Global[Literal["NAT64", "NAT66"]]] = Field()
 
 
-class WANIPv6StaticRoute(Parcel):
+class WANIPv6StaticRoute(BaseModel):
     prefix: Global[IPv6Address] = Field()
-    gateway: Union[
-        Ipv6StaticRouteNull0, IPv6StaticRouteNextHop, IPv6StaticRouteNAT
-    ] = Field(alias="oneOfIpRoute")
+    gateway: Union[Ipv6StaticRouteNull0, IPv6StaticRouteNextHop, IPv6StaticRouteNAT] = Field(alias="oneOfIpRoute")
 
     def set_to_next_hop(
         self,
@@ -115,18 +109,17 @@ class WANIPv6StaticRoute(Parcel):
         next_hops: Optional[List[NextHop]] = None,
     ):
         if prefix is not None:
-            self.prefix = prefix
-        self.gateway = IPv6StaticRouteNextHop(
-            next_hop_container=NextHopContainer(next_hops=next_hops)
-        )
+            self.prefix = as_global(prefix)
+        if next_hops:
+            self.gateway = IPv6StaticRouteNextHop(next_hop_container=NextHopContainer(nextHop=next_hops))
 
     def set_to_null0(
         self,
         prefix: Optional[IPv6Address] = None,
-        enabled: Union[Default[bool], Global[bool]] = None,
+        enabled: Union[Default[bool], Global[bool], None] = None,
     ):
         if prefix is not None:
-            self.prefix = prefix
+            self.prefix = as_global(prefix)
         if enabled is None:
             enabled = Default[bool](value=True)
         self.gateway = Ipv6StaticRouteNull0(null0=enabled)
@@ -137,8 +130,9 @@ class WANIPv6StaticRoute(Parcel):
         nat: Union[Variable, Global[Literal["NAT64", "NAT66"]]],
     ):
         if prefix is not None:
-            self.prefix = prefix
+            self.prefix = as_global(prefix)
         self.gateway = IPv6StaticRouteNAT(nat=nat)
 
-class WANService(Parcel):
+
+class WANService(BaseModel):
     service_type: Global[Literal["TE"]] = Field(alias="serviceType")

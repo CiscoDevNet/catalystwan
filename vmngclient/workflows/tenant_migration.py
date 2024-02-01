@@ -10,7 +10,7 @@ from packaging.version import Version  # type: ignore
 from vmngclient.api.tenant_migration_api import TenantMigrationAPI
 from vmngclient.endpoints.troubleshooting_tools.device_connectivity import NPingRequest
 from vmngclient.exceptions import TenantMigrationPreconditionsError
-from vmngclient.model.tenant import TenantExport
+from vmngclient.models.tenant import TenantExport
 from vmngclient.session import create_vManageSession, vManageSession
 from vmngclient.utils.personality import Personality
 from vmngclient.utils.session_type import SessionType

@@ -1,9 +1,10 @@
 # mypy: disable-error-code="empty-body"
 from enum import Enum
+from typing import List
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, Field, RootModel
 
-from vmngclient.endpoints import APIEndpoints, get
+from vmngclient.endpoints import APIEndpoints, get, put
 from vmngclient.typed_list import DataSequence
 
 
@@ -14,29 +15,60 @@ class StatusEnum(str, Enum):
     custom = "custom"
 
 
+index_name_field = Field(..., alias="indexName", pattern="^[a-z]+$")
+
+
 class Status(BaseModel):
-    index_name: str = Field(alias="indexName")
+    index_name: str = index_name_field
     status: StatusEnum
     display_name: str = Field(alias="displayName")
 
 
+class UpdateStatus(BaseModel):
+    index_name: str = index_name_field
+    status: StatusEnum
+
+
+class EnabledIndex(BaseModel):
+    index_name: str = index_name_field
+
+
+SingleList = RootModel[List[str]]  # trick to make endpoint return list of strings
+
+
+class DisabledDeviceList(SingleList):
+    pass
+
+
+class DisabledDeviceListResponse(SingleList):
+    pass
+
+
+class UpdateIndexResponse(BaseModel):
+    response: bool
+
+
+class EnabledIndexDeviceListResponse(SingleList):
+    pass
+
+
 class MonitoringStatus(APIEndpoints):
-    def get_disabled_device_list(self):
-        # GET /statistics/settings/disable/devicelist/{indexName}
+    @get("/statistics/settings/disable/devicelist/{indexName}")
+    def get_disabled_device_list(self, indexName: str) -> DisabledDeviceListResponse:
         ...
 
-    def get_enabled_index_for_device(self):
-        # GET /statistics/settings/status/device
+    @put("/statistics/settings/disable/devicelist/{indexName}", "response")
+    def update_statistics_device_list(self, indexName: str, payload: DisabledDeviceList) -> UpdateIndexResponse:
         ...
 
     @get("/statistics/settings/status")
     def get_statistics_settings(self) -> DataSequence[Status]:
         ...
 
-    def update_statistics_device_list(self):
-        # PUT /statistics/settings/disable/devicelist/{indexName}
+    @put("/statistics/settings/status")
+    def update_statistics_settings(self, payload: List[UpdateStatus]) -> DataSequence[Status]:
         ...
 
-    def update_statistics_settings(self):
-        # PUT /statistics/settings/status
+    @get("/statistics/settings/status/device")
+    def get_enabled_index_for_device(self, params: dict) -> EnabledIndexDeviceListResponse:
         ...

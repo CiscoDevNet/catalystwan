@@ -1,15 +1,17 @@
 # mypy: disable-error-code="empty-body"
 
+from uuid import UUID
+
 from pydantic.v1 import BaseModel, Field, IPvAnyAddress
 
 from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, put
-from vmngclient.model.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
-from vmngclient.model.policy.policy import PolicyId
+from vmngclient.models.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
+from vmngclient.models.policy.policy import PolicyId
 from vmngclient.typed_list import DataSequence
 
 
 class VSmartConnectivityStatus(BaseModel):
-    device_uuid: str = Field(alias="deviceUUID")
+    device_uuid: UUID = Field(alias="deviceUUID")
     operation_mode: str = Field(alias="operationMode")
     device_ip: IPvAnyAddress = Field(alias="deviceIp")
     local_system_ip: IPvAnyAddress = Field(alias="local-system-ip")
@@ -21,13 +23,13 @@ class AutoConfirm(BaseModel):
 
 
 class ActivateDeactivateTaskId(BaseModel):
-    id: str
+    id: UUID
 
 
 class ConfigurationVSmartTemplatePolicy(APIEndpoints):
     @post("/template/policy/vsmart/activate/{id}")
     def activate_policy(
-        self, id: str, params: AutoConfirm = AutoConfirm(), payload: JSON = {}
+        self, id: UUID, params: AutoConfirm = AutoConfirm(), payload: JSON = {}
     ) -> ActivateDeactivateTaskId:
         ...
 
@@ -45,20 +47,20 @@ class ConfigurationVSmartTemplatePolicy(APIEndpoints):
 
     @post("/template/policy/vsmart/deactivate/{id}")
     def deactivate_policy(
-        self, id: str, params: AutoConfirm = AutoConfirm(), payload: JSON = {}
+        self, id: UUID, params: AutoConfirm = AutoConfirm(), payload: JSON = {}
     ) -> ActivateDeactivateTaskId:
         ...
 
     @delete("/template/policy/vsmart/{id}")
-    def delete_vsmart_template(self, id: str) -> None:
+    def delete_vsmart_template(self, id: UUID) -> None:
         ...
 
     @put("/template/policy/vsmart/central/{id}")
-    def edit_template_without_lock_checks(self, id: str, payload: CentralizedPolicyEditPayload) -> JSON:
+    def edit_template_without_lock_checks(self, id: UUID, payload: CentralizedPolicyEditPayload) -> JSON:
         ...
 
     @put("/template/policy/vsmart/{id}")
-    def edit_vsmart_template(self, id: str, payload: CentralizedPolicyEditPayload) -> JSON:
+    def edit_vsmart_template(self, id: UUID, payload: CentralizedPolicyEditPayload) -> JSON:
         ...
 
     @get("/template/policy/vsmart", "data")
@@ -66,7 +68,7 @@ class ConfigurationVSmartTemplatePolicy(APIEndpoints):
         ...
 
     @get("/template/policy/vsmart/definition/{id}")
-    def get_template_by_policy_id(self, id: str) -> CentralizedPolicy:
+    def get_template_by_policy_id(self, id: UUID) -> CentralizedPolicy:
         ...
 
     def qosmos_nbar_migration_warning(self):
