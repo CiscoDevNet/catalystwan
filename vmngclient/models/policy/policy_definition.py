@@ -715,7 +715,7 @@ class LossProtectionAction(BaseModel):
 class LossProtectionFECAction(BaseModel):
     type: Literal["lossProtectFec"] = "lossProtectFec"
     parameter: LossProtectionEnum = LossProtectionEnum.FEC_ALWAYS
-    value: Optional[str] = Field(default=None, description="BETA")
+    value: Optional[str] = Field(default=None, description="BETA number in range 1-5")
 
 
 class LossProtectionPacketDuplicationAction(BaseModel):

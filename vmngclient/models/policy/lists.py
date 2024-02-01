@@ -11,6 +11,7 @@ from vmngclient.models.policy.lists_entries import (
     AppProbeClassListEntry,
     ASPathListEntry,
     ClassMapListEntry,
+    ColorGroupPreference,
     ColorListEntry,
     CommunityListEntry,
     DataIPv6PrefixListEntry,
@@ -23,6 +24,7 @@ from vmngclient.models.policy.lists_entries import (
     LocalAppListEntry,
     LocalDomainListEntry,
     MirrorListEntry,
+    PathPreferenceEnum,
     PolicerExceedAction,
     PolicerListEntry,
     PortListEntry,
@@ -277,6 +279,28 @@ class TLOCList(PolicyListBase):
 class PreferredColorGroupList(PolicyListBase):
     type: Literal["preferredColorGroup"] = "preferredColorGroup"
     entries: List[PreferredColorGroupListEntry] = []
+
+    def assign_color_groups(
+        self,
+        primary: Tuple[Set[TLOCColorEnum], PathPreferenceEnum],
+        secondary: Optional[Tuple[Set[TLOCColorEnum], PathPreferenceEnum]] = None,
+        tertiary: Optional[Tuple[Set[TLOCColorEnum], PathPreferenceEnum]] = None,
+    ) -> PreferredColorGroupListEntry:
+        primary_preference = ColorGroupPreference.from_color_set_and_path(*primary)
+        secondary_preference = (
+            ColorGroupPreference.from_color_set_and_path(*secondary) if secondary is not None else None
+        )
+        tertiary_preference = ColorGroupPreference.from_color_set_and_path(*tertiary) if tertiary is not None else None
+        entry = PreferredColorGroupListEntry(
+            primary_preference=primary_preference,
+            secondary_preference=secondary_preference,
+            tertiary_preference=tertiary_preference,
+        )
+        if self.entries:
+            self.entries[0] = entry
+        else:
+            self.entries.append(entry)
+        return entry
 
 
 class PrefixList(PolicyListBase):

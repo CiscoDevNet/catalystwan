@@ -91,6 +91,7 @@ AnyControlPolicyTLOCSequenceMatchEntry = Annotated[
         SiteListEntry,
         RegionEntry,
         RegionListEntry,
+        RoleEntry,
         TLOCListEntry,
         TLOCEntry,
     ],
