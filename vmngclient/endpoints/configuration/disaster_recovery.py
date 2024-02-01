@@ -1,9 +1,9 @@
 # mypy: disable-error-code="empty-body"
 from ipaddress import IPv4Address
-from typing import List
+from typing import List, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, RootModel
 
 from vmngclient.endpoints import APIEndpoints, get, post
 from vmngclient.typed_list import DataSequence
@@ -22,6 +22,10 @@ class DeregisterDisasterRecoveryTaskId(DisasterRecoveryTaskId):
 
 
 class ActivateDisasterRecoveryTaskId(DisasterRecoveryTaskId):
+    ...
+
+
+class UnpauseDisasterRecoveryTaskId(DisasterRecoveryTaskId):
     ...
 
 
@@ -90,6 +94,53 @@ class DisasterRecoveryRegisterPayload(BaseModel):
     vbonds: List[VbondPayload]
 
 
+class DisasterRecoveryStatusInformation(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    pause_replication: bool = Field(serialization_alias="pauseReplication", validation_alias="pauseReplication")
+    pause_dr: bool = Field(serialization_alias="pauseDR", validation_alias="pauseDR")
+    dr_enabled: bool = Field(serialization_alias="drenabled", validation_alias="drenabled")
+
+
+class DisasterRecoveryStatusResponse(BaseModel):
+    dr_status: Union[DisasterRecoveryStatusInformation, None] = Field(
+        serialization_alias="drStatus", validation_alias="drStatus"
+    )
+
+
+class DisasterRecoveryScheduleResponse(BaseModel):
+    schedule: DisasterRecoverySettings
+
+
+class RemoteDataCentervManageVersionResponse(RootModel):
+    root: list
+
+
+class RemoteDataCenterDetails(BaseModel):
+    name: str
+    ip: IPv4Address
+    uuid: UUID
+    serialno: str
+    state: str
+
+
+class DisasterRecoveryDataCenterStatus(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    dc_personality: str = Field(serialization_alias="dcPersonality", validation_alias="dcPersonality")
+    management_ip: IPv4Address = Field(serialization_alias="mgmtIPAddress", validation_alias="mgmtIPAddress")
+
+
+class LastestLocalHistory(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    last_switch: int = Field(serialization_alias="lastSwitch", validation_alias="lastSwitch")
+    reason_for_switch: Union[str, None] = Field(
+        serialization_alias="reasonForSwitch", validation_alias="reasonForSwitch"
+    )
+    updated_primary: Union[str, None] = Field(serialization_alias="updatedPrimary", validation_alias="updatedPrimary")
+
+
 class ConfigurationDisasterRecovery(APIEndpoints):
     @post("/disasterrecovery/activate")
     def activate(self) -> ActivateDisasterRecoveryTaskId:
@@ -143,13 +194,13 @@ class ConfigurationDisasterRecovery(APIEndpoints):
     def get_details(self) -> DisasterRecoveryDetailsResponse:
         ...
 
-    # def get_disaster_recovery_local_replication_schedule(self) -> None:
-    #     # GET /disasterrecovery/schedule
-    #     ...
+    @get("/disasterrecovery/schedule")
+    def get_disaster_recovery_local_replication_schedule(self) -> DisasterRecoveryScheduleResponse:
+        ...
 
-    # def get_disaster_recovery_status(self) -> None:
-    #     # GET /disasterrecovery/drstatus
-    #     ...
+    @get("/disasterrecovery/drstatus")
+    def get_disaster_recovery_status(self) -> DataSequence[DisasterRecoveryDataCenterStatus]:
+        ...
 
     # def get_history(self) -> None:
     #     # GET /disasterrecovery/history
@@ -159,29 +210,29 @@ class ConfigurationDisasterRecovery(APIEndpoints):
     #     # GET /disasterrecovery/localdc
     #     ...
 
-    # def get_local_history(self) -> None:
-    #     # GET /disasterrecovery/localLatestHistory
-    #     ...
+    @get("/disasterrecovery/localLatestHistory")
+    def get_local_history(self) -> LastestLocalHistory:
+        ...
 
     @post("/disasterrecovery/validateNodes")
     def get_reachability_info(self, payload: List[ValidateNodePayload]) -> DataSequence[ValidatedNodeEntry]:
         ...
 
-    # def get_remote_data_center_state(self) -> None:
-    #     # GET /disasterrecovery/remotedc
-    #     ...
+    @get("/disasterrecovery/remotedc")
+    def get_remote_data_center_details(self) -> DataSequence[RemoteDataCenterDetails]:
+        ...
 
-    # def get_remote_data_center_version(self) -> None:
-    #     # GET /disasterrecovery/remotedc/swversion
-    #     ...
+    @get("/disasterrecovery/remotedc/swversion")
+    def get_remote_data_center_version(self) -> RemoteDataCentervManageVersionResponse:
+        ...
 
     # def get_remote_dc_members_state(self) -> None:
     #     # GET /disasterrecovery/remoteDcState
     #     ...
 
-    # def getdr_status(self) -> None:
-    #     # GET /disasterrecovery/status
-    #     ...
+    @get("/disasterrecovery/status")
+    def get_dr_status(self) -> DisasterRecoveryStatusResponse:
+        ...
 
     @post("/disasterrecovery/pause")
     def pause_dr(self) -> DisasterRecoveryPauseResponse:
@@ -211,9 +262,9 @@ class ConfigurationDisasterRecovery(APIEndpoints):
     #     # POST /disasterrecovery/dbrestore
     #     ...
 
-    # def unpause_dr(self) -> None:
-    #     # POST /disasterrecovery/unpause
-    #     ...
+    @post("/disasterrecovery/unpause")
+    def unpause_dr(self) -> UnpauseDisasterRecoveryTaskId:
+        ...
 
     # def unpause_local_arbitrator(self) -> None:
     #     # POST /disasterrecovery/unpauseLocalArbitrator
