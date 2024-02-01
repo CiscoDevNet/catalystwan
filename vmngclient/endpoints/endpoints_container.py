@@ -9,6 +9,7 @@ from vmngclient.endpoints.client import Client
 from vmngclient.endpoints.cluster_management import ClusterManagement
 from vmngclient.endpoints.configuration.device.software_update import ConfigurationDeviceSoftwareUpdate
 from vmngclient.endpoints.configuration.disaster_recovery import ConfigurationDisasterRecovery
+from vmngclient.endpoints.configuration.feature_profile.sdwan.transport import TransportFeatureProfile
 from vmngclient.endpoints.configuration.policy.definition.access_control_list import ConfigurationPolicyAclDefinition
 from vmngclient.endpoints.configuration.policy.definition.access_control_list_ipv6 import (
     ConfigurationPolicyAclIPv6Definition,
@@ -152,7 +153,7 @@ class ConfigurationPolicyContainer:
 
 class ConfigurationSDWANFeatureProfileContainer:
     def __init__(self, session: vManageSession):
-        pass
+        self.transport = TransportFeatureProfile(client=session)
 
 
 class ConfigurationFeatureProfileContainer:

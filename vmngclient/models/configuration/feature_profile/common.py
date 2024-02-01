@@ -143,3 +143,10 @@ class ParcelId(BaseModel):
 class GetFeatureProfilesPayload(BaseModel):
     limit: Optional[int]
     offset: Optional[int]
+
+
+class ParcelSequence(BaseModel, Generic[T]):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    header: Header
+    data: List[Parcel[T]]
