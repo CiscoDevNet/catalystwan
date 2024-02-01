@@ -3,8 +3,9 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, DefaultWitoutValue, Global, RefId, Variable
-from vmngclient.model.configuration.feature_profile.common import Prefix
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
+from vmngclient.models.configuration.common import RefId
+from vmngclient.models.configuration.feature_profile.common import Prefix
 
 
 class NetworkType(str, Enum):
@@ -49,9 +50,9 @@ class Ospfv3InterfaceParametres(BaseModel):
     retransmit_interval: Optional[Union[Global[int], Variable, Default[int]]] = Field(
         alias="retransmitInterval", default=None
     )
-    cost: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = None
+    cost: Optional[Union[Global[int], Variable, Default[None]]] = None
     priority: Optional[Union[Global[int], Variable, Default[int]]] = None
-    network_type: Optional[Union[Global[NetworkType], Variable, DefaultWitoutValue]] = Field(
+    network_type: Optional[Union[Global[NetworkType], Variable, Default[None]]] = Field(
         alias="networkType", default=None
     )
     passive_interface: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
@@ -65,14 +66,14 @@ class SummaryRouteIPv6(BaseModel):
 
     network: Union[Global[str], Variable]
     no_advertise: Union[Global[bool], Variable, Default[bool]] = Field(alias="noAdvertise")
-    cost: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = None
+    cost: Optional[Union[Global[int], Variable, Default[None]]] = None
 
 
 class SummaryRoute(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     network: Optional[Prefix] = None
-    cost: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = None
+    cost: Optional[Union[Global[int], Variable, Default[None]]] = None
     no_advertise: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(alias="noAdvertise", default=None)
 
 
@@ -102,7 +103,7 @@ class NormalArea(BaseModel):
 class DefaultArea(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    area_type: DefaultWitoutValue = Field(alias="areaType", default=DefaultWitoutValue())
+    area_type: Default[None] = Field(alias="areaType", default=Default[None](value=None))
 
 
 class Ospfv3IPv4Area(BaseModel):
@@ -167,14 +168,14 @@ class RedistributedRoute(BaseModel):
 
     protocol: Union[Global[RedistributeProtocol], Variable]
     nat_dia: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(alias="natDia", default=None)
-    route_policy: Optional[Union[DefaultWitoutValue, RefId[str]]] = Field(alias="routePolicy", default=None)
+    route_policy: Optional[Union[Default[None], RefId]] = Field(alias="routePolicy", default=None)
 
 
 class RedistributedRouteIPv6(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     protocol: Union[Global[RedistributeProtocolIPv6], Variable]
-    route_policy: Optional[Union[DefaultWitoutValue, RefId[str]]] = Field(alias="routePolicy", default=None)
+    route_policy: Optional[Union[Default[None], RefId]] = Field(alias="routePolicy", default=None)
 
 
 class DefaultOriginate(BaseModel):
@@ -182,8 +183,8 @@ class DefaultOriginate(BaseModel):
 
     originate: Union[Global[bool], Default[bool]]
     always: Optional[Union[Global[bool], Variable, Default[bool]]] = None
-    metric: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = None
-    metricType: Optional[Union[Global[MetricType], Variable, DefaultWitoutValue]] = None
+    metric: Optional[Union[Global[str], Variable, Default[None]]] = None
+    metricType: Optional[Union[Global[MetricType], Variable, Default[None]]] = None
 
 
 class SpfTimers(BaseModel):
@@ -205,14 +206,14 @@ class AdvancedOspfv3Attributes(BaseModel):
     )
     default_originate: Optional[DefaultOriginate] = Field(alias="defaultOriginate", default=None)
     spf_timers: Optional[SpfTimers] = Field(alias="spfTimers", default=None)
-    policy_name: Optional[Union[DefaultWitoutValue, RefId[str]]] = Field(alias="policyName", default=None)
+    policy_name: Optional[Union[Default[None], RefId]] = Field(alias="policyName", default=None)
     filter: Optional[Union[Global[bool], Variable, Default[bool]]] = None
 
 
 class BasicOspfv3Attributes(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    router_id: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(alias="routerId", default=None)
+    router_id: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="routerId", default=None)
     distance: Optional[Union[Global[int], Variable, Default[int]]] = None
     external_distance: Optional[Union[Global[int], Variable, Default[int]]] = Field(
         alias="externalDistance", default=None

@@ -3,7 +3,8 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, Global, RefId
+from vmngclient.api.configuration_groups.parcel import Default, Global
+from vmngclient.models.configuration.common import RefId
 
 
 class Action(str, Enum):
@@ -27,31 +28,31 @@ class StandardCommunityList(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     criteria: Union[Global[Criteria], Default[Criteria]] = Default[Criteria](value=Criteria.OR)
-    standard_community_list: List[RefId[str]] = Field(alias="standardCommunityList")
+    standard_community_list: List[RefId] = Field(alias="standardCommunityList")
 
 
 class ExpandedCommunityList(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    expanded_community_list: RefId[str] = Field(alias="expandedCommunityList")
+    expanded_community_list: RefId = Field(alias="expandedCommunityList")
 
 
 class RoutePolicyMatch(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    as_path_list: Optional[RefId[str]] = Field(alias="asPathList", default=None)
+    as_path_list: Optional[RefId] = Field(alias="asPathList", default=None)
     community_list: Optional[Union[StandardCommunityList, ExpandedCommunityList]] = Field(
         alias="communityList", default=None
     )
-    ext_community_list: Optional[RefId[str]] = Field(alias="extCommunityList", default=None)
+    ext_community_list: Optional[RefId] = Field(alias="extCommunityList", default=None)
     bgp_local_preference: Optional[Global[int]] = Field(alias="bgpLocalPreference", default=None)
     metric: Optional[Global[int]] = None
     omp_tag: Optional[Global[int]] = Field(alias="ompTag", default=None)
     ospf_tag: Optional[Global[int]] = Field(alias="ospfTag", default=None)
-    ipv4_address: Optional[RefId[str]] = Field(alias="ipv4Address", default=None)
-    ipv4_nexthop: Optional[RefId[str]] = Field(alias="ipv4NextHop", default=None)
-    ipv6_address: Optional[RefId[str]] = Field(alias="ipv6Address", default=None)
-    ipv6_nexthop: Optional[RefId[str]] = Field(alias="ipv6NextHop", default=None)
+    ipv4_address: Optional[RefId] = Field(alias="ipv4Address", default=None)
+    ipv4_nexthop: Optional[RefId] = Field(alias="ipv4NextHop", default=None)
+    ipv6_address: Optional[RefId] = Field(alias="ipv6Address", default=None)
+    ipv6_nexthop: Optional[RefId] = Field(alias="ipv6NextHop", default=None)
 
 
 class MetricType(str, Enum):

@@ -3,14 +3,15 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, DefaultWitoutValue, Global, RefId, Variable
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
+from vmngclient.models.configuration.common import RefId
 
 
 class LocalConfig(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     local: Union[Global[bool], Variable, Default[bool]] = Default[bool](value=False)
-    threshold: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = DefaultWitoutValue()
+    threshold: Optional[Union[Global[int], Variable, Default[None]]] = Default[None](value=None)
 
 
 class MulticastBasicAttributes(BaseModel):
@@ -24,8 +25,8 @@ class StaticJoin(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     group_address: Union[Global[str], Variable] = Field(alias="groupAddress")
-    source_address: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(
-        alias="sourceAddress", default=DefaultWitoutValue()
+    source_address: Optional[Union[Global[str], Variable, Default[None]]] = Field(
+        alias="sourceAddress", default=Default[None](value=None)
     )
 
 
@@ -47,7 +48,7 @@ class SmmFlag(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     enable_ssm_flag: Global[bool] = Global[bool](value=True)
-    range: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = DefaultWitoutValue()
+    range: Optional[Union[Global[str], Variable, Default[None]]] = Default[None](value=None)
 
 
 class SptThreshold(str, Enum):
@@ -105,18 +106,18 @@ class RpDiscoveryScope(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     interface_name: Union[Global[str], Variable] = Field(alias="interfaceName")
-    group_list: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(alias="groupList", default=None)
-    interval: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = None
-    priority: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = None
+    group_list: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="groupList", default=None)
+    interval: Optional[Union[Global[int], Variable, Default[None]]] = None
+    priority: Optional[Union[Global[int], Variable, Default[None]]] = None
 
 
 class BsrCandidateAttributes(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     interface_name: Union[Global[str], Variable] = Field(alias="interfaceName")
-    mask: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = None
-    priority: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = None
-    accept_rp_candidate: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(
+    mask: Optional[Union[Global[int], Variable, Default[None]]] = None
+    priority: Optional[Union[Global[int], Variable, Default[None]]] = None
+    accept_rp_candidate: Optional[Union[Global[str], Variable, Default[None]]] = Field(
         alias="acceptRpCandidate", default=None
     )
 
@@ -142,32 +143,32 @@ class DefaultMsdpPeer(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     default_peer: Union[Global[bool], Default[bool]]
-    prefix_list: Optional[RefId[str]] = None
+    prefix_list: Optional[RefId] = None
 
 
 class MsdpPeerAttributes(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     peer_ip: Union[Global[str], Variable] = Field(alias="peerIp")
-    connect_source_intf: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(
+    connect_source_intf: Optional[Union[Global[str], Variable, Default[None]]] = Field(
         alias="connectSourceIntf", default=None
     )
-    remote_as: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = Field(alias="remoteAs", default=None)
-    password: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = None
-    keepalive_interval: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = Field(
+    remote_as: Optional[Union[Global[int], Variable, Default[None]]] = Field(alias="remoteAs", default=None)
+    password: Optional[Union[Global[str], Variable, Default[None]]] = None
+    keepalive_interval: Optional[Union[Global[int], Variable, Default[None]]] = Field(
         alias="keepaliveInterval", default=None
     )
-    keepalive_holdtime: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = Field(
+    keepalive_holdtime: Optional[Union[Global[int], Variable, Default[None]]] = Field(
         alias="keepaliveHoldTime", default=None
     )
-    sa_limit: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = Field(alias="saLimit", default=None)
+    sa_limit: Optional[Union[Global[int], Variable, Default[None]]] = Field(alias="saLimit", default=None)
     default: Optional[DefaultMsdpPeer] = None
 
 
 class MsdpPeer(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    mesh_group: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(alias="meshGroup", default=None)
+    mesh_group: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="meshGroup", default=None)
     peer: List[MsdpPeerAttributes]
 
 
@@ -175,12 +176,8 @@ class MsdpAttributes(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     msdp_list: Optional[List[MsdpPeer]] = Field(alias="msdpList", default=None)
-    originator_id: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(
-        alias="originatorId", default=None
-    )
-    refresh_timer: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = Field(
-        alias="refreshTimer", default=None
-    )
+    originator_id: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="originatorId", default=None)
+    refresh_timer: Optional[Union[Global[int], Variable, Default[None]]] = Field(alias="refreshTimer", default=None)
 
 
 class MulticastData(BaseModel):

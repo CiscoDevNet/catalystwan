@@ -3,8 +3,9 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, DefaultWitoutValue, Global, RefId, Variable
-from vmngclient.model.configuration.feature_profile.common import Prefix
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
+from vmngclient.models.configuration.common import RefId
+from vmngclient.models.configuration.feature_profile.common import Prefix
 
 
 class AggregatePrefix(BaseModel):
@@ -64,14 +65,14 @@ class RedistributedRoute(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     protocol: Union[Global[RedistributeProtocol], Variable]
-    route_policy: Optional[Union[DefaultWitoutValue, RefId[str]]] = Field(alias="routePolicy")
+    route_policy: Optional[Union[Default[None], RefId]] = Field(alias="routePolicy")
 
 
 class RedistributedRouteIPv6(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     protocol: Union[Global[RedistributeProtocolIPv6], Variable]
-    route_policy: Optional[Union[DefaultWitoutValue, RefId[str]]] = Field(alias="routePolicy")
+    route_policy: Optional[Union[Default[None], RefId]] = Field(alias="routePolicy")
 
 
 class AddressFamilyIPv4(BaseModel):
@@ -79,9 +80,9 @@ class AddressFamilyIPv4(BaseModel):
 
     aggregate_address: Optional[List[AggregatePrefix]] = Field(alias="aggregateAddress")
     network: Optional[List[NetworkPrefix]] = None
-    paths: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = None
+    paths: Optional[Union[Global[int], Variable, Default[None]]] = None
     originate: Optional[Union[Global[bool], Variable, Default[bool]]] = Default[bool](value=False)
-    name: Optional[Union[DefaultWitoutValue, RefId[str]]] = None
+    name: Optional[Union[Default[None], RefId]] = None
     filter: Optional[Union[Global[bool], Variable, Default[bool]]] = Default[bool](value=False)
     redistribute: Optional[List[RedistributedRoute]] = None
 
@@ -114,9 +115,9 @@ class AddressFamilyIPv6(BaseModel):
 
     aggregate_address: Optional[List[AggregatePrefixIPv6]] = Field(alias="ipv6AggregateAddress")
     network: Optional[List[NetworkPrefixIPv6]] = Field(alias="ipv6Network")
-    paths: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = None
+    paths: Optional[Union[Global[int], Variable, Default[None]]] = None
     originate: Optional[Union[Global[bool], Variable, Default[bool]]] = Default[bool](value=False)
-    name: Optional[Union[DefaultWitoutValue, RefId[str]]] = None
+    name: Optional[Union[Default[None], RefId]] = None
     filter: Optional[Union[Global[bool], Variable, Default[bool]]] = Default[bool](value=False)
     redistribute: Optional[List[RedistributedRouteIPv6]] = None
 
@@ -128,21 +129,21 @@ class BgpAddressFamily(BaseModel):
     max_prefix_config: Optional[Union[PolicyType, PolicyTypeWithRestart, PolicyTypeWithThreshold]] = Field(
         alias="maxPrefixConfig"
     )
-    in_route_policy: Optional[Union[DefaultWitoutValue, RefId[str]]] = Field(alias="inRoutePolicy")
-    out_route_policy: Optional[Union[DefaultWitoutValue, RefId[str]]] = Field(alias="outRoutePolicy")
+    in_route_policy: Optional[Union[Default[None], RefId]] = Field(alias="inRoutePolicy")
+    out_route_policy: Optional[Union[Default[None], RefId]] = Field(alias="outRoutePolicy")
 
 
 class BgpIPv4Neighbor(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     address: Union[Global[str], Variable]
-    description: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = None
+    description: Optional[Union[Global[str], Variable, Default[None]]] = None
     shutdown: Optional[Union[Global[bool], Variable, Default[bool]]] = Default[bool](value=False)
     remote_as: Union[Global[int], Variable] = Field(alias="remoteAs")
     local_as: Union[Global[int], Variable] = Field(alias="localAs", default=None)
     keepalive: Optional[Union[Global[int], Variable, Default[int]]] = Default[int](value=60)
     holdtime: Optional[Union[Global[int], Variable, Default[int]]] = Default[int](value=180)
-    interface_name: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(alias="ifName", default=None)
+    interface_name: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="ifName", default=None)
     next_hop_self: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
         alias="nextHopSelf", default=Default[bool](value=False)
     )
@@ -155,14 +156,14 @@ class BgpIPv4Neighbor(BaseModel):
     ebgp_multihop: Optional[Union[Global[int], Variable, Default[int]]] = Field(
         alias="ebgpMultihop", default=Default[int](value=1)
     )
-    password: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = None
+    password: Optional[Union[Global[str], Variable, Default[None]]] = None
     send_label: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
         alias="sendLabel", default=Default[bool](value=False)
     )
     as_override: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
         alias="asOverride", default=Default[bool](value=False)
     )
-    as_number: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = Field(alias="asNumber", default=None)
+    as_number: Optional[Union[Global[int], Variable, Default[None]]] = Field(alias="asNumber", default=None)
     address_family: Optional[BgpAddressFamily] = Field(alias="addressFamily")
 
 
@@ -170,13 +171,13 @@ class BgpIPv6Neighbor(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     address: Union[Global[str], Variable]
-    description: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = None
+    description: Optional[Union[Global[str], Variable, Default[None]]] = None
     shutdown: Optional[Union[Global[bool], Variable, Default[bool]]] = Default[bool](value=False)
     remote_as: Union[Global[int], Variable] = Field(alias="remoteAs")
     local_as: Union[Global[int], Variable] = Field(alias="localAs", default=None)
     keepalive: Optional[Union[Global[int], Variable, Default[int]]] = Default[int](value=60)
     holdtime: Optional[Union[Global[int], Variable, Default[int]]] = Default[int](value=180)
-    interface_name: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(alias="ifName", default=None)
+    interface_name: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="ifName", default=None)
     next_hop_self: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
         alias="nextHopSelf", default=Default[bool](value=False)
     )
@@ -189,14 +190,14 @@ class BgpIPv6Neighbor(BaseModel):
     ebgp_multihop: Optional[Union[Global[int], Variable, Default[int]]] = Field(
         alias="ebgpMultihop", default=Default[int](value=1)
     )
-    password: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = None
+    password: Optional[Union[Global[str], Variable, Default[None]]] = None
     send_label: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
         alias="sendLabel", default=Default[bool](value=False)
     )
     as_override: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
         alias="asOverride", default=Default[bool](value=False)
     )
-    as_number: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = Field(alias="asNumber", default=None)
+    as_number: Optional[Union[Global[int], Variable, Default[None]]] = Field(alias="asNumber", default=None)
     address_family: Optional[BgpAddressFamily] = Field(alias="addressFamily")
 
 
@@ -204,7 +205,7 @@ class BgpData(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     as_num: Union[Global[int], Variable] = Field(alias="asNum")
-    router_id: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(alias="routerId", default=None)
+    router_id: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="routerId", default=None)
     propagate_aspath: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
         alias="propagateAspath", default=Default[bool](value=False)
     )

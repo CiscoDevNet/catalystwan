@@ -3,7 +3,8 @@ from typing import Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import DefaultWitoutValue, Global, RefId, Variable
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
+from vmngclient.models.configuration.common import RefId
 
 
 class IkeMode(str, Enum):
@@ -63,7 +64,7 @@ class TunnelApplication(str, Enum):
 class Arp(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    ip_address: Union[Variable, Global[str], DefaultWitoutValue]
+    ip_address: Union[Variable, Global[str], Default[None]]
     mac_address: Union[Global[str], Variable]
 
 
@@ -75,7 +76,7 @@ class VrrpTrackerAction(str, Enum):
 class VrrpTrackingObject(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    tracker_id: Union[DefaultWitoutValue, RefId[str]] = Field(alias="trackerId")
+    tracker_id: Union[Default[None], RefId] = Field(alias="trackerId")
     tracker_action: Union[Global[VrrpTrackerAction], Variable] = Field(alias="trackerAction")
     decrement_value: Optional[Union[Variable, Global[int]]] = Field(alias="decrementValue", default=None)
 
@@ -84,14 +85,14 @@ class VrrpIPv6Address(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     ipv6_link_local: Union[Global[str], Variable] = Field(alias="ipv6LinkLocal")
-    prefix: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = None
+    prefix: Optional[Union[Global[str], Variable, Default[None]]] = None
 
 
 class StaticIPv4Address(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    ip_address: Union[Variable, Global[str], DefaultWitoutValue] = Field(alias="ipAddress")
-    subnet_mask: Union[Variable, Global[str], DefaultWitoutValue] = Field(alias="subnetMask")
+    ip_address: Union[Variable, Global[str], Default[None]] = Field(alias="ipAddress")
+    subnet_mask: Union[Variable, Global[str], Default[None]] = Field(alias="subnetMask")
 
 
 class StaticIPv6Address(BaseModel):

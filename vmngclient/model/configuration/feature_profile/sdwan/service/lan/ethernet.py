@@ -3,7 +3,7 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, DefaultWitoutValue, Global, RefId, Variable
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.common import (
     Arp,
     StaticIPv4Address,
@@ -12,6 +12,7 @@ from vmngclient.model.configuration.feature_profile.sdwan.service.lan.common imp
     VrrpTrackingObject,
 )
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.vpn import Direction
+from vmngclient.models.configuration.common import RefId
 
 
 class DynamicDhcpDistance(BaseModel):
@@ -56,7 +57,7 @@ class Dhcpv6Helper(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     ip_address: Union[Global[str], Variable] = Field(alias="ipAddress")
-    vpn: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = None
+    vpn: Optional[Union[Global[int], Variable, Default[None]]] = None
 
 
 class StaticIPv6AddressConfig(BaseModel):
@@ -81,9 +82,9 @@ class NatType(str, Enum):
 class NatPool(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    range_start: Union[Variable, Global[str], DefaultWitoutValue] = Field(alias="rangeStart")
-    range_end: Union[Variable, Global[str], DefaultWitoutValue] = Field(alias="rangeEnd")
-    prefix_length: Union[Variable, Global[int], DefaultWitoutValue] = Field(alias="prefixLength")
+    range_start: Union[Variable, Global[str], Default[None]] = Field(alias="rangeStart")
+    range_end: Union[Variable, Global[str], Default[None]] = Field(alias="rangeEnd")
+    prefix_length: Union[Variable, Global[int], Default[None]] = Field(alias="prefixLength")
     overload: Union[Variable, Global[bool], Default[bool]] = Default[bool](value=True)
 
 
@@ -104,7 +105,7 @@ class NatAttributesIPv4(BaseModel):
 
     nat_type: Union[Global[NatType], Variable] = Field(alias="natType")
     nat_pool: Optional[NatPool] = Field(alias="natPool", default=None)
-    nat_loopback: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(alias="natLoopbakc", default=None)
+    nat_loopback: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="natLoopbakc", default=None)
     udp_timeout: Union[Global[int], Variable, Default[int]] = Field(alias="udpTimeout", default=Default[int](value=1))
     tcp_timeout: Union[Global[int], Variable, Default[int]] = Field(alias="tcpTimeout", default=Default[int](value=1))
     new_static_nat: Optional[List[StaticNat]] = Field(alias="newStaticNat", default=None)
@@ -119,11 +120,11 @@ class NatAttributesIPv6(BaseModel):
 class AclQos(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    shaping_rate: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = Field(alias="shapingRate", default=None)
-    ipv4_acl_egress: Optional[RefId[str]] = Field(alias="ipv4AclEgress", default=None)
-    ipv4_acl_ingress: Optional[RefId[str]] = Field(alias="ipv4AclIngress", default=None)
-    ipv6_acl_egress: Optional[RefId[str]] = Field(alias="ipv6AclEgress", default=None)
-    ipv6_acl_ingress: Optional[RefId[str]] = Field(alias="ipv6AclIngress", default=None)
+    shaping_rate: Optional[Union[Global[int], Variable, Default[None]]] = Field(alias="shapingRate", default=None)
+    ipv4_acl_egress: Optional[RefId] = Field(alias="ipv4AclEgress", default=None)
+    ipv4_acl_ingress: Optional[RefId] = Field(alias="ipv4AclIngress", default=None)
+    ipv6_acl_egress: Optional[RefId] = Field(alias="ipv6AclEgress", default=None)
+    ipv6_acl_ingress: Optional[RefId] = Field(alias="ipv6AclIngress", default=None)
 
 
 class VrrpIPv6(BaseModel):
@@ -148,7 +149,7 @@ class VrrpIPv4(BaseModel):
     tloc_pref_change: Union[Global[bool], Default[bool]] = Field(
         alias="tlocPrefChange", default=Default[bool](value=False)
     )
-    tloc_pref_change_value: Optional[Union[Global[int], DefaultWitoutValue]] = Field(
+    tloc_pref_change_value: Optional[Union[Global[int], Default[None]]] = Field(
         alias="tlocPrefChangeValue", default=None
     )
     tracking_object: Optional[List[VrrpTrackingObject]] = Field(alias="trackingObject", default=None)
@@ -161,13 +162,11 @@ class Trustsec(BaseModel):
         alias="enableSGTPropagation", default=Default[bool](value=False)
     )
     propagate: Optional[Union[Global[bool], Default[bool]]] = Default[bool](value=True)
-    security_group_tag: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = Field(
+    security_group_tag: Optional[Union[Global[int], Variable, Default[None]]] = Field(
         alias="securityGroupTag", default=None
     )
-    enable_enforced_propagation: Union[Global[bool], DefaultWitoutValue] = Field(alias="enableEnforcedPropagation")
-    enforced_security_group_tag: Union[Global[int], Variable, DefaultWitoutValue] = Field(
-        alias="enforcedSecurityGroupTag"
-    )
+    enable_enforced_propagation: Union[Global[bool], Default[None]] = Field(alias="enableEnforcedPropagation")
+    enforced_security_group_tag: Union[Global[int], Variable, Default[None]] = Field(alias="enforcedSecurityGroupTag")
 
 
 class DuplexMode(str, Enum):
@@ -185,29 +184,27 @@ class MediaType(str, Enum):
 class AdvancedAttributes(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    duplex: Optional[Union[Global[DuplexMode], Variable, DefaultWitoutValue]] = None
-    mac_address: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(alias="macAddress", default=None)
+    duplex: Optional[Union[Global[DuplexMode], Variable, Default[None]]] = None
+    mac_address: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="macAddress", default=None)
     ip_mtu: Union[Global[int], Variable, Default[int]] = Field(alias="ipMtu", default=Default[int](value=1500))
     interface_mtu: Optional[Union[Global[int], Variable, Default[int]]] = Field(
         alias="intrfMtu", default=Default[int](value=1500)
     )
     tcp_mss: Optional[Union[Global[int], Variable, Default[int]]] = Field(alias="tcpMss", default=None)
-    speed: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = None
+    speed: Optional[Union[Global[str], Variable, Default[None]]] = None
     arp_timeout: Union[Global[int], Variable, Default[int]] = Field(
         alias="arpTimeout", default=Default[int](value=1200)
     )
     autonegotiate: Optional[Union[Global[bool], Variable, Default[bool]]] = None
-    media_type: Optional[Union[Global[MediaType], Variable, DefaultWitoutValue]] = Field(
-        alias="mediaType", default=None
-    )
+    media_type: Optional[Union[Global[MediaType], Variable, Default[None]]] = Field(alias="mediaType", default=None)
     load_interval: Union[Global[int], Variable, Default[int]] = Field(
         alias="loadInterval", default=Default[int](value=30)
     )
-    tracker: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = None
+    tracker: Optional[Union[Global[str], Variable, Default[None]]] = None
     icmp_redirect_disable: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
         alias="icmpRedirectDisable", default=Default[bool](value=True)
     )
-    xconnect: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = None
+    xconnect: Optional[Union[Global[str], Variable, Default[None]]] = None
     ip_directed_broadcast: Union[Global[bool], Variable, Default[bool]] = Field(
         alias="ipDirectedBroadcast", default=Default[bool](value=False)
     )
@@ -218,11 +215,9 @@ class InterfaceEthernetData(BaseModel):
 
     shutdown: Union[Global[bool], Variable, Default[bool]] = Default[bool](value=True)
     interface_name: Union[Global[str], Variable] = Field(alias="interfaceName")
-    description: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = None
+    description: Optional[Union[Global[str], Variable, Default[None]]] = None
     interface_ip_address: Union[InterfaceDynamicIPv4Address, InterfaceStaticIPv4Address] = Field(alias="intfIpAddress")
-    dhcp_helper: Optional[Union[Variable, Global[List[str]], DefaultWitoutValue]] = Field(
-        alias="dhcpHelper", default=None
-    )
+    dhcp_helper: Optional[Union[Variable, Global[List[str]], Default[None]]] = Field(alias="dhcpHelper", default=None)
     interface_ipv6_address: Optional[Union[InterfaceDynamicIPv6Address, InterfaceStaticIPv6Address]] = Field(
         alias="intfIpV6Address", default=None
     )

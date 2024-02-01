@@ -3,7 +3,8 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, Global, RefId, Variable
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
+from vmngclient.models.configuration.common import RefId
 
 
 class Action(str, Enum):
@@ -127,13 +128,13 @@ class SourceDataIPv6Prefix(BaseModel):
 class SourceDataIPv4PrefixParcel(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    source_data_prefix_list: RefId[str] = Field(alias="sourceDataPrefixList")
+    source_data_prefix_list: RefId = Field(alias="sourceDataPrefixList")
 
 
 class SourceDataIPv6PrefixParcel(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    source_data_prefix_list: RefId[str] = Field(alias="sourceDataPrefixList")
+    source_data_prefix_list: RefId = Field(alias="sourceDataPrefixList")
 
 
 class SourcePort(BaseModel):
@@ -157,13 +158,13 @@ class DestinationDataIPv6Prefix(BaseModel):
 class DestinationDataIPv4PrefixParcel(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    destination_data_prefix_list: RefId[str] = Field(alias="destinationDataPrefixList")
+    destination_data_prefix_list: RefId = Field(alias="destinationDataPrefixList")
 
 
 class DestinationDataIPv6PrefixParcel(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    destination_data_prefix_list: RefId[str] = Field(alias="destinationDataPrefixList")
+    destination_data_prefix_list: RefId = Field(alias="destinationDataPrefixList")
 
 
 class DestinationPort(BaseModel):
@@ -247,8 +248,8 @@ class AcceptActionIPv4(BaseModel):
     log: Optional[Union[Global[bool], Default[bool]]] = None
     set_next_hop: Optional[Global[str]] = Field(alias="setNextHop", default=None)
     set_service_chain: Optional[ServiceChain] = Field(alias="setServiceChain", default=None)
-    mirror: Optional[RefId[str]] = None
-    policer: Optional[RefId[str]] = None
+    mirror: Optional[RefId] = None
+    policer: Optional[RefId] = None
 
 
 class AcceptActionIPv6(BaseModel):
@@ -259,8 +260,8 @@ class AcceptActionIPv6(BaseModel):
     set_next_hop: Optional[Global[str]] = Field(alias="setNextHop", default=None)
     set_service_chain: Optional[ServiceChain] = Field(alias="setServiceChain", default=None)
     set_traffic_class: Optional[Global[int]] = Field(alias="setTrafficClass", default=None)
-    mirror: Optional[RefId[str]] = None
-    policer: Optional[RefId[str]] = None
+    mirror: Optional[RefId] = None
+    policer: Optional[RefId] = None
 
 
 class DropAction(BaseModel):

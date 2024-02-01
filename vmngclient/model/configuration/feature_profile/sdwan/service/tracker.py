@@ -3,7 +3,8 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, Global, RefId, Variable
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
+from vmngclient.models.configuration.common import RefId
 
 
 class EndpointProtocol(str, Enum):
@@ -57,7 +58,7 @@ class TrackerCreationPayload(BaseModel):
 class TrackerRef(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    tracker_ref: RefId[str] = Field(alias="trackerRef")
+    tracker_ref: RefId = Field(alias="trackerRef")
 
 
 class CombineBoolean(str, Enum):

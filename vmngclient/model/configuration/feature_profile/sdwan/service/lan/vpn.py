@@ -3,26 +3,23 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, DefaultWitoutValue, Global, RefId, Variable
-from vmngclient.model.configuration.feature_profile.common import Prefix
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
+from vmngclient.models.configuration.common import RefId
+from vmngclient.models.configuration.feature_profile.common import Prefix
 
 
 class DnsIPv4(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    primary_dns_address_ipv4: Union[Variable, Global[str], DefaultWitoutValue] = Field(alias="primaryDnsAddressIpv4")
-    secondary_dns_address_ipv4: Union[Variable, Global[str], DefaultWitoutValue] = Field(
-        alias="secondaryDnsAddressIpv4"
-    )
+    primary_dns_address_ipv4: Union[Variable, Global[str], Default[None]] = Field(alias="primaryDnsAddressIpv4")
+    secondary_dns_address_ipv4: Union[Variable, Global[str], Default[None]] = Field(alias="secondaryDnsAddressIpv4")
 
 
 class DnsIPv6(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    primary_dns_address_ipv6: Union[Variable, Global[str], DefaultWitoutValue] = Field(alias="primaryDnsAddressIpv6")
-    secondary_dns_address_ipv6: Union[Variable, Global[str], DefaultWitoutValue] = Field(
-        alias="secondaryDnsAddressIpv6"
-    )
+    primary_dns_address_ipv6: Union[Variable, Global[str], Default[None]] = Field(alias="primaryDnsAddressIpv6")
+    secondary_dns_address_ipv6: Union[Variable, Global[str], Default[None]] = Field(alias="secondaryDnsAddressIpv6")
 
 
 class HostMapping(BaseModel):
@@ -85,7 +82,7 @@ class OmpAdvertiseIPv4(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     omp_protocol: Union[Variable, Global[ProtocolIPv4]] = Field(alias="ompProtocol")
-    route_policy: Optional[Union[DefaultWitoutValue, RefId[str]]] = Field(alias="routePolicy", default=None)
+    route_policy: Optional[Union[Default[None], RefId]] = Field(alias="routePolicy", default=None)
     prefix_list: Optional[List[IPv4Prefix]] = None
 
 
@@ -93,7 +90,7 @@ class OmpAdvertiseIPv6(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     omp_protocol: Union[Variable, Global[ProtocolIPv6]] = Field(alias="ompProtocol")
-    route_policy: Optional[Union[DefaultWitoutValue, RefId[str]]] = Field(alias="routePolicy", default=None)
+    route_policy: Optional[Union[Default[None], RefId]] = Field(alias="routePolicy", default=None)
     prefix_list: Optional[List[IPv6Prefix]] = None
 
 
@@ -109,7 +106,7 @@ class IPv4RouteGatewayNextHopWithTracker(BaseModel):
 
     address: Union[Variable, Global[str]]
     distance: Union[Variable, Global[int], Default[int]] = Default[int](value=1)
-    tracker: Union[RefId[str], DefaultWitoutValue]
+    tracker: Union[RefId, Default[None]]
 
 
 class NextHopContainer(BaseModel):
@@ -185,14 +182,14 @@ class StaticRouteVPN(BaseModel):
 class NextHopInterfaceRoute(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    address: Union[Variable, Global[str], DefaultWitoutValue] = DefaultWitoutValue()
+    address: Union[Variable, Global[str], Default[None]] = Default[None](value=None)
     distance: Union[Variable, Global[int], Default[int]] = Default[int](value=1)
 
 
 class NextHopInterfaceRouteIPv6(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    address: Union[Variable, Global[str], DefaultWitoutValue] = DefaultWitoutValue()
+    address: Union[Variable, Global[str], Default[None]] = Default[None](value=None)
     distance: Union[Variable, Global[int], Default[int]] = Default[int](value=1)
 
 
@@ -292,7 +289,7 @@ class StaticGreRouteIPv4(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     prefix: Prefix
-    interface: Union[Variable, Global[List[str]], DefaultWitoutValue]
+    interface: Union[Variable, Global[List[str]], Default[None]]
     vpn: Global[int] = Global[int](value=0)
 
 
@@ -300,7 +297,7 @@ class StaticIpsecRouteIPv4(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     prefix: Prefix
-    interface: Union[Variable, Global[List[str]], DefaultWitoutValue]
+    interface: Union[Variable, Global[List[str]], Default[None]]
 
 
 class Direction(str, Enum):
@@ -328,7 +325,7 @@ class NATPortForwardProtocol(str, Enum):
 class NatPortForward(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    nat_pool_name: Union[Variable, Global[int], DefaultWitoutValue] = Field(alias="natPoolName")
+    nat_pool_name: Union[Variable, Global[int], Default[None]] = Field(alias="natPoolName")
     source_port: Union[Variable, Global[int]] = Field(alias="sourcePort")
     translate_port: Union[Variable, Global[int]] = Field(alias="translatePort")
     source_ip: Union[Variable, Global[str]] = Field(alias="sourceIp")
@@ -339,7 +336,7 @@ class NatPortForward(BaseModel):
 class StaticNat(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    nat_pool_name: Union[Variable, Global[int], DefaultWitoutValue] = Field(alias="natPoolName")
+    nat_pool_name: Union[Variable, Global[int], Default[None]] = Field(alias="natPoolName")
     source_ip: Union[Variable, Global[str]] = Field(alias="sourceIp")
     translated_source_ip: Union[Variable, Global[str]] = Field(alias="TranslatedSourceIP")
     static_nat_direction: Union[Variable, Global[Direction]] = Field(alias="staticNatDirection")
@@ -395,21 +392,21 @@ class RedistributeToService(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     protocol: Union[Variable, Global[RedistributeToServiceProtocol]]
-    policy: Union[DefaultWitoutValue, RefId[str]]
+    policy: Union[Default[None], RefId]
 
 
 class RedistributeToGlobal(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     protocol: Union[Variable, Global[RedistributeToGlobalProtocol]]
-    policy: Union[DefaultWitoutValue, RefId[str]]
+    policy: Union[Default[None], RefId]
 
 
 class RouteLeakFromGlobal(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     route_protocol: Union[Variable, Global[RouteLeakFromGlobalProtocol]] = Field(alias="routeProtocol")
-    route_policy: Optional[Union[DefaultWitoutValue, RefId[str]]] = Field(alias="routePolicy", default=None)
+    route_policy: Optional[Union[Default[None], RefId]] = Field(alias="routePolicy", default=None)
     redistribute_to_protocol: Optional[List[RedistributeToService]] = Field(
         alias="redistributeToProtocol", default=None
     )
@@ -419,7 +416,7 @@ class RouteLeakFromService(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     route_protocol: Union[Variable, Global[RouteLeakFromServiceProtocol]] = Field(alias="routeProtocol")
-    route_policy: Optional[Union[DefaultWitoutValue, RefId[str]]] = Field(alias="routePolicy", default=None)
+    route_policy: Optional[Union[Default[None], RefId]] = Field(alias="routePolicy", default=None)
     redistribute_to_protocol: Optional[List[RedistributeToService]] = Field(
         alias="redistributeToProtocol", default=None
     )
@@ -430,7 +427,7 @@ class RouteLeakBetweenServices(BaseModel):
 
     source_vpn: Union[Variable, Global[int]] = Field(alias="soureVpn")
     route_protocol: Union[Variable, Global[RouteLeakFromServiceProtocol]] = Field(alias="routeProtocol")
-    route_policy: Optional[Union[DefaultWitoutValue, RefId[str]]] = Field(alias="routePolicy", default=None)
+    route_policy: Optional[Union[Default[None], RefId]] = Field(alias="routePolicy", default=None)
     redistribute_to_protocol: Optional[List[RedistributeToService]] = Field(
         alias="redistributeToProtocol", default=None
     )
@@ -460,11 +457,11 @@ class LanVpnData(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     vpn_id: Union[Variable, Global[int], Default[int]] = Field(alias="vpnId")
-    name: Union[Variable, Global[str], DefaultWitoutValue]
-    omp_admin_distance: Optional[Union[Variable, Global[int], DefaultWitoutValue]] = Field(
+    name: Union[Variable, Global[str], Default[None]]
+    omp_admin_distance: Optional[Union[Variable, Global[int], Default[None]]] = Field(
         alias="ompAdminDistance", default=None
     )
-    omp_admin_distance_ipv6: Optional[Union[Variable, Global[int], DefaultWitoutValue]] = Field(
+    omp_admin_distance_ipv6: Optional[Union[Variable, Global[int], Default[None]]] = Field(
         alias="ompAdminDistanceIpv6", default=None
     )
     dns_ipv4: Optional[DnsIPv4] = Field(alias="dnsIpv4", default=None)

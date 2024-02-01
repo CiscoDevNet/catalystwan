@@ -3,7 +3,7 @@ from typing import Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, DefaultWitoutValue, Global, Variable
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.common import (
     IkeCiphersuite,
     IkeGroup,
@@ -30,7 +30,7 @@ class TunnelSourceIP(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     tunnel_source: Union[Global[str], Variable] = Field(alias="tunnelSource")
-    tunnel_route_via: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(
+    tunnel_route_via: Optional[Union[Global[str], Variable, Default[None]]] = Field(
         alias="tunnelRouteVia", default=None
     )
 
@@ -39,7 +39,7 @@ class TunnelSourceIPv6(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     tunnel_source_v6: Union[Global[str], Variable] = Field(alias="tunnelSourceV6")
-    tunnel_route_via: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(
+    tunnel_route_via: Optional[Union[Global[str], Variable, Default[None]]] = Field(
         alias="tunnelRouteVia", default=None
     )
 
@@ -48,7 +48,7 @@ class TunnelSourceInterface(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     tunnel_source_interface: Union[Global[str], Variable] = Field(alias="tunnelSourceInterface")
-    tunnel_route_via: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(
+    tunnel_route_via: Optional[Union[Global[str], Variable, Default[None]]] = Field(
         alias="tunnelRouteVia", default=None
     )
 
@@ -81,9 +81,9 @@ class BasicGre(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     interface_name: Optional[Union[Global[str], Variable]] = Field(alias="ifName", default=None)
-    description: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = None
+    description: Optional[Union[Global[str], Variable, Default[None]]] = None
     address: Optional[GreAddress] = None
-    ipv6_address: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(alias="ipv6Address", default=None)
+    ipv6_address: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="ipv6Address", default=None)
     shutdown: Optional[Union[Global[bool], Variable, Default[bool]]] = Default[bool](value=False)
     tunnel_protection: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
         alias="tunnelProtection", default=Default[bool](value=False)
@@ -97,11 +97,9 @@ class BasicGre(BaseModel):
     tunnel_destination: Optional[Union[Global[str], Variable]] = Field(alias="tunnelDestination", default=None)
     tunnel_destination_v6: Optional[Union[Global[str], Variable]] = Field(alias="tunnelDestinationV6", default=None)
     mtu: Optional[Union[Global[int], Variable, Default[int]]] = Default[int](value=1500)
-    mtu_v6: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = Field(alias="mtuV6", default=None)
-    tcp_mss_adjust: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = Field(
-        alias="tcpMssAdjust", default=None
-    )
-    tcp_mss_adjust_v6: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = Field(
+    mtu_v6: Optional[Union[Global[int], Variable, Default[None]]] = Field(alias="mtuV6", default=None)
+    tcp_mss_adjust: Optional[Union[Global[int], Variable, Default[None]]] = Field(alias="tcpMssAdjust", default=None)
+    tcp_mss_adjust_v6: Optional[Union[Global[int], Variable, Default[None]]] = Field(
         alias="tcpMssAdjustV6", default=None
     )
     clear_dont_fragment: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
@@ -126,11 +124,11 @@ class BasicGre(BaseModel):
     ike_group: Optional[Union[Global[IkeGroup], Variable, Default[IkeGroup]]] = Field(
         alias="ikeGroup", default=Default[IkeGroup](value=IkeGroup.GROUP_16)
     )
-    pre_shared_secret: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(
+    pre_shared_secret: Optional[Union[Global[str], Variable, Default[None]]] = Field(
         alias="preSharedSecret", default=None
     )
-    ike_local_id: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(alias="ikeLocalId", default=None)
-    ike_remote_id: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(alias="ikeRemoteId", default=None)
+    ike_local_id: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="ikeLocalId", default=None)
+    ike_remote_id: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="ikeRemoteId", default=None)
     ipsec_rekey_interval: Optional[Union[Global[int], Variable, Default[int]]] = Field(
         alias="ipsecRekeyInterval", default=Default[int](value=3600)
     )

@@ -2,7 +2,7 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, DefaultWitoutValue, Global, Variable
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
 
 
 class OptionCodeAscii(BaseModel):
@@ -44,23 +44,15 @@ class DhcpServerData(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     address_pool: DhcpAddressPool = Field(alias="addressPool")
-    exclude: Optional[Union[Global[List[str]], Variable, DefaultWitoutValue]] = None
+    exclude: Optional[Union[Global[List[str]], Variable, Default[None]]] = None
     lease_time: Optional[Union[Global[int], Variable, Default[int]]] = Field(
         alias="leaseTime", default=Default[int](value=86400)
     )
-    interface_mtu: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = Field(
-        alias="interfaceMtu", default=None
-    )
-    domain_name: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(alias="domainName", default=None)
-    default_gateway: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(
-        alias="defaultGateway", default=None
-    )
-    dns_servers: Optional[Union[Global[List[str]], Variable, DefaultWitoutValue]] = Field(
-        alias="dnsServers", default=None
-    )
-    tftp_servers: Optional[Union[Global[List[str]], Variable, DefaultWitoutValue]] = Field(
-        alias="tftpServers", default=None
-    )
+    interface_mtu: Optional[Union[Global[int], Variable, Default[None]]] = Field(alias="interfaceMtu", default=None)
+    domain_name: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="domainName", default=None)
+    default_gateway: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="defaultGateway", default=None)
+    dns_servers: Optional[Union[Global[List[str]], Variable, Default[None]]] = Field(alias="dnsServers", default=None)
+    tftp_servers: Optional[Union[Global[List[str]], Variable, Default[None]]] = Field(alias="tftpServers", default=None)
     static_lease: Optional[List[StaticLease]] = Field(alias="staticLease", default=None)
     option_code: Optional[List[Union[OptionCodeAscii, OptionCodeHex, OptionCodeIP]]] = Field(
         alias="optionCode", default=None

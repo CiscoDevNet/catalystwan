@@ -3,7 +3,7 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, DefaultWitoutValue, Global, Variable
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
 
 
 class VirtualApplicationType(str, Enum):
@@ -61,7 +61,7 @@ class Appqoe(BaseModel):
         default=[Global[ServiceNodeGroupName](value=ServiceNodeGroupName.SNG_APPQOE)], alias="serviceNodeGroups"
     )
     enable: Global[bool] = Global[bool](value=True)
-    vpn: Union[Global[int], DefaultWitoutValue, Variable] = Field(default=Global[int](value=0))
+    vpn: Union[Global[int], Default[None], Variable] = Field(default=Global[int](value=0))
 
 
 class ServiceContext(BaseModel):

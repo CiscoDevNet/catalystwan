@@ -3,7 +3,8 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, DefaultWitoutValue, Global, RefId, Variable
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
+from vmngclient.models.configuration.common import RefId
 
 
 class ObjectTrackerType(str, Enum):
@@ -40,7 +41,7 @@ class RouteTracker(BaseModel):
     )
     route_ip: Union[Global[str], Variable] = Field(alias="routeIp")
     route_mask: Union[Global[str], Variable, Default[str]] = Field(alias="routeMask")
-    vpn: Union[Global[int], Variable, DefaultWitoutValue] = DefaultWitoutValue()
+    vpn: Union[Global[int], Variable, Default[None]] = Default[None](value=None)
 
 
 class ObjectTrackerCreationPayload(BaseModel):
@@ -54,7 +55,7 @@ class ObjectTrackerCreationPayload(BaseModel):
 class ObjectTrackerRef(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    tracker_ref: RefId[str] = Field(alias="trackerRef")
+    tracker_ref: RefId = Field(alias="trackerRef")
 
 
 class Criteria(str, Enum):

@@ -3,8 +3,9 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, DefaultWitoutValue, Global, RefId, Variable
-from vmngclient.model.configuration.feature_profile.common import Prefix
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
+from vmngclient.models.configuration.common import RefId
+from vmngclient.models.configuration.feature_profile.common import Prefix
 
 
 class EigrpAuthType(str, Enum):
@@ -13,22 +14,22 @@ class EigrpAuthType(str, Enum):
 
 
 class KeychainDetails(BaseModel):
-    key_id: Union[Global[int], Variable, DefaultWitoutValue] = Field(alias="keyId")
-    keystring: Union[Global[str], Variable, DefaultWitoutValue]
+    key_id: Union[Global[int], Variable, Default[None]] = Field(alias="keyId")
+    keystring: Union[Global[str], Variable, Default[None]]
 
 
 class EigrpAuthentication(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    auth_type: Union[Global[EigrpAuthType], Variable, DefaultWitoutValue] = Field(alias="type")
-    auth_key: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(alias="authKey")
+    auth_type: Union[Global[EigrpAuthType], Variable, Default[None]] = Field(alias="type")
+    auth_key: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="authKey")
     key: Optional[List[KeychainDetails]] = Field(alias="key")
 
 
 class TableMap(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    name: Optional[Union[DefaultWitoutValue, RefId[str]]] = DefaultWitoutValue()
+    name: Optional[Union[Default[None], RefId]] = Default[None](value=None)
     filter: Optional[Union[Global[bool], Variable, Default[bool]]] = Default[bool](value=False)
 
 
@@ -60,7 +61,7 @@ class RedistributeIntoEigrp(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     protocol: Union[Global[RedistributeProtocol], Variable]
-    route_policy: Optional[Union[DefaultWitoutValue, RefId[str]]] = DefaultWitoutValue()
+    route_policy: Optional[Union[Default[None], RefId]] = Default[None](value=None)
 
 
 class AddressFamily(BaseModel):

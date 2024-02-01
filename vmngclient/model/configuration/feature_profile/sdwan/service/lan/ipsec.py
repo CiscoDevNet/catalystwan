@@ -3,7 +3,7 @@ from typing import Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, DefaultWitoutValue, Global, Variable
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.common import (
     IkeCiphersuite,
     IkeGroup,
@@ -35,7 +35,7 @@ class InterfaceIpsecData(BaseModel):
     tunnel_mode: Optional[Union[Global[IpsecTunnelMode], Default[IpsecTunnelMode]]] = Field(
         alias="tunnelMode", default=Default[IpsecTunnelMode](value=IpsecTunnelMode.IPv4)
     )
-    description: Union[Global[str], Variable, DefaultWitoutValue] = DefaultWitoutValue()
+    description: Union[Global[str], Variable, Default[None]] = Default[None](value=None)
     address: Optional[IpsecAddress] = None
     ipv6_address: Optional[Union[Global[str], Variable]] = Field(alias="ipv6Address", default=None)
     tunnel_source: Optional[IpsecAddress] = Field(alias="tunnelSource", default=None)
@@ -44,17 +44,17 @@ class InterfaceIpsecData(BaseModel):
     tunnel_destination: Optional[IpsecAddress] = Field(alias="tunnelDestination", default=None)
     tunnel_destination_v6: Optional[Union[Global[str], Variable]] = Field(alias="tunnelDestinationV6", default=None)
     application: Union[Global[TunnelApplication], Variable]
-    tcp_mss_adjust: Union[Global[int], Variable, DefaultWitoutValue] = Field(
-        alias="tcpMssAdjust", default=DefaultWitoutValue()
+    tcp_mss_adjust: Union[Global[int], Variable, Default[None]] = Field(
+        alias="tcpMssAdjust", default=Default[None](value=None)
     )
-    tcp_mss_adjust_v6: Union[Global[int], Variable, DefaultWitoutValue] = Field(
-        alias="tcpMssAdjustV6", default=DefaultWitoutValue()
+    tcp_mss_adjust_v6: Union[Global[int], Variable, Default[None]] = Field(
+        alias="tcpMssAdjustV6", default=Default[None](value=None)
     )
     clear_dont_fragment: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
         alias="clearDontFragment", default=Default[bool](value=False)
     )
     mtu: Optional[Union[Global[int], Variable, Default[int]]] = Default[int](value=1500)
-    mtu_v6: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = Field(alias="mtuV6", default=None)
+    mtu_v6: Optional[Union[Global[int], Variable, Default[None]]] = Field(alias="mtuV6", default=None)
     dpd_interval: Union[Global[int], Variable, Default[int]] = Field(
         alias="dpdInterval", default=Default[int](value=10)
     )
@@ -73,8 +73,8 @@ class InterfaceIpsecData(BaseModel):
         alias="ikeGroup", default=Default[IkeGroup](value=IkeGroup.GROUP_16)
     )
     pre_shared_secret: Union[Global[str], Variable] = Field(alias="preSharedSecret")
-    ike_local_id: Union[Global[str], Variable, DefaultWitoutValue] = Field(alias="ikeLocalId")
-    ike_remote_id: Union[Global[str], Variable, DefaultWitoutValue] = Field(alias="ikeRemoteId")
+    ike_local_id: Union[Global[str], Variable, Default[None]] = Field(alias="ikeLocalId")
+    ike_remote_id: Union[Global[str], Variable, Default[None]] = Field(alias="ikeRemoteId")
     ipsec_rekey_interval: Union[Global[int], Variable, Default[int]] = Field(
         alias="ipsecRekeyInterval", default=Default[int](value=3600)
     )
@@ -87,8 +87,8 @@ class InterfaceIpsecData(BaseModel):
     perfect_forward_secrecy: Union[Global[PfsGroup], Variable, Default[PfsGroup]] = Field(
         alias="perfectForwardSecrecy", default=Default[PfsGroup](value=PfsGroup.GROUP_16)
     )
-    tracker: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = None
-    tunnel_route_via: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(
+    tracker: Optional[Union[Global[str], Variable, Default[None]]] = None
+    tunnel_route_via: Optional[Union[Global[str], Variable, Default[None]]] = Field(
         alias="tunnelRouteVia", default=None
     )
 

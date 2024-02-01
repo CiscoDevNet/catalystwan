@@ -3,7 +3,8 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, Global, RefId, Variable
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
+from vmngclient.models.profileparcel.traffic_policy import RefId
 
 
 class AttachmentType(str, Enum):
@@ -129,7 +130,7 @@ class ServiceInsertionAttachmentData(BaseModel):
     service_chain_instance_id: Optional[Union[Global[str], Variable]] = Field(
         alias="serviceChainInstanceID", default=None
     )
-    service_chain_definition_id: RefId[str] = Field(alias="serviceChainDefinitionID")
+    service_chain_definition_id: RefId = Field(alias="serviceChainDefinitionID")
     vpn: Union[Global[int], Variable]
     services: Optional[List[Service]] = None
 

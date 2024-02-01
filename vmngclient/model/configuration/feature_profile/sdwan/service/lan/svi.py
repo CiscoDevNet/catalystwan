@@ -2,7 +2,7 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from vmngclient.api.configuration_groups.parcel import Default, DefaultWitoutValue, Global, RefId, Variable
+from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
 from vmngclient.model.configuration.feature_profile.sdwan.service.lan.common import (
     Arp,
     StaticIPv4Address,
@@ -10,6 +10,7 @@ from vmngclient.model.configuration.feature_profile.sdwan.service.lan.common imp
     VrrpIPv6Address,
     VrrpTrackingObject,
 )
+from vmngclient.models.configuration.common import RefId
 
 
 class VrrpIPv4SecondaryAddress(BaseModel):
@@ -39,7 +40,7 @@ class VrrpIPv4(BaseModel):
     tloc_pref_change_value: Optional[Union[Global[int], Variable]] = Field(alias="tlocPrefChangeValue", default=None)
     tracking_object: Optional[List[VrrpTrackingObject]] = Field(alias="trackingObject", default=None)
 
-    prefix_list: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = DefaultWitoutValue()
+    prefix_list: Optional[Union[Global[str], Variable, Default[None]]] = Default[None](value=None)
 
 
 class VrrpIPv6(BaseModel):
@@ -49,7 +50,7 @@ class VrrpIPv6(BaseModel):
     priority: Union[Variable, Global[int], Default[int]] = Default[int](value=100)
     timer: Union[Variable, Global[int], Default[int]] = Default[int](value=1000)
     track_omp: Union[Global[bool], Default[bool]] = Field(alias="trackOmp", default=Default[bool](value=False))
-    track_prefix_list: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = Field(alias="trackPrefixList")
+    track_prefix_list: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="trackPrefixList")
     ipv6: List[VrrpIPv6Address]
     ipv6_secondary: Optional[List[VrrpIPv6SecondaryAddress]]
 
@@ -58,14 +59,14 @@ class Dhcpv6Helper(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     address: Union[Global[str], Variable] = Field(alias="address")
-    vpn: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = None
+    vpn: Optional[Union[Global[int], Variable, Default[None]]] = None
 
 
 class AdvancedSviAttributes(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    tcp_mss: Optional[Union[Global[int], Variable, DefaultWitoutValue]] = Field(
-        alias="tcpMss", default=DefaultWitoutValue()
+    tcp_mss: Optional[Union[Global[int], Variable, Default[None]]] = Field(
+        alias="tcpMss", default=Default[None](value=None)
     )
     arp_timeout: Optional[Union[Global[int], Variable, Default[int]]] = Field(
         alias="arpTimeout", default=Default[int](value=1200)
@@ -83,15 +84,13 @@ class IPv4Address(BaseModel):
 
     address: StaticIPv4Address = Field(alias="addressV4")
     secondary_address: Optional[List[StaticIPv4Address]] = Field(alias="secondaryAddressV4", default=None)
-    dhcp_helper: Optional[Union[Global[List[str]], Variable, DefaultWitoutValue]] = Field(
-        alias="dhcpHelperV4", default=None
-    )
+    dhcp_helper: Optional[Union[Global[List[str]], Variable, Default[None]]] = Field(alias="dhcpHelperV4", default=None)
 
 
 class IPv6Address(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    address: Union[Global[str], Variable, DefaultWitoutValue] = Field(alias="addressV6")
+    address: Union[Global[str], Variable, Default[None]] = Field(alias="addressV6")
     secondary_address: Optional[List[StaticIPv6Address]] = Field(alias="secondaryAddressV6", default=None)
     dhcp_helper: Optional[List[Dhcpv6Helper]] = Field(alias="dhcpHelperV6", default=None)
 
@@ -99,10 +98,10 @@ class IPv6Address(BaseModel):
 class AclQos(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    ipv4_acl_egress: Optional[RefId[str]] = Field(alias="ipv4AclEgress", default=None)
-    ipv4_acl_ingress: Optional[RefId[str]] = Field(alias="ipv4AclIngress", default=None)
-    ipv6_acl_egress: Optional[RefId[str]] = Field(alias="ipv6AclEgress", default=None)
-    ipv6_acl_ingress: Optional[RefId[str]] = Field(alias="ipv6AclIngress", default=None)
+    ipv4_acl_egress: Optional[RefId] = Field(alias="ipv4AclEgress", default=None)
+    ipv4_acl_ingress: Optional[RefId] = Field(alias="ipv4AclIngress", default=None)
+    ipv6_acl_egress: Optional[RefId] = Field(alias="ipv6AclEgress", default=None)
+    ipv6_acl_ingress: Optional[RefId] = Field(alias="ipv6AclIngress", default=None)
 
 
 class InterfaceSviData(BaseModel):
@@ -110,7 +109,7 @@ class InterfaceSviData(BaseModel):
 
     shutdown: Union[Global[bool], Variable, Default[bool]] = Default[bool](value=True)
     interface_name: Optional[Union[Global[str], Variable]] = Field(alias="interfaceName")
-    description: Optional[Union[Global[str], Variable, DefaultWitoutValue]] = DefaultWitoutValue()
+    description: Optional[Union[Global[str], Variable, Default[None]]] = Default[None](value=None)
     interface_mtu: Optional[Union[Global[int], Variable, Default[int]]] = Field(
         alias="ifMtu", default=Default[int](value=1500)
     )
