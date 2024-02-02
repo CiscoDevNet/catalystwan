@@ -268,7 +268,7 @@ class ClusterManagementAPI:
         """
         url_path = "/dataservice/clusterManagement/setup"
         data = asdict(service_configuration)  # type: ignore
-        response = self.session.put(url_path, data)
+        response = self.session.put(url_path, json=data)
         return True if response.status_code == 200 else False
 
     def get_cluster_management_health_status(self) -> Union[dict, list]:
