@@ -10,7 +10,7 @@ Place every model in the `models` directory.
 
 For endpoints, use `endpoints/configuration/feature_profiles/sdwan/*.py`. 
 
-For models, use `model/configuration/feature_profiles/sdwan/*.py`.
+For models, use `models/configuration/feature_profiles/sdwan/*.py`.
 
 ### 2. Default Values
 

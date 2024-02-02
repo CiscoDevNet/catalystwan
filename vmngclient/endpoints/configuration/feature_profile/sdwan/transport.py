@@ -3,7 +3,6 @@ from typing import Optional
 
 from vmngclient.api.configuration_groups.parcel import _ParcelBase
 from vmngclient.endpoints import JSON, APIEndpoints, delete, get, post, put, versions
-from vmngclient.model.configuration.feature_profile.sdwan.transport.management.vpn import ManagementVPN
 from vmngclient.models.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
     FeatureProfileCreationResponse,
@@ -15,6 +14,7 @@ from vmngclient.models.configuration.feature_profile.common import (
     ParcelId,
     SchemaTypeQuery,
 )
+from vmngclient.models.configuration.feature_profile.sdwan.management.vpn import ManagementVPN
 from vmngclient.models.configuration.feature_profile.sdwan.transport.cellular_controller import CellularController
 from vmngclient.typed_list import DataSequence
 

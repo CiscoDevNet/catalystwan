@@ -4,7 +4,7 @@ from typing import Optional, Union
 from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
-from vmngclient.model.configuration.feature_profile.sdwan.service.lan.common import (
+from vmngclient.models.configuration.feature_profile.sdwan.service.lan.common import (
     IkeCiphersuite,
     IkeGroup,
     IkeMode,

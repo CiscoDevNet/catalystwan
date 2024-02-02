@@ -4,15 +4,15 @@ from typing import List, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field
 
 from vmngclient.api.configuration_groups.parcel import Default, Global, Variable
-from vmngclient.model.configuration.feature_profile.sdwan.service.lan.common import (
+from vmngclient.models.configuration.common import RefId
+from vmngclient.models.configuration.feature_profile.sdwan.service.lan.common import (
     Arp,
     StaticIPv4Address,
     StaticIPv6Address,
     VrrpIPv6Address,
     VrrpTrackingObject,
 )
-from vmngclient.model.configuration.feature_profile.sdwan.service.lan.vpn import Direction
-from vmngclient.models.configuration.common import RefId
+from vmngclient.models.configuration.feature_profile.sdwan.service.lan.vpn import Direction
 
 
 class DynamicDhcpDistance(BaseModel):
