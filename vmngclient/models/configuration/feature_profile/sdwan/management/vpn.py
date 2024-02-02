@@ -3,8 +3,13 @@ from typing import Any, List, Optional
 from pydantic import BaseModel, Field
 
 from vmngclient.api.configuration_groups.parcel import Default
-
-from ..common import DNSIPv4, DNSIPv6, HostMapping, WANIPv4StaticRoute, WANIPv6StaticRoute
+from vmngclient.models.configuration.feature_profile.common import (
+    DNSIPv4,
+    DNSIPv6,
+    HostMapping,
+    WANIPv4StaticRoute,
+    WANIPv6StaticRoute,
+)
 
 
 class ManagementVPN(BaseModel):
