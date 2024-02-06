@@ -1,6 +1,6 @@
 :tocdepth: 3
 
-vmngclient.utils package
+catalystwan.utils package
 ========================
 
 Submodules
@@ -9,7 +9,7 @@ Submodules
 certificate\_status module
 --------------------------
 
-.. automodule:: vmngclient.utils.certificate_status
+.. automodule:: catalystwan.utils.certificate_status
    :members:
    :undoc-members:
    :show-inheritance:
@@ -17,7 +17,7 @@ certificate\_status module
 config\_status module
 ---------------------
 
-.. automodule:: vmngclient.utils.config_status
+.. automodule:: catalystwan.utils.config_status
    :members:
    :undoc-members:
    :show-inheritance:
@@ -25,7 +25,7 @@ config\_status module
 creation\_tools module
 ----------------------
 
-.. automodule:: vmngclient.utils.creation_tools
+.. automodule:: catalystwan.utils.creation_tools
    :members:
    :undoc-members:
    :show-inheritance:
@@ -33,7 +33,7 @@ creation\_tools module
 personality module
 ------------------
 
-.. automodule:: vmngclient.utils.personality
+.. automodule:: catalystwan.utils.personality
    :members:
    :undoc-members:
    :show-inheritance:
@@ -41,7 +41,7 @@ personality module
 reachability module
 -------------------
 
-.. automodule:: vmngclient.utils.reachability
+.. automodule:: catalystwan.utils.reachability
    :members:
    :undoc-members:
    :show-inheritance:
@@ -49,7 +49,7 @@ reachability module
 validate\_status module
 -----------------------
 
-.. automodule:: vmngclient.utils.validate_status
+.. automodule:: catalystwan.utils.validate_status
    :members:
    :undoc-members:
    :show-inheritance:
@@ -57,7 +57,7 @@ validate\_status module
 Module contents
 ---------------
 
-.. automodule:: vmngclient.utils
+.. automodule:: catalystwan.utils
    :members:
    :undoc-members:
    :show-inheritance:

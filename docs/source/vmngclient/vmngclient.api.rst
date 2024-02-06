@@ -1,6 +1,6 @@
 :tocdepth: 3
 
-vmngclient.api package
+catalystwan.api package
 ======================
 
 Submodules
@@ -9,7 +9,7 @@ Submodules
 admin\_tech\_api module
 -----------------------
 
-.. automodule:: vmngclient.api.admin_tech_api
+.. automodule:: catalystwan.api.admin_tech_api
    :members:
    :undoc-members:
    :show-inheritance:
@@ -17,7 +17,7 @@ admin\_tech\_api module
 administration module
 ---------------------
 
-.. automodule:: vmngclient.api.administration
+.. automodule:: catalystwan.api.administration
    :members:
    :undoc-members:
    :show-inheritance:
@@ -25,7 +25,7 @@ administration module
 alarms\_api module
 -----------------------
 
-.. automodule:: vmngclient.api.alarms_api
+.. automodule:: catalystwan.api.alarms_api
    :members:
    :undoc-members:
    :show-inheritance:
@@ -33,7 +33,7 @@ alarms\_api module
 basic\_api module
 -----------------
 
-.. automodule:: vmngclient.api.basic_api
+.. automodule:: catalystwan.api.basic_api
    :members:
    :undoc-members:
    :show-inheritance:
@@ -41,7 +41,7 @@ basic\_api module
 device\_action\_api module
 --------------------------
 
-.. automodule:: vmngclient.api.device_action_api
+.. automodule:: catalystwan.api.device_action_api
    :members:
    :undoc-members:
    :show-inheritance:
@@ -49,7 +49,7 @@ device\_action\_api module
 logs\_api module
 ----------------
 
-.. automodule:: vmngclient.api.logs_api
+.. automodule:: catalystwan.api.logs_api
    :members:
    :undoc-members:
    :show-inheritance:
@@ -57,7 +57,7 @@ logs\_api module
 omp\_api module
 ---------------
 
-.. automodule:: vmngclient.api.omp_api
+.. automodule:: catalystwan.api.omp_api
    :members:
    :undoc-members:
    :show-inheritance:
@@ -65,7 +65,7 @@ omp\_api module
 packet\_capture\_api module
 ---------------------------
 
-.. automodule:: vmngclient.api.packet_capture_api
+.. automodule:: catalystwan.api.packet_capture_api
    :members:
    :undoc-members:
    :show-inheritance:
@@ -73,7 +73,7 @@ packet\_capture\_api module
 speedtest\_api module
 ---------------------
 
-.. automodule:: vmngclient.api.speedtest_api
+.. automodule:: catalystwan.api.speedtest_api
    :members:
    :undoc-members:
    :show-inheritance:
@@ -81,7 +81,7 @@ speedtest\_api module
 Module contents
 ---------------
 
-.. automodule:: vmngclient.api
+.. automodule:: catalystwan.api
    :members:
    :undoc-members:
    :show-inheritance:
