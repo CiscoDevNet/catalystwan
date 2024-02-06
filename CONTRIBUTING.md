@@ -57,7 +57,7 @@ Always write a clear log message for your commits.
     pre-commit install
     ```
 ### Environment Variables
-- `catalystwan_DEVEL` when set: loggers will be configured according to `./logging.conf` and `urllib3.exceptions.InsecureRequestWarning` will be suppressed
+- `VMNGCLIENT_DEVEL` when set: loggers will be configured according to `./logging.conf` and `urllib3.exceptions.InsecureRequestWarning` will be suppressed
 
 ## Code guidelines
 
