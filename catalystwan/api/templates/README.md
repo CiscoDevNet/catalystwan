@@ -18,14 +18,14 @@ These steps will help you to automate feature template creation. We'll explain w
 
 1. Get your template type name and version. 
     >Note: display name is not template type name!
-- For example, you could extract it from response body. Go to your vManage and create any template which you would like to automate in vmngclient. Send template creation request and check for `templateType` and `templateMinVersion` variable names. `OMP` (display name) for vSmart has `omp-vsmart` template type name.
+- For example, you could extract it from response body. Go to your vManage and create any template which you would like to automate in catalystwan. Send template creation request and check for `templateType` and `templateMinVersion` variable names. `OMP` (display name) for vSmart has `omp-vsmart` template type name.
 
-2. With corresponding `templateType` we are able to create new class which implements `FeatureTemplate` interface. Create new file in `vmngclient\api\templates\models\` and copy-paste the code and change name of the class with its type attribute.
+2. With corresponding `templateType` we are able to create new class which implements `FeatureTemplate` interface. Create new file in `catalystwan\api\templates\models\` and copy-paste the code and change name of the class with its type attribute.
 
 	```python
 	from pathlib import Path
 	from typing import ClassVar
-	from vmngclient.api.templates.feature_template import FeatureTemplate
+	from catalystwan.api.templates.feature_template import FeatureTemplate
 
 
 	class OMPvSmart(FeatureTemplate):
@@ -86,7 +86,7 @@ These steps will help you to automate feature template creation. We'll explain w
     ```
 
 8. Open `response_{template_type}.json` file.
-9. Find `fields` key. The value should be list of dictionaries. Get every possible key in the dictionary and fill our class with every possible key. You can find the code in `vmngclient\api\templates\models\omp_vsmart_model.py` file.
+9. Find `fields` key. The value should be list of dictionaries. Get every possible key in the dictionary and fill our class with every possible key. You can find the code in `catalystwan\api\templates\models\omp_vsmart_model.py` file.
 
 TODO:
 - Nested fields

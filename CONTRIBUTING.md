@@ -23,9 +23,9 @@ Test newly implemented features on Cisco SD-WAN, ideally on different versions. 
   ```
   poetry build
   ```
-  Then in `/vManage-client/dist/` directory there is a `.whl` file named `vmngclient-<version>-py3-none-any.whl`, which can be installed by running
+  Then in `/vManage-client/dist/` directory there is a `.whl` file named `catalystwan-<version>-py3-none-any.whl`, which can be installed by running
   ```
-  pip install vmngclient-<version>-py3-none-any.whl
+  pip install catalystwan-<version>-py3-none-any.whl
   ```
 
 ## Submitting changes
@@ -90,8 +90,8 @@ Start reading our code, and you'll get the hang of it.
   ```python
   from pydantic import BaseModel, Field
   from typing import List
-  from vmngclient.endpoints import APIEndpoints, delete, versions, view
-  from vmngclient.utils.session_type import ProviderView
+  from catalystwan.endpoints import APIEndpoints, delete, versions, view
+  from catalystwan.utils.session_type import ProviderView
 
   class TenantBulkDeleteRequest(BaseModel):
       password: str
@@ -111,21 +111,21 @@ Start reading our code, and you'll get the hang of it.
 
   Please note that when using `@request` decorator method must have no body. Request will be built automatically and return value based on defined type will be provided.
 
-  API endpoints Definitions can be found in: `vmngclient/endpoints` directory.
+  API endpoints Definitions can be found in: `catalystwan/endpoints` directory.
 
   The organization of items **strictly** follows an OpenAPI spec: https://developer.cisco.com/docs/sdwan/#!sd-wan-vmanage-v20-9
 
   Auto generated python methods names can be found in: https://ghe-msite.cisco.com/sbasan/openapi-generator-vmanage
 
-  If common data-model is being reused by more than one `APIEndpoints` class it should be moved to `vmngclient/model` folder with appropriate module name.
+  If common data-model is being reused by more than one `APIEndpoints` class it should be moved to `catalystwan/model` folder with appropriate module name.
 
   Dedicated pre-commit step will automatically check corectness and add documentation for endpoints with `@request` (or `@get`, `@post`, `@put`, `@delete`) decorator.
 
-  Custom payload types are allowed (eg. for sending various types of files) please check example: [**SoftwarePackageUpdatePayload**](vmngclient/utils/upgrades_helper.py#L68)
+  Custom payload types are allowed (eg. for sending various types of files) please check example: [**SoftwarePackageUpdatePayload**](catalystwan/utils/upgrades_helper.py#L68)
 
-1. Check that endpoints you want to utilize in your API already defined in `vmngclient/endpoints`.
+1. Check that endpoints you want to utilize in your API already defined in `catalystwan/endpoints`.
 2. If endpoint not present, create new file with endpoint including data-model and methods with `@request`, `@view` and `@versions` decorators when needed.
-3. Implement higher level API in `vmngclient/api` using created endpoints.
+3. Implement higher level API in `catalystwan/api` using created endpoints.
 
 Thanks,\
-vmngclient team
+catalystwan team

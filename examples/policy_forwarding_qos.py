@@ -1,6 +1,6 @@
 # mypy: ignore-errors
 """
-This example demonstrates usage of PolicyAPI in vmngclient
+This example demonstrates usage of PolicyAPI in catalystwan
 Code below provides same results as obtained after executing workflow manually via WEB-UI according to:
 'Forwarding and QoS Configuration Guide for vEdge Routers, Cisco SD-WAN Release 20'
 https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/qos/vEdge-20-x/qos-book/forwarding-qos.html#Cisco_Concept.dita_aa3e0d07-462e-463f-8f45-681f38f61ab0

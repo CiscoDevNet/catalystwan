@@ -12,7 +12,7 @@ from packaging.specifiers import SpecifierSet  # type: ignore
 from catalystwan.endpoints import BASE_PATH, APIEndpointRequestMeta, TypeSpecifier, request, versions, view
 from catalystwan.utils.session_type import SessionType  # type: ignore
 
-SOURCE_BASE_PATH = "https://github.com/CiscoDevNet/vManage-client/blob/main/"
+SOURCE_BASE_PATH = "https://github.com/CiscoDevNet/catalystwan/blob/main/"
 
 
 def relative(absolute: str) -> str:

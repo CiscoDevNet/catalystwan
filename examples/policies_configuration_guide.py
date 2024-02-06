@@ -1,6 +1,6 @@
 # mypy: ignore-errors
 """
-This example demonstrates usage of PolicyAPI in vmngclient
+This example demonstrates usage of PolicyAPI in catalystwan
 Code below provides same results as obtained after executing workflow manually via WEB-UI according to:
 'Policies Configuration Guide for vEdge Routers, Cisco SD-WAN Release 20'
 https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/policies/vedge-20-x/policies-book/centralized-policy.html
