@@ -30,7 +30,6 @@ class VpnType(Enum):
     VPN_MANAGMENT = 512
 
 
-# from vmngclient.third_parties
 @define
 class TacacsServer:
     """Default values from documentations."""
