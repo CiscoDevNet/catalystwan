@@ -1,3 +1,7 @@
+<p align="center">
+  <a href="#"><img src="docs/catalystwan.svg" alt="Cisco Catalyst WAN SDK Logo" style="height:150px" />
+</p>
+
 [![Python-Supported](https://img.shields.io/static/v1?label=Python&logo=Python&color=3776AB&message=3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12)](https://www.python.org/)
 
 vManage client is a package for creating simple and parallel automatic requests via official vManage API. It is intended to serve as a multiple session handler (provider, provider as a tenant, tenant). The library is not dependent on environment which is being run in, you just need a connection to any vManage.
