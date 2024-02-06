@@ -9,10 +9,10 @@ from typing import List
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "vmngclient"
-copyright = "2022, kagorski"
+project = "catalystwan"
+copyright = "2024, kagorski"
 author = "kagorski"
-release = importlib.metadata.version("vmngclient")
+release = importlib.metadata.version("catalystwan")
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

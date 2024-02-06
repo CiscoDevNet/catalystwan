@@ -28,9 +28,9 @@ from uuid import UUID
 from pydantic import ValidationError
 from requests import RequestException
 
-from vmngclient.api.policy_api import PolicyAPI
-from vmngclient.exceptions import vManageClientError
-from vmngclient.models.policy import (
+from catalystwan.api.policy_api import PolicyAPI
+from catalystwan.exceptions import vManageClientError
+from catalystwan.models.policy import (
     AppList,
     AppProbeClassList,
     CentralizedPolicy,
@@ -392,7 +392,7 @@ def delete_created_items(api: PolicyAPI, items: List[ConfigItem]) -> None:
 
 
 def run_demo(args: CmdArguments):
-    from vmngclient.session import create_vManageSession
+    from catalystwan.session import create_vManageSession
 
     with create_vManageSession(url=args.url, port=args.port, username=args.user, password=args.password) as session:
         api = session.api.policy

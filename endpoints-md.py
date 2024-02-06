@@ -9,8 +9,8 @@ from urllib.request import pathname2url
 
 from packaging.specifiers import SpecifierSet  # type: ignore
 
-from vmngclient.endpoints import BASE_PATH, APIEndpointRequestMeta, TypeSpecifier, request, versions, view
-from vmngclient.utils.session_type import SessionType  # type: ignore
+from catalystwan.endpoints import BASE_PATH, APIEndpointRequestMeta, TypeSpecifier, request, versions, view
+from catalystwan.utils.session_type import SessionType  # type: ignore
 
 SOURCE_BASE_PATH = "https://github.com/CiscoDevNet/vManage-client/blob/main/"
 
@@ -192,7 +192,7 @@ class EndpointRegistry(MarkdownRenderer):
 if __name__ == "__main__":
     from unittest.mock import MagicMock
 
-    from vmngclient.endpoints.endpoints_container import APIEndpointContainter
+    from catalystwan.endpoints.endpoints_container import APIEndpointContainter
 
     # this instantiates APIEndpoints classes triggering method decorators
     # endpoints not attached to container will be not documented !

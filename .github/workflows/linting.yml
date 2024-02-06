@@ -34,8 +34,8 @@ jobs:
           poetry install --sync -v
           mkdir .mypy_cache
       - name: Checking if imports are sorted correctly
-        run: poetry run isort --check --diff -l 120 --profile black vmngclient
+        run: poetry run isort --check --diff -l 120 --profile black catalystwan
       - name: Check static-typing
-        run: poetry run mypy --show-error-codes --show-error-context --pretty --install-types --non-interactive vmngclient --cache-dir=.mypy_cache/
+        run: poetry run mypy --show-error-codes --show-error-context --pretty --install-types --non-interactive catalystwan --cache-dir=.mypy_cache/
       - name: Check code style
-        run: poetry run flake8 --max-line-length 120 --inline-quotes double --extend-ignore E203,W503 vmngclient
+        run: poetry run flake8 --max-line-length 120 --inline-quotes double --extend-ignore E203,W503 catalystwan
