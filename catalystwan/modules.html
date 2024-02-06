@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>vManage-client &#8212; catalystwan 0.22.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="vManage-client package" href="catalystwan.html" />
+    <link rel="prev" title="This is documentation for vManage-client" href="../index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="catalystwan.html" title="vManage-client package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="This is documentation for vManage-client"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">catalystwan 0.22.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">vManage-client</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="vmanage-client">
+<h1>vManage-client<a class="headerlink" href="#vmanage-client" title="Permalink to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="catalystwan.html">vManage-client package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="catalystwan.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.api.html">catalystwan.api package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.utils.html">catalystwan.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="catalystwan.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="catalystwan.html#module-catalystwan.dataclasses">dataclasses module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.AdminTech"><code class="docutils literal notranslate"><span class="pre">AdminTech</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.AlarmData"><code class="docutils literal notranslate"><span class="pre">AlarmData</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.BfdSessionData"><code class="docutils literal notranslate"><span class="pre">BfdSessionData</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.Certificate"><code class="docutils literal notranslate"><span class="pre">Certificate</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.CloudConnectorData"><code class="docutils literal notranslate"><span class="pre">CloudConnectorData</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.CloudOnRampForSaasMode"><code class="docutils literal notranslate"><span class="pre">CloudOnRampForSaasMode</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.CloudServicesSettings"><code class="docutils literal notranslate"><span class="pre">CloudServicesSettings</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.Connection"><code class="docutils literal notranslate"><span class="pre">Connection</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.DataclassBase"><code class="docutils literal notranslate"><span class="pre">DataclassBase</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.Device"><code class="docutils literal notranslate"><span class="pre">Device</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.DeviceAdminTech"><code class="docutils literal notranslate"><span class="pre">DeviceAdminTech</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.DeviceTemplateInfo"><code class="docutils literal notranslate"><span class="pre">DeviceTemplateInfo</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.EventData"><code class="docutils literal notranslate"><span class="pre">EventData</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.FeatureTemplateInfo"><code class="docutils literal notranslate"><span class="pre">FeatureTemplateInfo</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.FeatureTemplateInformation"><code class="docutils literal notranslate"><span class="pre">FeatureTemplateInformation</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.FeatureTemplatesTypes"><code class="docutils literal notranslate"><span class="pre">FeatureTemplatesTypes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.OmpAdvertisedRouteData"><code class="docutils literal notranslate"><span class="pre">OmpAdvertisedRouteData</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.OmpAdvertisedTlocData"><code class="docutils literal notranslate"><span class="pre">OmpAdvertisedTlocData</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.OmpPeerData"><code class="docutils literal notranslate"><span class="pre">OmpPeerData</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.OmpReceivedRouteData"><code class="docutils literal notranslate"><span class="pre">OmpReceivedRouteData</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.OmpReceivedTlocData"><code class="docutils literal notranslate"><span class="pre">OmpReceivedTlocData</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.OmpServiceData"><code class="docutils literal notranslate"><span class="pre">OmpServiceData</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.OmpSummaryData"><code class="docutils literal notranslate"><span class="pre">OmpSummaryData</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.Organization"><code class="docutils literal notranslate"><span class="pre">Organization</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.PacketSetup"><code class="docutils literal notranslate"><span class="pre">PacketSetup</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.Password"><code class="docutils literal notranslate"><span class="pre">Password</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.RadiusServer"><code class="docutils literal notranslate"><span class="pre">RadiusServer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.ResourcePoolData"><code class="docutils literal notranslate"><span class="pre">ResourcePoolData</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.ServiceConfigurationData"><code class="docutils literal notranslate"><span class="pre">ServiceConfigurationData</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.SoftwareInstallTimeout"><code class="docutils literal notranslate"><span class="pre">SoftwareInstallTimeout</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.Speedtest"><code class="docutils literal notranslate"><span class="pre">Speedtest</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.Status"><code class="docutils literal notranslate"><span class="pre">Status</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.TLOC"><code class="docutils literal notranslate"><span class="pre">TLOC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.TacacsServer"><code class="docutils literal notranslate"><span class="pre">TacacsServer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.TemplateInfo"><code class="docutils literal notranslate"><span class="pre">TemplateInfo</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.TenantAAA"><code class="docutils literal notranslate"><span class="pre">TenantAAA</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.TenantRadiusServer"><code class="docutils literal notranslate"><span class="pre">TenantRadiusServer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.TenantTacacsServer"><code class="docutils literal notranslate"><span class="pre">TenantTacacsServer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.TierInfo"><code class="docutils literal notranslate"><span class="pre">TierInfo</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.Vbond"><code class="docutils literal notranslate"><span class="pre">Vbond</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.WanInterface"><code class="docutils literal notranslate"><span class="pre">WanInterface</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="catalystwan.html#module-catalystwan.session">session module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.session.TenancyMode"><code class="docutils literal notranslate"><span class="pre">TenancyMode</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.session.UserMode"><code class="docutils literal notranslate"><span class="pre">UserMode</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.session.ViewMode"><code class="docutils literal notranslate"><span class="pre">ViewMode</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.session.create_vManageSession"><code class="docutils literal notranslate"><span class="pre">create_vManageSession()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.session.determine_session_type"><code class="docutils literal notranslate"><span class="pre">determine_session_type()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageBadRequestError"><code class="docutils literal notranslate"><span class="pre">vManageBadRequestError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageBadResponseError"><code class="docutils literal notranslate"><span class="pre">vManageBadResponseError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageResponseAdapter"><code class="docutils literal notranslate"><span class="pre">vManageResponseAdapter</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession"><code class="docutils literal notranslate"><span class="pre">vManageSession</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="catalystwan.html#module-catalystwan">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.get_first_external_stack_frame"><code class="docutils literal notranslate"><span class="pre">get_first_external_stack_frame()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.is_file_in_package"><code class="docutils literal notranslate"><span class="pre">is_file_in_package()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.list_package_sources"><code class="docutils literal notranslate"><span class="pre">list_package_sources()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="catalystwan.html#catalystwan.with_proc_info_header"><code class="docutils literal notranslate"><span class="pre">with_proc_info_header()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="../index.html"
+                          title="previous chapter">This is documentation for vManage-client</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="catalystwan.html"
+                          title="next chapter">vManage-client package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/catalystwan/modules.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="catalystwan.html" title="vManage-client package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="This is documentation for vManage-client"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">catalystwan 0.22.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">vManage-client</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2024, kagorski.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    </div>
+  </body>
+</html>

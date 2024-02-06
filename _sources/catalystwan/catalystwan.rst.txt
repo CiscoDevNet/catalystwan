@@ -9,8 +9,8 @@ Subpackages
 .. toctree::
    :maxdepth: 2
 
-   vmngclient.api
-   vmngclient.utils
+   catalystwan.api
+   catalystwan.utils
 
 Submodules
 ----------
@@ -18,7 +18,7 @@ Submodules
 dataclasses module
 ------------------
 
-.. automodule:: vmngclient.dataclasses
+.. automodule:: catalystwan.dataclasses
    :members:
    :undoc-members:
    :show-inheritance:
@@ -26,7 +26,7 @@ dataclasses module
 session module
 --------------
 
-.. automodule:: vmngclient.session
+.. automodule:: catalystwan.session
    :members:
    :undoc-members:
    :show-inheritance:
@@ -34,7 +34,7 @@ session module
 Module contents
 ---------------
 
-.. automodule:: vmngclient
+.. automodule:: catalystwan
    :members:
    :undoc-members:
    :show-inheritance:
