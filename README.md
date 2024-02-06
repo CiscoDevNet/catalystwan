@@ -4,13 +4,13 @@ vManage client is a package for creating simple and parallel automatic requests 
 
 ## Installation
 ```console
-pip install vmngclient
+pip install catalystwan
 ```
 
 ## Session usage example
 Our session is an extension to `requests.Session` designed to make it easier to communicate via API calls with vManage. We provide ready to use authenticetion, you have to simply provide the vmanage url, username and password as as if you were doing it through a GUI. 
 ```python
-from vmngclient.session import create_vManageSession
+from catalystwan.session import create_vManageSession
 
 url = "example.com"
 username = "admin"
@@ -248,9 +248,9 @@ api.get_vsmart_mapping()
 
 ```python
 from pathlib import Path
-from vmngclient.session import create_vManageSession
-from vmngclient.models.tenant import TenantExport
-from vmngclient.workflows.tenant_migration import migration_workflow
+from catalystwan.session import create_vManageSession
+from catalystwan.models.tenant import TenantExport
+from catalystwan.workflows.tenant_migration import migration_workflow
 
 tenant = TenantExport(
     name="mango",
