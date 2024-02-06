@@ -28,7 +28,7 @@ class TestAaaAPI(unittest.TestCase):
         self.p_aaa_dataclass = create_dataclass(TenantAAA, self.p_aaa)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.Session")
+    @patch("catalystwan.session.Session")
     @patch("requests.Response")
     def test_del_aaa(self, status_code, expected_outcome, mock_session, mock_response):
         # Arrange
@@ -42,7 +42,7 @@ class TestAaaAPI(unittest.TestCase):
 
     @parameterized.expand([[200, True], [400, False]])
     @patch("requests.Response")
-    @patch("vmngclient.session.Session")
+    @patch("catalystwan.session.Session")
     def test_add_aaa(self, status_code, expected_outcome, mock_session, mock_response):
         # Arrange
         mock_session.get_data.return_value = self.aaa
@@ -53,7 +53,7 @@ class TestAaaAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, expected_outcome)
 
-    @patch("vmngclient.session.Session")
+    @patch("catalystwan.session.Session")
     def test_get_aaa(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.aaa
@@ -63,7 +63,7 @@ class TestAaaAPI(unittest.TestCase):
         self.assertEqual(answer, self.aaa_dataclass)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.Session")
+    @patch("catalystwan.session.Session")
     @patch("requests.Response")
     def test_put_aaa(self, status_code, expected_outcome, mock_session, mock_response):
         # Arrange
@@ -138,7 +138,7 @@ class TestRadiusAPI(unittest.TestCase):
         self.p_radius_server_dataclass = create_dataclass(TenantRadiusServer, self.p_radius_server)
 
     @parameterized.expand([[204, True], [400, False]])
-    @patch("vmngclient.session.Session")
+    @patch("catalystwan.session.Session")
     @patch("requests.Response")
     def test_del_radius(self, status_code, expected_outcome, mock_session, mock_response):
         # Arrange
@@ -151,7 +151,7 @@ class TestRadiusAPI(unittest.TestCase):
         self.assertEqual(answer, expected_outcome)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.Session")
+    @patch("catalystwan.session.Session")
     @patch("requests.Response")
     def test_add_radius(self, status_code, expected_outcome, mock_session, mock_response):
         # Arrange
@@ -163,7 +163,7 @@ class TestRadiusAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, expected_outcome)
 
-    @patch("vmngclient.session.Session")
+    @patch("catalystwan.session.Session")
     def test_get_radius(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.radius_server
@@ -173,7 +173,7 @@ class TestRadiusAPI(unittest.TestCase):
         self.assertEqual(answer, self.radius_server_dataclass)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.Session")
+    @patch("catalystwan.session.Session")
     @patch("requests.Response")
     def test_put_radius(self, status_code, expected_outcome, mock_session, mock_response):
         # Arrange
@@ -243,7 +243,7 @@ class TestTacacsAPI(unittest.TestCase):
         self.p_tacacs_server_dataclass = create_dataclass(TenantTacacsServer, self.p_tacacs_server)
 
     @parameterized.expand([[204, True], [400, False]])
-    @patch("vmngclient.session.Session")
+    @patch("catalystwan.session.Session")
     @patch("requests.Response")
     def test_del_tacacs(self, status_code, expected_outcome, mock_session, mock_response):
         # Arrange
@@ -256,7 +256,7 @@ class TestTacacsAPI(unittest.TestCase):
         self.assertEqual(answer, expected_outcome)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.Session")
+    @patch("catalystwan.session.Session")
     @patch("requests.Response")
     def test_add_tacacs(self, status_code, expected_outcome, mock_session, mock_response):
         # Arrange
@@ -268,7 +268,7 @@ class TestTacacsAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, expected_outcome)
 
-    @patch("vmngclient.session.Session")
+    @patch("catalystwan.session.Session")
     def test_get_tacacs(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.tacacs_server
@@ -278,7 +278,7 @@ class TestTacacsAPI(unittest.TestCase):
         self.assertEqual(answer, self.tacacs_server_dataclass)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.Session")
+    @patch("catalystwan.session.Session")
     @patch("requests.Response")
     def test_put_tacacs(self, status_code, expected_outcome, mock_session, mock_response):
         # Arrange

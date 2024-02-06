@@ -2,8 +2,8 @@
 vManage API endpoint handlers in declarative way.
 Just create a sub-class and define endpoints using using included decorators: request, view, versions.
 Method decorated with @request has no body, as decorator constructs and sends request.
->>> from vmngclient.endpoints import APIEndpoints, versions, view, request
->>> from vmngclient.utils.session_type import ProviderView
+>>> from catalystwan.endpoints import APIEndpoints, versions, view, request
+>>> from catalystwan.utils.session_type import ProviderView
 >>>
 >>>
 >>> class TenantBulkDeleteRequest(BaseModel):
@@ -374,7 +374,7 @@ class request(APIEndpointsDecorator):
 
             "payload": argument with that name is used to send data in request
             usually it is user defined subclass of: pydantic.BaseModel
-            other types are also supported please check: vmngclient.endpoints.PayloadType
+            other types are also supported please check: catalystwan.endpoints.PayloadType
 
             "params": argument with that name is used to generate url query string
             supports Dict[str, str] and pydantic.BaseModel
@@ -383,7 +383,7 @@ class request(APIEndpointsDecorator):
 
         Return Type:
 
-            supports types defined in: vmngclient.endpoints.ReturnType
+            supports types defined in: catalystwan.endpoints.ReturnType
 
     Raises:
         APIEndpointError: when decorated method has unsupported parameters or response type

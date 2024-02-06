@@ -45,7 +45,7 @@ organization_dataclass = Organization("My org name", 1)
 
 
 class TestUsersAPI(unittest.TestCase):
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def setUp(self, session_mock):
         self.session = session_mock
         self.session.api_version = None
@@ -150,7 +150,7 @@ class TestUsersAPI(unittest.TestCase):
 
 
 class TestUserGroupsAPI(unittest.TestCase):
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def setUp(self, session_mock):
         self.session = session_mock
         self.session.api_version = None
@@ -206,7 +206,7 @@ class TestUserGroupsAPI(unittest.TestCase):
 
 
 class TestResourceGroupsAPI(unittest.TestCase):
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def setUp(self, session_mock):
         self.session = session_mock
         self.session.api_version = None
@@ -292,7 +292,7 @@ class TestClusterManagementAPI(unittest.TestCase):
         ]
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     @patch("requests.Response")
     def test_modify_cluster_setup(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
@@ -303,7 +303,7 @@ class TestClusterManagementAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, expected_outcome)
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_get_cluster_management_health_status(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.cluster_management_health_status
@@ -326,7 +326,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         self.cloud_services_settings_dataclass = create_dataclass(CloudServicesSettings, self.cloud_services_settings)
         self.cloud_on_ramp = [{"": ""}]
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_get_sdavc_cloud_connector_config(self, mock_session):
         # Arrange
         mock_session.get_json.return_value = self.cloud_connector_data
@@ -336,7 +336,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         self.assertEqual(answer, self.cloud_connector_data_dataclass)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     @patch("requests.Response")
     def test_enable_sdavc_cloud_connector(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
@@ -350,7 +350,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         self.assertEqual(answer, expected_outcome)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     @patch("requests.Response")
     def test_disable_sdavc_cloud_connector(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
@@ -361,7 +361,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, expected_outcome)
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_get_cloud_services(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = [self.cloud_services_settings]
@@ -371,7 +371,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         self.assertEqual(answer, self.cloud_services_settings_dataclass)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     @patch("requests.Response")
     def test_set_cloud_services(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
@@ -382,7 +382,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, expected_outcome)
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_get_cloud_on_ramp_for_saas_mode(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.cloud_on_ramp
@@ -392,7 +392,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         self.assertEqual(answer, self.cloud_on_ramp)
 
     @parameterized.expand([[200, True], [400, False]])
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     @patch("requests.Response")
     def test_enable_cloud_on_ramp_for_saas_mode(self, status_code, expected_outcome, mock_response, mock_session):
         # Arrange
@@ -403,7 +403,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, expected_outcome)
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_get_organization(self, mock_session):
         # Arrange
         organization = [{"domain-id": "1", "org": "My org name", "controlConnectionUp": "true"}]
@@ -415,7 +415,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         self.assertEqual(answer, organization_data)
 
     @parameterized.expand([[password_dataclass], [certificate_dataclass], [organization_dataclass]])
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     @patch("requests.Response")
     def test_update(self, payload, mock_response, mock_session):
         # Arrange
@@ -426,7 +426,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, True)
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     @patch("requests.Response")
     def test_update_vbond(self, mock_response, mock_session):
         # Arrange
@@ -437,7 +437,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, True)
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     @patch("requests.Response")
     def test_update_error_with_dataclass(self, mock_response, mock_session):
         # Arrange
@@ -452,7 +452,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
         # Assert
         self.assertRaises(InvalidOperationError, answer)
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     @patch("requests.Response")
     def test_update_error_without_dataclass(self, mock_response, mock_session):
         # Arrange

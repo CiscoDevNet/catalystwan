@@ -45,7 +45,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         self.mock_device_versions = DeviceVersions(self.mock_repository_object)
         self.mock_partition_manager_obj = PartitionManagerAPI(mock_session)
 
-    @patch("vmngclient.utils.upgrades_helper.get_install_specification")
+    @patch("catalystwan.utils.upgrades_helper.get_install_specification")
     @patch.object(DeviceVersions, "get_devices_available_versions")
     def test_remove_partition_if_force_true(self, mock_get_device_list, mock_get_spec):
         # Prepare mock data
@@ -93,7 +93,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         self.assertEqual(answer, None, "lists are not equal")
 
     @patch.object(DeviceVersions, "get_devices_current_version")
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_set_default_partition(self, mock_session, mock_get_devices):
         # Arrange
         mock_partition_manager = PartitionManagerAPI(mock_session)

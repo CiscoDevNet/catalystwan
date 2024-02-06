@@ -1,5 +1,5 @@
 class vManageClientError(Exception):
-    """Superclass of all vmngclient exception types."""
+    """Superclass of all catalystwan exception types."""
 
 
 class InvalidOperationError(vManageClientError):

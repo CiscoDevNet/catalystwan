@@ -33,7 +33,7 @@ def with_proc_info_header(method: Callable[..., str]) -> Callable[..., str]:
 def get_first_external_stack_frame(stack: StackSummary) -> Optional[FrameSummary]:
     """
     Get the first python frame
-    on the stack before entering vmngclient module
+    on the stack before entering catalystwan module
     """
     if len(stack) < 1:
         return None
@@ -49,7 +49,7 @@ def get_first_external_stack_frame(stack: StackSummary) -> Optional[FrameSummary
 def is_file_in_package(fname: str) -> bool:
     """
     Checks if filepath given by string
-    is part of vmngclient source code
+    is part of catalystwan source code
     """
     return Path(fname) in pkg_src_list
 
@@ -71,8 +71,8 @@ __version__ = metadata.version(__package__)
 pkg_src_list = list_package_sources()
 
 
-if environ.get("VMNGCLIENT_DEVEL") is not None:
+if environ.get("catalystwan_DEVEL") is not None:
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-    vmngclient_logger = logging.getLogger(__name__)
+    catalystwan_logger = logging.getLogger(__name__)
     logging.config.fileConfig(LOGGING_CONF_DIR, disable_existing_loggers=False)
-    vmngclient_logger.debug(f"vmngclient {__version__}")
+    catalystwan_logger.debug(f"catalystwan {__version__}")

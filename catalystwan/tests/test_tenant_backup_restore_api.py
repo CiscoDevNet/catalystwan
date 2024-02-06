@@ -20,7 +20,7 @@ class TestTenantBackupRestoreAPI(unittest.TestCase):
         )
         self.downloaded_file = Path("/tmp") / self.full_name.name
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     @patch("requests.Response")
     def test_delete_full_name(self, mock_session, mock_response):
         # Arrange
@@ -32,7 +32,7 @@ class TestTenantBackupRestoreAPI(unittest.TestCase):
         # Assert
         mock_session.delete.assert_called_once_with(expected_api)
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     @patch("requests.Response")
     def test_delete_name(self, mock_session, mock_response):
         # Arrange
@@ -44,7 +44,7 @@ class TestTenantBackupRestoreAPI(unittest.TestCase):
         # Assert
         mock_session.delete.assert_called_once_with(expected_api)
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     @patch("requests.Response")
     def test_delete_all(self, mock_session, mock_response):
         # Arrange
@@ -56,7 +56,7 @@ class TestTenantBackupRestoreAPI(unittest.TestCase):
         # Assert
         mock_session.delete.assert_called_once_with(expected_api)
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     @patch("requests.Response")
     def test_download_full(self, mock_session, mock_response):
         # Arrange
@@ -70,7 +70,7 @@ class TestTenantBackupRestoreAPI(unittest.TestCase):
             # Assert
             self.assertEqual(download_path, Path(tmpdir) / self.full_name.name)
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     @patch("requests.Response")
     def test_download_name(self, mock_session, mock_response):
         # Arrange

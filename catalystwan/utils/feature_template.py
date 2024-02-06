@@ -8,7 +8,7 @@ from catalystwan.exceptions import TemplateTypeError
 def choose_model(type_value: str) -> Any:
     """Chooses correct model based on provided type
 
-    With provided type of feature template searches supported by vmngclient models
+    With provided type of feature template searches supported by catalystwan models
     and returns correct for given type of feature template class.
 
     Args:
@@ -18,7 +18,7 @@ def choose_model(type_value: str) -> Any:
         model
 
     Raises:
-            TemplateTypeError: Raises when the model is not supported by vmngclient.
+            TemplateTypeError: Raises when the model is not supported by catalystwan.
     """
     if type_value not in available_models:
         for model in available_models.values():

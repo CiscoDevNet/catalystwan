@@ -12,7 +12,7 @@ from catalystwan.models.tenant import Tenant, TenantExport
 
 
 class TestTenantMigrationAPI(unittest.TestCase):
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def setUp(self, session_mock):
         self.session = session_mock
         self.api = TenantMigrationAPI(self.session)

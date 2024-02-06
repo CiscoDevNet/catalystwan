@@ -52,7 +52,7 @@ class TestSession(unittest.TestCase):
         # Assert
         self.assertNotEqual(repr(session), session_str)
 
-    @patch("vmngclient.session.Session.__repr__")
+    @patch("catalystwan.session.Session.__repr__")
     def test_session_eval_repr(self, mock_repr):
         # Arrange, Act
         mock_repr.return_value = "vManageSession('domain.com', 'user1', '$password', port=111, subdomain='None')"
@@ -60,8 +60,8 @@ class TestSession(unittest.TestCase):
         # Assert
         self.assertEqual(eval(mock_repr()), session)
 
-    @patch("vmngclient.session.vManageSession.check_vmanage_server_connection")
-    @patch("vmngclient.session.Session.__repr__")
+    @patch("catalystwan.session.vManageSession.check_vmanage_server_connection")
+    @patch("catalystwan.session.Session.__repr__")
     def test_session_eval_repr_different_sessions(self, mock_repr, mock_check_connection):
         # Arrange, Act
         mock_check_connection.return_value = True
@@ -77,7 +77,7 @@ class TestSession(unittest.TestCase):
         # Assert
         self.assertEqual(session_1, session_2)
 
-    @patch("vmngclient.session.vManageSession.check_vmanage_server_connection")
+    @patch("catalystwan.session.vManageSession.check_vmanage_server_connection")
     def test_session_eq_different_sessions(self, mock_check_connection):
         # Arrange, Act
         mock_check_connection.return_value = True
@@ -101,7 +101,7 @@ class TestSession(unittest.TestCase):
         # Assert
         self.assertEqual(session.get_full_url(url), full_url)
 
-    @patch("vmngclient.session.head")
+    @patch("catalystwan.session.head")
     def test_check_vmanage_server_with_port(self, mock_head):
         # Arrange, Act
         mock_head.return_value = None
@@ -110,7 +110,7 @@ class TestSession(unittest.TestCase):
         # Assert
         self.assertEqual(answer, True)
 
-    @patch("vmngclient.session.head")
+    @patch("catalystwan.session.head")
     def test_check_vmanage_server_no_port(self, mock_requests):
         # Arrange, Act
         mock_requests.return_value = None

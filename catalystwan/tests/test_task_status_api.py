@@ -7,7 +7,7 @@ from catalystwan.exceptions import TaskValidationError
 
 
 class TestTaskStatusApi(unittest.TestCase):
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def setUp(self, mock_session):
         self.task = Task(mock_session, "task_id")
         self.success_response = {

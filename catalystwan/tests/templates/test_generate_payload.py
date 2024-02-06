@@ -107,7 +107,7 @@ class TestFeatureTemplate(TestCase):
             ("children_nested_datapath.json", None, mocked_feature_template_children_2),
         ]
     )
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_get(
         self,
         filename: str,

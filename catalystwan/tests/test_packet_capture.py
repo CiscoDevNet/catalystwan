@@ -24,7 +24,7 @@ class TestPacketCaptureApi(unittest.TestCase):
         )
         self.packet_setup = PacketSetup("id", True)
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_get_status(self, mock_session):
         # Arrange
         mock_session.get_json.return_value = self.status_response
@@ -33,14 +33,14 @@ class TestPacketCaptureApi(unittest.TestCase):
         # Assert
         self.assertEqual(answer, self.status)
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_download_capture_session(self, mock_session):
         # Act
         answer = PacketCaptureAPI(mock_session).download_capture_session(self.packet_setup, self.device)
         # Assert
         self.assertEqual(answer, True)
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_get_interface_name(self, mock_session):
         # Arrange
         interface_response = {"data": [{"ifname": "GE01"}]}
@@ -50,7 +50,7 @@ class TestPacketCaptureApi(unittest.TestCase):
         # Assert
         self.assertEqual(answer, "GE01")
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_start_stop(self, mock_session):
         # Arrange
         mock_session.get_json.return_value = None
@@ -62,10 +62,10 @@ class TestPacketCaptureApi(unittest.TestCase):
         # Assert
         self.assertEqual(answer, None)
 
-    @patch("vmngclient.api.packet_capture_api.time.sleep")
+    @patch("catalystwan.api.packet_capture_api.time.sleep")
     @patch.object(PacketCaptureAPI, "download_capture_session")
     @patch.object(PacketCaptureAPI, "get_status")
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_channel(self, mock_session, mock_get_status, mock_download, mock_sleep):
         # Arrange
         device_capture_response = {"sessionId": "id", "isNewSession": True}
@@ -77,8 +77,8 @@ class TestPacketCaptureApi(unittest.TestCase):
         # Assert
         self.assertEqual(answer, self.packet_setup)
 
-    @patch("vmngclient.api.packet_capture_api.time.sleep")
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.api.packet_capture_api.time.sleep")
+    @patch("catalystwan.session.vManageSession")
     def test_channel_raise_error(self, mock_session, mock_sleep):
         # Arrange
         device_capture_response = {"sessionId": "id", "isNewSession": False}
@@ -93,7 +93,7 @@ class TestPacketCaptureApi(unittest.TestCase):
     @patch.object(PacketCaptureAPI, "start_stop")
     @patch.object(PacketCaptureAPI, "channel")
     @patch.object(DeviceStateAPI, "enable_data_stream")
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_get_packets(self, mock_session, mock_enable, mock_channel, mock_start_stop):
         # Arrange
         mock_enable.return_value.__enter__.return_value = None
@@ -109,7 +109,7 @@ class TestPacketCaptureApi(unittest.TestCase):
     @patch.object(PacketCaptureAPI, "start_stop")
     @patch.object(PacketCaptureAPI, "channel")
     @patch.object(DeviceStateAPI, "enable_data_stream")
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_get_packets_handle_permission_error(self, mock_session, mock_enable, mock_channel, mock_start_stop):
         # Arrange
         mock_enable.return_value.__enter__.return_value = None

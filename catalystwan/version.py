@@ -46,7 +46,7 @@ def parse_vmanage_version(version: str) -> Version:
     >>> parse_vmanage_version('smart-li-20.13.999-3077')
     <Version('20.13.999.post3077')>
     >>> parse_vmanage_version('Not a version.')
-    <class 'vmngclient.version.NullVersion'>
+    <class 'catalystwan.version.NullVersion'>
 
     Args:
         version (str): The version string to parse.

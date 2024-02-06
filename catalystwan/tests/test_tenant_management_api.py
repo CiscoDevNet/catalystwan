@@ -20,7 +20,7 @@ from catalystwan.typed_list import DataSequence
 
 
 class TenantManagementAPITest(unittest.TestCase):
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def setUp(self, session_mock):
         self.session = session_mock
         self.session.api_version = None

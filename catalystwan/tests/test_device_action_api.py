@@ -20,7 +20,7 @@ class TestRebootActionAPI(TestCase):
             model="vedge-cloud",
         )
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_execute(self, mock_session):
         # Arrange
         reboot_action = RebootAction(mock_session, self.device)
@@ -31,7 +31,7 @@ class TestRebootActionAPI(TestCase):
         # Assert
         self.assertEqual(reboot_action.action_id, mock_id)
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_execute_raise_exception(self, mock_session):
         # Arrange
         reboot_action = RebootAction(mock_session, self.device)
@@ -55,7 +55,7 @@ class TestValidateActionAPI(TestCase):
             model="vedge-cloud",
         )
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_execute(self, mock_session):
         # Arrange
         reboot_action = ValidateAction(mock_session, self.device)
@@ -66,7 +66,7 @@ class TestValidateActionAPI(TestCase):
         # Assert
         self.assertEqual(reboot_action.action_id, mock_id)
 
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_execute_raise_exception(self, mock_session):
         # Arrange
         reboot_action = ValidateAction(mock_session, self.device)
@@ -91,7 +91,7 @@ class TestDecommissionActionAPI(TestCase):
         )
 
     @patch("requests.Response")
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_execute(self, mock_session, mock_response):
         # Arrange
         mock_response.status_code = 200
@@ -103,7 +103,7 @@ class TestDecommissionActionAPI(TestCase):
         self.assertEqual(mock_response.status_code, 200)
 
     @patch("requests.Response")
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_execute_raise_exception(self, mock_session, mock_response):
         # Arrange
         mock_response.status_code = 404

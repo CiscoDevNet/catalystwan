@@ -20,7 +20,7 @@ class TestFeatureTemplate2(TestCase):
     @parameterized.expand(
         [(template,) for template in map(models.__dict__.get, models.__all__)],  # type: ignore
     )
-    @patch("vmngclient.session.vManageSession")
+    @patch("catalystwan.session.vManageSession")
     def test_generate_feature_template_payload_definition(
         self, template: FeatureTemplate, mocked_session: vManageSession
     ):

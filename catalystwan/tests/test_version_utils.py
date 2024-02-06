@@ -30,7 +30,7 @@ class TestRepositoryAPI(unittest.TestCase):
             )
         }
 
-    @patch("vmngclient.session.Session")
+    @patch("catalystwan.session.Session")
     def test_get_image_version_if_image_available(self, mock_session):
         versions_response = [{"availableFiles": "vmanage-20.9.1-x86_64.tar.gz", "versionName": "20.9.1"}]
         mock_session.get_data.return_value = versions_response
@@ -39,7 +39,7 @@ class TestRepositoryAPI(unittest.TestCase):
 
         self.assertEqual(answer, image_version, "not same version")
 
-    @patch("vmngclient.session.Session")
+    @patch("catalystwan.session.Session")
     def test_get_image_version_if_image_unavailable(self, mock_session):
         api_mock_response = [{"availableFiles": "vmanage-20.9.2-x86_64.tar.gz", "versionName": "20.9.1"}]
         mock_session.get_data.return_value = api_mock_response
@@ -48,7 +48,7 @@ class TestRepositoryAPI(unittest.TestCase):
 
         self.assertEqual(answer, image_version, "not same version")
 
-    @patch("vmngclient.session.Session")
+    @patch("catalystwan.session.Session")
     def test_get_devices_versions_repository(self, mock_session):
         api_mock_response = [
             {

@@ -27,8 +27,8 @@ class TenantBackupRestoreAPI:
         session (vManageSession): logged in API client session
 
     Example usage:
-        from vmngclient.api.tenant_backup_restore_api import TenantBackupRestoreAPI
-        from vmngclient.session import create_vManageSession
+        from catalystwan.api.tenant_backup_restore_api import TenantBackupRestoreAPI
+        from catalystwan.session import create_vManageSession
 
 
         tenant_session = create_vManageSession(
