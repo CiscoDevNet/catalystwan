@@ -1,10 +1,10 @@
 [tool.poetry]
 name = "catalystwan"
-version = "0.22.0"
+version = "0.1.0"
 description = "vManage SDK for Python"
 authors = ["kagorski <kagorski@cisco.com>"]
 readme = "README.md"
-repository = "https://github.com/CiscoDevNet/vManage-client"
+repository = "https://github.com/CiscoDevNet/catalystwan"
 
 [tool.poetry.dependencies]
 python = "^3.8.0"
