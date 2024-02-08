@@ -1,4 +1,4 @@
-Cisco Catalyst SD-WAN SDK
+Cisco Catalyst WAN SDK
 ==============
 
 .. toctree::
