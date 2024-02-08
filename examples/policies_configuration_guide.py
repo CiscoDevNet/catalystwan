@@ -1,4 +1,3 @@
-# mypy: ignore-errors
 """
 This example demonstrates usage of PolicyAPI in catalystwan
 Code below provides same results as obtained after executing workflow manually via WEB-UI according to:
@@ -30,9 +29,11 @@ from requests import RequestException
 
 from catalystwan.api.policy_api import PolicyAPI
 from catalystwan.exceptions import vManageClientError
+from catalystwan.models.common import TLOCColorEnum, WellKnownBGPCommunitiesEnum
 from catalystwan.models.policy import (
     AppList,
     AppProbeClassList,
+    CarrierEnum,
     CentralizedPolicy,
     ClassMapList,
     ColorList,
@@ -40,15 +41,25 @@ from catalystwan.models.policy import (
     ControlPolicy,
     DataIPv6PrefixList,
     DataPrefixList,
+    DNSTypeEntryEnum,
+    EncapEnum,
     ExpandedCommunityList,
     HubAndSpokePolicy,
     MeshPolicy,
+    MultiRegionRoleEnum,
+    OriginProtocolEnum,
+    PathPreferenceEnum,
+    PathTypeEnum,
+    PolicerExceedActionEnum,
     PolicerList,
+    PolicyActionTypeEnum,
     PreferredColorGroupList,
     PrefixList,
     RegionList,
+    ServiceTypeEnum,
     SiteList,
     SLAClassList,
+    TLOCActionEnum,
     TLOCList,
     TrafficDataPolicy,
     VPNList,
@@ -103,21 +114,21 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[ConfigItem]:
 
     # Configure Color
     color_list = ColorList(name="MyColors")
-    color_list.add_color("biz-internet")
-    color_list.add_color("public-internet")
+    color_list.add_color(TLOCColorEnum.BIZ_INTERNET)
+    color_list.add_color(TLOCColorEnum.PUBLIC_INTERNET)
     color_list_id = api.lists.create(color_list)
     configured_items.append(ConfigItem(ColorList, color_list.name, color_list_id))
 
     # Configure Community
     community_list = CommunityList(name="MyCommunities")
     community_list.add_community(1000, 10000)
-    community_list.add_well_known_community("no-advertise")
+    community_list.add_well_known_community(WellKnownBGPCommunitiesEnum.LOCAL_AS)
     community_list_id = api.lists.create(community_list)
     configured_items.append(ConfigItem(CommunityList, community_list.name, community_list_id))
 
     expanded_community_list = ExpandedCommunityList(name="MyExpandedCommunities")
     expanded_community_list.add_community(1000, 9999999)
-    expanded_community_list.add_well_known_community("internet")
+    expanded_community_list.add_well_known_community(WellKnownBGPCommunitiesEnum.INTERNET)
     expanded_community_list_id = api.lists.create(expanded_community_list)
     configured_items.append(ConfigItem(ExpandedCommunityList, expanded_community_list.name, expanded_community_list_id))
 
@@ -136,7 +147,7 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[ConfigItem]:
 
     # Configure Policer
     policer = PolicerList(name="MyPolicer")
-    policer.police(2**17, 8, "remark")
+    policer.police(2**17, 8, PolicerExceedActionEnum.REMARK)
     policer_id = api.lists.create(policer)
     configured_items.append(ConfigItem(PolicerList, policer.name, policer_id))
 
@@ -186,7 +197,7 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[ConfigItem]:
     configured_items.append(ConfigItem(ClassMapList, class_map.name, class_map_id))
 
     app_probe_class = AppProbeClassList(name="MyAppProbeClass")
-    app_probe_class.assign_forwarding_class("MyClassMap").add_color_mapping("3g", 5)
+    app_probe_class.assign_forwarding_class("MyClassMap").add_color_mapping(TLOCColorEnum.THREEG, 5)
     app_probe_class_id = api.lists.create(app_probe_class)
     configured_items.append(ConfigItem(AppProbeClassList, app_probe_class.name, app_probe_class_id))
 
@@ -200,8 +211,8 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[ConfigItem]:
 
     # Configure TLOC
     tloc_list = TLOCList(name="MyTLOCList")
-    tloc_list.add_tloc(IPv4Address("10.0.0.55"), color="blue", encap="gre")
-    tloc_list.add_tloc(IPv4Address("10.0.0.56"), color="silver", encap="ipsec", preference=5678)
+    tloc_list.add_tloc(IPv4Address("10.0.0.55"), color=TLOCColorEnum.BLUE, encap=EncapEnum.GRE)
+    tloc_list.add_tloc(IPv4Address("10.0.0.56"), color=TLOCColorEnum.SILVER, encap=EncapEnum.IPSEC, preference=5678)
     tloc_list_id = api.lists.create(tloc_list)
     configured_items.append(ConfigItem(TLOCList, tloc_list.name, tloc_list_id))
 
@@ -237,9 +248,9 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[ConfigItem]:
     # Configure preffered colors
     preferred_color_group_list = PreferredColorGroupList(name="MyPreferredColorGroups")
     preferred_color_group_list.assign_color_groups(
-        primary=({"gold", "lte", "metro-ethernet"}, "direct-path"),
-        secondary=({"metro-ethernet"}, "all-paths"),
-        tertiary=({"private1", "private2"}, "multi-hop-path"),
+        primary=({TLOCColorEnum.GREEN, TLOCColorEnum.LTE, TLOCColorEnum.METRO_ETHERNET}, PathPreferenceEnum.ALL_PATHS),
+        secondary=({TLOCColorEnum.METRO_ETHERNET}, PathPreferenceEnum.ALL_PATHS),
+        tertiary=({TLOCColorEnum.PRIVATE1, TLOCColorEnum.PRIVATE2}, PathPreferenceEnum.MULTI_HOP_PATH),
     )
     preferred_color_group_list_id = api.lists.create(preferred_color_group_list)
     configured_items.append(
@@ -293,38 +304,40 @@ def create_custom_control_topology(api: PolicyAPI, items: Sequence[ConfigItem]) 
     policy = ControlPolicy(name="MyControlPolicy")
 
     # add first route sequence
-    route_1 = policy.add_route_sequence(base_action="accept")
+    route_1 = policy.add_route_sequence(base_action=PolicyActionTypeEnum.ACCEPT)
     route_1.match_color_list(find_id(items, "MyColors"))
     route_1.match_community_list(find_id(items, "MyCommunities"))
     route_1.match_expanded_community_list(find_id(items, "MyExpandedCommunities"))
     route_1.match_omp_tag(4321)
-    route_1.match_origin("ospf-inter-area")
+    route_1.match_origin(OriginProtocolEnum.OSPF_INTER_AREA)
     route_1.match_originator(IPv4Address("10.0.0.123"))
-    route_1.match_path_type("direct-path")
+    route_1.match_path_type(PathTypeEnum.DIRECT)
     route_1.match_preference(5432)
     route_1.match_prefix_list(find_id(items, "MyPrefixes"))
-    route_1.match_region(7, "border-router")
+    route_1.match_region(7, MultiRegionRoleEnum.BORDER)
     route_1.associate_affinity_action(3)
     route_1.associate_community_action("local-AS")
     route_1.associate_export_to_action(find_id(items, "MyExportVPN"))
     route_1.associate_omp_tag_action(4)
     route_1.associate_preference_action(5)
-    route_1.associate_service_action("IDP", 19, tloc_list_id=find_id(items, "MyTLOCList"))
+    route_1.associate_service_action(
+        ServiceTypeEnum.INTRUSION_DETECTION_PREVENTION, 19, tloc_list_id=find_id(items, "MyTLOCList")
+    )
 
     # add second route sequence
-    route_2 = policy.add_route_sequence("Route-2", base_action="accept")
+    route_2 = policy.add_route_sequence("Route-2", base_action=PolicyActionTypeEnum.ACCEPT)
     route_2.match_region_list(find_id(items, "MyRegions"))
-    route_2.associate_tloc_action("primary")
+    route_2.associate_tloc_action(TLOCActionEnum.PRIMARY)
 
     # add TLOC sequence
-    tloc = policy.add_tloc_sequence(base_action="accept")
-    tloc.match_carrier("carrier1")
+    tloc = policy.add_tloc_sequence(base_action=PolicyActionTypeEnum.ACCEPT)
+    tloc.match_carrier(CarrierEnum.CARRIER_1)
     tloc.match_color_list(find_id(items, "MyColors"))
     tloc.match_domain_id(6543)
     tloc.match_group_id(7654)
     tloc.match_omp_tag(8765)
     tloc.match_preference(9876)
-    tloc.match_region_list(find_id(items, "MyRegions"), "edge-router")
+    tloc.match_region_list(find_id(items, "MyRegions"), MultiRegionRoleEnum.EDGE)
     tloc.match_site(20)
 
     # commit policy to sdwan manager, store id
@@ -337,7 +350,7 @@ def create_traffic_data_policy(api: PolicyAPI, items: List[ConfigItem]) -> Confi
     policy = TrafficDataPolicy(name="MyTrafficDataPolicy")
 
     # add first sequence
-    seq_1 = policy.add_ipv4_sequence(base_action="accept")
+    seq_1 = policy.add_ipv4_sequence(base_action=PolicyActionTypeEnum.ACCEPT)
     seq_1.match_app_list(find_id(items, "Microsoft_Apps"))
     seq_1.match_destination_ip([IPv4Network("19.3.0.0/16")])
     seq_1.match_destination_port(port_ranges=[(1000, 5000)])
@@ -363,7 +376,7 @@ def create_traffic_data_policy(api: PolicyAPI, items: List[ConfigItem]) -> Confi
     seq_1.associate_nat_action(nat_pool=1)
 
     # add second sequence
-    seq_2 = policy.add_ipv4_sequence("Second Sequence", base_action="accept")
+    seq_2 = policy.add_ipv4_sequence("Second Sequence", base_action=PolicyActionTypeEnum.ACCEPT)
     seq_2.match_dns_response()
     seq_2.match_low_plp()
     seq_2.match_secondary_destination_region()
@@ -375,7 +388,7 @@ def create_traffic_data_policy(api: PolicyAPI, items: List[ConfigItem]) -> Confi
     seq_2.associate_next_hop_action(next_hop=IPv4Address("12.0.1.12"), loose=True)
     seq_2.associate_policer_list_action(find_id(items, "MyPolicer"))
     seq_2.associate_preffered_color_group(find_id(items, "MyPreferredColorGroups"))
-    seq_2.associate_redirect_dns_action(dns_type="host")
+    seq_2.associate_redirect_dns_action(dns_type=DNSTypeEntryEnum.HOST)
     seq_2.associate_secure_internet_gateway_action(fallback_to_routing=True)
     seq_2.associate_tloc_action(tloc_list_id=find_id(items, "MyTLOCList"))
     seq_2.associate_vpn_action(11)

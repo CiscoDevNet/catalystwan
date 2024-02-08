@@ -308,7 +308,7 @@ migrate_task.wait_for_completed()
 </details>
 
 ### Note:
-To remove `InsecureRequestWarning`, you can include in your scripts (warning is suppressed when `VMNGCLIENT_DEVEL` environment variable is set):
+To remove `InsecureRequestWarning`, you can include in your scripts (warning is suppressed when `catalystwan_devel` environment variable is set):
 ```Python
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)

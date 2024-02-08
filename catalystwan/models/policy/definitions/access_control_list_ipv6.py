@@ -6,7 +6,6 @@ from pydantic import ConfigDict, Field
 from typing_extensions import Annotated
 
 from catalystwan.models.policy.policy_definition import (
-    ActionTypeEnum,
     ClassMapAction,
     ClassMapListEntry,
     CountAction,
@@ -24,6 +23,7 @@ from catalystwan.models.policy.policy_definition import (
     PLPEntry,
     PLPEntryValues,
     PolicerAction,
+    PolicyActionTypeEnum,
     PolicyDefinitionBase,
     PolicyDefinitionSequenceBase,
     Reference,
@@ -69,8 +69,8 @@ class AclIPv6PolicySequence(PolicyDefinitionSequenceBase):
     sequence_type: Literal["aclv6"] = Field(
         default="aclv6", serialization_alias="sequenceType", validation_alias="sequenceType"
     )
-    base_action: ActionTypeEnum = Field(
-        default=ActionTypeEnum.ACCEPT, serialization_alias="baseAction", validation_alias="baseAction"
+    base_action: PolicyActionTypeEnum = Field(
+        default=PolicyActionTypeEnum.ACCEPT, serialization_alias="baseAction", validation_alias="baseAction"
     )
     match: AclIPv6PolicySequenceMatch = AclIPv6PolicySequenceMatch()
     actions: List[AclIPv6PolicySequenceActions] = []
@@ -145,14 +145,14 @@ class AclIPv6PolicySequence(PolicyDefinitionSequenceBase):
 class AclIPv6Policy(AclIPv6PolicyHeader, DefinitionWithSequencesCommonBase):
     sequences: List[AclIPv6PolicySequence] = []
     default_action: DefaultAction = Field(
-        default=DefaultAction(type=ActionTypeEnum.DROP),
+        default=DefaultAction(type=PolicyActionTypeEnum.DROP),
         serialization_alias="defaultAction",
         validation_alias="defaultAction",
     )
     model_config = ConfigDict(populate_by_name=True)
 
     def add_acl_sequence(
-        self, name: str = "Access Control List", base_action: ActionTypeEnum = ActionTypeEnum.ACCEPT
+        self, name: str = "Access Control List", base_action: PolicyActionTypeEnum = PolicyActionTypeEnum.ACCEPT
     ) -> AclIPv6PolicySequence:
         seq = AclIPv6PolicySequence(
             sequence_name=name,

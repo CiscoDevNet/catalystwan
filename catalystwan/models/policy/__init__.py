@@ -45,6 +45,17 @@ from .lists import URLBlackList as URLBlackList  # noqa: F401
 from .lists import URLWhiteList as URLWhiteList  # noqa: F401
 from .lists import VPNList as VPNList  # noqa: F401
 from .lists import ZoneList as ZoneList  # noqa: F401
+from .lists_entries import EncapEnum as EncapEnum  # noqa: F401
+from .lists_entries import PathPreferenceEnum as PathPreferenceEnum  # noqa: F401
+from .lists_entries import PolicerExceedActionEnum as PolicerExceedActionEnum  # noqa: F401
 from .localized import LocalizedPolicy as LocalizedPolicy  # noqa: F401
+from .policy_definition import CarrierEnum as CarrierEnum  # noqa: F401
+from .policy_definition import DNSTypeEntryEnum as DNSTypeEntryEnum  # noqa: F401
+from .policy_definition import MultiRegionRoleEnum as MultiRegionRoleEnum  # noqa: F401
+from .policy_definition import OriginProtocolEnum as OriginProtocolEnum  # noqa: F401
+from .policy_definition import PathTypeEnum as PathTypeEnum  # noqa: F401
+from .policy_definition import PolicyActionTypeEnum as PolicyActionTypeEnum  # noqa: F401
+from .policy_definition import ServiceTypeEnum as ServiceTypeEnum  # noqa: F401
+from .policy_definition import TLOCActionEnum as TLOCActionEnum  # noqa: F401
 from .security import SecurityPolicy as SecurityPolicy  # noqa: F401
 from .security import UnifiedSecurityPolicy as UnifiedSecurityPolicy  # noqa: F401

@@ -7,7 +7,6 @@ from typing_extensions import Annotated
 
 from catalystwan.models.misc.application_protocols import ApplicationProtocol
 from catalystwan.models.policy.policy_definition import (
-    ActionTypeEnum,
     AppListEntry,
     DefinitionWithSequencesCommonBase,
     DestinationDataPrefixListEntry,
@@ -19,6 +18,7 @@ from catalystwan.models.policy.policy_definition import (
     DestinationPortListEntry,
     LogAction,
     Match,
+    PolicyActionTypeEnum,
     PolicyDefinitionBase,
     PolicyDefinitionSequenceBase,
     ProtocolEntry,
@@ -88,7 +88,7 @@ class ZoneBasedFWPolicySequenceWithRuleSets(PolicyDefinitionSequenceBase):
         self._insert_match(RuleSetListEntry.from_rule_set_ids(rule_set_ids))
 
     def match_app_list(self, app_list_id: UUID) -> None:
-        if self.base_action != ActionTypeEnum.INSPECT:
+        if self.base_action != PolicyActionTypeEnum.INSPECT:
             raise ValueError("Action must be Inspect when Application/Application Family List is selected.")
         self._insert_match(AppListEntry(ref=app_list_id))
 
@@ -102,7 +102,7 @@ class ZoneBasedFWPolicySequence(PolicyDefinitionSequenceBase):
     model_config = ConfigDict(populate_by_name=True)
 
     def match_app_list(self, app_list_id: UUID) -> None:
-        if self.base_action != ActionTypeEnum.INSPECT:
+        if self.base_action != PolicyActionTypeEnum.INSPECT:
             raise ValueError("Action must be Inspect when Application/Application Family List is selected.")
         self._insert_match(AppListEntry(ref=app_list_id))
 
@@ -194,7 +194,7 @@ class ZoneBasedFWPolicy(ZoneBasedFWPolicyHeader):
     definition: ZoneBasedFWPolicyDefinition = ZoneBasedFWPolicyDefinition()
 
     def add_ipv4_rule(
-        self, name: str, base_action: ActionTypeEnum = ActionTypeEnum.DROP, log: bool = False
+        self, name: str, base_action: PolicyActionTypeEnum = PolicyActionTypeEnum.DROP, log: bool = False
     ) -> ZoneBasedFWPolicySequence:
         """Adds new IPv4 Rule to Zone Based Firewall Policy
 
@@ -218,7 +218,7 @@ class ZoneBasedFWPolicy(ZoneBasedFWPolicyHeader):
         return sequence
 
     def add_ipv4_rule_sets(
-        self, name: str, base_action: ActionTypeEnum = ActionTypeEnum.DROP, log: bool = False
+        self, name: str, base_action: PolicyActionTypeEnum = PolicyActionTypeEnum.DROP, log: bool = False
     ) -> ZoneBasedFWPolicySequenceWithRuleSets:
         sequence = ZoneBasedFWPolicySequenceWithRuleSets(
             sequence_name=name,

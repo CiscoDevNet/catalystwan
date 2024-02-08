@@ -8,7 +8,6 @@ from typing_extensions import Annotated
 from catalystwan.models.common import TLOCColorEnum
 from catalystwan.models.policy.lists_entries import EncapEnum
 from catalystwan.models.policy.policy_definition import (
-    ActionTypeEnum,
     AffinityEntry,
     CarrierEntry,
     CarrierEnum,
@@ -30,6 +29,7 @@ from catalystwan.models.policy.policy_definition import (
     OriginProtocolEnum,
     PathTypeEntry,
     PathTypeEnum,
+    PolicyActionTypeEnum,
     PolicyDefinitionBase,
     PolicyDefinitionSequenceBase,
     PreferenceEntry,
@@ -118,8 +118,8 @@ class ControlPolicyRouteSequence(PolicyDefinitionSequenceBase):
     sequence_type: Literal["route"] = Field(
         default="route", serialization_alias="sequenceType", validation_alias="sequenceType"
     )
-    base_action: ActionTypeEnum = Field(
-        default=ActionTypeEnum.REJECT, serialization_alias="baseAction", validation_alias="baseAction"
+    base_action: PolicyActionTypeEnum = Field(
+        default=PolicyActionTypeEnum.REJECT, serialization_alias="baseAction", validation_alias="baseAction"
     )
     match: ControlPolicyRouteSequenceMatch = ControlPolicyRouteSequenceMatch()
     actions: List[ControlPolicyRouteSequenceActions] = []
@@ -237,8 +237,8 @@ class ControlPolicyTLOCSequence(PolicyDefinitionSequenceBase):
     sequence_type: Literal["tloc"] = Field(
         default="tloc", serialization_alias="sequenceType", validation_alias="sequenceType"
     )
-    base_action: ActionTypeEnum = Field(
-        default=ActionTypeEnum.REJECT, serialization_alias="baseAction", validation_alias="baseAction"
+    base_action: PolicyActionTypeEnum = Field(
+        default=PolicyActionTypeEnum.REJECT, serialization_alias="baseAction", validation_alias="baseAction"
     )
     match: ControlPolicyTLOCSequenceMatch = ControlPolicyTLOCSequenceMatch()
     actions: List[ControlPolicyTLOCSequenceActions] = []
@@ -313,14 +313,14 @@ AnyControlPolicySequence = Annotated[
 class ControlPolicy(ControlPolicyHeader, DefinitionWithSequencesCommonBase):
     sequences: List[AnyControlPolicySequence] = []
     default_action: DefaultAction = Field(
-        default=DefaultAction(type=ActionTypeEnum.REJECT),
+        default=DefaultAction(type=PolicyActionTypeEnum.REJECT),
         serialization_alias="defaultAction",
         validation_alias="defaultAction",
     )
     model_config = ConfigDict(populate_by_name=True)
 
     def add_route_sequence(
-        self, name: str = "Route", base_action: ActionTypeEnum = ActionTypeEnum.REJECT
+        self, name: str = "Route", base_action: PolicyActionTypeEnum = PolicyActionTypeEnum.REJECT
     ) -> ControlPolicyRouteSequence:
         seq = ControlPolicyRouteSequence(
             sequence_name=name,
@@ -331,7 +331,7 @@ class ControlPolicy(ControlPolicyHeader, DefinitionWithSequencesCommonBase):
         return seq
 
     def add_tloc_sequence(
-        self, name: str = "TLOC", base_action: ActionTypeEnum = ActionTypeEnum.REJECT
+        self, name: str = "TLOC", base_action: PolicyActionTypeEnum = PolicyActionTypeEnum.REJECT
     ) -> ControlPolicyTLOCSequence:
         seq = ControlPolicyTLOCSequence(
             sequence_name=name,
