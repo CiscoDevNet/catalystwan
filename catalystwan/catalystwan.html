@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Cisco Catalyst SD-WAN SDK package &#8212; catalystwan 0.1.0 documentation</title>
+    <title>Cisco Catalyst WAN SDK package &#8212; catalystwan 0.1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="catalystwan.api package" href="catalystwan.api.html" />
-    <link rel="prev" title="Cisco Catalyst SD-WAN SDK" href="modules.html" /> 
+    <link rel="prev" title="Cisco Catalyst WAN SDK" href="modules.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -35,11 +35,11 @@
           <a href="catalystwan.api.html" title="catalystwan.api package"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="modules.html" title="Cisco Catalyst SD-WAN SDK"
+          <a href="modules.html" title="Cisco Catalyst WAN SDK"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">catalystwan 0.1.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">Cisco Catalyst SD-WAN SDK</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Cisco Catalyst SD-WAN SDK package</a></li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">Cisco Catalyst WAN SDK</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Cisco Catalyst WAN SDK package</a></li> 
       </ul>
     </div>  
 
@@ -48,8 +48,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="cisco-catalyst-sd-wan-sdk-package">
-<h1>Cisco Catalyst SD-WAN SDK package<a class="headerlink" href="#cisco-catalyst-sd-wan-sdk-package" title="Permalink to this heading">¶</a></h1>
+  <section id="cisco-catalyst-wan-sdk-package">
+<h1>Cisco Catalyst WAN SDK package<a class="headerlink" href="#cisco-catalyst-wan-sdk-package" title="Permalink to this heading">¶</a></h1>
 <section id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
@@ -1703,7 +1703,7 @@ closed and resources are cleaned up even in case of exceptions.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="catalystwan.session.ManagerSession.logout">
-<span class="sig-name descname"><span class="pre">logout</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">vManageResponse</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.logout" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">logout</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">ManagerResponse</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.logout" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1718,7 +1718,7 @@ closed and resources are cleaned up even in case of exceptions.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="catalystwan.session.ManagerSession.request">
-<span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">vManageResponse</span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.request" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ManagerResponse</span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.request" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructs a <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>, prepares it and sends it.
 Returns <code class="xref py py-class docutils literal notranslate"><span class="pre">Response</span></code> object.</p>
 <dl class="field-list simple">
@@ -1885,7 +1885,7 @@ works only on provider user mode</p></li>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="catalystwan.session.vManageBadRequestError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.session.</span></span><span class="sig-name descname"><span class="pre">vManageBadRequestError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">ErrorInfo</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">vManageResponse</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.session.vManageBadRequestError" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.session.</span></span><span class="sig-name descname"><span class="pre">vManageBadRequestError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">ErrorInfo</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ManagerResponse</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.session.vManageBadRequestError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#catalystwan.session.vManageBadResponseError" title="catalystwan.session.vManageBadResponseError"><code class="xref py py-class docutils literal notranslate"><span class="pre">vManageBadResponseError</span></code></a></p>
 <p>Indicates that vManage returned HTTP status code 400.</p>
 <p>A 400 Bad Request response status code indicates that the server
@@ -1895,8 +1895,8 @@ malformed request message, or missing request parameters.</p>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="catalystwan.session.vManageBadResponseError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.session.</span></span><span class="sig-name descname"><span class="pre">vManageBadResponseError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">ErrorInfo</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">vManageResponse</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.session.vManageBadResponseError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">vManageClientError</span></code></p>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.session.</span></span><span class="sig-name descname"><span class="pre">vManageBadResponseError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">ErrorInfo</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ManagerResponse</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.session.vManageBadResponseError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ManagerError</span></code></p>
 <p>Indicates that vManage returned error HTTP status code other than 400.</p>
 </dd></dl>
 
@@ -1906,7 +1906,7 @@ malformed request message, or missing request parameters.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="catalystwan.session.vManageResponseAdapter.delete">
-<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">vManageResponse</span></span></span><a class="headerlink" href="#catalystwan.session.vManageResponseAdapter.delete" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ManagerResponse</span></span></span><a class="headerlink" href="#catalystwan.session.vManageResponseAdapter.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sends a DELETE request. Returns <code class="xref py py-class docutils literal notranslate"><span class="pre">Response</span></code> object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1923,7 +1923,7 @@ malformed request message, or missing request parameters.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="catalystwan.session.vManageResponseAdapter.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">vManageResponse</span></span></span><a class="headerlink" href="#catalystwan.session.vManageResponseAdapter.get" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ManagerResponse</span></span></span><a class="headerlink" href="#catalystwan.session.vManageResponseAdapter.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sends a GET request. Returns <code class="xref py py-class docutils literal notranslate"><span class="pre">Response</span></code> object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1940,7 +1940,7 @@ malformed request message, or missing request parameters.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="catalystwan.session.vManageResponseAdapter.post">
-<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">vManageResponse</span></span></span><a class="headerlink" href="#catalystwan.session.vManageResponseAdapter.post" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ManagerResponse</span></span></span><a class="headerlink" href="#catalystwan.session.vManageResponseAdapter.post" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sends a POST request. Returns <code class="xref py py-class docutils literal notranslate"><span class="pre">Response</span></code> object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1960,7 +1960,7 @@ object to send in the body of the <code class="xref py py-class docutils literal
 
 <dl class="py method">
 <dt class="sig sig-object py" id="catalystwan.session.vManageResponseAdapter.put">
-<span class="sig-name descname"><span class="pre">put</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">vManageResponse</span></span></span><a class="headerlink" href="#catalystwan.session.vManageResponseAdapter.put" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">put</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ManagerResponse</span></span></span><a class="headerlink" href="#catalystwan.session.vManageResponseAdapter.put" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sends a PUT request. Returns <code class="xref py py-class docutils literal notranslate"><span class="pre">Response</span></code> object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1979,7 +1979,7 @@ object to send in the body of the <code class="xref py py-class docutils literal
 
 <dl class="py method">
 <dt class="sig sig-object py" id="catalystwan.session.vManageResponseAdapter.request">
-<span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">vManageResponse</span></span></span><a class="headerlink" href="#catalystwan.session.vManageResponseAdapter.request" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ManagerResponse</span></span></span><a class="headerlink" href="#catalystwan.session.vManageResponseAdapter.request" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructs a <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>, prepares it and sends it.
 Returns <code class="xref py py-class docutils literal notranslate"><span class="pre">Response</span></code> object.</p>
 <dl class="field-list simple">
@@ -2072,7 +2072,7 @@ for current package</p>
   <div>
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
-<li><a class="reference internal" href="#">Cisco Catalyst SD-WAN SDK package</a><ul>
+<li><a class="reference internal" href="#">Cisco Catalyst WAN SDK package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-catalystwan.dataclasses">dataclasses module</a><ul>
@@ -2147,7 +2147,7 @@ for current package</p>
   <div>
     <h4>Previous topic</h4>
     <p class="topless"><a href="modules.html"
-                          title="previous chapter">Cisco Catalyst SD-WAN SDK</a></p>
+                          title="previous chapter">Cisco Catalyst WAN SDK</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -2188,11 +2188,11 @@ for current package</p>
           <a href="catalystwan.api.html" title="catalystwan.api package"
              >next</a> |</li>
         <li class="right" >
-          <a href="modules.html" title="Cisco Catalyst SD-WAN SDK"
+          <a href="modules.html" title="Cisco Catalyst WAN SDK"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">catalystwan 0.1.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" >Cisco Catalyst SD-WAN SDK</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Cisco Catalyst SD-WAN SDK package</a></li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >Cisco Catalyst WAN SDK</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Cisco Catalyst WAN SDK package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
