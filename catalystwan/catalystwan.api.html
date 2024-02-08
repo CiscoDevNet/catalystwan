@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="catalystwan.utils package" href="catalystwan.utils.html" />
-    <link rel="prev" title="vManage-client package" href="catalystwan.html" /> 
+    <link rel="prev" title="Cisco Catalyst SD-WAN SDK package" href="catalystwan.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -35,11 +35,11 @@
           <a href="catalystwan.utils.html" title="catalystwan.utils package"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="catalystwan.html" title="vManage-client package"
+          <a href="catalystwan.html" title="Cisco Catalyst SD-WAN SDK package"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">catalystwan 0.1.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" >vManage-client</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="catalystwan.html" accesskey="U">vManage-client package</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Cisco Catalyst SD-WAN SDK</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="catalystwan.html" accesskey="U">Cisco Catalyst SD-WAN SDK package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">catalystwan.api package</a></li> 
       </ul>
     </div>  
@@ -58,7 +58,7 @@
 <p>Module for handling admintech logs for a device</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.api.admin_tech_api.AdminTechAPI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.admin_tech_api.</span></span><span class="sig-name descname"><span class="pre">AdminTechAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.admin_tech_api.AdminTechAPI" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.admin_tech_api.</span></span><span class="sig-name descname"><span class="pre">AdminTechAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.admin_tech_api.AdminTechAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class for handling admintech logs for a device.</p>
 <dl class="py attribute">
@@ -69,7 +69,7 @@
 
 <dl class="simple">
 <dt>Usage example:</dt><dd><p># Create session
-session = create_vManageSession(…)
+session = create_manager_session(…)
 # Get admintech data for all devices
 all_admintechs = session.api.admin_tech.get_all()</p>
 </dd>
@@ -170,7 +170,7 @@ all_admintechs = session.api.admin_tech.get_all()</p>
 <span id="administration-module"></span><h3>administration module<a class="headerlink" href="#module-catalystwan.api.administration" title="Permalink to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.api.administration.AdministrationSettingsAPI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.administration.</span></span><span class="sig-name descname"><span class="pre">AdministrationSettingsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.administration.AdministrationSettingsAPI" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.administration.</span></span><span class="sig-name descname"><span class="pre">AdministrationSettingsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.administration.AdministrationSettingsAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="catalystwan.api.administration.AdministrationSettingsAPI.disable_sdavc_cloud_connector">
@@ -247,7 +247,7 @@ all_admintechs = session.api.admin_tech.get_all()</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.api.administration.ClusterManagementAPI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.administration.</span></span><span class="sig-name descname"><span class="pre">ClusterManagementAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.administration.ClusterManagementAPI" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.administration.</span></span><span class="sig-name descname"><span class="pre">ClusterManagementAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.administration.ClusterManagementAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Covers clusterManagement API calls.</p>
 <dl class="py attribute">
@@ -258,7 +258,7 @@ all_admintechs = session.api.admin_tech.get_all()</p>
 
 <dl class="simple">
 <dt>Example usage:</dt><dd><p># Create session
-session = create_vManageSession(…)
+session = create_manager_session(…)
 # Get health status
 health_status = session.api.cluster_management.get_cluster_management_health_status()</p>
 </dd>
@@ -289,7 +289,7 @@ health_status = session.api.cluster_management.get_cluster_management_health_sta
 
 <dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.api.administration.ResourceGroupsAPI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.administration.</span></span><span class="sig-name descname"><span class="pre">ResourceGroupsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.administration.ResourceGroupsAPI" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.administration.</span></span><span class="sig-name descname"><span class="pre">ResourceGroupsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.administration.ResourceGroupsAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class implementing methods for resource groups management.</p>
 <dl class="py method">
@@ -357,7 +357,7 @@ health_status = session.api.cluster_management.get_cluster_management_health_sta
 
 <dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.api.administration.SessionsAPI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.administration.</span></span><span class="sig-name descname"><span class="pre">SessionsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.administration.SessionsAPI" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.administration.</span></span><span class="sig-name descname"><span class="pre">SessionsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.administration.SessionsAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class implementing methods for vmanage sessions management.</p>
 <dl class="py method">
@@ -395,7 +395,7 @@ health_status = session.api.cluster_management.get_cluster_management_health_sta
 
 <dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.api.administration.UserGroupsAPI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.administration.</span></span><span class="sig-name descname"><span class="pre">UserGroupsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.administration.UserGroupsAPI" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.administration.</span></span><span class="sig-name descname"><span class="pre">UserGroupsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.administration.UserGroupsAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class implementing methods for user group management.</p>
 <dl class="py method">
@@ -449,7 +449,7 @@ health_status = session.api.cluster_management.get_cluster_management_health_sta
 
 <dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.api.administration.UsersAPI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.administration.</span></span><span class="sig-name descname"><span class="pre">UsersAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.administration.UsersAPI" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.administration.</span></span><span class="sig-name descname"><span class="pre">UsersAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.administration.UsersAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class implementing methods for user managment.</p>
 <dl class="py attribute">
@@ -460,7 +460,7 @@ health_status = session.api.cluster_management.get_cluster_management_health_sta
 
 <dl class="simple">
 <dt>Usage example:</dt><dd><p># Create session
-session = create_vManageSession(…)
+session = create_manager_session(…)
 # Get information about all users
 all_users = session.api.users.get()</p>
 </dd>
@@ -616,7 +616,7 @@ all_users = session.api.users.get()</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.api.alarms_api.AlarmsAPI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.alarms_api.</span></span><span class="sig-name descname"><span class="pre">AlarmsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.alarms_api.AlarmsAPI" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.alarms_api.</span></span><span class="sig-name descname"><span class="pre">AlarmsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.alarms_api.AlarmsAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>API methods of vManage for Alarms.</p>
 <dl class="py attribute">
@@ -812,12 +812,12 @@ it will not poll any further.</p>
 <span id="device-action-api-module"></span><h3>device_action_api module<a class="headerlink" href="#module-catalystwan.api.device_action_api" title="Permalink to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.api.device_action_api.DecommissionAction">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.device_action_api.</span></span><span class="sig-name descname"><span class="pre">DecommissionAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.Device" title="catalystwan.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.device_action_api.DecommissionAction" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.device_action_api.</span></span><span class="sig-name descname"><span class="pre">DecommissionAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.Device" title="catalystwan.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.device_action_api.DecommissionAction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#catalystwan.api.device_action_api.DeviceActionAPI" title="catalystwan.api.device_action_api.DeviceActionAPI"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceActionAPI</span></code></a></p>
 <p>API method to decommission Device</p>
 <p>Usage example:
 # Create session and chose device
-session = create_vManageSession(…)
+session = create_manager_session(…)
 device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
 # Decommission device
 DecommissionAction(session, device).execute()</p>
@@ -836,7 +836,7 @@ DecommissionAction(session, device).execute()</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.api.device_action_api.DeviceActionAPI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.device_action_api.</span></span><span class="sig-name descname"><span class="pre">DeviceActionAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.Device" title="catalystwan.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.device_action_api.DeviceActionAPI" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.device_action_api.</span></span><span class="sig-name descname"><span class="pre">DeviceActionAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.Device" title="catalystwan.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.device_action_api.DeviceActionAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
 <p>API method to execute action on Device.</p>
 <dl class="py method">
@@ -853,7 +853,7 @@ DecommissionAction(session, device).execute()</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.api.device_action_api.RebootAction">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.device_action_api.</span></span><span class="sig-name descname"><span class="pre">RebootAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.Device" title="catalystwan.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.device_action_api.RebootAction" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.device_action_api.</span></span><span class="sig-name descname"><span class="pre">RebootAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.Device" title="catalystwan.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.device_action_api.RebootAction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#catalystwan.api.device_action_api.DeviceActionAPI" title="catalystwan.api.device_action_api.DeviceActionAPI"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceActionAPI</span></code></a></p>
 <p>API method to perform reboot on Device.</p>
 <dl class="py method">
@@ -870,7 +870,7 @@ DecommissionAction(session, device).execute()</p>
 </dl>
 <p>Usage example:
 # Create session and chose device
-session = create_vManageSession(…)
+session = create_manager_session(…)
 device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
 # Restart device
 RebootAction(session, device).execute()</p>
@@ -885,12 +885,12 @@ RebootAction(session, device).execute()</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.api.device_action_api.ValidateAction">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.device_action_api.</span></span><span class="sig-name descname"><span class="pre">ValidateAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.Device" title="catalystwan.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.device_action_api.ValidateAction" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.device_action_api.</span></span><span class="sig-name descname"><span class="pre">ValidateAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.dataclasses.Device" title="catalystwan.dataclasses.Device"><span class="pre">Device</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.device_action_api.ValidateAction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#catalystwan.api.device_action_api.DeviceActionAPI" title="catalystwan.api.device_action_api.DeviceActionAPI"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceActionAPI</span></code></a></p>
 <p>API method to perform validate Device</p>
 <p>Usage example:
 # Create session and chose device
-session = create_vManageSession(…)
+session = create_manager_session(…)
 device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
 # Validate device
 ValidateAction(session, device).execute()</p>
@@ -912,12 +912,12 @@ ValidateAction(session, device).execute()</p>
 <span id="logs-api-module"></span><h3>logs_api module<a class="headerlink" href="#module-catalystwan.api.logs_api" title="Permalink to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.api.logs_api.LogsAPI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.logs_api.</span></span><span class="sig-name descname"><span class="pre">LogsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.logs_api.LogsAPI" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.logs_api.</span></span><span class="sig-name descname"><span class="pre">LogsAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.logs_api.LogsAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class for get and save audit log file</p>
 <dl class="simple">
 <dt>Usage example:</dt><dd><p># Create session
-session = create_vManageSession(…)
+session = create_manager_session(…)
 # Get auditlogs
 session.api.logs.get_auditlogs()</p>
 </dd>
@@ -934,7 +934,7 @@ session.api.logs.get_auditlogs()</p>
 <span id="omp-api-module"></span><h3>omp_api module<a class="headerlink" href="#module-catalystwan.api.omp_api" title="Permalink to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.api.omp_api.OmpAPI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.omp_api.</span></span><span class="sig-name descname"><span class="pre">OmpAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.omp_api.OmpAPI" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.omp_api.</span></span><span class="sig-name descname"><span class="pre">OmpAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.omp_api.OmpAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>OMP API methods of vManage for get common omp data.</p>
 <dl class="py attribute">
@@ -943,14 +943,14 @@ session.api.logs.get_auditlogs()</p>
 <dd><p>logged in API client session</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession">vManageSession</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession">ManagerSession</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="simple">
 <dt>Usage example:</dt><dd><p># Create session and chose device
-session = create_vManageSession(…)
+session = create_manager_session(…)
 device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
 # Gets OMP peers for a device
 omp_peers = session.api.omp.get_omp_peers(device.id)</p>
@@ -1104,7 +1104,7 @@ omp_peers = session.api.omp.get_omp_peers(device.id)</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.api.packet_capture_api.PacketCaptureAPI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.packet_capture_api.</span></span><span class="sig-name descname"><span class="pre">PacketCaptureAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vpn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ge0/1'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.packet_capture_api.PacketCaptureAPI" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.packet_capture_api.</span></span><span class="sig-name descname"><span class="pre">PacketCaptureAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vpn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ge0/1'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.packet_capture_api.PacketCaptureAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Methods for setting up packet capture session, and download .pcap session file.</p>
 <dl class="field-list simple">
@@ -1188,11 +1188,11 @@ omp_peers = session.api.omp.get_omp_peers(device.id)</p>
 <span id="speedtest-api-module"></span><h3>speedtest_api module<a class="headerlink" href="#module-catalystwan.api.speedtest_api" title="Permalink to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.api.speedtest_api.SpeedtestAPI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.speedtest_api.</span></span><span class="sig-name descname"><span class="pre">SpeedtestAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.speedtest_api.SpeedtestAPI" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.api.speedtest_api.</span></span><span class="sig-name descname"><span class="pre">SpeedtestAPI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="catalystwan.html#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.api.speedtest_api.SpeedtestAPI" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>API methods to perform speedtest between 2 edge devices.</p>
 <p class="rubric">Example</p>
-<p>session = create_vManageSession(…)
+<p>session = create_manager_session(…)
 devices = session.api.basic_api.devices
 speedtest = session.api.speedtest.speedtest(devices[0], devices[1])</p>
 <p>print(f”Upload speed from {speedtest.device_name} is {speedtest.up_speed} Mbps.)</p>
@@ -1257,7 +1257,7 @@ speedtest = session.api.speedtest.speedtest(devices[0], devices[1])</p>
   <div>
     <h4>Previous topic</h4>
     <p class="topless"><a href="catalystwan.html"
-                          title="previous chapter">vManage-client package</a></p>
+                          title="previous chapter">Cisco Catalyst SD-WAN SDK package</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -1298,11 +1298,11 @@ speedtest = session.api.speedtest.speedtest(devices[0], devices[1])</p>
           <a href="catalystwan.utils.html" title="catalystwan.utils package"
              >next</a> |</li>
         <li class="right" >
-          <a href="catalystwan.html" title="vManage-client package"
+          <a href="catalystwan.html" title="Cisco Catalyst SD-WAN SDK package"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">catalystwan 0.1.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" >vManage-client</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="catalystwan.html" >vManage-client package</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Cisco Catalyst SD-WAN SDK</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="catalystwan.html" >Cisco Catalyst SD-WAN SDK package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">catalystwan.api package</a></li> 
       </ul>
     </div>

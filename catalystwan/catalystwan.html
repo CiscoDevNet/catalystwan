@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>vManage-client package &#8212; catalystwan 0.1.0 documentation</title>
+    <title>Cisco Catalyst SD-WAN SDK package &#8212; catalystwan 0.1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/classic.css" />
     
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="catalystwan.api package" href="catalystwan.api.html" />
-    <link rel="prev" title="vManage-client" href="modules.html" /> 
+    <link rel="prev" title="Cisco Catalyst SD-WAN SDK" href="modules.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -35,11 +35,11 @@
           <a href="catalystwan.api.html" title="catalystwan.api package"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="modules.html" title="vManage-client"
+          <a href="modules.html" title="Cisco Catalyst SD-WAN SDK"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">catalystwan 0.1.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">vManage-client</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">vManage-client package</a></li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">Cisco Catalyst SD-WAN SDK</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Cisco Catalyst SD-WAN SDK package</a></li> 
       </ul>
     </div>  
 
@@ -48,8 +48,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="vmanage-client-package">
-<h1>vManage-client package<a class="headerlink" href="#vmanage-client-package" title="Permalink to this heading">¶</a></h1>
+  <section id="cisco-catalyst-sd-wan-sdk-package">
+<h1>Cisco Catalyst SD-WAN SDK package<a class="headerlink" href="#cisco-catalyst-sd-wan-sdk-package" title="Permalink to this heading">¶</a></h1>
 <section id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
@@ -1584,6 +1584,225 @@
 <section id="module-catalystwan.session">
 <span id="session-module"></span><h2>session module<a class="headerlink" href="#module-catalystwan.session" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.session.</span></span><span class="sig-name descname"><span class="pre">ManagerSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subdomain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">AuthBase</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.session.ManagerSession" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#catalystwan.session.vManageResponseAdapter" title="catalystwan.session.vManageResponseAdapter"><code class="xref py py-class docutils literal notranslate"><span class="pre">vManageResponseAdapter</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">APIEndpointClient</span></code></p>
+<p>Base class for API sessions for vManage client.</p>
+<p>Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> – IP address or domain name, i.e. ‘10.0.1.200’ or ‘example.com’</p></li>
+<li><p><strong>port</strong> – port</p></li>
+<li><p><strong>username</strong> – username</p></li>
+<li><p><strong>password</strong> – password</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.enable_relogin">
+<span class="sig-name descname"><span class="pre">enable_relogin</span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.enable_relogin" title="Permalink to this definition">¶</a></dt>
+<dd><p>defaults to True, in case that session is not properly logged-in, session will try to
+relogin and try the same request again</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.about">
+<span class="sig-name descname"><span class="pre">about</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AboutInfo</span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.about" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.api_version">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">api_version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Version</span></em><a class="headerlink" href="#catalystwan.session.ManagerSession.api_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.check_vmanage_server_connection">
+<span class="sig-name descname"><span class="pre">check_vmanage_server_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.check_vmanage_server_connection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the ManagerSession.</p>
+<p>This method is overrided from requests.Session.
+Firstly it cleans up any resources associated with vManage.
+Then it closes all adapters and as such the session.</p>
+<p>Note: It is generally recommended to use the session as a context manager
+using the <cite>with</cite> statement, which ensures that the session is properly
+closed and resources are cleaned up even in case of exceptions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.get_data">
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.get_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.get_file">
+<span class="sig-name descname"><span class="pre">get_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Response</span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.get_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a file using session get.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> – dataservice api.</p></li>
+<li><p><strong>filename</strong> – Filename to write download file to.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>http response.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Example usage:</dt><dd><p>response = self.session.get_file(url, filename)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.get_full_url">
+<span class="sig-name descname"><span class="pre">get_full_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.get_full_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns base API url plus given url path.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.get_json">
+<span class="sig-name descname"><span class="pre">get_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.get_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.get_tenant_id">
+<span class="sig-name descname"><span class="pre">get_tenant_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.get_tenant_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets tenant UUID for its subdomain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tenant UUID.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.get_virtual_session_id">
+<span class="sig-name descname"><span class="pre">get_virtual_session_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tenant_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.get_virtual_session_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get VSessionId for a specific tenant</p>
+<p>Note: In a multitenant vManage system, this API is only available in the Provider view.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tenant_id</strong> – provider or tenant UUID</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Virtual session token</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.logout">
+<span class="sig-name descname"><span class="pre">logout</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">vManageResponse</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.logout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.on_session_create_hook">
+<span class="sig-name descname"><span class="pre">on_session_create_hook</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.session.ManagerSession.on_session_create_hook" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.platform_version">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">platform_version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#catalystwan.session.ManagerSession.platform_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.request">
+<span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">vManageResponse</span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs a <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>, prepares it and sends it.
+Returns <code class="xref py py-class docutils literal notranslate"><span class="pre">Response</span></code> object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> – method for the new <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code> object.</p></li>
+<li><p><strong>url</strong> – URL for the new <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code> object.</p></li>
+<li><p><strong>params</strong> – (optional) Dictionary or bytes to be sent in the query
+string for the <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>.</p></li>
+<li><p><strong>data</strong> – (optional) Dictionary, list of tuples, bytes, or file-like
+object to send in the body of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>.</p></li>
+<li><p><strong>json</strong> – (optional) json to send in the body of the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>.</p></li>
+<li><p><strong>headers</strong> – (optional) Dictionary of HTTP Headers to send with the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>.</p></li>
+<li><p><strong>cookies</strong> – (optional) Dict or CookieJar object to send with the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>.</p></li>
+<li><p><strong>files</strong> – (optional) Dictionary of <code class="docutils literal notranslate"><span class="pre">'filename':</span> <span class="pre">file-like-objects</span></code>
+for multipart encoding upload.</p></li>
+<li><p><strong>auth</strong> – (optional) Auth tuple or callable to enable
+Basic/Digest/Custom HTTP Auth.</p></li>
+<li><p><strong>timeout</strong> (<em>float</em><em> or </em><em>tuple</em>) – (optional) How long to wait for the server to send
+data before giving up, as a float, or a <span class="xref std std-ref">(connect timeout,
+read timeout)</span> tuple.</p></li>
+<li><p><strong>allow_redirects</strong> (<em>bool</em>) – (optional) Set to True by default.</p></li>
+<li><p><strong>proxies</strong> – (optional) Dictionary mapping protocol or protocol and
+hostname to the URL of the proxy.</p></li>
+<li><p><strong>stream</strong> – (optional) whether to immediately download the response
+content. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>verify</strong> – (optional) Either a boolean, in which case it controls whether we verify
+the server’s TLS certificate, or a string, in which case it must be a path
+to a CA bundle to use. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>. When set to
+<code class="docutils literal notranslate"><span class="pre">False</span></code>, requests will accept any TLS certificate presented by
+the server, and will ignore hostname mismatches and/or expired
+certificates, which will make your application vulnerable to
+man-in-the-middle (MitM) attacks. Setting verify to <code class="docutils literal notranslate"><span class="pre">False</span></code>
+may be useful during local development or testing.</p></li>
+<li><p><strong>cert</strong> – (optional) if String, path to ssl client cert file (.pem).
+If Tuple, (‘cert’, ‘key’) pair.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>requests.Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.server">
+<span class="sig-name descname"><span class="pre">server</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ServerInfo</span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.server" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.session_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">session_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SessionType</span></em><a class="headerlink" href="#catalystwan.session.ManagerSession.session_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="catalystwan.session.ManagerSession.wait_for_server_reachability">
+<span class="sig-name descname"><span class="pre">wait_for_server_reachability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">retries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#catalystwan.session.ManagerSession.wait_for_server_reachability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if vManage API is reachable by sending server request.</p>
+<p>Retries on HTTPError for specified number of times.
+Delays between each request are configurable,
+It is intended to be used as a probe, so it doesn’t raise original error from exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>retries</strong> – total number of retires</p></li>
+<li><p><strong>delay</strong> – time to wait between each retry</p></li>
+<li><p><strong>initial_delay</strong> – time before sending first request</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if device is reachable, False if not</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="catalystwan.session.TenancyMode">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.session.</span></span><span class="sig-name descname"><span class="pre">TenancyMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.session.TenancyMode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
@@ -1635,8 +1854,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="catalystwan.session.create_vManageSession">
-<span class="sig-prename descclassname"><span class="pre">catalystwan.session.</span></span><span class="sig-name descname"><span class="pre">create_vManageSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subdomain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Logger</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession"><span class="pre">vManageSession</span></a></span></span><a class="headerlink" href="#catalystwan.session.create_vManageSession" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="catalystwan.session.create_manager_session">
+<span class="sig-prename descclassname"><span class="pre">catalystwan.session.</span></span><span class="sig-name descname"><span class="pre">create_manager_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subdomain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Logger</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession"><span class="pre">ManagerSession</span></a></span></span><a class="headerlink" href="#catalystwan.session.create_manager_session" title="Permalink to this definition">¶</a></dt>
 <dd><p>Factory function that creates session object based on provided arguments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1654,7 +1873,7 @@ works only on provider user mode</p></li>
 <dd class="field-even"><p>Configured Session to perform tasks on vManage.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#catalystwan.session.vManageSession" title="catalystwan.session.vManageSession">vManageSession</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#catalystwan.session.ManagerSession" title="catalystwan.session.ManagerSession">ManagerSession</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1810,225 +2029,6 @@ If Tuple, (‘cert’, ‘key’) pair.</p></li>
 
 </dd></dl>
 
-<dl class="py class">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">catalystwan.session.</span></span><span class="sig-name descname"><span class="pre">vManageSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subdomain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">AuthBase</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.session.vManageSession" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#catalystwan.session.vManageResponseAdapter" title="catalystwan.session.vManageResponseAdapter"><code class="xref py py-class docutils literal notranslate"><span class="pre">vManageResponseAdapter</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">APIEndpointClient</span></code></p>
-<p>Base class for API sessions for vManage client.</p>
-<p>Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>url</strong> – IP address or domain name, i.e. ‘10.0.1.200’ or ‘example.com’</p></li>
-<li><p><strong>port</strong> – port</p></li>
-<li><p><strong>username</strong> – username</p></li>
-<li><p><strong>password</strong> – password</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.enable_relogin">
-<span class="sig-name descname"><span class="pre">enable_relogin</span></span><a class="headerlink" href="#catalystwan.session.vManageSession.enable_relogin" title="Permalink to this definition">¶</a></dt>
-<dd><p>defaults to True, in case that session is not properly logged-in, session will try to
-relogin and try the same request again</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.about">
-<span class="sig-name descname"><span class="pre">about</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AboutInfo</span></span></span><a class="headerlink" href="#catalystwan.session.vManageSession.about" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.api_version">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">api_version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Version</span></em><a class="headerlink" href="#catalystwan.session.vManageSession.api_version" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.check_vmanage_server_connection">
-<span class="sig-name descname"><span class="pre">check_vmanage_server_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#catalystwan.session.vManageSession.check_vmanage_server_connection" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.close">
-<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#catalystwan.session.vManageSession.close" title="Permalink to this definition">¶</a></dt>
-<dd><p>Closes the vManageSession.</p>
-<p>This method is overrided from requests.Session.
-Firstly it cleans up any resources associated with vManage.
-Then it closes all adapters and as such the session.</p>
-<p>Note: It is generally recommended to use the session as a context manager
-using the <cite>with</cite> statement, which ensures that the session is properly
-closed and resources are cleaned up even in case of exceptions.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.get_data">
-<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#catalystwan.session.vManageSession.get_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.get_file">
-<span class="sig-name descname"><span class="pre">get_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Response</span></span></span><a class="headerlink" href="#catalystwan.session.vManageSession.get_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a file using session get.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>url</strong> – dataservice api.</p></li>
-<li><p><strong>filename</strong> – Filename to write download file to.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>http response.</p>
-</dd>
-</dl>
-<dl class="simple">
-<dt>Example usage:</dt><dd><p>response = self.session.get_file(url, filename)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.get_full_url">
-<span class="sig-name descname"><span class="pre">get_full_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#catalystwan.session.vManageSession.get_full_url" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns base API url plus given url path.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.get_json">
-<span class="sig-name descname"><span class="pre">get_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#catalystwan.session.vManageSession.get_json" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.get_tenant_id">
-<span class="sig-name descname"><span class="pre">get_tenant_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#catalystwan.session.vManageSession.get_tenant_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets tenant UUID for its subdomain.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Tenant UUID.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.get_virtual_session_id">
-<span class="sig-name descname"><span class="pre">get_virtual_session_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tenant_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#catalystwan.session.vManageSession.get_virtual_session_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get VSessionId for a specific tenant</p>
-<p>Note: In a multitenant vManage system, this API is only available in the Provider view.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tenant_id</strong> – provider or tenant UUID</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Virtual session token</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.logout">
-<span class="sig-name descname"><span class="pre">logout</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">vManageResponse</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#catalystwan.session.vManageSession.logout" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.on_session_create_hook">
-<span class="sig-name descname"><span class="pre">on_session_create_hook</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#catalystwan.session.vManageSession.on_session_create_hook" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.platform_version">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">platform_version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#catalystwan.session.vManageSession.platform_version" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.request">
-<span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">vManageResponse</span></span></span><a class="headerlink" href="#catalystwan.session.vManageSession.request" title="Permalink to this definition">¶</a></dt>
-<dd><p>Constructs a <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>, prepares it and sends it.
-Returns <code class="xref py py-class docutils literal notranslate"><span class="pre">Response</span></code> object.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>method</strong> – method for the new <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code> object.</p></li>
-<li><p><strong>url</strong> – URL for the new <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code> object.</p></li>
-<li><p><strong>params</strong> – (optional) Dictionary or bytes to be sent in the query
-string for the <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>.</p></li>
-<li><p><strong>data</strong> – (optional) Dictionary, list of tuples, bytes, or file-like
-object to send in the body of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>.</p></li>
-<li><p><strong>json</strong> – (optional) json to send in the body of the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>.</p></li>
-<li><p><strong>headers</strong> – (optional) Dictionary of HTTP Headers to send with the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>.</p></li>
-<li><p><strong>cookies</strong> – (optional) Dict or CookieJar object to send with the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code>.</p></li>
-<li><p><strong>files</strong> – (optional) Dictionary of <code class="docutils literal notranslate"><span class="pre">'filename':</span> <span class="pre">file-like-objects</span></code>
-for multipart encoding upload.</p></li>
-<li><p><strong>auth</strong> – (optional) Auth tuple or callable to enable
-Basic/Digest/Custom HTTP Auth.</p></li>
-<li><p><strong>timeout</strong> (<em>float</em><em> or </em><em>tuple</em>) – (optional) How long to wait for the server to send
-data before giving up, as a float, or a <span class="xref std std-ref">(connect timeout,
-read timeout)</span> tuple.</p></li>
-<li><p><strong>allow_redirects</strong> (<em>bool</em>) – (optional) Set to True by default.</p></li>
-<li><p><strong>proxies</strong> – (optional) Dictionary mapping protocol or protocol and
-hostname to the URL of the proxy.</p></li>
-<li><p><strong>stream</strong> – (optional) whether to immediately download the response
-content. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>verify</strong> – (optional) Either a boolean, in which case it controls whether we verify
-the server’s TLS certificate, or a string, in which case it must be a path
-to a CA bundle to use. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>. When set to
-<code class="docutils literal notranslate"><span class="pre">False</span></code>, requests will accept any TLS certificate presented by
-the server, and will ignore hostname mismatches and/or expired
-certificates, which will make your application vulnerable to
-man-in-the-middle (MitM) attacks. Setting verify to <code class="docutils literal notranslate"><span class="pre">False</span></code>
-may be useful during local development or testing.</p></li>
-<li><p><strong>cert</strong> – (optional) if String, path to ssl client cert file (.pem).
-If Tuple, (‘cert’, ‘key’) pair.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>requests.Response</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.server">
-<span class="sig-name descname"><span class="pre">server</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ServerInfo</span></span></span><a class="headerlink" href="#catalystwan.session.vManageSession.server" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.session_type">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">session_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SessionType</span></em><a class="headerlink" href="#catalystwan.session.vManageSession.session_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="catalystwan.session.vManageSession.wait_for_server_reachability">
-<span class="sig-name descname"><span class="pre">wait_for_server_reachability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">retries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_delay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#catalystwan.session.vManageSession.wait_for_server_reachability" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks if vManage API is reachable by sending server request.</p>
-<p>Retries on HTTPError for specified number of times.
-Delays between each request are configurable,
-It is intended to be used as a probe, so it doesn’t raise original error from exception.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>retries</strong> – total number of retires</p></li>
-<li><p><strong>delay</strong> – time to wait between each retry</p></li>
-<li><p><strong>initial_delay</strong> – time before sending first request</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>True if device is reachable, False if not</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="module-catalystwan">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-catalystwan" title="Permalink to this heading">¶</a></h2>
@@ -2072,7 +2072,7 @@ for current package</p>
   <div>
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
-<li><a class="reference internal" href="#">vManage-client package</a><ul>
+<li><a class="reference internal" href="#">Cisco Catalyst SD-WAN SDK package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-catalystwan.dataclasses">dataclasses module</a><ul>
@@ -2121,15 +2121,15 @@ for current package</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-catalystwan.session">session module</a><ul>
+<li><a class="reference internal" href="#catalystwan.session.ManagerSession"><code class="docutils literal notranslate"><span class="pre">ManagerSession</span></code></a></li>
 <li><a class="reference internal" href="#catalystwan.session.TenancyMode"><code class="docutils literal notranslate"><span class="pre">TenancyMode</span></code></a></li>
 <li><a class="reference internal" href="#catalystwan.session.UserMode"><code class="docutils literal notranslate"><span class="pre">UserMode</span></code></a></li>
 <li><a class="reference internal" href="#catalystwan.session.ViewMode"><code class="docutils literal notranslate"><span class="pre">ViewMode</span></code></a></li>
-<li><a class="reference internal" href="#catalystwan.session.create_vManageSession"><code class="docutils literal notranslate"><span class="pre">create_vManageSession()</span></code></a></li>
+<li><a class="reference internal" href="#catalystwan.session.create_manager_session"><code class="docutils literal notranslate"><span class="pre">create_manager_session()</span></code></a></li>
 <li><a class="reference internal" href="#catalystwan.session.determine_session_type"><code class="docutils literal notranslate"><span class="pre">determine_session_type()</span></code></a></li>
 <li><a class="reference internal" href="#catalystwan.session.vManageBadRequestError"><code class="docutils literal notranslate"><span class="pre">vManageBadRequestError</span></code></a></li>
 <li><a class="reference internal" href="#catalystwan.session.vManageBadResponseError"><code class="docutils literal notranslate"><span class="pre">vManageBadResponseError</span></code></a></li>
 <li><a class="reference internal" href="#catalystwan.session.vManageResponseAdapter"><code class="docutils literal notranslate"><span class="pre">vManageResponseAdapter</span></code></a></li>
-<li><a class="reference internal" href="#catalystwan.session.vManageSession"><code class="docutils literal notranslate"><span class="pre">vManageSession</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-catalystwan">Module contents</a><ul>
@@ -2147,7 +2147,7 @@ for current package</p>
   <div>
     <h4>Previous topic</h4>
     <p class="topless"><a href="modules.html"
-                          title="previous chapter">vManage-client</a></p>
+                          title="previous chapter">Cisco Catalyst SD-WAN SDK</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -2188,11 +2188,11 @@ for current package</p>
           <a href="catalystwan.api.html" title="catalystwan.api package"
              >next</a> |</li>
         <li class="right" >
-          <a href="modules.html" title="vManage-client"
+          <a href="modules.html" title="Cisco Catalyst SD-WAN SDK"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">catalystwan 0.1.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" >vManage-client</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">vManage-client package</a></li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >Cisco Catalyst SD-WAN SDK</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Cisco Catalyst SD-WAN SDK package</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
