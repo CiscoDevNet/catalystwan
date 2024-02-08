@@ -76,7 +76,7 @@ class LocalizedPolicy(PolicyCreationPayload):
         serialization_alias="policyDefinition",
         validation_alias="policyDefinition",
     )
-    policy_type: str = Field("feature", serialization_alias="policyType", validation_alias="policyType")
+    policy_type: str = Field(default="feature", serialization_alias="policyType", validation_alias="policyType")
 
     def _add_item(self, type: LocalizedPolicySupportedItemType, id: UUID) -> None:
         self.policy_definition.assembly.append(LocalizedPolicyAssemblyItem(type=type, definition_id=id))

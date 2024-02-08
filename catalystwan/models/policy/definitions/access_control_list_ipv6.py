@@ -21,7 +21,7 @@ from catalystwan.models.policy.policy_definition import (
     NextHopEntry,
     PacketLengthEntry,
     PLPEntry,
-    PLPEntryValues,
+    PLPEntryEnum,
     PolicerAction,
     PolicyActionTypeEnum,
     PolicyDefinitionBase,
@@ -83,10 +83,10 @@ class AclIPv6PolicySequence(PolicyDefinitionSequenceBase):
         self._insert_match(PacketLengthEntry.from_range(packet_lengths))
 
     def match_low_plp(self) -> None:
-        self._insert_match(PLPEntry(value=PLPEntryValues.LOW))
+        self._insert_match(PLPEntry(value=PLPEntryEnum.LOW))
 
     def match_high_plp(self) -> None:
-        self._insert_match(PLPEntry(value=PLPEntryValues.HIGH))
+        self._insert_match(PLPEntry(value=PLPEntryEnum.HIGH))
 
     def match_source_data_prefix_list(self, data_prefix_list_id: UUID) -> None:
         self._insert_match(SourceDataIPv6PrefixListEntry(ref=data_prefix_list_id))

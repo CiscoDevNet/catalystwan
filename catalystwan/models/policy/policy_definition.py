@@ -34,7 +34,7 @@ class VariableName(BaseModel):
     vip_variable_name: str = Field(serialization_alias="vipVariableName", validation_alias="vipVariableName")
 
 
-class PLPEntryValues(str, Enum):
+class PLPEntryEnum(str, Enum):
     LOW = "low"
     HIGH = "high"
 
@@ -205,7 +205,7 @@ class PacketLengthEntry(BaseModel):
 
 class PLPEntry(BaseModel):
     field: Literal["plp"] = "plp"
-    value: PLPEntryValues
+    value: PLPEntryEnum
 
 
 class ProtocolEntry(BaseModel):
