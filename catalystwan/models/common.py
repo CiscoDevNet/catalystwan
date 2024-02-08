@@ -91,7 +91,7 @@ class TLOCColorEnum(str, Enum):
 
 class WellKnownBGPCommunitiesEnum(str, Enum):
     INTERNET = "internet"
-    LOCAL_AS = "local-as"
+    LOCAL_AS = "local-AS"
     NO_ADVERTISE = "no-advertise"
     NO_EXPORT = "no-export"
 

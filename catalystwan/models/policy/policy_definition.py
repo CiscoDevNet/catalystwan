@@ -34,7 +34,7 @@ class VariableName(BaseModel):
     vip_variable_name: str = Field(serialization_alias="vipVariableName", validation_alias="vipVariableName")
 
 
-class PLPEntryValues(str, Enum):
+class PLPEntryEnum(str, Enum):
     LOW = "low"
     HIGH = "high"
 
@@ -110,7 +110,7 @@ class SequenceIpType(str, Enum):
     ALL = "all"
 
 
-class ActionTypeEnum(str, Enum):
+class PolicyActionTypeEnum(str, Enum):
     DROP = "drop"
     ACCEPT = "accept"
     PASS = "pass"
@@ -139,7 +139,7 @@ class Optimized(str, Enum):
     FALSE = "false"
 
 
-class DNSTypeEntryValues(str, Enum):
+class DNSTypeEntryEnum(str, Enum):
     HOST = "host"
     UMBRELLA = "umbrella"
 
@@ -205,7 +205,7 @@ class PacketLengthEntry(BaseModel):
 
 class PLPEntry(BaseModel):
     field: Literal["plp"] = "plp"
-    value: PLPEntryValues
+    value: PLPEntryEnum
 
 
 class ProtocolEntry(BaseModel):
@@ -425,7 +425,7 @@ class LocalTLOCListEntry(BaseModel):
 
 class DNSTypeEntry(BaseModel):
     field: Literal["dnsType"] = "dnsType"
-    value: DNSTypeEntryValues
+    value: DNSTypeEntryEnum
 
 
 class ServiceChainEntry(BaseModel):
@@ -688,7 +688,7 @@ class RedirectDNSAction(BaseModel):
         return RedirectDNSAction(parameter=IPAddressEntry(value=ip))
 
     @staticmethod
-    def from_dns_type(dns_type: DNSTypeEntryValues = DNSTypeEntryValues.HOST) -> "RedirectDNSAction":
+    def from_dns_type(dns_type: DNSTypeEntryEnum = DNSTypeEntryEnum.HOST) -> "RedirectDNSAction":
         return RedirectDNSAction(parameter=DNSTypeEntry(value=dns_type))
 
 
@@ -908,8 +908,8 @@ class Action(BaseModel):
 class PolicyDefinitionSequenceBase(BaseModel):
     sequence_id: int = Field(default=0, serialization_alias="sequenceId", validation_alias="sequenceId")
     sequence_name: str = Field(serialization_alias="sequenceName", validation_alias="sequenceName")
-    base_action: ActionTypeEnum = Field(
-        default=ActionTypeEnum.DROP, serialization_alias="baseAction", validation_alias="baseAction"
+    base_action: PolicyActionTypeEnum = Field(
+        default=PolicyActionTypeEnum.DROP, serialization_alias="baseAction", validation_alias="baseAction"
     )
     sequence_type: SequenceType = Field(serialization_alias="sequenceType", validation_alias="sequenceType")
     sequence_ip_type: SequenceIpType = Field(serialization_alias="sequenceIpType", validation_alias="sequenceIpType")
@@ -1002,15 +1002,15 @@ def accept_action(method):
     @wraps(method)
     def wrapper(self: PolicyDefinitionSequenceBase, *args, **kwargs):
         assert (
-            self.base_action == ActionTypeEnum.ACCEPT
-        ), f"{method.__name__} only allowed when base_action is {ActionTypeEnum.ACCEPT}"
+            self.base_action == PolicyActionTypeEnum.ACCEPT
+        ), f"{method.__name__} only allowed when base_action is {PolicyActionTypeEnum.ACCEPT}"
         return method(self, *args, **kwargs)
 
     return wrapper
 
 
 class DefaultAction(BaseModel):
-    type: ActionTypeEnum
+    type: PolicyActionTypeEnum
 
 
 class InfoTag(BaseModel):
@@ -1028,7 +1028,7 @@ class PolicyReference(BaseModel):
 
 class DefinitionWithSequencesCommonBase(BaseModel):
     default_action: Optional[DefaultAction] = Field(
-        default=DefaultAction(type=ActionTypeEnum.DROP),
+        default=DefaultAction(type=PolicyActionTypeEnum.DROP),
         serialization_alias="defaultAction",
         validation_alias="defaultAction",
     )

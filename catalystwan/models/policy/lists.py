@@ -25,7 +25,7 @@ from catalystwan.models.policy.lists_entries import (
     LocalDomainListEntry,
     MirrorListEntry,
     PathPreferenceEnum,
-    PolicerExceedAction,
+    PolicerExceedActionEnum,
     PolicerListEntry,
     PortListEntry,
     PreferredColorGroupListEntry,
@@ -196,7 +196,7 @@ class PolicerList(PolicyListBase):
     type: Literal["policer"] = "policer"
     entries: List[PolicerListEntry] = []
 
-    def police(self, burst: int, rate: int, exceed: PolicerExceedAction = PolicerExceedAction.DROP) -> None:
+    def police(self, burst: int, rate: int, exceed: PolicerExceedActionEnum = PolicerExceedActionEnum.DROP) -> None:
         # Policer list must have only single entry!
         entry = PolicerListEntry(burst=str(burst), exceed=exceed, rate=str(rate))
         self._add_entry(entry, single=True)

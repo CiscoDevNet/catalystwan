@@ -57,7 +57,9 @@ Always write a clear log message for your commits.
     pre-commit install
     ```
 ### Environment Variables
-- `VMNGCLIENT_DEVEL` when set: loggers will be configured according to `./logging.conf` and `urllib3.exceptions.InsecureRequestWarning` will be suppressed
+- `catalystwan_devel` when set: loggers will be configured according to `./logging.conf` and `urllib3.exceptions.InsecureRequestWarning` will be suppressed
+
+- `catalystwan_export_endpoints` when set `endpoints-md` pre-commit step will generate `ENDPOINTS.md` file in addition to perform definition checks. This should be set only when creating version bump commit with new release tag.
 
 ## Code guidelines
 

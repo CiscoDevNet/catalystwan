@@ -185,7 +185,9 @@ class CentralizedPolicyDefinition(PolicyDefinition):
 
 class CentralizedPolicy(PolicyCreationPayload):
     policy_definition: CentralizedPolicyDefinition = Field(
-        CentralizedPolicyDefinition(), serialization_alias="policyDefinition", validation_alias="policyDefinition"
+        default=CentralizedPolicyDefinition(),
+        serialization_alias="policyDefinition",
+        validation_alias="policyDefinition",
     )
     policy_type: Literal["feature"] = Field(
         default="feature", serialization_alias="policyType", validation_alias="policyType"

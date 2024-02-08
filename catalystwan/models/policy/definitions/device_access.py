@@ -6,7 +6,6 @@ from pydantic import ConfigDict, Field
 from typing_extensions import Annotated
 
 from catalystwan.models.policy.policy_definition import (
-    ActionTypeEnum,
     CountAction,
     DefaultAction,
     DefinitionWithSequencesCommonBase,
@@ -15,6 +14,7 @@ from catalystwan.models.policy.policy_definition import (
     DestinationPortEntry,
     DeviceAccessProtocolEnum,
     Match,
+    PolicyActionTypeEnum,
     PolicyDefinitionBase,
     PolicyDefinitionSequenceBase,
     SequenceIpType,
@@ -50,8 +50,8 @@ class DeviceAccessPolicySequence(PolicyDefinitionSequenceBase):
     sequence_type: Literal["deviceaccesspolicy"] = Field(
         default="deviceaccesspolicy", serialization_alias="sequenceType", validation_alias="sequenceType"
     )
-    base_action: ActionTypeEnum = Field(
-        default=ActionTypeEnum.ACCEPT, serialization_alias="baseAction", validation_alias="baseAction"
+    base_action: PolicyActionTypeEnum = Field(
+        default=PolicyActionTypeEnum.ACCEPT, serialization_alias="baseAction", validation_alias="baseAction"
     )
     match: DeviceAccessPolicySequenceMatch = DeviceAccessPolicySequenceMatch()
     actions: List[DeviceAccessPolicySequenceActions] = []
@@ -82,7 +82,7 @@ class DeviceAccessPolicySequence(PolicyDefinitionSequenceBase):
 class DeviceAccessPolicy(DeviceAccessPolicyHeader, DefinitionWithSequencesCommonBase):
     sequences: List[DeviceAccessPolicySequence] = []
     default_action: DefaultAction = Field(
-        default=DefaultAction(type=ActionTypeEnum.DROP),
+        default=DefaultAction(type=PolicyActionTypeEnum.DROP),
         serialization_alias="defaultAction",
         validation_alias="defaultAction",
     )
@@ -91,7 +91,7 @@ class DeviceAccessPolicy(DeviceAccessPolicyHeader, DefinitionWithSequencesCommon
     def add_acl_sequence(
         self,
         name: str = "Device Access Control List",
-        base_action: ActionTypeEnum = ActionTypeEnum.ACCEPT,
+        base_action: PolicyActionTypeEnum = PolicyActionTypeEnum.ACCEPT,
         device_access_protocol: Optional[DeviceAccessProtocolEnum] = None,
     ) -> DeviceAccessPolicySequence:
         seq = DeviceAccessPolicySequence(

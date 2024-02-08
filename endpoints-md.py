@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from inspect import getsourcefile, getsourcelines
+from os import environ
 from pathlib import Path, PurePath
 from typing import Any, Dict, List, Optional, Protocol, Sequence, Set
 from urllib.request import pathname2url
@@ -203,6 +204,7 @@ if __name__ == "__main__":
         versions_lookup=versions.versions_lookup,
         tenancy_modes_lookup=view.view_lookup,
     )
-    with open("ENDPOINTS.md", "w") as f:
-        f.write("**THIS FILE IS AUTO-GENERATED DO NOT EDIT**\n\n")
-        f.write(endpoint_registry.md())
+    if environ.get("catalystwan_export_endpoints") is not None:
+        with open("ENDPOINTS.md", "w") as f:
+            f.write("**THIS FILE IS AUTO-GENERATED DO NOT EDIT**\n\n")
+            f.write(endpoint_registry.md())

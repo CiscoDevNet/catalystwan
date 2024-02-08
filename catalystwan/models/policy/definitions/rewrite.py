@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from catalystwan.models.policy.policy_definition import (
     DefinitionWithSequencesCommonBase,
-    PLPEntryValues,
+    PLPEntryEnum,
     PolicyDefinitionBase,
 )
 
@@ -29,7 +29,7 @@ class RewritePolicyDefinition(BaseModel):
 class RewritePolicy(RewritePolicyHeader, DefinitionWithSequencesCommonBase):
     definition: RewritePolicyDefinition = RewritePolicyDefinition()
 
-    def add_rule(self, class_map_ref: UUID, dscp: int, l2cos: int, plp: PLPEntryValues) -> None:
+    def add_rule(self, class_map_ref: UUID, dscp: int, l2cos: int, plp: PLPEntryEnum) -> None:
         self.definition.rules.append(RewritePolicyRule(class_=class_map_ref, plp=plp, dscp=str(dscp), l2cos=str(l2cos)))
 
     model_config = ConfigDict(populate_by_name=True)

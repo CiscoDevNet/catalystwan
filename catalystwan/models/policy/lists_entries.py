@@ -23,7 +23,7 @@ def check_loss_percent(loss_str: str) -> str:
     return loss_str
 
 
-class PolicerExceedAction(str, Enum):
+class PolicerExceedActionEnum(str, Enum):
     DROP = "drop"
     REMARK = "remark"
 
@@ -271,7 +271,7 @@ class PolicerListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     burst: str = Field(description="bytes: integer in range 15000-10000000")
-    exceed: PolicerExceedAction = PolicerExceedAction.DROP
+    exceed: PolicerExceedActionEnum = PolicerExceedActionEnum.DROP
     rate: str = Field(description="bps: integer in range 8-100000000000")
 
     @field_validator("burst")

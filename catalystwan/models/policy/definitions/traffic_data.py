@@ -8,7 +8,6 @@ from typing_extensions import Annotated
 from catalystwan.models.common import TLOCColorEnum
 from catalystwan.models.policy.lists_entries import EncapEnum
 from catalystwan.models.policy.policy_definition import (
-    ActionTypeEnum,
     AppListEntry,
     CFlowDAction,
     CountAction,
@@ -22,7 +21,7 @@ from catalystwan.models.policy.policy_definition import (
     DNSAppListEntry,
     DNSEntry,
     DNSEntryValues,
-    DNSTypeEntryValues,
+    DNSTypeEntryEnum,
     DREOptimizationAction,
     DSCPEntry,
     FallBackToRoutingAction,
@@ -40,8 +39,9 @@ from catalystwan.models.policy.policy_definition import (
     NextHopLooseEntry,
     PacketLengthEntry,
     PLPEntry,
-    PLPEntryValues,
+    PLPEntryEnum,
     PolicerListEntry,
+    PolicyActionTypeEnum,
     PolicyDefinitionBase,
     PolicyDefinitionSequenceBase,
     PrefferedColorGroupListEntry,
@@ -129,10 +129,10 @@ class TrafficDataPolicySequence(PolicyDefinitionSequenceBase):
         self._insert_match(PacketLengthEntry.from_range(packet_lengths))
 
     def match_low_plp(self) -> None:
-        self._insert_match(PLPEntry(value=PLPEntryValues.LOW))
+        self._insert_match(PLPEntry(value=PLPEntryEnum.LOW))
 
     def match_high_plp(self) -> None:
-        self._insert_match(PLPEntry(value=PLPEntryValues.HIGH))
+        self._insert_match(PLPEntry(value=PLPEntryEnum.HIGH))
 
     def match_protocols(self, protocols: Set[int]) -> None:
         self._insert_match(ProtocolEntry.from_protocol_set(protocols))
@@ -239,7 +239,7 @@ class TrafficDataPolicySequence(PolicyDefinitionSequenceBase):
         ...
 
     @overload
-    def associate_redirect_dns_action(self, *, dns_type: DNSTypeEntryValues = DNSTypeEntryValues.HOST) -> None:
+    def associate_redirect_dns_action(self, *, dns_type: DNSTypeEntryEnum = DNSTypeEntryEnum.HOST) -> None:
         ...
 
     @accept_action
@@ -357,7 +357,7 @@ class TrafficDataPolicy(TrafficDataPolicyHeader, DefinitionWithSequencesCommonBa
     model_config = ConfigDict(populate_by_name=True)
 
     def add_ipv4_sequence(
-        self, name: str = "Custom", base_action: ActionTypeEnum = ActionTypeEnum.DROP, log: bool = False
+        self, name: str = "Custom", base_action: PolicyActionTypeEnum = PolicyActionTypeEnum.DROP, log: bool = False
     ) -> TrafficDataPolicySequence:
         seq = TrafficDataPolicySequence(
             sequence_name=name,
