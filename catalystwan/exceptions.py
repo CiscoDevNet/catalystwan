@@ -111,7 +111,7 @@ class TenantSubdomainNotFound(ManagerError):
     pass
 
 
-class APIEndpointError(ManagerError):
+class APIEndpointError(Exception):
     """Raised when there is a problem with endpoint definition"""
 
     pass
