@@ -24,11 +24,11 @@ class TestSoftwareAcionAPI(unittest.TestCase):
         )
         self.DeviceSoftwareRepository_obj = {
             "mock_uuid": DeviceSoftwareRepository(
-                ["ver1", "ver2", "curr_ver"],
-                ["ver1", "ver2"],
-                "20.8",
-                "def_ver",
-                "mock_uuid",
+                installed_versions=["ver1", "ver2", "curr_ver"],
+                availableVersions=["ver1", "ver2"],
+                version="20.8",
+                defaultVersion="def_ver",
+                uuid="mock_uuid",
             ),
         }
 
