@@ -21,24 +21,18 @@ username = "admin"
 password = "password123"
 with create_manager_session(url=url, username=username, password=password) as session:
     session.get("/dataservice/device")
-```
 
-## Releasing User Session Resource on SDWAN Manager
-When interacting with the SDWAN Manager API without using a context manager, it's important to manually execute the `close()` method to release the user session resource. 
+# Releasing User Session Resource on SDWAN Manager
+#
+# When interacting with the SDWAN Manager API without using a context manager, it's important to manually execute the `close()` method to release the user session resource.
 
-```python
-from catalystwan.session import create_manager_session
-
-
-url = "example.com"
-username = "admin"
 session = create_manager_session(url=url, username=username, password=password)
 
 session.get("/dataservice/device")
 
 session.close()
-```
 
+```
 Ensure that the `close()` method is called after you have finished using the session to maintain optimal resource management and avoid potential errors.
 
 ## API usage examples
