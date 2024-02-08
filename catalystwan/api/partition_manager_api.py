@@ -7,7 +7,6 @@ from catalystwan.api.task_status_api import Task
 from catalystwan.api.versions_utils import DeviceVersions, RemovePartitionPayload, RepositoryAPI
 from catalystwan.dataclasses import Device
 from catalystwan.typed_list import DataSequence
-from catalystwan.utils.creation_tools import asdict
 from catalystwan.utils.upgrades_helper import get_install_specification, validate_personality_homogeneity
 
 logger = logging.getLogger(__name__)
@@ -64,7 +63,7 @@ class PartitionManagerAPI:
         url = "/dataservice/device/action/defaultpartition"
         payload = {
             "action": "defaultpartition",
-            "devices": [asdict(device) for device in payload_devices],  # type: ignore
+            "devices": [device.model_dump() for device in payload_devices],  # type: ignore
             "deviceType": get_install_specification(devices.first()).device_type.value,
         }
         set_default = dict(self.session.post(url, json=payload).json())
@@ -92,14 +91,16 @@ class PartitionManagerAPI:
             payload_devices = self.device_version.get_devices_available_versions(devices)
 
         remove_partition_payload = [
-            RemovePartitionPayload(device.deviceId, device.deviceIP, device.version)  # type: ignore
+            RemovePartitionPayload(
+                device_id=device.device_id, device_ip=device.device_id, version=device.version
+            )  # type: ignore
             for device in payload_devices
         ]
 
         url = "/dataservice/device/action/removepartition"
         payload = {
             "action": "removepartition",
-            "devices": [asdict(device) for device in remove_partition_payload],  # type: ignore
+            "devices": [device.model_dump() for device in remove_partition_payload],  # type: ignore
             "deviceType": get_install_specification(devices.first()).device_type.value,
         }
         if force is False:

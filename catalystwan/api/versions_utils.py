@@ -2,16 +2,17 @@ from __future__ import annotations
 
 import logging
 from pathlib import PurePath
-from typing import TYPE_CHECKING, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Dict, List, Union
 
-from attr import Factory, define, field  # type: ignore
 from clint.textui.progress import Bar as ProgressBar  # type: ignore
+from pydantic import BaseModel, ConfigDict, Field
+from pydantic.functional_validators import BeforeValidator
 from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
+from typing_extensions import Annotated
 
-from catalystwan.dataclasses import DataclassBase, Device
+from catalystwan.dataclasses import Device
 from catalystwan.exceptions import ImageNotInRepositoryError
 from catalystwan.typed_list import DataSequence
-from catalystwan.utils.creation_tools import FIELD_NAME, create_dataclass
 
 if TYPE_CHECKING:
     from catalystwan.session import vManageSession
@@ -19,27 +20,40 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-@define
-class DeviceSoftwareRepository(DataclassBase):
-    installed_versions: List[str] = field(default=None)
-    available_versions: List[str] = field(default=Factory(list), metadata={FIELD_NAME: "availableVersions"})
-    current_version: str = field(default=None, metadata={FIELD_NAME: "version"})
-    default_version: str = field(default=None, metadata={FIELD_NAME: "defaultVersion"})
-    device_id: str = field(default=None, metadata={FIELD_NAME: "uuid"})
+class DeviceSoftwareRepository(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    installed_versions: List[str] = Field(default_factory=list)
+    available_versions: List[str] = Field(
+        default_factory=list, serialization_alias="availableVersions", validation_alias="availableVersions"
+    )
+    current_version: str = Field(
+        default="",
+        serialization_alias="version",
+        validation_alias="version",
+        description="Current active version of software on device",
+    )
+    default_version: str = Field(default="", serialization_alias="defaultVersion", validation_alias="defaultVersion")
+    device_id: str = Field(default="", serialization_alias="uuid", validation_alias="uuid")
 
 
-@define
-class DeviceVersionPayload(DataclassBase):
-    deviceId: str
-    deviceIP: str
-    version: Optional[Union[str, List[str]]] = ""
+class DeviceVersionPayload(BaseModel):
+    device_id: str = Field(serialization_alias="deviceId")
+    device_ip: str = Field(serialization_alias="deviceIP")
+    version: Union[str, List[str]] = Field(default="")
 
 
-@define(frozen=False)
-class RemovePartitionPayload(DataclassBase):
-    deviceId: str
-    deviceIP: str
-    version: Union[str, List[str]] = field(converter=(lambda x: [x] if isinstance(x, str) else x))
+def convert_to_list(element: Union[str, List[str]]) -> List[str]:
+    return [element] if isinstance(element, str) else element
+
+
+VersionList = Annotated[Union[str, List[str]], BeforeValidator(convert_to_list)]
+
+
+class RemovePartitionPayload(BaseModel):
+    device_id: str = Field(serialization_alias="deviceId")
+    device_ip: str = Field(serialization_alias="deviceIP")
+    version: VersionList
 
 
 class RepositoryAPI:
@@ -89,10 +103,10 @@ class RepositoryAPI:
         edges_versions_info = self.session.get_data(url)
         devices_versions_repository = {}
         for device in controllers_versions_info + edges_versions_info:
-            device_all_versions = create_dataclass(DeviceSoftwareRepository, device)
-            device_all_versions.installed_versions = [version for version in device_all_versions.available_versions]
-            device_all_versions.installed_versions.append(device_all_versions.current_version)
-            devices_versions_repository[device_all_versions.device_id] = device_all_versions
+            device_software_repository = DeviceSoftwareRepository(**device)
+            device_software_repository.installed_versions = [a for a in device_software_repository.available_versions]
+            device_software_repository.installed_versions.append(device_software_repository.current_version)
+            devices_versions_repository[device_software_repository.device_id] = device_software_repository
         return devices_versions_repository
 
     def get_image_version(self, software_image: str) -> Union[str, None]:
@@ -189,11 +203,12 @@ class DeviceVersions:
             list : list of devices
         """
         devices_payload = DataSequence(
-            DeviceVersionPayload, [DeviceVersionPayload(device.uuid, device.id) for device in devices]  # type: ignore
+            DeviceVersionPayload,
+            [DeviceVersionPayload(device_id=device.uuid, device_ip=device.id) for device in devices],
         )
         all_dev_versions = self.repository.get_devices_versions_repository()
         for device in devices_payload:
-            device_versions = getattr(all_dev_versions[device.deviceId], version_type)
+            device_versions = getattr(all_dev_versions[device.device_id], version_type)
             try:
                 for version in device_versions:
                     if version_to_set_up in version:
@@ -254,11 +269,12 @@ class DeviceVersions:
             list : list of devices
         """
         devices_payload = DataSequence(
-            DeviceVersionPayload, [DeviceVersionPayload(device.uuid, device.id) for device in devices]  # type: ignore
+            DeviceVersionPayload,
+            [DeviceVersionPayload(device_id=device.uuid, device_ip=device.id) for device in devices],
         )
         all_dev_versions = self.repository.get_devices_versions_repository()
         for device in devices_payload:
-            device.version = getattr(all_dev_versions[device.deviceId], version_type)
+            device.version = getattr(all_dev_versions[device.device_id], version_type)
         return devices_payload
 
     def get_devices_current_version(self, devices: DataSequence[Device]) -> DataSequence[DeviceVersionPayload]:
@@ -291,4 +307,4 @@ class DeviceVersions:
         return self._get_devices_chosen_version(devices, "available_versions")
 
     def get_device_list(self, devices: DataSequence[Device]) -> List[DeviceVersionPayload]:
-        return [DeviceVersionPayload(device.uuid, device.id) for device in devices]  # type: ignore
+        return [DeviceVersionPayload(device_id=device.uuid, device_ip=device.id) for device in devices]  # type: ignore

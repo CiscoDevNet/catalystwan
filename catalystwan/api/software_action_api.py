@@ -8,7 +8,6 @@ from catalystwan.api.versions_utils import DeviceVersions, RepositoryAPI
 from catalystwan.dataclasses import Device
 from catalystwan.exceptions import VersionDeclarationError  # type: ignore
 from catalystwan.typed_list import DataSequence
-from catalystwan.utils.creation_tools import asdict
 from catalystwan.utils.personality import Personality
 from catalystwan.utils.upgrades_helper import get_install_specification, validate_personality_homogeneity
 from catalystwan.version import parse_vmanage_version
@@ -78,9 +77,7 @@ class SoftwareActionAPI:
         url = "/dataservice/device/action/changepartition"
         payload = {
             "action": "changepartition",
-            "devices": [
-                asdict(device) for device in self.device_versions.get_device_available(version, devices)  # type: ignore
-            ],
+            "devices": [device.model_dump() for device in self.device_versions.get_device_available(version, devices)],
             "deviceType": get_install_specification(devices.first()).device_type.value,
         }
         activate = dict(self.session.post(url, json=payload).json())
@@ -137,7 +134,7 @@ class SoftwareActionAPI:
                 "sync": sync,
             },
             "devices": [
-                {"deviceId": device.deviceId, "deviceIP": device.deviceIP}
+                {"deviceId": device.device_id, "deviceIP": device.device_ip}
                 for device in self.device_versions.get_device_list(devices)
             ],  # type: ignore
             "deviceType": install_specification.device_type.value,

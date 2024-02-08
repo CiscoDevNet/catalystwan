@@ -22,11 +22,11 @@ class TestRepositoryAPI(unittest.TestCase):
         )
         self.DeviceSoftwareRepository_obj = {
             "mock_uuid": DeviceSoftwareRepository(
-                ["ver1", "ver2", "curr_ver"],
-                ["ver1", "ver2"],
-                "curr_ver",
-                "def_ver",
-                "mock_uuid",
+                installed_versions=["ver1", "ver2", "curr_ver"],
+                availableVersions=["ver1", "ver2"],
+                version="curr_ver",
+                defaultVersion="def_ver",
+                uuid="mock_uuid",
             )
         }
 
@@ -78,7 +78,9 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_device_versions = DeviceVersions(mock_repository_object)
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
         answer = mock_device_versions.get_device_available("ver1", [self.device])
-        expected_result = DataSequence(DeviceVersionPayload, [DeviceVersionPayload("mock_uuid", "mock_ip", "ver1")])
+        expected_result = DataSequence(
+            DeviceVersionPayload, [DeviceVersionPayload(device_id="mock_uuid", device_ip="mock_ip", version="ver1")]
+        )
 
         # Assert
         self.assertEqual(
@@ -96,7 +98,9 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_device_versions = DeviceVersions(mock_repository_object)
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
         answer = mock_device_versions.get_device_list_in_installed("ver1", [self.device])
-        expected_result = DataSequence(DeviceVersionPayload, [DeviceVersionPayload("mock_uuid", "mock_ip", "ver1")])
+        expected_result = DataSequence(
+            DeviceVersionPayload, [DeviceVersionPayload(device_id="mock_uuid", device_ip="mock_ip", version="ver1")]
+        )
 
         # Assert
         self.assertEqual(
@@ -116,5 +120,7 @@ class TestRepositoryAPI(unittest.TestCase):
         # Act
         answer = mock_device_versions.get_devices_current_version([self.device])
         # Answer
-        proper_answer = DataSequence(DeviceVersionPayload, [DeviceVersionPayload("mock_uuid", "mock_ip", "curr_ver")])
+        proper_answer = DataSequence(
+            DeviceVersionPayload, [DeviceVersionPayload(device_id="mock_uuid", device_ip="mock_ip", version="curr_ver")]
+        )
         self.assertEqual(answer, proper_answer)
