@@ -4,7 +4,7 @@
 
 [![Python-Supported](https://img.shields.io/static/v1?label=Python&logo=Python&color=3776AB&message=3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12)](https://www.python.org/)
 
-vManage client is a package for creating simple and parallel automatic requests via official vManage API. It is intended to serve as a multiple session handler (provider, provider as a tenant, tenant). The library is not dependent on environment which is being run in, you just need a connection to any vManage.
+Cisco Catalyst SD-WAN SDK is a package for creating simple and parallel automatic requests via official Manager API. It is intended to serve as a multiple session handler (provider, provider as a tenant, tenant). The library is not dependent on environment which is being run in, you just need a connection to any Manager.
 
 ## Installation
 ```console
@@ -12,7 +12,7 @@ pip install catalystwan
 ```
 
 ## Session usage example
-Our session is an extension to `requests.Session` designed to make it easier to communicate via API calls with vManage. We provide ready to use authenticetion, you have to simply provide the vmanage url, username and password as as if you were doing it through a GUI. 
+Our session is an extension to `requests.Session` designed to make it easier to communicate via API calls with Manager. We provide ready to use authenticetion, you have to simply provide the Manager url, username and password as as if you were doing it through a GUI. 
 ```python
 from catalystwan.session import create_vManageSession
 
