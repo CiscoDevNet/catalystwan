@@ -274,7 +274,6 @@ def run_demo(args: CmdArguments):
         vpn_list.add_vpn_range((100, 300))
         pol_dict["My-VPN-List"] = api.lists.create(vpn_list)
 
-        # pol_application.apply([pol_dict["My-Site-List"]], [pol_dict["My-VPN-List"]], direction="tunnel")
         pol_application.assign_to(
             [pol_dict["My-VPN-List"]], TrafficDataDirectionEnum.TUNNEL, site_lists=[pol_dict["My-Site-List"]]
         )
