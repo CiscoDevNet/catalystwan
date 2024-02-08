@@ -85,26 +85,14 @@ class SoftwareActionAPI:
         else:
             raise ValueError("You can not provide software_image and image version at the same time!")
 
-        if not version:
-            raise ImageNotInRepositoryError(
-                "Based on provided arguments, software version to activate on device(s) cannot be detected."
-            )
-
-        payload_devices = self.device_versions.get_device_available(version, devices)
-        for device in payload_devices:
-            if not device.version:
-                raise EmptyVersionPayloadError("PartitionDevice payload contains entry with empty version field.")
-
-        device_type = get_install_specification(devices.first()).device_type.value
-        partition_payload = PartitionActionPayload(
-            action="changepartition", devices=[dev for dev in payload_devices], device_type=device_type
-        )
-
-        partition_action = self.session.endpoints.configuration_device_actions.process_mark_change_partition(
-            payload=partition_payload
-        )
-
-        return Task(self.session, partition_action.id)
+        url = "/dataservice/device/action/changepartition"
+        payload = {
+            "action": "changepartition",
+            "devices": [device.model_dump() for device in self.device_versions.get_device_available(version, devices)],
+            "deviceType": get_install_specification(devices.first()).device_type.value,
+        }
+        activate = dict(self.session.post(url, json=payload).json())
+        return Task(self.session, activate["id"])
 
     def install(
         self,
@@ -197,27 +185,27 @@ class SoftwareActionAPI:
                 sync=sync,
             )
         else:
-            input = InstallInput(
-                v_edge_vpn=v_edge_vpn,
-                v_smart_vpn=v_smart_vpn,
-                data=[
-                    InstallData(
-                        family=install_specification.family.value,
-                        version=remote_image_details.version_id,  # type: ignore
-                        remote_server_id=remote_image_details.remote_server_id,  # type: ignore
-                        version_id=remote_image_details.version_id,  # type: ignore
-                    )
-                ],
-                version_type=install_specification.version_type.value,
-                reboot=reboot,
-                sync=sync,
-            )
+            raise VersionDeclarationError("You can not provide image and image version at the same time")
+        install_specification = get_install_specification(devices.first())
 
-        device_type = install_specification.device_type.value
-        install_payload = InstallActionPayload(
-            action="install", input=input, devices=install_devices, device_type=device_type
-        )
-
+        url = "/dataservice/device/action/install"
+        payload: Dict[str, Any] = {
+            "action": "install",
+            "input": {
+                "vEdgeVPN": 0,
+                "vSmartVPN": 0,
+                "family": install_specification.family.value,
+                "version": version,
+                "versionType": install_specification.version_type.value,
+                "reboot": reboot,
+                "sync": sync,
+            },
+            "devices": [
+                {"deviceId": device.device_id, "deviceIP": device.device_ip}
+                for device in self.device_versions.get_device_list(devices)
+            ],  # type: ignore
+            "deviceType": install_specification.device_type.value,
+        }
         if downgrade_check and devices.first().personality in (Personality.VMANAGE, Personality.EDGE):
             self._downgrade_check(
                 install_payload.devices,

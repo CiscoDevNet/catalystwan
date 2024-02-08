@@ -70,20 +70,14 @@ class PartitionManagerAPI:
         else:
             payload_devices = self.device_version.get_devices_current_version(devices)
 
-        for device in payload_devices:
-            if not device.version:
-                raise EmptyVersionPayloadError("PartitionDevice payload contains entry with empty version field.")
-
-        device_type = get_install_specification(devices.first()).device_type.value
-        partition_payload = PartitionActionPayload(
-            action="defaultpartition", devices=[dev for dev in payload_devices], device_type=device_type
-        )
-
-        partition_action = self.session.endpoints.configuration_device_actions.process_mark_default_partition(
-            payload=partition_payload
-        )
-
-        return Task(self.session, partition_action.id)
+        url = "/dataservice/device/action/defaultpartition"
+        payload = {
+            "action": "defaultpartition",
+            "devices": [device.model_dump() for device in payload_devices],  # type: ignore
+            "deviceType": get_install_specification(devices.first()).device_type.value,
+        }
+        set_default = dict(self.session.post(url, json=payload).json())
+        return Task(self.session, set_default["id"])
 
     def remove_partition(
         self, devices: DataSequence[DeviceDetailsResponse], partition: Optional[str] = None, force: bool = False
@@ -106,17 +100,19 @@ class PartitionManagerAPI:
         else:
             payload_devices = self.device_version.get_devices_available_versions(devices)
 
-        for device in payload_devices:
-            if not device.version:
-                raise EmptyVersionPayloadError("PartitionDevice payload contains entry with empty version field.")
+        remove_partition_payload = [
+            RemovePartitionPayload(
+                device_id=device.device_id, device_ip=device.device_id, version=device.version
+            )  # type: ignore
+            for device in payload_devices
+        ]
 
-        device_type = get_install_specification(devices.first()).device_type.value
-        partition_payload = RemovePartitionActionPayload(
-            action="removepartition",
-            devices=[RemovePartitionDevice(**dev.model_dump()) for dev in payload_devices],
-            device_type=device_type,
-        )
-
+        url = "/dataservice/device/action/removepartition"
+        payload = {
+            "action": "removepartition",
+            "devices": [device.model_dump() for device in remove_partition_payload],  # type: ignore
+            "deviceType": get_install_specification(devices.first()).device_type.value,
+        }
         if force is False:
             self._check_remove_partition_possibility(cast(list, partition_payload.devices))
 
