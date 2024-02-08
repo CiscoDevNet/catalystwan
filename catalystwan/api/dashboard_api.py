@@ -28,7 +28,7 @@ class DashboardAPI:
 
     Usage example:
         # Create session
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
         # Get information about tenant status
         tenant_status = session.api.dashboard.get_tenant_status()
     """

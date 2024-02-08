@@ -20,7 +20,7 @@ class SpeedtestAPI:
     API methods to perform speedtest between 2 edge devices.
 
     Example:
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
         devices = session.api.basic_api.devices
         speedtest = session.api.speedtest.speedtest(devices[0], devices[1])
 

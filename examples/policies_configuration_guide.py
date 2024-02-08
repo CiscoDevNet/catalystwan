@@ -405,9 +405,9 @@ def delete_created_items(api: PolicyAPI, items: List[ConfigItem]) -> None:
 
 
 def run_demo(args: CmdArguments):
-    from catalystwan.session import create_vManageSession
+    from catalystwan.session import create_manager_session
 
-    with create_vManageSession(url=args.url, port=args.port, username=args.user, password=args.password) as session:
+    with create_manager_session(url=args.url, port=args.port, username=args.user, password=args.password) as session:
         api = session.api.policy
         configured_items: List[ConfigItem] = []
         try:

@@ -48,7 +48,7 @@ class RepositoryAPI:
 
     Usage example:
         # Create session
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
 
         # Upload image
         software_image = <path_to_your_image>

@@ -41,7 +41,7 @@ class AdminTechAPI:
 
     Usage example:
         # Create session
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
         # Get admintech data for all devices
         all_admintechs = session.api.admin_tech.get_all()
     """

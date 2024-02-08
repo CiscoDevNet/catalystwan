@@ -28,12 +28,12 @@ class TenantBackupRestoreAPI:
 
     Example usage:
         from catalystwan.api.tenant_backup_restore_api import TenantBackupRestoreAPI
-        from catalystwan.session import create_vManageSession
+        from catalystwan.session import create_manager_session
 
 
-        tenant_session = create_vManageSession(
+        tenant_session = create_manager_session(
              tenant_domain, tenantadmin, password, port)
-        provider_tenant_session = create_vManageSession(
+        provider_tenant_session = create_manager_session(
             domain, admin, password, port, subdomain=tenant_domain)
 
         tenant_backup_restore = TenantBackupRestoreAPI(tenant_session)

@@ -84,7 +84,7 @@ def determine_session_type(
         return SessionType.NOT_DEFINED
 
 
-def create_vManageSession(
+def create_manager_session(
     url: str,
     username: str,
     password: str,

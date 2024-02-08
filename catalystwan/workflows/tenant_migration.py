@@ -11,7 +11,7 @@ from catalystwan.api.tenant_migration_api import TenantMigrationAPI
 from catalystwan.endpoints.troubleshooting_tools.device_connectivity import NPingRequest
 from catalystwan.exceptions import TenantMigrationPreconditionsError
 from catalystwan.models.tenant import TenantExport
-from catalystwan.session import ManagerSession, create_vManageSession
+from catalystwan.session import ManagerSession, create_manager_session
 from catalystwan.utils.personality import Personality
 from catalystwan.utils.session_type import SessionType
 
@@ -125,7 +125,7 @@ def migration_preconditions_check(
     logger.info("Checking if migrated devices can reach target validator...")
     conn_check = False
     if origin_session.session_type == SessionType.PROVIDER:
-        with create_vManageSession(
+        with create_manager_session(
             url=origin_session.url,
             username=origin_session.username,
             password=origin_session.password,

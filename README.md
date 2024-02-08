@@ -14,12 +14,12 @@ pip install catalystwan
 ## Session usage example
 Our session is an extension to `requests.Session` designed to make it easier to communicate via API calls with Manager. We provide ready to use authenticetion, you have to simply provide the Manager url, username and password as as if you were doing it through a GUI. 
 ```python
-from catalystwan.session import create_vManageSession
+from catalystwan.session import create_manager_session
 
 url = "example.com"
 username = "admin"
 password = "password123"
-session = create_vManageSession(url=url, username=username, password=password)
+session = create_manager_session(url=url, username=username, password=password)
 
 session.get("/dataservice/device")
 ```
@@ -252,7 +252,7 @@ api.get_vsmart_mapping()
 
 ```python
 from pathlib import Path
-from catalystwan.session import create_vManageSession
+from catalystwan.session import create_manager_session
 from catalystwan.models.tenant import TenantExport
 from catalystwan.workflows.tenant_migration import migration_workflow
 
@@ -266,8 +266,8 @@ tenant = TenantExport(
     is_destination_overlay_mt=True,            # only for SDWAN Manager >= 20.13
 )
 
-with create_vManageSession(url="10.0.1.15", username="st-admin", password="") as origin_session, \
-     create_vManageSession(url="10.9.0.16", username="mt-provider-admin", password="") as target_session:
+with create_manager_session(url="10.0.1.15", username="st-admin", password="") as origin_session, \
+     create_manager_session(url="10.9.0.16", username="mt-provider-admin", password="") as target_session:
     migration_workflow(
         origin_session=origin_session,
         target_session=target_session,

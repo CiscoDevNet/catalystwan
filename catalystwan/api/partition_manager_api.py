@@ -23,7 +23,7 @@ class PartitionManagerAPI:
 
     Usage example:
         # Create session
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
 
         # Prepare devices list
         devices = session.api.devices.get()

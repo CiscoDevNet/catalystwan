@@ -17,7 +17,7 @@ class LogsAPI:
 
     Usage example:
         # Create session
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
         # Get auditlogs
         session.api.logs.get_auditlogs()
     """

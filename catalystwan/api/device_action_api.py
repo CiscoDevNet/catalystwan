@@ -62,7 +62,7 @@ class RebootAction(DeviceActionAPI):
 
         Usage example:
         # Create session and chose device
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
         device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
         # Restart device
         RebootAction(session, device).execute()
@@ -121,7 +121,7 @@ class ValidateAction(DeviceActionAPI):  # TODO check
 
     Usage example:
     # Create session and chose device
-    session = create_vManageSession(...)
+    session = create_manager_session(...)
     device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
     # Validate device
     ValidateAction(session, device).execute()
@@ -174,7 +174,7 @@ class DecommissionAction(DeviceActionAPI):
 
     Usage example:
     # Create session and chose device
-    session = create_vManageSession(...)
+    session = create_manager_session(...)
     device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
     # Decommission device
     DecommissionAction(session, device).execute()

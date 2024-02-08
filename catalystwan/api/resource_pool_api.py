@@ -19,7 +19,7 @@ class ResourcePoolAPI:
         session: logged in API client session
     Usage example:
         # Create session
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
         # Create device vpn
         resource_poold_data = session.api.resource_pool.create()
     """

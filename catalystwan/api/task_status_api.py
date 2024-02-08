@@ -61,7 +61,7 @@ class Task:
 
         Example:
             # create session
-            session = create_vManageSession(ip_address,admin_username,password,port=port)
+            session = create_manager_session(ip_address,admin_username,password,port=port)
             devices = DevicesAPI(session).get()
             vsmart = devices.filter(personality= Personality.VSMART]).single_or_default()
 

@@ -48,7 +48,7 @@ class UsersAPI:
 
     Usage example:
         # Create session
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
         # Get information about all users
         all_users = session.api.users.get()
     """
@@ -252,7 +252,7 @@ class ClusterManagementAPI:
 
     Example usage:
         # Create session
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
         # Get health status
         health_status = session.api.cluster_management.get_cluster_management_health_status()
     """
