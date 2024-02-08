@@ -18,12 +18,7 @@ from catalystwan.api.api_container import APIContainer
 from catalystwan.endpoints import APIEndpointClient
 from catalystwan.endpoints.client import AboutInfo, ServerInfo
 from catalystwan.endpoints.endpoints_container import APIEndpointContainter
-from catalystwan.exceptions import (
-    InvalidOperationError,
-    SessionNotCreatedError,
-    TenantSubdomainNotFound,
-    vManageClientError,
-)
+from catalystwan.exceptions import InvalidOperationError, ManagerError, SessionNotCreatedError, TenantSubdomainNotFound
 from catalystwan.models.tenant import Tenant
 from catalystwan.response import ErrorInfo, ManagerResponse, response_history_debug
 from catalystwan.utils.session_type import SessionType
@@ -34,7 +29,7 @@ JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
 USER_AGENT = f"{__package__}/{metadata.version(__package__)}"
 
 
-class vManageBadResponseError(vManageClientError):
+class vManageBadResponseError(ManagerError):
     """Indicates that vManage returned error HTTP status code other than 400."""
 
     def __init__(self, error_info: Optional[ErrorInfo], response: ManagerResponse):

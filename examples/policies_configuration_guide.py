@@ -28,7 +28,7 @@ from pydantic import ValidationError
 from requests import RequestException
 
 from catalystwan.api.policy_api import PolicyAPI
-from catalystwan.exceptions import vManageClientError
+from catalystwan.exceptions import ManagerError
 from catalystwan.models.common import TLOCColorEnum, WellKnownBGPCommunitiesEnum
 from catalystwan.models.policy import (
     AppList,
@@ -443,7 +443,7 @@ def run_demo(args: CmdArguments):
                 ConfigItem(CentralizedPolicy, centralized_policy.policy_name, centralized_policy_id)
             )
 
-        except (vManageClientError, ValidationError, RequestException) as e:
+        except (ManagerError, ValidationError, RequestException) as e:
             logger.exception(e)
 
         """Cleanup"""
