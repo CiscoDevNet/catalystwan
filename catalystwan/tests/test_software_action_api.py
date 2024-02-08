@@ -40,7 +40,7 @@ class TestSoftwareAcionAPI(unittest.TestCase):
         self.mock_device_versions = DeviceVersions(self.mock_repository_object)
         self.mock_software_action_obj = SoftwareActionAPI(mock_session)
 
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     @patch.object(SoftwareActionAPI, "_downgrade_check")
     @patch.object(RepositoryAPI, "get_image_version")
     def test_upgrade_software_if_downgrade_check_is_none(

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from uuid import UUID
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 from catalystwan.api.task_status_api import Task
 from catalystwan.endpoints.configuration_device_inventory import (
@@ -18,7 +18,7 @@ from catalystwan.models.device_inventory import BoostrapConfigurationDetails
 
 
 class ConfigurationDeviceInventoryAPI:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.session = session
         self.endpoint = ConfigurationDeviceInventory(session)
 

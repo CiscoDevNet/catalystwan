@@ -14,7 +14,7 @@ class TestLogsAPI(unittest.TestCase):
             {"logid": "67890", "logmessage": "message from log 2", "tenant": "tenant987", "entry_time": 1671028426000},
         ]
 
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_get_auditlogs_file_path_not_provided(self, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.logs
@@ -26,7 +26,7 @@ class TestLogsAPI(unittest.TestCase):
         self.assertTrue(does_file_exist)
 
     @parameterized.expand([["test_file.log"], ["other_test_file.log"]])
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_get_auditlogs_file_path(self, file_name, mock_session):
         # Arrange
         mock_session.get_data.return_value = self.logs

@@ -12,7 +12,7 @@ from catalystwan.dataclasses import Device, Speedtest
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 class SpeedtestAPI:
@@ -32,7 +32,7 @@ class SpeedtestAPI:
             upload and download speed between them
     """
 
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.session = session
 
     def speedtest(

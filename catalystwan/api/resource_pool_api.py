@@ -7,7 +7,7 @@ from catalystwan.dataclasses import ResourcePoolData
 from catalystwan.typed_list import DataSequence
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ class ResourcePoolAPI:
 
     URL = "/dataservice/resourcepool/resource/vpn"
 
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.session = session
 
     def get(self, tenant_id: str, tenant_vpn: int) -> DataSequence[ResourcePoolData]:

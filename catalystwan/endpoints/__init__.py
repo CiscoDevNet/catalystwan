@@ -22,7 +22,7 @@ Method decorated with @request has no body, as decorator constructs and sends re
 >>>     def delete_tenant_async_bulk(self, payload: TenantBulkDeleteRequest) -> TenantTaskId:
 >>>         ...
 >>>
-To send request instantiate API with logged vManageSession:
+To send request instantiate API with logged ManagerSession:
 >>> api = TenantManagementAPI(session)
 >>> api.delete_tenant_async_bulk(TenantBulkDeleteRequest(password="", tenantIdList=["TNT00005"]))
 """

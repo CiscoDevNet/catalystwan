@@ -32,11 +32,11 @@ from catalystwan.api.tenant_migration_api import TenantMigrationAPI
 from catalystwan.api.versions_utils import RepositoryAPI
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 class APIContainer:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.tenant_management = TenantManagementAPI(session)
         self.admin_tech = AdminTechAPI(session)
         self.administration_settings = AdministrationSettingsAPI(session)

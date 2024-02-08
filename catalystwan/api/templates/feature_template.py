@@ -12,7 +12,7 @@ from catalystwan.api.templates.device_variable import DeviceVariable
 from catalystwan.utils.device_model import DeviceModel
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 class FeatureTemplate(BaseModel, ABC):
@@ -21,7 +21,7 @@ class FeatureTemplate(BaseModel, ABC):
     device_models: List[DeviceModel] = []
     device_specific_variables: Dict[str, DeviceVariable] = {}
 
-    def generate_payload(self, session: vManageSession) -> str:
+    def generate_payload(self, session: ManagerSession) -> str:
         env = Environment(
             loader=FileSystemLoader(self.payload_path.parent),
             trim_blocks=True,
@@ -69,11 +69,11 @@ class FeatureTemplate(BaseModel, ABC):
         return values
 
     @classmethod
-    def get(cls, session: vManageSession, name: str) -> FeatureTemplate:
+    def get(cls, session: ManagerSession, name: str) -> FeatureTemplate:
         """Gets feature template model corresponding to existing feature template based on provided name
 
         Args:
-            session: vManageSession
+            session: ManagerSession
             name: name of the existing feature template
 
         Returns:

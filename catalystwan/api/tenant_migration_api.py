@@ -15,11 +15,11 @@ from catalystwan.models.tenant import TenantExport
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 class ExportTask(Task):
-    def __init__(self, session: vManageSession, task_id: str):
+    def __init__(self, session: ManagerSession, task_id: str):
         super().__init__(session, task_id)
 
     @staticmethod
@@ -35,7 +35,7 @@ class ExportTask(Task):
 
 
 class ImportTask(Task):
-    def __init__(self, session: vManageSession, import_info: ImportInfo):
+    def __init__(self, session: ManagerSession, import_info: ImportInfo):
         super().__init__(session, import_info.process_id)
         self.import_info = import_info
 
@@ -43,7 +43,7 @@ class ImportTask(Task):
 class TenantMigrationAPI:
     """Set of methods used in tenant migration"""
 
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.session = session
 
     def export_tenant(self, tenant: TenantExport) -> ExportTask:

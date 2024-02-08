@@ -10,7 +10,7 @@ from catalystwan.typed_list import DataSequence
 from catalystwan.utils.creation_tools import create_dataclass, flatten_dict
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ class AlarmsAPI:
 
     URL = "/dataservice/alarms"
 
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.session = session
 
     def get(self, from_time: Optional[int] = None) -> DataSequence[AlarmData]:

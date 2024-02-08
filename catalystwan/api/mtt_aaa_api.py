@@ -8,7 +8,7 @@ from catalystwan.exceptions import vManageClientError
 from catalystwan.utils.creation_tools import asdict, create_dataclass
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class TenantAaaAPI:
     Used to configure  mtt tenant management users remote servers
     """
 
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
         self.url_path = "/dataservice/admin/aaa"
 
@@ -96,7 +96,7 @@ class TenantRadiusAPI:
     Used to configure  mtt tenant remote aaa radius servers
     """
 
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
         self.url_path = "/dataservice/admin/radius"
         self.tenant_id = self.session.get_tenant_id()
@@ -151,7 +151,7 @@ class TenantTacacsAPI:
     Used to configure mtt tenant remote aaa TACACS servers
     """
 
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
         self.url_path = "/dataservice/admin/tacacs"
         self.tenant_id = self.session.get_tenant_id()

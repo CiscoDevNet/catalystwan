@@ -9,7 +9,7 @@ from urllib.parse import quote
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 class LogsAPI:
@@ -22,7 +22,7 @@ class LogsAPI:
         session.api.logs.get_auditlogs()
     """
 
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
 
     def get_auditlogs(self, file_path: Optional[str] = None, n_hours: int = 1) -> None:

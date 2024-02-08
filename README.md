@@ -329,11 +329,11 @@ except vManageBadRequestError as error:
 
 ![Exceptions](docs/images/exceptions.png)
 
-## [Supported API endpoints](https://github.com/CiscoDevNet/vManage-client/blob/main/ENDPOINTS.md)
+## [Supported API endpoints](https://github.com/CiscoDevNet/catalystwan/blob/main/ENDPOINTS.md)
 
 
-## [Contributing, bug reporting and feature requests](https://github.com/CiscoDevNet/vManage-client/blob/main/CONTRIBUTING.md)
+## [Contributing, bug reporting and feature requests](https://github.com/CiscoDevNet/catalystwan/blob/main/CONTRIBUTING.md)
 
 ## Seeking support
 
-You can contact us by submitting [issues](https://github.com/CiscoDevNet/vManage-client/issues), or directly via mail on vmngclient@cisco.com.
+You can contact us by submitting [issues](https://github.com/CiscoDevNet/catalystwan/issues), or directly via mail on vmngclient@cisco.com.

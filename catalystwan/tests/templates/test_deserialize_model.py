@@ -51,7 +51,7 @@ class TestFeatureTemplate(TestCase):
 
     @parameterized.expand([(template,) for template in map(models.__dict__.get, models.__all__)])
     @pytest.mark.skip(reason="Deserialization to be refactored")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_get(self, template: FeatureTemplate, mock_session):
         # Arrange
         mock_session.api.templates._get_feature_templates.return_value = self.get_feature_templates_response

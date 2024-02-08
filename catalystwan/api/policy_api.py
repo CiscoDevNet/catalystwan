@@ -209,7 +209,7 @@ from catalystwan.models.policy.security import (
 from catalystwan.typed_list import DataSequence
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 POLICY_LIST_ENDPOINTS_MAP: Mapping[type, type] = {
@@ -280,7 +280,7 @@ AnyPolicyDefinition = Union[
 
 
 class CentralizedPolicyAPI:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self._session = session
         self._endpoints = ConfigurationVSmartTemplatePolicy(session)
 
@@ -321,7 +321,7 @@ class CentralizedPolicyAPI:
 
 
 class LocalizedPolicyAPI:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self._session = session
         self._endpoints = ConfigurationVEdgeTemplatePolicy(session)
 
@@ -357,7 +357,7 @@ class LocalizedPolicyAPI:
 
 
 class SecurityPolicyAPI:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self._session = session
         self._endpoints = ConfigurationSecurityTemplatePolicy(session)
 
@@ -393,7 +393,7 @@ class SecurityPolicyAPI:
 
 
 class PolicyListsAPI:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self._session = session
 
     def __get_list_endpoints_instance(self, payload_type: type) -> PolicyListEndpoints:
@@ -656,7 +656,7 @@ class PolicyListsAPI:
 
 
 class PolicyDefinitionsAPI:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self._session = session
 
     def __get_definition_endpoints_instance(self, payload_type: type) -> PolicyDefinitionEndpoints:
@@ -801,7 +801,7 @@ class PolicyDefinitionsAPI:
 class PolicyAPI:
     """This is exposing so called 'UX 1.0' API"""
 
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self._session = session
         self.centralized = CentralizedPolicyAPI(session)
         self.localized = LocalizedPolicyAPI(session)

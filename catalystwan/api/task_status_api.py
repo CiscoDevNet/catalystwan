@@ -8,7 +8,7 @@ from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # t
 from catalystwan.exceptions import TaskValidationError
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 from catalystwan.endpoints.configuration_dashboard_status import (
     ConfigurationDashboardStatus,
@@ -26,7 +26,7 @@ class Task:
     API class for getting data about task/sub-tasks
     """
 
-    def __init__(self, session: vManageSession, task_id: str):
+    def __init__(self, session: ManagerSession, task_id: str):
         self.session = session
         self.task_id = task_id
         self.url = f"/dataservice/device/action/status/{self.task_id}"
