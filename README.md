@@ -22,7 +22,8 @@ password = "password123"
 with create_manager_session(url=url, username=username, password=password) as session:
     session.get("/dataservice/device")
 
-# When interacting with the SDWAN Manager API without using a context manager, it's important to manually execute the `close()` method to release the user session resource.
+# When interacting with the SDWAN Manager API without using a context manager, it's important 
+# to manually execute the `close()` method to release the user session resource.
 
 session = create_manager_session(url=url, username=username, password=password)
 session.get("/dataservice/device")
