@@ -334,8 +334,6 @@ except vManageBadRequestError as error:
 # code = 'USER0006'
 ```
 
-![Exceptions](docs/images/exceptions.png)
-
 ## [Supported API endpoints](https://github.com/CiscoDevNet/catalystwan/blob/main/ENDPOINTS.md)
 
 
