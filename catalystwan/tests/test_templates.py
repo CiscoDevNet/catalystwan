@@ -84,7 +84,7 @@ class TestTemplatesAPI(unittest.TestCase):
         )
         self.task = TaskResult(result=True, sub_tasks_data=[sub_tasks_data])
 
-    @patch("catalystwan.response.vManageResponse")
+    @patch("catalystwan.response.ManagerResponse")
     @patch("catalystwan.session.ManagerSession")
     def test_templates_success(self, mock_session, mocked_response):
         # Arrange
@@ -97,7 +97,7 @@ class TestTemplatesAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, self.templates)
 
-    @patch("catalystwan.response.vManageResponse")
+    @patch("catalystwan.response.ManagerResponse")
     @patch("catalystwan.session.ManagerSession")
     def test_templates_get(self, mock_session, mocked_response):
         # Arrange

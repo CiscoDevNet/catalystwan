@@ -11,7 +11,7 @@ from catalystwan.endpoints.endpoints_container import APIEndpointContainter
 from catalystwan.endpoints.monitoring_device_details import DeviceData
 from catalystwan.endpoints.real_time_monitoring.reboot_history import RebootEntry
 from catalystwan.exceptions import InvalidOperationError
-from catalystwan.response import vManageResponse
+from catalystwan.response import ManagerResponse
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.creation_tools import create_dataclass
 from catalystwan.utils.personality import Personality
@@ -130,7 +130,7 @@ class TestDevicesAPI(TestCase):
         # self.assertEqual(answer, self.controllers_dataclass)
         pass  # TODO fix after updating .filter()
 
-    @patch("catalystwan.response.vManageResponse")
+    @patch("catalystwan.response.ManagerResponse")
     @patch("catalystwan.session.ManagerSession")
     def test_orchestrators(self, mock_session, mock_response):
         # Arrange
@@ -144,7 +144,7 @@ class TestDevicesAPI(TestCase):
         # Assert
         self.assertEqual(answer, self.orchestrators_dataseq)
 
-    @patch("catalystwan.response.vManageResponse")
+    @patch("catalystwan.response.ManagerResponse")
     @patch("catalystwan.session.ManagerSession")
     def test_edges(self, mock_session, mock_response):
         # Arrange
@@ -158,7 +158,7 @@ class TestDevicesAPI(TestCase):
         # Assert
         self.assertEqual(answer, self.edges_dataseq)
 
-    @patch("catalystwan.response.vManageResponse")
+    @patch("catalystwan.response.ManagerResponse")
     @patch("catalystwan.session.ManagerSession")
     def test_vsmarts(self, mock_session, mock_response):
         # Arrange
@@ -196,7 +196,7 @@ class TestDevicesAPI(TestCase):
         # Assert
         self.assertEqual(answer, self.ips_list)
 
-    @patch("catalystwan.response.vManageResponse")
+    @patch("catalystwan.response.ManagerResponse")
     @patch("catalystwan.session.ManagerSession")
     def test_get(self, mock_session, mock_response):
         # Arrange
@@ -218,7 +218,7 @@ class TestDevicesAPI(TestCase):
             ["bc2a78ac-a06e-40fd-b2b7-1b1e062f3f9e", 3],
         ]
     )
-    @patch("catalystwan.response.vManageResponse")
+    @patch("catalystwan.response.ManagerResponse")
     @patch("catalystwan.session.ManagerSession")
     def test_get_device_details(self, uuid, device_number, mock_session, mock_response):
         # Arrange
@@ -249,7 +249,7 @@ class TestDevicesAPI(TestCase):
         # Assert
         self.assertEqual(answer, devices_number)
 
-    @patch("catalystwan.response.vManageResponse")
+    @patch("catalystwan.response.ManagerResponse")
     @patch("catalystwan.session.ManagerSession")
     def test_get_reachable_devices_vsmarts(self, mock_session, mock_response):
         # Arrange
@@ -263,7 +263,7 @@ class TestDevicesAPI(TestCase):
         # Assert
         self.assertEqual(answer, self.vsmarts_dataseq)
 
-    @patch("catalystwan.response.vManageResponse")
+    @patch("catalystwan.response.ManagerResponse")
     @patch("catalystwan.session.ManagerSession")
     def test_get_reachable_devices_vbonds(self, mock_session, mock_response):
         # Arrange
@@ -277,7 +277,7 @@ class TestDevicesAPI(TestCase):
         # Assert
         self.assertEqual(answer, self.vbonds_dataseq)
 
-    @patch("catalystwan.response.vManageResponse")
+    @patch("catalystwan.response.ManagerResponse")
     @patch("catalystwan.session.ManagerSession")
     def test_get_reachable_devices_vedgess(self, mock_session, mock_response):
         # Arrange
@@ -329,7 +329,7 @@ class TestDevicesAPI(TestCase):
         self.assertRaises(InvalidOperationError, answer)
 
     @parameterized.expand([["vm200", 0], ["vm129", 1], ["vm128", 2], ["vm1", 3]])
-    @patch("catalystwan.response.vManageResponse")
+    @patch("catalystwan.response.ManagerResponse")
     @patch("catalystwan.session.ManagerSession")
     def test_get_by_hostname(self, hostname, device_number, mock_session, mock_response):
         # Arrange
@@ -344,7 +344,7 @@ class TestDevicesAPI(TestCase):
         self.assertEqual(answer, DataSequence(Device, [create_dataclass(Device, self.devices[device_number])]))
 
     @parameterized.expand([["1.1.1.1", 0], ["1.1.1.3", 1], ["1.1.1.2", 2], ["169.254.10.10", 3]])
-    @patch("catalystwan.response.vManageResponse")
+    @patch("catalystwan.response.ManagerResponse")
     @patch("catalystwan.session.ManagerSession")
     def test_get_by_id(self, device_id, device_number, mock_session, mock_response):
         # Arrange
@@ -578,7 +578,7 @@ class TestDevicesStateAPI(TestCase):
     def test_get_device_reboot_history(self, mock_session):
         # Arrange
         mock_session.endpoints = APIEndpointContainter(mock_session)
-        mock_session.request.return_value = vManageResponse(ResponseMock({"data": self.reboot_history}))
+        mock_session.request.return_value = ManagerResponse(ResponseMock({"data": self.reboot_history}))
         # Act
         answer = DeviceStateAPI(mock_session).get_device_reboot_history(device_id="1.1.1.11")
         # Assert
@@ -588,7 +588,7 @@ class TestDevicesStateAPI(TestCase):
     def test_get_device_reboot_history_empty(self, mock_session):
         # Arrange
         mock_session.endpoints = APIEndpointContainter(mock_session)
-        mock_session.request.return_value = vManageResponse(ResponseMock({"data": []}))
+        mock_session.request.return_value = ManagerResponse(ResponseMock({"data": []}))
         # Act
         answer = DeviceStateAPI(mock_session).get_device_reboot_history(device_id="1.1.1.1")
         # Assert
