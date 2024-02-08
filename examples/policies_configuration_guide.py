@@ -13,7 +13,7 @@ https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/policies/vedge
 7.  NAT Fallback on Cisco IOS XE Catalyst SD-WAN Devices
 8.  Activate a Centralized Policy
 
-To run example provide (url, port, username, password) to reachable vmanage instance as command line arguments:
+To run example provide (url, port, username, password) to reachable Manager instance as command line arguments:
 python examples/policies_configuration_guide.py 127.0.0.1 433 admin p4s$w0rD
 """
 
