@@ -93,7 +93,7 @@ class TestPartitionManagerAPI(unittest.TestCase):
         self.assertEqual(answer, None, "lists are not equal")
 
     @patch.object(DeviceVersions, "get_devices_current_version")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_set_default_partition(self, mock_session, mock_get_devices):
         # Arrange
         mock_partition_manager = PartitionManagerAPI(mock_session)

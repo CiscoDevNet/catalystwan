@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 from catalystwan.endpoints.configuration_group import (
     ConfigGroupAssociatePayload,
@@ -26,7 +26,7 @@ from catalystwan.endpoints.configuration_group import (
 
 
 class ConfigGroupAPI:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.session = session
         self.endpoint = ConfigurationGroup(session)
 

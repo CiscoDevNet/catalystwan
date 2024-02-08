@@ -45,7 +45,7 @@ from catalystwan.utils.dict import merge
 from catalystwan.utils.template_type import TemplateType
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +67,7 @@ class DeviceTemplateFeature(Enum):
 
 
 class TemplatesAPI:
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
 
     @overload

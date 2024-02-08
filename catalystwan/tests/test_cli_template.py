@@ -33,7 +33,7 @@ class TestCLITemplate(unittest.TestCase):
         """
         self.template = CiscoConfParse(self.config.splitlines())
 
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_load_success(self, mock_session):
         # Arrange
         mock_session.get_json.return_value = {"configType": "file", "templateConfiguration": self.config}
@@ -43,7 +43,7 @@ class TestCLITemplate(unittest.TestCase):
         # Assert
         self.assertEqual(answer.ioscfg, self.template.ioscfg)
 
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_load_raise(self, mock_session):
         # Arrange
         mock_session.get_json.return_value = {
@@ -60,7 +60,7 @@ class TestCLITemplate(unittest.TestCase):
         # Assert
         self.assertRaises(TemplateTypeError, answer)
 
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_load_running_success(self, mock_session):
         # Arrange
         mock_session.get_json.return_value = {"configType": "file", "config": self.config}
@@ -161,7 +161,7 @@ class TestCLITemplate(unittest.TestCase):
         }
         self.assertEqual(answer, proper_answer)
 
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_update_suceess(self, mock_session):
         # Arrange
         mock_session.put.return_value = {"data": {"attachedDevices": []}}
@@ -177,7 +177,7 @@ class TestCLITemplate(unittest.TestCase):
         # Assert
         self.assertTrue(result)
 
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_update_template_failure(self, mock_session):
         # Arrange
 

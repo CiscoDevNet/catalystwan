@@ -7,7 +7,7 @@ from catalystwan.dataclasses import ResourcePoolData
 from catalystwan.typed_list import DataSequence
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 logger = logging.getLogger(__name__)
 
@@ -19,14 +19,14 @@ class ResourcePoolAPI:
         session: logged in API client session
     Usage example:
         # Create session
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
         # Create device vpn
         resource_poold_data = session.api.resource_pool.create()
     """
 
     URL = "/dataservice/resourcepool/resource/vpn"
 
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.session = session
 
     def get(self, tenant_id: str, tenant_vpn: int) -> DataSequence[ResourcePoolData]:

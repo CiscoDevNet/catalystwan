@@ -9,11 +9,11 @@ from catalystwan.typed_list import DataSequence
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 class MonitoringStatusAPI:
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
         self._endpoints = MonitoringStatus(session)
 

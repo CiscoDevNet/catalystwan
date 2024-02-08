@@ -1,6 +1,6 @@
 # Configuration Group - Creation of First and Second Layer
 
-This README document provides guidelines on creating configuration groups within the `vManage-client` repository.
+This README document provides guidelines on creating configuration groups within the `Cisco Catalyst SD-WAN SDK` repository.
 
 ## Guidelines for Creating Config Groups
 

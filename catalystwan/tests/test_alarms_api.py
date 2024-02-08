@@ -130,7 +130,7 @@ class TestAlarmsAPI(TestCase):
         self.maxDiff = None
 
     @patch("catalystwan.response.vManageResponse")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_get_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
@@ -141,7 +141,7 @@ class TestAlarmsAPI(TestCase):
         self.assertEqual(answer, self.alarms_dataseq)
 
     @patch("catalystwan.response.vManageResponse")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_get_critical_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
@@ -152,7 +152,7 @@ class TestAlarmsAPI(TestCase):
         self.assertEqual(answer, self.critical_alarms_dataseq)
 
     @patch("catalystwan.response.vManageResponse")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_get_major_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
@@ -163,7 +163,7 @@ class TestAlarmsAPI(TestCase):
         self.assertEqual(answer, self.major_alarms_dataseq)
 
     @patch("catalystwan.response.vManageResponse")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_get_medium_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
@@ -174,7 +174,7 @@ class TestAlarmsAPI(TestCase):
         self.assertEqual(answer, self.medium_alarms_dataseq)
 
     @patch("catalystwan.response.vManageResponse")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_get_minor_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
@@ -185,7 +185,7 @@ class TestAlarmsAPI(TestCase):
         self.assertEqual(answer, self.minor_alarms_dataseq)
 
     @patch("catalystwan.response.vManageResponse")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_get_not_viewed_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
@@ -196,7 +196,7 @@ class TestAlarmsAPI(TestCase):
         self.assertEqual(answer, self.alarms_dataseq)
 
     @patch("catalystwan.response.vManageResponse")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_check_alarms(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
@@ -207,7 +207,7 @@ class TestAlarmsAPI(TestCase):
         self.assertEqual(answer, {"found": set(self.minor_alarms_dataseq), "not-found": set()})
 
     @patch("catalystwan.response.vManageResponse")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_check_alarms_not_found(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
@@ -219,7 +219,7 @@ class TestAlarmsAPI(TestCase):
 
     # # # test AlarmVerification class
     @patch("catalystwan.response.vManageResponse")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_verify(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response
@@ -234,7 +234,7 @@ class TestAlarmsAPI(TestCase):
         self.assertEqual(answer.not_found, set(self.minor_alarms_dataseq))
 
     @patch("catalystwan.response.vManageResponse")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_verify_not_found(self, mock_session, mock_response):
         # Arrange
         mock_session.post.return_value = mock_response

@@ -35,7 +35,7 @@ class TestSpeedTestAPI(unittest.TestCase):
         )
 
     @patch("catalystwan.api.speedtest_api.sleep")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_perform(self, mock_session, mock_sleep):
         # Arrange
         mock_session.post.return_value.json.return_value = {
@@ -54,7 +54,7 @@ class TestSpeedTestAPI(unittest.TestCase):
         # Assert
         self.assertEqual(speed_test_api.speedtest_output, speed_test_api_compare.speedtest_output)
 
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_perform_handle_error(self, mock_session):
         # Arrange
         mock_session.post.return_value.json.return_value = {"sessionId": "id", "data": []}
@@ -73,7 +73,7 @@ class TestSpeedTestAPI(unittest.TestCase):
     @patch.object(SpeedtestAPI, "_SpeedtestAPI__perform")
     @patch.object(DeviceStateAPI, "enable_data_stream")
     @patch.object(DeviceStateAPI, "get_colors")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_speedtest(self, mock_session, mock_get_colors, mock_enable, mock_perform):
         # Arrange
         mock_enable.return_value.__enter__.return_value = None
@@ -96,7 +96,7 @@ class TestSpeedTestAPI(unittest.TestCase):
     @patch.object(SpeedtestAPI, "_SpeedtestAPI__perform")
     @patch.object(DeviceStateAPI, "enable_data_stream")
     @patch.object(DeviceStateAPI, "get_colors")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_speedtest_not_reachable(self, mock_session, mock_get_colors, mock_enable, mock_perform):
         # Arrange
         mock_enable.return_value.__enter__.return_value = None
@@ -119,7 +119,7 @@ class TestSpeedTestAPI(unittest.TestCase):
     @patch.object(SpeedtestAPI, "_SpeedtestAPI__perform")
     @patch.object(DeviceStateAPI, "enable_data_stream")
     @patch.object(DeviceStateAPI, "get_colors")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_speedtest_handle_error(self, mock_session, mock_get_colors, mock_enable, mock_perform):
         # Arrange
         mock_enable.return_value.__enter__.return_value = None

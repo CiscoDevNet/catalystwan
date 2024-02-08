@@ -11,7 +11,7 @@ from catalystwan.api.templates.feature_template import FeatureTemplate
 from catalystwan.api.templates.payloads.aaa.aaa_model import VpnType
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 class GatewayType(Enum):
@@ -74,14 +74,14 @@ class CiscoVPNModel(FeatureTemplate):
                 raise ValueError("Must enter the name of the organization.")
         return v
 
-    def generate_vpn_id(self, session: vManageSession) -> None:
+    def generate_vpn_id(self, session: ManagerSession) -> None:
         self.tenant_vpn = self.vpn_id
         payload = {"resourcePoolDataType": "vpn", "tenantId": self.tenant_org_name, "tenantVpn": self.tenant_vpn}
         url = "/dataservice/resourcepool/resource/vpn"
         response = session.put(url=url, json=payload).json()
         self.vpn_id = response["deviceVpn"]
 
-    def generate_payload(self, session: vManageSession) -> str:
+    def generate_payload(self, session: ManagerSession) -> str:
         if self.vpn_id not in [0, 512]:
             self.generate_vpn_id(session=session)
         return super().generate_payload(session)

@@ -12,7 +12,7 @@ from catalystwan.dataclasses import Device, PacketSetup, Status
 from catalystwan.utils.creation_tools import create_dataclass
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ class PacketCaptureAPI:
 
     def __init__(
         self,
-        session: vManageSession,
+        session: ManagerSession,
         vpn: str = "0",
         interface: str = "ge0/1",
     ) -> None:

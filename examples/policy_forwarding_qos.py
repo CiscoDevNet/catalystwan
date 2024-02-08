@@ -39,9 +39,9 @@ class CmdArguments:
 
 def run_demo(args: CmdArguments):
     from catalystwan.exceptions import vManageClientError
-    from catalystwan.session import create_vManageSession
+    from catalystwan.session import create_manager_session
 
-    with create_vManageSession(url=args.url, port=args.port, username=args.user, password=args.password) as session:
+    with create_manager_session(url=args.url, port=args.port, username=args.user, password=args.password) as session:
         api = session.api.policy
         """ I. Map Each Forwarding Class to an Output Queue:
             1. From the Cisco vManage menu, choose Configuration > Policies.

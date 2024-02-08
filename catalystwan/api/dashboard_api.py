@@ -17,23 +17,23 @@ from catalystwan.utils.dashboard import (
 )
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 class DashboardAPI:
     """Dashboard API gathers information from vManage dashboard.
 
     Attributes:
-        session (vManageSession): logged in API client session
+        session (ManagerSession): logged in API client session
 
     Usage example:
         # Create session
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
         # Get information about tenant status
         tenant_status = session.api.dashboard.get_tenant_status()
     """
 
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.session = session
 
     def get_vmanages_count(self) -> DataSequence[Count]:

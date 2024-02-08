@@ -1,6 +1,6 @@
 :tocdepth: 3
 
-vManage-client package
+Cisco Catalyst SD-WAN SDK package
 ======================
 
 Subpackages

@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 class SoftwareActionAPI:
@@ -27,7 +27,7 @@ class SoftwareActionAPI:
 
     Usage example:
     # Create session
-    session = create_vManageSession(...)
+    session = create_manager_session(...)
 
     # Prepare devices list
     devices = session.api.devices.get()
@@ -42,7 +42,7 @@ class SoftwareActionAPI:
     TaskAPI(session, software_action_id).wait_for_completed()
     """
 
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
         self.repository = RepositoryAPI(self.session)
         self.device_versions = DeviceVersions(self.session)

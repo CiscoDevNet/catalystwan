@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 from catalystwan.api.parcel_api import SDRoutingFullConfigParcelAPI
 from catalystwan.endpoints.configuration_feature_profile import SDRoutingConfigurationFeatureProfile
@@ -14,7 +14,7 @@ from catalystwan.models.configuration.feature_profile.common import (
 
 
 class SDRoutingFeatureProfilesAPI:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.cli = SDRoutingCLIFeatureProfileAPI(session=session)
 
 
@@ -43,7 +43,7 @@ class SDRoutingCLIFeatureProfileAPI(FeatureProfileAPI):
     SD-Routing CLI feature-profile APIs
     """
 
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.session = session
         self.endpoint = SDRoutingConfigurationFeatureProfile(session)
 

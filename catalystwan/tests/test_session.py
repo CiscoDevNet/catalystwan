@@ -5,7 +5,7 @@ from unittest.mock import patch
 import pytest  # type: ignore
 from parameterized import parameterized  # type: ignore
 
-from catalystwan.session import vManageSession
+from catalystwan.session import ManagerSession
 
 
 @pytest.mark.skip(reason="Session is not mocked property (#149)")
@@ -17,7 +17,7 @@ class TestSession(unittest.TestCase):
 
     def test_session_str(self):
         # Arrange, Act
-        session = vManageSession(self.url, self.username, self.password, port=111)
+        session = ManagerSession(self.url, self.username, self.password, port=111)
 
         # Assert
         self.assertEqual(str(session), "admin@https://example.com:111")
@@ -34,55 +34,55 @@ class TestSession(unittest.TestCase):
     )
     def test_base_url(self, port: Optional[int], user_url: str, expected_url: str):
         # Arrange, Act
-        session = vManageSession(user_url, self.username, self.password, port=port)
+        session = ManagerSession(user_url, self.username, self.password, port=port)
         # Assert
         self.assertEqual(session.base_url, expected_url)
 
     def test_session_repr(self):
         # Arrange, Act
-        session = vManageSession("domain.com", "user1", "$password", port=111)
-        session_str = "vManageSession('domain.com', 'user1', '$password', port=111, subdomain='None')"
+        session = ManagerSession("domain.com", "user1", "$password", port=111)
+        session_str = "ManagerSession('domain.com', 'user1', '$password', port=111, subdomain='None')"
         # Assert
         self.assertEqual(repr(session), session_str)
 
     def test_session_repr_different_sessions(self):
         # Arrange, Act
-        session = vManageSession("domain.com", "user1", "$password", port=111)
-        session_str = "vManageSession('not.domain.com', 'different_user', '$password', port=111, subdomain='None')"
+        session = ManagerSession("domain.com", "user1", "$password", port=111)
+        session_str = "ManagerSession('not.domain.com', 'different_user', '$password', port=111, subdomain='None')"
         # Assert
         self.assertNotEqual(repr(session), session_str)
 
     @patch("catalystwan.session.Session.__repr__")
     def test_session_eval_repr(self, mock_repr):
         # Arrange, Act
-        mock_repr.return_value = "vManageSession('domain.com', 'user1', '$password', port=111, subdomain='None')"
-        session = vManageSession("domain.com", "user1", "$password", port=111)
+        mock_repr.return_value = "ManagerSession('domain.com', 'user1', '$password', port=111, subdomain='None')"
+        session = ManagerSession("domain.com", "user1", "$password", port=111)
         # Assert
         self.assertEqual(eval(mock_repr()), session)
 
-    @patch("catalystwan.session.vManageSession.check_vmanage_server_connection")
+    @patch("catalystwan.session.ManagerSession.check_vmanage_server_connection")
     @patch("catalystwan.session.Session.__repr__")
     def test_session_eval_repr_different_sessions(self, mock_repr, mock_check_connection):
         # Arrange, Act
         mock_check_connection.return_value = True
-        mock_repr.return_value = "vManageSession('domain.com', 'user1', '$password', port=111, subdomain='None')"
-        session = vManageSession("not.domain.com", "different_user", "$password", port=111)
+        mock_repr.return_value = "ManagerSession('domain.com', 'user1', '$password', port=111, subdomain='None')"
+        session = ManagerSession("not.domain.com", "different_user", "$password", port=111)
         # Assert
         self.assertNotEqual(eval(mock_repr()), session)
 
     def test_session_eq(self):
         # Arrange, Act
-        session_1 = vManageSession("domain.com", "user1", "$password", port=111)
-        session_2 = vManageSession("domain.com", "user1", "$password", port=111)
+        session_1 = ManagerSession("domain.com", "user1", "$password", port=111)
+        session_2 = ManagerSession("domain.com", "user1", "$password", port=111)
         # Assert
         self.assertEqual(session_1, session_2)
 
-    @patch("catalystwan.session.vManageSession.check_vmanage_server_connection")
+    @patch("catalystwan.session.ManagerSession.check_vmanage_server_connection")
     def test_session_eq_different_sessions(self, mock_check_connection):
         # Arrange, Act
         mock_check_connection.return_value = True
-        session_1 = vManageSession("domain.com", "user1", "$password", port=111)
-        session_2 = vManageSession("not.domain.com", "different_user", "$password", port=111)
+        session_1 = ManagerSession("domain.com", "user1", "$password", port=111)
+        session_2 = ManagerSession("not.domain.com", "different_user", "$password", port=111)
         # Assert
         self.assertNotEqual(session_1, session_2)
 
@@ -96,7 +96,7 @@ class TestSession(unittest.TestCase):
     )
     def test_get_full_url(self, port: Optional[int], url: str, full_url: str):
         # Arrange, Act
-        session = vManageSession(self.url, self.username, self.password, port=port)
+        session = ManagerSession(self.url, self.username, self.password, port=port)
 
         # Assert
         self.assertEqual(session.get_full_url(url), full_url)
@@ -105,7 +105,7 @@ class TestSession(unittest.TestCase):
     def test_check_vmanage_server_with_port(self, mock_head):
         # Arrange, Act
         mock_head.return_value = None
-        session = vManageSession("domain.com", "user1", "$password", port=111)
+        session = ManagerSession("domain.com", "user1", "$password", port=111)
         answer = session.check_vmanage_server_connection()
         # Assert
         self.assertEqual(answer, True)
@@ -114,7 +114,7 @@ class TestSession(unittest.TestCase):
     def test_check_vmanage_server_no_port(self, mock_requests):
         # Arrange, Act
         mock_requests.return_value = None
-        session = vManageSession("domain.com", "user1", "$password")
+        session = ManagerSession("domain.com", "user1", "$password")
         answer = session.check_vmanage_server_connection()
         # Assert
         self.assertEqual(answer, True)

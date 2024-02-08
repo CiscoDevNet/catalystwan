@@ -14,7 +14,7 @@ from catalystwan.typed_list import DataSequence
 from catalystwan.utils.creation_tools import FIELD_NAME, create_dataclass
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +48,7 @@ class RepositoryAPI:
 
     Usage example:
         # Create session
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
 
         # Upload image
         software_image = <path_to_your_image>
@@ -57,7 +57,7 @@ class RepositoryAPI:
 
     def __init__(
         self,
-        session: vManageSession,
+        session: ManagerSession,
     ):
         self.session = session
 
@@ -170,7 +170,7 @@ class DeviceVersions:
     Methods to prepare devices list for payload
     """
 
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.repository = RepositoryAPI(session)
 
     def _get_device_list_in(

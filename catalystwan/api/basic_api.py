@@ -17,7 +17,7 @@ from catalystwan.utils.personality import Personality
 from catalystwan.utils.reachability import Reachability
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ class DevicesAPI:
 
     max_params = 1000
 
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
 
     def __str__(self) -> str:
@@ -169,7 +169,7 @@ class DeviceStateAPI:
         session: logged in API client session
     """
 
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
 
     def __str__(self) -> str:

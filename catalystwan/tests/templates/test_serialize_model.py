@@ -9,7 +9,7 @@ from parameterized import parameterized  # type: ignore
 import catalystwan.tests.templates.models as models
 from catalystwan.api.template_api import TemplatesAPI
 from catalystwan.api.templates.feature_template import FeatureTemplate
-from catalystwan.session import vManageSession
+from catalystwan.session import ManagerSession
 
 # Take model
 # Generate payload
@@ -20,9 +20,9 @@ class TestFeatureTemplate2(TestCase):
     @parameterized.expand(
         [(template,) for template in map(models.__dict__.get, models.__all__)],  # type: ignore
     )
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_generate_feature_template_payload_definition(
-        self, template: FeatureTemplate, mocked_session: vManageSession
+        self, template: FeatureTemplate, mocked_session: ManagerSession
     ):
         # Arrange
         templates_api = TemplatesAPI(mocked_session)

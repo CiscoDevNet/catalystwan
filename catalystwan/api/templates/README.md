@@ -13,7 +13,7 @@ omp_vsmart = OMPvSmart(
 session.api.templates.create(omp_vsmart)
 ```
 
-## Add new Feature Template in vManage-client
+## Add new Feature Template in Cisco Catalyst SD-WAN SDK
 These steps will help you to automate feature template creation. We'll explain what to do and why, so everyone will have deep understanding how our templates work. In the example we will try to create `OMP` Feature Template for vSmart. 
 
 1. Get your template type name and version. 

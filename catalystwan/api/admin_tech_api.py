@@ -16,7 +16,7 @@ from catalystwan.exceptions import vManageClientError
 from catalystwan.utils.creation_tools import create_dataclass
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 logger = logging.getLogger(__name__)
 
@@ -41,12 +41,12 @@ class AdminTechAPI:
 
     Usage example:
         # Create session
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
         # Get admintech data for all devices
         all_admintechs = session.api.admin_tech.get_all()
     """
 
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
 
     def __str__(self) -> str:

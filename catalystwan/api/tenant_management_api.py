@@ -15,13 +15,13 @@ from catalystwan.endpoints.tenant_management import (
 from catalystwan.models.tenant import Tenant
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 from catalystwan.typed_list import DataSequence
 
 
 class TenantManagementAPI:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.session = session
         self._endpoints = TenantManagement(session)
 
