@@ -38,4 +38,4 @@ jobs:
       - name: Check static-typing
         run: poetry run mypy --show-error-codes --show-error-context --pretty --install-types --non-interactive catalystwan --cache-dir=.mypy_cache/
       - name: Check code style
-        run: poetry run flake8 --max-line-length 120 --inline-quotes double --extend-ignore E203,W503 catalystwan
+        run: poetry run flake8 catalystwan
