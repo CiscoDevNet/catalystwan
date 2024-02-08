@@ -12,7 +12,7 @@ pip install catalystwan
 ```
 
 ## Session usage example
-Our session is an extension to `requests.Session` designed to make it easier to communicate via API calls with Manager. We provide ready to use authenticetion, you have to simply provide the Manager url, username and password as as if you were doing it through a GUI. 
+Our session is an extension to `requests.Session` designed to make it easier to communicate via API calls with SDWAN Manager. We provide ready to use authentication, you have to simply provide the Manager url, username and password as as if you were doing it through a GUI. 
 ```python
 from catalystwan.session import create_manager_session
 
