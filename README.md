@@ -19,7 +19,8 @@ from catalystwan.session import create_manager_session
 url = "example.com"
 username = "admin"
 password = "password123"
-session = create_manager_session(url=url, username=username, password=password)
+with create_manager_session(url=url, username=username, password=password) as session:
+    session.get("/dataservice/device")
 
 session.get("/dataservice/device")
 ```
