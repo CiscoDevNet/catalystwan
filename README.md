@@ -4,7 +4,7 @@
 
 [![Python-Supported](https://img.shields.io/static/v1?label=Python&logo=Python&color=3776AB&message=3.8%20|%203.9%20|%203.10%20|%203.11%20|%203.12)](https://www.python.org/)
 
-Cisco Catalyst SD-WAN SDK is a package for creating simple and parallel automatic requests via official Manager API. It is intended to serve as a multiple session handler (provider, provider as a tenant, tenant). The library is not dependent on environment which is being run in, you just need a connection to any Manager.
+Cisco Catalyst WAN SDK is a package for creating simple and parallel automatic requests via official Manager API. It is intended to serve as a multiple session handler (provider, provider as a tenant, tenant). The library is not dependent on environment which is being run in, you just need a connection to any Manager.
 
 ## Installation
 ```console
@@ -333,8 +333,6 @@ except vManageBadRequestError as error:
 # details = 'No user with name XYZ was found' 
 # code = 'USER0006'
 ```
-
-![Exceptions](docs/images/exceptions.png)
 
 ## [Supported API endpoints](https://github.com/CiscoDevNet/catalystwan/blob/main/ENDPOINTS.md)
 

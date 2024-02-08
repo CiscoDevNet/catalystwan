@@ -1,5 +1,5 @@
-name: Cisco Catalyst SD-WAN SDK feature request
-description: Suggest an idea for Cisco Catalyst SD-WAN SDK.
+name: Cisco Catalyst WAN SDK feature request
+description: Suggest an idea for Cisco Catalyst WAN SDK.
 labels: [enhancement]
 body:
   - type: markdown
