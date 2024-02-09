@@ -12,7 +12,7 @@ from catalystwan.utils.upgrades_helper import get_install_specification, validat
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 class PartitionManagerAPI:
@@ -22,7 +22,7 @@ class PartitionManagerAPI:
 
     Usage example:
         # Create session
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
 
         # Prepare devices list
         devices = session.api.devices.get()
@@ -37,7 +37,7 @@ class PartitionManagerAPI:
 
     """
 
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
         self.repository = RepositoryAPI(self.session)
         self.device_version = DeviceVersions(self.session)

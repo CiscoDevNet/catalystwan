@@ -10,7 +10,7 @@ from pydantic.v1 import BaseModel as BaseModelV1
 from pydantic.v1 import Field as FieldV1
 
 from catalystwan.dataclasses import DataclassBase
-from catalystwan.response import ErrorInfo, vManageResponse
+from catalystwan.response import ErrorInfo, ManagerResponse
 from catalystwan.typed_list import DataSequence
 
 
@@ -75,7 +75,7 @@ class TestResponse(unittest.TestCase):
     @parameterized.expand(PARSE_DATASEQ_TEST_DATA)
     def test_dataseq_attrs(self, raises: bool, json: Any, expected_len: int, sourcekey: str):
         self.response_mock.json.return_value = json
-        vmng_response = vManageResponse(self.response_mock)
+        vmng_response = ManagerResponse(self.response_mock)
         if not raises:
             data_sequence = vmng_response.dataseq(ParsedDataTypeAttrs, sourcekey)
             assert isinstance(data_sequence, DataSequence)
@@ -87,7 +87,7 @@ class TestResponse(unittest.TestCase):
     @parameterized.expand(PARSE_DATASEQ_TEST_DATA)
     def test_dataseq_pydantic_v1(self, raises: bool, json: Any, expected_len: int, sourcekey: str):
         self.response_mock.json.return_value = json
-        vmng_response = vManageResponse(self.response_mock)
+        vmng_response = ManagerResponse(self.response_mock)
         if not raises:
             data_sequence = vmng_response.dataseq(ParsedDataTypePydanticV1, sourcekey)
             assert isinstance(data_sequence, DataSequence)
@@ -99,7 +99,7 @@ class TestResponse(unittest.TestCase):
     @parameterized.expand(PARSE_DATASEQ_TEST_DATA)
     def test_dataseq_pydantic_v2(self, raises: bool, json: Any, expected_len: int, sourcekey: str):
         self.response_mock.json.return_value = json
-        vmng_response = vManageResponse(self.response_mock)
+        vmng_response = ManagerResponse(self.response_mock)
         if not raises:
             data_sequence = vmng_response.dataseq(ParsedDataTypePydanticV2, sourcekey)
             assert isinstance(data_sequence, DataSequence)
@@ -111,7 +111,7 @@ class TestResponse(unittest.TestCase):
     @parameterized.expand(PARSE_DATAOBJ_TEST_DATA)
     def test_dataobj_attrs(self, raises: bool, json: Any, sourcekey: str):
         self.response_mock.json.return_value = json
-        vmng_response = vManageResponse(self.response_mock)
+        vmng_response = ManagerResponse(self.response_mock)
         if not raises:
             data_object = vmng_response.dataobj(ParsedDataTypeAttrs, sourcekey)
             assert isinstance(data_object, ParsedDataTypeAttrs)
@@ -122,7 +122,7 @@ class TestResponse(unittest.TestCase):
     @parameterized.expand(PARSE_DATAOBJ_TEST_DATA)
     def test_dataobj_pydantic_v1(self, raises: bool, json: Any, sourcekey: str):
         self.response_mock.json.return_value = json
-        vmng_response = vManageResponse(self.response_mock)
+        vmng_response = ManagerResponse(self.response_mock)
         if not raises:
             data_object = vmng_response.dataobj(ParsedDataTypePydanticV1, sourcekey)
             assert isinstance(data_object, ParsedDataTypePydanticV1)
@@ -133,7 +133,7 @@ class TestResponse(unittest.TestCase):
     @parameterized.expand(PARSE_DATAOBJ_TEST_DATA)
     def test_dataobj_pydantic_v2(self, raises: bool, json: Any, sourcekey: str):
         self.response_mock.json.return_value = json
-        vmng_response = vManageResponse(self.response_mock)
+        vmng_response = ManagerResponse(self.response_mock)
         if not raises:
             data_object = vmng_response.dataobj(ParsedDataTypePydanticV2, sourcekey)
             assert isinstance(data_object, ParsedDataTypePydanticV2)
@@ -159,7 +159,7 @@ class TestResponse(unittest.TestCase):
     )
     def test_get_error(self, empty_error: bool, json: Any):
         self.response_mock.json.return_value = json
-        vmng_response = vManageResponse(self.response_mock)
+        vmng_response = ManagerResponse(self.response_mock)
         error_info = vmng_response.get_error_info()
         assert isinstance(error_info, ErrorInfo)
         if empty_error:

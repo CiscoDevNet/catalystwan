@@ -11,7 +11,7 @@ from catalystwan.api.tenant_migration_api import TenantMigrationAPI
 from catalystwan.endpoints.troubleshooting_tools.device_connectivity import NPingRequest
 from catalystwan.exceptions import TenantMigrationPreconditionsError
 from catalystwan.models.tenant import TenantExport
-from catalystwan.session import create_vManageSession, vManageSession
+from catalystwan.session import ManagerSession, create_manager_session
 from catalystwan.utils.personality import Personality
 from catalystwan.utils.session_type import SessionType
 
@@ -24,11 +24,11 @@ def raise_or_log_precondition_check(msg: str, raises: bool) -> None:
     logger.warning(msg)
 
 
-def check_control_connectivity_from_edge_devices(session: vManageSession, host: str, attempts: int = 2) -> bool:
+def check_control_connectivity_from_edge_devices(session: ManagerSession, host: str, attempts: int = 2) -> bool:
     """Checks that all edge devices can reach specified host using ping on transport VPN 0 which carries control traffic
 
     Args:
-        session (vManageSession): Session logged as device owner user
+        session (ManagerSession): Session logged as device owner user
         host (str): IP address or domain name to ping to
         attempts (int, optional): Number of attempts. Defaults to 2.
 
@@ -56,8 +56,8 @@ def check_control_connectivity_from_edge_devices(session: vManageSession, host: 
 
 
 def migration_preconditions_check(
-    origin_session: vManageSession,
-    target_session: vManageSession,
+    origin_session: ManagerSession,
+    target_session: ManagerSession,
     tenant: TenantExport,
     validator: str,
     raises: bool,
@@ -65,8 +65,8 @@ def migration_preconditions_check(
     """Perform precondition checks prior tenant migration
 
     Args:
-        origin_session (vManageSession): session to migration origin
-        target_session (vManageSession): session to migration target
+        origin_session (ManagerSession): session to migration origin
+        target_session (ManagerSession): session to migration target
         tenant (MigrationTenant): Tenant object containig required fields: desc, name, subdomain, org_name
         validator (str): Target Validator (VBOND) IP address or domain name
         raises (bool): When true precondition check will raise, when false only warning will be logged
@@ -125,7 +125,7 @@ def migration_preconditions_check(
     logger.info("Checking if migrated devices can reach target validator...")
     conn_check = False
     if origin_session.session_type == SessionType.PROVIDER:
-        with create_vManageSession(
+        with create_manager_session(
             url=origin_session.url,
             username=origin_session.username,
             password=origin_session.password,
@@ -150,8 +150,8 @@ def migration_preconditions_check(
 
 
 def migration_workflow(
-    origin_session: vManageSession,
-    target_session: vManageSession,
+    origin_session: ManagerSession,
+    target_session: ManagerSession,
     workdir: Path,
     tenant: TenantExport,
     validator: str,
@@ -167,8 +167,8 @@ def migration_workflow(
     5. On origin Cisco vManage instance, initiate the migration of the overlay to target deployment.
 
     Args:
-        origin_session (vManageSession): session to migration origin
-        target_session (vManageSession): session to migration target
+        origin_session (ManagerSession): session to migration origin
+        target_session (ManagerSession): session to migration target
         workdir (Path): directory to store migration artifacts (token and export file)
         tenant (MigrationTenant): Tenant object containig required fields: desc, name, subdomain, org_name
         validator (str): Target Validator (VBOND) IP address or domain name

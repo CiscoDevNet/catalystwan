@@ -90,11 +90,11 @@ from catalystwan.endpoints.tenant_migration import TenantMigration
 from catalystwan.endpoints.troubleshooting_tools.device_connectivity import TroubleshootingToolsDeviceConnectivity
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 class ConfigurationPolicyListContainer:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.app = ConfigurationPolicyApplicationList(session)
         self.app_probe = ConfigurationPolicyAppProbeClassList(session)
         self.as_path = ConfigurationPolicyASPathList(session)
@@ -127,7 +127,7 @@ class ConfigurationPolicyListContainer:
 
 
 class ConfigurationPolicyDefinitionContainer:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.data = ConfigurationPolicyDataDefinition(session)
         self.rule_set = ConfigurationPolicyRuleSetDefinition(session)
         self.security_group = ConfigurationPolicySecurityGroupDefinition(session)
@@ -145,7 +145,7 @@ class ConfigurationPolicyDefinitionContainer:
 
 
 class ConfigurationPolicyContainer:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.list = ConfigurationPolicyListContainer(session)
         self.definition = ConfigurationPolicyDefinitionContainer(session)
         self.vsmart_template = ConfigurationVSmartTemplatePolicy(session)
@@ -154,33 +154,33 @@ class ConfigurationPolicyContainer:
 
 
 class ConfigurationSDWANFeatureProfileContainer:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.transport = TransportFeatureProfile(client=session)
 
 
 class ConfigurationFeatureProfileContainer:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.sdwan = ConfigurationSDWANFeatureProfileContainer(session=session)
 
 
 class ConfigurationContainer:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.policy = ConfigurationPolicyContainer(session)
         self.feature_profile = ConfigurationFeatureProfileContainer(session=session)
 
 
 class TroubleshootingToolsContainer:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.device_connectivity = TroubleshootingToolsDeviceConnectivity(session)
 
 
 class RealTimeMonitoringContainer:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.reboot_history = RealTimeMonitoringRebootHistory(session)
 
 
 class APIEndpointContainter:
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.administration_user_and_group = AdministrationUserAndGroup(session)
         self.certificate_management_vmanage = CertificateManagementVManage(session)
         self.client = Client(session)

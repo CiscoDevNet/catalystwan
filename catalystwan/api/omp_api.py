@@ -14,24 +14,24 @@ from catalystwan.dataclasses import (
 from catalystwan.utils.creation_tools import create_dataclass
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 class OmpAPI:
     """OMP API methods of vManage for get common omp data.
 
     Attributes:
-        session (vManageSession): logged in API client session
+        session (ManagerSession): logged in API client session
 
     Usage example:
         # Create session and chose device
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
         device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
         # Gets OMP peers for a device
         omp_peers = session.api.omp.get_omp_peers(device.id)
     """
 
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
 
     def __str__(self) -> str:

@@ -38,14 +38,14 @@ from catalystwan.api.templates.models.system_vsmart_model import SystemVsmart
 from catalystwan.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, FeatureTemplatesTypes, TemplateInfo
 from catalystwan.endpoints.configuration_device_template import FeatureToCLIPayload
 from catalystwan.exceptions import AttachedError, TemplateNotFoundError
-from catalystwan.response import vManageResponse
+from catalystwan.response import ManagerResponse
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.device_model import DeviceModel
 from catalystwan.utils.dict import merge
 from catalystwan.utils.template_type import TemplateType
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +67,7 @@ class DeviceTemplateFeature(Enum):
 
 
 class TemplatesAPI:
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
 
     @overload
@@ -377,7 +377,7 @@ class TemplatesAPI:
     def _edit_device_template(self, template: DeviceTemplate):
         self._create_device_template(template, True)
 
-    def _edit_feature_template(self, template: FeatureTemplate, data: FeatureTemplateInfo) -> vManageResponse:
+    def _edit_feature_template(self, template: FeatureTemplate, data: FeatureTemplateInfo) -> ManagerResponse:
         if self.is_created_by_generator(template):
             debug = False
             schema = self.get_feature_template_schema(template, debug)

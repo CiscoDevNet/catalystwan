@@ -18,14 +18,9 @@ from catalystwan.api.api_container import APIContainer
 from catalystwan.endpoints import APIEndpointClient
 from catalystwan.endpoints.client import AboutInfo, ServerInfo
 from catalystwan.endpoints.endpoints_container import APIEndpointContainter
-from catalystwan.exceptions import (
-    InvalidOperationError,
-    SessionNotCreatedError,
-    TenantSubdomainNotFound,
-    vManageClientError,
-)
+from catalystwan.exceptions import InvalidOperationError, ManagerError, SessionNotCreatedError, TenantSubdomainNotFound
 from catalystwan.models.tenant import Tenant
-from catalystwan.response import ErrorInfo, response_history_debug, vManageResponse
+from catalystwan.response import ErrorInfo, ManagerResponse, response_history_debug
 from catalystwan.utils.session_type import SessionType
 from catalystwan.version import NullVersion, parse_api_version
 from catalystwan.vmanage_auth import vManageAuth
@@ -34,10 +29,10 @@ JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
 USER_AGENT = f"{__package__}/{metadata.version(__package__)}"
 
 
-class vManageBadResponseError(vManageClientError):
+class vManageBadResponseError(ManagerError):
     """Indicates that vManage returned error HTTP status code other than 400."""
 
-    def __init__(self, error_info: Optional[ErrorInfo], response: vManageResponse):
+    def __init__(self, error_info: Optional[ErrorInfo], response: ManagerResponse):
         self.response = response
         self.info = error_info
         super().__init__(error_info)
@@ -84,14 +79,14 @@ def determine_session_type(
         return SessionType.NOT_DEFINED
 
 
-def create_vManageSession(
+def create_manager_session(
     url: str,
     username: str,
     password: str,
     port: Optional[int] = None,
     subdomain: Optional[str] = None,
     logger: Optional[logging.Logger] = None,
-) -> vManageSession:
+) -> ManagerSession:
     """Factory function that creates session object based on provided arguments.
 
     Args:
@@ -104,9 +99,9 @@ def create_vManageSession(
         logger: logger for logging API requests
 
     Returns:
-        vManageSession: Configured Session to perform tasks on vManage.
+        ManagerSession: Configured Session to perform tasks on vManage.
     """
-    session = vManageSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
+    session = ManagerSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
     if logger:
         session.logger = logger
@@ -149,23 +144,23 @@ def create_vManageSession(
 
 
 class vManageResponseAdapter(Session):
-    def request(self, method, url, *args, **kwargs) -> vManageResponse:
-        return vManageResponse(super().request(method, url, *args, **kwargs))
+    def request(self, method, url, *args, **kwargs) -> ManagerResponse:
+        return ManagerResponse(super().request(method, url, *args, **kwargs))
 
-    def get(self, url, *args, **kwargs) -> vManageResponse:
-        return vManageResponse(super().get(url, *args, **kwargs))
+    def get(self, url, *args, **kwargs) -> ManagerResponse:
+        return ManagerResponse(super().get(url, *args, **kwargs))
 
-    def post(self, url, *args, **kwargs) -> vManageResponse:
-        return vManageResponse(super().post(url, *args, **kwargs))
+    def post(self, url, *args, **kwargs) -> ManagerResponse:
+        return ManagerResponse(super().post(url, *args, **kwargs))
 
-    def put(self, url, *args, **kwargs) -> vManageResponse:
-        return vManageResponse(super().put(url, *args, **kwargs))
+    def put(self, url, *args, **kwargs) -> ManagerResponse:
+        return ManagerResponse(super().put(url, *args, **kwargs))
 
-    def delete(self, url, *args, **kwargs) -> vManageResponse:
-        return vManageResponse(super().delete(url, *args, **kwargs))
+    def delete(self, url, *args, **kwargs) -> ManagerResponse:
+        return ManagerResponse(super().delete(url, *args, **kwargs))
 
 
-class vManageSession(vManageResponseAdapter, APIEndpointClient):
+class ManagerSession(vManageResponseAdapter, APIEndpointClient):
     """Base class for API sessions for vManage client.
 
     Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
@@ -181,7 +176,7 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
             relogin and try the same request again
     """
 
-    on_session_create_hook: ClassVar[Callable[[vManageSession], Any]] = lambda *args: None
+    on_session_create_hook: ClassVar[Callable[[ManagerSession], Any]] = lambda *args: None
 
     def __init__(
         self,
@@ -207,7 +202,7 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
         self.response_trace: Callable[
             [Optional[Response], Union[Request, PreparedRequest, None]], str
         ] = response_history_debug
-        super(vManageSession, self).__init__()
+        super(ManagerSession, self).__init__()
         self.headers.update({"User-Agent": USER_AGENT})
         self.__prepare_session(verify, auth)
         self.api = APIContainer(self)
@@ -215,10 +210,10 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
         self._platform_version: str = ""
         self._api_version: Version
 
-    def request(self, method, url, *args, **kwargs) -> vManageResponse:
+    def request(self, method, url, *args, **kwargs) -> ManagerResponse:
         full_url = self.get_full_url(url)
         try:
-            response = super(vManageSession, self).request(method, full_url, *args, **kwargs)
+            response = super(ManagerSession, self).request(method, full_url, *args, **kwargs)
             self.logger.debug(self.response_trace(response, None))
         except RequestException as exception:
             self.logger.debug(self.response_trace(exception.response, exception.request))
@@ -360,7 +355,7 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
         response = self.post(url_path)
         return response.json()["VSessionId"]
 
-    def logout(self) -> Optional[vManageResponse]:
+    def logout(self) -> Optional[ManagerResponse]:
         if isinstance((version := self.api_version), NullVersion):
             self.logger.warning("Cannot perform logout operation without known api_version.")
             return None
@@ -368,7 +363,7 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
             return self.post("/logout") if version >= Version("20.12") else self.get("/logout")
 
     def close(self) -> None:
-        """Closes the vManageSession.
+        """Closes the ManagerSession.
 
         This method is overrided from requests.Session.
         Firstly it cleans up any resources associated with vManage.
@@ -386,7 +381,7 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
         self.auth = auth
         self.verify = verify
 
-    def __is_jsession_updated(self, response: vManageResponse) -> bool:
+    def __is_jsession_updated(self, response: ManagerResponse) -> bool:
         if (jsessionid := response.cookies.get("JSESSIONID")) and isinstance(self.auth, vManageAuth):
             if jsessionid != self.auth.set_cookie.get("JSESSIONID"):
                 return True
@@ -427,7 +422,7 @@ class vManageSession(vManageResponseAdapter, APIEndpointClient):
         )
 
     def __eq__(self, other):
-        if isinstance(other, vManageSession):
+        if isinstance(other, ManagerSession):
             comparison_list = [
                 self.url == other.url,
                 self.username == other.username,

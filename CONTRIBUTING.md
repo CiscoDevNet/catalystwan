@@ -4,15 +4,15 @@ We're really glad you want to help.
 
 ## Here are some important resources:
 
-  * Want to add something from yourself? [Make a PR](https://github.com/CiscoDevNet/vManage-client/pulls) - remember to follow code guidelines.
+  * Want to add something from yourself? [Make a PR](https://github.com/CiscoDevNet/catalystwan/pulls) - remember to follow code guidelines.
     ### Contributors from CiscoDevNet organization:
     To make a PR - pull the repository, create branch for your changes, make said changes and make the pull request. Now just wait for the review and feedback from our developers.  
     ### Contributors outside CiscoDevNet organization
     To make a PR - fork our repository, make your changes and make the pull request. Now just wait for the review and feedback from our developers.
-  * Feel free to review existing [PR](https://github.com/CiscoDevNet/vManage-client/pulls)s, any suggestion is welcome.
-  * Want to help but you don't have any new ideas for improvement or feature? Take any [issue](https://github.com/CiscoDevNet/vManage-client/issues) and fix it.
-  * Bugs? [Report it here](https://github.com/CiscoDevNet/vManage-client/issues/new?assignees=&labels=needs+review&template=bug_report.yml) - remember to provide as much information as you can.
-  * Need some additional feature? [Let us know here](https://github.com/CiscoDevNet/vManage-client/issues/new?assignees=&labels=enhancement&template=feature_request.yml)
+  * Feel free to review existing [PR](https://github.com/CiscoDevNet/catalystwan/pulls)s, any suggestion is welcome.
+  * Want to help but you don't have any new ideas for improvement or feature? Take any [issue](https://github.com/CiscoDevNet/catalystwan/issues) and fix it.
+  * Bugs? [Report it here](https://github.com/CiscoDevNet/catalystwan/issues/new?assignees=&labels=needs+review&template=bug_report.yml) - remember to provide as much information as you can.
+  * Need some additional feature? [Let us know here](https://github.com/CiscoDevNet/catalystwan/issues/new?assignees=&labels=enhancement&template=feature_request.yml)
 
 ## Testing
 
@@ -23,7 +23,7 @@ Test newly implemented features on Cisco SD-WAN, ideally on different versions. 
   ```
   poetry build
   ```
-  Then in `/vManage-client/dist/` directory there is a `.whl` file named `catalystwan-<version>-py3-none-any.whl`, which can be installed by running
+  Then in `/catalystwan/dist/` directory there is a `.whl` file named `catalystwan-<version>-py3-none-any.whl`, which can be installed by running
   ```
   pip install catalystwan-<version>-py3-none-any.whl
   ```
@@ -38,7 +38,7 @@ Always write a clear log message for your commits.
 1. Download Python3.8 or higher.
 2. Download repository
     ```
-    git clone https://github.com/CiscoDevNet/vManage-client.git
+    git clone https://github.com/CiscoDevNet/catalystwan.git
     ```
 3. Install and configure poetry (v1.3.1 or higher)
     https://python-poetry.org/docs/#installation
@@ -79,7 +79,7 @@ Start reading our code, and you'll get the hang of it.
 ## Introducing new API
 
   ### API Endpoints:
-  vManage-client APIs should make requests only through API Endpoints layer. This layer defines:
+  catalystwan APIs should make requests only through API Endpoints layer. This layer defines:
   * http method
   * endpoint url
   * payload data-model (subtyping `pydantic.BaseModel` and others)

@@ -12,24 +12,24 @@ from requests import Response
 from requests.exceptions import HTTPError
 
 from catalystwan.dataclasses import AdminTech, DeviceAdminTech
-from catalystwan.exceptions import vManageClientError
+from catalystwan.exceptions import ManagerError
 from catalystwan.utils.creation_tools import create_dataclass
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 logger = logging.getLogger(__name__)
 
 
-class GenerateAdminTechLogError(vManageClientError):
+class GenerateAdminTechLogError(ManagerError):
     pass
 
 
-class DownloadAdminTechLogError(vManageClientError):
+class DownloadAdminTechLogError(ManagerError):
     pass
 
 
-class RequestTokenIdNotFound(vManageClientError):
+class RequestTokenIdNotFound(ManagerError):
     pass
 
 
@@ -41,12 +41,12 @@ class AdminTechAPI:
 
     Usage example:
         # Create session
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
         # Get admintech data for all devices
         all_admintechs = session.api.admin_tech.get_all()
     """
 
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
 
     def __str__(self) -> str:

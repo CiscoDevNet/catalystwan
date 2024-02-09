@@ -35,7 +35,7 @@ from catalystwan.typed_list import DataSequence
 from catalystwan.utils.creation_tools import asdict, create_dataclass
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 logger = logging.getLogger(__name__)
 
@@ -48,12 +48,12 @@ class UsersAPI:
 
     Usage example:
         # Create session
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
         # Get information about all users
         all_users = session.api.users.get()
     """
 
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
         self._endpoints = AdministrationUserAndGroup(session)
 
@@ -129,7 +129,7 @@ class UsersAPI:
 class UserGroupsAPI:
     """Class implementing methods for user group management."""
 
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.session = session
         self._endpoints = AdministrationUserAndGroup(session)
 
@@ -169,7 +169,7 @@ class UserGroupsAPI:
 class ResourceGroupsAPI:
     """Class implementing methods for resource groups management."""
 
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.session = session
         self._endpoints = AdministrationUserAndGroup(session)
 
@@ -219,7 +219,7 @@ class ResourceGroupsAPI:
 class SessionsAPI:
     """Class implementing methods for vmanage sessions management."""
 
-    def __init__(self, session: vManageSession):
+    def __init__(self, session: ManagerSession):
         self.session = session
         self._endpoints = AdministrationUserAndGroup(session)
 
@@ -252,12 +252,12 @@ class ClusterManagementAPI:
 
     Example usage:
         # Create session
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
         # Get health status
         health_status = session.api.cluster_management.get_cluster_management_health_status()
     """
 
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
 
     def modify_cluster_setup(self, service_configuration: ServiceConfigurationData) -> bool:
@@ -282,7 +282,7 @@ class ClusterManagementAPI:
 
 
 class AdministrationSettingsAPI:
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         """Covers Administration Settings API calls.
 
         Args:

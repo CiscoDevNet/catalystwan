@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a problem or a bug with vManage-client code.
+description: Report a problem or a bug with Cisco Catalyst WAN SDK code.
 labels: ["needs review"]
 body:
   - type: markdown

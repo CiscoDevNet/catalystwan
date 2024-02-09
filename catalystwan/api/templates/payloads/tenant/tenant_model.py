@@ -10,7 +10,7 @@ from catalystwan.endpoints.monitoring_device_details import Tier as TierInfo
 from catalystwan.models.tenant import Tenant as TenantInfo
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 class Tenant(BaseModel):
@@ -31,7 +31,7 @@ class TenantModel(FeatureTemplate):
 
     tenants: List[Tenant] = []
 
-    def generate_payload(self, session: vManageSession) -> str:
+    def generate_payload(self, session: ManagerSession) -> str:
         tenant_infos = session.endpoints.tenant_management.get_all_tenants()
         tier_infos = session.endpoints.monitoring_device_details.get_tiers()
 

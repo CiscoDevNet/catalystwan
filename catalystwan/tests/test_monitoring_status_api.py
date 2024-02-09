@@ -55,7 +55,7 @@ class TestMonitoringStatusAPI(unittest.TestCase):
         # Assert
         assert result == self.expected_list_enabled_indexes
 
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def setUp(self, mock_session) -> None:
         self.session = mock_session
         self.session.api_version = None

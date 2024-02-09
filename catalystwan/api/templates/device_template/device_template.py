@@ -10,7 +10,7 @@ from pydantic.v1 import BaseModel, Field, validator
 from catalystwan.utils.device_model import DeviceModel
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +80,7 @@ class DeviceTemplate(BaseModel):
     payload_path: Final[Path] = Path(__file__).parent / "device_template_payload.json.j2"
 
     @classmethod
-    def get(self, name: str, session: vManageSession) -> DeviceTemplate:
+    def get(self, name: str, session: ManagerSession) -> DeviceTemplate:
         device_template = session.api.templates.get(DeviceTemplate).filter(name=name).single_or_default()
         resp = session.get(f"dataservice/template/device/object/{device_template.id}").json()
         return DeviceTemplate(**resp)

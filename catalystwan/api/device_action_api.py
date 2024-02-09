@@ -17,13 +17,13 @@ from catalystwan.utils.validate_status import ValidateStatus
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 class DeviceActionAPI(ABC):
     """API method to execute action on Device."""
 
-    def __init__(self, session: vManageSession, dev: Device):
+    def __init__(self, session: ManagerSession, dev: Device):
         self.session = session
         self.dev = dev
         self.action_status = ""
@@ -62,7 +62,7 @@ class RebootAction(DeviceActionAPI):
 
         Usage example:
         # Create session and chose device
-        session = create_vManageSession(...)
+        session = create_manager_session(...)
         device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
         # Restart device
         RebootAction(session, device).execute()
@@ -121,7 +121,7 @@ class ValidateAction(DeviceActionAPI):  # TODO check
 
     Usage example:
     # Create session and chose device
-    session = create_vManageSession(...)
+    session = create_manager_session(...)
     device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
     # Validate device
     ValidateAction(session, device).execute()
@@ -174,7 +174,7 @@ class DecommissionAction(DeviceActionAPI):
 
     Usage example:
     # Create session and chose device
-    session = create_vManageSession(...)
+    session = create_manager_session(...)
     device = DevicesAPI(session).get().filter(personality = Personality.VSMART)[0]
     # Decommission device
     DecommissionAction(session, device).execute()

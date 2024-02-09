@@ -84,8 +84,8 @@ class TestTemplatesAPI(unittest.TestCase):
         )
         self.task = TaskResult(result=True, sub_tasks_data=[sub_tasks_data])
 
-    @patch("catalystwan.response.vManageResponse")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.response.ManagerResponse")
+    @patch("catalystwan.session.ManagerSession")
     def test_templates_success(self, mock_session, mocked_response):
         # Arrange
         mock_session.get.return_value = mocked_response
@@ -97,8 +97,8 @@ class TestTemplatesAPI(unittest.TestCase):
         # Assert
         self.assertEqual(answer, self.templates)
 
-    @patch("catalystwan.response.vManageResponse")
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.response.ManagerResponse")
+    @patch("catalystwan.session.ManagerSession")
     def test_templates_get(self, mock_session, mocked_response):
         # Arrange
         mock_session.get_data.return_value = mocked_response
@@ -148,7 +148,7 @@ class TestTemplatesAPI(unittest.TestCase):
             ),
         ]
     )
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     @patch("catalystwan.api.template_api.TemplatesAPI.create_by_generator")
     @patch("catalystwan.api.template_api.TemplatesAPI._create_feature_template")
     @patch("catalystwan.api.template_api.TemplatesAPI._create_device_template")
@@ -208,7 +208,7 @@ class TestTemplatesAPI(unittest.TestCase):
             ),
         ]
     )
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     @patch("catalystwan.api.template_api.TemplatesAPI.create_by_generator")
     @patch("catalystwan.api.template_api.TemplatesAPI._create_feature_template")
     @patch("catalystwan.api.template_api.TemplatesAPI._create_device_template")
@@ -235,7 +235,7 @@ class TestTemplatesAPI(unittest.TestCase):
         # Assert
         self.assertEqual(templates_api.create(templates), template_ids)
 
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     @patch("catalystwan.api.template_api.TemplatesAPI.create_by_generator")
     @patch("catalystwan.api.template_api.TemplatesAPI._create_feature_template")
     @patch("catalystwan.api.template_api.TemplatesAPI._create_device_template")
@@ -261,7 +261,7 @@ class TestTemplatesAPI(unittest.TestCase):
 
     # @patch.object(TemplatesAPI, "templates")
     # @patch("catalystwan.api.template_api.wait_for_completed")
-    # @patch("catalystwan.session.vManageSession")
+    # @patch("catalystwan.session.ManagerSession")
     # def test_attach_exist_template(self, mock_session, mock_wait_for_completed, mock_templates):
 
     #     # Arrage
@@ -284,7 +284,7 @@ class TestTemplatesAPI(unittest.TestCase):
 
     # @patch.object(TemplatesAPI, "templates")
     # @patch("catalystwan.api.template_api.wait_for_completed")
-    # @patch("catalystwan.session.vManageSession")
+    # @patch("catalystwan.session.ManagerSession")
     # def test_attach_no_exist_template(self, mock_session, mock_wait_for_completed, mock_templates):
 
     #     # Arrage
@@ -306,7 +306,7 @@ class TestTemplatesAPI(unittest.TestCase):
     #     self.assertFalse(answer)
 
     # @patch("catalystwan.api.template_api.wait_for_completed")
-    # @patch("catalystwan.session.vManageSession")
+    # @patch("catalystwan.session.ManagerSession")
     # def test_device_to_cli_true(self, mock_session, mock_wait_for_completed):
 
     #     # Arrage
@@ -323,7 +323,7 @@ class TestTemplatesAPI(unittest.TestCase):
     #     self.assertTrue(answer)
 
     # @patch.object(TemplatesAPI, "templates")
-    # @patch("catalystwan.session.vManageSession")
+    # @patch("catalystwan.session.ManagerSession")
     # def test_delete_success(self, mock_session, mock_templates):
 
     #     # Arrage
@@ -343,7 +343,7 @@ class TestTemplatesAPI(unittest.TestCase):
     #     self.assertTrue(answer)
 
     # @patch.object(TemplatesAPI, "templates")
-    # @patch("catalystwan.session.vManageSession")
+    # @patch("catalystwan.session.ManagerSession")
     # def test_delete_wrong_status(self, mock_session, mock_templates):
 
     #     # Arrage
@@ -364,7 +364,7 @@ class TestTemplatesAPI(unittest.TestCase):
     #     self.assertFalse(answer)
 
     # @patch.object(TemplatesAPI, "templates")
-    # @patch("catalystwan.session.vManageSession")
+    # @patch("catalystwan.session.ManagerSession")
     # def test_delete_exception(self, mock_session, mock_templates):
 
     #     # Arrage
@@ -386,7 +386,7 @@ class TestTemplatesAPI(unittest.TestCase):
     #     self.assertRaises(AttachedError, answer)
 
     # @patch.object(TemplatesAPI, "templates")
-    # @patch("catalystwan.session.vManageSession")
+    # @patch("catalystwan.session.ManagerSession")
     # def test_create_exception(self, mock_session, mock_templates):
 
     #     # Arrage

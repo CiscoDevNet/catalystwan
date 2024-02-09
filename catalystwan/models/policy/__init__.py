@@ -1,64 +1,63 @@
 # This stub provide top-level "public" policy models and enums to be used with PolicyAPI()
-# TODO: ignore F401 for whole file in pre-commit/github-actions, possibly by introducing flake8 config file
 # TODO: explore model attribute access customization with https://peps.python.org/pep-0562/
-from .centralized import CentralizedPolicy as CentralizedPolicy  # noqa: F401
-from .centralized import TrafficDataDirectionEnum as TrafficDataDirectionEnum  # noqa: F401
-from .definitions.access_control_list import AclPolicy as AclPolicy  # noqa: F401
-from .definitions.access_control_list_ipv6 import AclIPv6Policy as AclIPv6Policy  # noqa: F401
-from .definitions.control import ControlPolicy as ControlPolicy  # noqa: F401
-from .definitions.device_access import DeviceAccessPolicy as DeviceAccessPolicy  # noqa: F401
-from .definitions.device_access_ipv6 import DeviceAccessIPv6Policy as DeviceAccessIPv6Policy  # noqa: F401
-from .definitions.hub_and_spoke import HubAndSpokePolicy as HubAndSpokePolicy  # noqa: F401
-from .definitions.mesh import MeshPolicy as MeshPolicy  # noqa: F401
-from .definitions.qos_map import QoSDropEnum as QoSDropEnum  # noqa: F401
-from .definitions.qos_map import QoSMapPolicy as QoSMapPolicy  # noqa: F401
-from .definitions.rewrite import RewritePolicy as RewritePolicy  # noqa: F401
-from .definitions.rule_set import RuleSet as RuleSet  # noqa: F401
-from .definitions.security_group import SecurityGroup as SecurityGroup  # noqa: F401
-from .definitions.traffic_data import TrafficDataPolicy as TrafficDataPolicy  # noqa: F401
-from .definitions.vpn_membership import VPNMembershipPolicy as VPNMembershipPolicy  # noqa: F401
-from .definitions.zone_based_firewall import ZoneBasedFWPolicy as ZoneBasedFWPolicy  # noqa: F401
-from .lists import AppList as AppList  # noqa: F401
-from .lists import AppProbeClassList as AppProbeClassList  # noqa: F401
-from .lists import ASPathList as ASPathList  # noqa: F401
-from .lists import ClassMapList as ClassMapList  # noqa: F401
-from .lists import ColorList as ColorList  # noqa: F401
-from .lists import CommunityList as CommunityList  # noqa: F401
-from .lists import DataIPv6PrefixList as DataIPv6PrefixList  # noqa: F401
-from .lists import DataPrefixList as DataPrefixList  # noqa: F401
-from .lists import ExpandedCommunityList as ExpandedCommunityList  # noqa: F401
-from .lists import FQDNList as FQDNList  # noqa: F401
-from .lists import GeoLocationList as GeoLocationList  # noqa: F401
-from .lists import IPSSignatureList as IPSSignatureList  # noqa: F401
-from .lists import IPv6PrefixList as IPv6PrefixList  # noqa: F401
-from .lists import LocalAppList as LocalAppList  # noqa: F401
-from .lists import LocalDomainList as LocalDomainList  # noqa: F401
-from .lists import MirrorList as MirrorList  # noqa: F401
-from .lists import PolicerList as PolicerList  # noqa: F401
-from .lists import PortList as PortList  # noqa: F401
-from .lists import PreferredColorGroupList as PreferredColorGroupList  # noqa: F401
-from .lists import PrefixList as PrefixList  # noqa: F401
-from .lists import ProtocolNameList as ProtocolNameList  # noqa: F401
-from .lists import RegionList as RegionList  # noqa: F401
-from .lists import SiteList as SiteList  # noqa: F401
-from .lists import SLAClassList as SLAClassList  # noqa: F401
-from .lists import TLOCList as TLOCList  # noqa: F401
-from .lists import URLBlackList as URLBlackList  # noqa: F401
-from .lists import URLWhiteList as URLWhiteList  # noqa: F401
-from .lists import VPNList as VPNList  # noqa: F401
-from .lists import ZoneList as ZoneList  # noqa: F401
-from .lists_entries import EncapEnum as EncapEnum  # noqa: F401
-from .lists_entries import PathPreferenceEnum as PathPreferenceEnum  # noqa: F401
-from .lists_entries import PolicerExceedActionEnum as PolicerExceedActionEnum  # noqa: F401
-from .localized import LocalizedPolicy as LocalizedPolicy  # noqa: F401
-from .policy_definition import CarrierEnum as CarrierEnum  # noqa: F401
-from .policy_definition import DNSTypeEntryEnum as DNSTypeEntryEnum  # noqa: F401
-from .policy_definition import MultiRegionRoleEnum as MultiRegionRoleEnum  # noqa: F401
-from .policy_definition import OriginProtocolEnum as OriginProtocolEnum  # noqa: F401
-from .policy_definition import PathTypeEnum as PathTypeEnum  # noqa: F401
-from .policy_definition import PLPEntryEnum as PLPEntryEnum  # noqa: F401
-from .policy_definition import PolicyActionTypeEnum as PolicyActionTypeEnum  # noqa: F401
-from .policy_definition import ServiceTypeEnum as ServiceTypeEnum  # noqa: F401
-from .policy_definition import TLOCActionEnum as TLOCActionEnum  # noqa: F401
-from .security import SecurityPolicy as SecurityPolicy  # noqa: F401
-from .security import UnifiedSecurityPolicy as UnifiedSecurityPolicy  # noqa: F401
+from .centralized import CentralizedPolicy as CentralizedPolicy
+from .centralized import TrafficDataDirectionEnum as TrafficDataDirectionEnum
+from .definitions.access_control_list import AclPolicy as AclPolicy
+from .definitions.access_control_list_ipv6 import AclIPv6Policy as AclIPv6Policy
+from .definitions.control import ControlPolicy as ControlPolicy
+from .definitions.device_access import DeviceAccessPolicy as DeviceAccessPolicy
+from .definitions.device_access_ipv6 import DeviceAccessIPv6Policy as DeviceAccessIPv6Policy
+from .definitions.hub_and_spoke import HubAndSpokePolicy as HubAndSpokePolicy
+from .definitions.mesh import MeshPolicy as MeshPolicy
+from .definitions.qos_map import QoSDropEnum as QoSDropEnum
+from .definitions.qos_map import QoSMapPolicy as QoSMapPolicy
+from .definitions.rewrite import RewritePolicy as RewritePolicy
+from .definitions.rule_set import RuleSet as RuleSet
+from .definitions.security_group import SecurityGroup as SecurityGroup
+from .definitions.traffic_data import TrafficDataPolicy as TrafficDataPolicy
+from .definitions.vpn_membership import VPNMembershipPolicy as VPNMembershipPolicy
+from .definitions.zone_based_firewall import ZoneBasedFWPolicy as ZoneBasedFWPolicy
+from .lists import AppList as AppList
+from .lists import AppProbeClassList as AppProbeClassList
+from .lists import ASPathList as ASPathList
+from .lists import ClassMapList as ClassMapList
+from .lists import ColorList as ColorList
+from .lists import CommunityList as CommunityList
+from .lists import DataIPv6PrefixList as DataIPv6PrefixList
+from .lists import DataPrefixList as DataPrefixList
+from .lists import ExpandedCommunityList as ExpandedCommunityList
+from .lists import FQDNList as FQDNList
+from .lists import GeoLocationList as GeoLocationList
+from .lists import IPSSignatureList as IPSSignatureList
+from .lists import IPv6PrefixList as IPv6PrefixList
+from .lists import LocalAppList as LocalAppList
+from .lists import LocalDomainList as LocalDomainList
+from .lists import MirrorList as MirrorList
+from .lists import PolicerList as PolicerList
+from .lists import PortList as PortList
+from .lists import PreferredColorGroupList as PreferredColorGroupList
+from .lists import PrefixList as PrefixList
+from .lists import ProtocolNameList as ProtocolNameList
+from .lists import RegionList as RegionList
+from .lists import SiteList as SiteList
+from .lists import SLAClassList as SLAClassList
+from .lists import TLOCList as TLOCList
+from .lists import URLBlackList as URLBlackList
+from .lists import URLWhiteList as URLWhiteList
+from .lists import VPNList as VPNList
+from .lists import ZoneList as ZoneList
+from .lists_entries import EncapEnum as EncapEnum
+from .lists_entries import PathPreferenceEnum as PathPreferenceEnum
+from .lists_entries import PolicerExceedActionEnum as PolicerExceedActionEnum
+from .localized import LocalizedPolicy as LocalizedPolicy
+from .policy_definition import CarrierEnum as CarrierEnum
+from .policy_definition import DNSTypeEntryEnum as DNSTypeEntryEnum
+from .policy_definition import MultiRegionRoleEnum as MultiRegionRoleEnum
+from .policy_definition import OriginProtocolEnum as OriginProtocolEnum
+from .policy_definition import PathTypeEnum as PathTypeEnum
+from .policy_definition import PLPEntryEnum as PLPEntryEnum
+from .policy_definition import PolicyActionTypeEnum as PolicyActionTypeEnum
+from .policy_definition import ServiceTypeEnum as ServiceTypeEnum
+from .policy_definition import TLOCActionEnum as TLOCActionEnum
+from .security import SecurityPolicy as SecurityPolicy
+from .security import UnifiedSecurityPolicy as UnifiedSecurityPolicy

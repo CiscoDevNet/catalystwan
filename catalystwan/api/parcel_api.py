@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 from catalystwan.endpoints.configuration_feature_profile import ParcelId, SDRoutingConfigurationFeatureProfile
 from catalystwan.models.feature_profile_parcel import FullConfig, FullConfigParcel
@@ -21,7 +21,7 @@ class ParcelAPI(Protocol):
 
 
 class SDRoutingFullConfigParcelAPI(ParcelAPI):
-    def __init__(self, session: vManageSession, fp_id: str):
+    def __init__(self, session: ManagerSession, fp_id: str):
         self.session = session
         self.fp_id = fp_id
         self.endpoint = SDRoutingConfigurationFeatureProfile(session)

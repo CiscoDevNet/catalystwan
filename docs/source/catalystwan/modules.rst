@@ -1,4 +1,4 @@
-vManage-client
+Cisco Catalyst WAN SDK
 ==============
 
 .. toctree::

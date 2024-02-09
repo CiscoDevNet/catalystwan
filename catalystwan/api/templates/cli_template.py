@@ -17,7 +17,7 @@ from catalystwan.utils.template_type import TemplateType
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 
 @define
@@ -27,7 +27,7 @@ class CLITemplate:
     device_model: DeviceModel
     config: CiscoConfParse = CiscoConfParse([])
 
-    def load(self, session: vManageSession, id: str) -> CiscoConfParse:
+    def load(self, session: ManagerSession, id: str) -> CiscoConfParse:
         """Load CLI config from template.
         Args:
             id (str): The template id from which load config.
@@ -43,7 +43,7 @@ class CLITemplate:
         self.config = CiscoConfParse(config["templateConfiguration"].splitlines())
         return self.config
 
-    def load_running(self, session: vManageSession, device: Device) -> CiscoConfParse:
+    def load_running(self, session: ManagerSession, device: Device) -> CiscoConfParse:
         """Load running config from device.
 
         Args:
@@ -80,7 +80,7 @@ class CLITemplate:
             payload["draftMode"] = False
         return payload
 
-    def update(self, session: vManageSession, id: str, config: CiscoConfParse) -> bool:
+    def update(self, session: ManagerSession, id: str, config: CiscoConfParse) -> bool:
         """Update an existing cli template.
 
         Args:

@@ -11,7 +11,7 @@ from pydantic.v1 import BaseModel, Field
 
 from catalystwan.api.template_api import TemplatesAPI
 from catalystwan.api.templates.feature_template import FeatureTemplate
-from catalystwan.session import vManageSession
+from catalystwan.session import ManagerSession
 
 
 class MockedFeatureTemplate(FeatureTemplate):
@@ -107,13 +107,13 @@ class TestFeatureTemplate(TestCase):
             ("children_nested_datapath.json", None, mocked_feature_template_children_2),
         ]
     )
-    @patch("catalystwan.session.vManageSession")
+    @patch("catalystwan.session.ManagerSession")
     def test_get(
         self,
         filename: str,
         definition_name: Optional[str],
         mocked_template: Optional[FeatureTemplate],
-        mocked_session: vManageSession,
+        mocked_session: ManagerSession,
     ):
         # Arrange
         templates_api = TemplatesAPI(mocked_session)

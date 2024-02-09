@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, List, Optional
 from catalystwan.api.task_status_api import SubTaskData, Task
 
 if TYPE_CHECKING:
-    from catalystwan.session import vManageSession
+    from catalystwan.session import ManagerSession
 
 logger = logging.getLogger(__name__)
 
@@ -24,16 +24,16 @@ class TenantBackupRestoreAPI:
         Provider-as-tenant or tenant
 
     Attributes:
-        session (vManageSession): logged in API client session
+        session (ManagerSession): logged in API client session
 
     Example usage:
         from catalystwan.api.tenant_backup_restore_api import TenantBackupRestoreAPI
-        from catalystwan.session import create_vManageSession
+        from catalystwan.session import create_manager_session
 
 
-        tenant_session = create_vManageSession(
+        tenant_session = create_manager_session(
              tenant_domain, tenantadmin, password, port)
-        provider_tenant_session = create_vManageSession(
+        provider_tenant_session = create_manager_session(
             domain, admin, password, port, subdomain=tenant_domain)
 
         tenant_backup_restore = TenantBackupRestoreAPI(tenant_session)
@@ -47,7 +47,7 @@ class TenantBackupRestoreAPI:
         deleted_list = provider_backup_restore.delete_all()
     """
 
-    def __init__(self, session: vManageSession) -> None:
+    def __init__(self, session: ManagerSession) -> None:
         self.session = session
 
     def list(self) -> list:
