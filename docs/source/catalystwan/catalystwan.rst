@@ -1,6 +1,6 @@
 :tocdepth: 3
 
-Cisco Catalyst SD-WAN SDK package
+Cisco Catalyst WAN SDK package
 ======================
 
 Subpackages

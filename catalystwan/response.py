@@ -133,7 +133,7 @@ class JsonPayload:
             self.headers = json.get("headers", None)
 
 
-class vManageResponse(Response, APIEndpointClientResponse):
+class ManagerResponse(Response, APIEndpointClientResponse):
     """Extends Response object with methods specific to vManage.
     Object is meant to be created from aready received requests.Response"""
 
@@ -225,9 +225,9 @@ class vManageResponse(Response, APIEndpointClientResponse):
         return ErrorInfo(**self.payload.error)
 
 
-def with_vmanage_response(method: Callable[[Any], Response]) -> Callable[[Any], vManageResponse]:
+def with_vmanage_response(method: Callable[[Any], Response]) -> Callable[[Any], ManagerResponse]:
     @wraps(method)
-    def wrapper(*args, **kwargs) -> vManageResponse:
-        return vManageResponse(method(*args, **kwargs))
+    def wrapper(*args, **kwargs) -> ManagerResponse:
+        return ManagerResponse(method(*args, **kwargs))
 
     return wrapper

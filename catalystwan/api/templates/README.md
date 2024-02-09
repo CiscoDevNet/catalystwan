@@ -13,12 +13,12 @@ omp_vsmart = OMPvSmart(
 session.api.templates.create(omp_vsmart)
 ```
 
-## Add new Feature Template in Cisco Catalyst SD-WAN SDK
+## Add new Feature Template in Cisco Catalyst WAN SDK
 These steps will help you to automate feature template creation. We'll explain what to do and why, so everyone will have deep understanding how our templates work. In the example we will try to create `OMP` Feature Template for vSmart. 
 
 1. Get your template type name and version. 
     >Note: display name is not template type name!
-- For example, you could extract it from response body. Go to your vManage and create any template which you would like to automate in catalystwan. Send template creation request and check for `templateType` and `templateMinVersion` variable names. `OMP` (display name) for vSmart has `omp-vsmart` template type name.
+- For example, you could extract it from response body. Go to your Manager and create any template which you would like to automate in catalystwan. Send template creation request and check for `templateType` and `templateMinVersion` variable names. `OMP` (display name) for vSmart has `omp-vsmart` template type name.
 
 2. With corresponding `templateType` we are able to create new class which implements `FeatureTemplate` interface. Create new file in `catalystwan\api\templates\models\` and copy-paste the code and change name of the class with its type attribute.
 
@@ -65,7 +65,7 @@ These steps will help you to automate feature template creation. We'll explain w
 
 	`Template my_first_template (FeatureTemplate) was created successfully (7e56acdd-640e-45dc-9335-87abc697995f).`
 
-6. We can check whether our template is created sucessfully in vManage manually. If there is an error, please create an issue with error and try go to the 7th step.
+6. We can check whether our template is created sucessfully in Manager manually. If there is an error, please create an issue with error and try go to the 7th step.
    
 ### Custimize Feature Template fields.
 7. Run below code with already created session and changed corresponding variables.

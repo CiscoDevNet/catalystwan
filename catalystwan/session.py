@@ -18,14 +18,9 @@ from catalystwan.api.api_container import APIContainer
 from catalystwan.endpoints import APIEndpointClient
 from catalystwan.endpoints.client import AboutInfo, ServerInfo
 from catalystwan.endpoints.endpoints_container import APIEndpointContainter
-from catalystwan.exceptions import (
-    InvalidOperationError,
-    SessionNotCreatedError,
-    TenantSubdomainNotFound,
-    vManageClientError,
-)
+from catalystwan.exceptions import InvalidOperationError, ManagerError, SessionNotCreatedError, TenantSubdomainNotFound
 from catalystwan.models.tenant import Tenant
-from catalystwan.response import ErrorInfo, response_history_debug, vManageResponse
+from catalystwan.response import ErrorInfo, ManagerResponse, response_history_debug
 from catalystwan.utils.session_type import SessionType
 from catalystwan.version import NullVersion, parse_api_version
 from catalystwan.vmanage_auth import vManageAuth
@@ -34,10 +29,10 @@ JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
 USER_AGENT = f"{__package__}/{metadata.version(__package__)}"
 
 
-class vManageBadResponseError(vManageClientError):
+class vManageBadResponseError(ManagerError):
     """Indicates that vManage returned error HTTP status code other than 400."""
 
-    def __init__(self, error_info: Optional[ErrorInfo], response: vManageResponse):
+    def __init__(self, error_info: Optional[ErrorInfo], response: ManagerResponse):
         self.response = response
         self.info = error_info
         super().__init__(error_info)
@@ -149,20 +144,20 @@ def create_manager_session(
 
 
 class vManageResponseAdapter(Session):
-    def request(self, method, url, *args, **kwargs) -> vManageResponse:
-        return vManageResponse(super().request(method, url, *args, **kwargs))
+    def request(self, method, url, *args, **kwargs) -> ManagerResponse:
+        return ManagerResponse(super().request(method, url, *args, **kwargs))
 
-    def get(self, url, *args, **kwargs) -> vManageResponse:
-        return vManageResponse(super().get(url, *args, **kwargs))
+    def get(self, url, *args, **kwargs) -> ManagerResponse:
+        return ManagerResponse(super().get(url, *args, **kwargs))
 
-    def post(self, url, *args, **kwargs) -> vManageResponse:
-        return vManageResponse(super().post(url, *args, **kwargs))
+    def post(self, url, *args, **kwargs) -> ManagerResponse:
+        return ManagerResponse(super().post(url, *args, **kwargs))
 
-    def put(self, url, *args, **kwargs) -> vManageResponse:
-        return vManageResponse(super().put(url, *args, **kwargs))
+    def put(self, url, *args, **kwargs) -> ManagerResponse:
+        return ManagerResponse(super().put(url, *args, **kwargs))
 
-    def delete(self, url, *args, **kwargs) -> vManageResponse:
-        return vManageResponse(super().delete(url, *args, **kwargs))
+    def delete(self, url, *args, **kwargs) -> ManagerResponse:
+        return ManagerResponse(super().delete(url, *args, **kwargs))
 
 
 class ManagerSession(vManageResponseAdapter, APIEndpointClient):
@@ -215,7 +210,7 @@ class ManagerSession(vManageResponseAdapter, APIEndpointClient):
         self._platform_version: str = ""
         self._api_version: Version
 
-    def request(self, method, url, *args, **kwargs) -> vManageResponse:
+    def request(self, method, url, *args, **kwargs) -> ManagerResponse:
         full_url = self.get_full_url(url)
         try:
             response = super(ManagerSession, self).request(method, full_url, *args, **kwargs)
@@ -360,7 +355,7 @@ class ManagerSession(vManageResponseAdapter, APIEndpointClient):
         response = self.post(url_path)
         return response.json()["VSessionId"]
 
-    def logout(self) -> Optional[vManageResponse]:
+    def logout(self) -> Optional[ManagerResponse]:
         if isinstance((version := self.api_version), NullVersion):
             self.logger.warning("Cannot perform logout operation without known api_version.")
             return None
@@ -386,7 +381,7 @@ class ManagerSession(vManageResponseAdapter, APIEndpointClient):
         self.auth = auth
         self.verify = verify
 
-    def __is_jsession_updated(self, response: vManageResponse) -> bool:
+    def __is_jsession_updated(self, response: ManagerResponse) -> bool:
         if (jsessionid := response.cookies.get("JSESSIONID")) and isinstance(self.auth, vManageAuth):
             if jsessionid != self.auth.set_cookie.get("JSESSIONID"):
                 return True
