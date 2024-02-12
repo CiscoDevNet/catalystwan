@@ -25,7 +25,7 @@ class CLITemplate:
     template_name: str
     template_description: str
     device_model: DeviceModel
-    config: CiscoConfParse = CiscoConfParse([])
+    config: CiscoConfParse = CiscoConfParse([], factory=True)
 
     def load(self, session: ManagerSession, id: str) -> CiscoConfParse:
         """Load CLI config from template.
