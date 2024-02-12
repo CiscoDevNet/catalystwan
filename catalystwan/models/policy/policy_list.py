@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from catalystwan.models.policy.lists import AnyPolicyList
+from catalystwan.models.policy import AnyPolicyList
 from catalystwan.typed_list import DataSequence
 
 

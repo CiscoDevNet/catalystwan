@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Type, Union, overload
+from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Type, overload
 from uuid import UUID
 
 from catalystwan.api.task_status_api import Task
@@ -139,6 +139,7 @@ from catalystwan.endpoints.configuration.policy.vsmart_template import (
     VSmartConnectivityStatus,
 )
 from catalystwan.models.misc.application_protocols import ApplicationProtocol
+from catalystwan.models.policy import AnyPolicyDefinition, AnyPolicyList
 from catalystwan.models.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
 from catalystwan.models.policy.definitions.access_control_list import AclPolicy
 from catalystwan.models.policy.definitions.access_control_list_ipv6 import AclIPv6Policy
@@ -154,7 +155,6 @@ from catalystwan.models.policy.definitions.security_group import SecurityGroup
 from catalystwan.models.policy.definitions.vpn_membership import VPNMembershipPolicy
 from catalystwan.models.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy
 from catalystwan.models.policy.lists import (
-    AnyPolicyList,
     AppList,
     AppProbeClassList,
     ASPathList,
@@ -260,23 +260,6 @@ POLICY_DEFINITION_ENDPOINTS_MAP: Mapping[type, type] = {
     DeviceAccessPolicy: ConfigurationPolicyDeviceAccessDefinition,
     DeviceAccessIPv6Policy: ConfigurationPolicyDeviceAccessIPv6Definition,
 }
-
-AnyPolicyDefinition = Union[
-    RuleSet,
-    SecurityGroup,
-    ZoneBasedFWPolicy,
-    TrafficDataPolicy,
-    QoSMapPolicy,
-    RewritePolicy,
-    ControlPolicy,
-    VPNMembershipPolicy,
-    HubAndSpokePolicy,
-    MeshPolicy,
-    AclPolicy,
-    AclIPv6Policy,
-    DeviceAccessPolicy,
-    DeviceAccessIPv6Policy,
-]
 
 
 class CentralizedPolicyAPI:
