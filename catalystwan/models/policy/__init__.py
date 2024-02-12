@@ -1,5 +1,10 @@
 # This stub provide top-level "public" policy models and enums to be used with PolicyAPI()
 # TODO: explore model attribute access customization with https://peps.python.org/pep-0562/
+from typing import Union
+
+from pydantic import Field
+from typing_extensions import Annotated
+
 from .centralized import CentralizedPolicy as CentralizedPolicy
 from .centralized import TrafficDataDirectionEnum as TrafficDataDirectionEnum
 from .definitions.access_control_list import AclPolicy as AclPolicy
@@ -61,3 +66,58 @@ from .policy_definition import ServiceTypeEnum as ServiceTypeEnum
 from .policy_definition import TLOCActionEnum as TLOCActionEnum
 from .security import SecurityPolicy as SecurityPolicy
 from .security import UnifiedSecurityPolicy as UnifiedSecurityPolicy
+
+AnyPolicyDefinition = Annotated[
+    Union[
+        RuleSet,
+        SecurityGroup,
+        ZoneBasedFWPolicy,
+        TrafficDataPolicy,
+        QoSMapPolicy,
+        RewritePolicy,
+        ControlPolicy,
+        VPNMembershipPolicy,
+        HubAndSpokePolicy,
+        MeshPolicy,
+        AclPolicy,
+        AclIPv6Policy,
+        DeviceAccessPolicy,
+        DeviceAccessIPv6Policy,
+    ],
+    Field(discriminator="type"),
+]
+
+AnyPolicyList = Annotated[
+    Union[
+        AppList,
+        AppProbeClassList,
+        ASPathList,
+        ClassMapList,
+        ColorList,
+        CommunityList,
+        DataIPv6PrefixList,
+        DataPrefixList,
+        ExpandedCommunityList,
+        FQDNList,
+        GeoLocationList,
+        IPSSignatureList,
+        IPv6PrefixList,
+        LocalAppList,
+        LocalDomainList,
+        MirrorList,
+        PolicerList,
+        PortList,
+        PreferredColorGroupList,
+        PrefixList,
+        ProtocolNameList,
+        RegionList,
+        SiteList,
+        SLAClassList,
+        TLOCList,
+        URLBlackList,
+        URLWhiteList,
+        VPNList,
+        ZoneList,
+    ],
+    Field(discriminator="type"),
+]
