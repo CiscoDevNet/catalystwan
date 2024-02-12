@@ -1,9 +1,10 @@
 from enum import Enum
 from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, PrivateAttr
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
+from catalystwan.models.configuration.feature_profile.sdwan.policy_object.object_list_type import PolicyObjectListType
 
 
 class ColorType(str, Enum):
@@ -35,13 +36,14 @@ class Color(Global):
     value: ColorType
 
 
-class Entry(BaseModel):
+class ColorEntry(BaseModel):
     color: Color
 
 
-class Data(BaseModel):
-    entries: List[Entry]
+class ColorData(BaseModel):
+    entries: List[ColorEntry]
 
 
 class ColorPayload(_ParcelBase):
-    data: Data
+    _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.COLOR)
+    data: ColorData
