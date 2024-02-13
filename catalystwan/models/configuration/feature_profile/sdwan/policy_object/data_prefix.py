@@ -26,4 +26,4 @@ class DataPrefixData(BaseModel):
 
 class DataPrefixPayload(_ParcelBase):
     _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.DATA_PREFIX)
-    data = DataPrefixData
+    data: DataPrefixData

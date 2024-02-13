@@ -111,9 +111,9 @@ class SLAClassListEntry(BaseModel):
 
 
 class SLAClassData(BaseModel):
-    entries = List[SLAClassListEntry]
+    entries: List[SLAClassListEntry]
 
 
 class SLAClassPayload(_ParcelBase):
     _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.SLA_CLASS)
-    data = SLAClassData
+    data: SLAClassData

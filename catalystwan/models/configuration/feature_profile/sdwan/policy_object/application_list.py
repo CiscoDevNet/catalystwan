@@ -61,9 +61,9 @@ class ApplicationFamilyListEntry(BaseModel):
 
 
 class ApplicationListData(BaseModel):
-    entries = List[Union[ApplicationListEntry, ApplicationFamilyListEntry]]
+    entries: List[Union[ApplicationListEntry, ApplicationFamilyListEntry]]
 
 
 class ApplicationListPayload(_ParcelBase):
     _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.APP_LIST)
-    data = ApplicationListData
+    data: ApplicationListData
