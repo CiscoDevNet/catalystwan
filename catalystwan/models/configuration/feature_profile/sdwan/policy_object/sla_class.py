@@ -2,7 +2,7 @@ from enum import Enum
 from typing import List, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
+from pydantic import AliasPath, BaseModel, ConfigDict, Field, PrivateAttr
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object.object_list_type import PolicyObjectListType
@@ -24,10 +24,6 @@ class CriteriaEnum(str, Enum):
     LATENCY_JITTER_LOSS = "latency-jitter-loss"
     JITTER_LATENCY_LOSS = "jitter-latency-loss"
     JITTER_LOSS_LATENCY = "jitter-loss-latency"
-
-
-class Criteria(Global):
-    value: CriteriaEnum
 
 
 class Latency(Global):
@@ -54,18 +50,14 @@ class JitterVariance(Jitter):
     ...
 
 
-class AppProbeClassRefId(Global):
-    value: UUID
-
-
 class AppProbeClass(BaseModel):
-    ref_id: AppProbeClassRefId = Field(alias="refId")
+    ref_id: Global[UUID] = Field(serialization_alias="refId", validation_alias="refId")
 
 
 class FallbackBestTunnel(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    criteria: Criteria
+    criteria: Global[CriteriaEnum]
     jitter_variance: Optional[JitterVariance] = Field(
         default=None,
         alias="jitterVariance",
@@ -110,10 +102,6 @@ class SLAClassListEntry(BaseModel):
     fallback_best_tunnel: Optional[FallbackBestTunnel] = Field(default=None, alias="fallbackBestTunnel")
 
 
-class SLAClassData(BaseModel):
-    entries: List[SLAClassListEntry]
-
-
-class SLAClassPayload(_ParcelBase):
+class SLAClassParcel(_ParcelBase):
     _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.SLA_CLASS)
-    data: SLAClassData
+    entries: List[SLAClassListEntry] = Field(validation_alias=AliasPath("data", "entries"))

@@ -1,36 +1,34 @@
-from enum import Enum
 from typing import List, Union
 
-from pydantic import BaseModel, Field, PrivateAttr, model_validator
+from pydantic import AliasPath, BaseModel, ConfigDict, Field, PrivateAttr, model_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.color_list import ColorType
+from catalystwan.models.common import TLOCColorEnum
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object.object_list_type import PolicyObjectListType
-
-
-class PathPreferenceEnum(str, Enum):
-    DIRECT_PATH = "direct-path"
-    MULTI_HOP_PATH = "multi-hop-path"
-    ALL_PATHS = "all-paths"
-
-
-class ColorPreference(Global):
-    value: List[ColorType]
-
-
-class PathPreference(Global):
-    value: PathPreferenceEnum
+from catalystwan.models.policy.lists_entries import PathPreferenceEnum
 
 
 class Preference(BaseModel):
-    color_preference: ColorPreference = Field(alias="colorPreference")
-    path_preference: PathPreference = Field(alias="pathPreference")
+    model_config = ConfigDict(populate_by_name=True)
+    color_preference: Global[List[TLOCColorEnum]] = Field(
+        serialization_alias="colorPreference", validation_alias="colorPreference"
+    )
+    path_preference: Global[PathPreferenceEnum] = Field(
+        serialization_alias="pathPreference", validation_alias="pathPreference"
+    )
 
 
 class PreferredColorGroupEntry(BaseModel):
-    primary_preference: Preference = Field(alias="primaryPreference")
-    secondary_preference: Union[Preference, dict] = Field(default_factory=dict, alias="secondaryPreference")
-    tertiary_preference: Union[Preference, dict] = Field(default_factory=dict, alias="tertiaryPreference")
+    model_config = ConfigDict(populate_by_name=True)
+    primary_preference: Preference = Field(
+        serialization_alias="primaryPreference", validation_alias="primaryPreference"
+    )
+    secondary_preference: Union[Preference, None] = Field(
+        None, serialization_alias="secondaryPreference", validation_alias="secondaryPreference"
+    )
+    tertiary_preference: Union[Preference, None] = Field(
+        None, serialization_alias="tertiaryPreference", validation_alias="tertiaryPreference"
+    )
 
     @model_validator(mode="after")
     def check_passwords_match(self) -> "PreferredColorGroupEntry":
@@ -39,10 +37,6 @@ class PreferredColorGroupEntry(BaseModel):
         return self
 
 
-class PreferredColorGroupData(BaseModel):
-    entries: List[PreferredColorGroupEntry]
-
-
-class PreferredColorGroupPayload(_ParcelBase):
+class PreferredColorGroupParcel(_ParcelBase):
     _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.PREFERRED_COLOR_GROUP)
-    data: PreferredColorGroupData
+    entries: List[PreferredColorGroupEntry] = Field(validation_alias=AliasPath("data", "entries"))

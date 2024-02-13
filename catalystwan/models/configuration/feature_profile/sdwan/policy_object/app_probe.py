@@ -1,34 +1,31 @@
 from typing import List
 
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import AliasPath, BaseModel, ConfigDict, Field, PrivateAttr, field_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.color_list import ColorType
+from catalystwan.models.common import TLOCColorEnum
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object.object_list_type import PolicyObjectListType
 
 
-class Dscp(Global):
-    value: int = Field(ge=0, le=63)
-
-
 class MapItem(BaseModel):
-    color: ColorType
-    dscp: Dscp
+    color: TLOCColorEnum
+    dscp: Global[int]
 
-
-class ForwardingClassName(Global):
-    value: str = Field(description="Name of a chosen Forwarding Class")
+    @field_validator("dscp")
+    @classmethod
+    def check_rate(cls, dscp: Global):
+        assert 0 <= int(dscp.value) <= 63
+        return dscp
 
 
 class AppProbeEntry(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     map: List[MapItem]
-    forwarding_class_name: ForwardingClassName = Field(alias="forwardingClass")
+    forwarding_class_name: Global[str] = Field(
+        serialization_alias="forwardingClass", validation_alias="forwardingClass"
+    )
 
 
-class AppProbeData(BaseModel):
-    entries: List[AppProbeEntry]
-
-
-class AppProbePayload(_ParcelBase):
+class AppProbeParcel(_ParcelBase):
     _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.APP_PROBE)
-    data: AppProbeData
+    entries: List[AppProbeEntry] = Field(validation_alias=AliasPath("data", "entries"))

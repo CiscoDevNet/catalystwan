@@ -1,19 +1,22 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol
-from uuid import uuid4
+from typing import TYPE_CHECKING, Protocol, Union, overload
+from uuid import UUID
 
 if TYPE_CHECKING:
     from catalystwan.session import ManagerSession
 
 from catalystwan.api.parcel_api import SDRoutingFullConfigParcelAPI
 from catalystwan.endpoints.configuration.feature_profile.sdwan.policy_object import PolicyObjectFeatureProfile
-from catalystwan.endpoints.configuration_feature_profile import SDRoutingConfigurationFeatureProfile
+from catalystwan.endpoints.configuration_feature_profile import (
+    ConfigurationFeatureProfile,
+    SDRoutingConfigurationFeatureProfile,
+)
 from catalystwan.models.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
     FeatureProfileCreationResponse,
 )
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.payload_type import AnyPolicyObjectPayload
+from catalystwan.models.configuration.feature_profile.sdwan.policy_object.payload_type import AnyPolicyObjectParcel
 
 
 class SDRoutingFeatureProfilesAPI:
@@ -80,11 +83,30 @@ class PolicyObjectFeatureProfileAPI:
     def __init__(self, session: ManagerSession):
         self.session = session
         self.endpoint = PolicyObjectFeatureProfile(session)
+        self.configuration_feature_profile = ConfigurationFeatureProfile(session)
 
-    def create(self, payload: AnyPolicyObjectPayload) -> None:
+    @overload
+    def create(self, profile: UUID, payload: AnyPolicyObjectParcel) -> None:
+        ...
+
+    @overload
+    def create(self, profile: str, payload: AnyPolicyObjectParcel) -> None:
+        ...
+
+    def create(self, profile: Union[UUID, str], payload: AnyPolicyObjectParcel) -> None:
         """
-        Creates Policy Object based on list type
+        Creates Policy Object for selected profile based on payload type
         """
+
+        profile_id = profile
+        if isinstance(profile, str):
+            profile_id = (
+                self.configuration_feature_profile.get_sdwan_feature_profiles()
+                .filter(profile_name=profile)
+                .single_or_default()
+                .profile_id
+            )
+
         return self.endpoint.create(
-            policy_object_id=uuid4(), policy_object_list_type=payload._payload_endpoint.value, payload=payload
+            profile_id=profile_id, policy_object_list_type=payload._payload_endpoint.value, payload=payload
         )
