@@ -26,4 +26,4 @@ class IPv6DataPrefixData(BaseModel):
 
 class IPv6DataPrefixPayload(_ParcelBase):
     _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.DATA_IPV6_PREFIX)
-    data = IPv6DataPrefixData
+    data: IPv6DataPrefixData

@@ -45,4 +45,4 @@ class PreferredColorGroupData(BaseModel):
 
 class PreferredColorGroupPayload(_ParcelBase):
     _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.PREFERRED_COLOR_GROUP)
-    data = PreferredColorGroupData
+    data: PreferredColorGroupData
