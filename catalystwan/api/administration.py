@@ -5,6 +5,7 @@ from http import HTTPStatus
 from typing import TYPE_CHECKING, List, Union, cast, overload
 
 from requests import Response
+from typing_extensions import deprecated
 
 from catalystwan.dataclasses import (
     Certificate,
@@ -30,7 +31,7 @@ from catalystwan.endpoints.administration_user_and_group import (
     UserRole,
     UserUpdateRequest,
 )
-from catalystwan.exceptions import InvalidOperationError
+from catalystwan.exceptions import CatalystwanDeprecationWarning, InvalidOperationError
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.creation_tools import asdict, create_dataclass
 
@@ -341,6 +342,9 @@ class AdministrationSettingsAPI:
         response = self.session.put(url_path, data)
         return True if response.status_code == 200 else False
 
+    @deprecated(
+        "Use .endpoints.configuration_settings.get_organizations() instead", category=CatalystwanDeprecationWarning
+    )
     def get_organization(self) -> Organization:
         endpoint = "/dataservice/settings/configuration/organization"
 
@@ -408,6 +412,9 @@ class AdministrationSettingsAPI:
         endpoint = "/dataservice/settings/configuration/device"
         return self.session.post(endpoint, json=payload)
 
+    @deprecated(
+        "Use .endpoints.configuration_settings.edit_organizations() instead", category=CatalystwanDeprecationWarning
+    )
     def __update_organization(self, payload: dict) -> Response:
         endpoint = "/dataservice/settings/configuration/organization"
         del payload["controlConnectionUp"]

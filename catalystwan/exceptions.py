@@ -127,3 +127,26 @@ class TenantMigrationPreconditionsError(ManagerError):
     """Raised when preconditions for tenant migration fail"""
 
     pass
+
+
+class CatalystwanDeprecationWarning(DeprecationWarning):
+    """Warning issued when using deprecated features or functionality in the Catalystwan SDK.
+
+    This warning indicates that the current usage of certain features or functionality within the Catalystwan SDK
+    is deprecated and may be removed in future versions. It serves as a notice to developers to update their code
+    to use the recommended alternatives.
+    """
+
+    message: str
+
+    def __init__(self, message) -> None:
+        super().__init__(message)
+        self.message = message
+
+    def __str__(self) -> str:
+        message = (
+            f"{self.message}. Deprecated in catalystwan (0.y.z), will be removed in (1.y.z)."
+            f" Major version zero (0.y.z) is for initial development. Anything MAY change at any time."
+            f" The public API SHOULD NOT be considered stable."
+        )
+        return message
