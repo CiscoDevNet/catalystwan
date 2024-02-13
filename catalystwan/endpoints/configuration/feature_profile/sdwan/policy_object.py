@@ -5,7 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from catalystwan.endpoints import APIEndpoints, post, versions
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.payload_type import PolicyObjectPayload
+from catalystwan.models.configuration.feature_profile.sdwan.policy_object.payload_type import AnyPolicyObjectPayload
 
 
 class ParcelId(BaseModel):
@@ -15,7 +15,7 @@ class ParcelId(BaseModel):
 class PolicyObjectFeatureProfile(APIEndpoints):
     @versions(supported_versions=(">=20.13"), raises=False)
     @post("/v1/feature-profile/sdwan/policy-object/{policy_object_id}/{policy_object_list_type}")
-    def create(self, policy_object_id: UUID, policy_object_list_type: str, payload: PolicyObjectPayload) -> ParcelId:
+    def create(self, policy_object_id: UUID, policy_object_list_type: str, payload: AnyPolicyObjectPayload) -> ParcelId:
         ...
 
     # @versions(supported_versions=(">=20.13"), raises=False)

@@ -1,17 +1,12 @@
 from enum import Enum
 from ipaddress import IPv4Address
-from typing import Annotated, List, Optional, Union
+from typing import List, Optional
 
-from pydantic import BaseModel, Field, PrivateAttr
-from pydantic.functional_validators import AfterValidator
+from pydantic import BaseModel, Field, PrivateAttr, field_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object.color_list import ColorType
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object.object_list_type import PolicyObjectListType
-
-PreferenceValue = Annotated[
-    Union[str, int], AfterValidator(lambda value: value if isinstance(value, str) else str(value))
-]
 
 
 class Encapsulation(str, Enum):
@@ -20,7 +15,14 @@ class Encapsulation(str, Enum):
 
 
 class Preference(Global):
-    value: PreferenceValue = Field(ge=0, le=4_294_967_295)  # 2 ** 32 - 1
+    value: str = Field(description="Number in range 0-4294967295")  # 2 ** 32 - 1
+
+    @field_validator("value")
+    @classmethod
+    def ensure_correct_value(cls, v: str):
+        if 0 < int(v) < 4_294_967_295:
+            raise ValueError('"value" not in range 0 - 4 294 967 295 (2 ** 32 - 1)')
+        return v
 
 
 class TlocIPv4Address(Global):
