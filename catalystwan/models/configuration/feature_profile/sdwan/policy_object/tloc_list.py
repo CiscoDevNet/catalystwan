@@ -1,45 +1,31 @@
-from enum import Enum
 from ipaddress import IPv4Address
 from typing import List, Optional
 
-from pydantic import BaseModel, Field, PrivateAttr, field_validator
+from pydantic import AliasPath, BaseModel, ConfigDict, Field, PrivateAttr, field_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.color_list import ColorType
+from catalystwan.models.common import TLOCColorEnum
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object.object_list_type import PolicyObjectListType
+from catalystwan.models.policy.lists_entries import EncapEnum
 
 
-class Encapsulation(str, Enum):
-    IPSEC = "ipsec"
-    GRE = "gre"
+class TlocEntry(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+    tloc: Global[IPv4Address]
+    color: Global[TLOCColorEnum]
+    encapsulation: Global[EncapEnum] = Field(serialization_alias="encap", validation_alias="encap")
+    preference: Optional[Global[str]] = None
 
-
-class Preference(Global):
-    value: str = Field(description="Number in range 0-4294967295")  # 2 ** 32 - 1
-
-    @field_validator("value")
+    @field_validator("preference")
     @classmethod
-    def ensure_correct_value(cls, v: str):
-        if 0 < int(v) < 4_294_967_295:
+    def ensure_correct_preference_value(cls, v: Global):
+        if not v:
+            return v
+        if 0 < int(v.value) < 4_294_967_295:
             raise ValueError('"value" not in range 0 - 4 294 967 295 (2 ** 32 - 1)')
         return v
 
 
-class TlocIPv4Address(Global):
-    value: IPv4Address
-
-
-class TlocEntry(BaseModel):
-    tloc: TlocIPv4Address
-    color: ColorType
-    encapsulation: Encapsulation = Field(alias="encap")
-    preference: Optional[Preference] = None
-
-
-class TlocData(_ParcelBase):
-    entries: List[TlocEntry]
-
-
-class TlocPayload(BaseModel):
+class TlocParcel(_ParcelBase):
     _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.TLOC)
-    data: TlocData
+    entries: List[TlocEntry] = Field(validation_alias=AliasPath("data", "entries"))

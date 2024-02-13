@@ -20,6 +20,9 @@ class ProfileType(str, Enum):
     SYSTEM = "system"
     CLI = "cli"
     SERVICE = "service"
+    APPLICATION_PRIORITY = "application-priority"
+    POLICY_OBJECT = "policy-object"
+    EMBEDDED_SECURITY = "embedded-security"
 
 
 class FeatureProfileInfo(BaseModel):

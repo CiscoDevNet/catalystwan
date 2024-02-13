@@ -1,29 +1,18 @@
 from ipaddress import IPv6Address
 from typing import List
 
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import AliasPath, BaseModel, ConfigDict, Field, PrivateAttr
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object.object_list_type import PolicyObjectListType
 
 
-class Ipv6Address(Global):
-    value: IPv6Address
-
-
-class Ipv6PrefixLength(Global):
-    value: int
-
-
 class IPv6DataPrefixEntry(BaseModel):
-    ipv6_address: Ipv6Address = Field(alias="ipv6Address")
-    ipv6_prefix_length: Ipv6PrefixLength = Field(alias="ipv6PrefixLength")
+    model_config = ConfigDict(populate_by_name=True)
+    ipv6_address: Global[IPv6Address] = Field(serialization_alias="ipv6Address", validation_alias="ipv6Address")
+    ipv6_prefix_length: Global[int] = Field(serialization_alias="ipv6PrefixLength", validation_alias="ipv6PrefixLength")
 
 
-class IPv6DataPrefixData(BaseModel):
-    entries: List[IPv6DataPrefixEntry]
-
-
-class IPv6DataPrefixPayload(_ParcelBase):
+class IPv6DataPrefixParcel(_ParcelBase):
     _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.DATA_IPV6_PREFIX)
-    data: IPv6DataPrefixData
+    entries: List[IPv6DataPrefixEntry] = Field(validation_alias=AliasPath("data", "entries"))
