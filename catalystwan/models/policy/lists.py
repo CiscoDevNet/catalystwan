@@ -1,9 +1,8 @@
 from ipaddress import IPv4Address, IPv4Network, IPv6Network
-from typing import Any, List, Literal, Optional, Set, Tuple, Union
+from typing import Any, List, Literal, Optional, Set, Tuple
 from uuid import UUID
 
 from pydantic import BaseModel, Field
-from typing_extensions import Annotated
 
 from catalystwan.models.common import InterfaceTypeEnum, TLOCColorEnum, WellKnownBGPCommunitiesEnum
 from catalystwan.models.policy.lists_entries import (
@@ -329,39 +328,3 @@ class RegionList(PolicyListBase):
     def add_region_range(self, region_range: Tuple[int, int]):
         entry = RegionListEntry(region_id=f"{region_range[0]}-{region_range[1]}")
         self._add_entry(entry)
-
-
-AnyPolicyList = Annotated[
-    Union[
-        AppList,
-        AppProbeClassList,
-        ASPathList,
-        ClassMapList,
-        ColorList,
-        CommunityList,
-        DataIPv6PrefixList,
-        DataPrefixList,
-        ExpandedCommunityList,
-        FQDNList,
-        GeoLocationList,
-        IPSSignatureList,
-        IPv6PrefixList,
-        LocalAppList,
-        LocalDomainList,
-        MirrorList,
-        PolicerList,
-        PortList,
-        PreferredColorGroupList,
-        PrefixList,
-        ProtocolNameList,
-        RegionList,
-        SiteList,
-        SLAClassList,
-        TLOCList,
-        URLBlackList,
-        URLWhiteList,
-        VPNList,
-        ZoneList,
-    ],
-    Field(discriminator="type"),
-]
