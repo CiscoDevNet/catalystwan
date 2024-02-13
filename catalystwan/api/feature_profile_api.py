@@ -13,7 +13,7 @@ from catalystwan.models.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
     FeatureProfileCreationResponse,
 )
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.payload_type import PolicyObjectPayload
+from catalystwan.models.configuration.feature_profile.sdwan.policy_object.payload_type import AnyPolicyObjectPayload
 
 
 class SDRoutingFeatureProfilesAPI:
@@ -81,7 +81,7 @@ class PolicyObjectFeatureProfileAPI:
         self.session = session
         self.endpoint = PolicyObjectFeatureProfile(session)
 
-    def create(self, payload: PolicyObjectPayload) -> None:
+    def create(self, payload: AnyPolicyObjectPayload) -> None:
         """
         Creates Policy Object based on list type
         """

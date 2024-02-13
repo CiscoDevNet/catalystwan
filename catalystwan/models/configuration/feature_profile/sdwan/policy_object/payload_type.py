@@ -1,5 +1,8 @@
 from typing import Union
 
+from pydantic import Field
+from typing_extensions import Annotated
+
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object.app_probe import AppProbePayload
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object.application_list import ApplicationListPayload
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object.color_list import ColorPayload
@@ -18,18 +21,21 @@ from catalystwan.models.configuration.feature_profile.sdwan.policy_object.prefix
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object.sla_class import SLAClassPayload
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object.tloc_list import TlocPayload
 
-PolicyObjectPayload = Union[
-    AppProbePayload,
-    ApplicationListPayload,
-    ColorPayload,
-    DataPrefixPayload,
-    ExpandedCommunityPayload,
-    FowardingClassPayload,
-    IPv6DataPrefixPayload,
-    IPv6PrefixListPayload,
-    PrefixListPayload,
-    PolicierPayload,
-    PreferredColorGroupPayload,
-    SLAClassPayload,
-    TlocPayload,
+AnyPolicyObjectPayload = Annotated[
+    Union[
+        AppProbePayload,
+        ApplicationListPayload,
+        ColorPayload,
+        DataPrefixPayload,
+        ExpandedCommunityPayload,
+        FowardingClassPayload,
+        IPv6DataPrefixPayload,
+        IPv6PrefixListPayload,
+        PrefixListPayload,
+        PolicierPayload,
+        PreferredColorGroupPayload,
+        SLAClassPayload,
+        TlocPayload,
+    ],
+    Field(discriminator="type"),
 ]

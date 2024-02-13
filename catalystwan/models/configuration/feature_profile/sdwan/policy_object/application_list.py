@@ -48,7 +48,7 @@ class ApplicationList(Global):
     value: Union[str, ApplicationType]
 
 
-class ApplicationFamily(Global):
+class ApplicationFamilyList(Global):
     value: Union[str, AppliactionFamilyType]
 
 
@@ -57,11 +57,11 @@ class ApplicationListEntry(BaseModel):
 
 
 class ApplicationFamilyListEntry(BaseModel):
-    app_list_family: AppliactionFamilyType = Field(alias="appFamily")
+    app_list_family: ApplicationFamilyList = Field(alias="appFamily")
 
 
 class ApplicationListData(BaseModel):
-    entries = List[ApplicationListEntry]
+    entries = List[Union[ApplicationListEntry, ApplicationFamilyListEntry]]
 
 
 class ApplicationListPayload(_ParcelBase):
