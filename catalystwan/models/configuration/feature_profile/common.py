@@ -1,11 +1,11 @@
 from datetime import datetime
 from enum import Enum
 from typing import Generic, List, Literal, Optional, TypeVar, Union
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, as_global
-from catalystwan.models.common import UUID
 from catalystwan.models.configuration.common import Solution
 
 T = TypeVar("T")
@@ -73,9 +73,9 @@ class FeatureProfileCreationResponse(BaseModel):
 
 
 class ParcelCreationResponse(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(populate_by_name=True)
 
-    id: UUID = Field(alias="parcelId")
+    id: UUID = Field(serialization_alias="parcelId", validation_alias="parcelId")
 
 
 class ParcelType(str, Enum):

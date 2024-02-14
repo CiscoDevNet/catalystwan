@@ -1,16 +1,14 @@
 from typing import List, Union
 
-from pydantic import AliasPath, BaseModel, ConfigDict, Field, PrivateAttr, model_validator
+from pydantic import AliasPath, BaseModel, ConfigDict, Field, model_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
-from catalystwan.models.common import TLOCColorEnum
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.object_list_type import PolicyObjectListType
 from catalystwan.models.policy.lists_entries import PathPreferenceEnum
 
 
 class Preference(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-    color_preference: Global[List[TLOCColorEnum]] = Field(
+    color_preference: Global[list] = Field(  # [TLOCColorEnum]
         serialization_alias="colorPreference", validation_alias="colorPreference"
     )
     path_preference: Global[PathPreferenceEnum] = Field(
@@ -38,5 +36,4 @@ class PreferredColorGroupEntry(BaseModel):
 
 
 class PreferredColorGroupParcel(_ParcelBase):
-    _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.PREFERRED_COLOR_GROUP)
     entries: List[PreferredColorGroupEntry] = Field(validation_alias=AliasPath("data", "entries"))

@@ -2,10 +2,9 @@ from enum import Enum
 from typing import List, Optional, Union
 from uuid import UUID
 
-from pydantic import AliasPath, BaseModel, ConfigDict, Field, PrivateAttr
+from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.object_list_type import PolicyObjectListType
 
 
 class CriteriaEnum(str, Enum):
@@ -51,6 +50,8 @@ class JitterVariance(Jitter):
 
 
 class AppProbeClass(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     ref_id: Global[UUID] = Field(serialization_alias="refId", validation_alias="refId")
 
 
@@ -58,19 +59,22 @@ class FallbackBestTunnel(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     criteria: Global[CriteriaEnum]
-    jitter_variance: Optional[JitterVariance] = Field(
+    jitter_variance: Optional[Global[int]] = Field(
         default=None,
-        alias="jitterVariance",
+        serialization_alias="jitterVariance",
+        validation_alias="jitterVariance",
         description="jitter variance in ms",
     )
-    latency_variance: Optional[LatencyVariance] = Field(
+    latency_variance: Optional[Global[int]] = Field(
         default=None,
-        alias="latencyVariance",
+        serialization_alias="latencyVariance",
+        validation_alias="latencyVariance",
         description="latency variance in ms",
     )
-    loss_variance: Optional[LossVariance] = Field(
+    loss_variance: Optional[Global[int]] = Field(
         default=None,
-        alias="lossVariance",
+        serialization_alias="lossVariance",
+        validation_alias="lossVariance",
         description="loss variance as percentage",
     )
 
@@ -91,17 +95,56 @@ class FallbackBestTunnel(BaseModel):
             if e not in self.criteria.value:
                 raise ValueError(f"Criteria {e} is not in configured criteraias {self.criteria.value}")
 
+    @field_validator("latency_variance")
+    @classmethod
+    def check_latency(cls, latency: Global):
+        assert 1 <= latency.value <= 1000
+        return latency
+
+    @field_validator("loss_variance")
+    @classmethod
+    def check_loss(cls, loss: Global):
+        assert 0 <= loss.value <= 100
+        return loss
+
+    @field_validator("jitter_variance")
+    @classmethod
+    def check_jitter(cls, jitter: Global):
+        assert 1 <= jitter.value <= 1000
+        return jitter
+
 
 class SLAClassListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    latency: Optional[Latency] = None
-    loss: Optional[Loss] = None
-    jitter: Optional[Jitter] = None
-    app_probe_class: Optional[AppProbeClass] = Field(alias="appProbeClass")
-    fallback_best_tunnel: Optional[FallbackBestTunnel] = Field(default=None, alias="fallbackBestTunnel")
+    latency: Optional[Global[int]] = None
+    loss: Optional[Global[int]] = None
+    jitter: Optional[Global[int]] = None
+    app_probe_class: Optional[AppProbeClass] = Field(
+        validation_alias="appProbeClass", serialization_alias="appProbeClass"
+    )
+    fallback_best_tunnel: Optional[FallbackBestTunnel] = Field(
+        default=None, validation_alias="fallbackBestTunnel", serialization_alias="fallbackBestTunnel"
+    )
+
+    @field_validator("latency")
+    @classmethod
+    def check_latency(cls, latency: Global):
+        assert 1 <= latency.value <= 1000
+        return latency
+
+    @field_validator("loss")
+    @classmethod
+    def check_loss(cls, loss: Global):
+        assert 0 <= loss.value <= 100
+        return loss
+
+    @field_validator("jitter")
+    @classmethod
+    def check_jitter(cls, jitter: Global):
+        assert 1 <= jitter.value <= 1000
+        return jitter
 
 
 class SLAClassParcel(_ParcelBase):
-    _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.SLA_CLASS)
     entries: List[SLAClassListEntry] = Field(validation_alias=AliasPath("data", "entries"))

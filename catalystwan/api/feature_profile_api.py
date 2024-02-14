@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol, Union, overload
+from typing import TYPE_CHECKING, Protocol
 from uuid import UUID
 
 if TYPE_CHECKING:
@@ -8,15 +8,17 @@ if TYPE_CHECKING:
 
 from catalystwan.api.parcel_api import SDRoutingFullConfigParcelAPI
 from catalystwan.endpoints.configuration.feature_profile.sdwan.policy_object import PolicyObjectFeatureProfile
-from catalystwan.endpoints.configuration_feature_profile import (
-    ConfigurationFeatureProfile,
-    SDRoutingConfigurationFeatureProfile,
-)
+from catalystwan.endpoints.configuration_feature_profile import SDRoutingConfigurationFeatureProfile
 from catalystwan.models.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
     FeatureProfileCreationResponse,
+    FeatureProfileInfo,
+    ParcelCreationResponse,
 )
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.payload_type import AnyPolicyObjectParcel
+from catalystwan.models.configuration.feature_profile.sdwan.policy_object import (
+    PAYLOAD_ENDPOINT_MAPPING,
+    AnyPolicyObjectParcel,
+)
 
 
 class SDRoutingFeatureProfilesAPI:
@@ -83,30 +85,42 @@ class PolicyObjectFeatureProfileAPI:
     def __init__(self, session: ManagerSession):
         self.session = session
         self.endpoint = PolicyObjectFeatureProfile(session)
-        self.configuration_feature_profile = ConfigurationFeatureProfile(session)
 
-    @overload
-    def create(self, profile: UUID, payload: AnyPolicyObjectParcel) -> None:
-        ...
+    # def get(self, profile: FeatureProfileInfo,
+    #    get_by_type: AnyPolicyObjectParcel,
+    #    get_by_id: Union[UUID, None] = None):
+    #     if not get_by_id:
+    #         policy_object_list_type = PAYLOAD_ENDPOINT_MAPPING[get_by_type]
+    #         return self.endpoint.get_all(profile_id=profile.profile_id,
+    #    policy_object_list_type=policy_object_list_type)
 
-    @overload
-    def create(self, profile: str, payload: AnyPolicyObjectParcel) -> None:
-        ...
-
-    def create(self, profile: Union[UUID, str], payload: AnyPolicyObjectParcel) -> None:
+    def create(self, profile: FeatureProfileInfo, payload: AnyPolicyObjectParcel) -> ParcelCreationResponse:
         """
-        Creates Policy Object for selected profile based on payload type
+        Create Policy Object for selected profile based on payload type
         """
 
-        profile_id = profile
-        if isinstance(profile, str):
-            profile_id = (
-                self.configuration_feature_profile.get_sdwan_feature_profiles()
-                .filter(profile_name=profile)
-                .single_or_default()
-                .profile_id
-            )
-
+        profile_id = profile.profile_id
+        policy_object_list_type = PAYLOAD_ENDPOINT_MAPPING[type(payload)]
         return self.endpoint.create(
-            profile_id=profile_id, policy_object_list_type=payload._payload_endpoint.value, payload=payload
+            profile_id=profile_id, policy_object_list_type=policy_object_list_type, payload=payload
+        )
+
+    def update(self, profile: FeatureProfileInfo, payload: AnyPolicyObjectParcel, list_object_id: UUID):
+        """
+        Update Policy Object for selected profile based on payload type
+        """
+        profile_id = profile.profile_id
+        policy_type = PAYLOAD_ENDPOINT_MAPPING[type(payload)]
+        return self.endpoint.update(
+            profile_id=profile_id, policy_object_list_type=policy_type, list_object_id=list_object_id, payload=payload
+        )
+
+    def delete(self, profile: FeatureProfileInfo, policy_type: AnyPolicyObjectParcel, list_object_id: UUID):
+        """
+        Delete Policy Object for selected profile based on payload type
+        """
+        profile_id = profile.profile_id
+        policy_object_list_type = PAYLOAD_ENDPOINT_MAPPING[type(policy_type)]
+        return self.endpoint.delete(
+            profile_id=profile_id, policy_object_list_type=policy_object_list_type, list_object_id=list_object_id
         )
