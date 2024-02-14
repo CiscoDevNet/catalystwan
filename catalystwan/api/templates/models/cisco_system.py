@@ -2,7 +2,7 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from catalystwan.api.templates.device_variable import DeviceVariable
 from catalystwan.api.templates.feature_template import FeatureTemplate
@@ -52,21 +52,19 @@ class Type(str, Enum):
 
 class Tracker(BaseModel):
     name: str
-    endpoint_ip: str = Field(vmanage_key="endpoint-ip")
-    endpoint_ip_transport_port: str = Field(vmanage_key="endpoint-ip", data_path=["endpoint-ip-transport-port"])
-    protocol: Protocol = Field(data_path=["endpoint-ip-transport-port"])
-    port: int = Field(data_path=["endpoint-ip-transport-port"])
-    endpoint_dns_name: str = Field(vmanage_key="endpoint-dns-name")
-    endpoint_api_url: str = Field(vmanage_key="endpoint-api-url")
+    endpoint_ip: str = Field(json_schema_extra={'vmanage_key': 'endpoint-ip'})
+    endpoint_ip_transport_port: str = Field(json_schema_extra={'vmanage_key': 'endpoint-ip', 'data_path': ['endpoint-ip-transport-port']})
+    protocol: Protocol = Field(json_schema_extra={'data_path': ['endpoint-ip-transport-port']})
+    port: int = Field(json_schema_extra={'data_path': ['endpoint-ip-transport-port']})
+    endpoint_dns_name: str = Field(json_schema_extra={'vmanage_key': 'endpoint-dns-name'})
+    endpoint_api_url: str = Field(json_schema_extra={'vmanage_key': 'endpoint-api-url'})
     elements: List[str]
     boolean: Optional[Boolean] = Boolean.OR
     threshold: Optional[int] = 300
     interval: Optional[int] = 60
     multiplier: Optional[int] = 3
     type: Optional[Type] = Type.INTERFACE
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Object(BaseModel):
@@ -74,7 +72,7 @@ class Object(BaseModel):
 
 
 class ObjectTrack(BaseModel):
-    object_number: int = Field(vmanage_key="object-number")
+    object_number: int = Field(json_schema_extra={'vmanage_key': 'object-number'})
     interface: str
     sig: str
     ip: str
@@ -82,9 +80,7 @@ class ObjectTrack(BaseModel):
     vpn: int
     object: List[Object]
     boolean: Boolean
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Role(str, Enum):
@@ -93,11 +89,9 @@ class Role(str, Enum):
 
 
 class AffinityPerVrf(BaseModel):
-    affinity_group_number: Optional[int] = Field(vmanage_key="affinity-group-number")
-    vrf_range: Optional[str] = Field(vmanage_key="vrf-range")
-
-    class Config:
-        allow_population_by_field_name = True
+    affinity_group_number: Optional[int] = Field(json_schema_extra={'vmanage_key': 'affinity-group-number'})
+    vrf_range: Optional[str] = Field(json_schema_extra={'vmanage_key': 'vrf-range'})
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class EnableMrfMigration(str, Enum):
@@ -106,11 +100,9 @@ class EnableMrfMigration(str, Enum):
 
 
 class Vrf(BaseModel):
-    vrf_id: int = Field(vmanage_key="vrf-id")
-    gateway_preference: Optional[List[int]] = Field(vmanage_key="gateway-preference")
-
-    class Config:
-        allow_population_by_field_name = True
+    vrf_id: int = Field(json_schema_extra={'vmanage_key': 'vrf-id'})
+    gateway_preference: Optional[List[int]] = Field(json_schema_extra={'vmanage_key': 'gateway-preference'})
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class Epfr(str, Enum):
@@ -121,57 +113,51 @@ class Epfr(str, Enum):
 
 
 class CiscoSystemModel(FeatureTemplate, ConvertBoolToStringModel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    timezone: Optional[Timezone] = Field(data_path=["clock"])
-    hostname: str = Field(
-        default=DeviceVariable(name="system_host_name"), vmanage_key="host-name", validate_default=True
-    )
+    timezone: Optional[Timezone] = Field(json_schema_extra={'data_path': ['clock']})
+    hostname: str = Field(default=DeviceVariable(name="system_host_name"), validate_default=True, json_schema_extra={'vmanage_key': 'host-name'})
     location: Optional[str]
-    latitude: Optional[float] = Field(data_path=["gps-location"])
-    longitude: Optional[float] = Field(data_path=["gps-location"])
-    range: Optional[int] = Field(100, data_path=["gps-location", "geo-fencing"])
-    enable_fencing: Optional[bool] = Field(data_path=["gps-location", "geo-fencing"], vmanage_key="enable")
-    mobile_number: Optional[List[MobileNumber]] = Field(
-        vmanage_key="mobile-number", data_path=["gps-location", "geo-fencing", "sms"]
-    )
-    enable_sms: Optional[bool] = Field(False, data_path=["gps-location", "geo-fencing", "sms"], vmanage_key="enable")
-    device_groups: Optional[List[str]] = Field(vmanage_key="device-groups")
-    controller_group_list: Optional[List[int]] = Field(vmanage_key="controller-group-list")
-    system_ip: DeviceVariable = Field(default=DeviceVariable(name="system_system_ip"), vmanage_key="system-ip")
-    overlay_id: Optional[int] = Field(vmanage_key="overlay-id")
-    site_id: int = Field(default=DeviceVariable(name="system_site_id"), vmanage_key="site-id")
-    site_type: Optional[List[SiteType]] = Field(vmanage_key="site-type")
-    port_offset: Optional[int] = Field(vmanage_key="port-offset")
-    port_hop: Optional[bool] = Field(vmanage_key="port-hop")
-    control_session_pps: Optional[int] = Field(vmanage_key="control-session-pps")
-    track_transport: Optional[bool] = Field(vmanage_key="track-transport")
-    track_interface_tag: Optional[int] = Field(vmanage_key="track-interface-tag")
-    console_baud_rate: Optional[ConsoleBaudRate] = Field(vmanage_key="console-baud-rate")
-    max_omp_sessions: Optional[int] = Field(vmanage_key="max-omp-sessions")
-    multi_tenant: Optional[bool] = Field(vmanage_key="multi-tenant")
-    track_default_gateway: Optional[bool] = Field(vmanage_key="track-default-gateway")
-    admin_tech_on_failure: Optional[bool] = Field(vmanage_key="admin-tech-on-failure")
-    enable_tunnel: Optional[bool] = Field(vmanage_key="enable", data_path=["on-demand"])
-    idle_timeout: Optional[int] = Field(vmanage_key="idle-timeout")
-    on_demand_idle_timeout_min: Optional[int] = Field(vmanage_key="idle-timeout", data_path=["on-demand"])
+    latitude: Optional[float] = Field(json_schema_extra={'data_path': ['gps-location']})
+    longitude: Optional[float] = Field(json_schema_extra={'data_path': ['gps-location']})
+    range: Optional[int] = Field(100, json_schema_extra={'data_path': ['gps-location', 'geo-fencing']})
+    enable_fencing: Optional[bool] = Field(json_schema_extra={'data_path': ['gps-location', 'geo-fencing'], 'vmanage_key': 'enable'})
+    mobile_number: Optional[List[MobileNumber]] = Field(json_schema_extra={'vmanage_key': 'mobile-number', 'data_path': ['gps-location', 'geo-fencing', 'sms']})
+    enable_sms: Optional[bool] = Field(False, json_schema_extra={'data_path': ['gps-location', 'geo-fencing', 'sms'], 'vmanage_key': 'enable'})
+    device_groups: Optional[List[str]] = Field(json_schema_extra={'vmanage_key': 'device-groups'})
+    controller_group_list: Optional[List[int]] = Field(json_schema_extra={'vmanage_key': 'controller-group-list'})
+    system_ip: DeviceVariable = Field(default=DeviceVariable(name="system_system_ip"), json_schema_extra={'vmanage_key': 'system-ip'})
+    overlay_id: Optional[int] = Field(json_schema_extra={'vmanage_key': 'overlay-id'})
+    site_id: int = Field(default=DeviceVariable(name="system_site_id"), json_schema_extra={'vmanage_key': 'site-id'})
+    site_type: Optional[List[SiteType]] = Field(json_schema_extra={'vmanage_key': 'site-type'})
+    port_offset: Optional[int] = Field(json_schema_extra={'vmanage_key': 'port-offset'})
+    port_hop: Optional[bool] = Field(json_schema_extra={'vmanage_key': 'port-hop'})
+    control_session_pps: Optional[int] = Field(json_schema_extra={'vmanage_key': 'control-session-pps'})
+    track_transport: Optional[bool] = Field(json_schema_extra={'vmanage_key': 'track-transport'})
+    track_interface_tag: Optional[int] = Field(json_schema_extra={'vmanage_key': 'track-interface-tag'})
+    console_baud_rate: Optional[ConsoleBaudRate] = Field(json_schema_extra={'vmanage_key': 'console-baud-rate'})
+    max_omp_sessions: Optional[int] = Field(json_schema_extra={'vmanage_key': 'max-omp-sessions'})
+    multi_tenant: Optional[bool] = Field(json_schema_extra={'vmanage_key': 'multi-tenant'})
+    track_default_gateway: Optional[bool] = Field(json_schema_extra={'vmanage_key': 'track-default-gateway'})
+    admin_tech_on_failure: Optional[bool] = Field(json_schema_extra={'vmanage_key': 'admin-tech-on-failure'})
+    enable_tunnel: Optional[bool] = Field(json_schema_extra={'vmanage_key': 'enable', 'data_path': ['on-demand']})
+    idle_timeout: Optional[int] = Field(json_schema_extra={'vmanage_key': 'idle-timeout'})
+    on_demand_idle_timeout_min: Optional[int] = Field(json_schema_extra={'vmanage_key': 'idle-timeout', 'data_path': ['on-demand']})
     tracker: Optional[List[Tracker]]
-    object_track: Optional[List[ObjectTrack]] = Field(vmanage_key="object-track")
-    region_id: Optional[int] = Field(vmanage_key="region-id")
-    secondary_region: Optional[int] = Field(vmanage_key="secondary-region")
+    object_track: Optional[List[ObjectTrack]] = Field(json_schema_extra={'vmanage_key': 'object-track'})
+    region_id: Optional[int] = Field(json_schema_extra={'vmanage_key': 'region-id'})
+    secondary_region: Optional[int] = Field(json_schema_extra={'vmanage_key': 'secondary-region'})
     role: Optional[Role]
-    affinity_group_number: Optional[int] = Field(vmanage_key="affinity-group-number", data_path=["affinity-group"])
-    preference: Optional[List[int]] = Field(data_path=["affinity-group"])
-    preference_auto: Optional[bool] = Field(vmanage_key="preference-auto")
-    affinity_per_vrf: Optional[List[AffinityPerVrf]] = Field(vmanage_key="affinity-per-vrf")
-    transport_gateway: Optional[bool] = Field(vmanage_key="transport-gateway")
-    enable_mrf_migration: Optional[EnableMrfMigration] = Field(vmanage_key="enable-mrf-migration")
-    migration_bgp_community: Optional[int] = Field(vmanage_key="migration-bgp-community")
-    enable_management_region: Optional[bool] = Field(vmanage_key="enable-management-region")
+    affinity_group_number: Optional[int] = Field(json_schema_extra={'vmanage_key': 'affinity-group-number', 'data_path': ['affinity-group']})
+    preference: Optional[List[int]] = Field(json_schema_extra={'data_path': ['affinity-group']})
+    preference_auto: Optional[bool] = Field(json_schema_extra={'vmanage_key': 'preference-auto'})
+    affinity_per_vrf: Optional[List[AffinityPerVrf]] = Field(json_schema_extra={'vmanage_key': 'affinity-per-vrf'})
+    transport_gateway: Optional[bool] = Field(json_schema_extra={'vmanage_key': 'transport-gateway'})
+    enable_mrf_migration: Optional[EnableMrfMigration] = Field(json_schema_extra={'vmanage_key': 'enable-mrf-migration'})
+    migration_bgp_community: Optional[int] = Field(json_schema_extra={'vmanage_key': 'migration-bgp-community'})
+    enable_management_region: Optional[bool] = Field(json_schema_extra={'vmanage_key': 'enable-management-region'})
     vrf: Optional[List[Vrf]]
-    management_gateway: Optional[bool] = Field(vmanage_key="management-gateway")
+    management_gateway: Optional[bool] = Field(json_schema_extra={'vmanage_key': 'management-gateway'})
     epfr: Optional[Epfr]
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"

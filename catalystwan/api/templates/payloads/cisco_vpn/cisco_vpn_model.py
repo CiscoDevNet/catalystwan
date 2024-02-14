@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, List, Optional
 
 from attr import define, field  # type: ignore
-from pydantic.v1 import validator
+from pydantic.v1 import ConfigDict, validator
 
 from catalystwan.api.templates.feature_template import FeatureTemplate
 from catalystwan.api.templates.payloads.aaa.aaa_model import VpnType
@@ -67,6 +67,8 @@ class CiscoVPNModel(FeatureTemplate):
     ipv4route: List[IPv4Route] = []
     ipv6route: List[IPv6Route] = []
 
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
     @validator("vpn_id")
     def check_id(cls, v, values):
         if v not in [VpnType.VPN_TRANSPORT.value, VpnType.VPN_MANAGMENT.value]:
@@ -85,6 +87,4 @@ class CiscoVPNModel(FeatureTemplate):
         if self.vpn_id not in [0, 512]:
             self.generate_vpn_id(session=session)
         return super().generate_payload(session)
-
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)

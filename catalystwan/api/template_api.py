@@ -21,8 +21,8 @@ from catalystwan.api.templates.models.cisco_aaa_model import CiscoAAAModel
 from catalystwan.api.templates.models.cisco_banner_model import CiscoBannerModel
 from catalystwan.api.templates.models.cisco_bfd_model import CiscoBFDModel
 from catalystwan.api.templates.models.cisco_bgp_model import CiscoBGPModel
-from catalystwan.api.templates.models.cisco_logging_model import CiscoLoggingModel
-from catalystwan.api.templates.models.cisco_ntp_model import CiscoNTPModel
+# from catalystwan.api.templates.models.cisco_logging_model import CiscoLoggingModel
+# from catalystwan.api.templates.models.cisco_ntp_model import CiscoNTPModel
 from catalystwan.api.templates.models.cisco_omp_model import CiscoOMPModel
 from catalystwan.api.templates.models.cisco_ospf import CiscoOSPFModel
 from catalystwan.api.templates.models.cisco_ospfv3 import CiscoOspfv3Model
@@ -381,7 +381,7 @@ class TemplatesAPI:
         if self.is_created_by_generator(template):
             debug = False
             schema = self.get_feature_template_schema(template, debug)
-            payload = self.generate_feature_template_payload(template, schema, debug).dict(by_alias=True)
+            payload = self.generate_feature_template_payload(template, schema, debug).model_dump(by_alias=True)
         else:
             payload = json.loads(template.generate_payload(self.session))
 
@@ -506,8 +506,8 @@ class TemplatesAPI:
             CiscoAAAModel,
             CiscoBFDModel,
             CiscoBannerModel,
-            CiscoNTPModel,
-            CiscoLoggingModel,
+            # CiscoNTPModel,
+            # CiscoLoggingModel,
             CiscoOMPModel,
             OMPvSmart,
             SecurityvSmart,
@@ -540,7 +540,7 @@ class TemplatesAPI:
         payload = self.generate_feature_template_payload(template, schema, debug)
 
         endpoint = "/dataservice/template/feature"
-        response = self.session.post(endpoint, json=payload.dict(by_alias=True, exclude_none=True))
+        response = self.session.post(endpoint, json=payload.model_dump(by_alias=True, exclude_none=True))
 
         return response.json()["templateId"]
 
@@ -565,12 +565,23 @@ class TemplatesAPI:
             if field.key in template.device_specific_variables:
                 value = template.device_specific_variables[field.key]
             else:
-                for field_name, field_value in template.__fields__.items():
-                    if field.dataPath == field_value.field_info.extra.get("data_path", []) and (  # type: ignore
+                for field_name, field_value in template.model_fields.items():
+                    try:
+                        data_path = field_value.json_schema_extra.get("data_path", [])
+                    except AttributeError:
+                        data_path = []
+                    try:
+                        vmanage_key = field_value.json_schema_extra.get("vmanage_key")
+                    except AttributeError:
+                        vmanage_key = None
+                    if field.dataPath == data_path and (  # type: ignore
                         field.key == field_value.alias
-                        or field.key == field_value.field_info.extra.get("vmanage_key")  # type: ignore
+                        or field.key == vmanage_key  # type: ignore
                     ):
-                        priority_order = field_value.field_info.extra.get("priority_order")  # type: ignore
+                        try:
+                            priority_order = field_value.json_schema_extra.get("priority_order")  # type: ignore
+                        except:
+                            priority_order = None
                         value = getattr(template, field_name)
                         break
                 if value is None:
@@ -581,7 +592,7 @@ class TemplatesAPI:
 
         if debug:
             with open(f"payload_{template.type}.json", "w") as f:
-                f.write(json.dumps(payload.dict(by_alias=True), indent=4))
+                f.write(json.dumps(payload.model_dump(by_alias=True), indent=4))
 
         return payload
 

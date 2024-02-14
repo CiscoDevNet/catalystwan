@@ -3,8 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from pydantic.v1 import BaseModel, Field, validator
-from pydantic.v1.fields import ModelField  # type: ignore
+from pydantic import BaseModel, Field, field_validator
 
 from catalystwan.api.templates.device_variable import DeviceVariable
 from catalystwan.api.templates.feature_template import FeatureTemplate
@@ -73,7 +72,8 @@ class FeatureTemplateField(BaseModel):
     primaryKeys: List[str] = []
     children: List[FeatureTemplateField] = []
 
-    @validator("dataType", pre=True)
+    @field_validator("dataType", mode="before")
+    @classmethod
     def convert_data_type_to_dict(cls, value):
         if isinstance(value, str):
             return {"type": value}
@@ -110,7 +110,7 @@ class FeatureTemplateField(BaseModel):
                 vipObjectType=self.objectType,
                 vipVariableName=value.name,
             )
-            return nest_value_in_output(vip_variable.dict(by_alias=True, exclude_none=True))
+            return nest_value_in_output(vip_variable.model_dump(by_alias=True, exclude_none=True))
 
         else:
             if value is not None:
@@ -124,16 +124,17 @@ class FeatureTemplateField(BaseModel):
                             if current_path is None:
                                 current_path = []
                             obj: FeatureTemplate  # type: ignore
-                            model_field: ModelField = next(
+                            model_tuple = next(
                                 filter(
-                                    lambda f: f.field_info.extra.get("data_path", []) == child.dataPath
-                                    and (f.alias == child.key or f.field_info.extra.get("vmanage_key") == child.key),
-                                    obj.__fields__.values(),
-                                )
+                                    lambda f: f[1].json_schema_extra.get("data_path", []) == child.dataPath
+                                    and (f[1].alias == child.key or f[1].json_schema_extra.get("vmanage_key") == child.key),
+                                    obj.model_fields.items(),
+                                )   
                             )
-                            obj_value = getattr(obj, model_field.name)
-                            po = model_field.field_info.extra.get("priority_order")
-                            vip_type = model_field.field_info.extra.get("vip_type")
+                            model_field = model_tuple[1]
+                            obj_value = model_tuple[0]
+                            po = model_field.json_schema_extra.get("priority_order")
+                            vip_type = model_field.json_schema_extra.get("vip_type")
                             merge(
                                 child_payload,
                                 child.payload_scheme(

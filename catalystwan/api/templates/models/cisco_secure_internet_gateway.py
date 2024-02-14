@@ -3,7 +3,7 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from catalystwan.api.templates.feature_template import FeatureTemplate
 from catalystwan.utils.pydantic_validators import ConvertIPToStringModel
@@ -74,44 +74,38 @@ class PerfectForwardSecrecy(str, Enum):
 
 
 class Interface(ConvertIPToStringModel):
-    if_name: str = Field(vmanage_key="if-name")
+    if_name: str = Field(json_schema_extra={'vmanage_key': 'if-name'})
     auto: bool
     shutdown: bool
     description: Optional[str]
     unnumbered: bool = True
     address: Optional[ipaddress.IPv4Interface]
-    tunnel_source: ipaddress.IPv4Address = Field(vmanage_key="tunnel-source")
-    tunnel_source_interface: str = Field(vmanage_key="tunnel-source-interface")
-    tunnel_route_via: str = Field(vmanage_key="tunnel-route-via")
-    tunnel_destination: str = Field(vmanage_key="tunnel-destination")
+    tunnel_source: ipaddress.IPv4Address = Field(json_schema_extra={'vmanage_key': 'tunnel-source'})
+    tunnel_source_interface: str = Field(json_schema_extra={'vmanage_key': 'tunnel-source-interface'})
+    tunnel_route_via: str = Field(json_schema_extra={'vmanage_key': 'tunnel-route-via'})
+    tunnel_destination: str = Field(json_schema_extra={'vmanage_key': 'tunnel-destination'})
     application: Application = Application.SIG
-    tunnel_set: TunnelSet = Field(TunnelSet.SECURE_INTERNET_GATEWAY_UMBRELLA, vmanage_key="tunnel-set")
-    tunnel_dc_preference: TunnelDcPreference = Field(TunnelDcPreference.PRIMARY_DC, vmanage_key="tunnel-dc-preference")
-    tcp_mss_adjust: Optional[int] = Field(vmanage_key="tcp-mss-adjust")
+    tunnel_set: TunnelSet = Field(TunnelSet.SECURE_INTERNET_GATEWAY_UMBRELLA, json_schema_extra={'vmanage_key': 'tunnel-set'})
+    tunnel_dc_preference: TunnelDcPreference = Field(TunnelDcPreference.PRIMARY_DC, json_schema_extra={'vmanage_key': 'tunnel-dc-preference'})
+    tcp_mss_adjust: Optional[int] = Field(json_schema_extra={'vmanage_key': 'tcp-mss-adjust'})
     mtu: int = DEFAULT_INTERFACE_MTU
-    dpd_interval: Optional[int] = Field(DEFAULT_INTERFACE_DPD_INTERVAL, vmanage_key="dpd-interval")
-    dpd_retries: Optional[int] = Field(DEFAULT_INTERFACE_DPD_RETRIES, vmanage_key="dpd-retries")
-    ike_version: int = Field(DEFAULT_INTERFACE_IKE_VERSION, vmanage_key="ike-version")
-    pre_shared_secret: Optional[str] = Field(vmanage_key="pre-shared-secret")
-    ike_rekey_interval: Optional[int] = Field(DEFAULT_INTERFACE_IKE_REKEY_INTERVAL, vmanage_key="ike-rekey-interval")
-    ike_ciphersuite: Optional[IkeCiphersuite] = Field(IkeCiphersuite.AES256_CBC_SHA1, vmanage_key="ike-ciphersuite")
-    ike_group: IkeGroup = Field(IkeGroup.FOURTEEN, vmanage_key="ike-group")
-    pre_shared_key_dynamic: bool = Field(True, vmanage_key="pre-shared-key-dynamic")
-    ike_local_id: Optional[str] = Field(vmanage_key="ike-local-id")
-    ike_remote_id: Optional[str] = Field(vmanage_key="ike-remote-id")
-    ipsec_rekey_interval: Optional[int] = Field(
-        DEFAULT_INTERFACE_IPSEC_REKEY_INTERVAL, vmanage_key="ipsec-rekey-interval"
-    )
-    ipsec_replay_window: Optional[int] = Field(DEFAULT_INTERFACE_IPSEC_REPLAY_WINDOW, vmanage_key="ipsec-replay-window")
-    ipsec_ciphersuite: IpsecCiphersuite = Field(IpsecCiphersuite.AES256_GCM, vmanage_key="ipsec-ciphersuite")
-    perfect_forward_secrecy: PerfectForwardSecrecy = Field(
-        PerfectForwardSecrecy.NONE, vmanage_key="perfect-forward-secrecy"
-    )
+    dpd_interval: Optional[int] = Field(DEFAULT_INTERFACE_DPD_INTERVAL, json_schema_extra={'vmanage_key': 'dpd-interval'})
+    dpd_retries: Optional[int] = Field(DEFAULT_INTERFACE_DPD_RETRIES, json_schema_extra={'vmanage_key': 'dpd-retries'})
+    ike_version: int = Field(DEFAULT_INTERFACE_IKE_VERSION, json_schema_extra={'vmanage_key': 'ike-version'})
+    pre_shared_secret: Optional[str] = Field(json_schema_extra={'vmanage_key': 'pre-shared-secret'})
+    ike_rekey_interval: Optional[int] = Field(DEFAULT_INTERFACE_IKE_REKEY_INTERVAL, json_schema_extra={'vmanage_key': 'ike-rekey-interval'})
+    ike_ciphersuite: Optional[IkeCiphersuite] = Field(IkeCiphersuite.AES256_CBC_SHA1, json_schema_extra={'vmanage_key': 'ike-ciphersuite'})
+    ike_group: IkeGroup = Field(IkeGroup.FOURTEEN, json_schema_extra={'vmanage_key': 'ike-group'})
+    pre_shared_key_dynamic: bool = Field(True, json_schema_extra={'vmanage_key': 'pre-shared-key-dynamic'})
+    ike_local_id: Optional[str] = Field(json_schema_extra={'vmanage_key': 'ike-local-id'})
+    ike_remote_id: Optional[str] = Field(json_schema_extra={'vmanage_key': 'ike-remote-id'})
+    ipsec_rekey_interval: Optional[int] = Field(DEFAULT_INTERFACE_IPSEC_REKEY_INTERVAL, json_schema_extra={'vmanage_key': 'ipsec-rekey-interval'})
+    ipsec_replay_window: Optional[int] = Field(DEFAULT_INTERFACE_IPSEC_REPLAY_WINDOW, json_schema_extra={'vmanage_key': 'ipsec-replay-window'})
+    ipsec_ciphersuite: IpsecCiphersuite = Field(IpsecCiphersuite.AES256_GCM, json_schema_extra={'vmanage_key': 'ipsec-ciphersuite'})
+    perfect_forward_secrecy: PerfectForwardSecrecy = Field(PerfectForwardSecrecy.NONE, json_schema_extra={'vmanage_key': 'perfect-forward-secrecy'})
     tracker: Optional[bool]
-    track_enable: Optional[bool] = Field(True, vmanage_key="track-enable")
-
-    class Config:
-        allow_population_by_field_name = True
+    track_enable: Optional[bool] = Field(True, json_schema_extra={'vmanage_key': 'track-enable'})
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class SvcType(str, Enum):
@@ -119,17 +113,11 @@ class SvcType(str, Enum):
 
 
 class InterfacePair(BaseModel):
-    active_interface: str = Field(vmanage_key="active-interface")
-    active_interface_weight: int = Field(
-        DEFAULT_INTERFACE_PAIR_ACTIVE_INTERFACE_WEIGHT, vmanage_key="active-interface-weight"
-    )
-    backup_interface: Optional[str] = Field("None", vmanage_key="backup-interface")
-    backup_interface_weight: int = Field(
-        DEFAULT_INTERFACE_PAIR_BACKUP_INTERFACE_WEIGHT, vmanage_key="backup-interface-weight"
-    )
-
-    class Config:
-        allow_population_by_field_name = True
+    active_interface: str = Field(json_schema_extra={'vmanage_key': 'active-interface'})
+    active_interface_weight: int = Field(DEFAULT_INTERFACE_PAIR_ACTIVE_INTERFACE_WEIGHT, json_schema_extra={'vmanage_key': 'active-interface-weight'})
+    backup_interface: Optional[str] = Field("None", json_schema_extra={'vmanage_key': 'backup-interface'})
+    backup_interface_weight: int = Field(DEFAULT_INTERFACE_PAIR_BACKUP_INTERFACE_WEIGHT, json_schema_extra={'vmanage_key': 'backup-interface-weight'})
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class DisplayTimeUnit(str, Enum):
@@ -145,30 +133,28 @@ class RefreshTimeUnit(str, Enum):
 
 
 class Service(BaseModel):
-    svc_type: SvcType = Field(SvcType.SIG, vmanage_key="svc-type")
-    interface_pair: List[InterfacePair] = Field(vmanage_key="interface-pair")
-    auth_required: Optional[bool] = Field(False, vmanage_key="auth-required")
-    xff_forward_enabled: Optional[bool] = Field(False, vmanage_key="xff-forward-enabled")
-    ofw_enabled: Optional[bool] = Field(False, vmanage_key="ofw-enabled")
-    ips_control: Optional[bool] = Field(False, vmanage_key="ips-control")
-    caution_enabled: Optional[bool] = Field(False, vmanage_key="caution-enabled")
-    primary_data_center: Optional[str] = Field("Auto", vmanage_key="primary-data-center")
-    secondary_data_center: Optional[str] = Field("Auto", vmanage_key="secondary-data-center")
+    svc_type: SvcType = Field(SvcType.SIG, json_schema_extra={'vmanage_key': 'svc-type'})
+    interface_pair: List[InterfacePair] = Field(json_schema_extra={'vmanage_key': 'interface-pair'})
+    auth_required: Optional[bool] = Field(False, json_schema_extra={'vmanage_key': 'auth-required'})
+    xff_forward_enabled: Optional[bool] = Field(False, json_schema_extra={'vmanage_key': 'xff-forward-enabled'})
+    ofw_enabled: Optional[bool] = Field(False, json_schema_extra={'vmanage_key': 'ofw-enabled'})
+    ips_control: Optional[bool] = Field(False, json_schema_extra={'vmanage_key': 'ips-control'})
+    caution_enabled: Optional[bool] = Field(False, json_schema_extra={'vmanage_key': 'caution-enabled'})
+    primary_data_center: Optional[str] = Field("Auto", json_schema_extra={'vmanage_key': 'primary-data-center'})
+    secondary_data_center: Optional[str] = Field("Auto", json_schema_extra={'vmanage_key': 'secondary-data-center'})
     ip: Optional[bool]
-    idle_time: Optional[int] = Field(DEFAULT_SERVICE_IDLE_TIME, vmanage_key="idle-time")
-    display_time_unit: Optional[DisplayTimeUnit] = Field(DisplayTimeUnit.MINUTE, vmanage_key="display-time-unit")
-    ip_enforced_for_known_browsers: Optional[bool] = Field(False, vmanage_key="ip-enforced-for-known-browsers")
-    refresh_time: Optional[int] = Field(DEFAULT_SERVICE_REFRESH_TIME, vmanage_key="refresh-time")
-    refresh_time_unit: Optional[RefreshTimeUnit] = Field(RefreshTimeUnit.MINUTE, vmanage_key="refresh-time-unit")
+    idle_time: Optional[int] = Field(DEFAULT_SERVICE_IDLE_TIME, json_schema_extra={'vmanage_key': 'idle-time'})
+    display_time_unit: Optional[DisplayTimeUnit] = Field(DisplayTimeUnit.MINUTE, json_schema_extra={'vmanage_key': 'display-time-unit'})
+    ip_enforced_for_known_browsers: Optional[bool] = Field(False, json_schema_extra={'vmanage_key': 'ip-enforced-for-known-browsers'})
+    refresh_time: Optional[int] = Field(DEFAULT_SERVICE_REFRESH_TIME, json_schema_extra={'vmanage_key': 'refresh-time'})
+    refresh_time_unit: Optional[RefreshTimeUnit] = Field(RefreshTimeUnit.MINUTE, json_schema_extra={'vmanage_key': 'refresh-time-unit'})
     enabled: Optional[bool]
-    block_internet_until_accepted: Optional[bool] = Field(False, vmanage_key="block-internet-until-accepted")
-    force_ssl_inspection: Optional[bool] = Field(False, vmanage_key="force-ssl-inspection")
+    block_internet_until_accepted: Optional[bool] = Field(False, json_schema_extra={'vmanage_key': 'block-internet-until-accepted'})
+    force_ssl_inspection: Optional[bool] = Field(False, json_schema_extra={'vmanage_key': 'force-ssl-inspection'})
     timeout: Optional[int]
-    data_center_primary: Optional[str] = Field("Auto", vmanage_key="data-center-primary")
-    data_center_secondary: Optional[str] = Field("Auto", vmanage_key="data-center-secondary")
-
-    class Config:
-        allow_population_by_field_name = True
+    data_center_primary: Optional[str] = Field("Auto", json_schema_extra={'vmanage_key': 'data-center-primary'})
+    data_center_secondary: Optional[str] = Field("Auto", json_schema_extra={'vmanage_key': 'data-center-secondary'})
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class TrackerType(str, Enum):
@@ -177,25 +163,21 @@ class TrackerType(str, Enum):
 
 class Tracker(BaseModel):
     name: str
-    endpoint_api_url: str = Field(vmanage_key="endpoint-api-url")
+    endpoint_api_url: str = Field(json_schema_extra={'vmanage_key': 'endpoint-api-url'})
     threshold: Optional[int] = DEFAULT_TRACKER_THRESHOLD
     interval: Optional[int] = DEFAULT_TRACKER_INTERVAL
     multiplier: Optional[int] = DEFAULT_TRACKER_MULTIPLIER
-    tracker_type: TrackerType = Field(vmanage_key="tracker-type")
-
-    class Config:
-        allow_population_by_field_name = True
+    tracker_type: TrackerType = Field(json_schema_extra={'vmanage_key': 'tracker-type'})
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class CiscoSecureInternetGatewayModel(FeatureTemplate, ConvertIPToStringModel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    vpn_id: int = Field(DEFAULT_SIG_VPN_ID, vmanage_key="vpn-id")
+    vpn_id: int = Field(DEFAULT_SIG_VPN_ID, json_schema_extra={'vmanage_key': 'vpn-id'})
     interface: List[Interface]
     service: List[Service]
-    tracker_src_ip: ipaddress.IPv4Interface = Field(vmanage_key="tracker-src-ip")
+    tracker_src_ip: ipaddress.IPv4Interface = Field(json_schema_extra={'vmanage_key': 'tracker-src-ip'})
     tracker: Optional[List[Tracker]]
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
