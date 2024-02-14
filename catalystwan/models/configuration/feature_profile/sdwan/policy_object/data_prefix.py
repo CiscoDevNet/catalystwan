@@ -1,10 +1,9 @@
 from ipaddress import IPv4Address
 from typing import List
 
-from pydantic import AliasPath, BaseModel, ConfigDict, Field, PrivateAttr
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.object_list_type import PolicyObjectListType
 
 
 class DataPrefixEntry(BaseModel):
@@ -14,5 +13,4 @@ class DataPrefixEntry(BaseModel):
 
 
 class DataPrefixParcel(_ParcelBase):
-    _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.DATA_PREFIX)
     entries: List[DataPrefixEntry] = Field(validation_alias=AliasPath("data", "entries"))

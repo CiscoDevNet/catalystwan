@@ -2,20 +2,17 @@
 # flake8: noqa
 from uuid import UUID
 
-from pydantic import BaseModel, Field
-
-from catalystwan.endpoints import APIEndpoints, post, versions
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.payload_type import AnyPolicyObjectParcel
-
-
-class ParcelId(BaseModel):
-    parcel_id: UUID = Field(alias="parcelId")
+from catalystwan.endpoints import APIEndpoints, delete, post, put, versions
+from catalystwan.models.configuration.feature_profile.common import ParcelCreationResponse
+from catalystwan.models.configuration.feature_profile.sdwan.policy_object import AnyPolicyObjectParcel
 
 
 class PolicyObjectFeatureProfile(APIEndpoints):
     @versions(supported_versions=(">=20.13"), raises=False)
     @post("/v1/feature-profile/sdwan/policy-object/{profile_id}/{policy_object_list_type}")
-    def create(self, profile_id: UUID, policy_object_list_type: str, payload: AnyPolicyObjectParcel) -> ParcelId:
+    def create(
+        self, profile_id: UUID, policy_object_list_type: str, payload: AnyPolicyObjectParcel
+    ) -> ParcelCreationResponse:
         ...
 
     # @versions(supported_versions=(">=20.13"), raises=False)
@@ -23,12 +20,10 @@ class PolicyObjectFeatureProfile(APIEndpoints):
     # def create_security_profile_parcel(self, policy_object_id: UUID, security_object_list_type: SecurityPolicyObjectListType):
     #     ...
 
-    # @versions(supported_versions=(">=20.13"), raises=False)
-    # @delete("/v1/feature-profile/sdwan/policy-object/{policy_object_id}/{policy_object_list_type}/{list_object_id}")
-    # def delete_data_prefix_profile_parcel_for_policy_object(
-    #     self, policy_object_id: UUID, policy_object_list_type: PolicyObjectListType, list_object_id: UUID
-    # ):
-    #     ...
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @delete("/v1/feature-profile/sdwan/policy-object/{profile_id}/{policy_object_list_type}/{list_object_id}")
+    def delete(self, profile_id: UUID, policy_object_list_type: str, list_object_id: UUID) -> None:
+        ...
 
     # @versions(supported_versions=(">=20.13"), raises=False)
     # @delete(
@@ -39,12 +34,12 @@ class PolicyObjectFeatureProfile(APIEndpoints):
     # ):
     #     ...
 
-    # @versions(supported_versions=(">=20.13"), raises=False)
-    # @put("/v1/feature-profile/sdwan/policy-object/{policy_object_id}/{policy_object_list_type}/{list_object_id}")
-    # def edit_data_prefix_profile_parcel_for_policy_object(
-    #     self, policy_object_id: UUID, policy_object_list_type: PolicyObjectListType, list_object_id: UUID
-    # ):
-    #     ...
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @put("/v1/feature-profile/sdwan/policy-object/{profile_id}/{policy_object_list_type}/{list_object_id}")
+    def update(
+        self, profile_id: UUID, policy_object_list_type: str, list_object_id: UUID, payload: AnyPolicyObjectParcel
+    ) -> ParcelCreationResponse:
+        ...
 
     # @versions(supported_versions=(">=20.13"), raises=False)
     # @put(
@@ -64,7 +59,7 @@ class PolicyObjectFeatureProfile(APIEndpoints):
 
     # @versions(supported_versions=(">=20.13"), raises=False)
     # @get("/v1/feature-profile/sdwan/policy-object/{policy_object_id}/{policy_object_list_type}")
-    # def get_data_prefix_profile_parcel_for_policy_object(self, policy_object_id: UUID, policy_object_list_type: PolicyObjectListType):
+    # def get_all(self, profile_id: UUID, policy_object_list_type: str):
     #     ...
 
     # @versions(supported_versions=(">=20.13"), raises=False)

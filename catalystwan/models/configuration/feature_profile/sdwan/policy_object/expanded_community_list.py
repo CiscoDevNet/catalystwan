@@ -1,15 +1,16 @@
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import AliasPath, ConfigDict, Field, field_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.object_list_type import PolicyObjectListType
-
-
-class ExpandedCommunityListData(BaseModel):
-    expanded_community_list: Global[str] = Field(
-        serialization_alias="expandedCommunityList", validation_alias="expandedCommunityList"
-    )
 
 
 class ExpandedCommunityParcel(_ParcelBase):
-    _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.EXPANDED_COMMUNITY)
-    data: ExpandedCommunityListData
+    model_config = ConfigDict(populate_by_name=True)
+    expandedCommunityList: Global[list] = Field(
+        serialization_alias="expandedCommunityList", validation_alias=AliasPath("data", "expandedCommunityList")
+    )
+
+    @field_validator("expandedCommunityList")
+    @classmethod
+    def check_rate(cls, expanded_community_list: Global):
+        assert all([isinstance(ec, str) for ec in expanded_community_list.value])
+        return expanded_community_list

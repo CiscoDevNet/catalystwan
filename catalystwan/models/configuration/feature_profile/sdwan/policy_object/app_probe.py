@@ -1,14 +1,13 @@
 from typing import List
 
-from pydantic import AliasPath, BaseModel, ConfigDict, Field, PrivateAttr, field_validator
+from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
 from catalystwan.models.common import TLOCColorEnum
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.object_list_type import PolicyObjectListType
 
 
 class MapItem(BaseModel):
-    color: TLOCColorEnum
+    color: Global[TLOCColorEnum]
     dscp: Global[int]
 
     @field_validator("dscp")
@@ -27,5 +26,4 @@ class AppProbeEntry(BaseModel):
 
 
 class AppProbeParcel(_ParcelBase):
-    _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.APP_PROBE)
     entries: List[AppProbeEntry] = Field(validation_alias=AliasPath("data", "entries"))

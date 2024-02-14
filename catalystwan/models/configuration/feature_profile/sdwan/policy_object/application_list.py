@@ -1,9 +1,8 @@
 from typing import List, Union
 
-from pydantic import AliasPath, BaseModel, ConfigDict, Field, PrivateAttr
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.object_list_type import PolicyObjectListType
 
 
 class ApplicationListEntry(BaseModel):
@@ -17,7 +16,6 @@ class ApplicationFamilyListEntry(BaseModel):
 
 
 class ApplicationListParcel(_ParcelBase):
-    _payload_endpoint: PolicyObjectListType = PrivateAttr(default=PolicyObjectListType.APP_LIST)
     entries: List[Union[ApplicationListEntry, ApplicationFamilyListEntry]] = Field(
         validation_alias=AliasPath("data", "entries")
     )

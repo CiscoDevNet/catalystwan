@@ -19,6 +19,9 @@ from catalystwan.models.configuration.feature_profile.sdwan.policy_object.prefer
 )
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object.prefix_list import PrefixListParcel
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object.sla_class import SLAClassParcel
+from catalystwan.models.configuration.feature_profile.sdwan.policy_object.standard_community import (
+    StandardCommunityParcel,
+)
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object.tloc_list import TlocParcel
 
 AnyPolicyObjectParcel = Annotated[
@@ -36,6 +39,24 @@ AnyPolicyObjectParcel = Annotated[
         PreferredColorGroupParcel,
         SLAClassParcel,
         TlocParcel,
+        StandardCommunityParcel,
     ],
     Field(discriminator="type"),
 ]
+
+PAYLOAD_ENDPOINT_MAPPING = {
+    AppProbeParcel: "app-probe",
+    ApplicationListParcel: "app-list",
+    ColorParcel: "color",
+    DataPrefixParcel: "data-prefix",
+    ExpandedCommunityParcel: "expanded-community",
+    FowardingClassParcel: "class",
+    IPv6DataPrefixParcel: "data-ipv6-prefix",
+    IPv6PrefixListParcel: "ipv6-prefix",
+    PrefixListParcel: "prefix",
+    PolicierParcel: "policer",
+    PreferredColorGroupParcel: "preferred-color-group",
+    SLAClassParcel: "sla-class",
+    TlocParcel: "tloc",
+    StandardCommunityParcel: "standard-community",
+}
