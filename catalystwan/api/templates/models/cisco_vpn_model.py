@@ -13,13 +13,13 @@ class Role(str, Enum):
 
 
 class Dns(BaseModel):
-    dns_addr: str = Field(json_schema_extra={'vmanage_key': 'dns-addr'})
+    dns_addr: str = Field(json_schema_extra={"vmanage_key": "dns-addr"})
     role: Role = Role.PRIMARY
     model_config = ConfigDict(populate_by_name=True)
 
 
 class DnsIpv6(BaseModel):
-    dns_addr: str = Field(json_schema_extra={'vmanage_key': 'dns-addr'})
+    dns_addr: str = Field(json_schema_extra={"vmanage_key": "dns-addr"})
     role: Optional[Role] = Role.PRIMARY
     model_config = ConfigDict(populate_by_name=True)
 
@@ -42,10 +42,10 @@ class SvcType(str, Enum):
 
 
 class Service(BaseModel):
-    svc_type: SvcType = Field(json_schema_extra={'vmanage_key': 'svc-type'})
+    svc_type: SvcType = Field(json_schema_extra={"vmanage_key": "svc-type"})
     address: List[str]
     interface: str
-    track_enable: bool = Field(True, json_schema_extra={'vmanage_key': 'track-enable'})
+    track_enable: bool = Field(True, json_schema_extra={"vmanage_key": "track-enable"})
     model_config = ConfigDict(populate_by_name=True)
 
     @field_validator("track_enable")
@@ -77,12 +77,16 @@ class NextHopWithTrack(BaseModel):
 
 class Routev4(BaseModel):
     prefix: str
-    next_hop: Optional[List[NextHop]] = Field(json_schema_extra={'vmanage_key': 'next-hop', 'priority_order': ['address', 'distance']})
-    next_hop_with_track: Optional[List[NextHopWithTrack]] = Field(default=None, json_schema_extra={'vmanage_key': 'next-hop-with-track'})
-    null0: Optional[bool]
+    next_hop: Optional[List[NextHop]] = Field(
+        default=None, json_schema_extra={"vmanage_key": "next-hop", "priority_order": ["address", "distance"]}
+    )
+    next_hop_with_track: Optional[List[NextHopWithTrack]] = Field(
+        default=None, json_schema_extra={"vmanage_key": "next-hop-with-track"}
+    )
+    null0: Optional[bool] = None
     distance: Optional[int] = None
-    vpn: Optional[int]
-    dhcp: Optional[bool]
+    vpn: Optional[int] = None
+    dhcp: Optional[bool] = None
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -98,23 +102,23 @@ class Nat(str, Enum):
 
 class Routev6(BaseModel):
     prefix: str
-    next_hop: Optional[List[NextHopv6]] = Field(json_schema_extra={'vmanage_key': 'next-hop'})
-    null0: Optional[bool]
-    vpn: Optional[int]
-    nat: Optional[Nat]
+    next_hop: Optional[List[NextHopv6]] = Field(default=None, json_schema_extra={"vmanage_key": "next-hop"})
+    null0: Optional[bool] = None
+    vpn: Optional[int] = None
+    nat: Optional[Nat] = None
     model_config = ConfigDict(populate_by_name=True)
 
 
 class GreRoute(BaseModel):
     prefix: str
     vpn: int
-    interface: Optional[List[str]]
+    interface: Optional[List[str]] = None
 
 
 class IpsecRoute(BaseModel):
     prefix: str
     vpn: int
-    interface: Optional[List[str]]
+    interface: Optional[List[str]] = None
 
 
 class AdvertiseProtocol(str, Enum):
@@ -140,17 +144,19 @@ class Region(str, Enum):
 
 
 class PrefixList(BaseModel):
-    prefix_entry: str = Field(json_schema_extra={'vmanage_key': 'prefix-entry'})
-    aggregate_only: Optional[bool] = Field(json_schema_extra={'vmanage_key': 'aggregate-only'})
+    prefix_entry: str = Field(json_schema_extra={"vmanage_key": "prefix-entry"})
+    aggregate_only: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "aggregate-only"})
     region: Optional[Region]
     model_config = ConfigDict(populate_by_name=True)
 
 
 class Advertise(BaseModel):
     protocol: AdvertiseProtocol
-    route_policy: Optional[str] = Field(json_schema_extra={'vmanage_key': 'route-policy'})
-    protocol_sub_type: Optional[List[AdvertiseProtocolSubType]] = Field(json_schema_extra={'vmanage_key': 'protocol-sub-type'})
-    prefix_list: Optional[List[PrefixList]] = Field(json_schema_extra={'vmanage_key': 'prefix-list'})
+    route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
+    protocol_sub_type: Optional[List[AdvertiseProtocolSubType]] = Field(
+        default=None, json_schema_extra={"vmanage_key": "protocol-sub-type"}
+    )
+    prefix_list: Optional[List[PrefixList]] = Field(default=None, json_schema_extra={"vmanage_key": "prefix-list"})
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -169,9 +175,11 @@ class Ipv6AdvertiseProtocolSubType(str, Enum):
 
 class Ipv6Advertise(BaseModel):
     protocol: Ipv6AdvertiseProtocol
-    route_policy: Optional[str] = Field(json_schema_extra={'vmanage_key': 'route-policy'})
-    protocol_sub_type: Optional[List[Ipv6AdvertiseProtocolSubType]] = Field(json_schema_extra={'vmanage_key': 'protocol-sub-type'})
-    prefix_list: Optional[List[PrefixList]] = Field(json_schema_extra={'vmanage_key': 'prefix-list'})
+    route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
+    protocol_sub_type: Optional[List[Ipv6AdvertiseProtocolSubType]] = Field(
+        default=None, json_schema_extra={"vmanage_key": "protocol-sub-type"}
+    )
+    prefix_list: Optional[List[PrefixList]] = Field(default=None, json_schema_extra={"vmanage_key": "prefix-list"})
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -186,9 +194,9 @@ class LeakFromGlobalProtocol(str, Enum):
 
 class Pool(BaseModel):
     name: str
-    start_address: str = Field(json_schema_extra={'vmanage_key': 'start-address'})
-    end_address: str = Field(json_schema_extra={'vmanage_key': 'end-address'})
-    overload: Optional[bool]
+    start_address: str = Field(json_schema_extra={"vmanage_key": "start-address"})
+    end_address: str = Field(json_schema_extra={"vmanage_key": "end-address"})
+    overload: Optional[bool] = None
     leak_from_global: bool
     leak_from_global_protocol: LeakFromGlobalProtocol
     leak_to_global: bool
@@ -207,12 +215,12 @@ class Overload(str, Enum):
 
 class Natpool(BaseModel):
     name: int
-    prefix_length: int = Field(json_schema_extra={'vmanage_key': 'prefix-length'})
-    range_start: str = Field(json_schema_extra={'vmanage_key': 'range-start'})
-    range_end: str = Field(json_schema_extra={'vmanage_key': 'range-end'})
+    prefix_length: int = Field(json_schema_extra={"vmanage_key": "prefix-length"})
+    range_start: str = Field(json_schema_extra={"vmanage_key": "range-start"})
+    range_end: str = Field(json_schema_extra={"vmanage_key": "range-end"})
     overload: Overload = Overload.TRUE
     direction: Direction
-    tracker_id: Optional[int] = Field(json_schema_extra={'vmanage_key': 'tracker-id'})
+    tracker_id: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "tracker-id"})
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -222,20 +230,20 @@ class StaticNatDirection(str, Enum):
 
 
 class Static(BaseModel):
-    pool_name: Optional[int] = Field(json_schema_extra={'vmanage_key': 'pool-name'})
-    source_ip: str = Field(json_schema_extra={'vmanage_key': 'source-ip'})
-    translate_ip: str = Field(json_schema_extra={'vmanage_key': 'translate-ip'})
-    static_nat_direction: StaticNatDirection = Field(json_schema_extra={'vmanage_key': 'static-nat-direction'})
-    tracker_id: Optional[int] = Field(json_schema_extra={'vmanage_key': 'tracker-id'})
+    pool_name: Optional[int] = Field(json_schema_extra={"vmanage_key": "pool-name"})
+    source_ip: str = Field(json_schema_extra={"vmanage_key": "source-ip"})
+    translate_ip: str = Field(json_schema_extra={"vmanage_key": "translate-ip"})
+    static_nat_direction: StaticNatDirection = Field(json_schema_extra={"vmanage_key": "static-nat-direction"})
+    tracker_id: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "tracker-id"})
     model_config = ConfigDict(populate_by_name=True)
 
 
 class SubnetStatic(BaseModel):
-    source_ip_subnet: str = Field(json_schema_extra={'vmanage_key': 'source-ip-subnet'})
-    translate_ip_subnet: str = Field(json_schema_extra={'vmanage_key': 'translate-ip-subnet'})
-    prefix_length: int = Field(json_schema_extra={'vmanage_key': 'prefix-length'})
-    static_nat_direction: StaticNatDirection = Field(json_schema_extra={'vmanage_key': 'static-nat-direction'})
-    tracker_id: Optional[int] = Field(json_schema_extra={'vmanage_key': 'tracker-id'})
+    source_ip_subnet: str = Field(json_schema_extra={"vmanage_key": "source-ip-subnet"})
+    translate_ip_subnet: str = Field(json_schema_extra={"vmanage_key": "translate-ip-subnet"})
+    prefix_length: int = Field(json_schema_extra={"vmanage_key": "prefix-length"})
+    static_nat_direction: StaticNatDirection = Field(json_schema_extra={"vmanage_key": "static-nat-direction"})
+    tracker_id: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "tracker-id"})
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -245,11 +253,11 @@ class Proto(str, Enum):
 
 
 class PortForward(BaseModel):
-    pool_name: Optional[int] = Field(json_schema_extra={'vmanage_key': 'pool-name'})
-    source_port: int = Field(json_schema_extra={'vmanage_key': 'source-port'})
-    translate_port: int = Field(json_schema_extra={'vmanage_key': 'translate-port'})
-    source_ip: str = Field(json_schema_extra={'vmanage_key': 'source-ip'})
-    translate_ip: str = Field(json_schema_extra={'vmanage_key': 'translate-ip'})
+    pool_name: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "pool-name"})
+    source_port: int = Field(json_schema_extra={"vmanage_key": "source-port"})
+    translate_port: int = Field(json_schema_extra={"vmanage_key": "translate-port"})
+    source_ip: str = Field(json_schema_extra={"vmanage_key": "source-ip"})
+    translate_ip: str = Field(json_schema_extra={"vmanage_key": "translate-ip"})
     proto: Proto
     model_config = ConfigDict(populate_by_name=True)
 
@@ -273,15 +281,15 @@ class RouteImportRedistributeProtocol(str, Enum):
 
 class RouteImportRedistribute(BaseModel):
     protocol: RouteImportRedistributeProtocol
-    route_policy: Optional[str] = Field(json_schema_extra={'vmanage_key': 'route-policy'})
+    route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
     model_config = ConfigDict(populate_by_name=True)
 
 
 class RouteImport(BaseModel):
     protocol: RouteImportProtocol
-    protocol_sub_type: List[RouteImportProtocolSubType] = Field(json_schema_extra={'vmanage_key': 'protocol-sub-type'})
-    route_policy: Optional[str] = Field(json_schema_extra={'vmanage_key': 'route-policy'})
-    redistribute: Optional[List[RouteImportRedistribute]]
+    protocol_sub_type: List[RouteImportProtocolSubType] = Field(json_schema_extra={"vmanage_key": "protocol-sub-type"})
+    route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
+    redistribute: Optional[List[RouteImportRedistribute]] = None
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -305,16 +313,18 @@ class RouteImportFromRedistributeProtocol(str, Enum):
 
 class RouteImportFromRedistribute(BaseModel):
     protocol: RouteImportFromRedistributeProtocol
-    route_policy: Optional[str] = Field(json_schema_extra={'vmanage_key': 'route-policy'})
+    route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
     model_config = ConfigDict(populate_by_name=True)
 
 
 class RouteImportFrom(BaseModel):
-    source_vpn: int = Field(json_schema_extra={'vmanage_key': 'source-vpn'})
+    source_vpn: int = Field(json_schema_extra={"vmanage_key": "source-vpn"})
     protocol: RouteImportFromProtocol
-    protocol_sub_type: List[RouteImportFromProtocolSubType] = Field(json_schema_extra={'vmanage_key': 'protocol-sub-type'})
-    route_policy: Optional[str] = Field(json_schema_extra={'vmanage_key': 'route-policy'})
-    redistribute: Optional[List[RouteImportFromRedistribute]]
+    protocol_sub_type: List[RouteImportFromProtocolSubType] = Field(
+        json_schema_extra={"vmanage_key": "protocol-sub-type"}
+    )
+    route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
+    redistribute: Optional[List[RouteImportFromRedistribute]] = None
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -337,14 +347,14 @@ class RouteExportRedistributeProtocol(str, Enum):
 
 class RouteExportRedistribute(BaseModel):
     protocol: RouteExportRedistributeProtocol
-    route_policy: Optional[str] = Field(json_schema_extra={'vmanage_key': 'route-policy'})
+    route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
     model_config = ConfigDict(populate_by_name=True)
 
 
 class RouteExport(BaseModel):
     protocol: RouteExportProtocol
-    protocol_sub_type: List[RouteExportProtocolSubType] = Field(json_schema_extra={'vmanage_key': 'protocol-sub-type'})
-    route_policy: Optional[str] = Field(json_schema_extra={'vmanage_key': 'route-policy'})
+    protocol_sub_type: List[RouteExportProtocolSubType] = Field(json_schema_extra={"vmanage_key": "protocol-sub-type"})
+    route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
     redistribute: Optional[List[RouteExportRedistribute]]
     model_config = ConfigDict(populate_by_name=True)
 
@@ -352,32 +362,59 @@ class RouteExport(BaseModel):
 class CiscoVPNModel(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    vpn_id: int = Field(default=0, json_schema_extra={'vmanage_key': 'vpn-id'})
-    vpn_name: Optional[str] = Field(json_schema_extra={'vmanage_key': 'name'})
-    tenant_vpn_id: Optional[int] = Field(json_schema_extra={'vmanage_key': 'tenant-vpn-id'})
-    org_name: Optional[str] = Field(json_schema_extra={'vmanage_key': 'org-name'})
-    omp_admin_distance_ipv4: Optional[int] = Field(json_schema_extra={'vmanage_key': 'omp-admin-distance-ipv4'})
-    omp_admin_distance_ipv6: Optional[int] = Field(json_schema_extra={'vmanage_key': 'omp-admin-distance-ipv6'})
-    dns: Optional[List[Dns]]
-    dns_ipv6: Optional[List[DnsIpv6]] = Field(json_schema_extra={'vmanage_key': 'dns-ipv6'})
-    layer4: Optional[bool] = Field(json_schema_extra={'data_path': ['ecmp-hash-key']})
-    host: Optional[List[Host]] = Field(json_schema_extra={'priority_order': ['hostname', 'ip']})
-    service: Optional[List[Service]]
-    service_route: Optional[List[ServiceRoute]] = Field(json_schema_extra={'data_path': ['ip'], 'vmanage_key': 'service-route'})
-    route_v4: Optional[List[Routev4]] = Field(json_schema_extra={'data_path': ['ip'], 'vmanage_key': 'route', 'priority_order': ['prefix', 'next-hop', 'next-hop-with-track']})
-    route_v6: Optional[List[Routev6]] = Field(json_schema_extra={'data_path': ['ipv6'], 'vmanage_key': 'route'})
-    gre_route: Optional[List[GreRoute]] = Field(json_schema_extra={'data_path': ['ip'], 'vmanage_key': 'gre-route'})
-    ipsec_route: Optional[List[IpsecRoute]] = Field(json_schema_extra={'data_path': ['ip'], 'vmanage_key': 'ipsec-route'})
-    advertise: Optional[List[Advertise]] = Field(json_schema_extra={'data_path': ['omp']})
-    ipv6_advertise: Optional[List[Ipv6Advertise]] = Field(json_schema_extra={'data_path': ['omp'], 'vmanage_key': 'ipv6-advertise'})
-    pool: Optional[List[Pool]] = Field(json_schema_extra={'data_path': ['nat64', 'v4']})
-    natpool: Optional[List[Natpool]] = Field(json_schema_extra={'data_path': ['nat']})
-    static: Optional[List[Static]] = Field(json_schema_extra={'data_path': ['nat']})
-    subnet_static: Optional[List[SubnetStatic]] = Field(json_schema_extra={'data_path': ['nat'], 'vmanage_key': 'subnet-static'})
-    port_forward: Optional[List[PortForward]] = Field(json_schema_extra={'data_path': ['nat'], 'vmanage_key': 'port-forward'})
-    route_import: Optional[List[RouteImport]] = Field(json_schema_extra={'vmanage_key': 'route-import'})
-    route_import_from: Optional[List[RouteImportFrom]] = Field(json_schema_extra={'vmanage_key': 'route-import-from'})
-    route_export: Optional[List[RouteExport]] = Field(json_schema_extra={'vmanage_key': 'route-export'})
+    vpn_id: int = Field(default=0, json_schema_extra={"vmanage_key": "vpn-id"})
+    vpn_name: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "name"})
+    tenant_vpn_id: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "tenant-vpn-id"})
+    org_name: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "org-name"})
+    omp_admin_distance_ipv4: Optional[int] = Field(
+        default=None, json_schema_extra={"vmanage_key": "omp-admin-distance-ipv4"}
+    )
+    omp_admin_distance_ipv6: Optional[int] = Field(
+        default=None, json_schema_extra={"vmanage_key": "omp-admin-distance-ipv6"}
+    )
+    dns: Optional[List[Dns]] = None
+    dns_ipv6: Optional[List[DnsIpv6]] = Field(default=None, json_schema_extra={"vmanage_key": "dns-ipv6"})
+    layer4: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["ecmp-hash-key"]})
+    host: Optional[List[Host]] = Field(default=None, json_schema_extra={"priority_order": ["hostname", "ip"]})
+    service: Optional[List[Service]] = None
+    service_route: Optional[List[ServiceRoute]] = Field(
+        default=None, json_schema_extra={"data_path": ["ip"], "vmanage_key": "service-route"}
+    )
+    route_v4: Optional[List[Routev4]] = Field(
+        default=None,
+        json_schema_extra={
+            "data_path": ["ip"],
+            "vmanage_key": "route",
+            "priority_order": ["prefix", "next-hop", "next-hop-with-track"],
+        },
+    )
+    route_v6: Optional[List[Routev6]] = Field(
+        default=None, json_schema_extra={"data_path": ["ipv6"], "vmanage_key": "route"}
+    )
+    gre_route: Optional[List[GreRoute]] = Field(
+        default=None, json_schema_extra={"data_path": ["ip"], "vmanage_key": "gre-route"}
+    )
+    ipsec_route: Optional[List[IpsecRoute]] = Field(
+        default=None, json_schema_extra={"data_path": ["ip"], "vmanage_key": "ipsec-route"}
+    )
+    advertise: Optional[List[Advertise]] = Field(default=None, json_schema_extra={"data_path": ["omp"]})
+    ipv6_advertise: Optional[List[Ipv6Advertise]] = Field(
+        default=None, json_schema_extra={"data_path": ["omp"], "vmanage_key": "ipv6-advertise"}
+    )
+    pool: Optional[List[Pool]] = Field(default=None, json_schema_extra={"data_path": ["nat64", "v4"]})
+    natpool: Optional[List[Natpool]] = Field(default=None, json_schema_extra={"data_path": ["nat"]})
+    static: Optional[List[Static]] = Field(default=None, json_schema_extra={"data_path": ["nat"]})
+    subnet_static: Optional[List[SubnetStatic]] = Field(
+        default=None, json_schema_extra={"data_path": ["nat"], "vmanage_key": "subnet-static"}
+    )
+    port_forward: Optional[List[PortForward]] = Field(
+        default=None, json_schema_extra={"data_path": ["nat"], "vmanage_key": "port-forward"}
+    )
+    route_import: Optional[List[RouteImport]] = Field(default=None, json_schema_extra={"vmanage_key": "route-import"})
+    route_import_from: Optional[List[RouteImportFrom]] = Field(
+        default=None, json_schema_extra={"vmanage_key": "route-import-from"}
+    )
+    route_export: Optional[List[RouteExport]] = Field(default=None, json_schema_extra={"vmanage_key": "route-export"})
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_vpn"

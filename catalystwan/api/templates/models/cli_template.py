@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import ClassVar
+
 from pydantic import ConfigDict
 
 from catalystwan.api.templates.feature_template import FeatureTemplate

@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field, field_validator
 from catalystwan.api.templates.device_variable import DeviceVariable
 from catalystwan.api.templates.feature_template import FeatureTemplate
 from catalystwan.utils.dict import merge
+from catalystwan.utils.pydantic_field import get_extra_field
 
 
 class FeatureTemplateOptionType(str, Enum):
@@ -117,7 +118,6 @@ class FeatureTemplateField(BaseModel):
                 output["vipType"] = vip_type or FeatureTemplateOptionType.CONSTANT.value
                 if self.children:
                     children_output = []
-
                     for obj in value:  # obj is User, atomic value. Loop every child
                         child_payload: dict = {}
                         for child in self.children:  # Child in schema
@@ -126,15 +126,19 @@ class FeatureTemplateField(BaseModel):
                             obj: FeatureTemplate  # type: ignore
                             model_tuple = next(
                                 filter(
-                                    lambda f: f[1].json_schema_extra.get("data_path", []) == child.dataPath
-                                    and (f[1].alias == child.key or f[1].json_schema_extra.get("vmanage_key") == child.key),
+                                    lambda f: get_extra_field(f[1], "data_path", []) == child.dataPath
+                                    and (
+                                        f[1].alias == child.key
+                                        or get_extra_field(f[1], "vmanage_key") == child.key
+                                        or f[0] == child.key
+                                    ),
                                     obj.model_fields.items(),
-                                )   
+                                )
                             )
                             model_field = model_tuple[1]
-                            obj_value = model_tuple[0]
-                            po = model_field.json_schema_extra.get("priority_order")
-                            vip_type = model_field.json_schema_extra.get("vip_type")
+                            obj_value = getattr(obj, model_tuple[0])
+                            po = get_extra_field(model_field, "priority_order")
+                            vip_type = get_extra_field(model_field, "vip_type")
                             merge(
                                 child_payload,
                                 child.payload_scheme(

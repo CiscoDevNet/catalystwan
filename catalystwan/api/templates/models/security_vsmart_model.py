@@ -15,7 +15,9 @@ class Protocol(str, Enum):
 class SecurityvSmart(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    protocol: Optional[Protocol] = Field(default=None, json_schema_extra={'data_path': ['control']})
-    tls_port: Optional[int] = Field(default=None, json_schema_extra={'vmanage_key': 'tls-port', 'data_path': ['control']})
+    protocol: Optional[Protocol] = Field(default=None, json_schema_extra={"data_path": ["control"]})
+    tls_port: Optional[int] = Field(
+        default=None, json_schema_extra={"vmanage_key": "tls-port", "data_path": ["control"]}
+    )
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "security-vsmart"

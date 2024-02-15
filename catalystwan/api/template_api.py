@@ -42,6 +42,7 @@ from catalystwan.response import ManagerResponse
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.device_model import DeviceModel
 from catalystwan.utils.dict import merge
+from catalystwan.utils.pydantic_field import get_extra_field
 from catalystwan.utils.template_type import TemplateType
 
 if TYPE_CHECKING:
@@ -566,22 +567,13 @@ class TemplatesAPI:
                 value = template.device_specific_variables[field.key]
             else:
                 for field_name, field_value in template.model_fields.items():
-                    try:
-                        data_path = field_value.json_schema_extra.get("data_path", [])
-                    except AttributeError:
-                        data_path = []
-                    try:
-                        vmanage_key = field_value.json_schema_extra.get("vmanage_key")
-                    except AttributeError:
-                        vmanage_key = None
+                    data_path = get_extra_field(field_value, "data_path", default=[])
+                    vmanage_key = get_extra_field(field_value, "data_path")
                     if field.dataPath == data_path and (  # type: ignore
-                        field.key == field_value.alias
+                        (field.key == field_value.alias or field.key == field_name)
                         or field.key == vmanage_key  # type: ignore
                     ):
-                        try:
-                            priority_order = field_value.json_schema_extra.get("priority_order")  # type: ignore
-                        except:
-                            priority_order = None
+                        priority_order = get_extra_field(field_value, "priority_order")  # type: ignore
                         value = getattr(template, field_name)
                         break
                 if value is None:

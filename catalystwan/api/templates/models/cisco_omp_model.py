@@ -67,23 +67,43 @@ class SiteTypes(str, Enum):
 class CiscoOMPModel(FeatureTemplate, ConvertBoolToStringModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    graceful_restart: Optional[bool] = Field(True, json_schema_extra={'vmanage_key': 'graceful-restart'})
-    overlay_as: Optional[int] = Field(json_schema_extra={'vmanage_key': 'overlay-as'})
-    send_path_limit: Optional[int] = Field(DEFAULT_OMP_SENDPATH_LIMIT, json_schema_extra={'vmanage_key': 'send-path-limit'})
-    ecmp_limit: Optional[int] = Field(DEFAULT_OMP_ECMP_LIMIT, json_schema_extra={'vmanage_key': 'ecmp-limit'})
+    graceful_restart: Optional[bool] = Field(True, json_schema_extra={"vmanage_key": "graceful-restart"})
+    overlay_as: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "overlay-as"})
+    send_path_limit: Optional[int] = Field(
+        DEFAULT_OMP_SENDPATH_LIMIT, json_schema_extra={"vmanage_key": "send-path-limit"}
+    )
+    ecmp_limit: Optional[int] = Field(DEFAULT_OMP_ECMP_LIMIT, json_schema_extra={"vmanage_key": "ecmp-limit"})
     shutdown: Optional[bool]
-    omp_admin_distance_ipv4: Optional[int] = Field(json_schema_extra={'vmanage_key': 'omp-admin-distance-ipv4'})
-    omp_admin_distance_ipv6: Optional[int] = Field(json_schema_extra={'vmanage_key': 'omp-admin-distance-ipv6'})
-    advertisement_interval: Optional[int] = Field(DEFAULT_OMP_ADVERTISEMENT_INTERVAL, json_schema_extra={'vmanage_key': 'advertisement-interval', 'data_path': ['timers']})
-    graceful_restart_timer: Optional[int] = Field(DEFAULT_OMP_GRACEFUL_RESTART_TIMER, json_schema_extra={'vmanage_key': 'graceful-restart-timer', 'data_path': ['timers']})
-    eor_timer: Optional[int] = Field(DEFAULT_OMP_EOR_TIMER, json_schema_extra={'vmanage_key': 'eor-timer', 'data_path': ['timers']})
-    holdtime: Optional[int] = Field(DEFAULT_OMP_HOLDTIME, json_schema_extra={'data_path': ['timers']})
-    advertise: Optional[List[IPv4Advertise]]
-    ipv6_advertise: Optional[List[IPv6Advertise]] = Field(json_schema_extra={'vmanage_key': 'ipv6-advertise'})
-    ignore_region_path_length: Optional[bool] = Field(False, json_schema_extra={'vmanage_key': 'ignore-region-path-length'})
-    transport_gateway: Optional[TransportGateway] = Field(json_schema_extra={'vmanage_key': 'transport-gateway'})
-    site_types: Optional[List[SiteTypes]] = Field(json_schema_extra={'vmanage_key': 'site-types'})
-    auto_translate: Optional[bool] = Field(False, json_schema_extra={'vmanage_key': 'auto-translate'})
+    omp_admin_distance_ipv4: Optional[int] = Field(
+        default=None, json_schema_extra={"vmanage_key": "omp-admin-distance-ipv4"}
+    )
+    omp_admin_distance_ipv6: Optional[int] = Field(
+        default=None, json_schema_extra={"vmanage_key": "omp-admin-distance-ipv6"}
+    )
+    advertisement_interval: Optional[int] = Field(
+        DEFAULT_OMP_ADVERTISEMENT_INTERVAL,
+        json_schema_extra={"vmanage_key": "advertisement-interval", "data_path": ["timers"]},
+    )
+    graceful_restart_timer: Optional[int] = Field(
+        DEFAULT_OMP_GRACEFUL_RESTART_TIMER,
+        json_schema_extra={"vmanage_key": "graceful-restart-timer", "data_path": ["timers"]},
+    )
+    eor_timer: Optional[int] = Field(
+        DEFAULT_OMP_EOR_TIMER, json_schema_extra={"vmanage_key": "eor-timer", "data_path": ["timers"]}
+    )
+    holdtime: Optional[int] = Field(DEFAULT_OMP_HOLDTIME, json_schema_extra={"data_path": ["timers"]})
+    advertise: Optional[List[IPv4Advertise]] = None
+    ipv6_advertise: Optional[List[IPv6Advertise]] = Field(
+        default=None, json_schema_extra={"vmanage_key": "ipv6-advertise"}
+    )
+    ignore_region_path_length: Optional[bool] = Field(
+        False, json_schema_extra={"vmanage_key": "ignore-region-path-length"}
+    )
+    transport_gateway: Optional[TransportGateway] = Field(
+        default=None, json_schema_extra={"vmanage_key": "transport-gateway"}
+    )
+    site_types: Optional[List[SiteTypes]] = Field(default=None, json_schema_extra={"vmanage_key": "site-types"})
+    auto_translate: Optional[bool] = Field(False, json_schema_extra={"vmanage_key": "auto-translate"})
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_omp"

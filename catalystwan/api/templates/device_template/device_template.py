@@ -84,6 +84,7 @@ class DeviceTemplate(BaseModel):
         device_template = session.api.templates.get(DeviceTemplate).filter(name=name).single_or_default()
         resp = session.get(f"dataservice/template/device/object/{device_template.id}").json()
         return DeviceTemplate(**resp)
+
     model_config = ConfigDict(populate_by_name=True, use_enum_values=True)
 
 
