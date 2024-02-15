@@ -29,11 +29,11 @@ class ConfigurationDeviceInventoryAPI:
         devices = []
         for device_detail in device_details:
             unlock_device_detail = UnlockDeviceDetail(
-                deviceId=device_detail["deviceId"], deviceIP=device_detail["deviceIP"]
+                device_id=device_detail["deviceId"], device_ip=device_detail["deviceIP"]
             )
             devices.append(unlock_device_detail)
 
-        payload = DeviceUnlockPayload(deviceType=device_type, devices=devices)
+        payload = DeviceUnlockPayload(device_type=device_type, devices=devices)
 
         task_id = self.endpoint.unlock(device_uuid=device_uuid, payload=payload).parentTaskId
         return Task(self.session, task_id=task_id)
@@ -41,7 +41,7 @@ class ConfigurationDeviceInventoryAPI:
     def generate_bootstrap_cfg(
         self,
         device_uuid: UUID,
-        configtype: ConfigType = ConfigType.CLOUDINIT,
+        configtype: ConfigType = "cloudinit",
         incl_def_root_cert: bool = False,
         version: str = "v1",
     ) -> BoostrapConfigurationDetails:
@@ -49,7 +49,7 @@ class ConfigurationDeviceInventoryAPI:
         Returns handy model of generated bootstrap config
         """
         params = GenerateBoostrapConfigurationQueryParams(
-            configtype=configtype, inclDefRootCert=incl_def_root_cert, version=version
+            configtype=configtype, incl_def_root_cert=incl_def_root_cert, version=version
         )
         reponse = self.endpoint.generate_bootstrap_configuration(uuid=device_uuid, params=params)
 
