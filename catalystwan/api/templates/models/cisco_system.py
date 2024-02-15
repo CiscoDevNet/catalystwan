@@ -122,7 +122,7 @@ class CiscoSystemModel(FeatureTemplate, ConvertBoolToStringModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     timezone: Optional[Timezone] = Field(default=None, json_schema_extra={"data_path": ["clock"]})
-    hostname: str = Field(
+    hostname: DeviceVariable = Field(
         default=DeviceVariable(name="system_host_name"),
         validate_default=True,
         json_schema_extra={"vmanage_key": "host-name"},
