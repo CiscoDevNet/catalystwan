@@ -7,7 +7,7 @@ from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
 
 
-class CriteriaEnum(str, Enum):
+class SLAClassCriteriaEnum(str, Enum):
     LOSS = "loss"
     LATENCY = "latency"
     JITTER = "jitter"
@@ -25,31 +25,7 @@ class CriteriaEnum(str, Enum):
     JITTER_LOSS_LATENCY = "jitter-loss-latency"
 
 
-class Latency(Global):
-    value: int = Field(ge=1, le=1000)
-
-
-class Loss(Global):
-    value: int = Field(ge=0, le=100)
-
-
-class Jitter(Global):
-    value: int = Field(ge=1, le=1000)
-
-
-class LatencyVariance(Latency):
-    ...
-
-
-class LossVariance(Loss):
-    ...
-
-
-class JitterVariance(Jitter):
-    ...
-
-
-class AppProbeClass(BaseModel):
+class SLAAppProbeClass(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     ref_id: Global[UUID] = Field(serialization_alias="refId", validation_alias="refId")
@@ -58,7 +34,7 @@ class AppProbeClass(BaseModel):
 class FallbackBestTunnel(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    criteria: Global[CriteriaEnum]
+    criteria: Global[SLAClassCriteriaEnum]
     jitter_variance: Optional[Global[int]] = Field(
         default=None,
         serialization_alias="jitterVariance",
@@ -83,13 +59,13 @@ class FallbackBestTunnel(BaseModel):
     ):
         expected_criterias = []
         if jitter_variance:
-            self.jitter_variance = JitterVariance(value=jitter_variance)
+            self.jitter_variance = Global(value=jitter_variance)
             expected_criterias.append("jitter")
         if latency_variance:
-            self.latency_variance = LatencyVariance(value=latency_variance)
+            self.latency_variance = Global(value=latency_variance)
             expected_criterias.append("latency")
         if loss_variance:
-            self.loss_variance = LossVariance(value=loss_variance)
+            self.loss_variance = Global(value=loss_variance)
             expected_criterias.append("loss")
         for e in expected_criterias:
             if e not in self.criteria.value:
@@ -120,7 +96,7 @@ class SLAClassListEntry(BaseModel):
     latency: Optional[Global[int]] = None
     loss: Optional[Global[int]] = None
     jitter: Optional[Global[int]] = None
-    app_probe_class: Optional[AppProbeClass] = Field(
+    app_probe_class: Optional[SLAAppProbeClass] = Field(
         validation_alias="appProbeClass", serialization_alias="appProbeClass"
     )
     fallback_best_tunnel: Optional[FallbackBestTunnel] = Field(

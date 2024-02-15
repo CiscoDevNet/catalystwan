@@ -5,7 +5,7 @@ from pydantic import AliasPath, BaseModel, Field, field_validator
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
 
 
-class QueueEntry(BaseModel):
+class FowardingClassQueueEntry(BaseModel):
     queue: Global[str]
 
     @field_validator("queue")
@@ -16,4 +16,4 @@ class QueueEntry(BaseModel):
 
 
 class FowardingClassParcel(_ParcelBase):
-    entries: List[QueueEntry] = Field(validation_alias=AliasPath("data", "entries"))
+    entries: List[FowardingClassQueueEntry] = Field(validation_alias=AliasPath("data", "entries"))
