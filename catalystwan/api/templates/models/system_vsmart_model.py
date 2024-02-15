@@ -10,7 +10,7 @@ from catalystwan.utils.timezone import Timezone
 class SystemVsmart(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    timezone: Optional[Timezone] = Field(default=None, json_schema_extra={"converter": Timezone})
+    timezone: Optional[Timezone] = Field(default=None)
     idle_timeout: Optional[int] = Field(default=None, ge=0, le=300, json_schema_extra={"vmanage_key": "idle-timeout"})
     admin_tech_on_failure: Optional[bool] = Field(
         default=True, json_schema_extra={"vmanage_key": "admin-tech-on-failure"}
