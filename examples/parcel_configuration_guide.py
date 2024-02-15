@@ -1,66 +1,73 @@
 import logging
 import sys
 from dataclasses import dataclass
-from ipaddress import IPv4Address, IPv6Address
+from ipaddress import IPv4Address, IPv4Network, IPv6Address
 from typing import List, Optional, Tuple
 
 from catalystwan.api.configuration_groups.parcel import as_global
 from catalystwan.api.feature_profile_api import PolicyObjectFeatureProfileAPI
 from catalystwan.endpoints.configuration_feature_profile import ConfigurationFeatureProfile
-from catalystwan.models.common import TLOCColorEnum, WellKnownBGPCommunitiesEnum
+from catalystwan.models.common import InterfaceTypeEnum, TLOCColorEnum, WellKnownBGPCommunitiesEnum
 from catalystwan.models.configuration.feature_profile.common import FeatureProfileInfo, ParcelCreationResponse
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object import AnyPolicyObjectParcel
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.app_probe import (
-    AppProbeEntry,
-    AppProbeParcel,
-    MapItem,
-)
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.application_list import (
+from catalystwan.models.configuration.feature_profile.sdwan.interest_groups import (
+    AnyInterestGroupParcel,
     ApplicationListEntry,
     ApplicationListParcel,
-)
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.color_list import ColorEntry, ColorParcel
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.data_prefix import (
+    AppProbeEntry,
+    AppProbeMapItem,
+    AppProbeParcel,
+    ColorEntry,
+    ColorParcel,
     DataPrefixEntry,
     DataPrefixParcel,
-)
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.expanded_community_list import (
     ExpandedCommunityParcel,
-)
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.fowarding_class import (
+    FallbackBestTunnel,
     FowardingClassParcel,
-    QueueEntry,
-)
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.ipv6_data_prefix import (
+    FowardingClassQueueEntry,
+    FQDNDomainParcel,
+    FQDNListEntry,
+    GeoLocationListEntry,
+    GeoLocationListParcel,
+    IPSSignatureListEntry,
+    IPSSignatureParcel,
     IPv6DataPrefixEntry,
     IPv6DataPrefixParcel,
-)
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.ipv6_prefix_list import (
     IPv6PrefixListEntry,
     IPv6PrefixListParcel,
-)
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.policier import PolicierEntry, PolicierParcel
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.prefered_group_color import (
+    LocalDomainListEntry,
+    LocalDomainParcel,
+    PolicierEntry,
+    PolicierParcel,
     Preference,
     PreferredColorGroupEntry,
     PreferredColorGroupParcel,
-)
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.prefix_list import (
     PrefixListEntry,
     PrefixListParcel,
-)
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.sla_class import (
-    AppProbeClass,
-    CriteriaEnum,
-    FallbackBestTunnel,
+    ProtocolListEntry,
+    ProtocolListParcel,
+    ProtocolTypeEnum,
+    SecurityApplicationFamilyListEntry,
+    SecurityApplicationListEntry,
+    SecurityApplicationListParcel,
+    SecurityDataPrefixEntry,
+    SecurityDataPrefixParcel,
+    SecurityPortListEntry,
+    SecurityPortParcel,
+    SecurityZoneListEntry,
+    SecurityZoneListParcel,
+    SLAAppProbeClass,
+    SLAClassCriteriaEnum,
     SLAClassListEntry,
     SLAClassParcel,
-)
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.standard_community import (
     StandardCommunityEntry,
     StandardCommunityParcel,
+    TlocEntry,
+    TlocParcel,
+    URLAllowListEntry,
+    URLAllowParcel,
+    URLBlockListEntry,
+    URLBlockParcel,
 )
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.tloc_list import TlocEntry, TlocParcel
 from catalystwan.models.policy.lists_entries import EncapEnum, PathPreferenceEnum, PolicerExceedActionEnum
 
 logger = logging.getLogger(__name__)
@@ -78,9 +85,78 @@ class CmdArguments:
 
 
 def configure_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectFeatureProfileAPI):
-    items: List[AnyPolicyObjectParcel] = []
-    items_ids: List[Tuple[ParcelCreationResponse, AnyPolicyObjectParcel]] = []
+    items: List[AnyInterestGroupParcel] = []
+    items_ids: List[Tuple[ParcelCreationResponse, AnyInterestGroupParcel]] = []
 
+    # Security Groups
+    fqdn = FQDNDomainParcel(
+        parcel_name="FQDNDomainParcelExmaple",
+        entries=[FQDNListEntry(pattern=as_global("www.cisco.com")), FQDNListEntry(pattern=as_global("www.aws.com"))],
+    )
+    local_domain = LocalDomainParcel(
+        parcel_name="LocalDomainParcelExample", entries=[LocalDomainListEntry(name_server=as_global("www.google.com"))]
+    )
+    ips_signature = IPSSignatureParcel(
+        parcel_name="IPSSignatureParcelExample",
+        entries=[IPSSignatureListEntry(generator_id=as_global("30"), signature_id=as_global("1000"))],
+    )
+    url_allowed = URLAllowParcel(
+        parcel_name="URLAllowParcelExample", entries=[URLAllowListEntry(pattern=as_global("https://www.cisco.com/"))]
+    )
+    url_blocked = URLBlockParcel(
+        parcel_name="URLBlockParcelExample", entries=[URLBlockListEntry(pattern=as_global("https://www.example.com/"))]
+    )
+    security_port = SecurityPortParcel(
+        parcel_name="SecurityPortParcelExmaple",
+        entries=[
+            SecurityPortListEntry(port=as_global("10")),
+            SecurityPortListEntry(port=as_global("50-100")),
+            SecurityPortListEntry(port=as_global("400-999")),
+        ],
+    )
+    geolocation = GeoLocationListParcel(
+        parcel_name="GeoLocationListParcelExample",
+        entries=[
+            GeoLocationListEntry(country=as_global("BVT")),
+            GeoLocationListEntry(country=as_global("ATA")),
+            GeoLocationListEntry(continent=as_global("AF")),
+        ],
+    )
+    security_zone = SecurityZoneListParcel(
+        parcel_name="SecurityZoneListParcel",
+        entries=[
+            SecurityZoneListEntry(interface=as_global(InterfaceTypeEnum.FAST_ETHERNET)),
+            SecurityZoneListEntry(interface=as_global(InterfaceTypeEnum.FIVE_GIGABIT_ETHERNET)),
+        ],
+    )
+    security_application_list = SecurityApplicationListParcel(
+        parcel_name="SecurityApplListParcelExample",
+        entries=[
+            SecurityApplicationFamilyListEntry(app_list_family=as_global("app-fam-2")),
+            SecurityApplicationListEntry(app_list=as_global("msn-messenger-ft")),
+            SecurityApplicationListEntry(app_list=as_global("aol-messenger")),
+        ],
+    )
+    security_data_prefix_parcel = SecurityDataPrefixParcel(
+        parcel_name="SecurityDataPrefixExample",
+        entries=[
+            SecurityDataPrefixEntry(ip_prefix=as_global(IPv4Network("10.0.0.0/16"))),
+            SecurityDataPrefixEntry(ip_prefix=as_global(IPv4Network("30.0.0.0/16"))),
+            SecurityDataPrefixEntry(ip_prefix=as_global(IPv4Network("50.0.0.0/16"))),
+        ],
+    )
+    protocol_list = ProtocolListParcel(
+        parcel_name="ProtocolListParcelExample",
+        entries=[
+            ProtocolListEntry(protocol=as_global(ProtocolTypeEnum.APPLEQTC)),
+            ProtocolListEntry(protocol=as_global(ProtocolTypeEnum.CISCO_SVCS)),
+            ProtocolListEntry(protocol=as_global(ProtocolTypeEnum.CDDBP)),
+            ProtocolListEntry(protocol=as_global(ProtocolTypeEnum.EXEC)),
+            ProtocolListEntry(protocol=as_global(ProtocolTypeEnum.HSRP)),
+        ],
+    )
+
+    # Policy Groups
     color_parcel = ColorParcel(
         parcel_name="ColorParcelExample",
         entries=[ColorEntry(color=as_global(TLOCColorEnum.LTE)), ColorEntry(color=as_global(TLOCColorEnum.GREEN))],
@@ -138,7 +214,7 @@ def configure_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectF
         ],
     )
     fowarding_class = FowardingClassParcel(
-        parcel_name="FowardingClassParcelExmaple", entries=[QueueEntry(queue=as_global("4"))]
+        parcel_name="FowardingClassParcelExmaple", entries=[FowardingClassQueueEntry(queue=as_global("4"))]
     )
     tloc_list = TlocParcel(
         parcel_name="TlocParcelExample",
@@ -174,14 +250,25 @@ def configure_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectF
             AppProbeEntry(
                 forwarding_class_name=as_global("FowardingClassParcelExmaple"),
                 map=[
-                    MapItem(color=as_global(TLOCColorEnum.CUSTOM1), dscp=as_global(33)),
-                    MapItem(color=as_global(TLOCColorEnum.BLUE), dscp=as_global(40)),
-                    MapItem(color=as_global(TLOCColorEnum.PUBLIC_INTERNET), dscp=as_global(43)),
+                    AppProbeMapItem(color=as_global(TLOCColorEnum.CUSTOM1), dscp=as_global(33)),
+                    AppProbeMapItem(color=as_global(TLOCColorEnum.BLUE), dscp=as_global(40)),
+                    AppProbeMapItem(color=as_global(TLOCColorEnum.PUBLIC_INTERNET), dscp=as_global(43)),
                 ],
             )
         ],
     )
 
+    items.append(fqdn)
+    items.append(local_domain)
+    items.append(ips_signature)
+    items.append(url_allowed)
+    items.append(url_blocked)
+    items.append(security_port)
+    items.append(geolocation)
+    items.append(security_zone)
+    items.append(security_application_list)
+    items.append(security_data_prefix_parcel)
+    items.append(protocol_list)
     items.append(color_parcel)
     items.append(data_prefix_parcel)
     items.append(ipv6_data_prefix)
@@ -208,12 +295,12 @@ def configure_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectF
         parcel_name="SLAClassParcelExample",
         entries=[
             SLAClassListEntry(
-                app_probe_class=AppProbeClass(ref_id=as_global(_id.id)),
+                app_probe_class=SLAAppProbeClass(ref_id=as_global(_id.id)),
                 jitter=as_global(20),
                 latency=as_global(50),
                 loss=as_global(100),
                 fallback_best_tunnel=FallbackBestTunnel(
-                    criteria=as_global(CriteriaEnum.JITTER_LOSS_LATENCY),
+                    criteria=as_global(SLAClassCriteriaEnum.JITTER_LOSS_LATENCY),
                     jitter_variance=as_global(10),
                     latency_variance=as_global(10),
                     loss_variance=as_global(10),

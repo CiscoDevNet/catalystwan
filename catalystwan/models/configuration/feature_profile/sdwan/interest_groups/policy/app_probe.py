@@ -6,7 +6,7 @@ from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
 from catalystwan.models.common import TLOCColorEnum
 
 
-class MapItem(BaseModel):
+class AppProbeMapItem(BaseModel):
     color: Global[TLOCColorEnum]
     dscp: Global[int]
 
@@ -19,7 +19,7 @@ class MapItem(BaseModel):
 
 class AppProbeEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-    map: List[MapItem]
+    map: List[AppProbeMapItem]
     forwarding_class_name: Global[str] = Field(
         serialization_alias="forwardingClass", validation_alias="forwardingClass"
     )

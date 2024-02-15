@@ -15,9 +15,9 @@ from catalystwan.models.configuration.feature_profile.common import (
     FeatureProfileInfo,
     ParcelCreationResponse,
 )
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object import (
-    PAYLOAD_ENDPOINT_MAPPING,
-    AnyPolicyObjectParcel,
+from catalystwan.models.configuration.feature_profile.sdwan.interest_groups import (
+    INTEREST_GROUP_PAYLOAD_ENDPOINT_MAPPING,
+    AnyInterestGroupParcel,
 )
 
 
@@ -87,40 +87,40 @@ class PolicyObjectFeatureProfileAPI:
         self.endpoint = PolicyObjectFeatureProfile(session)
 
     # def get(self, profile: FeatureProfileInfo,
-    #    get_by_type: AnyPolicyObjectParcel,
+    #    get_by_type: AnyPolicyParcel,
     #    get_by_id: Union[UUID, None] = None):
     #     if not get_by_id:
     #         policy_object_list_type = PAYLOAD_ENDPOINT_MAPPING[get_by_type]
     #         return self.endpoint.get_all(profile_id=profile.profile_id,
     #    policy_object_list_type=policy_object_list_type)
 
-    def create(self, profile: FeatureProfileInfo, payload: AnyPolicyObjectParcel) -> ParcelCreationResponse:
+    def create(self, profile: FeatureProfileInfo, payload: AnyInterestGroupParcel) -> ParcelCreationResponse:
         """
         Create Policy Object for selected profile based on payload type
         """
 
         profile_id = profile.profile_id
-        policy_object_list_type = PAYLOAD_ENDPOINT_MAPPING[type(payload)]
+        policy_object_list_type = INTEREST_GROUP_PAYLOAD_ENDPOINT_MAPPING[type(payload)]
         return self.endpoint.create(
             profile_id=profile_id, policy_object_list_type=policy_object_list_type, payload=payload
         )
 
-    def update(self, profile: FeatureProfileInfo, payload: AnyPolicyObjectParcel, list_object_id: UUID):
+    def update(self, profile: FeatureProfileInfo, payload: AnyInterestGroupParcel, list_object_id: UUID):
         """
         Update Policy Object for selected profile based on payload type
         """
         profile_id = profile.profile_id
-        policy_type = PAYLOAD_ENDPOINT_MAPPING[type(payload)]
+        policy_type = INTEREST_GROUP_PAYLOAD_ENDPOINT_MAPPING[type(payload)]
         return self.endpoint.update(
             profile_id=profile_id, policy_object_list_type=policy_type, list_object_id=list_object_id, payload=payload
         )
 
-    def delete(self, profile: FeatureProfileInfo, policy_type: AnyPolicyObjectParcel, list_object_id: UUID):
+    def delete(self, profile: FeatureProfileInfo, policy_type: AnyInterestGroupParcel, list_object_id: UUID):
         """
         Delete Policy Object for selected profile based on payload type
         """
         profile_id = profile.profile_id
-        policy_object_list_type = PAYLOAD_ENDPOINT_MAPPING[type(policy_type)]
+        policy_object_list_type = INTEREST_GROUP_PAYLOAD_ENDPOINT_MAPPING[type(policy_type)]
         return self.endpoint.delete(
             profile_id=profile_id, policy_object_list_type=policy_object_list_type, list_object_id=list_object_id
         )
