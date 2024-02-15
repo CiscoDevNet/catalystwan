@@ -1,5 +1,4 @@
 # mypy: disable-error-code="empty-body"
-# flake8: noqa
 from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put, versions
@@ -18,7 +17,7 @@ class PolicyObjectFeatureProfile(APIEndpoints):
 
     # @versions(supported_versions=(">=20.13"), raises=False)
     # @post("/v1/feature-profile/sdwan/policy-object/{policy_object_id}/unified/{security_object_list_type}")
-    # def create_security_profile_parcel(self, policy_object_id: UUID, security_object_list_type: SecurityPolicyObjectListType):
+    # def create_security_profile_parcel(self, policy_object_id: UUID, security_object_list_type: str):
     #     ...
 
     @versions(supported_versions=(">=20.13"), raises=False)
@@ -31,7 +30,7 @@ class PolicyObjectFeatureProfile(APIEndpoints):
     #     "/v1/feature-profile/sdwan/policy-object/{policy_object_id}/unified/{security_object_list_type}/{security_profile_parcel_id}"
     # )
     # def delete_security_profile_parcel1(
-    #     self, policy_object_id: UUID, security_object_list_type: SecurityPolicyObjectListType, security_profile_parcel_id: UUID
+    #     self, policy_object_id: UUID, security_object_list_type: str, security_profile_parcel_id: UUID
     # ):
     #     ...
 
@@ -47,7 +46,7 @@ class PolicyObjectFeatureProfile(APIEndpoints):
     #     "/v1/feature-profile/sdwan/policy-object/{policy_object_id}/unified/{security_object_list_type}/{security_profile_parcel_id}"
     # )
     # def edit_security_profile_parcel1(
-    #     self, policy_object_id: UUID, security_object_list_type: SecurityPolicyObjectListType, security_profile_parcel_id: UUID
+    #     self, policy_object_id: UUID, security_object_list_type: str, security_profile_parcel_id: UUID
     # ):
     #     ...
 
@@ -63,12 +62,12 @@ class PolicyObjectFeatureProfile(APIEndpoints):
 
     # @versions(supported_versions=(">=20.13"), raises=False)
     # @get("/v1/feature-profile/sdwan/policy-object/{policy_object_list_type}/schema")
-    # def get_sdwan_policy_object_data_prefix_parcel_schema_by_schema_type(self, policy_object_list_type: PolicyObjectListType):
+    # def get_sdwan_policy_object_data_prefix_parcel_schema_by_schema_type(self, policy_object_list_type: str):
     #     ...
 
     # @versions(supported_versions=(">=20.13"), raises=False)
     # @get("/v1/feature-profile/sdwan/policy-object/{policy_object_id}/unified/{security_object_list_type}")
-    # def get_security_profile_parcel(self, policy_object_id: UUID, security_object_list_type: SecurityPolicyObjectListType):
+    # def get_security_profile_parcel(self, policy_object_id: UUID, security_object_list_type: str):
     #     ...
 
     # @versions(supported_versions=(">=20.13"), raises=False)
@@ -76,6 +75,6 @@ class PolicyObjectFeatureProfile(APIEndpoints):
     #     "/v1/feature-profile/sdwan/policy-object/{policy_object_id}/unified/{security_object_list_type}/{security_profile_parcel_id}"
     # )
     # def get_security_profile_parcel_by_parcel_id(
-    #     self, policy_object_id: UUID, security_object_list_type: SecurityPolicyObjectListType, security_profile_parcel_id: UUID
+    #     self, policy_object_id: UUID, security_object_list_type: str, security_profile_parcel_id: UUID
     # ):
     #     ...
