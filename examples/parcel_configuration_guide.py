@@ -2,7 +2,7 @@ import logging
 import sys
 from dataclasses import dataclass
 from ipaddress import IPv4Address, IPv4Network, IPv6Address
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 from catalystwan.api.configuration_groups.parcel import as_global
 from catalystwan.api.feature_profile_api import PolicyObjectFeatureProfileAPI
@@ -10,7 +10,6 @@ from catalystwan.endpoints.configuration_feature_profile import ConfigurationFea
 from catalystwan.models.common import InterfaceTypeEnum, TLOCColorEnum, WellKnownBGPCommunitiesEnum
 from catalystwan.models.configuration.feature_profile.common import FeatureProfileInfo, ParcelCreationResponse
 from catalystwan.models.configuration.feature_profile.sdwan.interest_groups import (
-    AnyInterestGroupParcel,
     ApplicationListEntry,
     ApplicationListParcel,
     AppProbeEntry,
@@ -85,8 +84,8 @@ class CmdArguments:
 
 
 def configure_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectFeatureProfileAPI):
-    items: List[AnyInterestGroupParcel] = []
-    items_ids: List[Tuple[ParcelCreationResponse, AnyInterestGroupParcel]] = []
+    items: List[Any] = []
+    items_ids: List[Tuple[ParcelCreationResponse, Any]] = []
 
     # Security Groups
     fqdn = FQDNDomainParcel(
@@ -287,7 +286,7 @@ def configure_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectF
         print(item.model_dump_json(by_alias=True, indent=4))
 
     for item in items:
-        items_ids.append((api.create(profile, item), item))
+        items_ids.append((api.create(profile, item), item.__class__))
 
     _id, _ = items_ids[-1]
 
@@ -309,12 +308,16 @@ def configure_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectF
         ],
     )
 
-    items_ids.append((api.create(profile, sla), sla))
+    items_ids.append((api.create(profile, sla), sla.__class__))
 
     input("Press enter to delete...")
 
     for _id, item_type in reversed(items_ids):
         api.delete(profile, item_type, _id.id)
+
+
+def retrive_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectFeatureProfileAPI):
+    print(api.get(profile, ApplicationListParcel))  # Get all Application List Parcels
 
 
 def run_demo(args: CmdArguments):
@@ -331,6 +334,7 @@ def run_demo(args: CmdArguments):
             .single_or_default()
         )
         configure_groups_of_interest(profile, api)
+        retrive_groups_of_interest(profile, api)
 
 
 def load_arguments() -> CmdArguments:

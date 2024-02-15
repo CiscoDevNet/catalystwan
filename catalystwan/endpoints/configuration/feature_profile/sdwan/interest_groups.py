@@ -2,9 +2,10 @@
 # flake8: noqa
 from uuid import UUID
 
-from catalystwan.endpoints import APIEndpoints, delete, post, put, versions
-from catalystwan.models.configuration.feature_profile.common import ParcelCreationResponse
+from catalystwan.endpoints import APIEndpoints, delete, get, post, put, versions
+from catalystwan.models.configuration.feature_profile.common import Parcel, ParcelCreationResponse
 from catalystwan.models.configuration.feature_profile.sdwan.interest_groups import AnyInterestGroupParcel
+from catalystwan.typed_list import DataSequence
 
 
 class PolicyObjectFeatureProfile(APIEndpoints):
@@ -50,17 +51,15 @@ class PolicyObjectFeatureProfile(APIEndpoints):
     # ):
     #     ...
 
-    # @versions(supported_versions=(">=20.13"), raises=False)
-    # @get("/v1/feature-profile/sdwan/policy-object/{policy_object_id}/{policy_object_list_type}/{list_object_id}")
-    # def get_data_prefix_profile_parcel_by_parcel_id_for_policy_object(
-    #     self, policy_object_id: UUID, policy_object_list_type: PolicyObjectListType, list_object_id: UUID
-    # ):
-    #     ...
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/policy-object/{profile_id}/{policy_object_list_type}/{list_object_id}")
+    def get_by_id(self, profile_id: UUID, policy_object_list_type: str, list_object_id: UUID) -> Parcel:
+        ...
 
-    # @versions(supported_versions=(">=20.13"), raises=False)
-    # @get("/v1/feature-profile/sdwan/policy-object/{policy_object_id}/{policy_object_list_type}")
-    # def get_all(self, profile_id: UUID, policy_object_list_type: str):
-    #     ...
+    @versions(supported_versions=(">=20.13"), raises=False)
+    @get("/v1/feature-profile/sdwan/policy-object/{profile_id}/{policy_object_list_type}", resp_json_key="data")
+    def get_all(self, profile_id: UUID, policy_object_list_type: str) -> DataSequence[Parcel]:
+        ...
 
     # @versions(supported_versions=(">=20.13"), raises=False)
     # @get("/v1/feature-profile/sdwan/policy-object/{policy_object_list_type}/schema")
