@@ -858,6 +858,29 @@ class TestAPIEndpoints(unittest.TestCase):
                 def get_data(self, fruit_type: FruitEnum) -> None:  # type: ignore [empty-body]
                     ...
 
+    def test_request_decorator_format_url_with_literal(self):
+        FruitType = Literal["banana", "orange", "apple"]
+
+        class TestAPI(APIEndpoints):
+            @request("GET", "/v1/data/{fruit_type}")
+            def get_data(self, fruit_type: FruitType, payload: str) -> None:  # type: ignore [empty-body]
+                ...
+
+        api = TestAPI(self.session_mock)
+        # Act
+        api.get_data("banana", "not a fruit")
+        # Assert
+        self.session_mock.request.assert_called_once_with("GET", self.base_path + "/v1/data/banana", data="not a fruit")
+
+    def test_request_decorator_raises_when_format_url_with_literal_is_not_str_subtype(self):
+        with self.assertRaises(APIEndpointError):
+            FruitType = Literal[1, 2, 3]
+
+            class TestAPI(APIEndpoints):
+                @request("POST", "/v1/data/{fruit_type}")
+                def get_data(self, fruit_type: FruitType) -> None:  # type: ignore [empty-body]
+                    ...
+
     def test_request_decorator_accept_union_of_models(self):
         class TestAPI(APIEndpoints):
             @request("GET", "/v1/data")
