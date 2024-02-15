@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Dict, Mapping, Union
 
 from pydantic import Field
 from typing_extensions import Annotated
@@ -61,15 +61,6 @@ from .security.url_block import URLBlockParcel as URLBlockParcel
 from .security.zone import SecurityZoneListEntry as SecurityZoneListEntry
 from .security.zone import SecurityZoneListParcel as SecurityZoneListParcel
 
-# from .policy import PAYLOAD_ENDPOINT_MAPPING as POLICY_PAYLOAD_ENDPOINT_MAPPING
-# from .policy import AnyPolicyParcel
-# from .security import PAYLOAD_ENDPOINT_MAPPING as SECURITY_PAYLOAD_ENDPOINT_MAPPING
-# from .security import AnySecurityParcel
-
-# AnyInterestGroupParcel = Union[AnyPolicyParcel, AnySecurityParcel]
-# INTEREST_GROUP_PAYLOAD_ENDPOINT_MAPPING = {**POLICY_PAYLOAD_ENDPOINT_MAPPING, **SECURITY_PAYLOAD_ENDPOINT_MAPPING}
-
-
 AnyInterestGroupParcel = Annotated[
     Union[
         AppProbeParcel,
@@ -101,7 +92,7 @@ AnyInterestGroupParcel = Annotated[
     Field(discriminator="type"),
 ]
 
-INTEREST_GROUP_PAYLOAD_ENDPOINT_MAPPING = {
+INTEREST_GROUP_PAYLOAD_ENDPOINT_MAPPING: Mapping[type, str] = {
     AppProbeParcel: "app-probe",
     ApplicationListParcel: "app-list",
     ColorParcel: "color",
