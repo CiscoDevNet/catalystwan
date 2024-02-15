@@ -38,7 +38,7 @@ class CmdArguments:
 
 
 def run_demo(args: CmdArguments):
-    from catalystwan.exceptions import ManagerError
+    from catalystwan.exceptions import ManagerRequestException
     from catalystwan.session import create_manager_session
 
     with create_manager_session(url=args.url, port=args.port, username=args.user, password=args.password) as session:
@@ -210,7 +210,7 @@ def run_demo(args: CmdArguments):
                 device_template = DeviceTemplate.get(args.device_template, session)
                 device_template.policy_id = str(pol_dict["My-Localized-Policy"])
                 session.api.templates.edit(device_template)
-            except ManagerError:
+            except ManagerRequestException:
                 logger.warning("Failed to attach My-Localized-Policy to Device Template")
 
         """ V. Define Centralized Traffic Data QoS Policy to Classify Traffic into Proper Queue
@@ -282,7 +282,7 @@ def run_demo(args: CmdArguments):
         try:
             policy_activate_task = api.centralized.activate(pol_dict["My-Centralized-Policy"])
             policy_activate_task.wait_for_completed()
-        except ManagerError:
+        except ManagerRequestException:
             logger.warning("My-Centralized-Policy activation failed! are vSmarts in Manager mode?")
 
         """End of procedure, below is user prompt to check created policies and delete everything afterwards"""

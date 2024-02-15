@@ -325,7 +325,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 ```python
 try:
 	session.api.users.delete_user("XYZ")
-except vManageBadRequestError as error:
+except ManagerBadRequestError as error:
 	# Process an error.
 	logger.error(error.info.details)
 

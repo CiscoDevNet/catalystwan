@@ -12,7 +12,7 @@ from requests import Response
 from requests.exceptions import HTTPError
 
 from catalystwan.dataclasses import AdminTech, DeviceAdminTech
-from catalystwan.exceptions import ManagerError
+from catalystwan.exceptions import ManagerRequestException
 from catalystwan.utils.creation_tools import create_dataclass
 
 if TYPE_CHECKING:
@@ -21,15 +21,15 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class GenerateAdminTechLogError(ManagerError):
+class GenerateAdminTechLogError(ManagerRequestException):
     pass
 
 
-class DownloadAdminTechLogError(ManagerError):
+class DownloadAdminTechLogError(ManagerRequestException):
     pass
 
 
-class RequestTokenIdNotFound(ManagerError):
+class RequestTokenIdNotFound(ManagerRequestException):
     pass
 
 

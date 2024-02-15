@@ -4,7 +4,7 @@ import logging
 from typing import TYPE_CHECKING
 
 from catalystwan.dataclasses import TenantAAA, TenantRadiusServer, TenantTacacsServer
-from catalystwan.exceptions import ManagerError
+from catalystwan.exceptions import ManagerRequestException
 from catalystwan.utils.creation_tools import asdict, create_dataclass
 
 if TYPE_CHECKING:
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class AAAConfigNotPresent(ManagerError):
+class AAAConfigNotPresent(ManagerRequestException):
     pass
 
 
