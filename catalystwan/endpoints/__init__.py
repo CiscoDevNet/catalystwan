@@ -43,6 +43,7 @@ from typing import (
     Final,
     Iterable,
     List,
+    Literal,
     Mapping,
     Optional,
     Protocol,
@@ -538,8 +539,19 @@ class request(APIEndpointsDecorator):
             raise APIEndpointError(f"Missing parameters: {missing} to format url: {self.url}")
 
         for parameter in [parameters.get(name) for name in self.url_field_names]:
+            # Check if 'params' is type of str, UUID or LIteral
             if not (isclass(parameter.annotation) and issubclass(parameter.annotation, (str, UUID))):
-                raise APIEndpointError(f"Parameter {parameter} used for url formatting must be 'str' sub-type or UUID")
+                if not get_origin(parameter.annotation) == Literal:
+                    raise APIEndpointError(
+                        f"Parameter {parameter} used for url formatting must be 'str', UUID or Literal sub-type"
+                    )
+
+                elif p_args := get_args(parameter.annotation):
+                    # Check if all 'params' Literal values are str
+                    if not all((isinstance(arg, str) for arg in p_args)):
+                        raise APIEndpointError(
+                            f"Literal values for parameter {parameter} used for url formatting must be 'str'"
+                        )
 
         no_purpose_params = {
             parameters.get(name) for name in general_purpose_arg_names.difference(self.url_field_names)
