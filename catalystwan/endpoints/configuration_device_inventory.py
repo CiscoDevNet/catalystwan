@@ -172,7 +172,7 @@ class ConfigType(str, Enum):
 
 class GenerateBoostrapConfigurationQueryParams(BaseModel):
     configtype: Optional[ConfigType] = Field(default=ConfigType.CLOUDINIT)
-    incl_def_root_cert: Optional[bool] = Field(default=False)
+    incl_def_root_cert: Optional[bool] = Field(default=False, alias="inclDefRootCert")
     version: Optional[str] = Field(default="v1")
 
 

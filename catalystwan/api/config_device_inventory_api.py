@@ -49,7 +49,7 @@ class ConfigurationDeviceInventoryAPI:
         Returns handy model of generated bootstrap config
         """
         params = GenerateBoostrapConfigurationQueryParams(
-            configtype=configtype, incl_def_root_cert=incl_def_root_cert, version=version
+            configtype=configtype, inclDefRootCert=incl_def_root_cert, version=version
         )
         reponse = self.endpoint.generate_bootstrap_configuration(uuid=device_uuid, params=params)
 
