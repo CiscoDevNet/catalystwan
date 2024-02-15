@@ -568,7 +568,7 @@ class TemplatesAPI:
             else:
                 for field_name, field_value in template.model_fields.items():
                     data_path = get_extra_field(field_value, "data_path", default=[])
-                    vmanage_key = get_extra_field(field_value, "data_path")
+                    vmanage_key = get_extra_field(field_value, "vmanage_key")
                     if field.dataPath == data_path and (  # type: ignore
                         (field.key == field_value.alias or field.key == field_name)
                         or field.key == vmanage_key  # type: ignore
