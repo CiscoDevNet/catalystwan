@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, cast
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
-from pydantic.v1 import BaseModel, root_validator
+from pydantic import BaseModel, model_validator
 
 from catalystwan.api.templates.device_variable import DeviceVariable
 from catalystwan.utils.device_model import DeviceModel
@@ -29,7 +29,7 @@ class FeatureTemplate(BaseModel, ABC):
             undefined=DebugUndefined,
         )
         template = env.get_template(self.payload_path.name)
-        output = template.render(self.dict())
+        output = template.render(self.model_dump())
 
         ast = env.parse(output)
         if meta.find_undeclared_variables(ast):
@@ -49,7 +49,8 @@ class FeatureTemplate(BaseModel, ABC):
     def type(self) -> str:
         raise NotImplementedError()
 
-    @root_validator(pre=True)
+    @model_validator(mode="before")
+    @classmethod
     def remove_device_variables(cls, values):
         if "device_specific_variables" not in values:
             values["device_specific_variables"] = {}
@@ -59,7 +60,7 @@ class FeatureTemplate(BaseModel, ABC):
         for key, value in values.items():
             if isinstance(value, DeviceVariable):
                 to_delete[key] = value
-                field_key = cls.__fields__[key].field_info.extra.get("vmanage_key", cls.__fields__[key].alias)
+                field_key = cls.model_fields[key].json_schema_extra.get("vmanage_key", cls.model_fields[key].alias)
                 values["device_specific_variables"][field_key] = DeviceVariable(name=value.name)
 
         for var in to_delete:

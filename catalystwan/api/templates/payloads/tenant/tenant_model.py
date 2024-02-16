@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, List, Optional
 
-from pydantic.v1 import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from catalystwan.api.templates.feature_template import FeatureTemplate
 from catalystwan.endpoints.monitoring_device_details import Tier as TierInfo
@@ -23,8 +23,7 @@ class Tenant(BaseModel):
 
 
 class TenantModel(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     type: ClassVar[str] = "tenant"  # Tenant
     payload_path: ClassVar[Path] = Path(__file__).parent / "tenant.json.j2"

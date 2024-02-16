@@ -43,7 +43,7 @@ class TestFeatureTemplate2(TestCase):
         self.maxDiff = 10000
         self.assertDictEqual(
             definition["templateDefinition"],
-            feature_template_payload.dict(by_alias=True)["templateDefinition"],
+            feature_template_payload.model_dump(by_alias=True)["templateDefinition"],
         )
 
 
