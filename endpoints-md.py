@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from importlib import metadata
 from inspect import getsourcefile, getsourcelines
 from os import environ
 from pathlib import Path, PurePath
@@ -10,6 +11,7 @@ from urllib.request import pathname2url
 
 from packaging.specifiers import SpecifierSet  # type: ignore
 
+from catalystwan import __package__
 from catalystwan.endpoints import BASE_PATH, APIEndpointRequestMeta, TypeSpecifier, request, versions, view
 from catalystwan.utils.session_type import SessionType  # type: ignore
 
@@ -206,5 +208,6 @@ if __name__ == "__main__":
     )
     if environ.get("catalystwan_export_endpoints") is not None:
         with open("ENDPOINTS.md", "w") as f:
-            f.write("**THIS FILE IS AUTO-GENERATED DO NOT EDIT**\n\n")
+            f.write("**THIS FILE WAS AUTO-GENERATED DO NOT EDIT**\n\n")
+            f.write(f"Generated for: {__package__}-{metadata.version(__package__)}\n\n")
             f.write(endpoint_registry.md())
