@@ -3,11 +3,12 @@ import sys
 from dataclasses import dataclass
 from ipaddress import IPv4Address, IPv4Network, IPv6Network
 from typing import Any, List, Optional, Tuple
+from uuid import UUID
 
 from catalystwan.api.feature_profile_api import PolicyObjectFeatureProfileAPI
 from catalystwan.endpoints.configuration_feature_profile import ConfigurationFeatureProfile
 from catalystwan.models.common import InterfaceTypeEnum, TLOCColorEnum, WellKnownBGPCommunitiesEnum
-from catalystwan.models.configuration.feature_profile.common import FeatureProfileInfo, ParcelCreationResponse
+from catalystwan.models.configuration.feature_profile.common import ParcelCreationResponse
 from catalystwan.models.configuration.feature_profile.sdwan.interest_groups import (
     ApplicationListParcel,
     AppProbeParcel,
@@ -52,7 +53,7 @@ class CmdArguments:
     device_template: Optional[str] = None
 
 
-def configure_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectFeatureProfileAPI):
+def configure_groups_of_interest(profile_id: UUID, api: PolicyObjectFeatureProfileAPI):
     """
     This function creates various policy objects such as
         FQDN,
@@ -93,14 +94,11 @@ def configure_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectF
 
     # Create FQDN parcel and add FQDNs
     fqdn = FQDNDomainParcel(parcel_name="FQDNDomainParcelExmaple")
-    fqdn.add_fqdn("www.cisco.com")
-    fqdn.add_fqdn("www.aws.com")
-    fqdn.add_fqdn("www.youtube.com")
+    fqdn.from_fqdns(["www.cisco.com", "www.aws.com", "www.youtube.com"])
 
     # Create Local Domain parcel and add Local Domains
     local_domain = LocalDomainParcel(parcel_name="LocalDomainParcelExample")
-    local_domain.add_local_domain("www.google.com")
-    local_domain.add_local_domain("www.ciscodevnet.com")
+    local_domain.from_local_domains(["www.google.com", "www.ciscodevnet.com"])
 
     # Create IPS Signature parcel and add signatures
     ips_signature = IPSSignatureParcel(parcel_name="IPSSignatureParcelExample")
@@ -206,7 +204,7 @@ def configure_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectF
 
     # Create Fowarding Class parcel and add fowarding classes
     fowarding_class = FowardingClassParcel(parcel_name="FowardingClassParcelExmaple")
-    fowarding_class.add_queue("4")
+    fowarding_class.add_queue(4)
 
     # Create Tloc Parcel and add tlocs
     tloc_list = TlocParcel(parcel_name="TlocParcelExample")
@@ -265,7 +263,7 @@ def configure_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectF
         print(item.model_dump_json(by_alias=True, indent=4))
 
     for item in items:
-        items_ids.append((api.create(profile, item), item.__class__))
+        items_ids.append((api.create(profile_id, item), item.__class__))
 
     _id, _ = items_ids[-1]
 
@@ -275,16 +273,16 @@ def configure_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectF
         criteria=SLAClassCriteriaEnum.JITTER_LATENCY_LOSS, latency_variance=10, jitter_variance=10, loss_variance=10
     )
 
-    items_ids.append((api.create(profile, sla), sla.__class__))
+    items_ids.append((api.create(profile_id, sla), sla.__class__))
 
     input("Press enter to delete...")
 
     for _id, item_type in reversed(items_ids):
-        api.delete(profile, item_type, _id.id)
+        api.delete(profile_id, item_type, _id.id)
 
 
-def retrive_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectFeatureProfileAPI):
-    print(api.get(profile, ApplicationListParcel))  # Get all Application List Parcels
+def retrive_groups_of_interest(profile_id: UUID, api: PolicyObjectFeatureProfileAPI):
+    print(api.get(profile_id, ApplicationListParcel))  # Get all Application List Parcels
 
 
 def run_demo(args: CmdArguments):
@@ -303,14 +301,14 @@ def run_demo(args: CmdArguments):
         url=args.url, port=args.port, username=args.user, password=args.password, logger=logger
     ) as session:
         api = PolicyObjectFeatureProfileAPI(session)
-        profile = (
+        profile_id = (
             ConfigurationFeatureProfile(session)
             .get_sdwan_feature_profiles()
             .filter(profile_name=PROFILE_NAME)
             .single_or_default()
-        )
-        configure_groups_of_interest(profile, api)
-        retrive_groups_of_interest(profile, api)
+        ).profile_id
+        configure_groups_of_interest(profile_id, api)
+        retrive_groups_of_interest(profile_id, api)
 
 
 def load_arguments() -> CmdArguments:

@@ -26,7 +26,7 @@ class ProfileType(str, Enum):
 
 
 class FeatureProfileInfo(BaseModel):
-    profile_id: str = Field(alias="profileId")
+    profile_id: UUID = Field(alias="profileId")
     profile_name: str = Field(alias="profileName")
     solution: Solution
     profile_type: ProfileType = Field(alias="profileType")

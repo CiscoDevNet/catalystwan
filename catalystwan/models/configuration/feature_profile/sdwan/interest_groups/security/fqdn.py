@@ -15,5 +15,6 @@ class FQDNListEntry(BaseModel):
 class FQDNDomainParcel(_ParcelBase):
     entries: List[FQDNListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
-    def add_fqdn(self, fqdn: str):
-        self.entries.append(FQDNListEntry(pattern=as_global(fqdn)))
+    def from_fqdns(self, fqdns: List[str]):
+        for fqdn in fqdns:
+            self.entries.append(FQDNListEntry(pattern=as_global(fqdn)))

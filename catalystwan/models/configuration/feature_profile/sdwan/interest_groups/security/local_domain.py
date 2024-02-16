@@ -15,5 +15,6 @@ class LocalDomainListEntry(BaseModel):
 class LocalDomainParcel(_ParcelBase):
     entries: List[LocalDomainListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
-    def add_local_domain(self, domain: str):
-        self.entries.append(LocalDomainListEntry(name_server=as_global(domain)))
+    def from_local_domains(self, domains: List[str]):
+        for domain in domains:
+            self.entries.append(LocalDomainListEntry(name_server=as_global(domain)))
