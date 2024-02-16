@@ -1,8 +1,13 @@
-from typing import Optional
+from typing import Any, Optional, Union
 
+from pydantic import BaseModel
 from requests import HTTPError, RequestException
 
-from catalystwan.response import ManagerErrorInfo, ManagerResponse
+
+class ManagerErrorInfo(BaseModel):
+    message: Union[str, None]
+    details: Union[str, None]
+    code: Union[str, None]
 
 
 class CatalystwanException(Exception):
@@ -18,26 +23,16 @@ class ManagerRequestException(RequestException, CatalystwanException):
 
 
 class ManagerHTTPError(HTTPError, ManagerRequestException):
-    def __init__(self, *args, **kwargs):
-        """Initialize RequestException with `request` and `response` objects."""
-        super().__init__(*args, **kwargs)
-
-
-class ManagerBadResponseError(ManagerHTTPError):
-    """Indicates that vManage returned error HTTP status code other than 400."""
-
-    def __init__(self, error_info: Optional[ManagerErrorInfo], response: ManagerResponse):
+    def __init__(self, *, error_info: Optional[ManagerErrorInfo], request: Any, response: Any):
+        """Initialize RequestException with `error_info`, `request` and `response` objects."""
         self.info = error_info
-        super().__init__(response=response)
+        super().__init__(request=request, response=response)
 
 
-class ManagerBadRequestError(ManagerBadResponseError):
-    """Indicates that vManage returned HTTP status code 400.
+class DefaultPasswordError(CatalystwanException):
+    """Default password for SDWAN Manager user was detected and needs to be changed."""
 
-    A 400 Bad Request response status code indicates that the server
-    could not understand the request due to invalid syntax,
-    malformed request message, or missing request parameters.
-    """
+    pass
 
 
 class InvalidOperationError(CatalystwanException):

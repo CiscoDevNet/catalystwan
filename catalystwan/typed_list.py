@@ -5,6 +5,7 @@ from typing import Any, Generic, Iterable, MutableSequence, Type, TypeVar, overl
 from pydantic import BaseModel as BaseModelV2
 from pydantic.v1 import BaseModel as BaseModelV1
 
+from catalystwan.exceptions import InvalidOperationError
 from catalystwan.utils.creation_tools import AttrsInstance, asdict
 
 T = TypeVar("T")
@@ -220,7 +221,7 @@ class DataSequence(TypedList[T], Generic[T]):
             return default
 
         if len(self.data) > 1:
-            raise IndexError("The input sequence contains more than one element.")
+            raise InvalidOperationError("The input sequence contains more than one element.")
 
         return self.data[0]
 
@@ -258,6 +259,6 @@ class DataSequence(TypedList[T], Generic[T]):
         """
 
         if len(self.data) < 1:
-            raise IndexError("The input sequence contains no elements.")
+            raise InvalidOperationError("The input sequence contains no elements.")
 
         return self.data[0]

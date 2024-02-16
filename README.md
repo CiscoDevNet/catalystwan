@@ -325,13 +325,13 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 ```python
 try:
     session.api.users.delete("bogus-user-name")
-except ManagerBadResponseError as error:
+except ManagerHTTPError as error:
     # Process an error.
-    logger.error(error.info.details)
+    print(error.response.status_code)
+    print(error.info.code)
+    print(error.info.message)
+    print(error.info.details)
 
-# message = 'Delete users request failed' 
-# details = 'Failed to process device request -  Error Message : bad-element:user' 
-# code = 'USER0006'
 ```
 
 ## [Supported API endpoints](https://github.com/CiscoDevNet/catalystwan/blob/main/ENDPOINTS.md)

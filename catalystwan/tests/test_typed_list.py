@@ -7,6 +7,7 @@ from attr import define  # type: ignore
 from parameterized import parameterized
 
 from catalystwan.dataclasses import DataclassBase, Device, User
+from catalystwan.exceptions import InvalidOperationError
 from catalystwan.typed_list import DataSequence, TypedList
 
 
@@ -323,7 +324,7 @@ class TestDataSequence(TestCase):
         data_seq = DataSequence(User, self.users)
 
         # Act, Assert
-        with self.assertRaises(IndexError):
+        with self.assertRaises(InvalidOperationError):
             data_seq.single_or_default()
 
     @parameterized.expand(

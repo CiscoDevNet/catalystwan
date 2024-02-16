@@ -12,18 +12,13 @@ from requests.exceptions import JSONDecodeError
 
 from catalystwan import with_proc_info_header
 from catalystwan.abstractions import APIEndpointClientResponse
+from catalystwan.exceptions import ManagerErrorInfo
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.creation_tools import create_dataclass
 
 T = TypeVar("T")
 PRINTABLE_CONTENT = re.compile(r"(text\/.+)|(application\/(json|html|xhtml|xml|x-www-form-urlencoded))", re.IGNORECASE)
 SENSITIVE_URL_PATHS = ["/dataservice/settings/configuration/smartaccountcredentials"]
-
-
-class ManagerErrorInfo(BaseModelV2):
-    message: Union[str, None]
-    details: Union[str, None]
-    code: Union[str, None]
 
 
 def response_debug(response: Optional[Response], request: Union[Request, PreparedRequest, None]) -> str:

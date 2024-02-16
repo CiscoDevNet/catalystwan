@@ -9,7 +9,7 @@ from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # t
 
 from catalystwan.dataclasses import BfdSessionData, Connection, Device, WanInterface
 from catalystwan.endpoints.real_time_monitoring.reboot_history import RebootEntry
-from catalystwan.exceptions import InvalidOperationError
+from catalystwan.exceptions import CatalystwanException
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.creation_tools import create_dataclass
 from catalystwan.utils.operation_status import OperationStatus
@@ -128,7 +128,7 @@ class DevicesAPI:
         if response.get("id"):
             action_id = response["id"]
         else:
-            raise InvalidOperationError("Failed to push edges list certificates")
+            raise CatalystwanException("Failed to push edges list certificates")
 
         return True if wait_for_state() else False
 

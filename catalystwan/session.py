@@ -19,9 +19,8 @@ from catalystwan.endpoints import APIEndpointClient
 from catalystwan.endpoints.client import AboutInfo, ServerInfo
 from catalystwan.endpoints.endpoints_container import APIEndpointContainter
 from catalystwan.exceptions import (
-    InvalidOperationError,
-    ManagerBadRequestError,
-    ManagerBadResponseError,
+    DefaultPasswordError,
+    ManagerHTTPError,
     ManagerRequestException,
     SessionNotCreatedError,
     TenantSubdomainNotFound,
@@ -103,7 +102,7 @@ def create_manager_session(
 
     try:
         server_info = session.server()
-    except InvalidOperationError:
+    except DefaultPasswordError:
         server_info = ServerInfo.parse_obj({})
 
     session.server_name = server_info.server
@@ -215,19 +214,14 @@ class ManagerSession(vManageResponseAdapter, APIEndpointClient):
             return self.request(method, url, *args, **kwargs)
 
         if response.request.url and "passwordReset.html" in response.request.url:
-            raise InvalidOperationError("Password must be changed to use this session.")
+            raise DefaultPasswordError("Password must be changed to use this session.")
 
         try:
             response.raise_for_status()
         except HTTPError as error:
-            self.logger.debug(error)
+            self.logger.error(error)
             error_info = response.get_error_info()
-            if response.status_code == 403:
-                self.logger.info(f"User {self.username} is unauthorized for method {method} {full_url}")
-            if response.status_code == 400:
-                raise ManagerBadRequestError(error_info, response)
-            else:
-                raise ManagerBadResponseError(error_info, response)
+            raise ManagerHTTPError(error_info=error_info, request=error.request, response=error.response)
         return response
 
     def get_full_url(self, url_path: str) -> str:
