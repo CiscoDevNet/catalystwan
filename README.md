@@ -121,11 +121,11 @@ critical_alarms = session.api.alarms.get(from_time=n).filter(severity=Severity.C
 session.api.users.get()
 
 # Create user
-new_user = User(userName="new_user", password="new_user", group=["netadmin"], description="new user")
+new_user = User(username="new_user", password="new_user", group=["netadmin"], description="new user")
 session.api.users.create(new_user)
 
 # Update user data
-new_user_update = UserUpdateRequest(userName="new_user", group=["netadmin", "netops"], locale="en_US", description="updated-new_user-description", resGroupName="global")
+new_user_update = UserUpdateRequest(username="new_user", group=["netadmin", "netops"], locale="en_US", description="updated-new_user-description")
 session.api.users.update(new_user_update)
 
 # Update user password
@@ -324,13 +324,13 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 ## Catching Exceptions
 ```python
 try:
-	session.api.users.delete_user("XYZ")
-except ManagerBadRequestError as error:
-	# Process an error.
-	logger.error(error.info.details)
+    session.api.users.delete("bogus-user-name")
+except ManagerBadResponseError as error:
+    # Process an error.
+    logger.error(error.info.details)
 
 # message = 'Delete users request failed' 
-# details = 'No user with name XYZ was found' 
+# details = 'Failed to process device request -  Error Message : bad-element:user' 
 # code = 'USER0006'
 ```
 
