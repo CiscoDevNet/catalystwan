@@ -3,7 +3,7 @@ from typing import List
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 
 
 class ProtocolTypeEnum(str, Enum):
@@ -182,4 +182,7 @@ class ProtocolListEntry(BaseModel):
 
 
 class ProtocolListParcel(_ParcelBase):
-    entries: List[ProtocolListEntry] = Field(validation_alias=AliasPath("data", "entries"))
+    entries: List[ProtocolListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
+
+    def add_protocol(self, protocol: ProtocolTypeEnum):
+        self.entries.append(ProtocolListEntry(protocol=as_global(protocol)))

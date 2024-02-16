@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
-from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 from catalystwan.models.policy.lists_entries import PolicerExceedActionEnum
 
 
@@ -26,4 +26,13 @@ class PolicierEntry(BaseModel):
 
 
 class PolicierParcel(_ParcelBase):
-    entries: List[PolicierEntry] = Field(validation_alias=AliasPath("data", "entries"))
+    entries: List[PolicierEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
+
+    def add_entry(self, burst: int, exceed: PolicerExceedActionEnum, rate: int):
+        self.entries.append(
+            PolicierEntry(
+                burst=as_global(burst),
+                exceed=as_global(exceed),
+                rate=as_global(rate),
+            )
+        )

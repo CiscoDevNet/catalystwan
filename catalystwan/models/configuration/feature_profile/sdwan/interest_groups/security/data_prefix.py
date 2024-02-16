@@ -3,7 +3,7 @@ from typing import List
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 
 
 class SecurityDataPrefixEntry(BaseModel):
@@ -12,4 +12,7 @@ class SecurityDataPrefixEntry(BaseModel):
 
 
 class SecurityDataPrefixParcel(_ParcelBase):
-    entries: List[SecurityDataPrefixEntry] = Field(validation_alias=AliasPath("data", "entries"))
+    entries: List[SecurityDataPrefixEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
+
+    def add_prefix(self, ip_prefix: IPv4Network):
+        self.entries.append(SecurityDataPrefixEntry(ip_prefix=as_global(ip_prefix)))

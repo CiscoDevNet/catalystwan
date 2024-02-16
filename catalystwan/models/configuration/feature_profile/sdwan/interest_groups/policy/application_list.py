@@ -2,7 +2,7 @@ from typing import List, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 
 
 class ApplicationListEntry(BaseModel):
@@ -17,5 +17,11 @@ class ApplicationFamilyListEntry(BaseModel):
 
 class ApplicationListParcel(_ParcelBase):
     entries: List[Union[ApplicationListEntry, ApplicationFamilyListEntry]] = Field(
-        validation_alias=AliasPath("data", "entries")
+        default=[], validation_alias=AliasPath("data", "entries")
     )
+
+    def add_application(self, application: str):
+        self.entries.append(ApplicationListEntry(app_list=as_global(application)))
+
+    def add_application_family(self, application_family: str):
+        self.entries.append(ApplicationFamilyListEntry(app_list_family=as_global(application_family)))

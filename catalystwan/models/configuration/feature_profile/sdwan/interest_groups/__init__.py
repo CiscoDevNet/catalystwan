@@ -54,10 +54,9 @@ from .security.protocol_list import ProtocolListParcel as ProtocolListParcel
 from .security.protocol_list import ProtocolTypeEnum as ProtocolTypeEnum
 from .security.security_port import SecurityPortListEntry as SecurityPortListEntry
 from .security.security_port import SecurityPortParcel as SecurityPortParcel
-from .security.url_allow import URLAllowListEntry as URLAllowListEntry
-from .security.url_allow import URLAllowParcel as URLAllowParcel
-from .security.url_block import URLBlockListEntry as URLBlockListEntry
-from .security.url_block import URLBlockParcel as URLBlockParcel
+from .security.url import BaseURLListEntry as BaseURLListEntry
+from .security.url import URLAllowParcel as URLAllowParcel
+from .security.url import URLBlockParcel as URLBlockParcel
 from .security.zone import SecurityZoneListEntry as SecurityZoneListEntry
 from .security.zone import SecurityZoneListParcel as SecurityZoneListParcel
 

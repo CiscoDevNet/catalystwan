@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
-from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 
 
 class SLAClassCriteriaEnum(str, Enum):
@@ -123,4 +123,29 @@ class SLAClassListEntry(BaseModel):
 
 
 class SLAClassParcel(_ParcelBase):
-    entries: List[SLAClassListEntry] = Field(validation_alias=AliasPath("data", "entries"))
+    entries: List[SLAClassListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
+
+    def add_entry(self, app_probe_class_id: UUID, loss: Optional[int], jitter: Optional[int], latency: Optional[int]):
+        self.entries.append(
+            SLAClassListEntry(
+                app_probe_class=SLAAppProbeClass(ref_id=as_global(app_probe_class_id)),
+                loss=as_global(loss),
+                jitter=as_global(jitter),
+                latency=as_global(latency),
+            )
+        )
+
+    def add_fallback(
+        self,
+        criteria: SLAClassCriteriaEnum,
+        jitter_variance: Optional[int],
+        latency_variance: Optional[int],
+        loss_variance: Optional[int],
+    ):
+        fallback = FallbackBestTunnel(
+            criteria=as_global(criteria),
+            jitter_variance=as_global(jitter_variance),
+            latency_variance=as_global(latency_variance),
+            loss_variance=as_global(loss_variance),
+        )
+        self.entries[0].fallback_best_tunnel = fallback

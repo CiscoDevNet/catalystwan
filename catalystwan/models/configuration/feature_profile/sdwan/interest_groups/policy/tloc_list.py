@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
-from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 from catalystwan.models.common import TLOCColorEnum
 from catalystwan.models.policy.lists_entries import EncapEnum
 
@@ -26,4 +26,16 @@ class TlocEntry(BaseModel):
 
 
 class TlocParcel(_ParcelBase):
-    entries: List[TlocEntry] = Field(validation_alias=AliasPath("data", "entries"))
+    entries: List[TlocEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
+
+    def add_entry(
+        self, tloc: IPv4Address, color: TLOCColorEnum, encapsulation: EncapEnum, preference: Optional[str] = None
+    ):
+        self.entries.append(
+            TlocEntry(
+                tloc=as_global(tloc),
+                color=as_global(color),
+                encapsulation=as_global(encapsulation),
+                preference=as_global(preference),
+            )
+        )

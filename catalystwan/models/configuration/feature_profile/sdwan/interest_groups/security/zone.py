@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from pydantic import AliasPath, BaseModel, Field, field_validator, model_validator
 
-from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 from catalystwan.models.common import InterfaceTypeEnum, check_fields_exclusive
 
 
@@ -23,4 +23,18 @@ class SecurityZoneListEntry(BaseModel):
 
 
 class SecurityZoneListParcel(_ParcelBase):
-    entries: List[SecurityZoneListEntry] = Field(validation_alias=AliasPath("data", "entries"))
+    entries: List[SecurityZoneListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
+
+    def add_interface(self, interface: InterfaceTypeEnum):
+        self.entries.append(
+            SecurityZoneListEntry(
+                interface=as_global(interface),
+            )
+        )
+
+    def add_vpn(self, vpn: str):
+        self.entries.append(
+            SecurityZoneListEntry(
+                vpn=as_global(vpn),
+            )
+        )

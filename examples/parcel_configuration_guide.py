@@ -1,70 +1,40 @@
 import logging
 import sys
 from dataclasses import dataclass
-from ipaddress import IPv4Address, IPv4Network, IPv6Address
+from ipaddress import IPv4Address, IPv4Network, IPv6Network
 from typing import Any, List, Optional, Tuple
 
-from catalystwan.api.configuration_groups.parcel import as_global
 from catalystwan.api.feature_profile_api import PolicyObjectFeatureProfileAPI
 from catalystwan.endpoints.configuration_feature_profile import ConfigurationFeatureProfile
 from catalystwan.models.common import InterfaceTypeEnum, TLOCColorEnum, WellKnownBGPCommunitiesEnum
 from catalystwan.models.configuration.feature_profile.common import FeatureProfileInfo, ParcelCreationResponse
 from catalystwan.models.configuration.feature_profile.sdwan.interest_groups import (
-    ApplicationListEntry,
     ApplicationListParcel,
-    AppProbeEntry,
-    AppProbeMapItem,
     AppProbeParcel,
-    ColorEntry,
     ColorParcel,
-    DataPrefixEntry,
     DataPrefixParcel,
     ExpandedCommunityParcel,
-    FallbackBestTunnel,
     FowardingClassParcel,
-    FowardingClassQueueEntry,
     FQDNDomainParcel,
-    FQDNListEntry,
-    GeoLocationListEntry,
     GeoLocationListParcel,
-    IPSSignatureListEntry,
     IPSSignatureParcel,
-    IPv6DataPrefixEntry,
     IPv6DataPrefixParcel,
-    IPv6PrefixListEntry,
     IPv6PrefixListParcel,
-    LocalDomainListEntry,
     LocalDomainParcel,
-    PolicierEntry,
     PolicierParcel,
-    Preference,
-    PreferredColorGroupEntry,
     PreferredColorGroupParcel,
-    PrefixListEntry,
     PrefixListParcel,
-    ProtocolListEntry,
     ProtocolListParcel,
     ProtocolTypeEnum,
-    SecurityApplicationFamilyListEntry,
-    SecurityApplicationListEntry,
     SecurityApplicationListParcel,
-    SecurityDataPrefixEntry,
     SecurityDataPrefixParcel,
-    SecurityPortListEntry,
     SecurityPortParcel,
-    SecurityZoneListEntry,
     SecurityZoneListParcel,
-    SLAAppProbeClass,
     SLAClassCriteriaEnum,
-    SLAClassListEntry,
     SLAClassParcel,
-    StandardCommunityEntry,
     StandardCommunityParcel,
-    TlocEntry,
     TlocParcel,
-    URLAllowListEntry,
     URLAllowParcel,
-    URLBlockListEntry,
     URLBlockParcel,
 )
 from catalystwan.models.policy.lists_entries import EncapEnum, PathPreferenceEnum, PolicerExceedActionEnum
@@ -84,178 +54,192 @@ class CmdArguments:
 
 
 def configure_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectFeatureProfileAPI):
+    """
+    This function creates various policy objects such as
+        FQDN,
+        Local Domain,
+        IPS Signature,
+        Allowed URL,
+        Blocked URL,
+        Security Port,
+        Geolocation,
+        Security Zone,
+        Security Application List,
+        Security Data Prefix,
+        Protocol,
+        Color,
+        Data Prefix,
+        IPv6 Data Prefix,
+        Application Family,
+        Preferred Color Group,
+        Policier,
+        Fowarding Class,
+        Tloc,
+        Standard Community,
+        Expanded Community,
+        App Probe, and
+        SLA Class.
+
+    Args:
+        profile (FeatureProfileInfo): The feature profile to which the policy objects are to be added.
+        api (PolicyObjectFeatureProfileAPI): The API object used to create and delete the policy objects.
+
+    Returns:
+        None: This function does not return any additional values.
+    """
     items: List[Any] = []
     items_ids: List[Tuple[ParcelCreationResponse, Any]] = []
 
     # Security Groups
-    fqdn = FQDNDomainParcel(
-        parcel_name="FQDNDomainParcelExmaple",
-        entries=[FQDNListEntry(pattern=as_global("www.cisco.com")), FQDNListEntry(pattern=as_global("www.aws.com"))],
-    )
-    local_domain = LocalDomainParcel(
-        parcel_name="LocalDomainParcelExample", entries=[LocalDomainListEntry(name_server=as_global("www.google.com"))]
-    )
-    ips_signature = IPSSignatureParcel(
-        parcel_name="IPSSignatureParcelExample",
-        entries=[IPSSignatureListEntry(generator_id=as_global("30"), signature_id=as_global("1000"))],
-    )
-    url_allowed = URLAllowParcel(
-        parcel_name="URLAllowParcelExample", entries=[URLAllowListEntry(pattern=as_global("https://www.cisco.com/"))]
-    )
-    url_blocked = URLBlockParcel(
-        parcel_name="URLBlockParcelExample", entries=[URLBlockListEntry(pattern=as_global("https://www.example.com/"))]
-    )
-    security_port = SecurityPortParcel(
-        parcel_name="SecurityPortParcelExmaple",
-        entries=[
-            SecurityPortListEntry(port=as_global("10")),
-            SecurityPortListEntry(port=as_global("50-100")),
-            SecurityPortListEntry(port=as_global("400-999")),
-        ],
-    )
-    geolocation = GeoLocationListParcel(
-        parcel_name="GeoLocationListParcelExample",
-        entries=[
-            GeoLocationListEntry(country=as_global("BVT")),
-            GeoLocationListEntry(country=as_global("ATA")),
-            GeoLocationListEntry(continent=as_global("AF")),
-        ],
-    )
-    security_zone = SecurityZoneListParcel(
-        parcel_name="SecurityZoneListParcel",
-        entries=[
-            SecurityZoneListEntry(interface=as_global(InterfaceTypeEnum.FAST_ETHERNET)),
-            SecurityZoneListEntry(interface=as_global(InterfaceTypeEnum.FIVE_GIGABIT_ETHERNET)),
-        ],
-    )
-    security_application_list = SecurityApplicationListParcel(
-        parcel_name="SecurityApplListParcelExample",
-        entries=[
-            SecurityApplicationFamilyListEntry(app_list_family=as_global("app-fam-2")),
-            SecurityApplicationListEntry(app_list=as_global("msn-messenger-ft")),
-            SecurityApplicationListEntry(app_list=as_global("aol-messenger")),
-        ],
-    )
-    security_data_prefix_parcel = SecurityDataPrefixParcel(
-        parcel_name="SecurityDataPrefixExample",
-        entries=[
-            SecurityDataPrefixEntry(ip_prefix=as_global(IPv4Network("10.0.0.0/16"))),
-            SecurityDataPrefixEntry(ip_prefix=as_global(IPv4Network("30.0.0.0/16"))),
-            SecurityDataPrefixEntry(ip_prefix=as_global(IPv4Network("50.0.0.0/16"))),
-        ],
-    )
-    protocol_list = ProtocolListParcel(
-        parcel_name="ProtocolListParcelExample",
-        entries=[
-            ProtocolListEntry(protocol=as_global(ProtocolTypeEnum.APPLEQTC)),
-            ProtocolListEntry(protocol=as_global(ProtocolTypeEnum.CISCO_SVCS)),
-            ProtocolListEntry(protocol=as_global(ProtocolTypeEnum.CDDBP)),
-            ProtocolListEntry(protocol=as_global(ProtocolTypeEnum.EXEC)),
-            ProtocolListEntry(protocol=as_global(ProtocolTypeEnum.HSRP)),
-        ],
-    )
+
+    # Create FQDN parcel and add FQDNs
+    fqdn = FQDNDomainParcel(parcel_name="FQDNDomainParcelExmaple")
+    fqdn.add_fqdn("www.cisco.com")
+    fqdn.add_fqdn("www.aws.com")
+    fqdn.add_fqdn("www.youtube.com")
+
+    # Create Local Domain parcel and add Local Domains
+    local_domain = LocalDomainParcel(parcel_name="LocalDomainParcelExample")
+    local_domain.add_local_domain("www.google.com")
+    local_domain.add_local_domain("www.ciscodevnet.com")
+
+    # Create IPS Signature parcel and add signatures
+    ips_signature = IPSSignatureParcel(parcel_name="IPSSignatureParcelExample")
+    ips_signature.add_signature("30:1000")
+    ips_signature.add_signature("60:3000")
+
+    # Create Allowed URL parcel and add URLs
+    url_allowed = URLAllowParcel(parcel_name="URLAllowParcelExample")
+    url_allowed.add_url("https://www.cisco.com/")
+    url_allowed.add_url("https://www.test.com/")
+
+    # Create Blocked URL parcel and add URLs
+    url_blocked = URLBlockParcel(parcel_name="URLBlockParcelExample")
+    url_blocked.add_url("https://www.example.com/")
+
+    # Create security port parcel and add ports
+    security_port = SecurityPortParcel(parcel_name="SecurityPortParcelExmaple")
+    security_port.add_port("10")
+    security_port.add_port("50-100")
+    security_port.add_port("400-999")
+
+    # Create Geolocation parcel and add geolocations
+    geolocation = GeoLocationListParcel(parcel_name="GeoLocationListParcelExample")
+    geolocation.add_continent("AF")
+    geolocation.add_country("BVT")
+    geolocation.add_country("ATA")
+
+    # Create Security Zone parcel and add interfaces
+    security_zone = SecurityZoneListParcel(parcel_name="SecurityZoneListParcel")
+    security_zone.add_interface(InterfaceTypeEnum.ETHERNET)
+    security_zone.add_interface(InterfaceTypeEnum.TUNNEL)
+
+    # Create Application parcel and add applications
+    security_application_list = SecurityApplicationListParcel(parcel_name="SecurityApplListParcelExample")
+    security_application_list.add_application("msn-messenger-ft")
+    security_application_list.add_application("aol-messenger")
+    security_application_list.add_application_family("app-fam-2")
+
+    # Create Security data prefix parcel and add data prefixes
+    security_data_prefix_parcel = SecurityDataPrefixParcel(parcel_name="SecurityDataPrefixExample")
+    security_data_prefix_parcel.add_prefix(IPv4Network("10.0.0.0/16"))
+    security_data_prefix_parcel.add_prefix(IPv4Network("30.0.0.0/16"))
+    security_data_prefix_parcel.add_prefix(IPv4Network("50.0.0.0/16"))
+    security_data_prefix_parcel.add_prefix(IPv4Network("60.0.0.0/16"))
+
+    # Create Protocol parcel and add protocols
+    protocol_list = ProtocolListParcel(parcel_name="ProtocolListParcelExample")
+    protocol_list.add_protocol(ProtocolTypeEnum.EXEC)
+    protocol_list.add_protocol(ProtocolTypeEnum.H323)
+    protocol_list.add_protocol(ProtocolTypeEnum.BOOTPS)
+    protocol_list.add_protocol(ProtocolTypeEnum.ACE_SVR)
+    protocol_list.add_protocol(ProtocolTypeEnum.CISCO_SVCS)
+    protocol_list.add_protocol(ProtocolTypeEnum.NTP)
+    protocol_list.add_protocol(ProtocolTypeEnum.BOOTPC)
 
     # Policy Groups
-    color_parcel = ColorParcel(
-        parcel_name="ColorParcelExample",
-        entries=[ColorEntry(color=as_global(TLOCColorEnum.LTE)), ColorEntry(color=as_global(TLOCColorEnum.GREEN))],
+
+    # Create Color parcel and add colors
+    color_parcel = ColorParcel(parcel_name="ColorParcelExample")
+    color_parcel.add_color(TLOCColorEnum.BIZ_INTERNET)
+    color_parcel.add_color(TLOCColorEnum.METRO_ETHERNET)
+    color_parcel.add_color(TLOCColorEnum.PUBLIC_INTERNET)
+
+    # Create Data prefix parcel and add data prefixes
+    data_prefix_parcel = DataPrefixParcel(parcel_name="DataPrefixExample")
+    data_prefix_parcel.add_data_prefix(IPv4Network("10.0.0.0/16"))
+    data_prefix_parcel.add_data_prefix(IPv4Network("50.0.0.0/32"))
+
+    # Create Prefix parcel and add prefixes
+    prefix_list_parcel = PrefixListParcel(parcel_name="PrefixListExample")
+    prefix_list_parcel.add_prefix(IPv4Network("10.0.0.0/16"))
+    prefix_list_parcel.add_prefix(IPv4Network("50.0.0.0/32"))
+
+    # Create IPv6 data prefix parcel and add IPv6 prefixes
+    ipv6_data_prefix = IPv6DataPrefixParcel(parcel_name="IPv6DataPrefixExample")
+    ipv6_data_prefix.add_prefix(IPv6Network("2000:0:0:0::/128"))
+    ipv6_data_prefix.add_prefix(IPv6Network("2001:0:0:0::/128"))
+    ipv6_data_prefix.add_prefix(IPv6Network("2002:0:0:0::/128"))
+
+    # Create IPv6 prefix parcel and add IPv6 prefixes
+    ipv6_prefix_list = IPv6PrefixListParcel(parcel_name="IPv6PrefixListExample")
+    ipv6_prefix_list.add_prefix(IPv6Network("2000:0:0:0::/64"))
+    ipv6_prefix_list.add_prefix(IPv6Network("2001:0:0:0::/64"))
+    ipv6_prefix_list.add_prefix(IPv6Network("2002:0:0:0::/64"))
+
+    # Create Application family parcel and add application families
+    application_list_parcel = ApplicationListParcel(parcel_name="AppListExample")
+    application_list_parcel.add_application_family("app-fam-2")
+    application_list_parcel.add_application_family("sugarcrm")
+
+    # Create Preferred color parcel and add preferred colors
+    preferred_group_color = PreferredColorGroupParcel(parcel_name="PreferredColorGroupParcelExmaple")
+    preferred_group_color.add_primary(
+        color_preference=[TLOCColorEnum.BIZ_INTERNET, TLOCColorEnum.MPLS],
+        path_preference=PathPreferenceEnum.DIRECT_PATH,
     )
-    data_prefix_parcel = DataPrefixParcel(
-        parcel_name="DataPrefixExample",
-        entries=[DataPrefixEntry(ipv4_address=as_global(IPv4Address("10.0.0.0")), ipv4_prefix_length=as_global(16))],
+    preferred_group_color.add_secondary(
+        color_preference=[TLOCColorEnum.BRONZE, TLOCColorEnum.SILVER], path_preference=PathPreferenceEnum.DIRECT_PATH
     )
-    prefix_list_parcel = PrefixListParcel(
-        parcel_name="PrefixListExample",
-        entries=[PrefixListEntry(ipv4_address=as_global(IPv4Address("10.0.0.0")), ipv4_prefix_length=as_global(16))],
+    preferred_group_color.add_tertiary(
+        color_preference=[TLOCColorEnum.METRO_ETHERNET], path_preference=PathPreferenceEnum.MULTI_HOP_PATH
     )
-    ipv6_data_prefix = IPv6DataPrefixParcel(
-        parcel_name="IPv6DataPrefixExample",
-        entries=[
-            IPv6DataPrefixEntry(ipv6_address=as_global(IPv6Address("2000:0:0:0::")), ipv6_prefix_length=as_global(32))
-        ],
+
+    # Create Policier parcel and add policiers
+    policier = PolicierParcel(parcel_name="PolicierParcelExmaple")
+    policier.add_entry(burst=17000, exceed=PolicerExceedActionEnum.DROP, rate=1000)
+
+    # Create Fowarding Class parcel and add fowarding classes
+    fowarding_class = FowardingClassParcel(parcel_name="FowardingClassParcelExmaple")
+    fowarding_class.add_queue("4")
+
+    # Create Tloc Parcel and add tlocs
+    tloc_list = TlocParcel(parcel_name="TlocParcelExample")
+    tloc_list.add_entry(
+        tloc=IPv4Address("40.0.0.0"), color=TLOCColorEnum.PRIVATE3, encapsulation=EncapEnum.GRE, preference="1000"
     )
-    ipv6_prefix_list = IPv6PrefixListParcel(
-        parcel_name="IPv6PrefixListExample",
-        entries=[
-            IPv6PrefixListEntry(ipv6_address=as_global(IPv6Address("2000:0:0:0::")), ipv6_prefix_length=as_global(32))
-        ],
+    tloc_list.add_entry(
+        tloc=IPv4Address("50.0.0.0"), color=TLOCColorEnum.CUSTOM1, encapsulation=EncapEnum.GRE, preference="10000"
     )
-    application_list_parcel = ApplicationListParcel(
-        parcel_name="AppListExample",
-        entries=[
-            ApplicationListEntry(app_list=as_global("3com-amp3")),
-            ApplicationListEntry(app_list=as_global("sugarcrm")),
-        ],
-    )
-    preferred_group_color = PreferredColorGroupParcel(
-        parcel_name="PreferredColorGroupParcelExmaple",
-        entries=[
-            PreferredColorGroupEntry(
-                primary_preference=Preference(
-                    color_preference=as_global([TLOCColorEnum.BIZ_INTERNET, TLOCColorEnum.MPLS]),
-                    path_preference=as_global(PathPreferenceEnum.DIRECT_PATH),
-                ),
-                secondary_preference=Preference(
-                    color_preference=as_global([TLOCColorEnum.BRONZE]),
-                    path_preference=as_global(PathPreferenceEnum.DIRECT_PATH),
-                ),
-                tertiary_preference=Preference(
-                    color_preference=as_global([TLOCColorEnum.METRO_ETHERNET]),
-                    path_preference=as_global(PathPreferenceEnum.MULTI_HOP_PATH),
-                ),
-            )
-        ],
-    )
-    policier = PolicierParcel(
-        parcel_name="PolicierParcelExmaple",
-        entries=[
-            PolicierEntry(burst=as_global(17000), exceed=as_global(PolicerExceedActionEnum.DROP), rate=as_global(1000))
-        ],
-    )
-    fowarding_class = FowardingClassParcel(
-        parcel_name="FowardingClassParcelExmaple", entries=[FowardingClassQueueEntry(queue=as_global("4"))]
-    )
-    tloc_list = TlocParcel(
-        parcel_name="TlocParcelExample",
-        entries=[
-            TlocEntry(
-                tloc=as_global(IPv4Address("20.0.0.0")),
-                color=as_global(TLOCColorEnum.PRIVATE3),
-                encapsulation=as_global(EncapEnum.GRE),
-                preference=as_global("1000"),
-            ),
-            TlocEntry(
-                tloc=as_global(IPv4Address("30.0.0.0")),
-                color=as_global(TLOCColorEnum.CUSTOM1),
-                encapsulation=as_global(EncapEnum.GRE),
-                preference=as_global("10000"),
-            ),
-        ],
-    )
-    standard_community = StandardCommunityParcel(
-        parcel_name="StandardCommunityParcelExample",
-        entries=[
-            StandardCommunityEntry(standard_community=as_global(WellKnownBGPCommunitiesEnum.LOCAL_AS)),
-            StandardCommunityEntry(standard_community=as_global(WellKnownBGPCommunitiesEnum.NO_ADVERTISE)),
-        ],
-    )
-    expanded_community = ExpandedCommunityParcel(
-        parcel_name="ExpandedCommunityParcel",
-        expandedCommunityList=as_global(["CommunityList", "CommunityList2", "CommunityList3"]),
-    )
-    app_probe = AppProbeParcel(
-        parcel_name="AppProbeParcelExample",
-        entries=[
-            AppProbeEntry(
-                forwarding_class_name=as_global("FowardingClassParcelExmaple"),
-                map=[
-                    AppProbeMapItem(color=as_global(TLOCColorEnum.CUSTOM1), dscp=as_global(33)),
-                    AppProbeMapItem(color=as_global(TLOCColorEnum.BLUE), dscp=as_global(40)),
-                    AppProbeMapItem(color=as_global(TLOCColorEnum.PUBLIC_INTERNET), dscp=as_global(43)),
-                ],
-            )
-        ],
-    )
+
+    # Create Standard Community Parcel and add standard communities
+    standard_community = StandardCommunityParcel(parcel_name="StandardCommunityParcelExample")
+    standard_community.add_community(WellKnownBGPCommunitiesEnum.INTERNET)
+    standard_community.add_community(WellKnownBGPCommunitiesEnum.LOCAL_AS)
+    standard_community.add_community(WellKnownBGPCommunitiesEnum.NO_ADVERTISE)
+
+    # Create Expanded Community Parcel and add expanded communities
+    expanded_community = ExpandedCommunityParcel(parcel_name="ExpandedCommunityParcel")
+    expanded_community.add_community("CommunityList1")
+    expanded_community.add_community("CommunityList2")
+    expanded_community.add_community("CommunityList3")
+
+    # Create App Probe Parcel and add app probes
+    app_probe = AppProbeParcel(parcel_name="AppProbeParcelExample")
+    app_probe.add_fowarding_class("FowardingClassParcelExmaple")
+    app_probe.add_map(color=TLOCColorEnum.CUSTOM1, dscp=33)
+    app_probe.add_map(color=TLOCColorEnum.BLUE, dscp=40)
+    app_probe.add_map(color=TLOCColorEnum.PUBLIC_INTERNET, dscp=43)
 
     items.append(fqdn)
     items.append(local_domain)
@@ -290,22 +274,10 @@ def configure_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectF
 
     _id, _ = items_ids[-1]
 
-    sla = SLAClassParcel(
-        parcel_name="SLAClassParcelExample",
-        entries=[
-            SLAClassListEntry(
-                app_probe_class=SLAAppProbeClass(ref_id=as_global(_id.id)),
-                jitter=as_global(20),
-                latency=as_global(50),
-                loss=as_global(100),
-                fallback_best_tunnel=FallbackBestTunnel(
-                    criteria=as_global(SLAClassCriteriaEnum.JITTER_LOSS_LATENCY),
-                    jitter_variance=as_global(10),
-                    latency_variance=as_global(10),
-                    loss_variance=as_global(10),
-                ),
-            )
-        ],
+    sla = SLAClassParcel(parcel_name="SLAClassParcelExample")
+    sla.add_entry(app_probe_class_id=_id.id, jitter=20, latency=50, loss=100)
+    sla.add_fallback(
+        criteria=SLAClassCriteriaEnum.JITTER_LATENCY_LOSS, latency_variance=10, jitter_variance=10, loss_variance=10
     )
 
     items_ids.append((api.create(profile, sla), sla.__class__))
@@ -321,6 +293,15 @@ def retrive_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectFea
 
 
 def run_demo(args: CmdArguments):
+    """
+    Runs a demo of the Catalyst WAN API.
+
+    Args:
+        args (CmdArguments): The command line arguments.
+
+    Returns:
+        None: This function does not return any additional values.
+    """
     from catalystwan.session import create_manager_session
 
     with create_manager_session(
@@ -338,6 +319,12 @@ def run_demo(args: CmdArguments):
 
 
 def load_arguments() -> CmdArguments:
+    """
+    Load the command line arguments for the script.
+
+    Returns:
+        CmdArguments: The command line arguments.
+    """
     url = sys.argv[1]
     port = sys.argv[2]
     user = sys.argv[3]

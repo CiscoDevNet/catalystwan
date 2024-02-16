@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
-from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 
 
 class IPSSignatureListEntry(BaseModel):
@@ -28,4 +28,13 @@ class IPSSignatureListEntry(BaseModel):
 
 
 class IPSSignatureParcel(_ParcelBase):
-    entries: List[IPSSignatureListEntry] = Field(validation_alias=AliasPath("data", "entries"))
+    entries: List[IPSSignatureListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
+
+    def add_signature(self, signature: str):
+        generator_id, signature_id = signature.split(":")
+        self.entries.append(
+            IPSSignatureListEntry(
+                generator_id=as_global(generator_id),
+                signature_id=as_global(signature_id),
+            )
+        )

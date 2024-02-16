@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import AliasPath, BaseModel, Field, field_validator
 
-from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 
 
 class FowardingClassQueueEntry(BaseModel):
@@ -16,4 +16,7 @@ class FowardingClassQueueEntry(BaseModel):
 
 
 class FowardingClassParcel(_ParcelBase):
-    entries: List[FowardingClassQueueEntry] = Field(validation_alias=AliasPath("data", "entries"))
+    entries: List[FowardingClassQueueEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
+
+    def add_queue(self, queue: str):
+        self.entries.append(FowardingClassQueueEntry(queue=as_global(queue)))

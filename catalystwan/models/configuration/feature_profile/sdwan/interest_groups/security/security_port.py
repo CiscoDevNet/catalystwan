@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
-from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 
 
 class SecurityPortListEntry(BaseModel):
@@ -27,4 +27,7 @@ class SecurityPortListEntry(BaseModel):
 
 
 class SecurityPortParcel(_ParcelBase):
-    entries: List[SecurityPortListEntry] = Field(validation_alias=AliasPath("data", "entries"))
+    entries: List[SecurityPortListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
+
+    def add_port(self, port: str):
+        self.entries.append(SecurityPortListEntry(port=as_global(port)))

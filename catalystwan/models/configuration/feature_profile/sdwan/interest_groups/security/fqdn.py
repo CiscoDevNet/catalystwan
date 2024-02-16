@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 
 
 class FQDNListEntry(BaseModel):
@@ -13,4 +13,7 @@ class FQDNListEntry(BaseModel):
 
 
 class FQDNDomainParcel(_ParcelBase):
-    entries: List[FQDNListEntry] = Field(validation_alias=AliasPath("data", "entries"))
+    entries: List[FQDNListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
+
+    def add_fqdn(self, fqdn: str):
+        self.entries.append(FQDNListEntry(pattern=as_global(fqdn)))

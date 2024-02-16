@@ -1,9 +1,9 @@
-from ipaddress import IPv4Address
+from ipaddress import IPv4Address, IPv4Network
 from typing import List
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 
 
 class PrefixListEntry(BaseModel):
@@ -13,4 +13,12 @@ class PrefixListEntry(BaseModel):
 
 
 class PrefixListParcel(_ParcelBase):
-    entries: List[PrefixListEntry] = Field(validation_alias=AliasPath("data", "entries"))
+    entries: List[PrefixListEntry] = Field(default_factory=list, validation_alias=AliasPath("data", "entries"))
+
+    def add_prefix(self, ipv4_network: IPv4Network):
+        self.entries.append(
+            PrefixListEntry(
+                ipv4_address=as_global(ipv4_network.network_address),
+                ipv4_prefix_length=as_global(ipv4_network.prefixlen),
+            )
+        )

@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
-from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 from catalystwan.models.common import TLOCColorEnum
 
 
@@ -19,11 +19,22 @@ class AppProbeMapItem(BaseModel):
 
 class AppProbeEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-    map: List[AppProbeMapItem]
+    map: List[AppProbeMapItem] = Field(default=[])
     forwarding_class_name: Global[str] = Field(
         serialization_alias="forwardingClass", validation_alias="forwardingClass"
     )
 
 
 class AppProbeParcel(_ParcelBase):
-    entries: List[AppProbeEntry] = Field(validation_alias=AliasPath("data", "entries"))
+    entries: List[AppProbeEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
+
+    def add_fowarding_class(self, forwarding_class_name: str):
+        self.entries.append(
+            AppProbeEntry(
+                forwarding_class_name=as_global(forwarding_class_name),
+            )
+        )
+
+    def add_map(self, color: TLOCColorEnum, dscp: int):
+        entry = self.entries[0]
+        entry.map.append(AppProbeMapItem(color=as_global(color), dscp=as_global(dscp)))

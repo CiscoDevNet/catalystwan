@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 
 
 class LocalDomainListEntry(BaseModel):
@@ -13,4 +13,7 @@ class LocalDomainListEntry(BaseModel):
 
 
 class LocalDomainParcel(_ParcelBase):
-    entries: List[LocalDomainListEntry] = Field(validation_alias=AliasPath("data", "entries"))
+    entries: List[LocalDomainListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
+
+    def add_local_domain(self, domain: str):
+        self.entries.append(LocalDomainListEntry(name_server=as_global(domain)))

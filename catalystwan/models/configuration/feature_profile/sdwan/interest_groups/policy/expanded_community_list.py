@@ -1,13 +1,18 @@
 from pydantic import AliasPath, ConfigDict, Field, field_validator
 
-from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 
 
 class ExpandedCommunityParcel(_ParcelBase):
     model_config = ConfigDict(populate_by_name=True)
     expandedCommunityList: Global[list] = Field(
-        serialization_alias="expandedCommunityList", validation_alias=AliasPath("data", "expandedCommunityList")
+        default=as_global([]),
+        serialization_alias="expandedCommunityList",
+        validation_alias=AliasPath("data", "expandedCommunityList"),
     )
+
+    def add_community(self, expanded_community: str):
+        self.expandedCommunityList.value.append(expanded_community)
 
     @field_validator("expandedCommunityList")
     @classmethod
