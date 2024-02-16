@@ -42,6 +42,7 @@ from catalystwan.response import ManagerResponse
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.device_model import DeviceModel
 from catalystwan.utils.dict import merge
+from catalystwan.utils.pydantic_field import get_extra_field
 from catalystwan.utils.template_type import TemplateType
 
 if TYPE_CHECKING:
@@ -381,7 +382,7 @@ class TemplatesAPI:
         if self.is_created_by_generator(template):
             debug = False
             schema = self.get_feature_template_schema(template, debug)
-            payload = self.generate_feature_template_payload(template, schema, debug).dict(by_alias=True)
+            payload = self.generate_feature_template_payload(template, schema, debug).model_dump(by_alias=True)
         else:
             payload = json.loads(template.generate_payload(self.session))
 
@@ -540,7 +541,7 @@ class TemplatesAPI:
         payload = self.generate_feature_template_payload(template, schema, debug)
 
         endpoint = "/dataservice/template/feature"
-        response = self.session.post(endpoint, json=payload.dict(by_alias=True, exclude_none=True))
+        response = self.session.post(endpoint, json=payload.model_dump(by_alias=True, exclude_none=True))
 
         return response.json()["templateId"]
 
@@ -565,12 +566,14 @@ class TemplatesAPI:
             if field.key in template.device_specific_variables:
                 value = template.device_specific_variables[field.key]
             else:
-                for field_name, field_value in template.__fields__.items():
-                    if field.dataPath == field_value.field_info.extra.get("data_path", []) and (  # type: ignore
-                        field.key == field_value.alias
-                        or field.key == field_value.field_info.extra.get("vmanage_key")  # type: ignore
+                for field_name, field_value in template.model_fields.items():
+                    data_path = get_extra_field(field_value, "data_path", default=[])
+                    vmanage_key = get_extra_field(field_value, "vmanage_key")
+                    if field.dataPath == data_path and (  # type: ignore
+                        (field.key == field_value.alias or field.key == field_name)
+                        or field.key == vmanage_key  # type: ignore
                     ):
-                        priority_order = field_value.field_info.extra.get("priority_order")  # type: ignore
+                        priority_order = get_extra_field(field_value, "priority_order")  # type: ignore
                         value = getattr(template, field_name)
                         break
                 if value is None:
@@ -581,7 +584,7 @@ class TemplatesAPI:
 
         if debug:
             with open(f"payload_{template.type}.json", "w") as f:
-                f.write(json.dumps(payload.dict(by_alias=True), indent=4))
+                f.write(json.dumps(payload.model_dump(by_alias=True), indent=4))
 
         return payload
 

@@ -31,7 +31,7 @@ from catalystwan.endpoints.administration_user_and_group import (
     UserRole,
     UserUpdateRequest,
 )
-from catalystwan.exceptions import CatalystwanDeprecationWarning, InvalidOperationError
+from catalystwan.exceptions import CatalystwanDeprecationWarning, CatalystwanException
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.creation_tools import asdict, create_dataclass
 
@@ -393,7 +393,7 @@ class AdministrationSettingsAPI:
         elif isinstance(payload, Vbond):
             response = self.__update_vbond(json_payload)
         else:
-            raise InvalidOperationError(f"Not supported payload type: {type(payload).__name__}")
+            raise CatalystwanException(f"Not supported payload type: {type(payload).__name__}")
 
         return True if response.status_code == HTTPStatus.OK else False
 

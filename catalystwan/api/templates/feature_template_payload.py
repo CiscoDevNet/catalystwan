@@ -1,11 +1,10 @@
 from typing import Any, List
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class FeatureTemplatePayload(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     name: str = Field(alias="templateName")
     description: str = Field(alias="templateDescription")
