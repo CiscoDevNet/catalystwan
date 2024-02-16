@@ -51,7 +51,6 @@ from .security.local_domain import LocalDomainListEntry as LocalDomainListEntry
 from .security.local_domain import LocalDomainParcel as LocalDomainParcel
 from .security.protocol_list import ProtocolListEntry as ProtocolListEntry
 from .security.protocol_list import ProtocolListParcel as ProtocolListParcel
-from .security.protocol_list import ProtocolTypeEnum as ProtocolTypeEnum
 from .security.security_port import SecurityPortListEntry as SecurityPortListEntry
 from .security.security_port import SecurityPortParcel as SecurityPortParcel
 from .security.url import BaseURLListEntry as BaseURLListEntry

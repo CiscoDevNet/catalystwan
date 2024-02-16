@@ -25,7 +25,6 @@ from catalystwan.models.configuration.feature_profile.sdwan.interest_groups impo
     PreferredColorGroupParcel,
     PrefixListParcel,
     ProtocolListParcel,
-    ProtocolTypeEnum,
     SecurityApplicationListParcel,
     SecurityDataPrefixParcel,
     SecurityPortParcel,
@@ -149,13 +148,9 @@ def configure_groups_of_interest(profile: FeatureProfileInfo, api: PolicyObjectF
 
     # Create Protocol parcel and add protocols
     protocol_list = ProtocolListParcel(parcel_name="ProtocolListParcelExample")
-    protocol_list.add_protocol(ProtocolTypeEnum.EXEC)
-    protocol_list.add_protocol(ProtocolTypeEnum.H323)
-    protocol_list.add_protocol(ProtocolTypeEnum.BOOTPS)
-    protocol_list.add_protocol(ProtocolTypeEnum.ACE_SVR)
-    protocol_list.add_protocol(ProtocolTypeEnum.CISCO_SVCS)
-    protocol_list.add_protocol(ProtocolTypeEnum.NTP)
-    protocol_list.add_protocol(ProtocolTypeEnum.BOOTPC)
+    protocol_list.add_protocol("ldap")
+    protocol_list.add_protocol("kerberos")
+    protocol_list.add_protocol("cifs")
 
     # Policy Groups
 
