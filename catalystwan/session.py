@@ -18,33 +18,21 @@ from catalystwan.api.api_container import APIContainer
 from catalystwan.endpoints import APIEndpointClient
 from catalystwan.endpoints.client import AboutInfo, ServerInfo
 from catalystwan.endpoints.endpoints_container import APIEndpointContainter
-from catalystwan.exceptions import InvalidOperationError, ManagerError, SessionNotCreatedError, TenantSubdomainNotFound
+from catalystwan.exceptions import (
+    DefaultPasswordError,
+    ManagerHTTPError,
+    ManagerRequestException,
+    SessionNotCreatedError,
+    TenantSubdomainNotFound,
+)
 from catalystwan.models.tenant import Tenant
-from catalystwan.response import ErrorInfo, ManagerResponse, response_history_debug
+from catalystwan.response import ManagerResponse, response_history_debug
 from catalystwan.utils.session_type import SessionType
 from catalystwan.version import NullVersion, parse_api_version
 from catalystwan.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
 USER_AGENT = f"{__package__}/{metadata.version(__package__)}"
-
-
-class vManageBadResponseError(ManagerError):
-    """Indicates that vManage returned error HTTP status code other than 400."""
-
-    def __init__(self, error_info: Optional[ErrorInfo], response: ManagerResponse):
-        self.response = response
-        self.info = error_info
-        super().__init__(error_info)
-
-
-class vManageBadRequestError(vManageBadResponseError):
-    """Indicates that vManage returned HTTP status code 400.
-
-    A 400 Bad Request response status code indicates that the server
-    could not understand the request due to invalid syntax,
-    malformed request message, or missing request parameters.
-    """
 
 
 class UserMode(str, Enum):
@@ -114,7 +102,7 @@ def create_manager_session(
 
     try:
         server_info = session.server()
-    except InvalidOperationError:
+    except DefaultPasswordError:
         server_info = ServerInfo.parse_obj({})
 
     session.server_name = server_info.server
@@ -218,7 +206,7 @@ class ManagerSession(vManageResponseAdapter, APIEndpointClient):
         except RequestException as exception:
             self.logger.debug(self.response_trace(exception.response, exception.request))
             self.logger.error(exception)
-            raise
+            raise ManagerRequestException(request=exception.request, response=exception.response)
 
         if self.enable_relogin and self.__is_jsession_updated(response):
             self.logger.warning("Logging to session again. Reason: JSESSIONID cookie updated by response")
@@ -226,19 +214,14 @@ class ManagerSession(vManageResponseAdapter, APIEndpointClient):
             return self.request(method, url, *args, **kwargs)
 
         if response.request.url and "passwordReset.html" in response.request.url:
-            raise InvalidOperationError("Password must be changed to use this session.")
+            raise DefaultPasswordError("Password must be changed to use this session.")
 
         try:
             response.raise_for_status()
         except HTTPError as error:
-            self.logger.debug(error)
+            self.logger.error(error)
             error_info = response.get_error_info()
-            if response.status_code == 403:
-                self.logger.info(f"User {self.username} is unauthorized for method {method} {full_url}")
-            if response.status_code == 400:
-                raise vManageBadRequestError(error_info, response)
-            else:
-                raise vManageBadResponseError(error_info, response)
+            raise ManagerHTTPError(error_info=error_info, request=error.request, response=error.response)
         return response
 
     def get_full_url(self, url_path: str) -> str:

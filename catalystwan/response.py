@@ -11,19 +11,14 @@ from requests.cookies import RequestsCookieJar
 from requests.exceptions import JSONDecodeError
 
 from catalystwan import with_proc_info_header
-from catalystwan.endpoints import APIEndpointClientResponse
+from catalystwan.abstractions import APIEndpointClientResponse
+from catalystwan.exceptions import ManagerErrorInfo
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.creation_tools import create_dataclass
 
 T = TypeVar("T")
 PRINTABLE_CONTENT = re.compile(r"(text\/.+)|(application\/(json|html|xhtml|xml|x-www-form-urlencoded))", re.IGNORECASE)
 SENSITIVE_URL_PATHS = ["/dataservice/settings/configuration/smartaccountcredentials"]
-
-
-class ErrorInfo(BaseModelV2):
-    message: Union[str, None]
-    details: Union[str, None]
-    code: Union[str, None]
 
 
 def response_debug(response: Optional[Response], request: Union[Request, PreparedRequest, None]) -> str:
@@ -212,17 +207,17 @@ class ManagerResponse(Response, APIEndpointClientResponse):
             return cls.model_validate(data)  # type: ignore
         return create_dataclass(cls, data)
 
-    def get_error_info(self) -> ErrorInfo:
+    def get_error_info(self) -> ManagerErrorInfo:
         """Returns error information from JSON payload"""
 
         if self.payload.error is None:
-            return ErrorInfo(
+            return ManagerErrorInfo(
                 message=None,
                 details=None,
                 code=None,
             )
 
-        return ErrorInfo(**self.payload.error)
+        return ManagerErrorInfo(**self.payload.error)
 
 
 def with_vmanage_response(method: Callable[[Any], Response]) -> Callable[[Any], ManagerResponse]:

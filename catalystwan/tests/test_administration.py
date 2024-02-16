@@ -34,7 +34,7 @@ from catalystwan.endpoints.administration_user_and_group import (
     UserRole,
     UserUpdateRequest,
 )
-from catalystwan.exceptions import InvalidOperationError
+from catalystwan.exceptions import CatalystwanException
 from catalystwan.utils.certificate_status import ValidityPeriod
 from catalystwan.utils.creation_tools import create_dataclass
 
@@ -450,7 +450,7 @@ class TestAdministrationSettingsAPI(unittest.TestCase):
             AdministrationSettingsAPI(mock_session).update(random_dataclass)
 
         # Assert
-        self.assertRaises(InvalidOperationError, answer)
+        self.assertRaises(CatalystwanException, answer)
 
     @patch("catalystwan.session.ManagerSession")
     @patch("requests.Response")
