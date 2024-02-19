@@ -4,7 +4,7 @@ from typing import List, Literal, Optional, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase, as_default
+from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase, as_default, as_global
 
 
 class ServerAuthOrder(str, Enum):
@@ -50,7 +50,8 @@ class PubkeyChainItem(BaseModel):
 #     name: Union[Name, Name1] = Field(..., description='Set the username')
 #     password: Union[Password, Password1] = Field(
 #         ...,
-#         description='Set the user password [Note: Catalyst SD-WAN Manager will encrypt this field before saving. Cleartext strings will not be returned back to the user in GET responses for sensitive fields.]',
+#         description='Set the user password [Note: Catalyst SD-WAN Manager will encrypt this field before saving.
+# Cleartext strings will not be returned back to the user in GET responses for sensitive fields.]',
 #     )
 #     privilege: Optional[Union[Privilege, Privilege1, Privilege2]] = Field(
 #         None, description='Set Privilege Level for this user'
@@ -63,530 +64,203 @@ class PubkeyChainItem(BaseModel):
 #     )
 
 
-class GroupName(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: str = Field(..., max_length=32, min_length=1)
+class RadiusServerItem(BaseModel):
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
-
-class Vpn(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: int = Field(..., ge=0, le=65530)
-
-
-class Vpn1(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["default"] = Field(..., alias="optionType")
-    value: int = Field(..., ge=0, le=0)
-
-
-class SourceInterface(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: str = Field(
-        ...,
-        max_length=32,
-        min_length=3,
-        pattern="(ATM|ATM-ACR|AppGigabitEthernet|AppNav-Compress|AppNav-UnCompress|Async|BD-VIF|BDI|CEM|CEM-ACR|Cellular|Dialer|Embedded-Service-Engine|Ethernet|Ethernet-Internal|FastEthernet|FiftyGigabitEthernet|FiveGigabitEthernet|FortyGigabitEthernet|FourHundredGigE|GMPLS|GigabitEthernet|Group-Async|HundredGigE|L2LISP|LISP|Loopback|MFR|Multilink|Port-channel|SM|Serial|Service-Engine|TenGigabitEthernet|Tunnel|TwentyFiveGigE|TwentyFiveGigabitEthernet|TwoGigabitEthernet|TwoHundredGigE|Vif|Virtual-PPP|Virtual-Template|VirtualPortGroup|Vlan|Wlan-GigabitEthernet|nat64|nat66|ntp|nve|ospfv3|overlay|pseudowire|ucse|vasileft|vasiright|vmi)([0-9]*(. ?[1-9][0-9]*)*|[0-9/]+|[0-9]+/[0-9]+/[0-9]+:[0-9]+|[0-9]+/[0-9]+/[0-9]+|[0-9]+/[0-9]+|[0-9]+)",
-    )
-
-
-class SourceInterface1(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["variable"] = Field(..., alias="optionType")
-    value: str = Field(
-        ...,
-        max_length=64,
-        min_length=1,
-        pattern="^\\{\\{[.\\/\\[\\]a-zA-Z0-9_-]+\\}\\}$",
-    )
-
-
-class SourceInterface2(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["default"] = Field(..., alias="optionType")
-
-
-class Address(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: Union[IPv4Address, IPv6Address]
-
-
-class AuthPort(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: int = Field(..., ge=1, le=65534)
-
-
-class AuthPort1(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["variable"] = Field(..., alias="optionType")
-    value: str = Field(
-        ...,
-        max_length=64,
-        min_length=1,
-        pattern="^\\{\\{[.\\/\\[\\]a-zA-Z0-9_-]+\\}\\}$",
-    )
-
-
-class AuthPort2(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["default"] = Field(..., alias="optionType")
-    value: int = Field(..., ge=1812, le=1812)
-
-
-class AcctPort(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: int = Field(..., ge=1, le=65534)
-
-
-class AcctPort1(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["variable"] = Field(..., alias="optionType")
-    value: str = Field(
-        ...,
-        max_length=64,
-        min_length=1,
-        pattern="^\\{\\{[.\\/\\[\\]a-zA-Z0-9_-]+\\}\\}$",
-    )
-
-
-class AcctPort2(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["default"] = Field(..., alias="optionType")
-    value: int = Field(..., ge=1813, le=1813)
-
-
-class Timeout(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: int = Field(..., ge=1, le=1000)
-
-
-class Timeout1(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["variable"] = Field(..., alias="optionType")
-    value: str = Field(
-        ...,
-        max_length=64,
-        min_length=1,
-        pattern="^\\{\\{[.\\/\\[\\]a-zA-Z0-9_-]+\\}\\}$",
-    )
-
-
-class Timeout2(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["default"] = Field(..., alias="optionType")
-    value: int = Field(..., ge=5, le=5)
-
-
-class Retransmit(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: int = Field(..., ge=1, le=100)
-
-
-class Retransmit1(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["variable"] = Field(..., alias="optionType")
-    value: str = Field(
-        ...,
-        max_length=64,
-        min_length=1,
-        pattern="^\\{\\{[.\\/\\[\\]a-zA-Z0-9_-]+\\}\\}$",
-    )
-
-
-class Retransmit2(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["default"] = Field(..., alias="optionType")
-    value: int = Field(..., ge=3, le=3)
-
-
-class Key(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: str = Field(..., min_length=1)
-
-
-class SecretKey(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: str = Field(..., max_length=150, min_length=1)
-
-
-class SecretKey1(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["variable"] = Field(..., alias="optionType")
-    value: str = Field(
-        ...,
-        max_length=64,
-        min_length=1,
-        pattern="^\\{\\{[.\\/\\[\\]a-zA-Z0-9_-]+\\}\\}$",
-    )
-
-
-class SecretKey2(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["default"] = Field(..., alias="optionType")
-
-
-class KeyEnum(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: Literal["6", "7"]
-
-
-class KeyEnum1(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["default"] = Field(..., alias="optionType")
-
-
-class KeyType1(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: Literal["key", "pac"]
-
-
-class KeyType2(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["variable"] = Field(..., alias="optionType")
-    value: str = Field(
-        ...,
-        max_length=64,
-        min_length=1,
-        pattern="^\\{\\{[.\\/\\[\\]a-zA-Z0-9_-]+\\}\\}$",
-    )
-
-
-class KeyType3(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["default"] = Field(..., alias="optionType")
-    value: Literal["key"]
-
-
-class ServerItem(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    address: Address = Field(..., description="Set IP address of Radius server")
-    auth_port: Optional[Union[AuthPort, AuthPort1, AuthPort2]] = Field(
-        None,
-        alias="authPort",
+    address: Union[Global[IPv4Address], Global[IPv6Address]] = Field(description="Set IP address of Radius server")
+    auth_port: Union[Global[int], Default[int], Variable, None] = Field(
+        default=None,
+        validation_alias="authPort",
+        serialization_alias="authPort",
         description="Set Authentication port to use to connect to Radius server",
     )
-    acct_port: Optional[Union[AcctPort, AcctPort1, AcctPort2]] = Field(
-        None,
-        alias="acctPort",
+    acct_port: Union[Global[int], Default[int], Variable, None] = Field(
+        default=None,
+        validation_alias="acctPort",
+        serialization_alias="acctPort",
         description="Set Accounting port to use to connect to Radius server",
     )
-    timeout: Optional[Union[Timeout, Timeout1, Timeout2]] = Field(
-        None,
+
+    timeout: Union[Variable, Global[int], Default[int], None] = Field(
+        default=None,
         description="Configure how long to wait for replies from the Radius server",
     )
-    retransmit: Optional[Union[Retransmit, Retransmit1, Retransmit2]] = Field(
-        None, description="Configure how many times to contact this Radius server"
+    key: Global[str] = Field(
+        description=(
+            "Set the Radius server shared key [Note: Catalyst SD-WAN Manager will encrypt "
+            "this field before saving. Cleartext strings will not be returned back "
+            "to the user in GET responses for sensitive fields.]"
+        )
     )
-    key: Key = Field(
-        ...,
-        description="Set the Radius server shared key [Note: Catalyst SD-WAN Manager will encrypt this field before saving. Cleartext strings will not be returned back to the user in GET responses for sensitive fields.]",
+    secret_key: Union[Global[str], Variable, None] = Field(
+        default=None,
+        validation_alias="secretKey",
+        serialization_alias="secretKey",
+        description="Set the TACACS server shared type 7 encrypted key",
     )
-    secret_key: Optional[Union[SecretKey, SecretKey1, SecretKey2]] = Field(
-        None,
-        alias="secretKey",
-        description="Set the Radius server shared type 7 encrypted key",
+    # Literal["6", "7"]
+    key_enum: Union[Global[str], Default[None], None] = Field(
+        default=None,
+        validation_alias="keyEnum",
+        serialization_alias="keyEnum",
+        description="Type of encyption. To be used for type 6",
     )
-    key_enum: Optional[Union[KeyEnum, KeyEnum1]] = Field(
-        None, alias="keyEnum", description="Type of encyption. To be used for type 6"
+    # Literal["key", "pac"]
+    key_type: Union[Global[str], Default[str], Variable, None] = Field(
+        default=None, validation_alias="keyType", serialization_alias="keyType", description="key type"
     )
-    key_type: Optional[Union[KeyType1, KeyType2, KeyType3]] = Field(None, alias="keyType", description="key type")
+
+    retransmit: Union[Variable, Global[int], Default[int], None] = Field(
+        default=None, description="Configure how many times to contact this Radius server"
+    )
 
 
 class Radius(BaseModel):
-    group_name: GroupName = Field(..., alias="groupName", description="Set Radius server Group Name")
-    vpn: Optional[Union[Vpn, Vpn1]] = Field(None, description="Set VPN in which Radius server is located")
-    source_interface: Optional[Union[SourceInterface, SourceInterface1, SourceInterface2]] = Field(
-        None,
-        alias="sourceInterface",
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    group_name: Global[str] = Field(
+        validation_alias="groupName", serialization_alias="groupName", description="Set Radius server Group Name"
+    )
+
+    vpn: Union[Global[int], Default[int], None] = Field(
+        default=None, description="Set VPN in which Radius server is located"
+    )
+    source_interface: Union[Global[str], Default[str], None] = Field(
+        default=None,
+        validation_alias="sourceInterface",
+        serialization_alias="sourceInterface",
         description="Set interface to use to reach Radius server",
     )
-    server: List[ServerItem] = Field(..., description="Configure the Radius server")
+    server: List[RadiusServerItem] = Field(description="Configure the Radius server")
+
+    @staticmethod
+    def generate_radius_server(
+        address: Union[IPv4Address, IPv6Address],
+        key: str,
+        auth_port: Optional[int] = None,
+        acct_port: Optional[int] = None,
+        timeout: Optional[int] = None,
+        secret_key: Optional[str] = None,
+        key_enum: Optional[str] = None,
+        key_type: Optional[str] = None,
+        retransmit: Optional[int] = None,
+    ) -> RadiusServerItem:
+        item = RadiusServerItem(
+            address=as_global(address),
+            auth_port=as_global(auth_port),
+            acct_port=as_global(acct_port),
+            key=as_global(key),
+            retransmit=as_global(retransmit),
+            timeout=as_global(timeout),
+            secret_key=as_global(secret_key),
+            key_enum=as_global(key_enum),
+            key_type=as_global(key_type),
+        )
+
+        return item
 
 
-class Vpn2(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: int = Field(..., ge=0, le=65530)
+class TacacsServerItem(BaseModel):
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
-
-class Vpn3(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["default"] = Field(..., alias="optionType")
-    value: int = Field(..., ge=0, le=0)
-
-
-class SourceInterface3(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: str = Field(
-        ...,
-        max_length=32,
-        min_length=3,
-        pattern="(ATM|ATM-ACR|AppGigabitEthernet|AppNav-Compress|AppNav-UnCompress|Async|BD-VIF|BDI|CEM|CEM-ACR|Cellular|Dialer|Embedded-Service-Engine|Ethernet|Ethernet-Internal|FastEthernet|FiftyGigabitEthernet|FiveGigabitEthernet|FortyGigabitEthernet|FourHundredGigE|GMPLS|GigabitEthernet|Group-Async|HundredGigE|L2LISP|LISP|Loopback|MFR|Multilink|Port-channel|SM|Serial|Service-Engine|TenGigabitEthernet|Tunnel|TwentyFiveGigE|TwentyFiveGigabitEthernet|TwoGigabitEthernet|TwoHundredGigE|Vif|Virtual-PPP|Virtual-Template|VirtualPortGroup|Vlan|Wlan-GigabitEthernet|nat64|nat66|ntp|nve|ospfv3|overlay|pseudowire|ucse|vasileft|vasiright|vmi)([0-9]*(. ?[1-9][0-9]*)*|[0-9/]+|[0-9]+/[0-9]+/[0-9]+:[0-9]+|[0-9]+/[0-9]+/[0-9]+|[0-9]+/[0-9]+|[0-9]+)",
-    )
-
-
-class SourceInterface4(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["variable"] = Field(..., alias="optionType")
-    value: str = Field(
-        ...,
-        max_length=64,
-        min_length=1,
-        pattern="^\\{\\{[.\\/\\[\\]a-zA-Z0-9_-]+\\}\\}$",
-    )
-
-
-class SourceInterface5(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["default"] = Field(..., alias="optionType")
-
-
-class Port(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: int = Field(..., ge=1, le=65535)
-
-
-class Port1(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["variable"] = Field(..., alias="optionType")
-    value: str = Field(
-        ...,
-        max_length=64,
-        min_length=1,
-        pattern="^\\{\\{[.\\/\\[\\]a-zA-Z0-9_-]+\\}\\}$",
-    )
-
-
-class Port2(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["default"] = Field(..., alias="optionType")
-    value: int = Field(..., ge=49, le=49)
-
-
-class Timeout3(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: int = Field(..., ge=1, le=1000)
-
-
-class Timeout4(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["variable"] = Field(..., alias="optionType")
-    value: str = Field(
-        ...,
-        max_length=64,
-        min_length=1,
-        pattern="^\\{\\{[.\\/\\[\\]a-zA-Z0-9_-]+\\}\\}$",
-    )
-
-
-class Timeout5(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["default"] = Field(..., alias="optionType")
-    value: int = Field(..., ge=5, le=5)
-
-
-class SecretKey3(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: str = Field(..., max_length=150, min_length=1)
-
-
-class SecretKey4(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["variable"] = Field(..., alias="optionType")
-    value: str = Field(
-        ...,
-        max_length=64,
-        min_length=1,
-        pattern="^\\{\\{[.\\/\\[\\]a-zA-Z0-9_-]+\\}\\}$",
-    )
-
-
-class KeyEnum2(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: Literal["6", "7"]
-
-
-class KeyEnum3(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["default"] = Field(..., alias="optionType")
-
-
-class ServerItem1(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    address: Address = Field(..., description="Set IP address of TACACS server")
-    port: Optional[Union[Port, Port1, Port2]] = Field(None, description="TACACS Port")
-    timeout: Optional[Union[Timeout3, Timeout4, Timeout5]] = Field(
-        None,
+    address: Union[Global[IPv4Address], Global[IPv6Address]] = Field(description="Set IP address of TACACS server")
+    port: Union[Variable, Global[int], Default[int], None] = Field(default=None, description="TACACS Port")
+    timeout: Union[Variable, Global[int], Default[int], None] = Field(
+        default=None,
         description="Configure how long to wait for replies from the TACACS server",
     )
-    key: Key = Field(
-        ...,
-        description="Set the TACACS server shared key [Note: Catalyst SD-WAN Manager will encrypt this field before saving. Cleartext strings will not be returned back to the user in GET responses for sensitive fields.]",
+    key: Global[str] = Field(
+        description=(
+            "Set the TACACS server shared key [Note: Catalyst SD-WAN Manager will encrypt"
+            "this field before saving. Cleartext strings will not be returned back"
+            "to the user in GET responses for sensitive fields.]"
+        )
     )
-    secret_key: Optional[Union[SecretKey3, SecretKey4]] = Field(
-        None,
-        alias="secretKey",
+    secret_key: Union[Global[str], Variable, None] = Field(
+        default=None,
+        validation_alias="secretKey",
+        serialization_alias="secretKey",
         description="Set the TACACS server shared type 7 encrypted key",
     )
-    key_enum: Optional[Union[KeyEnum2, KeyEnum3]] = Field(
-        None, alias="keyEnum", description="Type of encyption. To be used for type 6"
+    # Literal["6", "7"]
+    key_enum: Union[Global[str], Default[None], None] = Field(
+        default=None,
+        validation_alias="keyEnum",
+        serialization_alias="keyEnum",
+        description="Type of encyption. To be used for type 6",
     )
 
 
-class Tacac(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
+class Tacacs(BaseModel):
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    group_name: Global[str] = Field(
+        validation_alias="groupName", serialization_alias="groupName", description="Set TACACS server Group Name"
     )
-    group_name: GroupName = Field(..., alias="groupName", description="Set TACACS server Group Name")
-    vpn: Optional[Union[Vpn2, Vpn3]] = Field(None, description="Set VPN in which TACACS server is located")
-    source_interface: Optional[Union[SourceInterface3, SourceInterface4, SourceInterface5]] = Field(
+    vpn: Union[Global[int], Default[int], None] = Field(
+        default=None, description="Set VPN in which TACACS server is located"
+    )
+    source_interface: Union[Global[str], Default[str], None] = Field(
         None,
-        alias="sourceInterface",
+        validation_alias="sourceInterface",
+        serialization_alias="sourceInterface",
         description="Set interface to use to reach TACACS server",
     )
-    server: List[ServerItem1] = Field(..., description="Configure the TACACS server")
+    server: List[TacacsServerItem] = Field(description="Configure the TACACS server")
+
+    @staticmethod
+    def generate_tacacs_server(
+        address: Union[IPv4Address, IPv6Address],
+        key: str,
+        port: Optional[int] = None,
+        timeout: Optional[int] = None,
+        secret_key: Optional[str] = None,
+        key_enum: Optional[str] = None,
+    ) -> TacacsServerItem:
+        item = TacacsServerItem(
+            address=as_global(address),
+            key=as_global(key),
+            port=as_global(port),
+            timeout=as_global(timeout),
+            secret_key=as_global(secret_key),
+            key_enum=as_global(key_enum),
+        )
+
+        return item
 
 
 class AccountingRuleItem(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    rule_id: Global[str] = Field(
+        validation_alias="ruleId", serialization_alias="ruleId", description="Configure Accounting Rule ID"
     )
-    rule_id: Global[str] = Field(..., alias="ruleId", description="Configure Accounting Rule ID")
     # Literal['commands', 'exec', 'network', 'system']
-    method: Global[str] = Field(..., description="Configure Accounting Method")
+    method: Global[str] = Field(description="Configure Accounting Method")
     # Literal['1', '15']
     level: Union[Global[str], Default[None], None] = Field(None, description="Privilege level when method is commands")
     start_stop: Union[Variable, Global[bool], Default[bool], None] = Field(
-        None, alias="startStop", description="Record start and stop without waiting"
+        default=None,
+        validation_alias="startStop",
+        serialization_alias="startStop",
+        description="Record start and stop without waiting",
     )
-    group: Global[List[str]] = Field(..., description="Use Server-group")
-
-
-class Level2(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: Literal["1", "15"]
+    group: Global[List[str]] = Field(description="Use Server-group")
 
 
 class AuthorizationRuleItem(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    rule_id: Global[str] = Field(
+        validation_alias="ruleId", serialization_alias="ruleId", description="Configure Authorization Rule ID"
     )
-    rule_id: Global[str] = Field(..., alias="ruleId", description="Configure Authorization Rule ID")
-    method: Global[str] = Field(..., description="Method")
+    # Literal["commands"]
+    method: Global[str]
     # Literal['1', '15']
-    level: Global[str] = Field(..., description="Privilege level when method is commands")
-    group: Global[List[str]] = Field(..., description="Use Server-group")
+    level: Global[str] = Field(description="Privilege level when method is commands")
+    group: Global[List[str]] = Field(description="Use Server-group")
     if_authenticated: Union[Global[bool], Default[bool], None] = Field(
-        None, alias="ifAuthenticated", description="Succeed if user has authenticated"
+        default=None,
+        validation_alias="ifAuthenticated",
+        serialization_alias="ifAuthenticated",
+        description="Succeed if user has authenticated",
     )
 
 
@@ -611,10 +285,8 @@ class AAA(_ParcelBase):
     # user: Optional[List[UserItem]] = Field(
     #     None, description='Create local login account', min_length=1
     # )
-    # radius: Optional[List[Radiu]] = Field(
-    #     None, description='Configure the Radius serverGroup'
-    # )
-    tacacs: Optional[List[Tacac]] = Field(None, description="Configure the TACACS serverGroup")
+    radius: Optional[Radius] = Field(default=None, description="Configure the Radius serverGroup")
+    tacacs: Optional[List[Tacacs]] = Field(default=None, description="Configure the TACACS serverGroup")
     accounting_rule: Optional[List[AccountingRuleItem]] = Field(
         default=None, validation_alias=AliasPath("data", "accountingRule"), description="Configure the accounting rules"
     )
@@ -628,10 +300,44 @@ class AAA(_ParcelBase):
         validation_alias=AliasPath("data", "authorizationConfigCommands"),
         description="For configuration mode commands.",
     )
-
-    # TODO add method
     authorization_rule: Optional[List[AuthorizationRuleItem]] = Field(
         default=None,
         validation_alias=AliasPath("data", "authorizationRule"),
         description="Configure the Authorization Rules",
     )
+
+    def add_authorization_rule(
+        self, rule_id: str, method: str, level: str, group: List[str], if_authenticated: bool
+    ) -> AuthorizationRuleItem:
+        item = AuthorizationRuleItem(
+            rule_id=as_global(rule_id),
+            method=as_global(method),
+            level=as_global(level),
+            group=Global[List[str]](value=group),
+            if_authenticated=as_global(if_authenticated),
+        )
+
+        if self.authorization_rule:
+            self.authorization_rule.append(item)
+        else:
+            self.authorization_rule = [item]
+
+        return item
+
+    def add_accounting_rule(
+        self, rule_id: str, method: str, level: str, group: List[str], start_stop: bool
+    ) -> AccountingRuleItem:
+        item = AccountingRuleItem(
+            rule_id=as_global(rule_id),
+            method=as_global(method),
+            level=as_global(level),
+            start_stop=as_global(start_stop),
+            group=Global[List[str]](value=group),
+        )
+
+        if self.accounting_rule:
+            self.accounting_rule.append(item)
+        else:
+            self.accounting_rule = [item]
+
+        return item
