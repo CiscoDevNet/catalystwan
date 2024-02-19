@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from catalystwan.session import ManagerSession
 
 from catalystwan.api.parcel_api import SDRoutingFullConfigParcelAPI
-from catalystwan.endpoints.configuration.feature_profile.sdwan.interest_groups import PolicyObjectFeatureProfile
+from catalystwan.endpoints.configuration.feature_profile.sdwan.policy_object import PolicyObjectFeatureProfile
 from catalystwan.endpoints.configuration_feature_profile import SDRoutingConfigurationFeatureProfile
 from catalystwan.models.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
@@ -17,9 +17,9 @@ from catalystwan.models.configuration.feature_profile.common import (
     Parcel,
     ParcelCreationResponse,
 )
-from catalystwan.models.configuration.feature_profile.sdwan.interest_groups import (
-    INTEREST_GROUP_PAYLOAD_ENDPOINT_MAPPING,
-    AnyInterestGroupParcel,
+from catalystwan.models.configuration.feature_profile.sdwan.policy_object import (
+    POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING,
+    AnyPolicyObjectParcel,
     ApplicationListParcel,
     AppProbeParcel,
     ColorParcel,
@@ -337,14 +337,14 @@ class PolicyObjectFeatureProfileAPI:
     def get(
         self,
         profile_id: UUID,
-        parcel_type: Type[AnyInterestGroupParcel],
+        parcel_type: Type[AnyPolicyObjectParcel],
         parcel_id: Union[UUID, None] = None,
     ) -> DataSequence[Parcel[Any]]:
         """
         Get all Policy Objects for selected profile_id and selected type or get one Policy Object given parcel id
         """
 
-        policy_object_list_type = INTEREST_GROUP_PAYLOAD_ENDPOINT_MAPPING[parcel_type]
+        policy_object_list_type = POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING[parcel_type]
         if not parcel_id:
             return self.endpoint.get_all(profile_id=profile_id, policy_object_list_type=policy_object_list_type)
         parcel = self.endpoint.get_by_id(
@@ -352,22 +352,22 @@ class PolicyObjectFeatureProfileAPI:
         )
         return DataSequence(Parcel, [parcel])
 
-    def create(self, profile_id: UUID, payload: AnyInterestGroupParcel) -> ParcelCreationResponse:
+    def create(self, profile_id: UUID, payload: AnyPolicyObjectParcel) -> ParcelCreationResponse:
         """
         Create Policy Object for selected profile_id based on payload type
         """
 
-        policy_object_list_type = INTEREST_GROUP_PAYLOAD_ENDPOINT_MAPPING[type(payload)]
+        policy_object_list_type = POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING[type(payload)]
         return self.endpoint.create(
             profile_id=profile_id, policy_object_list_type=policy_object_list_type, payload=payload
         )
 
-    def update(self, profile_id: UUID, payload: AnyInterestGroupParcel, list_object_id: UUID):
+    def update(self, profile_id: UUID, payload: AnyPolicyObjectParcel, list_object_id: UUID):
         """
         Update Policy Object for selected profile_id based on payload type
         """
 
-        policy_type = INTEREST_GROUP_PAYLOAD_ENDPOINT_MAPPING[type(payload)]
+        policy_type = POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING[type(payload)]
         return self.endpoint.update(
             profile_id=profile_id, policy_object_list_type=policy_type, list_object_id=list_object_id, payload=payload
         )
@@ -468,12 +468,12 @@ class PolicyObjectFeatureProfileAPI:
     def delete(self, profile_id: UUID, parcel_type: Type[URLBlockParcel], list_object_id: UUID) -> None:
         ...
 
-    def delete(self, profile_id: UUID, parcel_type: Type[AnyInterestGroupParcel], list_object_id: UUID) -> None:
+    def delete(self, profile_id: UUID, parcel_type: Type[AnyPolicyObjectParcel], list_object_id: UUID) -> None:
         """
         Delete Policy Object for selected profile_id based on payload type
         """
 
-        policy_object_list_type = INTEREST_GROUP_PAYLOAD_ENDPOINT_MAPPING[parcel_type]
+        policy_object_list_type = POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING[parcel_type]
         return self.endpoint.delete(
             profile_id=profile_id, policy_object_list_type=policy_object_list_type, list_object_id=list_object_id
         )

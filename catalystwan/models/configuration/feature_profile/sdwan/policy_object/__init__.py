@@ -59,7 +59,7 @@ from .security.url import URLBlockParcel as URLBlockParcel
 from .security.zone import SecurityZoneListEntry as SecurityZoneListEntry
 from .security.zone import SecurityZoneListParcel as SecurityZoneListParcel
 
-AnyInterestGroupParcel = Annotated[
+AnyPolicyObjectParcel = Annotated[
     Union[
         AppProbeParcel,
         ApplicationListParcel,
@@ -90,7 +90,7 @@ AnyInterestGroupParcel = Annotated[
     Field(discriminator="type"),
 ]
 
-INTEREST_GROUP_PAYLOAD_ENDPOINT_MAPPING: Mapping[type, str] = {
+POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING: Mapping[type, str] = {
     AppProbeParcel: "app-probe",
     ApplicationListParcel: "app-list",
     ColorParcel: "color",

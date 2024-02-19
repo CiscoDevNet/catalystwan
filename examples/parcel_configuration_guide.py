@@ -9,7 +9,7 @@ from catalystwan.api.feature_profile_api import PolicyObjectFeatureProfileAPI
 from catalystwan.endpoints.configuration_feature_profile import ConfigurationFeatureProfile
 from catalystwan.models.common import InterfaceTypeEnum, TLOCColorEnum, WellKnownBGPCommunitiesEnum
 from catalystwan.models.configuration.feature_profile.common import ParcelCreationResponse
-from catalystwan.models.configuration.feature_profile.sdwan.interest_groups import (
+from catalystwan.models.configuration.feature_profile.sdwan.policy_object import (
     ApplicationListParcel,
     AppProbeParcel,
     ColorParcel,
