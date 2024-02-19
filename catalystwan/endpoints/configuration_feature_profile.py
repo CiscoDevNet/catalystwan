@@ -96,6 +96,11 @@ class ConfigurationFeatureProfile(APIEndpoints):
     ) -> ParcelId:
         ...
 
+    @versions(supported_versions=(">=20.9"), raises=False)
+    @get("/v1/feature-profile/sdwan")
+    def get_sdwan_feature_profiles(self) -> DataSequence[FeatureProfileInfo]:
+        ...
+
 
 class SDRoutingConfigurationFeatureProfile(APIEndpoints):
     @versions(supported_versions=(">=20.13"), raises=False)

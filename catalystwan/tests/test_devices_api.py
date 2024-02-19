@@ -10,7 +10,7 @@ from catalystwan.dataclasses import BfdSessionData, Connection, Device, WanInter
 from catalystwan.endpoints.endpoints_container import APIEndpointContainter
 from catalystwan.endpoints.monitoring_device_details import DeviceData
 from catalystwan.endpoints.real_time_monitoring.reboot_history import RebootEntry
-from catalystwan.exceptions import InvalidOperationError
+from catalystwan.exceptions import CatalystwanException
 from catalystwan.response import ManagerResponse
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.creation_tools import create_dataclass
@@ -326,7 +326,7 @@ class TestDevicesAPI(TestCase):
             return DevicesAPI(mock_session).send_certificate_state_to_controllers()
 
         # Assert
-        self.assertRaises(InvalidOperationError, answer)
+        self.assertRaises(CatalystwanException, answer)
 
     @parameterized.expand([["vm200", 0], ["vm129", 1], ["vm128", 2], ["vm1", 3]])
     @patch("catalystwan.response.ManagerResponse")

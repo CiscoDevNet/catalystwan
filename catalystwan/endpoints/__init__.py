@@ -43,13 +43,13 @@ from typing import (
     Final,
     Iterable,
     List,
+    Literal,
     Mapping,
     Optional,
     Protocol,
     Sequence,
     Set,
     Tuple,
-    Type,
     TypeVar,
     Union,
     runtime_checkable,
@@ -62,6 +62,7 @@ from pydantic import BaseModel as BaseModelV2
 from pydantic.v1 import BaseModel as BaseModelV1
 from typing_extensions import Annotated, get_args, get_origin
 
+from catalystwan.abstractions import APIEndpointClient, APIEndpointClientResponse
 from catalystwan.exceptions import APIEndpointError, APIRequestPayloadTypeError, APIVersionError, APIViewError
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.session_type import SessionType
@@ -151,50 +152,6 @@ def dict_values_to_str(field_names: Set[str], kwargs: Dict[str, Any]) -> Dict[st
         else:
             result[field_name] = str(field_value)
     return result
-
-
-class APIEndpointClientResponse(Protocol):
-    """
-    Interface to response object. Fits "requests.Response"
-    but set of methods is minimal to allow easy migration to another client if needed
-    """
-
-    @property
-    def text(self) -> str:
-        ...
-
-    @property
-    def content(self) -> bytes:
-        ...
-
-    def dataobj(self, cls: Type[T], sourcekey: Optional[str]) -> T:
-        ...
-
-    def dataseq(self, cls: Type[T], sourcekey: Optional[str]) -> DataSequence[T]:
-        ...
-
-    def json(self) -> dict:
-        ...
-
-
-class APIEndpointClient(Protocol):
-    """
-    Interface to client object.
-    We only need a 'request' function and few vmanage session properties obtained from server.
-    Matched to fit "requests.Session" but migration to other client is possible.
-    At his point not very clean as injection of custom kwargs is possible (and sometimes used)
-    """
-
-    def request(self, method: str, url: str, **kwargs) -> APIEndpointClientResponse:
-        ...
-
-    @property
-    def api_version(self) -> Optional[Version]:
-        ...
-
-    @property
-    def session_type(self) -> Optional[SessionType]:
-        ...
 
 
 class APIEndpoints:
@@ -538,8 +495,19 @@ class request(APIEndpointsDecorator):
             raise APIEndpointError(f"Missing parameters: {missing} to format url: {self.url}")
 
         for parameter in [parameters.get(name) for name in self.url_field_names]:
+            # Check if 'params' is type of str, UUID or LIteral
             if not (isclass(parameter.annotation) and issubclass(parameter.annotation, (str, UUID))):
-                raise APIEndpointError(f"Parameter {parameter} used for url formatting must be 'str' sub-type or UUID")
+                if not get_origin(parameter.annotation) == Literal:
+                    raise APIEndpointError(
+                        f"Parameter {parameter} used for url formatting must be 'str', UUID or Literal sub-type"
+                    )
+
+                elif p_args := get_args(parameter.annotation):
+                    # Check if all 'params' Literal values are str
+                    if not all((isinstance(arg, str) for arg in p_args)):
+                        raise APIEndpointError(
+                            f"Literal values for parameter {parameter} used for url formatting must be 'str'"
+                        )
 
         no_purpose_params = {
             parameters.get(name) for name in general_purpose_arg_names.difference(self.url_field_names)

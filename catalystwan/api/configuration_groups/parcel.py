@@ -59,7 +59,9 @@ class ParcelAttribute(BaseModel):
 # https://github.com/pydantic/pydantic/discussions/6090
 # Usage: Global[str](value="test")
 class Global(ParcelAttribute, Generic[T]):
-    option_type: OptionType = OptionType.GLOBAL
+    option_type: OptionType = Field(
+        default=OptionType.GLOBAL, serialization_alias="optionType", validation_alias="optionType"
+    )
     value: T
 
     def __len__(self) -> int:
