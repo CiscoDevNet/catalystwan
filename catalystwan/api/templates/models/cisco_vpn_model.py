@@ -1,6 +1,7 @@
 from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
+from catalystwan.api.templates.models.cisco_system import ConsoleBaudRate
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -13,13 +14,13 @@ class Role(str, Enum):
 
 
 class Dns(BaseModel):
-    dns_addr: str = Field(json_schema_extra={"vmanage_key": "dns-addr"})
+    dns_addr: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "dns-addr"})
     role: Role = Role.PRIMARY
     model_config = ConfigDict(populate_by_name=True)
 
 
 class DnsIpv6(BaseModel):
-    dns_addr: str = Field(json_schema_extra={"vmanage_key": "dns-addr"})
+    dns_addr: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "dns-addr"})
     role: Optional[Role] = Role.PRIMARY
     model_config = ConfigDict(populate_by_name=True)
 
@@ -215,12 +216,12 @@ class Overload(str, Enum):
 
 class Natpool(BaseModel):
     name: int
-    prefix_length: int = Field(json_schema_extra={"vmanage_key": "prefix-length"})
-    range_start: str = Field(json_schema_extra={"vmanage_key": "range-start"})
-    range_end: str = Field(json_schema_extra={"vmanage_key": "range-end"})
-    overload: Overload = Overload.TRUE
+    prefix_length: Optional[int] = Field(default=None, serialization_alias="prefix-length", validation_alias="prefix-length", json_schema_extra={"vmanage_key": "prefix-length"})
+    range_start: Optional[str] = Field(default=None, serialization_alias="range-start", validation_alias="range-start", json_schema_extra={"vmanage_key": "range-start"})
+    range_end: Optional[str] = Field(default=None, serialization_alias="range-end", validation_alias="range-end", json_schema_extra={"vmanage_key": "range-end"})
+    overload: Optional[Overload] = Overload.TRUE
     direction: Direction
-    tracker_id: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "tracker-id"})
+    tracker_id: Optional[int] = Field(default=None, serialization_alias="tracker-id", validation_alias="tracker-id", json_schema_extra={"vmanage_key": "tracker-id"})
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -230,20 +231,20 @@ class StaticNatDirection(str, Enum):
 
 
 class Static(BaseModel):
-    pool_name: Optional[int] = Field(json_schema_extra={"vmanage_key": "pool-name"})
-    source_ip: str = Field(json_schema_extra={"vmanage_key": "source-ip"})
-    translate_ip: str = Field(json_schema_extra={"vmanage_key": "translate-ip"})
-    static_nat_direction: StaticNatDirection = Field(json_schema_extra={"vmanage_key": "static-nat-direction"})
-    tracker_id: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "tracker-id"})
+    pool_name: Optional[int] = Field(default=None, serialization_alias="pool-name", validation_alias="pool-name", json_schema_extra={"vmanage_key": "pool-name"})
+    source_ip: Optional[str] = Field(default=None, serialization_alias="source-ip", validation_alias="source-ip", json_schema_extra={"vmanage_key": "source-ip"})
+    translate_ip: Optional[str] = Field(default=None, serialization_alias="translate-ip", validation_alias="translate-ip", json_schema_extra={"vmanage_key": "translate-ip"})
+    static_nat_direction: StaticNatDirection = Field(serialization_alias="static-nat-direction", validation_alias="static-nat-direction", json_schema_extra={"vmanage_key": "static-nat-direction"})
+    tracker_id: Optional[int] = Field(default=None, serialization_alias="tracker-id", validation_alias="tracker-id", json_schema_extra={"vmanage_key": "tracker-id"})
     model_config = ConfigDict(populate_by_name=True)
 
 
 class SubnetStatic(BaseModel):
-    source_ip_subnet: str = Field(json_schema_extra={"vmanage_key": "source-ip-subnet"})
-    translate_ip_subnet: str = Field(json_schema_extra={"vmanage_key": "translate-ip-subnet"})
-    prefix_length: int = Field(json_schema_extra={"vmanage_key": "prefix-length"})
-    static_nat_direction: StaticNatDirection = Field(json_schema_extra={"vmanage_key": "static-nat-direction"})
-    tracker_id: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "tracker-id"})
+    source_ip_subnet: str = Field(serialization_alias="source-ip-subnet", validation_alias="source-ip-subnet", json_schema_extra={"vmanage_key": "source-ip-subnet"})
+    translate_ip_subnet: str = Field(serialization_alias="translate-ip-subnet", validation_alias="translate-ip-subnet", json_schema_extra={"vmanage_key": "translate-ip-subnet"})
+    prefix_length: int = Field(serialization_alias="prefix-length", validation_alias="prefix-length", json_schema_extra={"vmanage_key": "prefix-length"})
+    static_nat_direction: StaticNatDirection = Field(serialization_alias="static-nat-direction", validation_alias="static-nat-direction", json_schema_extra={"vmanage_key": "static-nat-direction"})
+    tracker_id: Optional[int] = Field(default=None, serialization_alias="tracker-id", validation_alias="tracker-id", json_schema_extra={"vmanage_key": "tracker-id"})
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -392,14 +393,14 @@ class CiscoVPNModel(FeatureTemplate):
         default=None, json_schema_extra={"data_path": ["ipv6"], "vmanage_key": "route"}
     )
     gre_route: Optional[List[GreRoute]] = Field(
-        default=None, json_schema_extra={"data_path": ["ip"], "vmanage_key": "gre-route"}
+        default=None, serialization_alias="gre-route", validation_alias="gre-route", json_schema_extra={"data_path": ["ip"], "vmanage_key": "gre-route"}
     )
     ipsec_route: Optional[List[IpsecRoute]] = Field(
-        default=None, json_schema_extra={"data_path": ["ip"], "vmanage_key": "ipsec-route"}
+        default=None, serialization_alias="ipsec-route", validation_alias="ipsec-route", json_schema_extra={"data_path": ["ip"], "vmanage_key": "ipsec-route"}
     )
     advertise: Optional[List[Advertise]] = Field(default=None, json_schema_extra={"data_path": ["omp"]})
     ipv6_advertise: Optional[List[Ipv6Advertise]] = Field(
-        default=None, json_schema_extra={"data_path": ["omp"], "vmanage_key": "ipv6-advertise"}
+        default=None, serialization_alias="ipv6-advertise", validation_alias="ipv6-advertise", json_schema_extra={"data_path": ["omp"], "vmanage_key": "ipv6-advertise"}
     )
     pool: Optional[List[Pool]] = Field(default=None, json_schema_extra={"data_path": ["nat64", "v4"]})
     natpool: Optional[List[Natpool]] = Field(default=None, json_schema_extra={"data_path": ["nat"]})
@@ -408,13 +409,20 @@ class CiscoVPNModel(FeatureTemplate):
         default=None, json_schema_extra={"data_path": ["nat"], "vmanage_key": "subnet-static"}
     )
     port_forward: Optional[List[PortForward]] = Field(
-        default=None, json_schema_extra={"data_path": ["nat"], "vmanage_key": "port-forward"}
+        default=None, serialization_alias="port-forward", validation_alias="port-forward", json_schema_extra={"data_path": ["nat"], "vmanage_key": "port-forward"}
     )
-    route_import: Optional[List[RouteImport]] = Field(default=None, json_schema_extra={"vmanage_key": "route-import"})
+    route_import: Optional[List[RouteImport]] = Field(default=None, serialization_alias="route-import", validation_alias="route-import", json_schema_extra={"vmanage_key": "route-import"})
     route_import_from: Optional[List[RouteImportFrom]] = Field(
-        default=None, json_schema_extra={"vmanage_key": "route-import-from"}
+        default=None, serialization_alias="route-import-from", validation_alias="route-import-from", json_schema_extra={"vmanage_key": "route-import-from"}
     )
-    route_export: Optional[List[RouteExport]] = Field(default=None, json_schema_extra={"vmanage_key": "route-export"})
+    route_export: Optional[List[RouteExport]] = Field(default=None, serialization_alias="route-export", validation_alias="route-export", json_schema_extra={"vmanage_key": "route-export"})
+    tunnels_bandwidth: Optional[int] = Field(default=None, serialization_alias="tunnels-bandwidth", validation_alias="tunnels-bandwidth", json_schema_extra={"vmanage_key": "tunnels-bandwidth"})
+    console_baud_rate: Optional[ConsoleBaudRate] = Field(
+        default=None, serialization_alias="console-baud-rate", validation_alias="console-baud-rate", json_schema_extra={"vmanage_key": "console-baud-rate"}
+    )
+    control_connections: Optional[bool] = Field(
+        default=None, serialization_alias="control-connections", validation_alias="control-connections", json_schema_extra={"vmanage_key": "control-connections", "data_path": ["tunnel-interface"]}
+    )
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_vpn"

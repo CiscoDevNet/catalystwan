@@ -9,7 +9,6 @@ from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: 
 from pydantic import BaseModel, model_validator
 
 from catalystwan.api.templates.device_variable import DeviceVariable
-from catalystwan.utils.device_model import DeviceModel
 
 if TYPE_CHECKING:
     from catalystwan.session import ManagerSession
@@ -18,7 +17,7 @@ if TYPE_CHECKING:
 class FeatureTemplate(BaseModel, ABC):
     template_name: str
     template_description: str
-    device_models: List[DeviceModel] = []
+    device_models: List[str] = []
     device_specific_variables: Dict[str, DeviceVariable] = {}
 
     def generate_payload(self, session: ManagerSession) -> str:
@@ -95,10 +94,18 @@ class FeatureTemplate(BaseModel, ABC):
             template_definition_as_dict, device_specific_variables=device_specific_variables
         )
 
+        print(dict(
+            template_name=template_info.name,
+            template_description=template_info.description,
+            device_models=[model for model in template_info.device_type],
+            device_specific_variables=device_specific_variables,
+            **values_from_template_definition,
+        ))
+
         return feature_template_model(
             template_name=template_info.name,
             template_description=template_info.description,
-            device_models=[DeviceModel(model) for model in template_info.device_type],
+            device_models=[model for model in template_info.device_type],
             device_specific_variables=device_specific_variables,
             **values_from_template_definition,
         )

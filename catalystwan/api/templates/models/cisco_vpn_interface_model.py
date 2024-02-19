@@ -1,7 +1,9 @@
 import ipaddress
 from enum import Enum
 from pathlib import Path
-from typing import ClassVar, List, Optional
+from typing import ClassVar, List, Optional, Union
+from catalystwan.api.templates.models.cisco_system import Tracker
+from catalystwan.api.templates.models.cisco_vpn_model import Dns
 
 from pydantic import ConfigDict, Field
 
@@ -63,12 +65,13 @@ class StaticNatDirection(str, Enum):
 
 
 class Static(ConvertBoolToStringModel, ConvertIPToStringModel):
-    source_ip: ipaddress.IPv4Address = Field(json_schema_extra={"vmanage_key": "source-ip"})
-    translate_ip: ipaddress.IPv4Address = Field(json_schema_extra={"vmanage_key": "translate-ip"})
+    source_ip: Optional[ipaddress.IPv4Address] = Field(default=None, serialization_alias="source-ip", validation_alias="source-ip",json_schema_extra={"vmanage_key": "source-ip"})
+    translate_ip: Optional[ipaddress.IPv4Address] = Field(default=None, serialization_alias="translate-ip", validation_alias="translate-ip",json_schema_extra={"vmanage_key": "translate-ip"})
     static_nat_direction: StaticNatDirection = Field(
-        StaticNatDirection.INSIDE, json_schema_extra={"vmanage_key": "static-nat-direction"}
+        default=StaticNatDirection.INSIDE, serialization_alias="static-nat-direction", validation_alias="static-nat-direction",
+        json_schema_extra={"vmanage_key": "static-nat-direction"}
     )
-    source_vpn: int = Field(DEFAULT_STATIC_NAT_SOURCE_VPN_ID, json_schema_extra={"vmanage_key": "source-vpn"})
+    source_vpn: Optional[int] = Field(default=DEFAULT_STATIC_NAT_SOURCE_VPN_ID, serialization_alias="source-vpn", validation_alias="source-vpn", json_schema_extra={"vmanage_key": "source-vpn"})
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -236,7 +239,7 @@ class Ipv6Vrrp(ConvertBoolToStringModel):
 class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel, ConvertIPToStringModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    if_name: str = Field(json_schema_extra={"vmanage_key": "if-name"})
+    if_name: str = Field(serialization_alias="if-name", validation_alias="if-name", json_schema_extra={"vmanage_key": "if-name"})
     interface_description: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "description"})
     poe: Optional[bool] = None
     ipv4_address: Optional[str] = Field(default=None, json_schema_extra={"data_path": ["ip"], "vmanage_key": "address"})
@@ -259,7 +262,7 @@ class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel, ConvertI
     dhcp_helper_v6: Optional[List[DhcpHelperV6]] = Field(
         default=None, json_schema_extra={"vmanage_key": "dhcp-helper-v6"}
     )
-    tracker: Optional[List[str]] = None
+    tracker: Optional[Union[List[str], List[Tracker]]] = None
     auto_bandwidth_detect: Optional[bool] = Field(
         default=None, json_schema_extra={"vmanage_key": "auto-bandwidth-detect"}
     )
@@ -361,7 +364,7 @@ class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel, ConvertI
     all: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
     bgp: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
     dhcp: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
-    dns: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
+    dns: Optional[List[Dns]] = None
     icmp: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
     sshd: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
     netconf: Optional[bool] = Field(
@@ -399,8 +402,8 @@ class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel, ConvertI
     bandwidth_down: Optional[int] = Field(
         default=None, json_schema_extra={"vmanage_key": "bandwidth-down", "data_path": ["qos-adaptive", "downstream"]}
     )
-    dmin: Optional[int] = Field(default=None, json_schema_extra={"data_path": ["qos-adaptive", "downstream", "range"]})
-    dmax: Optional[int] = Field(default=None, json_schema_extra={"data_path": ["qos-adaptive", "downstream", "range"]})
+    dmin: Optional[int] = Field(default=None, json_schema_extra={"data_path": ["qos-adaptive", "downstream", "range"]}, description="Shaping Rate Downstream: Min Downstream (Kbps)")
+    dmax: Optional[int] = Field(default=None, json_schema_extra={"data_path": ["qos-adaptive", "downstream", "range"]}, description="Shaping Rate Downstream: Max Downstream (Kbps)")
     bandwidth_up: Optional[int] = Field(
         default=None, json_schema_extra={"vmanage_key": "bandwidth-up", "data_path": ["qos-adaptive", "upstream"]}
     )

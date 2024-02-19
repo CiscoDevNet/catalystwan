@@ -32,7 +32,7 @@ class Route(str, Enum):
 
 class IPv4Advertise(BaseModel):
     protocol: IPv4AdvertiseProtocol
-    route: Route
+    route: Optional[Route] = Field(default=None)
 
 
 class IPv6AdvertiseProtocol(str, Enum):

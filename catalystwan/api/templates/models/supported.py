@@ -12,6 +12,7 @@ from catalystwan.api.templates.models.cisco_vpn_model import CiscoVPNModel
 from catalystwan.api.templates.models.omp_vsmart_model import OMPvSmart
 from catalystwan.api.templates.models.security_vsmart_model import SecurityvSmart
 from catalystwan.api.templates.models.system_vsmart_model import SystemVsmart
+from catalystwan.api.templates.models.cisco_omp_model import CiscoOMPModel
 
 available_models = {
     "cisco_aaa": CiscoAAAModel,
@@ -20,6 +21,8 @@ available_models = {
     "cisco_ntp": CiscoNTPModel,
     "cisco_ospf": CiscoOSPFModel,
     "cisco_logging": CiscoLoggingModel,
+    "logging": CiscoLoggingModel,
+    "cisco_omp": CiscoOMPModel,
     "omp_vsmart": OMPvSmart,
     "security_vsmart": SecurityvSmart,
     "system_vsmart": SystemVsmart,
