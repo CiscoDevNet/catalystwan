@@ -127,8 +127,8 @@ class DeviceDetailsResponse(BaseModel):
     tags: Optional[List[str]] = None
     draft_mode: Optional[str] = Field(default=None, validation_alias="draftMode", serialization_alias="draftMode")
     solution: Optional[str] = None
-    device_lock: Optional[str] = Field(default=None, validation_alias="deviceLock", serialization_alias="deviceLock")
-    managed_by: Optional[str] = Field(default=None, validation_alias="managedBy", serialization_alias="managedBy")
+    device_lock: Optional[str] = Field(default=None, validation_alias="device-lock", serialization_alias="device-lock")
+    managed_by: Optional[str] = Field(default=None, validation_alias="managed-by", serialization_alias="managed-by")
     configured_site_id: Optional[str] = Field(
         default=None, validation_alias="configuredSiteId", serialization_alias="configuredSiteId"
     )
@@ -159,40 +159,38 @@ class DeviceDetailsResponse(BaseModel):
     time_remaining_for_expiration: Optional[int] = Field(
         default=None, validation_alias="timeRemainingForExpiration", serialization_alias="timeRemainingForExpiration"
     )
-    domain_id: Optional[str] = Field(default=None, validation_alias="domainId", serialization_alias="domainId")
+    domain_id: Optional[str] = Field(default=None, validation_alias="domain-id", serialization_alias="domain-id")
     local_system_ip: Optional[str] = Field(
-        default=None, validation_alias="localSystemIp", serialization_alias="localSystemIp"
+        default=None, validation_alias="local-system-ip", serialization_alias="ocal-system-ip"
     )
-    system_ip: Optional[str] = Field(default=None, validation_alias="systemIp", serialization_alias="systemIp")
-    model_sku: Optional[str] = Field(default=None, validation_alias="modelSku", serialization_alias="modelSku")
-    site_id: Optional[str] = Field(default=None, validation_alias="siteId", serialization_alias="siteId")
-    host_name: Optional[str] = Field(default=None, validation_alias="hostName", serialization_alias="hostName")
+    system_ip: Optional[str] = Field(default=None, validation_alias="system-ip", serialization_alias="system-ip")
+    model_sku: Optional[str] = Field(default=None)
+    site_id: Optional[str] = Field(default=None, validation_alias="site-id", serialization_alias="site-id")
+    host_name: Optional[str] = Field(default=None, validation_alias="host-name", serialization_alias="host-name")
     sp_organization_name: Optional[str] = Field(
-        default=None, validation_alias="spOrganizationName", serialization_alias="spOrganizationName"
+        default=None, validation_alias="sp-organization-name", serialization_alias="sp-organization-name"
     )
-    version: Optional[str] = Field(default=None, validation_alias="version", serialization_alias="version")
-    vbond: Optional[str] = Field(default=None, validation_alias="vbond", serialization_alias="vbond")
+    version: Optional[str] = Field(default=None)
+    vbond: Optional[str] = Field(default=None)
     vmanage_system_ip: Optional[str] = Field(
-        default=None, validation_alias="vmanageSystemIp", serialization_alias="vmanageSystemIp"
+        default=None, validation_alias="vmanage-system-ip", serialization_alias="vmanage-system-ip"
     )
     vmanage_connection_state: Optional[str] = Field(
         default=None, validation_alias="vmanageConnectionState", serialization_alias="vmanageConnectionState"
     )
-    last_updated: Optional[int] = Field(default=None, validation_alias="lastUpdated", serialization_alias="lastUpdated")
-    reachability: Optional[str] = Field(
-        default=None, validation_alias="reachability", serialization_alias="reachability"
-    )
-    uptime_date: Optional[int] = Field(default=None, validation_alias="uptimeDate", serialization_alias="uptimeDate")
+    last_updated: Optional[int] = Field(default=None, validation_alias="lastupdated", serialization_alias="lastupdated")
+    reachability: Optional[str] = Field(default=None)
+    uptime_date: Optional[int] = Field(default=None, validation_alias="uptime-date", serialization_alias="uptime-date")
     default_version: Optional[str] = Field(
         default=None, validation_alias="defaultVersion", serialization_alias="defaultVersion"
     )
     organization_name: Optional[str] = Field(
-        default=None, validation_alias="organizationName", serialization_alias="organizationName"
+        default=None, validation_alias="organization-name", serialization_alias="organization-name"
     )
     available_versions: Optional[List[str]] = Field(
         default=None, validation_alias="availableVersions", serialization_alias="availableVersions"
     )
-    site_name: Optional[str] = Field(default=None, validation_alias="siteName", serialization_alias="siteName")
+    site_name: Optional[str] = Field(default=None, validation_alias="site-name", serialization_alias="site-name")
 
 
 class DeviceDetailsQueryParams(BaseModel):

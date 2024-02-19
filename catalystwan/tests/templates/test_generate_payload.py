@@ -7,7 +7,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from parameterized import parameterized
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from catalystwan.api.template_api import TemplatesAPI
 from catalystwan.api.templates.feature_template import FeatureTemplate
@@ -15,9 +15,7 @@ from catalystwan.session import ManagerSession
 
 
 class MockedFeatureTemplate(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     template_name: str = "test"
     template_description: str = "test"
@@ -28,9 +26,7 @@ class MockedFeatureTemplate(FeatureTemplate):
 
 
 class MockedFeatureTemplateAlias(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     template_name: str = "test"
     template_description: str = "test"
@@ -41,27 +37,22 @@ class MockedFeatureTemplateAlias(FeatureTemplate):
 
 
 class RSA(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     key: str = Field(alias="key-string")
-    key_type: str = Field(alias="key-type", data_path=["type", "RSA"])
+    key_type: str = Field(alias="key-type", json_schema_extra={"data_path": ["type", "RSA"]})
 
 
 class User(BaseModel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     name: str
-    password: str = Field(data_path=["list"])
+    password: str = Field(json_schema_extra={"data_path": ["list"]})
     pubkey_chain: List[RSA] = Field(default=[], alias="pubkey-chain")
 
 
 class MockedFeatureTemplateChildren(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     template_name: str = "test"
     template_description: str = "test"
@@ -72,16 +63,14 @@ class MockedFeatureTemplateChildren(FeatureTemplate):
 
 
 class DataPathFeatureTemplate(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     template_name: str = "test"
     template_description: str = "test"
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "test_type"
 
-    as_num: str = Field(alias="as-num", data_path=["authentication", "dot1x", "default"])
+    as_num: str = Field(alias="as-num", json_schema_extra={"data_path": ["authentication", "dot1x", "default"]})
 
 
 mocked_feature_template_children_1 = MockedFeatureTemplateChildren(
@@ -132,7 +121,7 @@ class TestFeatureTemplate(TestCase):
             mocked_template = MockedFeatureTemplate()
 
         # Act
-        a = templates_api.generate_feature_template_payload(mocked_template, schema).dict(
+        a = templates_api.generate_feature_template_payload(mocked_template, schema).model_dump(
             by_alias=True, exclude_none=True
         )["templateDefinition"]
         print(json.dumps(a))

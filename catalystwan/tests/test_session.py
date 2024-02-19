@@ -4,7 +4,9 @@ from unittest.mock import patch
 
 import pytest  # type: ignore
 from parameterized import parameterized  # type: ignore
+from requests import HTTPError, Request, RequestException, Response
 
+from catalystwan.exceptions import CatalystwanException, ManagerHTTPError, ManagerRequestException
 from catalystwan.session import ManagerSession
 
 
@@ -13,7 +15,7 @@ class TestSession(unittest.TestCase):
     def setUp(self):
         self.url = "example.com"
         self.username = "admin"
-        self.password = "admin_password"
+        self.password = "admin_password"  # pragma: allowlist secret
 
     def test_session_str(self):
         # Arrange, Act
@@ -118,6 +120,40 @@ class TestSession(unittest.TestCase):
         answer = session.check_vmanage_server_connection()
         # Assert
         self.assertEqual(answer, True)
+
+
+class TestSessionExceptions(unittest.TestCase):
+    def setUp(self):
+        self.session = ManagerSession(url="domain.com", username="user", password="<>")
+        response = Response()
+        response.json = lambda: {
+            "error": {
+                "message": "Delete users request failed",
+                "details": "No user with name XYZ was found",
+                "code": "USER0006",
+            }
+        }
+        response.status_code = 500
+        response.request = Request(method="GET", url="/v1/data")
+        self.response = response
+
+    @parameterized.expand(
+        [
+            (RequestException(), [CatalystwanException, ManagerRequestException, RequestException]),
+            (HTTPError(), [CatalystwanException, ManagerHTTPError, ManagerRequestException, RequestException]),
+        ]
+    )
+    @patch("requests.sessions.Session.request")
+    def test_session_request_exceptions(self, lib_exception, sdk_exceptions, mock_request_base):
+        # Arrange
+        if isinstance(lib_exception, HTTPError):
+            mock_request_base.return_value = self.response
+        else:
+            mock_request_base.side_effect = lib_exception
+        for sdk_exception in sdk_exceptions:
+            # Act / Assert
+            with self.assertRaises(sdk_exception):
+                self.session.request(self.response.request.method, self.response.request.url)
 
 
 if __name__ == "__main__":

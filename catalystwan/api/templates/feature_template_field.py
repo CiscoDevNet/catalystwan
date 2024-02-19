@@ -3,12 +3,12 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from pydantic.v1 import BaseModel, Field, validator
-from pydantic.v1.fields import ModelField  # type: ignore
+from pydantic import BaseModel, Field, field_validator
 
 from catalystwan.api.templates.device_variable import DeviceVariable
 from catalystwan.api.templates.feature_template import FeatureTemplate
 from catalystwan.utils.dict import merge
+from catalystwan.utils.pydantic_field import get_extra_field
 
 
 class FeatureTemplateOptionType(str, Enum):
@@ -73,7 +73,8 @@ class FeatureTemplateField(BaseModel):
     primaryKeys: List[str] = []
     children: List[FeatureTemplateField] = []
 
-    @validator("dataType", pre=True)
+    @field_validator("dataType", mode="before")
+    @classmethod
     def convert_data_type_to_dict(cls, value):
         if isinstance(value, str):
             return {"type": value}
@@ -110,30 +111,34 @@ class FeatureTemplateField(BaseModel):
                 vipObjectType=self.objectType,
                 vipVariableName=value.name,
             )
-            return nest_value_in_output(vip_variable.dict(by_alias=True, exclude_none=True))
+            return nest_value_in_output(vip_variable.model_dump(by_alias=True, exclude_none=True))
 
         else:
             if value is not None:
                 output["vipType"] = vip_type or FeatureTemplateOptionType.CONSTANT.value
                 if self.children:
                     children_output = []
-
                     for obj in value:  # obj is User, atomic value. Loop every child
                         child_payload: dict = {}
                         for child in self.children:  # Child in schema
                             if current_path is None:
                                 current_path = []
                             obj: FeatureTemplate  # type: ignore
-                            model_field: ModelField = next(
+                            model_tuple = next(
                                 filter(
-                                    lambda f: f.field_info.extra.get("data_path", []) == child.dataPath
-                                    and (f.alias == child.key or f.field_info.extra.get("vmanage_key") == child.key),
-                                    obj.__fields__.values(),
+                                    lambda f: get_extra_field(f[1], "data_path", []) == child.dataPath
+                                    and (
+                                        f[1].alias == child.key
+                                        or get_extra_field(f[1], "vmanage_key") == child.key
+                                        or f[0] == child.key
+                                    ),
+                                    obj.model_fields.items(),
                                 )
                             )
-                            obj_value = getattr(obj, model_field.name)
-                            po = model_field.field_info.extra.get("priority_order")
-                            vip_type = model_field.field_info.extra.get("vip_type")
+                            model_field = model_tuple[1]
+                            obj_value = getattr(obj, model_tuple[0])
+                            po = get_extra_field(model_field, "priority_order")
+                            vip_type = get_extra_field(model_field, "vip_type")
                             merge(
                                 child_payload,
                                 child.payload_scheme(

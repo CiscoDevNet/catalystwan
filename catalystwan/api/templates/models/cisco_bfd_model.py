@@ -2,7 +2,7 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic.v1 import Field
+from pydantic import ConfigDict, Field
 
 from catalystwan.api.templates.feature_template import FeatureTemplate
 from catalystwan.utils.pydantic_validators import ConvertBoolToStringModel
@@ -41,26 +41,24 @@ class ColorType(str, Enum):
 
 class Color(ConvertBoolToStringModel):
     color: ColorType
-    hello_interval: Optional[int] = Field(DEFAULT_BFD_HELLO_INTERVAL, vmanage_key="hello-interval")
+    hello_interval: Optional[int] = Field(
+        DEFAULT_BFD_HELLO_INTERVAL, json_schema_extra={"vmanage_key": "hello-interval"}
+    )
     multiplier: Optional[int] = DEFAULT_BFD_COLOR_MULTIPLIER
-    pmtu_discovery: Optional[bool] = Field(True, vmanage_key="pmtu-discovery")
+    pmtu_discovery: Optional[bool] = Field(True, json_schema_extra={"vmanage_key": "pmtu-discovery"})
     dscp: Optional[int] = DEFAULT_BFD_DSCP
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class CiscoBFDModel(FeatureTemplate, ConvertBoolToStringModel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    multiplier: Optional[int] = Field(DEFAULT_BFD_MULTIPLIER, data_path=["app-route"])
+    multiplier: Optional[int] = Field(DEFAULT_BFD_MULTIPLIER, json_schema_extra={"data_path": ["app-route"]})
     poll_interval: Optional[int] = Field(
-        DEFAULT_BFD_POLL_INTERVAL, vmanage_key="poll-interval", data_path=["app-route"]
+        DEFAULT_BFD_POLL_INTERVAL, json_schema_extra={"vmanage_key": "poll-interval", "data_path": ["app-route"]}
     )
-    default_dscp: Optional[int] = Field(DEFAULT_BFD_DSCP, vmanage_key="default-dscp")
-    color: Optional[List[Color]]
+    default_dscp: Optional[int] = Field(DEFAULT_BFD_DSCP, json_schema_extra={"vmanage_key": "default-dscp"})
+    color: Optional[List[Color]] = None
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_bfd"
