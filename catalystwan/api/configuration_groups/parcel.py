@@ -59,11 +59,13 @@ class ParcelAttribute(BaseModel):
 # https://github.com/pydantic/pydantic/discussions/6090
 # Usage: Global[str](value="test")
 class Global(ParcelAttribute, Generic[T]):
-    option_type: OptionType = OptionType.GLOBAL
+    option_type: OptionType = Field(
+        default=OptionType.GLOBAL, serialization_alias="optionType", validation_alias="optionType"
+    )
     value: T
 
     def __len__(self) -> int:
-        if isinstance(self.value, str):
+        if isinstance(self.value, (str, list)):
             return len(self.value)
         return -1
 
@@ -79,12 +81,16 @@ class Global(ParcelAttribute, Generic[T]):
 
 
 class Variable(ParcelAttribute):
-    option_type: OptionType = OptionType.VARIABLE
+    option_type: OptionType = Field(
+        default=OptionType.VARIABLE, serialization_alias="optionType", validation_alias="optionType"
+    )
     value: str = Field(pattern=r"^\{\{[.\/\[\]a-zA-Z0-9_-]+\}\}$", min_length=1, max_length=64)
 
 
 class Default(ParcelAttribute, Generic[T]):
-    option_type: OptionType = OptionType.DEFAULT
+    option_type: OptionType = Field(
+        default=OptionType.DEFAULT, serialization_alias="optionType", validation_alias="optionType"
+    )
     value: Any
 
 
