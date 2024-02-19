@@ -3,11 +3,11 @@ from typing import List
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
-from catalystwan.models.common import TLOCColorEnum
+from catalystwan.models.common import TLOCColor
 
 
 class AppProbeMapItem(BaseModel):
-    color: Global[TLOCColorEnum]
+    color: Global[TLOCColor]
     dscp: Global[int]
 
     @field_validator("dscp")
@@ -35,6 +35,6 @@ class AppProbeParcel(_ParcelBase):
             )
         )
 
-    def add_map(self, color: TLOCColorEnum, dscp: int):
+    def add_map(self, color: TLOCColor, dscp: int):
         entry = self.entries[0]
         entry.map.append(AppProbeMapItem(color=as_global(color), dscp=as_global(dscp)))

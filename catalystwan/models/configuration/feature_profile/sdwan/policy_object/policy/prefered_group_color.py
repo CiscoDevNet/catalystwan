@@ -3,16 +3,14 @@ from typing import List, Optional
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, model_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
-from catalystwan.models.common import TLOCColorEnum
-from catalystwan.models.policy.lists_entries import PathPreferenceEnum
+from catalystwan.models.common import TLOCColor
+from catalystwan.models.policy.lists_entries import PathPreference
 
 
 class Preference(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-    color_preference: Global[list] = Field(  # [TLOCColorEnum]
-        serialization_alias="colorPreference", validation_alias="colorPreference"
-    )
-    path_preference: Global[PathPreferenceEnum] = Field(
+    color_preference: Global[list] = Field(serialization_alias="colorPreference", validation_alias="colorPreference")
+    path_preference: Global[PathPreference] = Field(
         serialization_alias="pathPreference", validation_alias="pathPreference"
     )
 
@@ -39,7 +37,7 @@ class PreferredColorGroupEntry(BaseModel):
 class PreferredColorGroupParcel(_ParcelBase):
     entries: List[PreferredColorGroupEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
-    def add_primary(self, color_preference: List[TLOCColorEnum], path_preference: PathPreferenceEnum):
+    def add_primary(self, color_preference: List[TLOCColor], path_preference: PathPreference):
         self.entries.append(
             PreferredColorGroupEntry(
                 primary_preference=Preference(
@@ -50,13 +48,13 @@ class PreferredColorGroupParcel(_ParcelBase):
             )
         )
 
-    def add_secondary(self, color_preference: List[TLOCColorEnum], path_preference: PathPreferenceEnum):
+    def add_secondary(self, color_preference: List[TLOCColor], path_preference: PathPreference):
         preferred_color = self.entries[0]
         preferred_color.secondary_preference = Preference(
             color_preference=as_global(color_preference), path_preference=as_global(path_preference)
         )
 
-    def add_tertiary(self, color_preference: List[TLOCColorEnum], path_preference: PathPreferenceEnum):
+    def add_tertiary(self, color_preference: List[TLOCColor], path_preference: PathPreference):
         preferred_color = self.entries[0]
         preferred_color.tertiary_preference = Preference(
             color_preference=as_global(color_preference), path_preference=as_global(path_preference)

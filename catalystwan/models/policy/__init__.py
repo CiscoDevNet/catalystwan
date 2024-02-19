@@ -1,11 +1,10 @@
-# This stub provide top-level "public" policy models and enums to be used with PolicyAPI()
-# TODO: explore model attribute access customization with https://peps.python.org/pep-0562/
+# This stub provide top-level "public" policy models to be used with PolicyAPI()
 from typing import List, Union
 
 from pydantic import Field
 from typing_extensions import Annotated
 
-from .centralized import CentralizedPolicy, TrafficDataDirectionEnum
+from .centralized import CentralizedPolicy, TrafficDataDirection
 from .definitions.access_control_list import AclPolicy
 from .definitions.access_control_list_ipv6 import AclIPv6Policy
 from .definitions.control import ControlPolicy
@@ -13,7 +12,7 @@ from .definitions.device_access import DeviceAccessPolicy
 from .definitions.device_access_ipv6 import DeviceAccessIPv6Policy
 from .definitions.hub_and_spoke import HubAndSpokePolicy
 from .definitions.mesh import MeshPolicy
-from .definitions.qos_map import QoSDropEnum, QoSMapPolicy
+from .definitions.qos_map import QoSDropType, QoSMapPolicy
 from .definitions.rewrite import RewritePolicy
 from .definitions.rule_set import RuleSet
 from .definitions.security_group import SecurityGroup
@@ -51,18 +50,18 @@ from .lists import (
     VPNList,
     ZoneList,
 )
-from .lists_entries import EncapEnum, PathPreferenceEnum, PolicerExceedActionEnum
+from .lists_entries import EncapType, PathPreference, PolicerExceedAction
 from .localized import LocalizedPolicy
 from .policy_definition import (
-    CarrierEnum,
-    DNSTypeEntryEnum,
-    MultiRegionRoleEnum,
-    OriginProtocolEnum,
-    PathTypeEnum,
-    PLPEntryEnum,
-    PolicyActionTypeEnum,
-    ServiceTypeEnum,
-    TLOCActionEnum,
+    Carrier,
+    DNSTypeEntryType,
+    MultiRegionRole,
+    OriginProtocol,
+    PathType,
+    PLPEntryType,
+    PolicyActionType,
+    ServiceType,
+    TLOCActionType,
 )
 from .security import SecurityPolicy, UnifiedSecurityPolicy
 
@@ -130,7 +129,7 @@ __all__ = (
     "AppList",
     "AppProbeClassList",
     "ASPathList",
-    "CarrierEnum",
+    "Carrier",
     "CentralizedPolicy",
     "ClassMapList",
     "ColorList",
@@ -140,8 +139,8 @@ __all__ = (
     "DataPrefixList",
     "DeviceAccessIPv6Policy",
     "DeviceAccessPolicy",
-    "DNSTypeEntryEnum",
-    "EncapEnum",
+    "DNSTypeEntryType",
+    "EncapType",
     "ExpandedCommunityList",
     "FQDNList",
     "GeoLocationList",
@@ -153,31 +152,31 @@ __all__ = (
     "LocalizedPolicy",
     "MeshPolicy",
     "MirrorList",
-    "MultiRegionRoleEnum",
-    "OriginProtocolEnum",
-    "PathPreferenceEnum",
-    "PathTypeEnum",
-    "PLPEntryEnum",
-    "PolicerExceedActionEnum",
+    "MultiRegionRole",
+    "OriginProtocol",
+    "PathPreference",
+    "PathType",
+    "PLPEntryType",
+    "PolicerExceedAction",
     "PolicerList",
-    "PolicyActionTypeEnum",
+    "PolicyActionType",
     "PortList",
     "PreferredColorGroupList",
     "PrefixList",
     "ProtocolNameList",
-    "QoSDropEnum",
+    "QoSDropType",
     "QoSMapPolicy",
     "RegionList",
     "RewritePolicy",
     "RuleSet",
     "SecurityGroup",
     "SecurityPolicy",
-    "ServiceTypeEnum",
+    "ServiceType",
     "SiteList",
     "SLAClassList",
-    "TLOCActionEnum",
+    "TLOCActionType",
     "TLOCList",
-    "TrafficDataDirectionEnum",
+    "TrafficDataDirection",
     "TrafficDataPolicy",
     "UnifiedSecurityPolicy",
     "URLBlackList",

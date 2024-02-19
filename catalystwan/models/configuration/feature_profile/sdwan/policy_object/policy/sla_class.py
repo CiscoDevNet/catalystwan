@@ -1,28 +1,27 @@
-from enum import Enum
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 from uuid import UUID
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 
-
-class SLAClassCriteriaEnum(str, Enum):
-    LOSS = "loss"
-    LATENCY = "latency"
-    JITTER = "jitter"
-    LOSS_LATENCY = "loss-latency"
-    LOSS_JITTER = "loss-jitter"
-    LATENCY_LOSS = "latency-loss"
-    LATENCY_JITTER = "latency-jitter"
-    JITTER_LATENCY = "jitter-latency"
-    JITTER_LOSS = "jitter-loss"
-    LOSS_LATENCY_JITTER = "loss-latency-jitter"
-    LOSS_JITTER_LATENCY = "loss-jitter-latency"
-    LATENCY_LOSS_JITTER = "latency-loss-jitter"
-    LATENCY_JITTER_LOSS = "latency-jitter-loss"
-    JITTER_LATENCY_LOSS = "jitter-latency-loss"
-    JITTER_LOSS_LATENCY = "jitter-loss-latency"
+SLAClassCriteria = Literal[
+    "loss",
+    "latency",
+    "jitter",
+    "loss-latency",
+    "loss-jitter",
+    "latency-loss",
+    "latency-jitter",
+    "jitter-latency",
+    "jitter-loss",
+    "loss-latency-jitter",
+    "loss-jitter-latency",
+    "latency-loss-jitter",
+    "latency-jitter-loss",
+    "jitter-latency-loss",
+    "jitter-loss-latency",
+]
 
 
 class SLAAppProbeClass(BaseModel):
@@ -34,7 +33,7 @@ class SLAAppProbeClass(BaseModel):
 class FallbackBestTunnel(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    criteria: Global[SLAClassCriteriaEnum]
+    criteria: Global[SLAClassCriteria]
     jitter_variance: Optional[Global[int]] = Field(
         default=None,
         serialization_alias="jitterVariance",
@@ -137,7 +136,7 @@ class SLAClassParcel(_ParcelBase):
 
     def add_fallback(
         self,
-        criteria: SLAClassCriteriaEnum,
+        criteria: SLAClassCriteria,
         jitter_variance: Optional[int],
         latency_variance: Optional[int],
         loss_variance: Optional[int],

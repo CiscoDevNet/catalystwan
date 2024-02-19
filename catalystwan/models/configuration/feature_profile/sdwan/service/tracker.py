@@ -1,15 +1,23 @@
-from enum import Enum
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable
-from catalystwan.models.configuration.common import RefId
 
+EndpointProtocol = Literal[
+    "tcp",
+    "udp",
+]
 
-class EndpointProtocol(str, Enum):
-    TCP = "tcp"
-    UDP = "udp"
+TrackerType = Literal["endpoint"]
+
+EndpointTrackerType = Literal["static-route"]
+
+CombineBoolean = Literal[
+    "and",
+    "or",
+]
 
 
 class EndpointTcpUdp(BaseModel):
@@ -19,30 +27,34 @@ class EndpointTcpUdp(BaseModel):
     port: Optional[Union[Variable, Global[int]]] = None
 
 
-class TrackerType(str, Enum):
-    ENDPOINT = "endpoint"
-
-
-class EndpointTrackerType(str, Enum):
-    STATIC_ROUTE = "static-route"
-
-
 class TrackerData(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    name: Union[Variable, Global[str]] = Field(alias="trackerName")
-    endpoint_api_url: Optional[Union[Variable, Global[str]]] = Field(alias="endpointApiUrl", default=None)
-    endpoint_dns_name: Optional[Union[Variable, Global[str]]] = Field(alias="endpointDnsName", default=None)
-    endpoint_ip: Optional[Union[Variable, Global[str]]] = Field(alias="endpointIp", default=None)
-    endpoint_tcp_udp: Optional[EndpointTcpUdp] = Field(alias="endpointTcpUdp", default=None)
+    name: Union[Variable, Global[str]] = Field(serialization_alias="trackerName", validation_alias="trackerName")
+    endpoint_api_url: Optional[Union[Variable, Global[str]]] = Field(
+        serialization_alias="endpointApiUrl", validation_alias="endpointApiUrl", default=None
+    )
+    endpoint_dns_name: Optional[Union[Variable, Global[str]]] = Field(
+        serialization_alias="endpointDnsName", validation_alias="endpointDnsName", default=None
+    )
+    endpoint_ip: Optional[Union[Variable, Global[str]]] = Field(
+        serialization_alias="endpointIp", validation_alias="endpointIp", default=None
+    )
+    endpoint_tcp_udp: Optional[EndpointTcpUdp] = Field(
+        serialization_alias="endpointTcpUdp", validation_alias="endpointTcpUdp", default=None
+    )
     interval: Optional[Union[Global[int], Variable, Default[int]]] = Default[int](value=60)
     multiplier: Optional[Union[Global[int], Variable, Default[int]]] = Default[int](value=3)
     threshold: Optional[Union[Global[int], Variable, Default[int]]] = Default[int](value=300)
     endpoint_tracker_type: Optional[Union[Global[EndpointTrackerType], Variable, Default[EndpointTrackerType]]] = Field(
-        alias="endpointTrackerType", default=Default[EndpointTrackerType](value=EndpointTrackerType.STATIC_ROUTE)
+        serialization_alias="endpointTrackerType",
+        validation_alias="endpointTrackerType",
+        default=Default[EndpointTrackerType](value="static-route"),
     )
     tracker_type: Optional[Union[Global[TrackerType], Variable, Default[TrackerType]]] = Field(
-        alias="trackerType", default=Default[TrackerType](value=TrackerType.ENDPOINT)
+        serialization_alias="trackerType",
+        validation_alias="trackerType",
+        default=Default[TrackerType](value="endpoint"),
     )
 
 
@@ -58,20 +70,17 @@ class TrackerCreationPayload(BaseModel):
 class TrackerRef(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    tracker_ref: RefId = Field(alias="trackerRef")
-
-
-class CombineBoolean(str, Enum):
-    AND = "and"
-    OR = "or"
+    tracker_ref: Global[UUID] = Field(serialization_alias="trackerRef", validation_alias="trackerRef")
 
 
 class TrackerGroupData(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    tracker_refs: List[TrackerRef] = Field(alias="trackerRefs")
+    tracker_refs: List[TrackerRef] = Field(serialization_alias="trackerRefs", validation_alias="trackerRefs")
     combine_boolean: Union[Global[CombineBoolean], Variable, Default[CombineBoolean]] = Field(
-        alias="combineBoolean", default=Default[CombineBoolean](value=CombineBoolean.OR)
+        serialization_alias="combineBoolean",
+        validation_alias="combineBoolean",
+        default=Default[CombineBoolean](value="or"),
     )
 
 
@@ -87,4 +96,4 @@ class TrackerGroupCreationPayload(BaseModel):
 class TrackerAssociationPayload(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    parcel_id: str = Field(alias="parcelId")
+    parcel_id: str = Field(serialization_alias="parcelId", validation_alias="parcelId")
