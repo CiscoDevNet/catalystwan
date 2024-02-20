@@ -322,7 +322,7 @@
                     ],
                     "defaultOption": "constant",
                     "dataType": {
-                        "type": "enum",
+                        "type": "str",
                         "values": [
                             {
                                 "key": "FW",

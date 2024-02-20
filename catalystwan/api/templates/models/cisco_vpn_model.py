@@ -36,7 +36,7 @@ class Host(BaseModel):
     ip: List[str]
 
 
-SvcType = Literal["fw", "ids", "idp", "netsvc1", "netsvc2", "netsvc3", "netsvc4", "TE", "appqoe"]
+SvcType = Literal["FW", "IDS", "IDP", "netsvc1", "netsvc2", "netsvc3", "netsvc4", "TE", "appqoe"]
 
 
 class Service(BaseModel):
