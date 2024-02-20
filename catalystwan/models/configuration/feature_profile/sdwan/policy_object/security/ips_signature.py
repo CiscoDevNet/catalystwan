@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Literal
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
@@ -28,6 +28,7 @@ class IPSSignatureListEntry(BaseModel):
 
 
 class IPSSignatureParcel(_ParcelBase):
+    type_: Literal["security-ipssignature"] = Field(default="security-ipssignature", exclude=True)
     entries: List[IPSSignatureListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_signature(self, signature: str):

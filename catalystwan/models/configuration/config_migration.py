@@ -2,10 +2,10 @@ from typing import List
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import _ParcelBase
 from catalystwan.api.template_api import DeviceTemplateInformation, FeatureTemplateInformation
 from catalystwan.endpoints.configuration_group import ConfigGroup
 from catalystwan.models.configuration.feature_profile.common import FeatureProfileCreationPayload
+from catalystwan.models.configuration.feature_profile.sdwan.policy_object import AnyPolicyObjectParcel
 from catalystwan.models.policy import (
     AnyPolicyDefinition,
     AnyPolicyList,
@@ -58,6 +58,6 @@ class UX2Config(BaseModel):
     feature_profiles: List[FeatureProfileCreationPayload] = Field(
         default=[], serialization_alias="featureProfiles", validation_alias="featureProfiles"
     )
-    profile_parcels: List[_ParcelBase] = Field(
+    profile_parcels: List[AnyPolicyObjectParcel] = Field(
         default=[], serialization_alias="profileParcels", validation_alias="profileParcels"
     )

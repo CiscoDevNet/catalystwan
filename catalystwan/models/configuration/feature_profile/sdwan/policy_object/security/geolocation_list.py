@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from pydantic import AliasPath, BaseModel, Field, model_validator
 
@@ -19,6 +19,7 @@ class GeoLocationListEntry(BaseModel):
 
 
 class GeoLocationListParcel(_ParcelBase):
+    type_: Literal["security-geolocation"] = Field(default="security-geolocation", exclude=True)
     entries: List[GeoLocationListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_country(self, country: str):

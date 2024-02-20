@@ -1,11 +1,15 @@
 from ipaddress import IPv4Address
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 from catalystwan.models.common import TLOCColor
-from catalystwan.models.policy.lists_entries import EncapType
+
+EncapType = Literal[
+    "ipsec",
+    "gre",
+]
 
 
 class TlocEntry(BaseModel):
@@ -26,6 +30,7 @@ class TlocEntry(BaseModel):
 
 
 class TlocParcel(_ParcelBase):
+    type_: Literal["tloc"] = Field(default="tloc", exclude=True)
     entries: List[TlocEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_entry(

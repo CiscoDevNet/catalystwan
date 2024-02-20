@@ -1,9 +1,12 @@
+from typing import Literal
+
 from pydantic import AliasPath, ConfigDict, Field, field_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 
 
 class ExpandedCommunityParcel(_ParcelBase):
+    type_: Literal["expanded-community"] = Field(default="expanded-community", exclude=True)
     model_config = ConfigDict(populate_by_name=True)
     expandedCommunityList: Global[list] = Field(
         default=as_global([]),
