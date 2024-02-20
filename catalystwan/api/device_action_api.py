@@ -8,6 +8,7 @@ from tenacity import retry, retry_if_result, stop_after_attempt, wait_fixed  # t
 
 from catalystwan.api.basic_api import DevicesAPI, DeviceStateAPI
 from catalystwan.dataclasses import Device
+from catalystwan.session import vManageBadResponseError
 from catalystwan.utils.certificate_status import CertificateStatus
 from catalystwan.utils.operation_status import OperationStatus
 from catalystwan.utils.personality import Personality
@@ -107,6 +108,70 @@ class RebootAction(DeviceActionAPI):
             status = DeviceStateAPI(self.session).get_system_status(self.dev.id)
             # it is necessary to wait also for Success of reboot because device can be reachable even several
             # seconds after execute reboot
+            if status.reachability.value == expected_reachability:
+                return action_data
+            else:
+                return None
+
+        wait_for_come_up()
+
+
+class PatchUpgradeAction(DeviceActionAPI):
+    def execute(self, patch_version: str = "default"):
+        if self.dev.personality != Personality.VMANAGE:
+            raise Exception(f"Patch upgrade cannot be executed for {self.dev.personality}")
+
+        body = {
+            "action": "patchupgrade",
+            "deviceType": "vmanage",
+            "patchversion": patch_version,
+            "devices": [{"deviceIP": self.dev.id, "deviceId": self.dev.uuid}],
+        }
+
+        response = self.session.post("/dataservice/device/action/patchupgrade", json=body).json()
+        if response.get("id"):
+            self.action_id = response["id"]
+        else:
+            raise Exception(f"Problem with patching {self.dev.id} occurred")
+
+    def wait_for_completed(
+        self,
+        sleep_seconds: int = 15,
+        timeout_seconds: int = 6000,
+        expected_status: str = OperationStatus.SUCCESS.value,
+        expected_reachability: str = Reachability.REACHABLE.value,
+    ):
+        def check_status(action_data):
+            task_done_status = {
+                OperationStatus.SUCCESS.value,
+                OperationStatus.FAILURE.value,
+                OperationStatus.VALIDATION_FAILURE.value,
+            }
+            return action_data not in task_done_status
+
+        @retry(
+            wait=wait_fixed(sleep_seconds),
+            stop=stop_after_attempt(int(timeout_seconds / sleep_seconds)),
+            retry=(retry_if_result(check_status)),
+        )
+        def wait_for_come_up():
+            status_api = f"{self.action_status_api}{self.action_id}"
+            try:
+                status = DeviceStateAPI(self.session).get_system_status(self.dev.id)
+            except (ConnectionError, vManageBadResponseError):
+                print(f"Waiting for {self.dev.hostname} to become reachable or task timeout...")
+                logger.debug(f"Waiting for {self.dev.hostname} to become reachable or task timeout...")
+                return None
+
+            try:
+                action_data = self.session.get_data(f"{status_api}")[0]["status"]
+                print(f"Status of device {self.dev.hostname}  job is: {action_data}")
+                logger.debug(f"Status of device {self.dev.hostname} patch job is: {action_data}")
+            except IndexError:
+                action_data = ""
+
+            print(f"{self.dev.hostname} reachability: {status.reachability.value}")
+            logger.debug(f"{self.dev.hostname} reachability: {status.reachability.value}")
             if status.reachability.value == expected_reachability:
                 return action_data
             else:
