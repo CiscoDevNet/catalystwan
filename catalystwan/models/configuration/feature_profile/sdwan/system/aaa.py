@@ -1,67 +1,61 @@
-from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
-from typing import List, Literal, Optional, Union
+from typing import List, Optional, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase, as_default, as_global
 
 
-class ServerAuthOrder(str, Enum):
-    LOCAL = "local"
-    RADIUS = "radius"
-    TACACS = "tacacs"
-
-
-class User(BaseModel):
-    name: Union[Global[str], Variable]
-    password: Union[Global[str], Variable]
-    privilege: Union[Global[str], Variable] = Field(default=as_default("15"))
-
-
-class KeyString(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: str = Field(..., max_length=1024, min_length=1, pattern="^AAAA[0-9A-Za-z+/]+[=]{0,3}$")
-
-
-class KeyType(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    option_type: Literal["global"] = Field(..., alias="optionType")
-    value: Literal["ssh-rsa"]
-
-
 class PubkeyChainItem(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    key_string: KeyString = Field(..., alias="keyString", description="Set the RSA key string")
-    key_type: Optional[KeyType] = Field(None, alias="keyType", description="Only RSA is supported")
+    key_string: Global[str] = Field(
+        validation_alias="keyString",
+        serialization_alias="keyString",
+        pattern="^AAAA[0-9A-Za-z+/]+[=]{0,3}$",
+        description="Set the RSA key string",
+    )
+
+    # Literal["ssh-rsa"]
+    key_type: Global[str] = Field(
+        default=Global[str](value="ssh-rsa"),
+        serialization_alias="keyType",
+        validation_alias="keyType",
+        description="Only RSA is supported",
+    )
 
 
-# class UserItem(BaseModel):
-#     model_config = ConfigDict(
-#         extra='forbid',
-#     )
-#     name: Union[Name, Name1] = Field(..., description='Set the username')
-#     password: Union[Password, Password1] = Field(
-#         ...,
-#         description='Set the user password [Note: Catalyst SD-WAN Manager will encrypt this field before saving.
-# Cleartext strings will not be returned back to the user in GET responses for sensitive fields.]',
-#     )
-#     privilege: Optional[Union[Privilege, Privilege1, Privilege2]] = Field(
-#         None, description='Set Privilege Level for this user'
-#     )
-#     pubkey_chain: Optional[List[PubkeyChainItem]] = Field(
-#         None,
-#         alias='pubkeyChain',
-#         description='List of RSA public-keys per user',
-#         max_length=2,
-#     )
+class UserItem(BaseModel):
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    name: Union[Global[str], Variable] = Field(description="Set the username")
+    password: Union[Global[str], Variable] = Field(
+        description=(
+            "Set the user password [Note: Catalyst SD-WAN Manager will encrypt this field before saving."
+            "Cleartext strings will not be returned back to the user in GET responses for sensitive fields.]"
+        )
+    )
+    privilege: Union[Global[str], Variable, Default[str], None] = Field(
+        None, description="Set Privilege Level for this user"
+    )
+    pubkey_chain: Optional[List[PubkeyChainItem]] = Field(
+        default=None,
+        validation_alias="pubkeyChain",
+        serialization_alias="pubkeyChain",
+        description="List of RSA public-keys per user",
+        max_length=2,
+    )
+
+    def add_pubkey_chain_item(self, key: str) -> PubkeyChainItem:
+        item = PubkeyChainItem(key_string=as_global(key))
+
+        if self.pubkey_chain:
+            self.pubkey_chain.append(item)
+        else:
+            self.pubkey_chain = [item]
+
+        return item
 
 
 class RadiusServerItem(BaseModel):
@@ -69,20 +63,20 @@ class RadiusServerItem(BaseModel):
 
     address: Union[Global[IPv4Address], Global[IPv6Address]] = Field(description="Set IP address of Radius server")
     auth_port: Union[Global[int], Default[int], Variable, None] = Field(
-        default=None,
+        default=as_default(1812),
         validation_alias="authPort",
         serialization_alias="authPort",
         description="Set Authentication port to use to connect to Radius server",
     )
     acct_port: Union[Global[int], Default[int], Variable, None] = Field(
-        default=None,
+        default=as_default(1813),
         validation_alias="acctPort",
         serialization_alias="acctPort",
         description="Set Accounting port to use to connect to Radius server",
     )
 
     timeout: Union[Variable, Global[int], Default[int], None] = Field(
-        default=None,
+        default=as_default(5),
         description="Configure how long to wait for replies from the Radius server",
     )
     key: Global[str] = Field(
@@ -107,11 +101,11 @@ class RadiusServerItem(BaseModel):
     )
     # Literal["key", "pac"]
     key_type: Union[Global[str], Default[str], Variable, None] = Field(
-        default=None, validation_alias="keyType", serialization_alias="keyType", description="key type"
+        default=as_default("key"), validation_alias="keyType", serialization_alias="keyType", description="key type"
     )
 
     retransmit: Union[Variable, Global[int], Default[int], None] = Field(
-        default=None, description="Configure how many times to contact this Radius server"
+        default=as_default(3), description="Configure how many times to contact this Radius server"
     )
 
 
@@ -124,7 +118,7 @@ class Radius(BaseModel):
     vpn: Union[Global[int], Default[int], None] = Field(
         default=None, description="Set VPN in which Radius server is located"
     )
-    source_interface: Union[Global[str], Default[str], None] = Field(
+    source_interface: Union[Global[str], Default[None], Variable, None] = Field(
         default=None,
         validation_alias="sourceInterface",
         serialization_alias="sourceInterface",
@@ -200,7 +194,7 @@ class Tacacs(BaseModel):
         default=None, description="Set VPN in which TACACS server is located"
     )
     source_interface: Union[Global[str], Default[str], None] = Field(
-        None,
+        default=None,
         validation_alias="sourceInterface",
         serialization_alias="sourceInterface",
         description="Set interface to use to reach TACACS server",
@@ -275,18 +269,20 @@ class AAA(_ParcelBase):
         validation_alias=AliasPath("data", "accountingGroup"),
         description="Accounting configurations parameters",
     )
+    # local, radius, tacacs
     server_auth_order: Global[List[str]] = Field(
         validation_alias=AliasPath("data", "serverAuthOrder"),
         min_length=1,
         max_length=4,
         description="ServerGroups priority order",
     )
-    # TODO method
-    # user: Optional[List[UserItem]] = Field(
-    #     None, description='Create local login account', min_length=1
-    # )
-    radius: Optional[Radius] = Field(default=None, description="Configure the Radius serverGroup")
-    tacacs: Optional[List[Tacacs]] = Field(default=None, description="Configure the TACACS serverGroup")
+    user: Optional[List[UserItem]] = Field(default=None, description="Create local login account", min_length=1)
+    radius: Optional[List[Radius]] = Field(
+        default=None, validation_alias=AliasPath("data", "radius"), description="Configure the Radius serverGroup"
+    )
+    tacacs: Optional[List[Tacacs]] = Field(
+        default=None, validation_alias=AliasPath("data", "tacacs"), description="Configure the TACACS serverGroup"
+    )
     accounting_rule: Optional[List[AccountingRuleItem]] = Field(
         default=None, validation_alias=AliasPath("data", "accountingRule"), description="Configure the accounting rules"
     )
@@ -341,3 +337,20 @@ class AAA(_ParcelBase):
             self.accounting_rule = [item]
 
         return item
+
+    def add_radius_group(
+        self, group_name: str, vpn: int, radius_servers: List[RadiusServerItem], source_interface: Optional[str] = None
+    ) -> Radius:
+        radius = Radius(
+            group_name=as_global(group_name),
+            vpn=as_global(vpn),
+            server=radius_servers,
+            source_interface=Default[None](value=None),
+        )
+
+        if self.radius:
+            self.radius.append(radius)
+        else:
+            self.radius = [radius]
+
+        return radius
