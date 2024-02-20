@@ -63,7 +63,7 @@ class PartitionManagerAPI:
         url = "/dataservice/device/action/defaultpartition"
         payload = {
             "action": "defaultpartition",
-            "devices": [device.model_dump() for device in payload_devices],  # type: ignore
+            "devices": [device.model_dump(by_alias=True) for device in payload_devices],  # type: ignore
             "deviceType": get_install_specification(devices.first()).device_type.value,
         }
         set_default = dict(self.session.post(url, json=payload).json())
@@ -100,7 +100,7 @@ class PartitionManagerAPI:
         url = "/dataservice/device/action/removepartition"
         payload = {
             "action": "removepartition",
-            "devices": [device.model_dump() for device in remove_partition_payload],  # type: ignore
+            "devices": [device.model_dump(by_alias=True) for device in remove_partition_payload],  # type: ignore
             "deviceType": get_install_specification(devices.first()).device_type.value,
         }
         if force is False:
