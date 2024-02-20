@@ -1,7 +1,8 @@
 import ipaddress
 from enum import Enum
 from pathlib import Path
-from typing import Annotated, ClassVar, List, Literal, Optional, Union
+from typing import ClassVar, List, Literal, Optional, Union
+from typing_extensions import Annotated
 
 from pydantic import BeforeValidator, ConfigDict, Field
 
