@@ -28,13 +28,13 @@ class SecurityZoneListParcel(_ParcelBase):
     def add_interface(self, interface: InterfaceType):
         self.entries.append(
             SecurityZoneListEntry(
-                interface=as_global(interface),
+                interface=as_global(interface, InterfaceType),
             )
         )
 
     def add_vpn(self, vpn: str):
         self.entries.append(
             SecurityZoneListEntry(
-                vpn=as_global(vpn),
+                vpn=as_global(vpn, InterfaceType),
             )
         )

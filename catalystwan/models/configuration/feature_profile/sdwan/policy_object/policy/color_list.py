@@ -14,4 +14,4 @@ class ColorParcel(_ParcelBase):
     entries: List[ColorEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_color(self, color: TLOCColor):
-        self.entries.append(ColorEntry(color=as_global(color)))
+        self.entries.append(ColorEntry(color=as_global(color, TLOCColor)))

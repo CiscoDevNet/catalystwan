@@ -37,4 +37,4 @@ class AppProbeParcel(_ParcelBase):
 
     def add_map(self, color: TLOCColor, dscp: int):
         entry = self.entries[0]
-        entry.map.append(AppProbeMapItem(color=as_global(color), dscp=as_global(dscp)))
+        entry.map.append(AppProbeMapItem(color=as_global(color, TLOCColor), dscp=as_global(dscp)))

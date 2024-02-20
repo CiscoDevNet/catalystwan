@@ -32,7 +32,7 @@ class PolicierParcel(_ParcelBase):
         self.entries.append(
             PolicierEntry(
                 burst=as_global(burst),
-                exceed=as_global(exceed),
+                exceed=as_global(exceed, PolicerExceedAction),
                 rate=as_global(rate),
             )
         )

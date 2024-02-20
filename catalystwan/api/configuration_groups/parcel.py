@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Dict, Generic, Optional, TypeVar
+from typing import Any, Dict, Generic, Literal, Optional, TypeVar, get_origin
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, PrivateAttr, model_serializer
 
@@ -49,10 +49,7 @@ class OptionType(str, Enum):
 
 
 class ParcelAttribute(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-
+    model_config = ConfigDict(extra="forbid")
     option_type: OptionType = Field(serialization_alias="optionType", validation_alias="optionType")
 
 
@@ -94,13 +91,47 @@ class Default(ParcelAttribute, Generic[T]):
     value: Any
 
 
-def as_global(value: Any):
-    return Global[type(value)](value=value)  # type: ignore
+def as_global(value: Any, generic_alias: Any = None):
+    """Produces Global object given only value (type is induced from value)
+
+    Args:
+        value (Any): value of Global object to be produced
+        generic_alias (Any, optional): specify alias type like Literal. Defaults to None.
+
+    Returns:
+        Global[Any]: global option type object
+    """
+    if generic_alias is None:
+        return Global[type(value)](value=value)  # type: ignore
+    elif get_origin(generic_alias) is Literal:
+        return Global[generic_alias](value=value)  # type: ignore
+    TypeError("Inappropriate type for argument generic_alias")
 
 
 def as_variable(value: str):
+    """Produces Variable object from variable name string
+
+    Args:
+        value (str): value of Variable object to be produced
+
+    Returns:
+        Variable: variable option type object
+    """
     return Variable(value=value)
 
 
-def as_default(value: Any):
-    return Default[type(value)](value=value)  # type: ignore
+def as_default(value: Any, generic_alias: Any = None):
+    """Produces Default object given only value (type is induced from value)
+
+    Args:
+        value (Any): value of Default object to be produced
+        generic_alias (Any, optional): specify alias type like Literal. Defaults to None.
+
+    Returns:
+        Default[Any]: default option type object
+    """
+    if generic_alias is None:
+        return Default[type(value)](value=value)  # type: ignore
+    elif get_origin(generic_alias) is Literal:
+        return Default[generic_alias](value=value)  # type: ignore
+    TypeError("Inappropriate type for argument generic_alias")

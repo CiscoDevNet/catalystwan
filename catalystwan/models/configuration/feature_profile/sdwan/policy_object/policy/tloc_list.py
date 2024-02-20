@@ -34,8 +34,8 @@ class TlocParcel(_ParcelBase):
         self.entries.append(
             TlocEntry(
                 tloc=as_global(tloc),
-                color=as_global(color),
-                encapsulation=as_global(encapsulation),
-                preference=as_global(preference),
+                color=as_global(color, TLOCColor),
+                encapsulation=as_global(encapsulation, EncapType),
+                preference=as_global(preference) if preference is not None else None,
             )
         )

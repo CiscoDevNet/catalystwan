@@ -17,4 +17,6 @@ class StandardCommunityParcel(_ParcelBase):
     entries: List[StandardCommunityEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_community(self, standard_community: WellKnownBGPCommunities):
-        self.entries.append(StandardCommunityEntry(standard_community=as_global(standard_community)))
+        self.entries.append(
+            StandardCommunityEntry(standard_community=as_global(standard_community, WellKnownBGPCommunities))
+        )

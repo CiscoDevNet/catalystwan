@@ -41,7 +41,8 @@ class PreferredColorGroupParcel(_ParcelBase):
         self.entries.append(
             PreferredColorGroupEntry(
                 primary_preference=Preference(
-                    color_preference=as_global(color_preference), path_preference=as_global(path_preference)
+                    color_preference=as_global(color_preference),
+                    path_preference=as_global(path_preference, PathPreference),
                 ),
                 secondary_preference=None,
                 tertiary_preference=None,
@@ -51,11 +52,11 @@ class PreferredColorGroupParcel(_ParcelBase):
     def add_secondary(self, color_preference: List[TLOCColor], path_preference: PathPreference):
         preferred_color = self.entries[0]
         preferred_color.secondary_preference = Preference(
-            color_preference=as_global(color_preference), path_preference=as_global(path_preference)
+            color_preference=as_global(color_preference), path_preference=as_global(path_preference, PathPreference)
         )
 
     def add_tertiary(self, color_preference: List[TLOCColor], path_preference: PathPreference):
         preferred_color = self.entries[0]
         preferred_color.tertiary_preference = Preference(
-            color_preference=as_global(color_preference), path_preference=as_global(path_preference)
+            color_preference=as_global(color_preference), path_preference=as_global(path_preference, PathPreference)
         )
