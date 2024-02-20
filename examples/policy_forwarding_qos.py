@@ -23,8 +23,6 @@ from dataclasses import dataclass
 from typing import Dict, Optional
 from uuid import UUID
 
-from catalystwan.models.policy import PLPEntryEnum, PolicyActionTypeEnum, QoSDropEnum, TrafficDataDirectionEnum
-
 logger = logging.getLogger(__name__)
 
 
@@ -128,7 +126,7 @@ def run_demo(args: CmdArguments):
         qos_map.add_scheduler(queue=3, class_map_ref=pol_dict["DEFAULT"], bandwidth=20, buffer=20)
         qos_map.add_scheduler(queue=4, class_map_ref=pol_dict["INTERACTIVE_VIDEO"], bandwidth=20, buffer=20)
         qos_map.add_scheduler(
-            queue=5, class_map_ref=pol_dict["CONTROL_SIGNALING"], bandwidth=10, buffer=10, drops=QoSDropEnum.TAIL
+            queue=5, class_map_ref=pol_dict["CONTROL_SIGNALING"], bandwidth=10, buffer=10, drops="tail-drop"
         )
         pol_dict["My-QosMap-Policy"] = api.definitions.create(qos_map)
 
@@ -167,20 +165,17 @@ def run_demo(args: CmdArguments):
         logger.info("II.C. Configure Localized Policy: Create Re-write Policy")
         from catalystwan.models.policy import RewritePolicy
 
-        _low = PLPEntryEnum.LOW
-        _high = PLPEntryEnum.HIGH
-
         rw_pol = RewritePolicy(name="My-Rewrite-Policy")
-        rw_pol.add_rule(class_map_ref=pol_dict["BULK"], plp=_low, dscp=10, l2cos=1)
-        rw_pol.add_rule(class_map_ref=pol_dict["BULK"], plp=_high, dscp=10, l2cos=1)
-        rw_pol.add_rule(class_map_ref=pol_dict["DEFAULT"], plp=_low, dscp=0, l2cos=0)
-        rw_pol.add_rule(class_map_ref=pol_dict["DEFAULT"], plp=_high, dscp=0, l2cos=0)
-        rw_pol.add_rule(class_map_ref=pol_dict["CONTROL_SIGNALING"], plp=_low, dscp=18, l2cos=2)
-        rw_pol.add_rule(class_map_ref=pol_dict["CONTROL_SIGNALING"], plp=_high, dscp=18, l2cos=2)
-        rw_pol.add_rule(class_map_ref=pol_dict["CRITICAL_DATA"], plp=_low, dscp=18, l2cos=2)
-        rw_pol.add_rule(class_map_ref=pol_dict["CRITICAL_DATA"], plp=_high, dscp=18, l2cos=2)
-        rw_pol.add_rule(class_map_ref=pol_dict["BULK"], plp=_low, dscp=10, l2cos=4)
-        rw_pol.add_rule(class_map_ref=pol_dict["BULK"], plp=_high, dscp=10, l2cos=4)
+        rw_pol.add_rule(class_map_ref=pol_dict["BULK"], plp="low", dscp=10, l2cos=1)
+        rw_pol.add_rule(class_map_ref=pol_dict["BULK"], plp="high", dscp=10, l2cos=1)
+        rw_pol.add_rule(class_map_ref=pol_dict["DEFAULT"], plp="low", dscp=0, l2cos=0)
+        rw_pol.add_rule(class_map_ref=pol_dict["DEFAULT"], plp="high", dscp=0, l2cos=0)
+        rw_pol.add_rule(class_map_ref=pol_dict["CONTROL_SIGNALING"], plp="low", dscp=18, l2cos=2)
+        rw_pol.add_rule(class_map_ref=pol_dict["CONTROL_SIGNALING"], plp="high", dscp=18, l2cos=2)
+        rw_pol.add_rule(class_map_ref=pol_dict["CRITICAL_DATA"], plp="low", dscp=18, l2cos=2)
+        rw_pol.add_rule(class_map_ref=pol_dict["CRITICAL_DATA"], plp="high", dscp=18, l2cos=2)
+        rw_pol.add_rule(class_map_ref=pol_dict["BULK"], plp="low", dscp=10, l2cos=4)
+        rw_pol.add_rule(class_map_ref=pol_dict["BULK"], plp="high", dscp=10, l2cos=4)
         pol_dict["My-Rewrite-Policy"] = api.definitions.create(rw_pol)
         loc_pol.add_rewrite_rule(pol_dict["My-Rewrite-Policy"])
         pol_dict["My-Localized-Policy"] = api.localized.create(loc_pol)
@@ -246,7 +241,7 @@ def run_demo(args: CmdArguments):
 
         centralized_pol = CentralizedPolicy(policy_name="My-Centralized-Policy")
         data_pol = TrafficDataPolicy(name="My-Traffic-Data-Policy")
-        data_pol_seq = data_pol.add_ipv4_sequence(base_action=PolicyActionTypeEnum.ACCEPT)
+        data_pol_seq = data_pol.add_ipv4_sequence(base_action="accept")
         data_pol_seq.associate_forwarding_class_action(fwclass="CONTROL_SIGNALING")
         pol_dict["My-Traffic-Data-Policy"] = api.definitions.create(data_pol)
 
@@ -274,9 +269,7 @@ def run_demo(args: CmdArguments):
         vpn_list.add_vpn_range((100, 300))
         pol_dict["My-VPN-List"] = api.lists.create(vpn_list)
 
-        pol_application.assign_to(
-            [pol_dict["My-VPN-List"]], TrafficDataDirectionEnum.TUNNEL, site_lists=[pol_dict["My-Site-List"]]
-        )
+        pol_application.assign_to([pol_dict["My-VPN-List"]], "tunnel", site_lists=[pol_dict["My-Site-List"]])
         pol_dict["My-Centralized-Policy"] = api.centralized.create(centralized_pol)
 
         try:

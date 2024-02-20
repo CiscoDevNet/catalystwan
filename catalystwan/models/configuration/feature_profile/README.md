@@ -310,10 +310,10 @@ auto_sim: Union[Variable, Global[bool], Default[None]]
 
 ### 3. Literals vs Enums
 
-Use `Enums` over the `Literals`. Justification:
-- `Enum` provides IntelliSense.
-- Both provides static typing safety.
-- `Enum` can be treated as a `str`.
+Use `Literal` over the `Enums`. Justification:
+- Both provides static typing safety ant intellisense (type-hints).
+- `(str, Enum)` can be problematic as `__str__` != `__format__` for Enum
+- When instantiating pydantic Field defined as `Literal` no explicit import of specific `Enum` is needed
 
 ### 4. Naming Conventions
 

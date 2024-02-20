@@ -1,5 +1,4 @@
 import datetime
-from enum import Enum
 from functools import wraps
 from ipaddress import IPv4Address, IPv4Network, IPv6Network
 from typing import Any, Dict, List, MutableSequence, Optional, Protocol, Sequence, Set, Tuple, Union
@@ -8,9 +7,9 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, RootModel, model_validator
 from typing_extensions import Annotated, Literal
 
-from catalystwan.models.common import TLOCColorEnum, check_fields_exclusive
+from catalystwan.models.common import ServiceChainNumber, TLOCColor, check_fields_exclusive
 from catalystwan.models.misc.application_protocols import ApplicationProtocol
-from catalystwan.models.policy.lists_entries import EncapEnum
+from catalystwan.models.policy.lists_entries import EncapType
 from catalystwan.typed_list import DataSequence
 
 
@@ -26,97 +25,72 @@ def networks_to_str(networks: Sequence[Union[IPv4Network, IPv6Network]]) -> str:
     return " ".join(str(net) for net in networks)
 
 
-class Reference(BaseModel):
-    ref: UUID
+PLPEntryType = Literal[
+    "low",
+    "high",
+]
 
+DNSEntryType = Literal[
+    "request",
+    "response",
+]
 
-class VariableName(BaseModel):
-    vip_variable_name: str = Field(serialization_alias="vipVariableName", validation_alias="vipVariableName")
+TrafficTargetType = Literal[
+    "access",
+    "core",
+    "service",
+]
 
+DestinationRegion = Literal[
+    "primary-region",
+    "secondary-region",
+    "other-region",
+]
 
-class PLPEntryEnum(str, Enum):
-    LOW = "low"
-    HIGH = "high"
+OriginProtocol = Literal[
+    "aggregate",
+    "bgp",
+    "bgp-external",
+    "bgp-internal",
+    "connected",
+    "eigrp",
+    "ospf",
+    "ospf-inter-area",
+    "ospf-intra-area",
+    "ospf-external1",
+    "ospf-external2",
+    "rip",
+    "static",
+    "eigrp-summary",
+    "eigrp-internal",
+    "eigrp-external",
+    "lisp",
+    "nat-dia",
+    "natpool",
+    "isis",
+    "isis-level1",
+    "isis-level2",
+]
 
+PathType = Literal[
+    "hierarchical-path",
+    "direct-path",
+    "transport-gateway-path",
+]
 
-class DNSEntryValues(str, Enum):
-    REQUEST = "request"
-    RESPONSE = "response"
+SequenceIpType = Literal[
+    "ipv4",
+    "ipv6",
+    "all",
+]
 
-
-class TrafficToEntryValues(str, Enum):
-    ACCESS = "access"
-    CORE = "core"
-    SERVICE = "service"
-
-
-class DestinationRegionEntryValues(str, Enum):
-    PRIMARY = "primary-region"
-    SECONDARY = "secondary-region"
-    OTHER = "other-region"
-
-
-class OriginProtocolEnum(str, Enum):
-    AGGREGATE = "aggregate"
-    BGP = "bgp"
-    BGP_EXTERNAL = "bgp-external"
-    BGP_INTERNAL = "bgp-internal"
-    CONNECTED = "connected"
-    EIGRP = "eigrp"
-    OSPF = "ospf"
-    OSPF_INTER_AREA = "ospf-inter-area"
-    OSPF_INTRA_AREA = "ospf-intra-area"
-    OSPF_EXTERNAL_1 = "ospf-external1"
-    OSPF_EXTERNAL_2 = "ospf-external2"
-    RIP = "rip"
-    STATIC = "static"
-    EIGRP_SUMMARY = "eigrp-summary"
-    EIGRP_INTERNAL = "eigrp-internal"
-    EIGRP_EXTERNAL = "eigrp-external"
-    LISP = "lisp"
-    NAT_DIA = "nat-dia"
-    NATPOOL = "natpool"
-    ISIS = "isis"
-    ISIS_LEVEL_1 = "isis-level1"
-    ISIS_LEVEL_2 = "isis-level2"
-
-
-class PathTypeEnum(str, Enum):
-    HIERARCHICAL = "hierarchical-path"
-    DIRECT = "direct-path"
-    TRANSPORT_GATEWAY = "transport-gateway-path"
-
-
-class DeviceAccessProtocolEnum(int, Enum):
-    SSH = 22
-    SNMP = 161
-
-
-class LocalTLOCListEntryValue(BaseModel):
-    color: TLOCColorEnum
-    encap: EncapEnum
-    restrict: Optional[str] = None
-
-
-class TLOCEntryValue(BaseModel):
-    ip: IPv4Address
-    color: TLOCColorEnum
-    encap: EncapEnum
-
-
-class SequenceIpType(str, Enum):
-    IPV4 = "ipv4"
-    IPV6 = "ipv6"
-    ALL = "all"
-
-
-class PolicyActionTypeEnum(str, Enum):
-    DROP = "drop"
-    ACCEPT = "accept"
-    PASS = "pass"
-    INSPECT = "inspect"
-    REJECT = "reject"
-
+PolicyActionType = Literal[
+    "drop",
+    "accept",
+    "pass",
+    "inspect",
+    "reject",
+]
 
 SequenceType = Literal[
     "applicationFirewall",
@@ -134,58 +108,81 @@ SequenceType = Literal[
 ]
 
 
-class Optimized(str, Enum):
-    TRUE = "true"
-    FALSE = "false"
+Optimized = Literal[
+    "true",
+    "false",
+]
+
+DNSTypeEntryType = Literal[
+    "host",
+    "umbrella",
+]
+
+LossProtectionType = Literal[
+    "fecAdaptive",
+    "fecAlways",
+    "packetDuplication",
+]
+
+MultiRegionRole = Literal[
+    "border-router",
+    "edge-router",
+]
+
+ServiceType = Literal[
+    "FW",
+    "IDP",
+    "IDS",
+    "netsvc1",
+    "netsvc2",
+    "netsvc3",
+    "netsvc4",
+]
+
+TLOCActionType = Literal[
+    "strict",
+    "primary",
+    "backup",
+    "ecmp",
+]
+
+Carrier = Literal[
+    "default",
+    "carrier1",
+    "carrier2",
+    "carrier3",
+    "carrier4",
+    "carrier5",
+    "carrier6",
+    "carrier7",
+    "carrier8",
+]
+
+DeviceAccessProtocol = Literal[22, 161]
 
 
-class DNSTypeEntryEnum(str, Enum):
-    HOST = "host"
-    UMBRELLA = "umbrella"
+class Reference(BaseModel):
+    ref: UUID
 
 
-class LossProtectionEnum(str, Enum):
-    FEC_ADAPTIVE = "fecAdaptive"
-    FEC_ALWAYS = "fecAlways"
-    PACKET_DUPLICATION = "packetDuplication"
+class VariableName(BaseModel):
+    vip_variable_name: str = Field(serialization_alias="vipVariableName", validation_alias="vipVariableName")
 
 
-class MultiRegionRoleEnum(str, Enum):
-    BORDER = "border-router"
-    EDGE = "edge-router"
+class LocalTLOCListEntryValue(BaseModel):
+    color: TLOCColor
+    encap: EncapType
+    restrict: Optional[str] = None
 
 
-class ServiceTypeEnum(str, Enum):
-    FIREWALL = "FW"
-    INTRUSION_DETECTION_PREVENTION = "IDP"
-    INTRUSION_DETECTION_SYSTEM = "IDS"
-    NET_SERVICE_1 = "netsvc1"
-    NET_SERVICE_2 = "netsvc2"
-    NET_SERVICE_3 = "netsvc3"
-    NET_SERVICE_4 = "netsvc4"
-
-
-class TLOCActionEnum(str, Enum):
-    STRICT = "strict"
-    PRIMARY = "primary"
-    BACKUP = "backup"
-    EQUAL_COST_MULTI_PATH = "ecmp"
-
-
-class CarrierEnum(str, Enum):
-    DEFAULT = "default"
-    CARRIER_1 = "carrier1"
-    CARRIER_2 = "carrier2"
-    CARRIER_3 = "carrier3"
-    CARRIER_4 = "carrier4"
-    CARRIER_5 = "carrier5"
-    CARRIER_6 = "carrier6"
-    CARRIER_7 = "carrier7"
-    CARRIER_8 = "carrier8"
+class TLOCEntryValue(BaseModel):
+    ip: IPv4Address
+    color: TLOCColor
+    encap: EncapType
 
 
 class ServiceChainEntryValue(BaseModel):
-    type: str = Field("SC1", pattern=r"SC(1[0-6]|[1-9])")
+    type: ServiceChainNumber = Field(default="SC1")
     vpn: str
     restrict: Optional[str] = None
     local: Optional[str] = None
@@ -205,7 +202,7 @@ class PacketLengthEntry(BaseModel):
 
 class PLPEntry(BaseModel):
     field: Literal["plp"] = "plp"
-    value: PLPEntryEnum
+    value: PLPEntryType
 
 
 class ProtocolEntry(BaseModel):
@@ -306,17 +303,17 @@ class TCPEntry(BaseModel):
 
 class DNSEntry(BaseModel):
     field: Literal["dns"] = "dns"
-    value: DNSEntryValues
+    value: DNSEntryType
 
 
 class TrafficToEntry(BaseModel):
     field: Literal["trafficTo"] = "trafficTo"
-    value: TrafficToEntryValues
+    value: TrafficTargetType
 
 
 class DestinationRegionEntry(BaseModel):
     field: Literal["destinationRegion"] = "destinationRegion"
-    value: DestinationRegionEntryValues
+    value: DestinationRegion
 
 
 class SourceFQDNEntry(BaseModel):
@@ -385,7 +382,7 @@ class OMPTagEntry(BaseModel):
 
 class OriginEntry(BaseModel):
     field: Literal["origin"] = "origin"
-    value: OriginProtocolEnum
+    value: OriginProtocol
 
 
 class OriginatorEntry(BaseModel):
@@ -400,7 +397,7 @@ class PreferenceEntry(BaseModel):
 
 class PathTypeEntry(BaseModel):
     field: Literal["pathType"] = "pathType"
-    value: PathTypeEnum
+    value: PathType
 
 
 class RegionEntry(BaseModel):
@@ -410,7 +407,7 @@ class RegionEntry(BaseModel):
 
 class RoleEntry(BaseModel):
     field: Literal["role"] = "role"
-    value: MultiRegionRoleEnum
+    value: MultiRegionRole
 
 
 class SiteEntry(BaseModel):
@@ -425,7 +422,7 @@ class LocalTLOCListEntry(BaseModel):
 
 class DNSTypeEntry(BaseModel):
     field: Literal["dnsType"] = "dnsType"
-    value: DNSTypeEntryEnum
+    value: DNSTypeEntryType
 
 
 class ServiceChainEntry(BaseModel):
@@ -455,7 +452,7 @@ class CommunityAdditiveEntry(BaseModel):
 
 class CarrierEntry(BaseModel):
     field: Literal["carrier"] = "carrier"
-    value: CarrierEnum
+    value: Carrier
 
 
 class DomainIDEntry(BaseModel):
@@ -621,7 +618,7 @@ class ClassMapListEntry(BaseModel):
 
 class ServiceEntryValue(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-    type: ServiceTypeEnum
+    type: ServiceType
     vpn: str
     tloc: Optional[TLOCEntryValue] = None
     tloc_list: Optional[TLOCListEntry] = Field(
@@ -641,7 +638,7 @@ class ServiceEntry(BaseModel):
 
 class TLOCActionEntry(BaseModel):
     field: Literal["tlocAction"] = "tlocAction"
-    value: TLOCActionEnum
+    value: TLOCActionType
 
 
 class AffinityEntry(BaseModel):
@@ -688,7 +685,7 @@ class RedirectDNSAction(BaseModel):
         return RedirectDNSAction(parameter=IPAddressEntry(value=ip))
 
     @staticmethod
-    def from_dns_type(dns_type: DNSTypeEntryEnum = DNSTypeEntryEnum.HOST) -> "RedirectDNSAction":
+    def from_dns_type(dns_type: DNSTypeEntryType = "host") -> "RedirectDNSAction":
         return RedirectDNSAction(parameter=DNSTypeEntry(value=dns_type))
 
 
@@ -709,18 +706,18 @@ class ServiceNodeGroupAction(BaseModel):
 
 class LossProtectionAction(BaseModel):
     type: Literal["lossProtect"] = "lossProtect"
-    parameter: LossProtectionEnum
+    parameter: LossProtectionType
 
 
 class LossProtectionFECAction(BaseModel):
     type: Literal["lossProtectFec"] = "lossProtectFec"
-    parameter: LossProtectionEnum = LossProtectionEnum.FEC_ALWAYS
+    parameter: LossProtectionType = "fecAlways"
     value: Optional[str] = Field(default=None, description="BETA number in range 1-5")
 
 
 class LossProtectionPacketDuplicationAction(BaseModel):
     type: Literal["lossProtectPktDup"] = "lossProtectPktDup"
-    parameter: LossProtectionEnum = LossProtectionEnum.PACKET_DUPLICATION
+    parameter: LossProtectionType = "packetDuplication"
 
 
 class SecureInternetGatewayAction(BaseModel):
@@ -908,8 +905,8 @@ class Action(BaseModel):
 class PolicyDefinitionSequenceBase(BaseModel):
     sequence_id: int = Field(default=0, serialization_alias="sequenceId", validation_alias="sequenceId")
     sequence_name: str = Field(serialization_alias="sequenceName", validation_alias="sequenceName")
-    base_action: PolicyActionTypeEnum = Field(
-        default=PolicyActionTypeEnum.DROP, serialization_alias="baseAction", validation_alias="baseAction"
+    base_action: PolicyActionType = Field(
+        default="drop", serialization_alias="baseAction", validation_alias="baseAction"
     )
     sequence_type: SequenceType = Field(serialization_alias="sequenceType", validation_alias="sequenceType")
     sequence_ip_type: SequenceIpType = Field(serialization_alias="sequenceIpType", validation_alias="sequenceIpType")
@@ -1001,16 +998,14 @@ class PolicyDefinitionSequenceBase(BaseModel):
 def accept_action(method):
     @wraps(method)
     def wrapper(self: PolicyDefinitionSequenceBase, *args, **kwargs):
-        assert (
-            self.base_action == PolicyActionTypeEnum.ACCEPT
-        ), f"{method.__name__} only allowed when base_action is {PolicyActionTypeEnum.ACCEPT}"
+        assert self.base_action == "accept", f"{method.__name__} only allowed when base_action is accept"
         return method(self, *args, **kwargs)
 
     return wrapper
 
 
 class DefaultAction(BaseModel):
-    type: PolicyActionTypeEnum
+    type: PolicyActionType
 
 
 class InfoTag(BaseModel):
@@ -1028,7 +1023,7 @@ class PolicyReference(BaseModel):
 
 class DefinitionWithSequencesCommonBase(BaseModel):
     default_action: Optional[DefaultAction] = Field(
-        default=DefaultAction(type=PolicyActionTypeEnum.DROP),
+        default=DefaultAction(type="drop"),
         serialization_alias="defaultAction",
         validation_alias="defaultAction",
     )
@@ -1088,7 +1083,7 @@ class PolicyDefinitionBase(BaseModel):
     description: str = "default description"
     type: str
     mode: Optional[str] = None
-    optimized: Optional[Optimized] = Optimized.FALSE
+    optimized: Optional[Optimized] = "false"
 
 
 class PolicyDefinitionInfo(PolicyDefinitionBase, PolicyDefinitionId):

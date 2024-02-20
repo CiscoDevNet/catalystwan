@@ -1,28 +1,45 @@
-from enum import Enum
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 from uuid import UUID
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 
+SLAClassCriteria = Literal[
+    "loss",
+    "latency",
+    "jitter",
+    "loss-latency",
+    "loss-jitter",
+    "latency-loss",
+    "latency-jitter",
+    "jitter-latency",
+    "jitter-loss",
+    "loss-latency-jitter",
+    "loss-jitter-latency",
+    "latency-loss-jitter",
+    "latency-jitter-loss",
+    "jitter-latency-loss",
+    "jitter-loss-latency",
+]
 
-class SLAClassCriteriaEnum(str, Enum):
-    LOSS = "loss"
-    LATENCY = "latency"
-    JITTER = "jitter"
-    LOSS_LATENCY = "loss-latency"
-    LOSS_JITTER = "loss-jitter"
-    LATENCY_LOSS = "latency-loss"
-    LATENCY_JITTER = "latency-jitter"
-    JITTER_LATENCY = "jitter-latency"
-    JITTER_LOSS = "jitter-loss"
-    LOSS_LATENCY_JITTER = "loss-latency-jitter"
-    LOSS_JITTER_LATENCY = "loss-jitter-latency"
-    LATENCY_LOSS_JITTER = "latency-loss-jitter"
-    LATENCY_JITTER_LOSS = "latency-jitter-loss"
-    JITTER_LATENCY_LOSS = "jitter-latency-loss"
-    JITTER_LOSS_LATENCY = "jitter-loss-latency"
+
+def check_latency_ms(cls, latency: Optional[Global]):
+    if latency is not None:
+        assert 1 <= latency.value <= 1000
+        return latency
+
+
+def check_loss_percent(cls, loss: Optional[Global]):
+    if loss is not None:
+        assert 0 <= loss.value <= 100
+    return loss
+
+
+def check_jitter_ms(cls, jitter: Optional[Global]):
+    if jitter is not None:
+        assert 1 <= jitter.value <= 1000
+    return jitter
 
 
 class SLAAppProbeClass(BaseModel):
@@ -34,7 +51,7 @@ class SLAAppProbeClass(BaseModel):
 class FallbackBestTunnel(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    criteria: Global[SLAClassCriteriaEnum]
+    criteria: Global[SLAClassCriteria]
     jitter_variance: Optional[Global[int]] = Field(
         default=None,
         serialization_alias="jitterVariance",
@@ -53,41 +70,27 @@ class FallbackBestTunnel(BaseModel):
         validation_alias="lossVariance",
         description="loss variance as percentage",
     )
+    # validators
+    _jitter_validator = field_validator("jitter_variance")(check_jitter_ms)
+    _latency_validator = field_validator("latency_variance")(check_latency_ms)
+    _loss_validator = field_validator("loss_variance")(check_loss_percent)
 
-    def add_criterias(
+    def add_criteria(
         self, jitter_variance: Union[int, None], latency_variance: Union[int, None], loss_variance: Union[int, None]
     ):
-        expected_criterias = []
+        expected_criteria = []
         if jitter_variance:
             self.jitter_variance = Global(value=jitter_variance)
-            expected_criterias.append("jitter")
+            expected_criteria.append("jitter")
         if latency_variance:
             self.latency_variance = Global(value=latency_variance)
-            expected_criterias.append("latency")
+            expected_criteria.append("latency")
         if loss_variance:
             self.loss_variance = Global(value=loss_variance)
-            expected_criterias.append("loss")
-        for e in expected_criterias:
+            expected_criteria.append("loss")
+        for e in expected_criteria:
             if e not in self.criteria.value:
-                raise ValueError(f"Criteria {e} is not in configured criteraias {self.criteria.value}")
-
-    @field_validator("latency_variance")
-    @classmethod
-    def check_latency(cls, latency: Global):
-        assert 1 <= latency.value <= 1000
-        return latency
-
-    @field_validator("loss_variance")
-    @classmethod
-    def check_loss(cls, loss: Global):
-        assert 0 <= loss.value <= 100
-        return loss
-
-    @field_validator("jitter_variance")
-    @classmethod
-    def check_jitter(cls, jitter: Global):
-        assert 1 <= jitter.value <= 1000
-        return jitter
+                raise ValueError(f"Criteria {e} is not in configured criteria {self.criteria.value}")
 
 
 class SLAClassListEntry(BaseModel):
@@ -103,49 +106,42 @@ class SLAClassListEntry(BaseModel):
         default=None, validation_alias="fallbackBestTunnel", serialization_alias="fallbackBestTunnel"
     )
 
-    @field_validator("latency")
-    @classmethod
-    def check_latency(cls, latency: Global):
-        assert 1 <= latency.value <= 1000
-        return latency
-
-    @field_validator("loss")
-    @classmethod
-    def check_loss(cls, loss: Global):
-        assert 0 <= loss.value <= 100
-        return loss
-
-    @field_validator("jitter")
-    @classmethod
-    def check_jitter(cls, jitter: Global):
-        assert 1 <= jitter.value <= 1000
-        return jitter
+    # validators
+    _jitter_validator = field_validator("jitter")(check_jitter_ms)
+    _latency_validator = field_validator("latency")(check_latency_ms)
+    _loss_validator = field_validator("loss")(check_loss_percent)
 
 
 class SLAClassParcel(_ParcelBase):
     entries: List[SLAClassListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
-    def add_entry(self, app_probe_class_id: UUID, loss: Optional[int], jitter: Optional[int], latency: Optional[int]):
+    def add_entry(
+        self,
+        app_probe_class_id: UUID,
+        loss: Optional[int] = None,
+        jitter: Optional[int] = None,
+        latency: Optional[int] = None,
+    ):
         self.entries.append(
             SLAClassListEntry(
                 app_probe_class=SLAAppProbeClass(ref_id=as_global(app_probe_class_id)),
-                loss=as_global(loss),
-                jitter=as_global(jitter),
-                latency=as_global(latency),
+                loss=as_global(loss) if loss is not None else None,
+                jitter=as_global(jitter) if jitter is not None else None,
+                latency=as_global(latency) if latency is not None else None,
             )
         )
 
     def add_fallback(
         self,
-        criteria: SLAClassCriteriaEnum,
-        jitter_variance: Optional[int],
-        latency_variance: Optional[int],
-        loss_variance: Optional[int],
+        criteria: SLAClassCriteria,
+        jitter_variance: Optional[int] = None,
+        latency_variance: Optional[int] = None,
+        loss_variance: Optional[int] = None,
     ):
         fallback = FallbackBestTunnel(
-            criteria=as_global(criteria),
-            jitter_variance=as_global(jitter_variance),
-            latency_variance=as_global(latency_variance),
-            loss_variance=as_global(loss_variance),
+            criteria=as_global(criteria, SLAClassCriteria),
+            jitter_variance=as_global(jitter_variance) if jitter_variance is not None else None,
+            latency_variance=as_global(latency_variance) if latency_variance is not None else None,
+            loss_variance=as_global(loss_variance) if loss_variance is not None else None,
         )
         self.entries[0].fallback_best_tunnel = fallback

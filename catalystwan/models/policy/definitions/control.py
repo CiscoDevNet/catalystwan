@@ -5,12 +5,12 @@ from uuid import UUID
 from pydantic import ConfigDict, Field
 from typing_extensions import Annotated
 
-from catalystwan.models.common import TLOCColorEnum
-from catalystwan.models.policy.lists_entries import EncapEnum
+from catalystwan.models.common import TLOCColor
+from catalystwan.models.policy.lists_entries import EncapType
 from catalystwan.models.policy.policy_definition import (
     AffinityEntry,
+    Carrier,
     CarrierEntry,
-    CarrierEnum,
     ColorListEntry,
     CommunityAdditiveEntry,
     CommunityEntry,
@@ -22,14 +22,14 @@ from catalystwan.models.policy.policy_definition import (
     ExportToAction,
     GroupIDEntry,
     Match,
-    MultiRegionRoleEnum,
+    MultiRegionRole,
     OMPTagEntry,
     OriginatorEntry,
     OriginEntry,
-    OriginProtocolEnum,
+    OriginProtocol,
+    PathType,
     PathTypeEntry,
-    PathTypeEnum,
-    PolicyActionTypeEnum,
+    PolicyActionType,
     PolicyDefinitionBase,
     PolicyDefinitionSequenceBase,
     PreferenceEntry,
@@ -37,14 +37,13 @@ from catalystwan.models.policy.policy_definition import (
     RegionEntry,
     RegionListEntry,
     RoleEntry,
-    SequenceIpType,
     ServiceEntry,
     ServiceEntryValue,
-    ServiceTypeEnum,
+    ServiceType,
     SiteEntry,
     SiteListEntry,
     TLOCActionEntry,
-    TLOCActionEnum,
+    TLOCActionType,
     TLOCEntry,
     TLOCEntryValue,
     TLOCListEntry,
@@ -118,8 +117,8 @@ class ControlPolicyRouteSequence(PolicyDefinitionSequenceBase):
     sequence_type: Literal["route"] = Field(
         default="route", serialization_alias="sequenceType", validation_alias="sequenceType"
     )
-    base_action: PolicyActionTypeEnum = Field(
-        default=PolicyActionTypeEnum.REJECT, serialization_alias="baseAction", validation_alias="baseAction"
+    base_action: PolicyActionType = Field(
+        default="reject", serialization_alias="baseAction", validation_alias="baseAction"
     )
     match: ControlPolicyRouteSequenceMatch = ControlPolicyRouteSequenceMatch()
     actions: List[ControlPolicyRouteSequenceActions] = []
@@ -137,26 +136,26 @@ class ControlPolicyRouteSequence(PolicyDefinitionSequenceBase):
     def match_omp_tag(self, omp_tag: int) -> None:
         self._insert_match(OMPTagEntry(value=str(omp_tag)))
 
-    def match_origin(self, origin: OriginProtocolEnum) -> None:
+    def match_origin(self, origin: OriginProtocol) -> None:
         self._insert_match(OriginEntry(value=origin))
 
     def match_originator(self, originator: IPv4Address) -> None:
         self._insert_match(OriginatorEntry(value=originator))
 
-    def match_path_type(self, path_type: PathTypeEnum) -> None:
+    def match_path_type(self, path_type: PathType) -> None:
         self._insert_match(PathTypeEntry(value=path_type))
 
     def match_preference(self, preference: int) -> None:
         self._insert_match(PreferenceEntry(value=str(preference)))
 
-    def match_region(self, region_id: int, role: Optional[MultiRegionRoleEnum] = None) -> None:
+    def match_region(self, region_id: int, role: Optional[MultiRegionRole] = None) -> None:
         self._insert_match(RegionEntry(value=str(region_id)))
         if role is not None:
             self._insert_match(RoleEntry(value=role))
         else:
             self._remove_match(RoleEntry)
 
-    def match_region_list(self, region_list_id: UUID, role: Optional[MultiRegionRoleEnum] = None) -> None:
+    def match_region_list(self, region_list_id: UUID, role: Optional[MultiRegionRole] = None) -> None:
         self._insert_match(RegionListEntry(ref=region_list_id))
         if role is not None:
             self._insert_match(RoleEntry(value=role))
@@ -172,7 +171,7 @@ class ControlPolicyRouteSequence(PolicyDefinitionSequenceBase):
     def match_tloc_list(self, tloc_list_id: UUID) -> None:
         self._insert_match(TLOCListEntry(ref=tloc_list_id))
 
-    def match_tloc(self, ip: IPv4Address, color: TLOCColorEnum, encap: EncapEnum) -> None:
+    def match_tloc(self, ip: IPv4Address, color: TLOCColor, encap: EncapType) -> None:
         self._insert_match(TLOCEntry(value=TLOCEntryValue(ip=ip, color=color, encap=encap)))
 
     def match_vpn_list(self, vpn_list_id: UUID) -> None:
@@ -198,18 +197,18 @@ class ControlPolicyRouteSequence(PolicyDefinitionSequenceBase):
         self._insert_action_in_set(PreferenceEntry(value=str(preference)))
 
     @overload
-    def associate_service_action(self, service_type: ServiceTypeEnum, vpn: int, *, tloc_list_id: UUID) -> None:
+    def associate_service_action(self, service_type: ServiceType, vpn: int, *, tloc_list_id: UUID) -> None:
         ...
 
     @overload
     def associate_service_action(
-        self, service_type: ServiceTypeEnum, vpn: int, *, ip: IPv4Address, color: TLOCColorEnum, encap: EncapEnum
+        self, service_type: ServiceType, vpn: int, *, ip: IPv4Address, color: TLOCColor, encap: EncapType
     ) -> None:
         ...
 
     @accept_action
     def associate_service_action(
-        self, service_type=ServiceTypeEnum, vpn=int, *, tloc_list_id=None, ip=None, color=None, encap=None
+        self, service_type=ServiceType, vpn=int, *, tloc_list_id=None, ip=None, color=None, encap=None
     ) -> None:
         if tloc_list_id is None:
             tloc_entry = TLOCEntryValue(ip=ip, color=color, encap=encap)
@@ -221,7 +220,7 @@ class ControlPolicyRouteSequence(PolicyDefinitionSequenceBase):
         self._insert_action_in_set(ServiceEntry(value=service_value))
 
     @accept_action
-    def associate_tloc_action(self, tloc_action: TLOCActionEnum) -> None:
+    def associate_tloc_action(self, tloc_action: TLOCActionType) -> None:
         self._insert_action_in_set(TLOCActionEntry(value=tloc_action))
 
     @accept_action
@@ -237,14 +236,14 @@ class ControlPolicyTLOCSequence(PolicyDefinitionSequenceBase):
     sequence_type: Literal["tloc"] = Field(
         default="tloc", serialization_alias="sequenceType", validation_alias="sequenceType"
     )
-    base_action: PolicyActionTypeEnum = Field(
-        default=PolicyActionTypeEnum.REJECT, serialization_alias="baseAction", validation_alias="baseAction"
+    base_action: PolicyActionType = Field(
+        default="reject", serialization_alias="baseAction", validation_alias="baseAction"
     )
     match: ControlPolicyTLOCSequenceMatch = ControlPolicyTLOCSequenceMatch()
     actions: List[ControlPolicyTLOCSequenceActions] = []
     model_config = ConfigDict(populate_by_name=True)
 
-    def match_carrier(self, carrier: CarrierEnum) -> None:
+    def match_carrier(self, carrier: Carrier) -> None:
         self._insert_match(CarrierEntry(value=carrier))
 
     def match_color_list(self, color_list_id: UUID) -> None:
@@ -271,14 +270,14 @@ class ControlPolicyTLOCSequence(PolicyDefinitionSequenceBase):
     def match_site_list(self, site_list_id: UUID) -> None:
         self._insert_match(SiteListEntry(ref=site_list_id))
 
-    def match_region(self, region_id: int, role: Optional[MultiRegionRoleEnum] = None) -> None:
+    def match_region(self, region_id: int, role: Optional[MultiRegionRole] = None) -> None:
         self._insert_match(RegionEntry(value=str(region_id)))
         if role is not None:
             self._insert_match(RoleEntry(value=role))
         else:
             self._remove_match(RoleEntry)
 
-    def match_region_list(self, region_list_id: UUID, role: Optional[MultiRegionRoleEnum] = None) -> None:
+    def match_region_list(self, region_list_id: UUID, role: Optional[MultiRegionRole] = None) -> None:
         self._insert_match(RegionListEntry(ref=region_list_id))
         if role is not None:
             self._insert_match(RoleEntry(value=role))
@@ -288,7 +287,7 @@ class ControlPolicyTLOCSequence(PolicyDefinitionSequenceBase):
     def match_tloc_list(self, tloc_list_id: UUID) -> None:
         self._insert_match(TLOCListEntry(ref=tloc_list_id))
 
-    def match_tloc(self, ip: IPv4Address, color: TLOCColorEnum, encap: EncapEnum) -> None:
+    def match_tloc(self, ip: IPv4Address, color: TLOCColor, encap: EncapType) -> None:
         self._insert_match(TLOCEntry(value=TLOCEntryValue(ip=ip, color=color, encap=encap)))
 
     @accept_action
@@ -313,30 +312,30 @@ AnyControlPolicySequence = Annotated[
 class ControlPolicy(ControlPolicyHeader, DefinitionWithSequencesCommonBase):
     sequences: List[AnyControlPolicySequence] = []
     default_action: DefaultAction = Field(
-        default=DefaultAction(type=PolicyActionTypeEnum.REJECT),
+        default=DefaultAction(type="reject"),
         serialization_alias="defaultAction",
         validation_alias="defaultAction",
     )
     model_config = ConfigDict(populate_by_name=True)
 
     def add_route_sequence(
-        self, name: str = "Route", base_action: PolicyActionTypeEnum = PolicyActionTypeEnum.REJECT
+        self, name: str = "Route", base_action: PolicyActionType = "reject"
     ) -> ControlPolicyRouteSequence:
         seq = ControlPolicyRouteSequence(
             sequence_name=name,
             base_action=base_action,
-            sequence_ip_type=SequenceIpType.IPV4,
+            sequence_ip_type="ipv4",
         )
         self.add(seq)
         return seq
 
     def add_tloc_sequence(
-        self, name: str = "TLOC", base_action: PolicyActionTypeEnum = PolicyActionTypeEnum.REJECT
+        self, name: str = "TLOC", base_action: PolicyActionType = "reject"
     ) -> ControlPolicyTLOCSequence:
         seq = ControlPolicyTLOCSequence(
             sequence_name=name,
             base_action=base_action,
-            sequence_ip_type=SequenceIpType.IPV4,
+            sequence_ip_type="ipv4",
         )
         self.add(seq)
         return seq

@@ -4,15 +4,15 @@ from typing import List, Optional
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
-from catalystwan.models.common import TLOCColorEnum
-from catalystwan.models.policy.lists_entries import EncapEnum
+from catalystwan.models.common import TLOCColor
+from catalystwan.models.policy.lists_entries import EncapType
 
 
 class TlocEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
     tloc: Global[IPv4Address]
-    color: Global[TLOCColorEnum]
-    encapsulation: Global[EncapEnum] = Field(serialization_alias="encap", validation_alias="encap")
+    color: Global[TLOCColor]
+    encapsulation: Global[EncapType] = Field(serialization_alias="encap", validation_alias="encap")
     preference: Optional[Global[str]] = None
 
     @field_validator("preference")
@@ -29,13 +29,13 @@ class TlocParcel(_ParcelBase):
     entries: List[TlocEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_entry(
-        self, tloc: IPv4Address, color: TLOCColorEnum, encapsulation: EncapEnum, preference: Optional[str] = None
+        self, tloc: IPv4Address, color: TLOCColor, encapsulation: EncapType, preference: Optional[str] = None
     ):
         self.entries.append(
             TlocEntry(
                 tloc=as_global(tloc),
-                color=as_global(color),
-                encapsulation=as_global(encapsulation),
-                preference=as_global(preference),
+                color=as_global(color, TLOCColor),
+                encapsulation=as_global(encapsulation, EncapType),
+                preference=as_global(preference) if preference is not None else None,
             )
         )

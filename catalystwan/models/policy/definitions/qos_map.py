@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import List, Literal, Optional, Union
 from uuid import UUID
 
@@ -6,15 +5,15 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from catalystwan.models.policy.policy_definition import PolicyDefinitionBase
 
+QoSScheduling = Literal[
+    "llq",
+    "wrr",
+]
 
-class QoSSchedulingEnum(str, Enum):
-    LLQ = "llq"
-    WRR = "wrr"
-
-
-class QoSDropEnum(str, Enum):
-    TAIL = "tail-drop"
-    RANDOM_EARLY = "red-drop"
+QoSDropType = Literal[
+    "tail-drop",
+    "red-drop",
+]
 
 
 class QoSScheduler(BaseModel):
@@ -23,8 +22,8 @@ class QoSScheduler(BaseModel):
     bandwidth_percent: str = Field("1", serialization_alias="bandwidthPercent", validation_alias="bandwidthPercent")
     buffer_percent: str = Field("1", serialization_alias="bufferPercent", validation_alias="bufferPercent")
     burst: Optional[str] = None
-    scheduling: QoSSchedulingEnum = QoSSchedulingEnum.WRR
-    drops: QoSDropEnum = QoSDropEnum.TAIL
+    scheduling: QoSScheduling = "wrr"
+    drops: QoSDropType = "tail-drop"
     temp_key_values: Optional[str] = Field(
         default=None, serialization_alias="tempKeyValues", validation_alias="tempKeyValues"
     )
@@ -37,8 +36,8 @@ class QoSScheduler(BaseModel):
             bandwidth_percent="100",
             buffer_percent="100",
             burst="15000",
-            scheduling=QoSSchedulingEnum.LLQ,
-            drops=QoSDropEnum.TAIL,
+            scheduling="llq",
+            drops="tail-drop",
         )
 
     model_config = ConfigDict(populate_by_name=True)
@@ -79,8 +78,8 @@ class QoSMapPolicy(PolicyDefinitionBase):
         class_map_ref: UUID,
         bandwidth: int = 1,
         buffer: int = 1,
-        scheduling: QoSSchedulingEnum = QoSSchedulingEnum.WRR,
-        drops: QoSDropEnum = QoSDropEnum.TAIL,
+        scheduling: QoSScheduling = "wrr",
+        drops: QoSDropType = "tail-drop",
         burst: Optional[int] = None,
     ) -> None:
         self.definition.qos_schedulers.append(

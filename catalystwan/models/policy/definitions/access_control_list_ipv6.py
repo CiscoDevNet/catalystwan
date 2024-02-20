@@ -21,13 +21,11 @@ from catalystwan.models.policy.policy_definition import (
     NextHopEntry,
     PacketLengthEntry,
     PLPEntry,
-    PLPEntryEnum,
     PolicerAction,
-    PolicyActionTypeEnum,
+    PolicyActionType,
     PolicyDefinitionBase,
     PolicyDefinitionSequenceBase,
     Reference,
-    SequenceIpType,
     SourceDataIPv6PrefixListEntry,
     SourceIPv6Entry,
     SourcePortEntry,
@@ -69,8 +67,8 @@ class AclIPv6PolicySequence(PolicyDefinitionSequenceBase):
     sequence_type: Literal["aclv6"] = Field(
         default="aclv6", serialization_alias="sequenceType", validation_alias="sequenceType"
     )
-    base_action: PolicyActionTypeEnum = Field(
-        default=PolicyActionTypeEnum.ACCEPT, serialization_alias="baseAction", validation_alias="baseAction"
+    base_action: PolicyActionType = Field(
+        default="accept", serialization_alias="baseAction", validation_alias="baseAction"
     )
     match: AclIPv6PolicySequenceMatch = AclIPv6PolicySequenceMatch()
     actions: List[AclIPv6PolicySequenceActions] = []
@@ -83,10 +81,10 @@ class AclIPv6PolicySequence(PolicyDefinitionSequenceBase):
         self._insert_match(PacketLengthEntry.from_range(packet_lengths))
 
     def match_low_plp(self) -> None:
-        self._insert_match(PLPEntry(value=PLPEntryEnum.LOW))
+        self._insert_match(PLPEntry(value="low"))
 
     def match_high_plp(self) -> None:
-        self._insert_match(PLPEntry(value=PLPEntryEnum.HIGH))
+        self._insert_match(PLPEntry(value="high"))
 
     def match_source_data_prefix_list(self, data_prefix_list_id: UUID) -> None:
         self._insert_match(SourceDataIPv6PrefixListEntry(ref=data_prefix_list_id))
@@ -145,19 +143,19 @@ class AclIPv6PolicySequence(PolicyDefinitionSequenceBase):
 class AclIPv6Policy(AclIPv6PolicyHeader, DefinitionWithSequencesCommonBase):
     sequences: List[AclIPv6PolicySequence] = []
     default_action: DefaultAction = Field(
-        default=DefaultAction(type=PolicyActionTypeEnum.DROP),
+        default=DefaultAction(type="drop"),
         serialization_alias="defaultAction",
         validation_alias="defaultAction",
     )
     model_config = ConfigDict(populate_by_name=True)
 
     def add_acl_sequence(
-        self, name: str = "Access Control List", base_action: PolicyActionTypeEnum = PolicyActionTypeEnum.ACCEPT
+        self, name: str = "Access Control List", base_action: PolicyActionType = "accept"
     ) -> AclIPv6PolicySequence:
         seq = AclIPv6PolicySequence(
             sequence_name=name,
             base_action=base_action,
-            sequence_ip_type=SequenceIpType.IPV6,
+            sequence_ip_type="ipv6",
         )
         self.add(seq)
         return seq

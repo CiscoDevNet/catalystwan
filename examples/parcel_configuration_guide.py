@@ -7,7 +7,6 @@ from uuid import UUID
 
 from catalystwan.api.feature_profile_api import PolicyObjectFeatureProfileAPI
 from catalystwan.endpoints.configuration_feature_profile import ConfigurationFeatureProfile
-from catalystwan.models.common import InterfaceTypeEnum, TLOCColorEnum, WellKnownBGPCommunitiesEnum
 from catalystwan.models.configuration.feature_profile.common import ParcelCreationResponse
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object import (
     ApplicationListParcel,
@@ -30,14 +29,12 @@ from catalystwan.models.configuration.feature_profile.sdwan.policy_object import
     SecurityDataPrefixParcel,
     SecurityPortParcel,
     SecurityZoneListParcel,
-    SLAClassCriteriaEnum,
     SLAClassParcel,
     StandardCommunityParcel,
     TlocParcel,
     URLAllowParcel,
     URLBlockParcel,
 )
-from catalystwan.models.policy.lists_entries import EncapEnum, PathPreferenceEnum, PolicerExceedActionEnum
 
 logger = logging.getLogger(__name__)
 
@@ -128,8 +125,8 @@ def configure_groups_of_interest(profile_id: UUID, api: PolicyObjectFeatureProfi
 
     # Create Security Zone parcel and add interfaces
     security_zone = SecurityZoneListParcel(parcel_name="SecurityZoneListParcel")
-    security_zone.add_interface(InterfaceTypeEnum.ETHERNET)
-    security_zone.add_interface(InterfaceTypeEnum.TUNNEL)
+    security_zone.add_interface("Ethernet")
+    security_zone.add_interface("Tunnel")
 
     # Create Application parcel and add applications
     security_application_list = SecurityApplicationListParcel(parcel_name="SecurityApplListParcelExample")
@@ -154,9 +151,9 @@ def configure_groups_of_interest(profile_id: UUID, api: PolicyObjectFeatureProfi
 
     # Create Color parcel and add colors
     color_parcel = ColorParcel(parcel_name="ColorParcelExample")
-    color_parcel.add_color(TLOCColorEnum.BIZ_INTERNET)
-    color_parcel.add_color(TLOCColorEnum.METRO_ETHERNET)
-    color_parcel.add_color(TLOCColorEnum.PUBLIC_INTERNET)
+    color_parcel.add_color("biz-internet")
+    color_parcel.add_color("metro-ethernet")
+    color_parcel.add_color("public-internet")
 
     # Create Data prefix parcel and add data prefixes
     data_prefix_parcel = DataPrefixParcel(parcel_name="DataPrefixExample")
@@ -188,19 +185,15 @@ def configure_groups_of_interest(profile_id: UUID, api: PolicyObjectFeatureProfi
     # Create Preferred color parcel and add preferred colors
     preferred_group_color = PreferredColorGroupParcel(parcel_name="PreferredColorGroupParcelExmaple")
     preferred_group_color.add_primary(
-        color_preference=[TLOCColorEnum.BIZ_INTERNET, TLOCColorEnum.MPLS],
-        path_preference=PathPreferenceEnum.DIRECT_PATH,
+        color_preference=["biz-internet", "mpls"],
+        path_preference="direct-path",
     )
-    preferred_group_color.add_secondary(
-        color_preference=[TLOCColorEnum.BRONZE, TLOCColorEnum.SILVER], path_preference=PathPreferenceEnum.DIRECT_PATH
-    )
-    preferred_group_color.add_tertiary(
-        color_preference=[TLOCColorEnum.METRO_ETHERNET], path_preference=PathPreferenceEnum.MULTI_HOP_PATH
-    )
+    preferred_group_color.add_secondary(color_preference=["bronze", "silver"], path_preference="direct-path")
+    preferred_group_color.add_tertiary(color_preference=["metro-ethernet"], path_preference="multi-hop-path")
 
     # Create Policier parcel and add policiers
     policier = PolicierParcel(parcel_name="PolicierParcelExmaple")
-    policier.add_entry(burst=17000, exceed=PolicerExceedActionEnum.DROP, rate=1000)
+    policier.add_entry(burst=17000, exceed="drop", rate=1000)
 
     # Create Fowarding Class parcel and add fowarding classes
     fowarding_class = FowardingClassParcel(parcel_name="FowardingClassParcelExmaple")
@@ -208,18 +201,14 @@ def configure_groups_of_interest(profile_id: UUID, api: PolicyObjectFeatureProfi
 
     # Create Tloc Parcel and add tlocs
     tloc_list = TlocParcel(parcel_name="TlocParcelExample")
-    tloc_list.add_entry(
-        tloc=IPv4Address("40.0.0.0"), color=TLOCColorEnum.PRIVATE3, encapsulation=EncapEnum.GRE, preference="1000"
-    )
-    tloc_list.add_entry(
-        tloc=IPv4Address("50.0.0.0"), color=TLOCColorEnum.CUSTOM1, encapsulation=EncapEnum.GRE, preference="10000"
-    )
+    tloc_list.add_entry(tloc=IPv4Address("40.0.0.0"), color="private3", encapsulation="gre", preference="1000")
+    tloc_list.add_entry(tloc=IPv4Address("50.0.0.0"), color="custom1", encapsulation="gre", preference="10000")
 
     # Create Standard Community Parcel and add standard communities
     standard_community = StandardCommunityParcel(parcel_name="StandardCommunityParcelExample")
-    standard_community.add_community(WellKnownBGPCommunitiesEnum.INTERNET)
-    standard_community.add_community(WellKnownBGPCommunitiesEnum.LOCAL_AS)
-    standard_community.add_community(WellKnownBGPCommunitiesEnum.NO_ADVERTISE)
+    standard_community.add_community("internet")
+    standard_community.add_community("local-AS")
+    standard_community.add_community("no-advertise")
 
     # Create Expanded Community Parcel and add expanded communities
     expanded_community = ExpandedCommunityParcel(parcel_name="ExpandedCommunityParcel")
@@ -230,9 +219,9 @@ def configure_groups_of_interest(profile_id: UUID, api: PolicyObjectFeatureProfi
     # Create App Probe Parcel and add app probes
     app_probe = AppProbeParcel(parcel_name="AppProbeParcelExample")
     app_probe.add_fowarding_class("FowardingClassParcelExmaple")
-    app_probe.add_map(color=TLOCColorEnum.CUSTOM1, dscp=33)
-    app_probe.add_map(color=TLOCColorEnum.BLUE, dscp=40)
-    app_probe.add_map(color=TLOCColorEnum.PUBLIC_INTERNET, dscp=43)
+    app_probe.add_map(color="custom1", dscp=33)
+    app_probe.add_map(color="blue", dscp=40)
+    app_probe.add_map(color="public-internet", dscp=43)
 
     items.append(fqdn)
     items.append(local_domain)
@@ -269,9 +258,7 @@ def configure_groups_of_interest(profile_id: UUID, api: PolicyObjectFeatureProfi
 
     sla = SLAClassParcel(parcel_name="SLAClassParcelExample")
     sla.add_entry(app_probe_class_id=_id.id, jitter=20, latency=50, loss=100)
-    sla.add_fallback(
-        criteria=SLAClassCriteriaEnum.JITTER_LATENCY_LOSS, latency_variance=10, jitter_variance=10, loss_variance=10
-    )
+    sla.add_fallback(criteria="jitter-latency-loss", latency_variance=10, jitter_variance=10, loss_variance=10)
 
     items_ids.append((api.create(profile_id, sla), sla.__class__))
 
