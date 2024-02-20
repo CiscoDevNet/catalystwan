@@ -10,7 +10,7 @@ from pydantic.v1 import BaseModel as BaseModelV1
 from pydantic.v1 import Field as FieldV1
 
 from catalystwan.dataclasses import DataclassBase
-from catalystwan.response import ErrorInfo, ManagerResponse
+from catalystwan.response import ManagerErrorInfo, ManagerResponse
 from catalystwan.typed_list import DataSequence
 
 
@@ -161,7 +161,7 @@ class TestResponse(unittest.TestCase):
         self.response_mock.json.return_value = json
         vmng_response = ManagerResponse(self.response_mock)
         error_info = vmng_response.get_error_info()
-        assert isinstance(error_info, ErrorInfo)
+        assert isinstance(error_info, ManagerErrorInfo)
         if empty_error:
             assert error_info.message is None
             assert error_info.details is None

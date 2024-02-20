@@ -1,11 +1,11 @@
 from datetime import datetime
 from enum import Enum
 from typing import Generic, List, Literal, Optional, TypeVar, Union
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, as_global
-from catalystwan.models.common import UUID
 from catalystwan.models.configuration.common import Solution
 
 T = TypeVar("T")
@@ -20,10 +20,13 @@ class ProfileType(str, Enum):
     SYSTEM = "system"
     CLI = "cli"
     SERVICE = "service"
+    APPLICATION_PRIORITY = "application-priority"
+    POLICY_OBJECT = "policy-object"
+    EMBEDDED_SECURITY = "embedded-security"
 
 
 class FeatureProfileInfo(BaseModel):
-    profile_id: str = Field(alias="profileId")
+    profile_id: UUID = Field(alias="profileId")
     profile_name: str = Field(alias="profileName")
     solution: Solution
     profile_type: ProfileType = Field(alias="profileType")
@@ -70,9 +73,9 @@ class FeatureProfileCreationResponse(BaseModel):
 
 
 class ParcelCreationResponse(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(populate_by_name=True)
 
-    id: UUID = Field(alias="parcelId")
+    id: UUID = Field(serialization_alias="parcelId", validation_alias="parcelId")
 
 
 class ParcelType(str, Enum):
@@ -93,6 +96,31 @@ class ParcelType(str, Enum):
     ROUTING_OSPFV3_IPV6 = "routing/ospfv3/ipv6"
     WIRELESSLAN = "wirelesslan"
     SWITCHPORT = "switchport"
+    APP_PROBE = "app-probe"
+    APPLICATION_LIST = "app-list"
+    COLOR = "color"
+    DATA_PREFIX = "data-prefix"
+    EXPANDED_COMMUNITY = "expanded-community"
+    FOWARDING_CLASS = "class"
+    IPV6_DATA_PREFIX = "data-ipv6-prefix"
+    IPV6_PREFIX_LIST = "ipv6-prefix"
+    PREFIX_LIST = "prefix"
+    POLICIER = "policer"
+    PREFERRED_COLOR_GROUP = "preferred-color-group"
+    SLA_CLASS = "sla-class"
+    TLOC = "tloc"
+    STANDARD_COMMUNITY = "standard-community"
+    LOCAL_DOMAIN = "security-localdomain"
+    FQDN_DOMAIN = "security-fqdn"
+    IPS_SIGNATURE = "security-ipssignature"
+    URL_ALLOW = "security-urllist"
+    URL_BLOCK = "security-urllist"
+    SECURITY_PORT = "security-port"
+    PROTOCOL_LIST = "security-protocolname"
+    GEO_LOCATION_LIST = "security-geolocation"
+    SECURITY_ZONE_LIST = "security-zone"
+    SECURITY_APPLICATION_LIST = "security-localapp"
+    SECURITY_DATA_PREFIX = "security-data-ip-prefix"
 
 
 class Parcel(BaseModel, Generic[T]):

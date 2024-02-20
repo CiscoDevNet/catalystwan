@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import ClassVar, List, Optional
 
 from attr import define, field  # type: ignore
+from pydantic import ConfigDict
 
 from catalystwan.api.templates.feature_template import FeatureTemplate
 from catalystwan.dataclasses import User
@@ -64,8 +65,7 @@ class AuthTask:
 
 
 class AAAModel(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "feature" / "aaa.json.j2"
     type: ClassVar[str] = "aaa"  # AAA

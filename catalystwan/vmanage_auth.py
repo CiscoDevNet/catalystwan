@@ -8,10 +8,10 @@ from requests.auth import AuthBase
 from requests.cookies import RequestsCookieJar
 
 from catalystwan import with_proc_info_header
-from catalystwan.exceptions import ManagerError
+from catalystwan.exceptions import CatalystwanException
 
 
-class UnauthorizedAccessError(ManagerError):
+class UnauthorizedAccessError(CatalystwanException):
     """Exception raised for wrong username/password or when user not authorized to access vManage.
 
     Attributes:
