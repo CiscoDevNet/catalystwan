@@ -94,13 +94,15 @@ class FeatureTemplate(BaseModel, ABC):
             template_definition_as_dict, device_specific_variables=device_specific_variables
         )
 
-        print(dict(
-            template_name=template_info.name,
-            template_description=template_info.description,
-            device_models=[model for model in template_info.device_type],
-            device_specific_variables=device_specific_variables,
-            **values_from_template_definition,
-        ))
+        print(
+            dict(
+                template_name=template_info.name,
+                template_description=template_info.description,
+                device_models=[model for model in template_info.device_type],
+                device_specific_variables=device_specific_variables,
+                **values_from_template_definition,
+            )
+        )
 
         return feature_template_model(
             template_name=template_info.name,

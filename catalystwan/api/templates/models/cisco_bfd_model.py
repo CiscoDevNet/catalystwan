@@ -42,10 +42,18 @@ class ColorType(str, Enum):
 class Color(ConvertBoolToStringModel):
     color: ColorType
     hello_interval: Optional[int] = Field(
-        DEFAULT_BFD_HELLO_INTERVAL, json_schema_extra={"vmanage_key": "hello-interval"}
+        default=DEFAULT_BFD_HELLO_INTERVAL,
+        validation_alias="hello-interval",
+        serialization_alias="hello-interval",
+        json_schema_extra={"vmanage_key": "hello-interval"},
     )
     multiplier: Optional[int] = DEFAULT_BFD_COLOR_MULTIPLIER
-    pmtu_discovery: Optional[bool] = Field(True, json_schema_extra={"vmanage_key": "pmtu-discovery"})
+    pmtu_discovery: Optional[bool] = Field(
+        default=True,
+        validation_alias="pmtu-discovery",
+        serialization_alias="pmtu-discovery",
+        json_schema_extra={"vmanage_key": "pmtu-discovery"},
+    )
     dscp: Optional[int] = DEFAULT_BFD_DSCP
     model_config = ConfigDict(populate_by_name=True)
 
@@ -55,9 +63,17 @@ class CiscoBFDModel(FeatureTemplate, ConvertBoolToStringModel):
 
     multiplier: Optional[int] = Field(DEFAULT_BFD_MULTIPLIER, json_schema_extra={"data_path": ["app-route"]})
     poll_interval: Optional[int] = Field(
-        DEFAULT_BFD_POLL_INTERVAL, json_schema_extra={"vmanage_key": "poll-interval", "data_path": ["app-route"]}
+        default=DEFAULT_BFD_POLL_INTERVAL,
+        serialization_alias="poll-interval",
+        validation_alias="poll-interval",
+        json_schema_extra={"vmanage_key": "poll-interval", "data_path": ["app-route"]},
     )
-    default_dscp: Optional[int] = Field(DEFAULT_BFD_DSCP, json_schema_extra={"vmanage_key": "default-dscp"})
+    default_dscp: Optional[int] = Field(
+        default=DEFAULT_BFD_DSCP,
+        validation_alias="default-dscp",
+        serialization_alias="default-dscp",
+        json_schema_extra={"vmanage_key": "default-dscp"},
+    )
     color: Optional[List[Color]] = None
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"

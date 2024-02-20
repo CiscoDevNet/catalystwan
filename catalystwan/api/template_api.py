@@ -552,7 +552,7 @@ class TemplatesAPI:
             name=template.template_name,
             description=template.template_description,
             template_type=template.type,
-            device_types=[device_model.value for device_model in template.device_models],
+            device_types=[device_model for device_model in template.device_models],
             definition={},
         )  # type: ignore
 

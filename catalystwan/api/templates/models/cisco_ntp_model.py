@@ -14,7 +14,12 @@ class Server(ConvertBoolToStringModel):
     key: Optional[int] = None
     vpn: Optional[int] = None
     version: Optional[int] = None
-    source_interface: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "source-interface"})
+    source_interface: Optional[str] = Field(
+        default=None,
+        serialization_alias="source-interface",
+        validation_alias="source-interface",
+        json_schema_extra={"vmanage_key": "source-interface"},
+    )
     prefer: Optional[bool] = None
 
 
