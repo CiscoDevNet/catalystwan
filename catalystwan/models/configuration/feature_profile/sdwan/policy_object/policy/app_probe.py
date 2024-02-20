@@ -28,6 +28,7 @@ class AppProbeEntry(BaseModel):
 
 
 class AppProbeParcel(_ParcelBase):
+    type_: Literal["app-probe"] = Field(default="app-probe", exclude=True)
     entries: List[AppProbeEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_fowarding_class(self, forwarding_class_name: str):

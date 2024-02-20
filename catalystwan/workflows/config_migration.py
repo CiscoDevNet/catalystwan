@@ -15,8 +15,11 @@ def log_progress(task: str, completed: int, total: int) -> None:
 
 def transform(ux1: UX1Config) -> UX2Config:
     ux2 = UX2Config()
-    ux2.profile_parcels.extend([lst.to_policy_object_parcel() for lst in ux1.policies.policy_lists])
     ux2.profile_parcels.extend([create_parcel_from_template(ft) for ft in ux1.templates.features])
+    # Policy Lists
+    for policy_list in ux1.policies.policy_lists:
+        if (parcel := policy_list.to_policy_object_parcel()) is not None:
+            ux2.profile_parcels.append(parcel)
     return ux2
 
 
@@ -54,8 +57,6 @@ def collect_ux1_config(session: ManagerSession, progress: Callable[[str, int, in
     for i, lpid in enumerate(localized_policy_ids):
         ux1.policies.localized_policies.append(policy_api.localized.get(id=lpid))
         progress("Collecting Localized Policies", i + 1, len(localized_policy_ids))
-
-    ux1.policies.policy_lists = policy_api.lists.get_all()
 
     """Collect Templates"""
     template_api = session.api.templates

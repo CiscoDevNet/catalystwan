@@ -1,6 +1,7 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
 from typing import List
+from typing import List, Literal
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
@@ -16,6 +17,7 @@ class StandardCommunityEntry(BaseModel):
 
 
 class StandardCommunityParcel(_ParcelBase):
+    type_: Literal["standard-community"] = Field(default="standard-community", exclude=True)
     entries: List[StandardCommunityEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_community(self, standard_community: WellKnownBGPCommunities):

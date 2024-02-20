@@ -1,6 +1,7 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
 from typing import List
+from typing import List, Literal
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
@@ -29,6 +30,7 @@ class SecurityPortListEntry(BaseModel):
 
 
 class SecurityPortParcel(_ParcelBase):
+    type_: Literal["security-port"] = Field(default="security-port", exclude=True)
     entries: List[SecurityPortListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_port(self, port: str):

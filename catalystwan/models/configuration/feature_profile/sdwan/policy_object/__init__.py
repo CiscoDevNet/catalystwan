@@ -34,35 +34,42 @@ from .security.security_port import SecurityPortListEntry, SecurityPortParcel
 from .security.url import BaseURLListEntry, URLAllowParcel, URLBlockParcel
 from .security.zone import SecurityZoneListEntry, SecurityZoneListParcel
 
+AnyURLParcel = Annotated[
+    Union[
+        URLAllowParcel,
+        URLBlockParcel,
+    ],
+    Field(discriminator="parcel_type"),
+]
+
 AnyPolicyObjectParcel = Annotated[
     Union[
-        AppProbeParcel,
+        AnyURLParcel,
         ApplicationListParcel,
+        AppProbeParcel,
         ColorParcel,
         DataPrefixParcel,
         ExpandedCommunityParcel,
         FowardingClassParcel,
+        FQDNDomainParcel,
+        GeoLocationListParcel,
+        IPSSignatureParcel,
         IPv6DataPrefixParcel,
         IPv6PrefixListParcel,
-        PrefixListParcel,
+        LocalDomainParcel,
         PolicierParcel,
         PreferredColorGroupParcel,
-        SLAClassParcel,
-        TlocParcel,
-        StandardCommunityParcel,
-        LocalDomainParcel,
-        FQDNDomainParcel,
-        IPSSignatureParcel,
-        URLAllowParcel,
-        URLBlockParcel,
-        SecurityPortParcel,
+        PrefixListParcel,
         ProtocolListParcel,
-        GeoLocationListParcel,
-        SecurityZoneListParcel,
         SecurityApplicationListParcel,
         SecurityDataPrefixParcel,
+        SecurityPortParcel,
+        SecurityZoneListParcel,
+        SLAClassParcel,
+        StandardCommunityParcel,
+        TlocParcel,
     ],
-    Field(discriminator="type"),
+    Field(discriminator="type_"),
 ]
 
 POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING: Mapping[type, str] = {

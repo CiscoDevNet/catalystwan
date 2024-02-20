@@ -1,6 +1,7 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
 from typing import List, Union
+from typing import List, Literal, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
@@ -18,6 +19,7 @@ class SecurityApplicationFamilyListEntry(BaseModel):
 
 
 class SecurityApplicationListParcel(_ParcelBase):
+    type_: Literal["security-localapp"] = Field(default="security-localapp", exclude=True)
     entries: List[Union[SecurityApplicationFamilyListEntry, SecurityApplicationListEntry]] = Field(
         default=[], validation_alias=AliasPath("data", "entries")
     )
