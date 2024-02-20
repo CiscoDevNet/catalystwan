@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import ClassVar, List, Literal, Optional
-from typing_extensions import Annotated
 
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
+from typing_extensions import Annotated
 
 from catalystwan.api.templates.device_variable import DeviceVariable
 from catalystwan.api.templates.feature_template import FeatureTemplate

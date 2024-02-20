@@ -2,9 +2,9 @@ import ipaddress
 from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Literal, Optional, Union
-from typing_extensions import Annotated
 
 from pydantic import BeforeValidator, ConfigDict, Field
+from typing_extensions import Annotated
 
 from catalystwan.api.templates.feature_template import FeatureTemplate
 from catalystwan.api.templates.models.cisco_omp_model import DEFAULT_OMP_SENDPATH_LIMIT
