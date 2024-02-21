@@ -176,7 +176,7 @@ class ConfigurationDeviceActions(APIEndpoints):
 
     @get("/device/action/install/devices/{device_type}", "data")
     def get_list_of_installed_devices(
-        self, device_type: DeviceType, params: GroupId = GroupId()
+        self, device_type: DeviceType = "controller", params: GroupId = GroupId()
     ) -> DataSequence[InstalledDeviceData]:
         ...
 

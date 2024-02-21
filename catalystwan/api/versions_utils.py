@@ -4,14 +4,14 @@ import logging
 from pathlib import PurePath
 from typing import TYPE_CHECKING, Dict, List, Union
 
-from clint.textui.progress import Bar as ProgressBar  # type: ignore
 from pydantic import BaseModel, ConfigDict, Field
-from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
 
 from catalystwan.dataclasses import Device
+from catalystwan.endpoints.configuration.software_actions import SoftwareImageDetails
 from catalystwan.endpoints.configuration_device_actions import PartitionDevice
 from catalystwan.exceptions import ImageNotInRepositoryError
 from catalystwan.typed_list import DataSequence
+from catalystwan.utils.upgrades_helper import SoftwarePackageUploadPayload
 
 if TYPE_CHECKING:
     from catalystwan.session import ManagerSession
@@ -55,7 +55,7 @@ class RepositoryAPI:
     ):
         self.session = session
 
-    def get_all_software_images(self) -> list:
+    def get_all_software_images(self) -> DataSequence[SoftwareImageDetails]:
         """
         Get all info about all software images stored
         in Vmanage repository
@@ -63,8 +63,7 @@ class RepositoryAPI:
         Returns:
             list: software images list
         """
-        url = "/dataservice/device/action/software/images?imageType=software"
-        software_images = list(self.session.get_data(url))
+        software_images = self.session.endpoints.configuration_software_actions.get_list_of_all_images()
         return software_images
 
     def get_devices_versions_repository(self) -> Dict[str, DeviceSoftwareRepository]:
@@ -77,10 +76,12 @@ class RepositoryAPI:
             information
         """
 
-        url = "/dataservice/system/device/controllers"
-        controllers_versions_info = self.session.get_data(url)
-        url = "/dataservice/system/device/vedges"
-        edges_versions_info = self.session.get_data(url)
+        controllers_versions_info = self.session.endpoints.configuration_device_actions.get_list_of_installed_devices(
+            device_type="controller"
+        )
+        edges_versions_info = self.session.endpoints.configuration_device_actions.get_list_of_installed_devices(
+            device_type="vedge"
+        )
         devices_versions_repository = {}
         for device in controllers_versions_info + edges_versions_info:
             device_software_repository = DeviceSoftwareRepository(**device)
@@ -102,22 +103,14 @@ class RepositoryAPI:
 
         image_name = PurePath(software_image).name
         software_images = self.get_all_software_images()
-        for img in software_images:
-            if image_name in img["availableFiles"]:
-                image_version = img["versionName"]
+        for image in software_images:
+            if image.available_files and image_name in image.available_files:
+                image_version = image.version_name
                 return image_version
         logger.error(f"Software image {image_name} is not in available images")
         return None
 
-    def _create_callback(self, encoder: MultipartEncoder):
-        bar = ProgressBar(expected_size=encoder._calculate_length(), filled_char="=")
-
-        def callback(monitor: MultipartEncoderMonitor):
-            bar.show(monitor.bytes_read)
-
-        return callback
-
-    def upload_image(self, image_path: str) -> int:
+    def upload_image(self, image_path: str) -> None:
         """
         Upload software image 'tar.gz' to Vmanage
         software repository
@@ -128,16 +121,11 @@ class RepositoryAPI:
         Returns:
             str: Response status code
         """
-        url = "/dataservice/device/action/software/package"
-        encoder = MultipartEncoder(
-            fields={"file": (PurePath(image_path).name, open(image_path, "rb"), "application/x-gzip")}
+        self.session.endpoints.configuration_device_software_update.upload_software_to_manager(
+            payload=SoftwarePackageUploadPayload(image_path=image_path)
         )
-        callback = self._create_callback(encoder)
-        monitor = MultipartEncoderMonitor(encoder, callback)
-        upload = self.session.post(url, data=monitor, headers={"content-type": monitor.content_type})
-        return upload.status_code
 
-    def delete_image(self, image_name: str) -> int:
+    def delete_image(self, image_name: str) -> None:
         """
         Delete image from vManage software repository
 
@@ -151,11 +139,12 @@ class RepositoryAPI:
             int: Reponse status code
         """
         for image in self.get_all_software_images():
-            if image_name in image["availableFiles"]:
-                version_id = image["versionId"]
-                url = f"/dataservice/device/action/software/{version_id}"
-                delete = self.session.delete(url)
-                return delete.status_code
+            if image.available_files and image_name in image.available_files:
+                version_id = image.version_id
+                self.session.endpoints.configuration_software_actions.delete_software_from_software_repository(
+                    version_id=version_id
+                )
+                # return delete.status_code
         raise ImageNotInRepositoryError(f"Image: {image_name} is not the vManage software repository")
 
 
