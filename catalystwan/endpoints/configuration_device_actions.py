@@ -104,7 +104,7 @@ class InstallDevice(BaseModel):
 class InstallActionPayload(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    action: str
+    action: str = Field(default="install")
     device_type: str = Field(serialization_alias="deviceType", validation_alias="deviceType")
     devices: List[InstallDevice]
     input: InstallInput
