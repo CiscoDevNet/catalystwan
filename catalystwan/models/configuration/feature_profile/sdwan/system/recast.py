@@ -1,5 +1,5 @@
 from ipaddress import AddressValueError, IPv4Address, IPv6Address
-from typing import Union
+from typing import List, Union
 
 from pydantic import BeforeValidator
 from typing_extensions import Annotated
@@ -18,7 +18,7 @@ def recast_as_global_bool(global_: Global[str]):
 
 def recast_as_global_list_str(global_: Global[str]):
     value = global_.value
-    return Global[list[str]](value=[v for v in value.split(",")])
+    return Global[List[str]](value=[v for v in value.split(",")])
 
 
 def recast_as_global_ipv6_ipv4(global_: Global[str]):
@@ -50,7 +50,7 @@ def recast_as_global_color_literal(global_: Global[str]):
 
 
 DefaultGlobalBool = Annotated[Global[bool], BeforeValidator(recast_as_global_bool)]
-DefaultGlobalList = Annotated[Global[list[str]], BeforeValidator(recast_as_global_list_str)]
+DefaultGlobalList = Annotated[Global[List[str]], BeforeValidator(recast_as_global_list_str)]
 DefaultGlobalIPAddress = Annotated[
     Union[Global[IPv4Address], Global[IPv6Address]], BeforeValidator(recast_as_global_ipv6_ipv4)
 ]
