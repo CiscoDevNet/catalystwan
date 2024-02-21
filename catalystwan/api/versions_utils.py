@@ -6,11 +6,10 @@ from typing import TYPE_CHECKING, Dict, List, Union
 
 from clint.textui.progress import Bar as ProgressBar  # type: ignore
 from pydantic import BaseModel, ConfigDict, Field
-from pydantic.functional_validators import BeforeValidator
 from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
-from typing_extensions import Annotated
 
 from catalystwan.dataclasses import Device
+from catalystwan.endpoints.configuration_device_actions import PartitionDevice
 from catalystwan.exceptions import ImageNotInRepositoryError
 from catalystwan.typed_list import DataSequence
 
@@ -35,25 +34,6 @@ class DeviceSoftwareRepository(BaseModel):
     )
     default_version: str = Field(default="", serialization_alias="defaultVersion", validation_alias="defaultVersion")
     device_id: str = Field(default="", serialization_alias="uuid", validation_alias="uuid")
-
-
-class DeviceVersionPayload(BaseModel):
-    device_id: str = Field(serialization_alias="deviceId")
-    device_ip: str = Field(serialization_alias="deviceIP")
-    version: Union[str, List[str]] = Field(default="")
-
-
-def convert_to_list(element: Union[str, List[str]]) -> List[str]:
-    return [element] if isinstance(element, str) else element
-
-
-VersionList = Annotated[Union[str, List[str]], BeforeValidator(convert_to_list)]
-
-
-class RemovePartitionPayload(BaseModel):
-    device_id: str = Field(serialization_alias="deviceId")
-    device_ip: str = Field(serialization_alias="deviceIP")
-    version: VersionList
 
 
 class RepositoryAPI:
@@ -189,7 +169,7 @@ class DeviceVersions:
 
     def _get_device_list_in(
         self, version_to_set_up: str, devices: DataSequence[Device], version_type: str
-    ) -> DataSequence[DeviceVersionPayload]:
+    ) -> DataSequence[PartitionDevice]:
         """
         Create devices payload list included requested version, if requested version
         is in specified version type
@@ -203,8 +183,8 @@ class DeviceVersions:
             list : list of devices
         """
         devices_payload = DataSequence(
-            DeviceVersionPayload,
-            [DeviceVersionPayload(device_id=device.uuid, device_ip=device.id) for device in devices],
+            PartitionDevice,
+            [PartitionDevice(device_id=device.uuid, device_ip=device.id) for device in devices],
         )
         all_dev_versions = self.repository.get_devices_versions_repository()
         for device in devices_payload:
@@ -223,7 +203,7 @@ class DeviceVersions:
 
     def get_device_list_in_installed(
         self, version_to_set_up: str, devices: DataSequence[Device]
-    ) -> DataSequence[DeviceVersionPayload]:
+    ) -> DataSequence[PartitionDevice]:
         """
         Create devices payload list included requested version, if requested version
         is in installed versions
@@ -239,7 +219,7 @@ class DeviceVersions:
 
     def get_device_available(
         self, version_to_set_up: str, devices: DataSequence[Device]
-    ) -> DataSequence[DeviceVersionPayload]:
+    ) -> DataSequence[PartitionDevice]:
         """
         Create devices payload list included requested, if requested version
         is in available versions
@@ -256,7 +236,7 @@ class DeviceVersions:
 
     def _get_devices_chosen_version(
         self, devices: DataSequence[Device], version_type: str
-    ) -> DataSequence[DeviceVersionPayload]:
+    ) -> DataSequence[PartitionDevice]:
         """
         Create devices payload list included software version key
         for every device in devices list
@@ -269,15 +249,15 @@ class DeviceVersions:
             list : list of devices
         """
         devices_payload = DataSequence(
-            DeviceVersionPayload,
-            [DeviceVersionPayload(device_id=device.uuid, device_ip=device.id) for device in devices],
+            PartitionDevice,
+            [PartitionDevice(device_id=device.uuid, device_ip=device.id) for device in devices],
         )
         all_dev_versions = self.repository.get_devices_versions_repository()
         for device in devices_payload:
             device.version = getattr(all_dev_versions[device.device_id], version_type)
         return devices_payload
 
-    def get_devices_current_version(self, devices: DataSequence[Device]) -> DataSequence[DeviceVersionPayload]:
+    def get_devices_current_version(self, devices: DataSequence[Device]) -> DataSequence[PartitionDevice]:
         """
         Create devices payload list included current software version key
         for every device in devices list
@@ -292,7 +272,7 @@ class DeviceVersions:
 
         return self._get_devices_chosen_version(devices, "current_version")
 
-    def get_devices_available_versions(self, devices: DataSequence[Device]) -> DataSequence[DeviceVersionPayload]:
+    def get_devices_available_versions(self, devices: DataSequence[Device]) -> DataSequence[PartitionDevice]:
         """
         Create devices payload list included available software versions key
         for every device in devices list
@@ -306,5 +286,5 @@ class DeviceVersions:
 
         return self._get_devices_chosen_version(devices, "available_versions")
 
-    def get_device_list(self, devices: DataSequence[Device]) -> List[DeviceVersionPayload]:
-        return [DeviceVersionPayload(device_id=device.uuid, device_ip=device.id) for device in devices]  # type: ignore
+    def get_device_list(self, devices: DataSequence[Device]) -> List[PartitionDevice]:
+        return [PartitionDevice(device_id=device.uuid, device_ip=device.id) for device in devices]  # type: ignore

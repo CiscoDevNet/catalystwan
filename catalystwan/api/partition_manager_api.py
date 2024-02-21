@@ -1,11 +1,17 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Dict, List, Optional, cast
+from typing import TYPE_CHECKING, List, Optional, cast
 
 from catalystwan.api.task_status_api import Task
-from catalystwan.api.versions_utils import DeviceVersions, RemovePartitionPayload, RepositoryAPI
+from catalystwan.api.versions_utils import DeviceVersions, RepositoryAPI
 from catalystwan.dataclasses import Device
+from catalystwan.endpoints.configuration_device_actions import (
+    PartitionActionPayload,
+    RemovePartitionActionPayload,
+    RemovePartitionDevice,
+)
+from catalystwan.exceptions import EmptyVersionPayloadError
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.upgrades_helper import get_install_specification, validate_personality_homogeneity
 
@@ -60,14 +66,20 @@ class PartitionManagerAPI:
         else:
             payload_devices = self.device_version.get_devices_current_version(devices)
 
-        url = "/dataservice/device/action/defaultpartition"
-        payload = {
-            "action": "defaultpartition",
-            "devices": [device.model_dump(by_alias=True) for device in payload_devices],  # type: ignore
-            "deviceType": get_install_specification(devices.first()).device_type.value,
-        }
-        set_default = dict(self.session.post(url, json=payload).json())
-        return Task(self.session, set_default["id"])
+        for device in payload_devices:
+            if not device.version:
+                raise EmptyVersionPayloadError("PartitionDevice payload contains entry with empty version field.")
+
+        device_type = get_install_specification(devices.first()).device_type.value
+        partition_payload = PartitionActionPayload(
+            action="defaultpartition", devices=[dev for dev in payload_devices], device_type=device_type
+        )
+
+        partition_action = self.session.endpoints.configuration_device_actions.process_mark_default_partition(
+            payload=partition_payload
+        )
+
+        return Task(self.session, partition_action.id)
 
     def remove_partition(
         self, devices: DataSequence[Device], partition: Optional[str] = None, force: bool = False
@@ -90,33 +102,36 @@ class PartitionManagerAPI:
         else:
             payload_devices = self.device_version.get_devices_available_versions(devices)
 
-        remove_partition_payload = [
-            RemovePartitionPayload(
-                device_id=device.device_id, device_ip=device.device_id, version=device.version
-            )  # type: ignore
-            for device in payload_devices
-        ]
+        for device in payload_devices:
+            if not device.version:
+                raise EmptyVersionPayloadError("PartitionDevice payload contains entry with empty version field.")
 
-        url = "/dataservice/device/action/removepartition"
-        payload = {
-            "action": "removepartition",
-            "devices": [device.model_dump(by_alias=True) for device in remove_partition_payload],  # type: ignore
-            "deviceType": get_install_specification(devices.first()).device_type.value,
-        }
+        device_type = get_install_specification(devices.first()).device_type.value
+        partition_payload = RemovePartitionActionPayload(
+            action="removepartition",
+            devices=[RemovePartitionDevice(**dev.model_dump()) for dev in payload_devices],
+            device_type=device_type,
+        )
+
         if force is False:
-            self._check_remove_partition_possibility(cast(list, payload["devices"]))
-        remove_action: Dict[str, str] = self.session.post(url, json=payload).json()
-        return Task(self.session, remove_action["id"])
+            self._check_remove_partition_possibility(cast(list, partition_payload.devices))
 
-    def _check_remove_partition_possibility(self, payload_devices: List[dict]) -> None:
+        partition_action = self.session.endpoints.configuration_device_actions.process_remove_partition(
+            payload=partition_payload
+        )
+
+        return Task(self.session, partition_action.id)
+
+    def _check_remove_partition_possibility(self, payload_devices: List[RemovePartitionDevice]) -> None:
         devices_versions_repository = self.repository.get_devices_versions_repository()
         invalid_devices = []
         for device in payload_devices:
-            if device["version"] in (
-                devices_versions_repository[device["deviceId"]].current_version,
-                devices_versions_repository[device["deviceId"]].default_version,
-            ):
-                invalid_devices.append((device["deviceId"]))
+            for version in device.version:
+                if version in (
+                    devices_versions_repository[device.device_id].current_version,
+                    devices_versions_repository[device.device_id].default_version,
+                ):
+                    invalid_devices.append((device.device_id))
         if invalid_devices:
             raise ValueError(
                 f"Current or default version of devices with ids {invalid_devices} \

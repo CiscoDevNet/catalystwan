@@ -1,8 +1,9 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from catalystwan.api.versions_utils import DeviceSoftwareRepository, DeviceVersionPayload, DeviceVersions, RepositoryAPI
+from catalystwan.api.versions_utils import DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
 from catalystwan.dataclasses import Device
+from catalystwan.endpoints.configuration_device_actions import PartitionDevice
 from catalystwan.typed_list import DataSequence
 
 
@@ -79,7 +80,7 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
         answer = mock_device_versions.get_device_available("ver1", [self.device])
         expected_result = DataSequence(
-            DeviceVersionPayload, [DeviceVersionPayload(device_id="mock_uuid", device_ip="mock_ip", version="ver1")]
+            PartitionDevice, [PartitionDevice(device_id="mock_uuid", device_ip="mock_ip", version="ver1")]
         )
 
         # Assert
@@ -99,7 +100,7 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
         answer = mock_device_versions.get_device_list_in_installed("ver1", [self.device])
         expected_result = DataSequence(
-            DeviceVersionPayload, [DeviceVersionPayload(device_id="mock_uuid", device_ip="mock_ip", version="ver1")]
+            PartitionDevice, [PartitionDevice(device_id="mock_uuid", device_ip="mock_ip", version="ver1")]
         )
 
         # Assert
@@ -121,6 +122,6 @@ class TestRepositoryAPI(unittest.TestCase):
         answer = mock_device_versions.get_devices_current_version([self.device])
         # Answer
         proper_answer = DataSequence(
-            DeviceVersionPayload, [DeviceVersionPayload(device_id="mock_uuid", device_ip="mock_ip", version="curr_ver")]
+            PartitionDevice, [PartitionDevice(device_id="mock_uuid", device_ip="mock_ip", version="curr_ver")]
         )
         self.assertEqual(answer, proper_answer)
