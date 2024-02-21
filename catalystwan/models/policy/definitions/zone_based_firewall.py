@@ -18,14 +18,13 @@ from catalystwan.models.policy.policy_definition import (
     DestinationPortListEntry,
     LogAction,
     Match,
-    PolicyActionTypeEnum,
+    PolicyActionType,
     PolicyDefinitionBase,
     PolicyDefinitionSequenceBase,
     ProtocolEntry,
     ProtocolNameEntry,
     ProtocolNameListEntry,
     RuleSetListEntry,
-    SequenceIpType,
     SourceDataPrefixListEntry,
     SourceFQDNEntry,
     SourceFQDNListEntry,
@@ -88,8 +87,8 @@ class ZoneBasedFWPolicySequenceWithRuleSets(PolicyDefinitionSequenceBase):
         self._insert_match(RuleSetListEntry.from_rule_set_ids(rule_set_ids))
 
     def match_app_list(self, app_list_id: UUID) -> None:
-        if self.base_action != PolicyActionTypeEnum.INSPECT:
-            raise ValueError("Action must be Inspect when Application/Application Family List is selected.")
+        if self.base_action != "inspect":
+            raise ValueError("Action must be inspect when Application/Application Family List is selected.")
         self._insert_match(AppListEntry(ref=app_list_id))
 
 
@@ -102,8 +101,8 @@ class ZoneBasedFWPolicySequence(PolicyDefinitionSequenceBase):
     model_config = ConfigDict(populate_by_name=True)
 
     def match_app_list(self, app_list_id: UUID) -> None:
-        if self.base_action != PolicyActionTypeEnum.INSPECT:
-            raise ValueError("Action must be Inspect when Application/Application Family List is selected.")
+        if self.base_action != "inspect":
+            raise ValueError("Action must be inspect when Application/Application Family List is selected.")
         self._insert_match(AppListEntry(ref=app_list_id))
 
     def match_destination_data_prefix_list(self, data_prefix_list_id: UUID) -> None:
@@ -194,7 +193,7 @@ class ZoneBasedFWPolicy(ZoneBasedFWPolicyHeader):
     definition: ZoneBasedFWPolicyDefinition = ZoneBasedFWPolicyDefinition()
 
     def add_ipv4_rule(
-        self, name: str, base_action: PolicyActionTypeEnum = PolicyActionTypeEnum.DROP, log: bool = False
+        self, name: str, base_action: PolicyActionType = "drop", log: bool = False
     ) -> ZoneBasedFWPolicySequence:
         """Adds new IPv4 Rule to Zone Based Firewall Policy
 
@@ -209,7 +208,7 @@ class ZoneBasedFWPolicy(ZoneBasedFWPolicyHeader):
         sequence = ZoneBasedFWPolicySequence(
             sequence_name=name,
             base_action=base_action,
-            sequence_ip_type=SequenceIpType.IPV4,
+            sequence_ip_type="ipv4",
             match=ZoneBasedFWPolicyMatches(),
         )
         if log:
@@ -218,12 +217,12 @@ class ZoneBasedFWPolicy(ZoneBasedFWPolicyHeader):
         return sequence
 
     def add_ipv4_rule_sets(
-        self, name: str, base_action: PolicyActionTypeEnum = PolicyActionTypeEnum.DROP, log: bool = False
+        self, name: str, base_action: PolicyActionType = "drop", log: bool = False
     ) -> ZoneBasedFWPolicySequenceWithRuleSets:
         sequence = ZoneBasedFWPolicySequenceWithRuleSets(
             sequence_name=name,
             base_action=base_action,
-            sequence_ip_type=SequenceIpType.IPV4,
+            sequence_ip_type="ipv4",
             match=ZoneBasedFWPolicyMatches(),
         )
         if log:

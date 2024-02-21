@@ -1,13 +1,10 @@
-from enum import Enum
-from typing import Union
+from typing import Literal, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
 
-
-class ConfigTypeValue(Enum):
-    NON_E_SIM = "non-eSim"
+ConfigTypeValue = Literal["non-eSim"]
 
 
 class ControllerConfig(BaseModel):
@@ -42,7 +39,7 @@ class ControllerConfig(BaseModel):
 
 class CellularController(_ParcelBase):
     config_type: Default[ConfigTypeValue] = Field(
-        default=Default(value=ConfigTypeValue.NON_E_SIM), validation_alias=AliasPath("data", "configType")
+        default=Default(value="non-eSim"), validation_alias=AliasPath("data", "configType")
     )
     controller_config: ControllerConfig = Field(validation_alias=AliasPath("data", "controllerConfig"))
 

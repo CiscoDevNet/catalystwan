@@ -9,6 +9,7 @@ from catalystwan.endpoints.client import Client
 from catalystwan.endpoints.cluster_management import ClusterManagement
 from catalystwan.endpoints.configuration.device.software_update import ConfigurationDeviceSoftwareUpdate
 from catalystwan.endpoints.configuration.disaster_recovery import ConfigurationDisasterRecovery
+from catalystwan.endpoints.configuration.feature_profile.sdwan.system import SystemFeatureProfile
 from catalystwan.endpoints.configuration.feature_profile.sdwan.transport import TransportFeatureProfile
 from catalystwan.endpoints.configuration.policy.definition.access_control_list import ConfigurationPolicyAclDefinition
 from catalystwan.endpoints.configuration.policy.definition.access_control_list_ipv6 import (
@@ -156,6 +157,7 @@ class ConfigurationPolicyContainer:
 class ConfigurationSDWANFeatureProfileContainer:
     def __init__(self, session: ManagerSession):
         self.transport = TransportFeatureProfile(client=session)
+        self.system = SystemFeatureProfile(client=session)
 
 
 class ConfigurationFeatureProfileContainer:

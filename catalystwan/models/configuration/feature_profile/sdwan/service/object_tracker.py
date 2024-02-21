@@ -1,33 +1,42 @@
-from enum import Enum
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable
-from catalystwan.models.configuration.common import RefId
+
+ObjectTrackerType = Literal[
+    "Interface",
+    "SIG",
+    "Route",
+]
 
 
-class ObjectTrackerType(str, Enum):
-    INTERFACE = "Interface"
-    SIG = "SIG"
-    ROUTE = "Route"
+Criteria = Literal[
+    "and",
+    "or",
+]
 
 
 class SigTracker(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    object_id: Union[Global[int], Variable] = Field(alias="objectId")
+    object_id: Union[Global[int], Variable] = Field(serialization_alias="objectId", validation_alias="objectId")
     object_tracker_type: Global[ObjectTrackerType] = Field(
-        alias="objectTrackerType", default=Global[ObjectTrackerType](value=ObjectTrackerType.SIG)
+        serialization_alias="objectTrackerType",
+        validation_alias="objectTrackerType",
+        default=Global[ObjectTrackerType](value="SIG"),
     )
 
 
 class InterfaceTracker(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    object_id: Union[Global[int], Variable] = Field(alias="objectId")
+    object_id: Union[Global[int], Variable] = Field(serialization_alias="objectId", validation_alias="objectId")
     object_tracker_type: Global[ObjectTrackerType] = Field(
-        alias="objectTrackerType", default=Global[ObjectTrackerType](value=ObjectTrackerType.INTERFACE)
+        serialization_alias="objectTrackerType",
+        validation_alias="objectTrackerType",
+        default=Global[ObjectTrackerType](value="Interface"),
     )
     interface: Union[Global[str], Variable]
 
@@ -35,12 +44,16 @@ class InterfaceTracker(BaseModel):
 class RouteTracker(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    object_id: Union[Global[int], Variable] = Field(alias="objectId")
+    object_id: Union[Global[int], Variable] = Field(serialization_alias="objectId", validation_alias="objectId")
     object_tracker_type: Global[ObjectTrackerType] = Field(
-        alias="objectTrackerType", default=Global[ObjectTrackerType](value=ObjectTrackerType.ROUTE)
+        serialization_alias="objectTrackerType",
+        validation_alias="objectTrackerType",
+        default=Global[ObjectTrackerType](value="Route"),
     )
-    route_ip: Union[Global[str], Variable] = Field(alias="routeIp")
-    route_mask: Union[Global[str], Variable, Default[str]] = Field(alias="routeMask")
+    route_ip: Union[Global[str], Variable] = Field(serialization_alias="routeIp", validation_alias="routeIp")
+    route_mask: Union[Global[str], Variable, Default[str]] = Field(
+        serialization_alias="routeMask", validation_alias="routeMask"
+    )
     vpn: Union[Global[int], Variable, Default[None]] = Default[None](value=None)
 
 
@@ -55,20 +68,15 @@ class ObjectTrackerCreationPayload(BaseModel):
 class ObjectTrackerRef(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    tracker_ref: RefId = Field(alias="trackerRef")
-
-
-class Criteria(str, Enum):
-    AND = "and"
-    OR = "or"
+    tracker_ref: Global[UUID] = Field(serialization_alias="trackerRef", validation_alias="trackerRef")
 
 
 class ObjectTrackerGroupData(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    object_id: Union[Global[int], Variable] = Field(alias="objectId")
-    tracker_refs: List[ObjectTrackerRef] = Field(alias="trackerRefs")
-    criteria: Union[Global[Criteria], Variable, Default[Criteria]] = Default[Criteria](value=Criteria.OR)
+    object_id: Union[Global[int], Variable] = Field(serialization_alias="objectId", validation_alias="objectId")
+    tracker_refs: List[ObjectTrackerRef] = Field(serialization_alias="trackerRefs", validation_alias="trackerRefs")
+    criteria: Union[Global[Criteria], Variable, Default[Criteria]] = Default[Criteria](value="or")
 
 
 class ObjectTrackerGroupCreationPayload(BaseModel):

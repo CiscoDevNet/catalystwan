@@ -1,49 +1,53 @@
-from enum import Enum
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable
 
+VirtualApplicationType = Literal["dreopt"]
 
-class VirtualApplicationType(str, Enum):
-    DREOPT = "dreopt"
+ResourceProfile = Literal[
+    "small",
+    "medium",
+    "large",
+    "extra-large",
+    "default",
+]
 
+AppqoeDeviceRole = Literal[
+    "forwarder",
+    "forwarderAndServiceNode",
+    "serviceNode",
+    "serviceNodeWithDre",
+    "forwarderAndServiceNodeWithDre",
+]
 
-class ResourceProfile(str, Enum):
-    SMALL = "small"
-    MEDIUM = "medium"
-    LARGE = "large"
-    EXTRA_LARGE = "extra-large"
-    DEFAULT = "default"
+AppnavControllerGroupName = Literal["ACG-APPQOE"]
+ServiceNodeGroupName = Literal["SNG-APPQOE"]
+ForwarderAndServiceNodeAddress = Literal["192.168.2.2"]  # TODO: 1.Is it really constant? 2.Use ipaddress.IPv4Address?
+ForwarderAndServiceNodeControllerAddress = Literal[
+    "192.168.2.1"
+]  # TODO: 1.Is it really constant? 2.Use ipaddress.IPv4Address?
+ServiceNodeExternalAddress = Literal["192.168.2.2"]  # TODO: 1.Is it really constant? 2.Use ipaddress.IPv4Address?
+ServiceNodeExternalVpgIp = Literal["192.168.2.1/24"]  # TODO: 1.Is it really constant? 2.Use ipaddress.IPv4Address?
 
 
 class VirtualApplication(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    instance_id: Global[int] = Field(default=Global(value=1), alias="instanceId")
+    instance_id: Global[int] = Field(
+        default=Global(value=1), serialization_alias="instanceId", validation_alias="instanceId"
+    )
     application_type: Global[VirtualApplicationType] = Field(
-        default=Global[VirtualApplicationType](value=VirtualApplicationType.DREOPT), alias="applicationType"
+        default=Global[VirtualApplicationType](value="dreopt"),
+        serialization_alias="applicationType",
+        validation_alias="applicationType",
     )
     resource_profile: Union[Global[ResourceProfile], Default[str]] = Field(
-        default=Global[ResourceProfile](value=ResourceProfile.DEFAULT), alias="resourceProfile"
+        default=Global[ResourceProfile](value="default"),
+        serialization_alias="resourceProfile",
+        validation_alias="resourceProfile",
     )
-
-
-class AppqoeDeviceRole(str, Enum):
-    FORWARDER = "forwarder"
-    FORWARDER_AND_SERVICE_NODE = "forwarderAndServiceNode"
-    SERVICE_NODE = "serviceNode"
-    SERVICE_NODE_WITH_DRE = "serviceNodeWithDre"
-    FORWARDER_AND_SERVICE_NODE_WITH_DRE = "forwarderAndServiceNodeWithDre"
-
-
-class AppnavControllerGroupName(str, Enum):
-    ACG_APPQOE = "ACG-APPQOE"
-
-
-class ServiceNodeGroupName(str, Enum):
-    SNG_APPQOE = "SNG-APPQOE"
 
 
 class Appqoe(BaseModel):
@@ -51,14 +55,19 @@ class Appqoe(BaseModel):
 
     name: Default[str] = Default(value="/1")
     appnav_controller_group: Global[AppnavControllerGroupName] = Field(
-        default=Global[AppnavControllerGroupName](value=AppnavControllerGroupName.ACG_APPQOE),
-        alias="appnavControllerGroup",
+        default=Global[AppnavControllerGroupName](value="ACG-APPQOE"),
+        serialization_alias="appnavControllerGroup",
+        validation_alias="appnavControllerGroup",
     )
     service_node_group: Global[ServiceNodeGroupName] = Field(
-        default=Global[ServiceNodeGroupName](value=ServiceNodeGroupName.SNG_APPQOE), alias="serviceNodeGroup"
+        default=Global[ServiceNodeGroupName](value="SNG-APPQOE"),
+        serialization_alias="serviceNodeGroup",
+        validation_alias="serviceNodeGroup",
     )
     service_node_groups: List[Global[ServiceNodeGroupName]] = Field(
-        default=[Global[ServiceNodeGroupName](value=ServiceNodeGroupName.SNG_APPQOE)], alias="serviceNodeGroups"
+        default=[Global[ServiceNodeGroupName](value="SNG-APPQOE")],
+        serialization_alias="serviceNodeGroups",
+        validation_alias="serviceNodeGroups",
     )
     enable: Global[bool] = Global[bool](value=True)
     vpn: Union[Global[int], Default[None], Variable] = Field(default=Global[int](value=0))
@@ -87,9 +96,11 @@ class ForwarderAppnavControllerGroup(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     group_name: Default[AppnavControllerGroupName] = Field(
-        default=Default(value=AppnavControllerGroupName.ACG_APPQOE), alias="groupName"
+        default=Default(value="ACG-APPQOE"), serialization_alias="groupName", validation_alias="groupName"
     )
-    appnav_controllers: List[ForwarderController] = Field(alias="appnavControllers")
+    appnav_controllers: List[ForwarderController] = Field(
+        serialization_alias="appnavControllers", validation_alias="appnavControllers"
+    )
 
 
 class ForwarderNodeGroup(BaseModel):
@@ -97,37 +108,33 @@ class ForwarderNodeGroup(BaseModel):
 
     name: Union[Global[str], Default[ServiceNodeGroupName]]
     internal: Default[bool] = Default[bool](value=False)
-    service_node: List[ServiceNodeInformation] = Field(alias="serviceNode")
+    service_node: List[ServiceNodeInformation] = Field(
+        serialization_alias="serviceNode", validation_alias="serviceNode"
+    )
 
 
 class ForwarderRole(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    appnav_controller_group: List[ForwarderAppnavControllerGroup] = Field(alias="appnavControllerGroup")
-    service_node_group: List[ForwarderNodeGroup] = Field(alias="serviceNodeGroup")
-    service_context: ServiceContext = Field(alias="serviceContext")
+    appnav_controller_group: List[ForwarderAppnavControllerGroup] = Field(
+        serialization_alias="appnavControllerGroup", validation_alias="appnavControllerGroup"
+    )
+    service_node_group: List[ForwarderNodeGroup] = Field(
+        serialization_alias="serviceNodeGroup", validation_alias="serviceNodeGroup"
+    )
+    service_context: ServiceContext = Field(serialization_alias="serviceContext", validation_alias="serviceContext")
 
 
 # Forwarder and Service
 
 
-class ForwarderAndServiceNodeAddress(str, Enum):
-    ADDRESS_192_168_2_2 = "192.168.2.2"
-
-
 class ServiceNodeInformationDefault(BaseModel):
-    address: Default[ForwarderAndServiceNodeAddress] = Default[ForwarderAndServiceNodeAddress](
-        value=ForwarderAndServiceNodeAddress.ADDRESS_192_168_2_2
-    )
-
-
-class ForwarderAndServiceNodeControllerAddress(str, Enum):
-    ADDRESS_192_168_2_1 = "192.168.2.1"
+    address: Default[ForwarderAndServiceNodeAddress] = Default[ForwarderAndServiceNodeAddress](value="192.168.2.2")
 
 
 class ForwarderAndServiceNodeController(BaseModel):
     address: Default[ForwarderAndServiceNodeControllerAddress] = Default[ForwarderAndServiceNodeControllerAddress](
-        value=ForwarderAndServiceNodeControllerAddress.ADDRESS_192_168_2_1
+        value="192.168.2.1"
     )
 
 
@@ -135,74 +142,88 @@ class ForwarderAndServiceNodeAppnavControllerGroup(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     group_name: Default[AppnavControllerGroupName] = Field(
-        default=Default[AppnavControllerGroupName](value=AppnavControllerGroupName.ACG_APPQOE), alias="groupName"
+        default=Default[AppnavControllerGroupName](value="ACG-APPQOE"),
+        serialization_alias="groupName",
+        validation_alias="groupName",
     )
-    appnav_controllers: List[ForwarderAndServiceNodeController] = Field(alias="appnavControllers")
+    appnav_controllers: List[ForwarderAndServiceNodeController] = Field(
+        serialization_alias="appnavControllers", validation_alias="appnavControllers"
+    )
 
 
 class ForwarderAndServiceNodeGroup(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    name: Default[ServiceNodeGroupName] = Default[ServiceNodeGroupName](value=ServiceNodeGroupName.SNG_APPQOE)
+    name: Default[ServiceNodeGroupName] = Default[ServiceNodeGroupName](value="SNG-APPQOE")
     internal: Default[bool] = Default[bool](value=True)
-    service_node: List[ServiceNodeInformationDefault] = Field(alias="serviceNode")
+    service_node: List[ServiceNodeInformationDefault] = Field(
+        serialization_alias="serviceNode", validation_alias="serviceNode"
+    )
 
 
 class ForwarderAndServiceNodeRole(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    appnav_controller_group: List[ForwarderAndServiceNodeAppnavControllerGroup] = Field(alias="appnavControllerGroup")
-    service_node_group: List[ForwarderAndServiceNodeGroup] = Field(alias="serviceNodeGroup")
+    appnav_controller_group: List[ForwarderAndServiceNodeAppnavControllerGroup] = Field(
+        serialization_alias="appnavControllerGroup", validation_alias="appnavControllerGroup"
+    )
+    service_node_group: List[ForwarderAndServiceNodeGroup] = Field(
+        serialization_alias="serviceNodeGroup", validation_alias="serviceNodeGroup"
+    )
 
-    service_context: ServiceContext = Field(alias="serviceContext")
+    service_context: ServiceContext = Field(serialization_alias="serviceContext", validation_alias="serviceContext")
 
 
 # Service
-class ServiceNodeExternalAddress(str, Enum):
-    ADDRESS_192_168_2_2 = "192.168.2.2"
-
-
-class ServiceNodeExternalVpgIp(str, Enum):
-    ADDRESS_192_168_2_1 = "192.168.2.1/24"
 
 
 class ServiceNodeInformationExternal(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    address: Default[ServiceNodeExternalAddress] = Default[ServiceNodeExternalAddress](
-        value=ServiceNodeExternalAddress.ADDRESS_192_168_2_2
-    )
+    address: Default[ServiceNodeExternalAddress] = Default[ServiceNodeExternalAddress](value="192.168.2.2")
     vpg_ip: Default[ServiceNodeExternalVpgIp] = Field(
-        default=Default[ServiceNodeExternalVpgIp](value=ServiceNodeExternalVpgIp.ADDRESS_192_168_2_1), alias="vpgIp"
+        default=Default[ServiceNodeExternalVpgIp](value="192.168.2.1"),
+        serialization_alias="vpgIp",
+        validation_alias="vpgIp",
     )
 
 
 class ServiceNodeGroup(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    name: Default[ServiceNodeGroupName] = Default[ServiceNodeGroupName](value=ServiceNodeGroupName.SNG_APPQOE)
-    external_node: Default[bool] = Field(default=Default[bool](value=True), alias="externalNode")
+    name: Default[ServiceNodeGroupName] = Default[ServiceNodeGroupName](value="SNG-APPQOE")
+    external_node: Default[bool] = Field(
+        default=Default[bool](value=True), serialization_alias="externalNode", validation_alias="externalNode"
+    )
     service_node: List[ServiceNodeInformationExternal] = Field(
-        default=[ServiceNodeInformationExternal()], alias="serviceNode"
+        default=[ServiceNodeInformationExternal()], serialization_alias="serviceNode", validation_alias="serviceNode"
     )
 
 
 class ServiceNodeRole(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    service_node_group: List[ServiceNodeGroup] = Field(default=[ServiceNodeGroup()], alias="serviceNodeGroup")
+    service_node_group: List[ServiceNodeGroup] = Field(
+        default=[ServiceNodeGroup()], serialization_alias="serviceNodeGroup", validation_alias="serviceNodeGroup"
+    )
 
 
 class AppqoeData(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     dreopt: Optional[Union[Global[bool], Default[bool]]] = Default[bool](value=False)
-    virtual_application: Optional[List[VirtualApplication]] = Field(alias="virtualApplication")
-    appqoe_device_role: Global[str] = Field(default=Global(value=AppqoeDeviceRole.FORWARDER), alias="appqoeDeviceRole")
+    virtual_application: Optional[List[VirtualApplication]] = Field(
+        serialization_alias="virtualApplication", validation_alias="virtualApplication"
+    )
+    appqoe_device_role: Global[str] = Field(
+        default=Global(value="forwarder"), serialization_alias="appqoeDeviceRole", validation_alias="appqoeDeviceRole"
+    )
 
     forwarder: Optional[ForwarderRole]
-    forwarder_and_service_node: Optional[ForwarderAndServiceNodeRole] = Field(alias="forwarderAndServiceNode")
-    service_node: Optional[ServiceNodeRole] = Field(alias="serviceNode")
+    forwarder_and_service_node: Optional[ForwarderAndServiceNodeRole] = Field(
+        serialization_alias="forwarderAndServiceNode", validation_alias="forwarderAndServiceNode"
+    )
+    service_node: Optional[ServiceNodeRole] = Field(serialization_alias="serviceNode", validation_alias="serviceNode")
 
 
 class AppqoeCreationPayload(BaseModel):

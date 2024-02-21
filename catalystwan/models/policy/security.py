@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import List, Literal, Optional, Union
 from uuid import UUID
 
@@ -38,15 +37,15 @@ UnifiedSecurityPolicyAssemblyItem = Annotated[
     Field(discriminator="type"),
 ]
 
+FailureMode = Literal[
+    "open",
+    "close",
+]
 
-class FailureMode(str, Enum):
-    OPEN = "open"
-    CLOSE = "close"
-
-
-class ZoneToNoZoneInternet(str, Enum):
-    ALLOW = "allow"
-    DENY = "deny"
+ZoneToNoZoneInternet = Literal[
+    "allow",
+    "deny",
+]
 
 
 class HighSpeedLoggingEntry(BaseModel):
@@ -70,9 +69,7 @@ class LoggingEntry(BaseModel):
 class SecurityPolicySettings(BaseModel):
     logging: Optional[List[LoggingEntry]] = None
     failure_mode: Optional[FailureMode] = Field(default=None, alias="failureMode")
-    zone_to_no_zone_internet: ZoneToNoZoneInternet = Field(
-        default=ZoneToNoZoneInternet.DENY, alias="zoneToNozoneInternet"
-    )
+    zone_to_no_zone_internet: ZoneToNoZoneInternet = Field(default="deny", alias="zoneToNozoneInternet")
     tcp_syn_flood_limit: Optional[str] = Field(default=None, alias="tcpSynFloodLimit")
     high_speed_logging: Optional[HighSpeedLoggingEntry] = Field(default=None, alias="highSpeedLogging")
     audit_trail: Optional[str] = Field(default=None, alias="auditTrail")

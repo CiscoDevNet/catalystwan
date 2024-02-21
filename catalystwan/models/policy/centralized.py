@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import List, Literal, Optional, Union, overload
 from uuid import UUID
 
@@ -13,21 +12,21 @@ from catalystwan.models.policy.policy import (
     PolicyInfo,
 )
 
+TrafficDataDirection = Literal[
+    "service",
+    "tunnel",
+    "all",
+]
 
-class TrafficDataDirectionEnum(str, Enum):
-    SERVICE = "service"
-    TUNNEL = "tunnel"
-    ALL = "all"
-
-
-class ControlDirectionEnum(str, Enum):
-    IN = "in"
-    OUT = "out"
+ControlDirection = Literal[
+    "in",
+    "out",
+]
 
 
 class DataApplicationEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-    direction: TrafficDataDirectionEnum = TrafficDataDirectionEnum.SERVICE
+    direction: TrafficDataDirection = "service"
     site_lists: Optional[List[UUID]] = Field(
         default=None, serialization_alias="siteLists", validation_alias="siteLists"
     )
@@ -46,7 +45,7 @@ class DataApplicationEntry(BaseModel):
 
 class ControlApplicationEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-    direction: ControlDirectionEnum
+    direction: ControlDirection
     site_lists: Optional[List[UUID]] = Field(
         default=None, serialization_alias="siteLists", validation_alias="siteLists"
     )
@@ -61,11 +60,11 @@ class ControlPolicyItem(AssemblyItemBase):
     entries: List[ControlApplicationEntry] = []
 
     def assign_to_inbound_sites(self, site_lists: List[UUID]) -> None:
-        entry = ControlApplicationEntry(direction=ControlDirectionEnum.IN, site_lists=site_lists)
+        entry = ControlApplicationEntry(direction="in", site_lists=site_lists)
         self.entries.append(entry)
 
     def assign_to_outbound_sites(self, site_lists: List[UUID]) -> None:
-        entry = ControlApplicationEntry(direction=ControlDirectionEnum.IN, site_lists=site_lists)
+        entry = ControlApplicationEntry(direction="in", site_lists=site_lists)
         self.entries.append(entry)
 
     @overload
@@ -80,9 +79,7 @@ class ControlPolicyItem(AssemblyItemBase):
         self, *, region_ids: Optional[List[int]] = None, region_lists: Optional[List[UUID]] = None
     ) -> None:
         _region_ids = [str(rid) for rid in region_ids] if region_ids else None
-        entry = entry = ControlApplicationEntry(
-            direction=ControlDirectionEnum.IN, region_ids=_region_ids, region_lists=region_lists
-        )
+        entry = entry = ControlApplicationEntry(direction="in", region_ids=_region_ids, region_lists=region_lists)
         self.entries.append(entry)
 
     @overload
@@ -97,9 +94,7 @@ class ControlPolicyItem(AssemblyItemBase):
         self, *, region_ids: Optional[List[int]] = None, region_lists: Optional[List[UUID]] = None
     ) -> None:
         _region_ids = [str(rid) for rid in region_ids] if region_ids else None
-        entry = entry = ControlApplicationEntry(
-            direction=ControlDirectionEnum.OUT, region_ids=_region_ids, region_lists=region_lists
-        )
+        entry = entry = ControlApplicationEntry(direction="out", region_ids=_region_ids, region_lists=region_lists)
         self.entries.append(entry)
 
 
@@ -111,7 +106,7 @@ class TrafficDataPolicyItem(AssemblyItemBase):
     def assign_to(
         self,
         vpn_lists: List[UUID],
-        direction: TrafficDataDirectionEnum = TrafficDataDirectionEnum.SERVICE,
+        direction: TrafficDataDirection = "service",
         *,
         site_lists: List[UUID],
     ) -> None:
@@ -121,7 +116,7 @@ class TrafficDataPolicyItem(AssemblyItemBase):
     def assign_to(
         self,
         vpn_lists: List[UUID],
-        direction: TrafficDataDirectionEnum = TrafficDataDirectionEnum.SERVICE,
+        direction: TrafficDataDirection = "service",
         *,
         region_lists: List[UUID],
     ) -> None:
@@ -131,7 +126,7 @@ class TrafficDataPolicyItem(AssemblyItemBase):
     def assign_to(
         self,
         vpn_lists: List[UUID],
-        direction: TrafficDataDirectionEnum = TrafficDataDirectionEnum.SERVICE,
+        direction: TrafficDataDirection = "service",
         *,
         region_ids: List[int],
     ) -> None:
@@ -140,7 +135,7 @@ class TrafficDataPolicyItem(AssemblyItemBase):
     def assign_to(
         self,
         vpn_lists: List[UUID],
-        direction: TrafficDataDirectionEnum = TrafficDataDirectionEnum.SERVICE,
+        direction: TrafficDataDirection = "service",
         *,
         site_lists: Optional[List[UUID]] = None,
         region_lists: Optional[List[UUID]] = None,

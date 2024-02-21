@@ -1,8 +1,8 @@
-from enum import Enum
+from typing import Literal
 
-
-class ProfileType(str, Enum):
-    TRANSPORT = "transport"
-    SYSTEM = "system"
-    CLI = "cli"
-    SERVICE = "service"
+ProfileType = Literal[
+    "transport",
+    "system",
+    "cli",
+    "service",
+]

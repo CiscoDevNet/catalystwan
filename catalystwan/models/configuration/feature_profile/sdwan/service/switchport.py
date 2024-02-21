@@ -1,5 +1,4 @@
-from enum import Enum
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -9,77 +8,94 @@ from catalystwan.api.configuration_groups.parcel import Default, Global, Variabl
 class StaticMacAddress(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    mac_address: Union[Global[str], Variable] = Field(alias="macaddr")
+    mac_address: Union[Global[str], Variable] = Field(serialization_alias="macaddr", validation_alias="macaddr")
     vlan: Union[Global[int], Variable]
-    interface_name: Optional[Union[Global[str], Variable]] = Field(alias="ifName", default=None)
+    interface_name: Optional[Union[Global[str], Variable]] = Field(
+        serialization_alias="ifName", validation_alias="ifName", default=None
+    )
 
 
-class SwitchportMode(str, Enum):
-    ACCESS = "access"
-    TRUNK = "trunk"
+SwitchportMode = Literal[
+    "access",
+    "trunk",
+]
 
+Duplex = Literal[
+    "full",
+    "half",
+]
 
-class Duplex(str, Enum):
-    FULL = "full"
-    HALF = "half"
+PortControl = Literal[
+    "auto",
+    "force-unauthorized",
+    "force-authorized",
+]
 
+HostMode = Literal[
+    "single-host",
+    "multi-auth",
+    "multi-host",
+    "multi-domain",
+]
 
-class PortControl(str, Enum):
-    AUTO = "auto"
-    FORCE_UNAUTHORIZED = "force-unauthorized"
-    FORCE_AUTHORIZED = "force-authorized"
-
-
-class HostMode(str, Enum):
-    SINGLE_HOST = "single-host"
-    MULTI_AUTH = "multi-auth"
-    MULTI_HOST = "multi-host"
-    MULTI_DOMAIN = "multi-domain"
-
-
-class ControlDirection(str, Enum):
-    BOTH = "both"
-    IN = "in"
+ControlDirection = Literal[
+    "both",
+    "in",
+]
 
 
 class SwitchportInterface(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    interface_name: Union[Global[str], Variable] = Field(alias="ifName")
+    interface_name: Union[Global[str], Variable] = Field(serialization_alias="ifName", validation_alias="ifName")
     mode: Optional[Global[SwitchportMode]] = None
     shutdown: Optional[Union[Global[bool], Variable, Default[bool]]] = Default[bool](value=True)
     speed: Optional[Union[Global[str], Variable, Default[None]]] = Default[None](value=None)
     duplex: Optional[Union[Global[Duplex], Variable, Default[None]]] = Default[None](value=None)
     switchport_access_vlan: Optional[Union[Global[int], Variable, Default[None]]] = Field(
-        alias="switchportAccessVlan", default=None
+        serialization_alias="switchportAccessVlan", validation_alias="switchportAccessVlan", default=None
     )
     switchport_trunk_allowed_vlans: Optional[Union[Global[str], Variable, Default[None]]] = Field(
-        alias="switchportTrunkAllowedVlans", default=None
+        serialization_alias="switchportTrunkAllowedVlans", validation_alias="switchportTrunkAllowedVlans", default=None
     )
     switchport_trunk_native_vlan: Optional[Union[Global[int], Variable, Default[None]]] = Field(
-        alias="switchportTrunkNativeVlan", default=None
+        serialization_alias="switchportTrunkNativeVlan", validation_alias="switchportTrunkNativeVlan", default=None
     )
     port_control: Optional[Union[Global[PortControl], Variable, Default[None]]] = Field(
-        alias="portControl", default=None
+        serialization_alias="portControl", validation_alias="portControl", default=None
     )
-    voice_vlan: Optional[Union[Global[int], Variable, Default[None]]] = Field(alias="voiceVlan", default=None)
-    pae_enable: Optional[Union[Global[bool], Variable, Default[None]]] = Field(alias="paeEnable", default=None)
+    voice_vlan: Optional[Union[Global[int], Variable, Default[None]]] = Field(
+        serialization_alias="voiceVlan", validation_alias="voiceVlan", default=None
+    )
+    pae_enable: Optional[Union[Global[bool], Variable, Default[None]]] = Field(
+        serialization_alias="paeEnable", validation_alias="paeEnable", default=None
+    )
     mac_authentication_bypass: Optional[Union[Global[bool], Variable, Default[None]]] = Field(
-        alias="macAuthenticationBypass", default=None
+        serialization_alias="macAuthenticationBypass", validation_alias="macAuthenticationBypass", default=None
     )
-    host_mode: Optional[Union[Global[HostMode], Variable, Default[None]]] = Field(alias="hostMode", default=None)
+    host_mode: Optional[Union[Global[HostMode], Variable, Default[None]]] = Field(
+        serialization_alias="hostMode", validation_alias="hostMode", default=None
+    )
     enable_periodic_reauth: Optional[Union[Global[bool], Variable, Default[None]]] = Field(
-        alias="enablePeriodicReauth", default=None
+        serialization_alias="enablePeriodicReauth", validation_alias="enablePeriodicReauth", default=None
     )
     inactivity: Optional[Union[Global[int], Variable, Default[None]]] = None
     reauthentication: Optional[Union[Global[int], Variable, Default[int]]] = None
     control_direction: Optional[Union[Global[ControlDirection], Variable, Default[None]]] = Field(
-        alias="controlDirection", default=None
+        serialization_alias="controlDirection", validation_alias="controlDirection", default=None
     )
-    restricted_vlan: Optional[Union[Global[int], Variable, Default[None]]] = Field(alias="restrictedVlan", default=None)
-    guest_vlan: Optional[Union[Global[int], Variable, Default[None]]] = Field(alias="guestVlan", default=None)
-    critical_vlan: Optional[Union[Global[int], Variable, Default[None]]] = Field(alias="criticalVlan", default=None)
-    enable_voice: Optional[Union[Global[bool], Variable, Default[None]]] = Field(alias="enableVoice", default=None)
+    restricted_vlan: Optional[Union[Global[int], Variable, Default[None]]] = Field(
+        serialization_alias="restrictedVlan", validation_alias="restrictedVlan", default=None
+    )
+    guest_vlan: Optional[Union[Global[int], Variable, Default[None]]] = Field(
+        serialization_alias="guestVlan", validation_alias="guestVlan", default=None
+    )
+    critical_vlan: Optional[Union[Global[int], Variable, Default[None]]] = Field(
+        serialization_alias="criticalVlan", validation_alias="criticalVlan", default=None
+    )
+    enable_voice: Optional[Union[Global[bool], Variable, Default[None]]] = Field(
+        serialization_alias="enableVoice", validation_alias="enableVoice", default=None
+    )
 
 
 class SwitchportData(BaseModel):
@@ -87,9 +103,11 @@ class SwitchportData(BaseModel):
 
     interface: Optional[List[SwitchportInterface]] = None
     age_time: Optional[Union[Global[int], Variable, Default[int]]] = Field(
-        alias="ageTime", default=Default[int](value=300)
+        serialization_alias="ageTime", validation_alias="ageTime", default=Default[int](value=300)
     )
-    static_mac_address: Optional[List[StaticMacAddress]] = Field(alias="staticMacAddress", default=None)
+    static_mac_address: Optional[List[StaticMacAddress]] = Field(
+        serialization_alias="staticMacAddress", validation_alias="staticMacAddress", default=None
+    )
 
 
 class SwitchportCreationPayload(BaseModel):
