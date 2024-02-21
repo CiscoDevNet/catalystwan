@@ -3,6 +3,7 @@ from typing import List
 from pydantic import BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import _ParcelBase
+from catalystwan.api.template_api import DeviceTemplateInformation, FeatureTemplateInformation
 from catalystwan.endpoints.configuration_group import ConfigGroup
 from catalystwan.models.configuration.feature_profile.common import FeatureProfileCreationPayload
 from catalystwan.models.policy import (
@@ -34,7 +35,8 @@ class UX1Policies(BaseModel):
 
 
 class UX1Templates(BaseModel):
-    pass
+    feature: List[FeatureTemplateInformation] = Field(default=[])
+    devices: List[DeviceTemplateInformation] = Field(default=[])
 
 
 class UX1Config(BaseModel):

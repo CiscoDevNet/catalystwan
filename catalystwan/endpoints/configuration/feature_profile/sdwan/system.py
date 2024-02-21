@@ -45,6 +45,11 @@ class SystemFeatureProfile(APIEndpoints):
         ...
 
     @versions(supported_versions=(">=20.9"), raises=False)
+    @post("/v1/feature-profile/sdwan/system/{system_id}/bfd")
+    def create_bfd_profile_parcel_for_system(self, system_id: str, payload: _ParcelBase) -> ParcelId:
+        ...
+
+    @versions(supported_versions=(">=20.9"), raises=False)
     @put("/v1/feature-profile/sdwan/system/{system_id}/aaa/{parcel_id}")
     def edit_aaa_profile_parcel_for_system(self, system_id: str, parcel_id: str, payload: _ParcelBase) -> ParcelId:
         ...

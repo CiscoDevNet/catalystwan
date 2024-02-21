@@ -4,6 +4,12 @@ from typing import List, Optional, Union
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase, as_default, as_global
+from catalystwan.models.configuration.feature_profile.sdwan.system.recast import (
+    DefaultGlobalBool,
+    DefaultGlobalIPAddress,
+    DefaultGlobalList,
+    DefaultGlobalStr,
+)
 
 
 class PubkeyChainItem(BaseModel):
@@ -27,7 +33,7 @@ class PubkeyChainItem(BaseModel):
 
 
 class UserItem(BaseModel):
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     name: Union[Global[str], Variable] = Field(description="Set the username")
     password: Union[Global[str], Variable] = Field(
@@ -61,7 +67,9 @@ class UserItem(BaseModel):
 class RadiusServerItem(BaseModel):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
-    address: Union[Global[IPv4Address], Global[IPv6Address]] = Field(description="Set IP address of Radius server")
+    address: Union[DefaultGlobalIPAddress, Global[IPv4Address], Global[IPv6Address]] = Field(
+        description="Set IP address of Radius server"
+    )
     auth_port: Union[Global[int], Default[int], Variable, None] = Field(
         default=as_default(1812),
         validation_alias="authPort",
@@ -93,7 +101,7 @@ class RadiusServerItem(BaseModel):
         description="Set the TACACS server shared type 7 encrypted key",
     )
     # Literal["6", "7"]
-    key_enum: Union[Global[str], Default[None], None] = Field(
+    key_enum: Union[DefaultGlobalStr, Global[str], Default[None], None] = Field(
         default=None,
         validation_alias="keyEnum",
         serialization_alias="keyEnum",
@@ -110,7 +118,7 @@ class RadiusServerItem(BaseModel):
 
 
 class Radius(BaseModel):
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
     group_name: Global[str] = Field(
         validation_alias="groupName", serialization_alias="groupName", description="Set Radius server Group Name"
     )
@@ -156,7 +164,9 @@ class Radius(BaseModel):
 class TacacsServerItem(BaseModel):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
-    address: Union[Global[IPv4Address], Global[IPv6Address]] = Field(description="Set IP address of TACACS server")
+    address: Union[DefaultGlobalIPAddress, Global[IPv4Address], Global[IPv6Address]] = Field(
+        description="Set IP address of TACACS server"
+    )
     port: Union[Variable, Global[int], Default[int], None] = Field(default=None, description="TACACS Port")
     timeout: Union[Variable, Global[int], Default[int], None] = Field(
         default=None,
@@ -176,7 +186,7 @@ class TacacsServerItem(BaseModel):
         description="Set the TACACS server shared type 7 encrypted key",
     )
     # Literal["6", "7"]
-    key_enum: Union[Global[str], Default[None], None] = Field(
+    key_enum: Union[DefaultGlobalStr, Global[str], Default[None], None] = Field(
         default=None,
         validation_alias="keyEnum",
         serialization_alias="keyEnum",
@@ -231,13 +241,13 @@ class AccountingRuleItem(BaseModel):
     method: Global[str] = Field(description="Configure Accounting Method")
     # Literal['1', '15']
     level: Union[Global[str], Default[None], None] = Field(None, description="Privilege level when method is commands")
-    start_stop: Union[Variable, Global[bool], Default[bool], None] = Field(
+    start_stop: Union[DefaultGlobalBool, Variable, Global[bool], Default[bool], None] = Field(
         default=None,
         validation_alias="startStop",
         serialization_alias="startStop",
         description="Record start and stop without waiting",
     )
-    group: Global[List[str]] = Field(description="Use Server-group")
+    group: Union[DefaultGlobalList, Global[List[str]]] = Field(description="Use Server-group")
 
 
 class AuthorizationRuleItem(BaseModel):
@@ -249,8 +259,8 @@ class AuthorizationRuleItem(BaseModel):
     method: Global[str]
     # Literal['1', '15']
     level: Global[str] = Field(description="Privilege level when method is commands")
-    group: Global[List[str]] = Field(description="Use Server-group")
-    if_authenticated: Union[Global[bool], Default[bool], None] = Field(
+    group: Union[DefaultGlobalList, Global[List[str]]] = Field(description="Use Server-group")
+    if_authenticated: Union[DefaultGlobalBool, Global[bool], Default[bool], None] = Field(
         default=None,
         validation_alias="ifAuthenticated",
         serialization_alias="ifAuthenticated",
@@ -259,24 +269,26 @@ class AuthorizationRuleItem(BaseModel):
 
 
 class AAA(_ParcelBase):
-    authentication_group: Union[Variable, Global[bool], Default[bool]] = Field(
+    authentication_group: Union[DefaultGlobalBool, Variable, Global[bool], Default[bool]] = Field(
         default=as_default(False),
         validation_alias=AliasPath("data", "authenticationGroup"),
         description="Authentication configurations parameters",
     )
-    accounting_group: Union[Variable, Global[bool], Default[bool]] = Field(
+    accounting_group: Union[DefaultGlobalBool, Variable, Global[bool], Default[bool]] = Field(
         default=as_default(False),
         validation_alias=AliasPath("data", "accountingGroup"),
         description="Accounting configurations parameters",
     )
     # local, radius, tacacs
-    server_auth_order: Global[List[str]] = Field(
+    server_auth_order: Union[DefaultGlobalList, Global[List[str]]] = Field(
         validation_alias=AliasPath("data", "serverAuthOrder"),
         min_length=1,
         max_length=4,
         description="ServerGroups priority order",
     )
-    user: Optional[List[UserItem]] = Field(default=None, description="Create local login account", min_length=1)
+    user: Optional[List[UserItem]] = Field(
+        default=None, validation_alias=AliasPath("data", "user"), description="Create local login account", min_length=1
+    )
     radius: Optional[List[Radius]] = Field(
         default=None, validation_alias=AliasPath("data", "radius"), description="Configure the Radius serverGroup"
     )
@@ -286,12 +298,12 @@ class AAA(_ParcelBase):
     accounting_rule: Optional[List[AccountingRuleItem]] = Field(
         default=None, validation_alias=AliasPath("data", "accountingRule"), description="Configure the accounting rules"
     )
-    authorization_console: Union[Variable, Global[bool], Default[bool]] = Field(
+    authorization_console: Union[DefaultGlobalBool, Variable, Global[bool], Default[bool]] = Field(
         default=as_default(False),
         validation_alias=AliasPath("data", "authorizationConsole"),
         description="For enabling console authorization",
     )
-    authorization_config_commands: Union[Variable, Global[bool], Default[bool]] = Field(
+    authorization_config_commands: Union[DefaultGlobalBool, Variable, Global[bool], Default[bool]] = Field(
         default=as_default(False),
         validation_alias=AliasPath("data", "authorizationConfigCommands"),
         description="For configuration mode commands.",

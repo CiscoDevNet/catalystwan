@@ -3,6 +3,7 @@ from typing import Callable
 
 from catalystwan.api.policy_api import POLICY_LIST_ENDPOINTS_MAP
 from catalystwan.models.configuration.config_migration import UX1Config, UX2Config
+from catalystwan.models.configuration.feature_profile.converters.feature_template import create_parcel_from_template
 from catalystwan.session import ManagerSession
 
 logger = logging.getLogger(__name__)
@@ -15,6 +16,8 @@ def log_progress(task: str, completed: int, total: int) -> None:
 def transform(ux1: UX1Config) -> UX2Config:
     ux2 = UX2Config()
     ux2.profile_parcels.extend([lst.to_policy_object_parcel() for lst in ux1.policies.policy_lists])
+
+    ux2.profile_parcels.extend([create_parcel_from_template(ft) for ft in ux1.templates.feature])
     return ux2
 
 
@@ -56,7 +59,15 @@ def collect_ux1_config(session: ManagerSession, progress: Callable[[str, int, in
     ux1.policies.policy_lists = policy_api.lists.get_all()
 
     """Collect Templates"""
-    # TODO
+    template_api = session.api.templates
+    progress("Collecting Templates Info", 0, 2)
+
+    ux1.templates.feature = [t for t in template_api.get_feature_templates()]
+    progress("Collecting Templates Info", 1, 2)
+
+    ux1.templates.devices = [t for t in template_api.get_device_templates()]
+    progress("Collecting Templates Info", 2, 2)
+
     return ux1
 
 
