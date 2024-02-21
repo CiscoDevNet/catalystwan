@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put, versions
 from catalystwan.models.configuration.common import Solution
