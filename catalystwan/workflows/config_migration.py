@@ -1,6 +1,7 @@
 import logging
 from typing import Callable
 
+from catalystwan.api.policy_api import POLICY_LIST_ENDPOINTS_MAP
 from catalystwan.models.configuration.config_migration import UX1Config, UX2Config
 from catalystwan.session import ManagerSession
 
@@ -8,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def log_progress(task: str, completed: int, total: int) -> None:
-    logger.info("{task} {completed}/{total}")
+    logger.info(f"{task} {completed}/{total}")
 
 
 def transform(ux1: UX1Config) -> UX2Config:
@@ -17,19 +18,44 @@ def transform(ux1: UX1Config) -> UX2Config:
     return ux2
 
 
-def collect_ux1_config(
-    session: ManagerSession, progress_callback: Callable[[str, int, int], None] = log_progress
-) -> UX1Config:
+def collect_ux1_config(session: ManagerSession, progress: Callable[[str, int, int], None] = log_progress) -> UX1Config:
     ux1 = UX1Config()
-    # Policies part
+
+    """Collect Policies"""
     policy_api = session.api.policy
-    progress_callback("Collecting Policy Info", 3, 0)
-    # centralized_policy_ids = [info.policy_id for info in policy_api.centralized.get()]
-    for uid in [info.policy_id for info in policy_api.centralized.get()]:
-        ux1.policies.centralized_policies.append(policy_api.centralized.get(id=uid))
-    for uid in [info.policy_id for info in policy_api.localized.get()]:
-        ux1.policies.localized_policies.append(policy_api.localized.get(id=uid))
-    # Templates part
+    progress("Collecting Policy Info", 0, 3)
+
+    centralized_policy_ids = [info.policy_id for info in policy_api.centralized.get()]
+    progress("Collecting Policy Info", 1, 3)
+
+    localized_policy_ids = [info.policy_id for info in policy_api.localized.get()]
+    progress("Collecting Policy Info", 2, 3)
+
+    policy_definition_types_and_ids = [
+        (policy_type, info.definition_id) for policy_type, info in policy_api.definitions.get_all()
+    ]
+    progress("Collecting Policy Info", 3, 3)
+
+    policy_list_types = POLICY_LIST_ENDPOINTS_MAP.keys()
+    for i, policy_list_type in enumerate(policy_list_types):
+        ux1.policies.policy_lists.extend(policy_api.lists.get(policy_list_type))
+        progress("Collecting Policy Lists", i + 1, len(policy_list_types))
+
+    for i, type_and_id in enumerate(policy_definition_types_and_ids):
+        ux1.policies.policy_definitions.append(policy_api.definitions.get(*type_and_id))
+        progress("Collecting Policy Definitions", i + 1, len(policy_definition_types_and_ids))
+
+    for i, cpid in enumerate(centralized_policy_ids):
+        ux1.policies.centralized_policies.append(policy_api.centralized.get(id=cpid))
+        progress("Collecting Centralized Policies", i + 1, len(centralized_policy_ids))
+
+    for i, lpid in enumerate(localized_policy_ids):
+        ux1.policies.localized_policies.append(policy_api.localized.get(id=lpid))
+        progress("Collecting Localized Policies", i + 1, len(localized_policy_ids))
+
+    ux1.policies.policy_lists = policy_api.lists.get_all()
+
+    """Collect Templates"""
     # TODO
     return ux1
 

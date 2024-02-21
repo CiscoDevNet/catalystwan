@@ -21,10 +21,10 @@ class _ParcelBase(BaseModel):
         validation_alias="description",
         description="Set the parcel description",
     )
-    data: Optional[Any] = None
+    # data: Optional[Any] = None
     _parcel_data_key: str = PrivateAttr(default="data")
 
-    @model_serializer(mode="wrap")
+    @model_serializer(mode="wrap", when_used="json")
     def envelope_parcel_data(self, handler) -> Dict[str, Any]:
         model_dict = handler(self)
         model_dict[self._parcel_data_key] = {}
@@ -49,7 +49,7 @@ class OptionType(str, Enum):
 
 
 class ParcelAttribute(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
     option_type: OptionType = Field(serialization_alias="optionType", validation_alias="optionType")
 
 
