@@ -178,7 +178,7 @@ class SystemFeatureProfileAPI:
         parcel_type = SYSTEM_PAYLOAD_ENDPOINT_MAPPING[type(payload)]
         return self.endpoint.create(profile_id=profile_id, parcel_type=parcel_type, payload=payload)
 
-    def update(self, profile_id: UUID, payload: AnySystemParcel, parcel_id: UUID):
+    def update(self, profile_id: UUID, payload: AnySystemParcel, parcel_id: UUID) -> ParcelCreationResponse:
         """
         Update System Parcel for selected profile_id based on payload type
         """
