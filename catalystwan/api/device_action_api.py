@@ -117,7 +117,24 @@ class RebootAction(DeviceActionAPI):
 
 
 class PatchUpgradeAction(DeviceActionAPI):
+    """API method to perform reboot on Device."""
+
     def execute(self, patch_version: str = "default"):
+        """Patches vmanage
+
+        Returns:
+            patching process id
+
+        Raises:
+            Exception when patching times out.
+
+        Usage example:
+        # Create session and chose vmanage device
+        session = create_manager_session(...)
+        device = DevicesAPI(session).get().filter(personality = Personality.VMANAGE)[0]
+        # Patch device. Requires passing the vmanage version vmanage will be patched to.
+        PatchAction(session, device).execute(version)
+        """
         if self.dev.personality != Personality.VMANAGE:
             raise Exception(f"Patch upgrade cannot be executed for {self.dev.personality}")
 
