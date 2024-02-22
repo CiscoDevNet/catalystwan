@@ -1,5 +1,4 @@
-from enum import Enum
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Literal, Set, Tuple
 
 
 def check_fields_exclusive(values: Dict, field_names: Set[str], at_least_one: bool = False) -> bool:
@@ -47,53 +46,71 @@ def check_any_of_exclusive_field_sets(values: Dict, field_sets: List[Tuple[Set[s
         raise ValueError(f"One of {all_sets_field_names} must be assigned")
 
 
-class InterfaceTypeEnum(str, Enum):
-    ETHERNET = "Ethernet"
-    FAST_ETHERNET = "FastEthernet"
-    FIVE_GIGABIT_ETHERNET = "FiveGigabitEthernet"
-    FORTY_GIGABIT_ETHERNET = "FortyGigabitEthernet"
-    GIGABIT_ETHERNET = "GigabitEthernet"
-    HUNDRED_GIG_ETHERNET = "HundredGigE"
-    LOOPBACK = "Loopback"
-    TEN_GIGABIT_ETHERNET = "TenGigabitEthernet"
-    TUNNEL = "Tunnel"
-    TWENTY_FIVEGIGABIT_ETHERNET = "TwentyFiveGigabitEthernet"
-    TWENTY_FIVE_GIG_ETHERNET = "TwentyFiveGigE"
-    TWO_GIGABIT_ETHERNET = "TwoGigabitEthernet"
-    VIRTUAL_PORT_GROUP = "VirtualPortGroup"
-    VLAN = "Vlan"
+InterfaceType = Literal[
+    "Ethernet",
+    "FastEthernet",
+    "FiveGigabitEthernet",
+    "FortyGigabitEthernet",
+    "GigabitEthernet",
+    "HundredGigE",
+    "Loopback",
+    "TenGigabitEthernet",
+    "Tunnel",
+    "TwentyFiveGigabitEthernet",
+    "TwentyFiveGigE",
+    "TwoGigabitEthernet",
+    "VirtualPortGroup",
+    "Vlan",
+]
+
+TLOCColor = Literal[
+    "default",
+    "mpls",
+    "metro-ethernet",
+    "biz-internet",
+    "public-internet",
+    "lte",
+    "3g",
+    "red",
+    "green",
+    "blue",
+    "gold",
+    "silver",
+    "bronze",
+    "custom1",
+    "custom2",
+    "custom3",
+    "private1",
+    "private2",
+    "private3",
+    "private4",
+    "private5",
+    "private6",
+]
 
 
-class TLOCColorEnum(str, Enum):
-    DEFAULT = "default"
-    MPLS = "mpls"
-    METRO_ETHERNET = "metro-ethernet"
-    BIZ_INTERNET = "biz-internet"
-    PUBLIC_INTERNET = "public-internet"
-    LTE = "lte"
-    THREEG = "3g"
-    RED = "red"
-    GREEN = "green"
-    BLUE = "blue"
-    GOLD = "gold"
-    SILVER = "silver"
-    BRONZE = "bronze"
-    CUSTOM1 = "custom1"
-    CUSTOM2 = "custom2"
-    CUSTOM3 = "custom3"
-    PRIVATE1 = "private1"
-    PRIVATE2 = "private2"
-    PRIVATE3 = "private3"
-    PRIVATE4 = "private4"
-    PRIVATE5 = "private5"
-    PRIVATE6 = "private6"
+WellKnownBGPCommunities = Literal[
+    "internet",
+    "local-AS",
+    "no-advertise",
+    "no-export",
+]
 
-
-class WellKnownBGPCommunitiesEnum(str, Enum):
-    INTERNET = "internet"
-    LOCAL_AS = "local-AS"
-    NO_ADVERTISE = "no-advertise"
-    NO_EXPORT = "no-export"
-
-
-UUID = str
+ServiceChainNumber = Literal[
+    "SC1",
+    "SC2",
+    "SC3",
+    "SC4",
+    "SC5",
+    "SC6",
+    "SC7",
+    "SC8",
+    "SC9",
+    "SC10",
+    "SC11",
+    "SC12",
+    "SC13",
+    "SC14",
+    "SC15",
+    "SC16",
+]

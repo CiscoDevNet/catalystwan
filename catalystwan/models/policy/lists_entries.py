@@ -1,11 +1,10 @@
-from enum import Enum
 from ipaddress import IPv4Address, IPv4Network, IPv6Network
 from typing import List, Literal, Optional, Set
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, field_validator, model_validator
 
-from catalystwan.models.common import InterfaceTypeEnum, TLOCColorEnum, check_fields_exclusive
+from catalystwan.models.common import InterfaceType, TLOCColor, check_fields_exclusive
 
 
 def check_jitter_ms(jitter_str: str) -> str:
@@ -23,24 +22,25 @@ def check_loss_percent(loss_str: str) -> str:
     return loss_str
 
 
-class PolicerExceedActionEnum(str, Enum):
-    DROP = "drop"
-    REMARK = "remark"
+PolicerExceedAction = Literal[
+    "drop",
+    "remark",
+]
 
+EncapType = Literal[
+    "ipsec",
+    "gre",
+]
 
-class EncapEnum(str, Enum):
-    IPSEC = "ipsec"
-    GRE = "gre"
-
-
-class PathPreferenceEnum(str, Enum):
-    DIRECT_PATH = "direct-path"
-    MULTI_HOP_PATH = "multi-hop-path"
-    ALL_PATHS = "all-paths"
+PathPreference = Literal[
+    "direct-path",
+    "multi-hop-path",
+    "all-paths",
+]
 
 
 class ColorDSCPMap(BaseModel):
-    color: TLOCColorEnum
+    color: TLOCColor
     dscp: int = Field(ge=0, le=63)
 
 
@@ -48,11 +48,11 @@ class ColorGroupPreference(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     color_preference: str = Field(serialization_alias="colorPreference", validation_alias="colorPreference")
-    path_preference: PathPreferenceEnum = Field(serialization_alias="pathPreference", validation_alias="pathPreference")
+    path_preference: PathPreference = Field(serialization_alias="pathPreference", validation_alias="pathPreference")
 
     @staticmethod
     def from_color_set_and_path(
-        color_preference: Set[TLOCColorEnum], path_preference: PathPreferenceEnum
+        color_preference: Set[TLOCColor], path_preference: PathPreference
     ) -> "ColorGroupPreference":
         return ColorGroupPreference(color_preference=" ".join(color_preference), path_preference=path_preference)
 
@@ -155,7 +155,7 @@ class VPNListEntry(BaseModel):
 
 class ZoneListEntry(BaseModel):
     vpn: Optional[str] = Field(default=None, description="0-65530 single number")
-    interface: Optional[InterfaceTypeEnum] = None
+    interface: Optional[InterfaceType] = None
 
     @field_validator("vpn")
     @classmethod
@@ -226,7 +226,7 @@ class AppListEntry(BaseModel):
 
 
 class ColorListEntry(BaseModel):
-    color: TLOCColorEnum
+    color: TLOCColor
 
 
 class DataIPv6PrefixListEntry(BaseModel):
@@ -271,7 +271,7 @@ class PolicerListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     burst: str = Field(description="bytes: integer in range 15000-10000000")
-    exceed: PolicerExceedActionEnum = PolicerExceedActionEnum.DROP
+    exceed: PolicerExceedAction = "drop"
     rate: str = Field(description="bps: integer in range 8-100000000000")
 
     @field_validator("burst")
@@ -316,7 +316,7 @@ class AppProbeClassListEntry(BaseModel):
     forwarding_class: str = Field(serialization_alias="forwardingClass", validation_alias="forwardingClass")
     map: List[ColorDSCPMap] = []
 
-    def add_color_mapping(self, color: TLOCColorEnum, dscp: int) -> None:
+    def add_color_mapping(self, color: TLOCColor, dscp: int) -> None:
         self.map.append(ColorDSCPMap(color=color, dscp=dscp))
 
 
@@ -362,8 +362,8 @@ class SLAClassListEntry(BaseModel):
 
 class TLOCListEntry(BaseModel):
     tloc: IPv4Address
-    color: TLOCColorEnum
-    encap: EncapEnum
+    color: TLOCColor
+    encap: EncapType
     preference: Optional[str] = None
 
     @field_validator("preference")

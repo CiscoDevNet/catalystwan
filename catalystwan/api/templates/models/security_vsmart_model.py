@@ -2,7 +2,7 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, Optional
 
-from pydantic.v1 import Field
+from pydantic import ConfigDict, Field
 
 from catalystwan.api.templates.feature_template import FeatureTemplate
 
@@ -13,11 +13,11 @@ class Protocol(str, Enum):
 
 
 class SecurityvSmart(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    protocol: Optional[Protocol] = Field(default=None, data_path=["control"])
-    tls_port: Optional[int] = Field(default=None, vmanage_key="tls-port", data_path=["control"])
+    protocol: Optional[Protocol] = Field(default=None, json_schema_extra={"data_path": ["control"]})
+    tls_port: Optional[int] = Field(
+        default=None, json_schema_extra={"vmanage_key": "tls-port", "data_path": ["control"]}
+    )
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "security-vsmart"

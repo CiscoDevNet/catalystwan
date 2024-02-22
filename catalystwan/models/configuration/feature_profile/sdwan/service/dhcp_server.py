@@ -29,33 +29,47 @@ class OptionCodeIP(BaseModel):
 class StaticLease(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    mac_address: Union[Global[str], Variable] = Field(alias="macAddress")
+    mac_address: Union[Global[str], Variable] = Field(serialization_alias="macAddress", validation_alias="macAddress")
     ip: Union[Global[str], Variable]
 
 
 class DhcpAddressPool(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    network_address: Union[Global[str], Variable] = Field(alias="networkAddress")
-    subnet_mask: Union[Global[str], Variable] = Field(alias="subnetMask")
+    network_address: Union[Global[str], Variable] = Field(
+        serialization_alias="networkAddress", validation_alias="networkAddress"
+    )
+    subnet_mask: Union[Global[str], Variable] = Field(serialization_alias="subnetMask", validation_alias="subnetMask")
 
 
 class DhcpServerData(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    address_pool: DhcpAddressPool = Field(alias="addressPool")
+    address_pool: DhcpAddressPool = Field(serialization_alias="addressPool", validation_alias="addressPool")
     exclude: Optional[Union[Global[List[str]], Variable, Default[None]]] = None
     lease_time: Optional[Union[Global[int], Variable, Default[int]]] = Field(
-        alias="leaseTime", default=Default[int](value=86400)
+        serialization_alias="leaseTime", validation_alias="leaseTime", default=Default[int](value=86400)
     )
-    interface_mtu: Optional[Union[Global[int], Variable, Default[None]]] = Field(alias="interfaceMtu", default=None)
-    domain_name: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="domainName", default=None)
-    default_gateway: Optional[Union[Global[str], Variable, Default[None]]] = Field(alias="defaultGateway", default=None)
-    dns_servers: Optional[Union[Global[List[str]], Variable, Default[None]]] = Field(alias="dnsServers", default=None)
-    tftp_servers: Optional[Union[Global[List[str]], Variable, Default[None]]] = Field(alias="tftpServers", default=None)
-    static_lease: Optional[List[StaticLease]] = Field(alias="staticLease", default=None)
+    interface_mtu: Optional[Union[Global[int], Variable, Default[None]]] = Field(
+        serialization_alias="interfaceMtu", validation_alias="interfaceMtu", default=None
+    )
+    domain_name: Optional[Union[Global[str], Variable, Default[None]]] = Field(
+        serialization_alias="domainName", validation_alias="domainName", default=None
+    )
+    default_gateway: Optional[Union[Global[str], Variable, Default[None]]] = Field(
+        serialization_alias="defaultGateway", validation_alias="defaultGateway", default=None
+    )
+    dns_servers: Optional[Union[Global[List[str]], Variable, Default[None]]] = Field(
+        serialization_alias="dnsServers", validation_alias="dnsServers", default=None
+    )
+    tftp_servers: Optional[Union[Global[List[str]], Variable, Default[None]]] = Field(
+        serialization_alias="tftpServers", validation_alias="tftpServers", default=None
+    )
+    static_lease: Optional[List[StaticLease]] = Field(
+        serialization_alias="staticLease", validation_alias="staticLease", default=None
+    )
     option_code: Optional[List[Union[OptionCodeAscii, OptionCodeHex, OptionCodeIP]]] = Field(
-        alias="optionCode", default=None
+        serialization_alias="optionCode", validation_alias="optionCode", default=None
     )
 
 

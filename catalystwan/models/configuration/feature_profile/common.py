@@ -1,11 +1,10 @@
 from datetime import datetime
-from enum import Enum
 from typing import Generic, List, Literal, Optional, TypeVar, Union
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, as_global
-from catalystwan.models.common import UUID
 from catalystwan.models.configuration.common import Solution
 
 T = TypeVar("T")
@@ -14,16 +13,69 @@ T = TypeVar("T")
 IPV4Address = str
 IPv6Address = str
 
+ParcelType = Literal[
+    "appqoe",
+    "lan/vpn",
+    "lan/vpn/interface/ethernet",
+    "lan/vpn/interface/gre",
+    "lan/vpn/interface/ipsec",
+    "lan/vpn/interface/svi",
+    "dhcp-server",
+    "tracker",
+    "trackergroup",
+    "routing/bgp",
+    "routing/eigrp",
+    "routing/multicast",
+    "routing/ospf",
+    "routing/ospfv3/ipv4",
+    "routing/ospfv3/ipv6",
+    "wirelesslan",
+    "switchport",
+    "app-probe",
+    "app-list",
+    "color",
+    "data-prefix",
+    "expanded-community",
+    "class",
+    "data-ipv6-prefix",
+    "ipv6-prefix",
+    "prefix",
+    "policer",
+    "preferred-color-group",
+    "sla-class",
+    "tloc",
+    "standard-community",
+    "security-localdomain",
+    "security-fqdn",
+    "security-ipssignature",
+    "security-urllist",
+    "security-urllist",
+    "security-port",
+    "security-protocolname",
+    "security-geolocation",
+    "security-zone",
+    "security-localapp",
+    "security-data-ip-prefix",
+]
 
-class ProfileType(str, Enum):
-    TRANSPORT = "transport"
-    SYSTEM = "system"
-    CLI = "cli"
-    SERVICE = "service"
+ProfileType = Literal[
+    "transport",
+    "system",
+    "cli",
+    "service",
+    "application-priority",
+    "policy-object",
+    "embedded-security",
+]
+
+SchemaType = Literal[
+    "post",
+    "put",
+]
 
 
 class FeatureProfileInfo(BaseModel):
-    profile_id: str = Field(alias="profileId")
+    profile_id: UUID = Field(alias="profileId")
     profile_name: str = Field(alias="profileName")
     solution: Solution
     profile_type: ProfileType = Field(alias="profileType")
@@ -70,29 +122,9 @@ class FeatureProfileCreationResponse(BaseModel):
 
 
 class ParcelCreationResponse(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(populate_by_name=True)
 
-    id: UUID = Field(alias="parcelId")
-
-
-class ParcelType(str, Enum):
-    APPQOE = "appqoe"
-    LAN_VPN = "lan/vpn"
-    LAN_VPN_INTERFACE_ETHERNET = "lan/vpn/interface/ethernet"
-    LAN_VPN_INTERFACE_GRE = "lan/vpn/interface/gre"
-    LAN_VPN_INTERFACE_IPSEC = "lan/vpn/interface/ipsec"
-    LAN_VPN_INTERFACE_SVI = "lan/vpn/interface/svi"
-    DHCP_SERVER = "dhcp-server"
-    TRACKER = "tracker"
-    TRACKER_GROUP = "trackergroup"
-    ROUTING_BGP = "routing/bgp"
-    ROUTING_EIGRP = "routing/eigrp"
-    ROUTING_MULTICAST = "routing/multicast"
-    ROUTING_OSPF = "routing/ospf"
-    ROUTING_OSPFV3_IPV4 = "routing/ospfv3/ipv4"
-    ROUTING_OSPFV3_IPV6 = "routing/ospfv3/ipv6"
-    WIRELESSLAN = "wirelesslan"
-    SWITCHPORT = "switchport"
+    id: UUID = Field(serialization_alias="parcelId", validation_alias="parcelId")
 
 
 class Parcel(BaseModel, Generic[T]):
@@ -127,11 +159,6 @@ class ParcelAssociationPayload(BaseModel):
 class Prefix(BaseModel):
     address: Union[Variable, Global[str]]
     mask: Union[Variable, Global[str]]
-
-
-class SchemaType(str, Enum):
-    POST = "post"
-    PUT = "put"
 
 
 class SchemaTypeQuery(BaseModel):

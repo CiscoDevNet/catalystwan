@@ -1,9 +1,10 @@
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 from catalystwan.api.partition_manager_api import PartitionManagerAPI
-from catalystwan.api.versions_utils import DeviceSoftwareRepository, DeviceVersionPayload, DeviceVersions, RepositoryAPI
+from catalystwan.api.versions_utils import DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
 from catalystwan.dataclasses import Device
+from catalystwan.endpoints.configuration_device_actions import ActionId, RemovePartitionDevice
 from catalystwan.typed_list import DataSequence
 
 
@@ -28,17 +29,17 @@ class TestPartitionManagerAPI(unittest.TestCase):
         )
         self.DeviceSoftwareRepository_obj = {
             "mock_uuid": DeviceSoftwareRepository(
-                ["ver1", "ver2", "curr_ver"],
-                ["ver1", "ver2"],
-                "curr_ver",
-                "def_ver",
-                "mock_uuid",
+                installed_versions=["ver1", "ver2", "curr_ver"],
+                availableVersions=["ver1", "ver2"],
+                version="curr_ver",
+                defaultVersion="def_ver",
+                uuid="mock_uuid",
             ),
         }
 
         self.mock_devices = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "ver1"}]
         self.mock_device_version_payload = DataSequence(
-            DeviceVersionPayload, [DeviceVersionPayload("mock_uuid", "mock_ip", "ver1")]
+            RemovePartitionDevice, [RemovePartitionDevice(device_id="mock_uuid", device_ip="mock_ip", version="ver1")]
         )
         mock_session = Mock()
         self.mock_repository_object = RepositoryAPI(mock_session)
@@ -54,7 +55,10 @@ class TestPartitionManagerAPI(unittest.TestCase):
         mock_devices.return_value = self.mock_devices
         mock_get_device_list.return_value = self.mock_device_version_payload
         self.mock_repository_object.devices = self.mock_devices
-        self.mock_repository_object.session.post.return_value.json.return_value = {"id": "mock_action_id"}
+        expected_id = ActionId(id="mock_action_id")
+        self.mock_repository_object.session.endpoints.configuration_device_actions.process_remove_partition = MagicMock(
+            return_value=expected_id
+        )
 
         # Assert
         answer = self.mock_partition_manager_obj.remove_partition(self.device, force=True).task_id
@@ -67,7 +71,10 @@ class TestPartitionManagerAPI(unittest.TestCase):
         mock_get_device_list.return_value = self.mock_device_version_payload
         mock_check_remove.return_value = []
         self.mock_repository_object.devices = self.mock_devices
-        self.mock_repository_object.session.post.return_value.json.return_value = {"id": "mock_action_id"}
+        expected_id = ActionId(id="mock_action_id")
+        self.mock_repository_object.session.endpoints.configuration_device_actions.process_remove_partition = MagicMock(
+            return_value=expected_id
+        )
 
         # Assert
         answer = self.mock_partition_manager_obj.remove_partition(self.device, force=False).task_id
@@ -77,16 +84,19 @@ class TestPartitionManagerAPI(unittest.TestCase):
     def test_check_remove_partition_possibility_if_version_incorrect(self, mock_get_devices_versions_repository):
         # Prepare mock data
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
-        mock_devices = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "curr_ver"}]
+        mock_devices = [
+            RemovePartitionDevice(**{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "curr_ver"})
+        ]
 
         # Assert
-        self.assertRaises(ValueError, self.mock_partition_manager_obj._check_remove_partition_possibility, mock_devices)
+        with self.assertRaises(ValueError):
+            self.mock_partition_manager_obj._check_remove_partition_possibility(mock_devices)
 
     @patch.object(RepositoryAPI, "get_devices_versions_repository")
     def test_check_remove_partition_possibility_if_version_correct(self, mock_get_devices_versions_repository):
         # Prepare mock data
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
-        mock_devices = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "any_ver"}]
+        mock_devices = [RemovePartitionDevice(**{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "any_ver"})]
 
         # Assert
         answer = self.mock_partition_manager_obj._check_remove_partition_possibility(mock_devices)
@@ -97,7 +107,11 @@ class TestPartitionManagerAPI(unittest.TestCase):
     def test_set_default_partition(self, mock_session, mock_get_devices):
         # Arrange
         mock_partition_manager = PartitionManagerAPI(mock_session)
-        mock_partition_manager.session.post.return_value.json.return_value = {"id": "id_1"}
+        expected_id = ActionId(id="id_1")
+        mock_partition_manager.session.endpoints.configuration_device_actions.process_mark_default_partition = (
+            MagicMock(return_value=expected_id)
+        )
+
         # Act
         answer = mock_partition_manager.set_default_partition(self.device).task_id
 

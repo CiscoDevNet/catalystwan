@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Dict, Generic, Optional, TypeVar
+from typing import Any, Dict, Generic, Literal, Optional, TypeVar, get_origin
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, PrivateAttr, model_serializer
 
@@ -49,21 +49,20 @@ class OptionType(str, Enum):
 
 
 class ParcelAttribute(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-
+    model_config = ConfigDict(extra="forbid")
     option_type: OptionType = Field(serialization_alias="optionType", validation_alias="optionType")
 
 
 # https://github.com/pydantic/pydantic/discussions/6090
 # Usage: Global[str](value="test")
 class Global(ParcelAttribute, Generic[T]):
-    option_type: OptionType = OptionType.GLOBAL
+    option_type: OptionType = Field(
+        default=OptionType.GLOBAL, serialization_alias="optionType", validation_alias="optionType"
+    )
     value: T
 
     def __len__(self) -> int:
-        if isinstance(self.value, str):
+        if isinstance(self.value, (str, list)):
             return len(self.value)
         return -1
 
@@ -79,22 +78,60 @@ class Global(ParcelAttribute, Generic[T]):
 
 
 class Variable(ParcelAttribute):
-    option_type: OptionType = OptionType.VARIABLE
+    option_type: OptionType = Field(
+        default=OptionType.VARIABLE, serialization_alias="optionType", validation_alias="optionType"
+    )
     value: str = Field(pattern=r"^\{\{[.\/\[\]a-zA-Z0-9_-]+\}\}$", min_length=1, max_length=64)
 
 
 class Default(ParcelAttribute, Generic[T]):
-    option_type: OptionType = OptionType.DEFAULT
+    option_type: OptionType = Field(
+        default=OptionType.DEFAULT, serialization_alias="optionType", validation_alias="optionType"
+    )
     value: Any
 
 
-def as_global(value: Any):
-    return Global[type(value)](value=value)  # type: ignore
+def as_global(value: Any, generic_alias: Any = None):
+    """Produces Global object given only value (type is induced from value)
+
+    Args:
+        value (Any): value of Global object to be produced
+        generic_alias (Any, optional): specify alias type like Literal. Defaults to None.
+
+    Returns:
+        Global[Any]: global option type object
+    """
+    if generic_alias is None:
+        return Global[type(value)](value=value)  # type: ignore
+    elif get_origin(generic_alias) is Literal:
+        return Global[generic_alias](value=value)  # type: ignore
+    TypeError("Inappropriate type for argument generic_alias")
 
 
 def as_variable(value: str):
+    """Produces Variable object from variable name string
+
+    Args:
+        value (str): value of Variable object to be produced
+
+    Returns:
+        Variable: variable option type object
+    """
     return Variable(value=value)
 
 
-def as_default(value: Any):
-    return Default[type(value)](value=value)  # type: ignore
+def as_default(value: Any, generic_alias: Any = None):
+    """Produces Default object given only value (type is induced from value)
+
+    Args:
+        value (Any): value of Default object to be produced
+        generic_alias (Any, optional): specify alias type like Literal. Defaults to None.
+
+    Returns:
+        Default[Any]: default option type object
+    """
+    if generic_alias is None:
+        return Default[type(value)](value=value)  # type: ignore
+    elif get_origin(generic_alias) is Literal:
+        return Default[generic_alias](value=value)  # type: ignore
+    TypeError("Inappropriate type for argument generic_alias")

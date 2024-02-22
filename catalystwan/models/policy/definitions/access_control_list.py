@@ -21,14 +21,12 @@ from catalystwan.models.policy.policy_definition import (
     NextHopEntry,
     PacketLengthEntry,
     PLPEntry,
-    PLPEntryEnum,
     PolicerAction,
-    PolicyActionTypeEnum,
+    PolicyActionType,
     PolicyDefinitionBase,
     PolicyDefinitionSequenceBase,
     ProtocolEntry,
     Reference,
-    SequenceIpType,
     SourceDataPrefixListEntry,
     SourceIPEntry,
     SourcePortEntry,
@@ -69,8 +67,8 @@ class AclPolicySequence(PolicyDefinitionSequenceBase):
     sequence_type: Literal["acl"] = Field(
         default="acl", serialization_alias="sequenceType", validation_alias="sequenceType"
     )
-    base_action: PolicyActionTypeEnum = Field(
-        default=PolicyActionTypeEnum.ACCEPT, serialization_alias="baseAction", validation_alias="baseAction"
+    base_action: PolicyActionType = Field(
+        default="accept", serialization_alias="baseAction", validation_alias="baseAction"
     )
     match: AclPolicySequenceMatch = AclPolicySequenceMatch()
     actions: List[AclPolicySequenceActions] = []
@@ -83,10 +81,10 @@ class AclPolicySequence(PolicyDefinitionSequenceBase):
         self._insert_match(PacketLengthEntry.from_range(packet_lengths))
 
     def match_low_plp(self) -> None:
-        self._insert_match(PLPEntry(value=PLPEntryEnum.LOW))
+        self._insert_match(PLPEntry(value="low"))
 
     def match_high_plp(self) -> None:
-        self._insert_match(PLPEntry(value=PLPEntryEnum.HIGH))
+        self._insert_match(PLPEntry(value="high"))
 
     def match_protocols(self, protocols: Set[int]) -> None:
         self._insert_match(ProtocolEntry.from_protocol_set(protocols))
@@ -145,19 +143,19 @@ class AclPolicySequence(PolicyDefinitionSequenceBase):
 class AclPolicy(AclPolicyHeader, DefinitionWithSequencesCommonBase):
     sequences: List[AclPolicySequence] = []
     default_action: DefaultAction = Field(
-        default=DefaultAction(type=PolicyActionTypeEnum.DROP),
+        default=DefaultAction(type="drop"),
         serialization_alias="defaultAction",
         validation_alias="defaultAction",
     )
     model_config = ConfigDict(populate_by_name=True)
 
     def add_acl_sequence(
-        self, name: str = "Access Control List", base_action: PolicyActionTypeEnum = PolicyActionTypeEnum.ACCEPT
+        self, name: str = "Access Control List", base_action: PolicyActionType = "accept"
     ) -> AclPolicySequence:
         seq = AclPolicySequence(
             sequence_name=name,
             base_action=base_action,
-            sequence_ip_type=SequenceIpType.IPV4,
+            sequence_ip_type="ipv4",
         )
         self.add(seq)
         return seq

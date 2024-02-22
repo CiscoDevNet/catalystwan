@@ -12,12 +12,11 @@ from catalystwan.models.policy.policy_definition import (
     DestinationDataIPv6PrefixListEntry,
     DestinationIPv6Entry,
     DestinationPortEntry,
-    DeviceAccessProtocolEnum,
+    DeviceAccessProtocol,
     Match,
-    PolicyActionTypeEnum,
+    PolicyActionType,
     PolicyDefinitionBase,
     PolicyDefinitionSequenceBase,
-    SequenceIpType,
     SourceDataIPv6PrefixListEntry,
     SourceIPv6Entry,
     SourcePortEntry,
@@ -50,14 +49,14 @@ class DeviceAccessIPv6PolicySequence(PolicyDefinitionSequenceBase):
     sequence_type: Literal["deviceaccesspolicyv6"] = Field(
         default="deviceaccesspolicyv6", serialization_alias="sequenceType", validation_alias="sequenceType"
     )
-    base_action: PolicyActionTypeEnum = Field(
-        default=PolicyActionTypeEnum.ACCEPT, serialization_alias="baseAction", validation_alias="baseAction"
+    base_action: PolicyActionType = Field(
+        default="accept", serialization_alias="baseAction", validation_alias="baseAction"
     )
     match: DeviceAccessIPv6PolicySequenceMatch = DeviceAccessIPv6PolicySequenceMatch()
     actions: List[DeviceAccessIPv6PolicySequenceActions] = []
     model_config = ConfigDict(populate_by_name=True)
 
-    def match_device_access_protocol(self, port: DeviceAccessProtocolEnum) -> None:
+    def match_device_access_protocol(self, port: DeviceAccessProtocol) -> None:
         self._insert_match(DestinationPortEntry.from_port_set_and_ranges(ports={port}))
 
     def match_source_data_prefix_list(self, data_prefix_list_id: UUID) -> None:
@@ -82,7 +81,7 @@ class DeviceAccessIPv6PolicySequence(PolicyDefinitionSequenceBase):
 class DeviceAccessIPv6Policy(DeviceAccessIPv6PolicyHeader, DefinitionWithSequencesCommonBase):
     sequences: List[DeviceAccessIPv6PolicySequence] = []
     default_action: DefaultAction = Field(
-        default=DefaultAction(type=PolicyActionTypeEnum.DROP),
+        default=DefaultAction(type="drop"),
         serialization_alias="defaultAction",
         validation_alias="defaultAction",
     )
@@ -91,13 +90,13 @@ class DeviceAccessIPv6Policy(DeviceAccessIPv6PolicyHeader, DefinitionWithSequenc
     def add_acl_sequence(
         self,
         name: str = "Device Access Control List",
-        base_action: PolicyActionTypeEnum = PolicyActionTypeEnum.ACCEPT,
-        device_access_protocol: Optional[DeviceAccessProtocolEnum] = None,
+        base_action: PolicyActionType = "accept",
+        device_access_protocol: Optional[DeviceAccessProtocol] = None,
     ) -> DeviceAccessIPv6PolicySequence:
         seq = DeviceAccessIPv6PolicySequence(
             sequence_name=name,
             base_action=base_action,
-            sequence_ip_type=SequenceIpType.IPV4,
+            sequence_ip_type="ipv4",
         )
         if device_access_protocol is not None:
             seq.match_device_access_protocol(port=device_access_protocol)

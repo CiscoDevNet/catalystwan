@@ -1,9 +1,10 @@
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 from catalystwan.api.software_action_api import SoftwareActionAPI
 from catalystwan.api.versions_utils import DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
 from catalystwan.dataclasses import Device
+from catalystwan.endpoints.configuration_device_actions import ActionId, InstallDevice
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.upgrades_helper import Family, InstallSpecHelper
 
@@ -24,11 +25,11 @@ class TestSoftwareAcionAPI(unittest.TestCase):
         )
         self.DeviceSoftwareRepository_obj = {
             "mock_uuid": DeviceSoftwareRepository(
-                ["ver1", "ver2", "curr_ver"],
-                ["ver1", "ver2"],
-                "20.8",
-                "def_ver",
-                "mock_uuid",
+                installed_versions=["ver1", "ver2", "curr_ver"],
+                availableVersions=["ver1", "ver2"],
+                version="20.8",
+                defaultVersion="def_ver",
+                uuid="mock_uuid",
             ),
         }
 
@@ -48,19 +49,27 @@ class TestSoftwareAcionAPI(unittest.TestCase):
     ):
         # Prepare mock data
         mock_downgrade_check.return_value = False
-        self.mock_repository_object.session.post.return_value.json.return_value = {"id": "mock_action_id"}
-        mock_session.post.return_value = {"id": "mock_action_id"}
+        expected_id = ActionId(id="mock_action_id")
+        mock_get_image_version.return_value = "any_version"
+        self.mock_software_action_obj.session.endpoints.configuration_device_actions.process_install_operation = (
+            MagicMock(return_value=expected_id)
+        )
 
         # Assert
-        answer = self.mock_software_action_obj.install(DataSequence(Device, [self.device]), True, True, "path").task_id
-        self.assertEqual(answer, "mock_action_id")
+        answer = self.mock_software_action_obj.install(
+            devices=DataSequence(Device, [self.device]),
+            reboot=True,
+            sync=True,
+            image="path",
+        )
+        self.assertEqual(answer.task_id, "mock_action_id")
 
     @patch.object(RepositoryAPI, "get_devices_versions_repository")
     def test_downgrade_check_no_incorrect_devices(self, mock_get_devices_versions_repository):
         # Preapre mock data
         upgrade_version = "20.9"
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
-        mock_devices = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": upgrade_version}]
+        mock_devices = [InstallDevice(**{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": upgrade_version})]
         self.mock_repository_object.devices = mock_devices
         # Assert
         answer = self.mock_software_action_obj._downgrade_check(mock_devices, upgrade_version, Family.VMANAGE.value)
@@ -71,7 +80,7 @@ class TestSoftwareAcionAPI(unittest.TestCase):
         # Preapre mock data
         upgrade_version = "20.6"
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
-        mock_devices = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": upgrade_version}]
+        mock_devices = [InstallDevice(**{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": upgrade_version})]
         self.mock_repository_object.devices = mock_devices
         # Assert
         # answer = self.mock_software_action_obj._downgrade_check(mock_devices, upgrade_version, Family.VMANAGE.value)

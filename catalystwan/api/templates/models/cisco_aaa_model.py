@@ -2,42 +2,39 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from catalystwan.api.templates.feature_template import FeatureTemplate
 
 
 class User(BaseModel):
     name: str
-    password: Optional[str]
-    secret: Optional[str]
-    privilege: Optional[str]
-    pubkey_chain: List[str] = Field(default=[], vmanage_key="pubkey-chain", vip_type="ignore")
+    password: Optional[str] = None
+    secret: Optional[str] = None
+    privilege: Optional[str] = None
+    pubkey_chain: List[str] = Field(default=[], json_schema_extra={"vmanage_key": "pubkey-chain", "vip_type": "ignore"})
 
 
 class RadiusServer(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     address: str
-    auth_port: int = Field(vmanage_key="auth-port", default=1812)
-    acct_port: int = Field(vmanage_key="acct-port", default=1813)
+    auth_port: int = Field(default=1812, json_schema_extra={"vmanage_key": "auth-port"})
+    acct_port: int = Field(default=1813, json_schema_extra={"vmanage_key": "acct-port"})
     timeout: int = Field(default=5)
     retransmit: int = 3
     key: str
-    secret_key: Optional[str] = Field(vmanage_key="secret-key", default=None)
-    key_enum: Optional[str] = Field(vmanage_key="key-enum", default=None)
-    key_type: Optional[str] = Field(vmanage_key="key-type", default=None)
+    secret_key: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "secret-key"})
+    key_enum: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "key-enum"})
+    key_type: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "key-type"})
 
 
 class RadiusGroup(BaseModel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    group_name: str = Field(vmanage_key="group-name")
-    vpn: Optional[int]
-    source_interface: Optional[str] = Field(vmanage_key="source-interface")
+    group_name: str = Field(json_schema_extra={"vmanage_key": "group-name"})
+    vpn: Optional[int] = None
+    source_interface: Optional[str] = Field(json_schema_extra={"vmanage_key": "source-interface"})
     server: List[RadiusServer] = []
 
 
@@ -48,40 +45,38 @@ class DomainStripping(str, Enum):
 
 
 class TacacsServer(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
     address: str
     port: int = 49
     timeout: int = Field(default=5)
     key: str
-    secret_key: Optional[str] = Field(vmanage_key="secret-key", default=None)
-    key_enum: Optional[str] = Field(vmanage_key="key-enum", default=None)
+    secret_key: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "secret-key"})
+    key_enum: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "key-enum"})
 
 
 class TacacsGroup(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
-    group_name: str = Field(vmanage_key="group-name")
+    group_name: str = Field(json_schema_extra={"vmanage_key": "group-name"})
     vpn: int = 0
-    source_interface: Optional[str] = Field(vmanage_key="source-interface", default=None)
+    source_interface: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "source-interface"})
     server: List[TacacsServer] = []
 
 
 class CiscoAAAModel(FeatureTemplate):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_population_by_field_name = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    user: Optional[List[User]]
-    authentication_group: bool = Field(vmanage_key="authentication_group", default=False)
+    user: Optional[List[User]] = None
+    authentication_group: bool = Field(default=False, json_schema_extra={"vmanage_key": "authentication_group"})
     accounting_group: bool = True
     radius: Optional[List[RadiusGroup]] = None
-    domain_stripping: Optional[DomainStripping] = Field(vmanage_key="domain-stripping", default=None)
+    domain_stripping: Optional[DomainStripping] = Field(
+        default=None, json_schema_extra={"vmanage_key": "domain-stripping"}
+    )
     port: int = 1700
     tacacs: Optional[List[TacacsGroup]] = None
-    server_auth_order: str = Field(vmanage_key="server-auth-order", default="local")
+    server_auth_order: str = Field(default="local", json_schema_extra={"vmanage_key": "server-auth-order"})
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cedge_aaa"
