@@ -51,7 +51,6 @@ from catalystwan.models.configuration.feature_profile.sdwan.policy_object import
     URLBlockParcel,
 )
 from catalystwan.models.configuration.feature_profile.sdwan.system import (
-    SYSTEM_PAYLOAD_ENDPOINT_MAPPING,
     AAAParcel,
     AnySystemParcel,
     BannerParcel,
@@ -169,8 +168,7 @@ class SystemFeatureProfileAPI:
         Get all System Parcels for selected profile_id and selected type or get one Policy Object given parcel id
         """
 
-        parcel_type_ = SYSTEM_PAYLOAD_ENDPOINT_MAPPING[parcel_type]
-        return self.endpoint.get_schema(profile_id=profile_id, parcel_type=parcel_type_)
+        return self.endpoint.get_schema(profile_id=profile_id, parcel_type=parcel_type._get_parcel_type())
 
     @overload
     def get(
@@ -268,7 +266,7 @@ class SystemFeatureProfileAPI:
         profile_id: UUID,
         parcel_type: Type[AAAParcel],
         parcel_id: UUID,
-    ) -> DataSequence[Parcel[AAAParcel]]:
+    ) -> Parcel[AAAParcel]:
         ...
 
     @overload
@@ -277,7 +275,7 @@ class SystemFeatureProfileAPI:
         profile_id: UUID,
         parcel_type: Type[BFDParcel],
         parcel_id: UUID,
-    ) -> DataSequence[Parcel[BFDParcel]]:
+    ) -> Parcel[BFDParcel]:
         ...
 
     @overload
@@ -286,7 +284,7 @@ class SystemFeatureProfileAPI:
         profile_id: UUID,
         parcel_type: Type[LoggingParcel],
         parcel_id: UUID,
-    ) -> DataSequence[Parcel[LoggingParcel]]:
+    ) -> Parcel[LoggingParcel]:
         ...
 
     @overload
@@ -295,7 +293,7 @@ class SystemFeatureProfileAPI:
         profile_id: UUID,
         parcel_type: Type[BannerParcel],
         parcel_id: UUID,
-    ) -> DataSequence[Parcel[BannerParcel]]:
+    ) -> Parcel[BannerParcel]:
         ...
 
     @overload
@@ -304,7 +302,7 @@ class SystemFeatureProfileAPI:
         profile_id: UUID,
         parcel_type: Type[BasicParcel],
         parcel_id: UUID,
-    ) -> DataSequence[Parcel[BasicParcel]]:
+    ) -> Parcel[BasicParcel]:
         ...
 
     @overload
@@ -313,7 +311,7 @@ class SystemFeatureProfileAPI:
         profile_id: UUID,
         parcel_type: Type[GlobalParcel],
         parcel_id: UUID,
-    ) -> DataSequence[Parcel[GlobalParcel]]:
+    ) -> Parcel[GlobalParcel]:
         ...
 
     @overload
@@ -322,7 +320,7 @@ class SystemFeatureProfileAPI:
         profile_id: UUID,
         parcel_type: Type[NTPParcel],
         parcel_id: UUID,
-    ) -> DataSequence[Parcel[NTPParcel]]:
+    ) -> Parcel[NTPParcel]:
         ...
 
     @overload
@@ -331,7 +329,7 @@ class SystemFeatureProfileAPI:
         profile_id: UUID,
         parcel_type: Type[MRFParcel],
         parcel_id: UUID,
-    ) -> DataSequence[Parcel[MRFParcel]]:
+    ) -> Parcel[MRFParcel]:
         ...
 
     @overload
@@ -340,7 +338,7 @@ class SystemFeatureProfileAPI:
         profile_id: UUID,
         parcel_type: Type[OMPParcel],
         parcel_id: UUID,
-    ) -> DataSequence[Parcel[OMPParcel]]:
+    ) -> Parcel[OMPParcel]:
         ...
 
     @overload
@@ -349,7 +347,7 @@ class SystemFeatureProfileAPI:
         profile_id: UUID,
         parcel_type: Type[SecurityParcel],
         parcel_id: UUID,
-    ) -> DataSequence[Parcel[SecurityParcel]]:
+    ) -> Parcel[SecurityParcel]:
         ...
 
     @overload
@@ -358,7 +356,7 @@ class SystemFeatureProfileAPI:
         profile_id: UUID,
         parcel_type: Type[SNMPParcel],
         parcel_id: UUID,
-    ) -> DataSequence[Parcel[SNMPParcel]]:
+    ) -> Parcel[SNMPParcel]:
         ...
 
     def get(
@@ -366,33 +364,29 @@ class SystemFeatureProfileAPI:
         profile_id: UUID,
         parcel_type: Type[AnySystemParcel],
         parcel_id: Union[UUID, None] = None,
-    ) -> DataSequence[Parcel[Any]]:
+    ) -> Union[DataSequence[Parcel[AnySystemParcel]], Parcel[AnySystemParcel]]:
         """
-        Get all System Parcels for selected profile_id and selected type or get one Policy Object given parcel id
+        Get all System Parcels for selected profile_id and selected type or get one System Parcel given parcel id
         """
 
-        parcel_type_ = SYSTEM_PAYLOAD_ENDPOINT_MAPPING[parcel_type]
         if not parcel_id:
-            return self.endpoint.get_all(profile_id=profile_id, parcel_type=parcel_type_)
-        parcel = self.endpoint.get_by_id(profile_id=profile_id, parcel_type=parcel_type_, list_object_id=parcel_id)
-        return DataSequence(Parcel, [parcel])
+            return self.endpoint.get_all(profile_id=profile_id, parcel_type=parcel_type._get_parcel_type())
+        return self.endpoint.get_by_id(profile_id=profile_id, parcel_type=parcel_type._get_parcel_type(), parcel_id=parcel_id)
 
     def create(self, profile_id: UUID, payload: AnySystemParcel) -> ParcelCreationResponse:
         """
         Create System Parcel for selected profile_id based on payload type
         """
 
-        parcel_type = SYSTEM_PAYLOAD_ENDPOINT_MAPPING[type(payload)]
-        return self.endpoint.create(profile_id=profile_id, parcel_type=parcel_type, payload=payload)
+        return self.endpoint.create(profile_id=profile_id, parcel_type=payload._get_parcel_type(), payload=payload)
 
     def update(self, profile_id: UUID, payload: AnySystemParcel, parcel_id: UUID) -> ParcelCreationResponse:
         """
         Update System Parcel for selected profile_id based on payload type
         """
 
-        policy_type = SYSTEM_PAYLOAD_ENDPOINT_MAPPING[type(payload)]
         return self.endpoint.update(
-            profile_id=profile_id, parcel_type=policy_type, parcel_id=parcel_id, payload=payload
+            profile_id=profile_id, parcel_type=payload._get_parcel_type(), parcel_id=parcel_id, payload=payload
         )
 
     @overload
@@ -498,9 +492,7 @@ class SystemFeatureProfileAPI:
         """
         Delete System Parcel for selected profile_id based on payload type
         """
-
-        parcel_type_ = SYSTEM_PAYLOAD_ENDPOINT_MAPPING[parcel_type]
-        return self.endpoint.delete(profile_id=profile_id, parcel_type=parcel_type_, parcel_id=parcel_id)
+        return self.endpoint.delete(profile_id=profile_id, parcel_type=parcel_type._get_parcel_type(), parcel_id=parcel_id)
 
 
 class PolicyObjectFeatureProfileAPI:
