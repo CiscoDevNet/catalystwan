@@ -9,9 +9,11 @@ from catalystwan.models.configuration.feature_profile.common import (
     FeatureProfileCreationResponse,
     FeatureProfileInfo,
     GetFeatureProfilesPayload,
+    Parcel,
     ParcelId,
     SchemaTypeQuery,
 )
+from catalystwan.models.configuration.feature_profile.sdwan.system import AnySystemParcel
 from catalystwan.typed_list import DataSequence
 
 
@@ -52,17 +54,17 @@ class SystemFeatureProfile(APIEndpoints):
 
     @versions(supported_versions=(">=20.9"), raises=False)
     @get("/v1/feature-profile/sdwan/system/{profile_id}/{parcel_type}")
-    def get_all(self, profile_id: UUID, parcel_type: UUID) -> None:
+    def get_all(self, profile_id: UUID, parcel_type: UUID) -> DataSequence[Parcel]:
         ...
 
     @versions(supported_versions=(">=20.9"), raises=False)
     @get("/v1/feature-profile/sdwan/system/{profile_id}/{parcel_type}/{parcel_id}")
-    def get_by_id(self, profile_id: UUID, parcel_type: str, parcel_id: UUID) -> _ParcelBase:
+    def get_by_id(self, profile_id: UUID, parcel_type: str, parcel_id: UUID) -> Parcel:
         ...
 
     @versions(supported_versions=(">=20.9"), raises=False)
     @put("/v1/feature-profile/sdwan/system/{profile_id}/{parcel_type}/{parcel_id}")
-    def update(self, profile_id: UUID, parcel_type: str, parcel_id: UUID) -> ParcelId:
+    def update(self, profile_id: UUID, parcel_type: str, parcel_id: UUID, payload: AnySystemParcel) -> ParcelId:
         ...
 
     @versions(supported_versions=(">=20.9"), raises=False)
@@ -72,5 +74,5 @@ class SystemFeatureProfile(APIEndpoints):
 
     @versions(supported_versions=(">=20.9"), raises=False)
     @post("/v1/feature-profile/sdwan/system/{profile_id}/{parcel_type}")
-    def create(self, profile_id: UUID, parcel_type: str, payload: _ParcelBase) -> ParcelId:
+    def create(self, profile_id: UUID, parcel_type: str, payload: AnySystemParcel) -> ParcelId:
         ...
