@@ -1,8 +1,10 @@
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
-from catalystwan.api.versions_utils import DeviceSoftwareRepository, DeviceVersionPayload, DeviceVersions, RepositoryAPI
+from catalystwan.api.versions_utils import DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
 from catalystwan.dataclasses import Device
+from catalystwan.endpoints.configuration.software_actions import SoftwareImageDetails
+from catalystwan.endpoints.configuration_device_actions import InstalledDeviceData, PartitionDevice
 from catalystwan.typed_list import DataSequence
 
 
@@ -29,13 +31,18 @@ class TestRepositoryAPI(unittest.TestCase):
                 uuid="mock_uuid",
             )
         }
+        mock_session = Mock()
+        self.mock_repository_object = RepositoryAPI(mock_session)
 
     @patch("catalystwan.session.Session")
     def test_get_image_version_if_image_available(self, mock_session):
-        versions_response = [{"availableFiles": "vmanage-20.9.1-x86_64.tar.gz", "versionName": "20.9.1"}]
-        mock_session.get_data.return_value = versions_response
+        versions_response = DataSequence(
+            SoftwareImageDetails,
+            [SoftwareImageDetails(**{"availableFiles": "vmanage-20.9.1-x86_64.tar.gz", "versionName": "20.9.1"})],
+        )
+        self.mock_repository_object.get_all_software_images = MagicMock(return_value=versions_response)
         image_version = "20.9.1"
-        answer = RepositoryAPI(mock_session).get_image_version("vmanage-20.9.1-x86_64.tar.gz")
+        answer = self.mock_repository_object.get_image_version("vmanage-20.9.1-x86_64.tar.gz")
 
         self.assertEqual(answer, image_version, "not same version")
 
@@ -50,18 +57,25 @@ class TestRepositoryAPI(unittest.TestCase):
 
     @patch("catalystwan.session.Session")
     def test_get_devices_versions_repository(self, mock_session):
-        api_mock_response = [
-            {
-                "availableVersions": ["ver1", "ver2"],
-                "version": "curr_ver",
-                "defaultVersion": "def_ver",
-                "uuid": "mock_uuid",
-            }
-        ]
-        mock_session.get_data.return_value = api_mock_response
-        mock_repository_object = RepositoryAPI(mock_session)
+        endpoint_mock_response = DataSequence(
+            InstalledDeviceData,
+            [
+                InstalledDeviceData(
+                    **{
+                        "availableVersions": ["ver1", "ver2"],
+                        "version": "curr_ver",
+                        "defaultVersion": "def_ver",
+                        "uuid": "mock_uuid",
+                    }
+                )
+            ],
+        )
 
-        answer = mock_repository_object.get_devices_versions_repository()
+        self.mock_repository_object.session.endpoints.configuration_device_actions.get_list_of_installed_devices = (
+            MagicMock(return_value=endpoint_mock_response)
+        )
+
+        answer = self.mock_repository_object.get_devices_versions_repository()
 
         self.assertEqual(
             answer["mock_uuid"],
@@ -79,7 +93,7 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
         answer = mock_device_versions.get_device_available("ver1", [self.device])
         expected_result = DataSequence(
-            DeviceVersionPayload, [DeviceVersionPayload(device_id="mock_uuid", device_ip="mock_ip", version="ver1")]
+            PartitionDevice, [PartitionDevice(device_id="mock_uuid", device_ip="mock_ip", version="ver1")]
         )
 
         # Assert
@@ -99,7 +113,7 @@ class TestRepositoryAPI(unittest.TestCase):
         mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
         answer = mock_device_versions.get_device_list_in_installed("ver1", [self.device])
         expected_result = DataSequence(
-            DeviceVersionPayload, [DeviceVersionPayload(device_id="mock_uuid", device_ip="mock_ip", version="ver1")]
+            PartitionDevice, [PartitionDevice(device_id="mock_uuid", device_ip="mock_ip", version="ver1")]
         )
 
         # Assert
@@ -121,6 +135,6 @@ class TestRepositoryAPI(unittest.TestCase):
         answer = mock_device_versions.get_devices_current_version([self.device])
         # Answer
         proper_answer = DataSequence(
-            DeviceVersionPayload, [DeviceVersionPayload(device_id="mock_uuid", device_ip="mock_ip", version="curr_ver")]
+            PartitionDevice, [PartitionDevice(device_id="mock_uuid", device_ip="mock_ip", version="curr_ver")]
         )
         self.assertEqual(answer, proper_answer)
