@@ -224,7 +224,7 @@ class ConfigurationDeviceActions(APIEndpoints):
         # POST /device/action/cancel
         ...
 
-    @post("device/action/changepartition", "data")
+    @post("/device/action/changepartition", "data")
     def process_mark_change_partition(self, payload: PartitionActionPayload) -> ActionId:
         ...
 
