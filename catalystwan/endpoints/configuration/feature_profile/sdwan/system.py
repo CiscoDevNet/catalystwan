@@ -2,6 +2,7 @@
 
 # mypy: disable-error-code="empty-body"
 from typing import Optional
+from uuid import UUID
 
 from catalystwan.api.configuration_groups.parcel import _ParcelBase
 from catalystwan.endpoints import JSON, APIEndpoints, delete, get, post, put, versions
@@ -18,8 +19,8 @@ from catalystwan.typed_list import DataSequence
 
 class SystemFeatureProfile(APIEndpoints):
     @versions(supported_versions=(">=20.9"), raises=False)
-    @get("/v1/feature-profile/sdwan/system/aaa/schema", resp_json_key="request")
-    def get_sdwan_system_aaa_parcel_schema(self, params: SchemaTypeQuery) -> JSON:
+    @get("/v1/feature-profile/sdwan/system/{parcel_type}/schema", resp_json_key="request")
+    def get_schema(self, parcel_type: str, params: SchemaTypeQuery) -> JSON:
         ...
 
     @versions(supported_versions=(">=20.9"), raises=False)
@@ -37,16 +38,41 @@ class SystemFeatureProfile(APIEndpoints):
         ...
 
     @versions(supported_versions=(">=20.9"), raises=False)
-    @delete("/v1/feature-profile/sdwan/system/{system_id}")
-    def delete_sdwan_system_feature_profile(self, system_id: str) -> None:
+    @delete("/v1/feature-profile/sdwan/system/{profile_id}")
+    def delete_sdwan_system_feature_profile(self, profile_id: UUID) -> None:
         ...
 
     @versions(supported_versions=(">=20.9"), raises=False)
-    @post("/v1/feature-profile/sdwan/system/{system_id}/aaa")
-    def create_aaa_profile_parcel_for_system(self, system_id: str, payload: _ParcelBase) -> ParcelId:
+    @post("/v1/feature-profile/sdwan/system/{profile_id}/aaa")
+    def create_aaa_profile_parcel_for_system(self, profile_id: UUID, payload: _ParcelBase) -> ParcelId:
         ...
 
     @versions(supported_versions=(">=20.9"), raises=False)
-    @put("/v1/feature-profile/sdwan/system/{system_id}/aaa/{parcel_id}")
-    def edit_aaa_profile_parcel_for_system(self, system_id: str, parcel_id: str, payload: _ParcelBase) -> ParcelId:
+    @put("/v1/feature-profile/sdwan/system/{profile_id}/aaa/{parcel_id}")
+    def edit_aaa_profile_parcel_for_system(self, profile_id: UUID, parcel_id: UUID, payload: _ParcelBase) -> ParcelId:
+        ...
+
+    @versions(supported_versions=(">=20.9"), raises=False)
+    @get("/v1/feature-profile/sdwan/system/{profile_id}/{parcel_type}")
+    def get_all(self, profile_id: UUID, parcel_type: UUID) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.9"), raises=False)
+    @get("/v1/feature-profile/sdwan/system/{profile_id}/{parcel_type}/{parcel_id}")
+    def get_by_id(self, profile_id: UUID, parcel_type: str, parcel_id: UUID) -> _ParcelBase:
+        ...
+
+    @versions(supported_versions=(">=20.9"), raises=False)
+    @put("/v1/feature-profile/sdwan/system/{profile_id}/{parcel_type}/{parcel_id}")
+    def update(self, profile_id: UUID, parcel_type: str, parcel_id: UUID) -> ParcelId:
+        ...
+
+    @versions(supported_versions=(">=20.9"), raises=False)
+    @delete("/v1/feature-profile/sdwan/system/{profile_id}/{parcel_type}/{parcel_id}")
+    def delete(self, profile_id: UUID, parcel_type: str, parcel_id: UUID) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.9"), raises=False)
+    @post("/v1/feature-profile/sdwan/system/{profile_id}/{parcel_type}")
+    def create(self, profile_id: UUID, parcel_type: str, payload: _ParcelBase) -> ParcelId:
         ...

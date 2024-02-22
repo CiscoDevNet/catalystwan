@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Protocol, Type, Union, overload
+from typing import TYPE_CHECKING, Any, Optional, Protocol, Type, Union, overload
 from uuid import UUID
 
+from catalystwan.endpoints.configuration.feature_profile.sdwan.system import SystemFeatureProfile
 from catalystwan.typed_list import DataSequence
 
 if TYPE_CHECKING:
@@ -12,13 +13,12 @@ if TYPE_CHECKING:
 
 from catalystwan.api.parcel_api import SDRoutingFullConfigParcelAPI
 from catalystwan.endpoints.configuration.feature_profile.sdwan.policy_object import PolicyObjectFeatureProfile
-from catalystwan.endpoints.configuration_feature_profile import (
-    SDRoutingConfigurationFeatureProfile,
-    SystemConfigurationFeatureProfile,
-)
+from catalystwan.endpoints.configuration_feature_profile import SDRoutingConfigurationFeatureProfile
 from catalystwan.models.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
     FeatureProfileCreationResponse,
+    FeatureProfileInfo,
+    GetFeatureProfilesPayload,
     Parcel,
     ParcelCreationResponse,
 )
@@ -119,7 +119,42 @@ class SystemFeatureProfileAPI:
 
     def __init__(self, session: ManagerSession):
         self.session = session
-        self.endpoint = SystemConfigurationFeatureProfile(session)
+        self.endpoint = SystemFeatureProfile(session)
+
+    def get_profiles(
+        self, limit: Optional[int] = None, offset: Optional[int] = None
+    ) -> DataSequence[FeatureProfileInfo]:
+        """
+        Get all System Feature Profiles
+        """
+        payload = GetFeatureProfilesPayload(limit=limit if limit else None, offset=offset if offset else None)
+
+        return self.endpoint.get_sdwan_system_feature_profiles(payload)
+
+    def create_profile(self, name: str, description: str) -> FeatureProfileCreationResponse:
+        """
+        Create System Feature Profile
+        """
+        payload = FeatureProfileCreationPayload(name=name, description=description)
+        return self.endpoint.create_sdwan_system_feature_profile(payload=payload)
+
+    def delete_profile(self, profile_id: UUID) -> None:
+        """
+        Delete System Feature Profile
+        """
+        self.endpoint.delete_sdwan_system_feature_profile(profile_id=profile_id)
+
+    def get_schema(
+        self,
+        profile_id: UUID,
+        parcel_type: Type[AnySystemParcel],
+    ) -> DataSequence[Parcel[Any]]:
+        """
+        Get all System Parcels for selected profile_id and selected type or get one Policy Object given parcel id
+        """
+
+        parcel_type_ = SYSTEM_PAYLOAD_ENDPOINT_MAPPING[parcel_type]
+        return self.endpoint.get_schema(profile_id=profile_id, parcel_type=parcel_type_)
 
     def get(
         self,
