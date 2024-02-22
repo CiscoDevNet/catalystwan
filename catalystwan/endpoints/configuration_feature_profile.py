@@ -3,6 +3,7 @@
 # mypy: disable-error-code="empty-body"
 from enum import Enum
 from typing import Optional
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -101,6 +102,33 @@ class ConfigurationFeatureProfile(APIEndpoints):
     @versions(supported_versions=(">=20.9"), raises=False)
     @get("/v1/feature-profile/sdwan")
     def get_sdwan_feature_profiles(self) -> DataSequence[FeatureProfileInfo]:
+        ...
+
+
+class SystemConfigurationFeatureProfile(APIEndpoints):
+    @versions(supported_versions=(">=20.9"), raises=False)
+    @get("/v1/feature-profile/sdwan/system/{profile_id}/{parcel_type}")
+    def get_all(self, profile_id: UUID, parcel_type: str) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.9"), raises=False)
+    @get("/v1/feature-profile/sdwan/system/{profile_id}/{parcel_type}/{parcel_id}")
+    def get_by_id(self, profile_id: UUID, parcel_type: str, parcel_id: UUID) -> _ParcelBase:
+        ...
+
+    @versions(supported_versions=(">=20.9"), raises=False)
+    @put("/v1/feature-profile/sdwan/system/{profile_id}/{parcel_type}/{parcel_id}")
+    def update(self, profile_id: UUID, parcel_type: str, parcel_id: UUID) -> ParcelId:
+        ...
+
+    @versions(supported_versions=(">=20.9"), raises=False)
+    @delete("/v1/feature-profile/sdwan/system/{profile_id}/{parcel_type}/{parcel_id}")
+    def delete(self, profile_id: UUID, parcel_type: str, parcel_id: UUID) -> None:
+        ...
+
+    @versions(supported_versions=(">=20.9"), raises=False)
+    @post("/v1/feature-profile/sdwan/system/{profile_id}/{parcel_type}")
+    def create(self, profile_id: UUID, parcel_type: str, payload: _ParcelBase) -> ParcelId:
         ...
 
 

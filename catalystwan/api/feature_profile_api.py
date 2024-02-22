@@ -12,7 +12,10 @@ if TYPE_CHECKING:
 
 from catalystwan.api.parcel_api import SDRoutingFullConfigParcelAPI
 from catalystwan.endpoints.configuration.feature_profile.sdwan.policy_object import PolicyObjectFeatureProfile
-from catalystwan.endpoints.configuration_feature_profile import SDRoutingConfigurationFeatureProfile
+from catalystwan.endpoints.configuration_feature_profile import (
+    SDRoutingConfigurationFeatureProfile,
+    SystemConfigurationFeatureProfile,
+)
 from catalystwan.models.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
     FeatureProfileCreationResponse,
@@ -46,6 +49,10 @@ from catalystwan.models.configuration.feature_profile.sdwan.policy_object import
     TlocParcel,
     URLAllowParcel,
     URLBlockParcel,
+)
+from catalystwan.models.configuration.feature_profile.sdwan.system import (
+    SYSTEM_PAYLOAD_ENDPOINT_MAPPING,
+    AnySystemParcel,
 )
 
 
@@ -103,6 +110,58 @@ class SDRoutingCLIFeatureProfileAPI(FeatureProfileAPI):
         Deletes CLI feature-profile
         """
         self.endpoint.delete_cli_feature_profile(cli_fp_id=fp_id)
+
+
+class SystemFeatureProfileAPI:
+    """
+    SDWAN Feature Profile System APIs
+    """
+
+    def __init__(self, session: ManagerSession):
+        self.session = session
+        self.endpoint = SystemConfigurationFeatureProfile(session)
+
+    def get(
+        self,
+        profile_id: UUID,
+        parcel_type: Type[AnySystemParcel],
+        parcel_id: Union[UUID, None] = None,
+    ) -> DataSequence[Parcel[Any]]:
+        """
+        Get all System Parcels for selected profile_id and selected type or get one Policy Object given parcel id
+        """
+
+        parcel_type_ = SYSTEM_PAYLOAD_ENDPOINT_MAPPING[parcel_type]
+        if not parcel_id:
+            return self.endpoint.get_all(profile_id=profile_id, parcel_type=parcel_type_)
+        parcel = self.endpoint.get_by_id(profile_id=profile_id, parcel_type=parcel_type_, list_object_id=parcel_id)
+        return DataSequence(Parcel, [parcel])
+
+    def create(self, profile_id: UUID, payload: AnySystemParcel) -> ParcelCreationResponse:
+        """
+        Create System Parcel for selected profile_id based on payload type
+        """
+
+        parcel_type = SYSTEM_PAYLOAD_ENDPOINT_MAPPING[type(payload)]
+        return self.endpoint.create(profile_id=profile_id, parcel_type=parcel_type, payload=payload)
+
+    def update(self, profile_id: UUID, payload: AnySystemParcel, parcel_id: UUID):
+        """
+        Update System Parcel for selected profile_id based on payload type
+        """
+
+        policy_type = SYSTEM_PAYLOAD_ENDPOINT_MAPPING[type(payload)]
+        return self.endpoint.update(
+            profile_id=profile_id, parcel_type=policy_type, parcel_id=parcel_id, payload=payload
+        )
+
+    def delete(self, profile_id: UUID, parcel_type: Type[AnySystemParcel], parcel_id: UUID) -> None:
+        """
+        Delete System Parcel for selected profile_id based on payload type
+        """
+
+        parcel_type_ = SYSTEM_PAYLOAD_ENDPOINT_MAPPING[parcel_type]
+        return self.endpoint.delete(profile_id=profile_id, parcel_type=parcel_type_, parcel_id=parcel_id)
 
 
 class PolicyObjectFeatureProfileAPI:
