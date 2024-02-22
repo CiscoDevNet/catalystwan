@@ -35,7 +35,7 @@ class UX1Policies(BaseModel):
 
 
 class UX1Templates(BaseModel):
-    feature: List[FeatureTemplateInformation] = Field(default=[])
+    features: List[FeatureTemplateInformation] = Field(default=[])
     devices: List[DeviceTemplateInformation] = Field(default=[])
 
 
