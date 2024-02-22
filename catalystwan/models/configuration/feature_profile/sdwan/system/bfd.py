@@ -4,7 +4,7 @@ from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 from catalystwan.models.common import TLOCColor
-from catalystwan.models.configuration.feature_profile.sdwan.system.recast import (
+from catalystwan.models.configuration.feature_profile.converters.recast import (
     DefaultGlobalBool,
     DefaultGlobalColorLiteral,
 )

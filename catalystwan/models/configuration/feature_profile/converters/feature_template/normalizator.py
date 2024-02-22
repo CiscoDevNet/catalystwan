@@ -17,8 +17,6 @@ def template_definition_normalization(template_definition):
 
     """
 
-    print(f"TEMPLATE DEF :{template_definition}")
-
     def to_snake_case(s: str):
         """
         Converts a string from kebab-case to snake_case.
@@ -72,11 +70,11 @@ def template_definition_normalization(template_definition):
                 node[key] = as_global(item)
 
     template_definition_as_dict = json.loads(cast(str, template_definition))
-    print(f"template_definition_as_dict : {template_definition_as_dict}")
+
     template_values = find_template_values(template_definition_as_dict)
-    print(f"find_template_values:{template_values}")
+
     template_values = transform_dict(template_values)
-    print(f"ID OF DICT :{id(template_values)}")
+
     cast_leafs_to_global(template_values)
-    print(f"cast_leafs_to_global:{template_values}")
+
     return template_values

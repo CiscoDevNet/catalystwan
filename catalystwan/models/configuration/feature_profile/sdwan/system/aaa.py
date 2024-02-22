@@ -4,7 +4,7 @@ from typing import List, Optional, Union
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase, as_default, as_global
-from catalystwan.models.configuration.feature_profile.sdwan.system.recast import (
+from catalystwan.models.configuration.feature_profile.converters.recast import (
     DefaultGlobalBool,
     DefaultGlobalIPAddress,
     DefaultGlobalList,
