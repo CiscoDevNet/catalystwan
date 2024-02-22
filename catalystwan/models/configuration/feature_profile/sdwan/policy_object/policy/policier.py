@@ -3,13 +3,13 @@ from typing import List
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
-from catalystwan.models.policy.lists_entries import PolicerExceedActionEnum
+from catalystwan.models.policy.lists_entries import PolicerExceedAction
 
 
 class PolicierEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
     burst: Global[int]
-    exceed: Global[PolicerExceedActionEnum]
+    exceed: Global[PolicerExceedAction]
     rate: Global[int]
 
     @field_validator("burst")
@@ -28,11 +28,11 @@ class PolicierEntry(BaseModel):
 class PolicierParcel(_ParcelBase):
     entries: List[PolicierEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
-    def add_entry(self, burst: int, exceed: PolicerExceedActionEnum, rate: int):
+    def add_entry(self, burst: int, exceed: PolicerExceedAction, rate: int):
         self.entries.append(
             PolicierEntry(
                 burst=as_global(burst),
-                exceed=as_global(exceed),
+                exceed=as_global(exceed, PolicerExceedAction),
                 rate=as_global(rate),
             )
         )

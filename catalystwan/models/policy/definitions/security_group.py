@@ -1,4 +1,3 @@
-from enum import Enum
 from ipaddress import IPv4Network, IPv6Network
 from typing import Literal, Optional, Union
 
@@ -7,10 +6,10 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from catalystwan.models.common import check_any_of_exclusive_field_sets, check_fields_exclusive
 from catalystwan.models.policy.policy_definition import PolicyDefinitionBase, Reference, VariableName
 
-
-class SequenceIPType(str, Enum):
-    IPV4 = "ipv4"
-    IPV6 = "ipv6"
+SequenceIPType = Literal[
+    "ipv4",
+    "ipv6",
+]
 
 
 class SecurityGroupIPv4Definition(BaseModel):

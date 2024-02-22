@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from catalystwan.models.common import InterfaceTypeEnum, TLOCColorEnum, WellKnownBGPCommunitiesEnum
+from catalystwan.models.common import InterfaceType, TLOCColor, WellKnownBGPCommunities
 from catalystwan.models.policy.lists_entries import (
     AppListEntry,
     AppProbeClassListEntry,
@@ -15,7 +15,7 @@ from catalystwan.models.policy.lists_entries import (
     CommunityListEntry,
     DataIPv6PrefixListEntry,
     DataPrefixListEntry,
-    EncapEnum,
+    EncapType,
     FQDNListEntry,
     GeoLocationListEntry,
     IPSSignatureListEntry,
@@ -23,8 +23,8 @@ from catalystwan.models.policy.lists_entries import (
     LocalAppListEntry,
     LocalDomainListEntry,
     MirrorListEntry,
-    PathPreferenceEnum,
-    PolicerExceedActionEnum,
+    PathPreference,
+    PolicerExceedAction,
     PolicerListEntry,
     PortListEntry,
     PreferredColorGroupListEntry,
@@ -97,7 +97,7 @@ class ZoneList(PolicyListBase):
     def assign_vpns(self, vpns: Set[int]) -> None:
         self.entries = [ZoneListEntry(vpn=str(vpn)) for vpn in vpns]
 
-    def assign_interfaces(self, ifs: Set[InterfaceTypeEnum]) -> None:
+    def assign_interfaces(self, ifs: Set[InterfaceType]) -> None:
         self.entries = [ZoneListEntry(interface=interface) for interface in ifs]
 
 
@@ -141,7 +141,7 @@ class ColorList(PolicyListBase):
     type: Literal["color"] = "color"
     entries: List[ColorListEntry] = []
 
-    def add_color(self, color: TLOCColorEnum) -> None:
+    def add_color(self, color: TLOCColor) -> None:
         self._add_entry(ColorListEntry(color=color))
 
 
@@ -176,7 +176,7 @@ class URLBlackList(PolicyListBase):
 class _CommunityListBase(PolicyListBase):
     entries: List[CommunityListEntry] = []
 
-    def add_well_known_community(self, community: WellKnownBGPCommunitiesEnum) -> None:
+    def add_well_known_community(self, community: WellKnownBGPCommunities) -> None:
         self._add_entry(CommunityListEntry(community=community))
 
     def add_community(self, as_number: int, community_number: int) -> None:
@@ -195,7 +195,7 @@ class PolicerList(PolicyListBase):
     type: Literal["policer"] = "policer"
     entries: List[PolicerListEntry] = []
 
-    def police(self, burst: int, rate: int, exceed: PolicerExceedActionEnum = PolicerExceedActionEnum.DROP) -> None:
+    def police(self, burst: int, rate: int, exceed: PolicerExceedAction = "drop") -> None:
         # Policer list must have only single entry!
         entry = PolicerListEntry(burst=str(burst), exceed=exceed, rate=str(rate))
         self._add_entry(entry, single=True)
@@ -268,9 +268,7 @@ class TLOCList(PolicyListBase):
     type: Literal["tloc"] = "tloc"
     entries: List[TLOCListEntry] = []
 
-    def add_tloc(
-        self, tloc: IPv4Address, color: TLOCColorEnum, encap: EncapEnum, preference: Optional[int] = None
-    ) -> None:
+    def add_tloc(self, tloc: IPv4Address, color: TLOCColor, encap: EncapType, preference: Optional[int] = None) -> None:
         _preference = str(preference) if preference is not None else None
         self.entries.append(TLOCListEntry(tloc=tloc, color=color, encap=encap, preference=_preference))
 
@@ -281,9 +279,9 @@ class PreferredColorGroupList(PolicyListBase):
 
     def assign_color_groups(
         self,
-        primary: Tuple[Set[TLOCColorEnum], PathPreferenceEnum],
-        secondary: Optional[Tuple[Set[TLOCColorEnum], PathPreferenceEnum]] = None,
-        tertiary: Optional[Tuple[Set[TLOCColorEnum], PathPreferenceEnum]] = None,
+        primary: Tuple[Set[TLOCColor], PathPreference],
+        secondary: Optional[Tuple[Set[TLOCColor], PathPreference]] = None,
+        tertiary: Optional[Tuple[Set[TLOCColor], PathPreference]] = None,
     ) -> PreferredColorGroupListEntry:
         primary_preference = ColorGroupPreference.from_color_set_and_path(*primary)
         secondary_preference = (
