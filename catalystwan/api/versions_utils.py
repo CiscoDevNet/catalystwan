@@ -57,8 +57,7 @@ class RepositoryAPI:
 
     def get_all_software_images(self) -> DataSequence[SoftwareImageDetails]:
         """
-        Get all info about all software images stored
-        in Vmanage repository
+        Get all info about all software images stored in Vmanage repository
 
         Returns:
             list: software images list
@@ -95,7 +94,7 @@ class RepositoryAPI:
 
     def get_image_version(self, software_image: str) -> Union[str, None]:
         """
-        Get proper software image version
+        Get proper software image version, based on name in available files
 
         Args:
             software_image (str): path to software image
@@ -115,8 +114,7 @@ class RepositoryAPI:
 
     def upload_image(self, image_path: str) -> None:
         """
-        Upload software image 'tar.gz' to Vmanage
-        software repository
+        Upload software image ('tar.gz' or 'SPA.bin') to vManage software repository
 
         Args:
             image_path (str): path to software image
@@ -133,7 +131,7 @@ class RepositoryAPI:
         Delete image from vManage software repository
 
         Args:
-            image_name (str): image name
+            image_name (str): image name (in available files)
 
         Raises:
             ImageNotInRepositoryError: raise error if image not in repository
@@ -147,7 +145,7 @@ class RepositoryAPI:
                 self.session.endpoints.configuration_software_actions.delete_software_from_software_repository(
                     version_id=version_id
                 )
-                # return delete.status_code
+                return None
         raise ImageNotInRepositoryError(f"Image: {image_name} is not the vManage software repository")
 
 

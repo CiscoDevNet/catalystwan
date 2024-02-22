@@ -224,7 +224,7 @@ class ConfigurationDeviceActions(APIEndpoints):
         # POST /device/action/cancel
         ...
 
-    @post("/device/action/changepartition", "data")
+    @post("/device/action/changepartition")
     def process_mark_change_partition(self, payload: PartitionActionPayload) -> ActionId:
         ...
 
@@ -240,7 +240,7 @@ class ConfigurationDeviceActions(APIEndpoints):
         # DELETE /device/action/security/amp/apikey/{uuid}
         ...
 
-    @post("/device/action/install", "data")
+    @post("/device/action/install")
     def process_install_operation(self, payload: InstallActionPayload) -> ActionId:
         ...
 

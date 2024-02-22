@@ -64,7 +64,7 @@ class SoftwareActionAPI:
         Args:
             devices (List[Device]): For those devices software will be activated
             version_to_activate (Optional[str]): version to be set as current version
-            image (Optional[str]): path to software image
+            image (Optional[str]): path to software image or its name from available files
 
             Notice: Have to pass one of those arguments (version_to_activate,
             image)
@@ -112,7 +112,7 @@ class SoftwareActionAPI:
             devices (List[Device]): For those devices software will be activated
             reboot (bool): reboot device after action end
             sync (bool, optional): Synchronize settings. Defaults to True.
-            image (str): path to software image
+            image (str): path to software image or its name from available files
             image_version (str): version of software image
             downgrade_check (bool): perform a downgrade check when applicable
 
