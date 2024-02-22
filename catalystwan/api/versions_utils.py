@@ -82,9 +82,12 @@ class RepositoryAPI:
         edges_versions_info = self.session.endpoints.configuration_device_actions.get_list_of_installed_devices(
             device_type="vedge"
         )
+        vmanages_versions_info = self.session.endpoints.configuration_device_actions.get_list_of_installed_devices(
+            device_type="vmanage"
+        )
         devices_versions_repository = {}
-        for device in controllers_versions_info + edges_versions_info:
-            device_software_repository = DeviceSoftwareRepository(**device)
+        for device in controllers_versions_info + edges_versions_info + vmanages_versions_info:
+            device_software_repository = DeviceSoftwareRepository(**device.model_dump(by_alias=True))
             device_software_repository.installed_versions = [a for a in device_software_repository.available_versions]
             device_software_repository.installed_versions.append(device_software_repository.current_version)
             devices_versions_repository[device_software_repository.device_id] = device_software_repository
