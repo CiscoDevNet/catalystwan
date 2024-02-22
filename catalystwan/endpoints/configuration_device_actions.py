@@ -1,17 +1,152 @@
 # mypy: disable-error-code="empty-body"
+from typing import List, Literal, Optional, Union
 
+from pydantic import BaseModel, ConfigDict, Field
+from pydantic.functional_validators import BeforeValidator
+from typing_extensions import Annotated
 
-from pydantic.v1 import BaseModel, Field
-
-from catalystwan.endpoints import APIEndpoints, get
+from catalystwan.endpoints import APIEndpoints, get, post
 from catalystwan.typed_list import DataSequence
 
 
+def convert_to_list(element: Union[str, List[str]]) -> List[str]:
+    return [element] if isinstance(element, str) else element
+
+
+DeviceType = Literal["vedge", "controller", "vmanage"]
+
+PartitionActionType = Literal["removepartition", "defaultpartition", "changepartition"]
+
+
+class ActionId(BaseModel):
+    id: str
+
+
+class GroupId(BaseModel):
+    group_id: str = Field(default="all", serialization_alias="groupID", validation_alias="groupID")
+
+
 class ZTPUpgradeSettings(BaseModel):
-    version_id: str = Field(alias="versionId")
-    platform_family: str = Field(alias="platformFamily")
-    enable_upgrade: bool = Field(alias="enableUpgrade")
-    version_name: str = Field(alias="versionName")
+    model_config = ConfigDict(populate_by_name=True)
+
+    enable_upgrade: bool = Field(serialization_alias="enableUpgrade", validation_alias="enableUpgrade")
+    platform_family: str = Field(serialization_alias="platformFamily", validation_alias="platformFamily")
+    version_id: str = Field(serialization_alias="versionId", validation_alias="versionId")
+    version_name: str = Field(serialization_alias="versionName", validation_alias="versionName")
+
+
+class PartitionDevice(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    device_id: str = Field(serialization_alias="deviceId", validation_alias="deviceId")
+    device_ip: str = Field(serialization_alias="deviceIP", validation_alias="deviceIP")
+    version: Union[str, List[str]] = Field(default="")
+
+
+VersionList = Annotated[Union[str, List[str]], BeforeValidator(convert_to_list)]
+
+
+class RemovePartitionDevice(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    device_id: str = Field(serialization_alias="deviceId", validation_alias="deviceId")
+    device_ip: str = Field(serialization_alias="deviceIP", validation_alias="deviceIP")
+    version: VersionList
+
+
+class PartitionActionPayload(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    action: PartitionActionType
+    device_type: str = Field(serialization_alias="deviceType", validation_alias="deviceType")
+    devices: List[PartitionDevice]
+
+
+class RemovePartitionActionPayload(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    action: PartitionActionType
+    device_type: str = Field(serialization_alias="deviceType", validation_alias="deviceType")
+    devices: List[RemovePartitionDevice]
+
+
+class InstallData(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    family: str
+    version: str
+    version_id: str = Field(serialization_alias="versionId", validation_alias="versionId")
+
+
+class InstallInput(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    data: Optional[List[InstallData]] = Field(default=None)
+    family: Optional[str]
+    reboot: bool
+    sync: bool
+    v_edge_vpn: int = Field(serialization_alias="vEdgeVPN", validation_alias="vEdgeVPN")
+    v_smart_vpn: int = Field(serialization_alias="vSmartVPN", validation_alias="vSmartVPN")
+    version: str = Field(default=None)
+    version_type: str = Field(serialization_alias="versionType", validation_alias="versionType")
+
+
+class InstallDevice(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    device_id: str = Field(serialization_alias="deviceId", validation_alias="deviceId")
+    device_ip: str = Field(serialization_alias="deviceIP", validation_alias="deviceIP")
+    is_nutella_migration: Optional[bool] = Field(
+        default=None, serialization_alias="isNutellaMigration", validation_alias="isNutellaMigration"
+    )
+
+
+class InstallActionPayload(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    action: str = Field(default="install")
+    device_type: str = Field(serialization_alias="deviceType", validation_alias="deviceType")
+    devices: List[InstallDevice]
+    input: InstallInput
+
+
+class InstalledDeviceData(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    available_versions: Optional[List[str]] = Field(
+        None, serialization_alias="availableVersions", validation_alias="availableVersions"
+    )
+    current_partition: Optional[str] = Field(
+        None, serialization_alias="current-partition", validation_alias="current-partition"
+    )
+    default_version: Optional[str] = Field(
+        None, serialization_alias="defaultVersion", validation_alias="defaultVersion"
+    )
+    device_model: Optional[str] = Field(None, serialization_alias="device-model", validation_alias="device-model")
+    device_os: Optional[str] = Field(None, serialization_alias="device-os", validation_alias="device-os")
+    device_type: Optional[str] = Field(None, serialization_alias="device-type", validation_alias="device-type")
+    host_name: Optional[str] = Field(None, serialization_alias="host-name", validation_alias="host-name")
+    is_multi_step_upgrade_supported: Optional[bool] = Field(
+        None, serialization_alias="isMultiStepUpgradeSupported", validation_alias="isMultiStepUpgradeSupported"
+    )
+    is_schedule_upgrade_supported: Optional[bool] = Field(
+        None, serialization_alias="isScheduleUpgradeSupported", validation_alias="isScheduleUpgradeSupported"
+    )
+    layout_level: Optional[int] = Field(None, serialization_alias="layoutLevel", validation_alias="layoutLevel")
+    local_system_ip: Optional[str] = Field(
+        None, serialization_alias="local-system-ip", validation_alias="local-system-ip"
+    )
+    personality: Optional[str] = Field(None)
+    platform: Optional[str] = Field(None)
+    platform_family: Optional[str] = Field(
+        None, serialization_alias="platformFamily", validation_alias="platformFamily"
+    )
+    reachability: Optional[str] = Field(None)
+    site_id: Optional[str] = Field(None, serialization_alias="site-id", validation_alias="site-id")
+    system_ip: Optional[str] = Field(None, serialization_alias="system-ip", validation_alias="system-ip")
+    uptime_date: Optional[int] = Field(None, serialization_alias="uptime-date", validation_alias="uptime-date")
+    uuid: Optional[str] = Field(None)
+    version: Optional[str] = Field(None)
 
 
 class ConfigurationDeviceActions(APIEndpoints):
@@ -39,8 +174,10 @@ class ConfigurationDeviceActions(APIEndpoints):
         # GET /device/action/list
         ...
 
-    def generate_device_list(self):
-        # GET /device/action/install/devices/{deviceType}
+    @get("/device/action/install/devices/{device_type}", "data")
+    def get_list_of_installed_devices(
+        self, device_type: DeviceType = "controller", params: GroupId = GroupId()
+    ) -> DataSequence[InstalledDeviceData]:
         ...
 
     def generate_install_info(self):
@@ -87,24 +224,24 @@ class ConfigurationDeviceActions(APIEndpoints):
         # POST /device/action/cancel
         ...
 
-    def process_change_partition(self):
-        # POST /device/action/changepartition
+    @post("/device/action/changepartition")
+    def process_mark_change_partition(self, payload: PartitionActionPayload) -> ActionId:
         ...
 
     def process_deactivate_smu(self):
         # POST /device/action/deactivate
         ...
 
-    def process_default_partition(self):
-        # POST /device/action/defaultpartition
+    @post("/device/action/defaultpartition")
+    def process_mark_default_partition(self, payload: PartitionActionPayload) -> ActionId:
         ...
 
     def process_delete_amp_api_key(self):
         # DELETE /device/action/security/amp/apikey/{uuid}
         ...
 
-    def process_install(self):
-        # POST /device/action/install
+    @post("/device/action/install")
+    def process_install_operation(self, payload: InstallActionPayload) -> ActionId:
         ...
 
     def process_lxc_activate(self):
@@ -135,8 +272,8 @@ class ConfigurationDeviceActions(APIEndpoints):
         # POST /device/action/reboot
         ...
 
-    def process_remove_partition(self):
-        # POST /device/action/removepartition
+    @post("/device/action/removepartition")
+    def process_remove_partition(self, payload: RemovePartitionActionPayload) -> ActionId:
         ...
 
     def process_remove_software_image(self):

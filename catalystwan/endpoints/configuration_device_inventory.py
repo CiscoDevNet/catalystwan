@@ -138,6 +138,8 @@ class DeviceDetailsResponse(BaseModel):
     config_status_message: Optional[str] = Field(
         default=None, validation_alias="configStatusMessage", serialization_alias="configStatusMessage"
     )
+    template: Optional[str] = Field(default=None)
+    template_id: Optional[str] = Field(default=None, validation_alias="templateId", serialization_alias="templateId")
     template_apply_log: Optional[List[str]] = Field(
         default=None, validation_alias="templateApplyLog", serialization_alias="templateApplyLog"
     )

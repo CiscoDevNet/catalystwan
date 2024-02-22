@@ -62,6 +62,10 @@ class ImageNotInRepositoryError(CatalystwanException):
     pass
 
 
+class EmptyVersionPayloadError(CatalystwanException):
+    """Used when a version is not found in device available or current versions."""
+
+
 class TemplateNotFoundError(CatalystwanException):
     """Used when a template item is not found."""
 
