@@ -258,7 +258,7 @@ class AuthorizationRuleItem(BaseModel):
     )
 
 
-class AAA(_ParcelBase):
+class AAAParcel(_ParcelBase):
     authentication_group: Union[Variable, Global[bool], Default[bool]] = Field(
         default=as_default(False),
         validation_alias=AliasPath("data", "authenticationGroup"),
