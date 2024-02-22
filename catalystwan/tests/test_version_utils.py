@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, Mock, patch
 from catalystwan.api.versions_utils import DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
 from catalystwan.dataclasses import Device
 from catalystwan.endpoints.configuration.software_actions import SoftwareImageDetails
-from catalystwan.endpoints.configuration_device_actions import PartitionDevice
+from catalystwan.endpoints.configuration_device_actions import InstalledDeviceData, PartitionDevice
 from catalystwan.typed_list import DataSequence
 
 
@@ -57,14 +57,20 @@ class TestRepositoryAPI(unittest.TestCase):
 
     @patch("catalystwan.session.Session")
     def test_get_devices_versions_repository(self, mock_session):
-        endpoint_mock_response = [
-            {
-                "availableVersions": ["ver1", "ver2"],
-                "version": "curr_ver",
-                "defaultVersion": "def_ver",
-                "uuid": "mock_uuid",
-            }
-        ]
+        endpoint_mock_response = DataSequence(
+            InstalledDeviceData,
+            [
+                InstalledDeviceData(
+                    **{
+                        "availableVersions": ["ver1", "ver2"],
+                        "version": "curr_ver",
+                        "defaultVersion": "def_ver",
+                        "uuid": "mock_uuid",
+                    }
+                )
+            ],
+        )
+
         self.mock_repository_object.session.endpoints.configuration_device_actions.get_list_of_installed_devices = (
             MagicMock(return_value=endpoint_mock_response)
         )

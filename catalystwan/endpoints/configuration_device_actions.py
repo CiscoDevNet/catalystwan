@@ -136,12 +136,12 @@ class InstalledDeviceData(BaseModel):
     local_system_ip: Optional[str] = Field(
         None, serialization_alias="local-system-ip", validation_alias="local-system-ip"
     )
-    personality: Optional[str]
-    platform: Optional[str]
+    personality: Optional[str] = Field(None)
+    platform: Optional[str] = Field(None)
     platform_family: Optional[str] = Field(
         None, serialization_alias="platformFamily", validation_alias="platformFamily"
     )
-    reachability: Optional[str]
+    reachability: Optional[str] = Field(None)
     site_id: Optional[str] = Field(None, serialization_alias="site-id", validation_alias="site-id")
     system_ip: Optional[str] = Field(None, serialization_alias="system-ip", validation_alias="system-ip")
     uptime_date: Optional[int] = Field(None, serialization_alias="uptime-date", validation_alias="uptime-date")
