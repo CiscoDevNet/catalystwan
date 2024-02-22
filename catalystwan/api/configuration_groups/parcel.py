@@ -2,6 +2,7 @@
 
 from enum import Enum
 from typing import Any, Dict, Generic, Literal, Optional, TypeVar, get_origin
+from catalystwan.exceptions import CatalystwanException
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, PrivateAttr, model_serializer
 
@@ -42,8 +43,14 @@ class _ParcelBase(BaseModel):
         for key in remove_keys:
             del model_dict[key]
         return model_dict
-
-
+    
+    @classmethod
+    def _get_parcel_type(cls) -> str:
+        field_info = cls.model_fields.get("type_")
+        if field_info is not None:
+            return str(field_info.default)
+        raise CatalystwanException("Field parcel type is not set.")
+                         
 class OptionType(str, Enum):
     GLOBAL = "global"
     DEFAULT = "default"

@@ -29,23 +29,8 @@ AnySystemParcel = Annotated[
         SecurityParcel,
         SNMPParcel,
     ],
-    Field(discriminator="type"),
+    Field(discriminator="type_"),
 ]
-
-SYSTEM_PAYLOAD_ENDPOINT_MAPPING: Mapping[type, str] = {
-    AAAParcel: "aaa",
-    BFDParcel: "bfd",
-    LoggingParcel: "logging",
-    BannerParcel: "banner",
-    BasicParcel: "basic",
-    GlobalParcel: "global",
-    NTPParcel: "ntp",
-    MRFParcel: "mrf",
-    OMPParcel: "omp",
-    SecurityParcel: "security",
-    SNMPParcel: "snmp",
-}
-
 
 __all__ = [
     "AAAParcel",
@@ -60,7 +45,6 @@ __all__ = [
     "SecurityParcel",
     "SNMPParcel",
     "AnySystemParcel",
-    "SYSTEM_PAYLOAD_ENDPOINT_MAPPING",
 ]
 
 
