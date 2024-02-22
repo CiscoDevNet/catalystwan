@@ -16,8 +16,7 @@ def log_progress(task: str, completed: int, total: int) -> None:
 def transform(ux1: UX1Config) -> UX2Config:
     ux2 = UX2Config()
     ux2.profile_parcels.extend([lst.to_policy_object_parcel() for lst in ux1.policies.policy_lists])
-
-    ux2.profile_parcels.extend([create_parcel_from_template(ft) for ft in ux1.templates.feature])
+    ux2.profile_parcels.extend([create_parcel_from_template(ft) for ft in ux1.templates.features])
     return ux2
 
 
@@ -62,7 +61,7 @@ def collect_ux1_config(session: ManagerSession, progress: Callable[[str, int, in
     template_api = session.api.templates
     progress("Collecting Templates Info", 0, 2)
 
-    ux1.templates.feature = [t for t in template_api.get_feature_templates()]
+    ux1.templates.features = [t for t in template_api.get_feature_templates()]
     progress("Collecting Templates Info", 1, 2)
 
     ux1.templates.devices = [t for t in template_api.get_device_templates()]
