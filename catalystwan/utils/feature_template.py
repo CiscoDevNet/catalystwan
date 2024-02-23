@@ -31,7 +31,7 @@ def choose_model(type_value: str) -> Any:
 
 def find_template_values(
     template_definition: dict,
-    templated_values: dict = {},
+    templated_values: Optional[dict] = None,
     parent_key: Optional[str] = None,
     target_key: str = "vipType",
     target_key_value_to_ignore: str = "ignore",
@@ -54,6 +54,9 @@ def find_template_values(
     Returns:
         templated_values: dictionary containing template fields as key and values assigned to those fields as values
     """
+    if templated_values is None:
+        templated_values = {}
+
     for key, value in template_definition.items():
         if key == target_key and value != target_key_value_to_ignore:
             if value == "variableName" and (device_specific_variables is not None) and parent_key:

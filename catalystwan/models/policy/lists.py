@@ -4,7 +4,12 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from catalystwan.api.configuration_groups.parcel import _ParcelBase
 from catalystwan.models.common import InterfaceType, TLOCColor, WellKnownBGPCommunities
+from catalystwan.models.configuration.feature_profile.sdwan.policy_object.policy.data_prefix import (
+    DataPrefixEntry,
+    DataPrefixParcel,
+)
 from catalystwan.models.policy.lists_entries import (
     AppListEntry,
     AppProbeClassListEntry,
@@ -55,6 +60,9 @@ class PolicyListBase(BaseModel):
         else:
             self.entries.append(entry)
 
+    def to_policy_object_parcel(self) -> _ParcelBase:
+        return _ParcelBase(parcel_name=self.name, parcel_description=self.description)
+
 
 class DataPrefixList(PolicyListBase):
     type: Literal["dataPrefix"] = "dataPrefix"
@@ -62,6 +70,11 @@ class DataPrefixList(PolicyListBase):
 
     def add_prefix(self, ip_prefix: IPv4Network) -> None:
         self._add_entry(DataPrefixListEntry(ip_prefix=ip_prefix))
+
+    def to_policy_object_parcel(self) -> DataPrefixParcel:
+        parcel = DataPrefixParcel(parcel_name=self.name, parcel_description=self.description)
+        parcel.entries = [DataPrefixEntry.from_ipv4_network(i.ip_prefix) for i in self.entries]
+        return parcel
 
 
 class SiteList(PolicyListBase):

@@ -326,7 +326,9 @@ class SLAClassListEntry(BaseModel):
     latency: Optional[str] = None
     loss: Optional[str] = None
     jitter: Optional[str] = None
-    app_probe_class: Optional[UUID] = Field(serialization_alias="appProbeClass", validation_alias="appProbeClass")
+    app_probe_class: Optional[UUID] = Field(
+        default=None, serialization_alias="appProbeClass", validation_alias="appProbeClass"
+    )
     fallback_best_tunnel: Optional[FallbackBestTunnel] = Field(
         default=None, serialization_alias="fallbackBestTunnel", validation_alias="fallbackBestTunnel"
     )
