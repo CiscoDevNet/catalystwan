@@ -18,7 +18,6 @@ from catalystwan.models.configuration.feature_profile.common import (
     ParcelCreationResponse,
 )
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object import (
-    POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING,
     AnyPolicyObjectParcel,
     ApplicationListParcel,
     AppProbeParcel,
@@ -42,8 +41,6 @@ from catalystwan.models.configuration.feature_profile.sdwan.policy_object import
     SecurityZoneListParcel,
     StandardCommunityParcel,
     TlocParcel,
-    URLAllowParcel,
-    URLBlockParcel,
 )
 
 
@@ -200,13 +197,13 @@ class PolicyObjectFeatureProfileAPI:
     def get(self, profile_id: UUID, parcel_type: Type[TlocParcel]) -> DataSequence[Parcel[Any]]:
         ...
 
-    @overload
-    def get(self, profile_id: UUID, parcel_type: Type[URLAllowParcel]) -> DataSequence[Parcel[Any]]:
-        ...
+    # @overload
+    # def get(self, profile_id: UUID, parcel_type: Type[URLAllowParcel]) -> DataSequence[Parcel[Any]]:
+    #     ...
 
-    @overload
-    def get(self, profile_id: UUID, parcel_type: Type[URLBlockParcel]) -> DataSequence[Parcel[Any]]:
-        ...
+    # @overload
+    # def get(self, profile_id: UUID, parcel_type: Type[URLBlockParcel]) -> DataSequence[Parcel[Any]]:
+    #     ...
 
     # get by id
 
@@ -326,13 +323,13 @@ class PolicyObjectFeatureProfileAPI:
     def get(self, profile_id: UUID, parcel_type: Type[TlocParcel], parcel_id: UUID) -> DataSequence[Parcel[Any]]:
         ...
 
-    @overload
-    def get(self, profile_id: UUID, parcel_type: Type[URLAllowParcel], parcel_id: UUID) -> DataSequence[Parcel[Any]]:
-        ...
+    # @overload
+    # def get(self, profile_id: UUID, parcel_type: Type[URLAllowParcel], parcel_id: UUID) -> DataSequence[Parcel[Any]]:
+    #     ...
 
-    @overload
-    def get(self, profile_id: UUID, parcel_type: Type[URLBlockParcel], parcel_id: UUID) -> DataSequence[Parcel[Any]]:
-        ...
+    # @overload
+    # def get(self, profile_id: UUID, parcel_type: Type[URLBlockParcel], parcel_id: UUID) -> DataSequence[Parcel[Any]]:
+    #     ...
 
     def get(
         self,
@@ -344,7 +341,7 @@ class PolicyObjectFeatureProfileAPI:
         Get all Policy Objects for selected profile_id and selected type or get one Policy Object given parcel id
         """
 
-        policy_object_list_type = POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING[parcel_type]
+        policy_object_list_type = parcel_type._get_parcel_type()
         if not parcel_id:
             return self.endpoint.get_all(profile_id=profile_id, policy_object_list_type=policy_object_list_type)
         parcel = self.endpoint.get_by_id(
@@ -357,7 +354,7 @@ class PolicyObjectFeatureProfileAPI:
         Create Policy Object for selected profile_id based on payload type
         """
 
-        policy_object_list_type = POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING[type(payload)]
+        policy_object_list_type = payload._get_parcel_type()
         return self.endpoint.create(
             profile_id=profile_id, policy_object_list_type=policy_object_list_type, payload=payload
         )
@@ -367,7 +364,7 @@ class PolicyObjectFeatureProfileAPI:
         Update Policy Object for selected profile_id based on payload type
         """
 
-        policy_type = POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING[type(payload)]
+        policy_type = payload._get_parcel_type()
         return self.endpoint.update(
             profile_id=profile_id, policy_object_list_type=policy_type, list_object_id=list_object_id, payload=payload
         )
@@ -460,20 +457,20 @@ class PolicyObjectFeatureProfileAPI:
     def delete(self, profile_id: UUID, parcel_type: Type[TlocParcel], list_object_id: UUID) -> None:
         ...
 
-    @overload
-    def delete(self, profile_id: UUID, parcel_type: Type[URLAllowParcel], list_object_id: UUID) -> None:
-        ...
+    # @overload
+    # def delete(self, profile_id: UUID, parcel_type: Type[URLAllowParcel], list_object_id: UUID) -> None:
+    #     ...
 
-    @overload
-    def delete(self, profile_id: UUID, parcel_type: Type[URLBlockParcel], list_object_id: UUID) -> None:
-        ...
+    # @overload
+    # def delete(self, profile_id: UUID, parcel_type: Type[URLBlockParcel], list_object_id: UUID) -> None:
+    #     ...
 
     def delete(self, profile_id: UUID, parcel_type: Type[AnyPolicyObjectParcel], list_object_id: UUID) -> None:
         """
         Delete Policy Object for selected profile_id based on payload type
         """
 
-        policy_object_list_type = POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING[parcel_type]
+        policy_object_list_type = parcel_type._get_parcel_type()
         return self.endpoint.delete(
             profile_id=profile_id, policy_object_list_type=policy_object_list_type, list_object_id=list_object_id
         )
