@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
@@ -30,6 +30,7 @@ class Color(BaseModel):
 
 
 class BFD(_ParcelBase):
+    type_: Literal["bfd"] = Field(default="bfd", exclude=True)
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     multiplier: Optional[Global[int]] = Field(

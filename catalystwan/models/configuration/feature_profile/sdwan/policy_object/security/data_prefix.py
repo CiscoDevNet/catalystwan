@@ -1,5 +1,5 @@
 from ipaddress import IPv4Network
-from typing import List
+from typing import List, Literal
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
@@ -12,6 +12,7 @@ class SecurityDataPrefixEntry(BaseModel):
 
 
 class SecurityDataPrefixParcel(_ParcelBase):
+    type_: Literal["security-data-ip-prefix"] = Field(default="security-data-ip-prefix", exclude=True)
     entries: List[SecurityDataPrefixEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_prefix(self, ip_prefix: IPv4Network):

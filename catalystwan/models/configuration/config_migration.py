@@ -1,11 +1,13 @@
-from typing import List
+from typing import List, Union
 
 from pydantic import BaseModel, ConfigDict, Field
+from typing_extensions import Annotated
 
-from catalystwan.api.configuration_groups.parcel import _ParcelBase
 from catalystwan.api.template_api import DeviceTemplateInformation, FeatureTemplateInformation
 from catalystwan.endpoints.configuration_group import ConfigGroup
 from catalystwan.models.configuration.feature_profile.common import FeatureProfileCreationPayload
+from catalystwan.models.configuration.feature_profile.sdwan.policy_object import AnyPolicyObjectParcel
+from catalystwan.models.configuration.feature_profile.sdwan.system import AnySystemParcel
 from catalystwan.models.policy import (
     AnyPolicyDefinition,
     AnyPolicyList,
@@ -13,6 +15,14 @@ from catalystwan.models.policy import (
     LocalizedPolicy,
     SecurityPolicy,
 )
+
+AnyParcel = Annotated[
+    Union[
+        AnySystemParcel,
+        AnyPolicyObjectParcel,
+    ],
+    Field(discriminator="type_"),
+]
 
 
 class UX1Policies(BaseModel):
@@ -58,6 +68,6 @@ class UX2Config(BaseModel):
     feature_profiles: List[FeatureProfileCreationPayload] = Field(
         default=[], serialization_alias="featureProfiles", validation_alias="featureProfiles"
     )
-    profile_parcels: List[_ParcelBase] = Field(
+    profile_parcels: List[AnyParcel] = Field(
         default=[], serialization_alias="profileParcels", validation_alias="profileParcels"
     )

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Literal
 
 from pydantic import AliasPath, BaseModel, Field
 
@@ -11,6 +11,7 @@ class ColorEntry(BaseModel):
 
 
 class ColorParcel(_ParcelBase):
+    type_: Literal["color"] = Field(default="color", exclude=True)
     entries: List[ColorEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_color(self, color: TLOCColor):

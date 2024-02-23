@@ -1,13 +1,23 @@
 from enum import Enum
 from typing import Any, Dict, Generic, Literal, Optional, TypeVar, get_origin
 
-from pydantic import AliasPath, BaseModel, ConfigDict, Field, PrivateAttr, model_serializer
+from pydantic import (
+    AliasPath,
+    BaseModel,
+    ConfigDict,
+    Field,
+    PrivateAttr,
+    SerializerFunctionWrapHandler,
+    model_serializer,
+)
 
 T = TypeVar("T")
 
 
 class _ParcelBase(BaseModel):
-    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(
+        extra="allow", arbitrary_types_allowed=True, populate_by_name=True,  # json_schema_mode_override="validation"
+    )
     parcel_name: str = Field(
         min_length=1,
         max_length=128,
@@ -21,11 +31,18 @@ class _ParcelBase(BaseModel):
         validation_alias="description",
         description="Set the parcel description",
     )
-    # data: Optional[Any] = None
     _parcel_data_key: str = PrivateAttr(default="data")
 
-    @model_serializer(mode="wrap", when_used="json")
-    def envelope_parcel_data(self, handler) -> Dict[str, Any]:
+    @model_serializer(mode="wrap")
+    def envelope_parcel_data(self, handler: SerializerFunctionWrapHandler) -> Dict[str, Any]:
+        """
+        serializes model fields with respect to field validation_alias,
+        sub-classing parcel fields can be defined like following:
+        >>> entries: List[SecurityZoneListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
+
+        "data" is default _parcel_data_key which must match validation_alias prefix,
+        this attribute can be overriden in sub-class when needed
+        """
         model_dict = handler(self)
         model_dict[self._parcel_data_key] = {}
         remove_keys = []

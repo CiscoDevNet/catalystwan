@@ -1,5 +1,5 @@
 from ipaddress import IPv6Address, IPv6Network
-from typing import List
+from typing import List, Literal
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
@@ -13,6 +13,7 @@ class IPv6PrefixListEntry(BaseModel):
 
 
 class IPv6PrefixListParcel(_ParcelBase):
+    type_: Literal["ipv6-prefix"] = Field(default="ipv6-prefix", exclude=True)
     entries: List[IPv6PrefixListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_prefix(self, ipv6_network: IPv6Network):

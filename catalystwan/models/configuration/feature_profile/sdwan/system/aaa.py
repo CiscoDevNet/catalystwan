@@ -1,5 +1,5 @@
 from ipaddress import IPv4Address, IPv6Address
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
@@ -269,6 +269,7 @@ class AuthorizationRuleItem(BaseModel):
 
 
 class AAA(_ParcelBase):
+    type_: Literal["aaa"] = Field(default="aaa", exclude=True)
     authentication_group: Union[DefaultGlobalBool, Variable, Global[bool], Default[bool]] = Field(
         default=as_default(False),
         validation_alias=AliasPath("data", "authenticationGroup"),
