@@ -16,7 +16,7 @@ T = TypeVar("T")
 
 class _ParcelBase(BaseModel):
     model_config = ConfigDict(
-        extra="allow", arbitrary_types_allowed=True, populate_by_name=True,  # json_schema_mode_override="validation"
+        extra="allow", arbitrary_types_allowed=True, populate_by_name=True, json_schema_mode_override="validation"
     )
     parcel_name: str = Field(
         min_length=1,

@@ -7,18 +7,21 @@ from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, field_validato
 from catalystwan.models.common import InterfaceType, TLOCColor, check_fields_exclusive
 
 
-def check_jitter_ms(jitter_str: str) -> str:
-    assert 1 <= int(jitter_str) <= 1000
+def check_jitter_ms(jitter_str: Optional[str]) -> Optional[str]:
+    if jitter_str is not None:
+        assert 1 <= int(jitter_str) <= 1000
     return jitter_str
 
 
-def check_latency_ms(latency_str: str) -> str:
-    assert 1 <= int(latency_str) <= 1000
+def check_latency_ms(latency_str: Optional[str]) -> Optional[str]:
+    if latency_str is not None:
+        assert 1 <= int(latency_str) <= 1000
     return latency_str
 
 
-def check_loss_percent(loss_str: str) -> str:
-    assert 0 <= int(loss_str) <= 100
+def check_loss_percent(loss_str: Optional[str]) -> Optional[str]:
+    if loss_str is not None:
+        assert 0 <= int(loss_str) <= 100
     return loss_str
 
 
