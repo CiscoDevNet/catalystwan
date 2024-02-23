@@ -8,6 +8,8 @@ from catalystwan.session import ManagerSession
 
 logger = logging.getLogger(__name__)
 
+SUPPORTED_TEMPLATE_TYPES = ["cedge_aaa", "cedge_aaa"]
+
 
 def log_progress(task: str, completed: int, total: int) -> None:
     logger.info(f"{task} {completed}/{total}")
@@ -15,7 +17,9 @@ def log_progress(task: str, completed: int, total: int) -> None:
 
 def transform(ux1: UX1Config) -> UX2Config:
     ux2 = UX2Config()
-    ux2.profile_parcels.extend([create_parcel_from_template(ft) for ft in ux1.templates.features])
+    for ft in ux1.templates.features:
+        if ft.template_type in SUPPORTED_TEMPLATE_TYPES:
+            ux2.profile_parcels.append(create_parcel_from_template(ft))
     # Policy Lists
     for policy_list in ux1.policies.policy_lists:
         if (parcel := policy_list.to_policy_object_parcel()) is not None:
