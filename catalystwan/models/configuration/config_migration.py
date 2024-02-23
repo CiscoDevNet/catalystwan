@@ -65,27 +65,16 @@ class UX1Config(BaseModel):
 class UX2Config(BaseModel):
     # All UX2 Configuration items - Mega Model
     model_config = ConfigDict(populate_by_name=True)
+    # TODO: config group name
     config_groups: List[ConfigGroup] = Field(
         default=[], serialization_alias="configurationGroups", validation_alias="configurationGroups"
     )
     policy_groups: List[ConfigGroup] = Field(
         default=[], serialization_alias="policyGroups", validation_alias="policyGroups"
     )
-    feature_profiles: List[FeatureProfileCreationPayload] = Field(
-        default=[], serialization_alias="featureProfiles", validation_alias="featureProfiles"
-    )
     profile_parcels: List[AnyParcel] = Field(
         default=[], serialization_alias="profileParcels", validation_alias="profileParcels"
     )
-
-
-class UX2ConfigPushResult(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-
-    status: Literal["success", "failure"]
-    config_group: Optional[ConfigGroup] = None
-    exception: Optional[ManagerHTTPError] = None
-
 
 class ConfigGroupCreator:
     """

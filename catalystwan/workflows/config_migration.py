@@ -2,6 +2,7 @@ import logging
 from typing import Callable
 
 from catalystwan.api.policy_api import POLICY_LIST_ENDPOINTS_MAP
+from catalystwan.endpoints.configuration_group import ConfigGroup
 from catalystwan.exceptions import ManagerHTTPError
 from catalystwan.models.configuration.config_migration import (
     ConfigGroupCreator,
@@ -81,7 +82,7 @@ def collect_ux1_config(session: ManagerSession, progress: Callable[[str, int, in
     return ux1
 
 
-def push_ux2_config(session: ManagerSession, config: UX2Config, logger: logging.Logger = logger) -> UX2ConfigPushResult:
+def push_ux2_config(session: ManagerSession, config: UX2Config) -> ConfigGroup:
     """
     Creates configuration group and pushes a UX2 configuration to the Cisco vManage.
 
@@ -96,16 +97,12 @@ def push_ux2_config(session: ManagerSession, config: UX2Config, logger: logging.
         ManagerHTTPError: If the configuration cannot be pushed.
     """
 
-    try:
-        config_group_creator = ConfigGroupCreator(session, config, logger)
-        config_group = config_group_creator.create()
-        feature_profiles = config_group.profiles  # noqa: F841
-        for parcels in config.profile_parcels:
-            # TODO: Create API that supports parcel creation on feature profiles
-            # Example: session.api.parcels.create(parcels=parcels, feature_profiles=feature_profiles)
-            pass
+    config_group_creator = ConfigGroupCreator(session, config, logger)
+    config_group = config_group_creator.create()
+    feature_profiles = config_group.profiles  # noqa: F841
+    for parcels in config.profile_parcels:
+        # TODO: Create API that supports parcel creation on feature profiles
+        # Example: session.api.parcels.create(parcels=parcels, feature_profiles=feature_profiles)
+        pass
 
-    except ManagerHTTPError as e:
-        return UX2ConfigPushResult(status="failure", exception=e)
-
-    return UX2ConfigPushResult(status="success", config_group=config_group)
+    return config_group
