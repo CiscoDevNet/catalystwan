@@ -19,12 +19,14 @@ class BaseURLParcel(_ParcelBase):
 
 
 class URLAllowParcel(BaseURLParcel):
+    type_: Literal["security-urllist"] = Field(default="security-urllist", exclude=True)
     parcel_type: Literal["urlallowed"] = Field(
         default="urlallowed", validation_alias="type", serialization_alias="type"
     )
 
 
 class URLBlockParcel(BaseURLParcel):
+    type_: Literal["security-urllist"] = Field(default="security-urllist", exclude=True)
     parcel_type: Literal["urlblocked"] = Field(
         default="urlblocked", validation_alias="type", serialization_alias="type"
     )
