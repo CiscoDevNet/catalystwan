@@ -20,7 +20,7 @@ T = TypeVar("T")
 
 class _ParcelBase(BaseModel):
     model_config = ConfigDict(
-        extra="allow", arbitrary_types_allowed=True, populate_by_name=True,  # json_schema_mode_override="validation"
+        extra="allow", arbitrary_types_allowed=True, populate_by_name=True, json_schema_mode_override="validation"
     )
     parcel_name: str = Field(
         min_length=1,
@@ -36,6 +36,13 @@ class _ParcelBase(BaseModel):
         description="Set the parcel description",
     )
     _parcel_data_key: str = PrivateAttr(default="data")
+
+    @classmethod
+    def _get_parcel_type(cls) -> str:
+        field_info = cls.model_fields.get("type_")
+        if field_info is not None:
+            return str(field_info.default)
+        raise CatalystwanException("Cannot obtain parcel type string")
 
     @model_serializer(mode="wrap")
     def envelope_parcel_data(self, handler: SerializerFunctionWrapHandler) -> Dict[str, Any]:
