@@ -213,12 +213,12 @@ class CentralizedPolicy(PolicyCreationPayload):
         # while POST /template/policy/vsmart requires a regular object
         # it makes sense to reuse that model for both requests and present parsed data to the user
         if isinstance(policy_definition, str):
-            return CentralizedPolicyDefinition.parse_raw(policy_definition)
+            return CentralizedPolicyDefinition.model_validate_json(policy_definition)
         return policy_definition
 
 
 class CentralizedPolicyEditPayload(PolicyEditPayload, CentralizedPolicy):
-    rid: Optional[str] = Field(default=None, serialization_alias="@rid", validation_alias="@rid")
+    rid: Optional[int] = Field(default=None, serialization_alias="@rid", validation_alias="@rid")
 
 
 class CentralizedPolicyInfo(PolicyInfo, CentralizedPolicyEditPayload):
