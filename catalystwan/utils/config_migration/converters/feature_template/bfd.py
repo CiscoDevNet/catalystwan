@@ -1,9 +1,9 @@
-from catalystwan.models.configuration.feature_profile.sdwan.system import BFD
+from catalystwan.models.configuration.feature_profile.sdwan.system import BFDParcel
 
 
 class BFDTemplateConverter:
     @staticmethod
-    def create_parcel(name: str, description: str, template_values: dict) -> BFD:
+    def create_parcel(name: str, description: str, template_values: dict) -> BFDParcel:
         """
         Creates an BFD object based on the provided template values.
 
@@ -17,4 +17,4 @@ class BFDTemplateConverter:
             template_values["colors"] = template_values["color"]
             del template_values["color"]
 
-        return BFD(**template_values)
+        return BFDParcel(**template_values)

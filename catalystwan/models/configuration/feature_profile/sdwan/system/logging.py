@@ -5,7 +5,7 @@
 # from catalystwan.api.configuration_groups.parcel import _ParcelBase, Global, as_global
 # from catalystwan.models.configuration.common import AuthType, Priority, Version
 # from pydantic import AliasPath, BaseModel, ConfigDict, Field
-# from catalystwan.models.configuration.feature_profile.converters.recast import (
+# from catalystwan.utils.config_migration.converters.recast import (
 #     DefaultGlobalBool,
 #     DefaultGlobalStr,
 # )

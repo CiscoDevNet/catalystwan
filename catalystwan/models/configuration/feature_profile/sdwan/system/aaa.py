@@ -4,7 +4,7 @@ from typing import List, Literal, Optional, Union
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase, as_default, as_global
-from catalystwan.models.configuration.feature_profile.converters.recast import (
+from catalystwan.utils.config_migration.converters.recast import (
     DefaultGlobalBool,
     DefaultGlobalIPAddress,
     DefaultGlobalList,
@@ -268,7 +268,7 @@ class AuthorizationRuleItem(BaseModel):
     )
 
 
-class AAA(_ParcelBase):
+class AAAParcel(_ParcelBase):
     type_: Literal["aaa"] = Field(default="aaa", exclude=True)
     authentication_group: Union[DefaultGlobalBool, Variable, Global[bool], Default[bool]] = Field(
         default=as_default(False),

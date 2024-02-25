@@ -1,12 +1,14 @@
-from typing import Any, Dict, List
+import json
+from typing import Any, Dict, List, cast
 
 from catalystwan.api.template_api import FeatureTemplateInformation
 from catalystwan.models.configuration.feature_profile.sdwan.system import AnySystemParcel
+from catalystwan.utils.feature_template import find_template_values
 
 from .aaa import AAATemplateConverter
 from .base import FeatureTemplateConverter
 from .bfd import BFDTemplateConverter
-from .normalizator import template_definition_normalization
+from .normalizer import template_definition_normalization
 
 supported_parcel_converters: Dict[Any, FeatureTemplateConverter] = {
     ("cisco_aaa", "cedge_aaa"): AAATemplateConverter,  # type: ignore[dict-item]
@@ -47,11 +49,13 @@ def create_parcel_from_template(template: FeatureTemplateInformation) -> AnySyst
         ValueError: If the given template type is not supported.
     """
     converter = choose_parcel_converter(template.template_type)
-    template_values = template_definition_normalization(template.template_definiton)
-    return converter.create_parcel(template.name, template.description, template_values)
+    template_definition_as_dict = json.loads(cast(str, template.template_definiton))
+    template_values = find_template_values(template_definition_as_dict)
+    template_values_normalized = template_definition_normalization(template_values)
+    return converter.create_parcel(template.name, template.description, template_values_normalized)
 
 
-__all__ = ["create_parcel_from_template"]
+__all__ = ["create_parcel_from_template", "template_definition_normalization"]
 
 
 def __dir__() -> "List[str]":
