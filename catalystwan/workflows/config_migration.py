@@ -2,9 +2,11 @@ import logging
 from typing import Callable
 
 from catalystwan.api.policy_api import POLICY_LIST_ENDPOINTS_MAP
-from catalystwan.models.configuration.config_migration import UX1Config, UX2Config
-from catalystwan.models.configuration.feature_profile.converters.feature_template import create_parcel_from_template
+from catalystwan.endpoints.configuration_group import ConfigGroup
+from catalystwan.models.configuration.config_migration import ConfigGroupPreset, UX1Config, UX2Config
 from catalystwan.session import ManagerSession
+from catalystwan.utils.config_migration.converters.feature_template import create_parcel_from_template
+from catalystwan.utils.config_migration.creators.config_group import ConfigGroupCreator
 
 logger = logging.getLogger(__name__)
 
@@ -17,13 +19,16 @@ def log_progress(task: str, completed: int, total: int) -> None:
 
 def transform(ux1: UX1Config) -> UX2Config:
     ux2 = UX2Config()
+    ux2.config_group_presets.append(ConfigGroupPreset(config_group_name="Default_Config_Group"))
+    profile_parcels = ux2.config_group_presets[0].profile_parcels
+    # Feature Templates
     for ft in ux1.templates.features:
         if ft.template_type in SUPPORTED_TEMPLATE_TYPES:
-            ux2.profile_parcels.append(create_parcel_from_template(ft))
+            profile_parcels.append(create_parcel_from_template(ft))
     # Policy Lists
     for policy_list in ux1.policies.policy_lists:
         if (parcel := policy_list.to_policy_object_parcel()) is not None:
-            ux2.profile_parcels.append(parcel)
+            profile_parcels.append(parcel)
     return ux2
 
 
@@ -75,5 +80,27 @@ def collect_ux1_config(session: ManagerSession, progress: Callable[[str, int, in
     return ux1
 
 
-def push_ux2_config(session: ManagerSession) -> None:
-    pass
+def push_ux2_config(session: ManagerSession, config: UX2Config) -> ConfigGroup:
+    """
+    Creates configuration group and pushes a UX2 configuration to the Cisco vManage.
+
+    Args:
+        session (ManagerSession): A valid Manager API session.
+        config (UX2Config): The UX2 configuration to push.
+
+    Returns:
+        UX2ConfigPushResult
+
+    Raises:
+        ManagerHTTPError: If the configuration cannot be pushed.
+    """
+
+    config_group_creator = ConfigGroupCreator(session, config, logger)
+    config_group = config_group_creator.create()
+    feature_profiles = config_group.profiles  # noqa: F841
+    for parcels in config.config_group_presets:
+        # TODO: Create API that supports parcel creation on feature profiles
+        # Example: session.api.parcels.create(parcels=parcels, feature_profiles=feature_profiles)
+        pass
+
+    return config_group

@@ -1,16 +1,24 @@
-from typing import Any, Dict, List
+import json
+import logging
+from typing import Any, Dict, cast
 
 from catalystwan.api.template_api import FeatureTemplateInformation
+from catalystwan.exceptions import CatalystwanException
 from catalystwan.models.configuration.feature_profile.sdwan.system import AnySystemParcel
+from catalystwan.utils.feature_template import find_template_values
 
 from .aaa import AAATemplateConverter
 from .base import FeatureTemplateConverter
 from .bfd import BFDTemplateConverter
-from .normalizator import template_definition_normalization
+from .logging_ import LoggingTemplateConverter
+from .normalizer import template_definition_normalization
+
+logger = logging.getLogger(__name__)
 
 supported_parcel_converters: Dict[Any, FeatureTemplateConverter] = {
     ("cisco_aaa", "cedge_aaa"): AAATemplateConverter,  # type: ignore[dict-item]
     ("cisco_bfd",): BFDTemplateConverter,  # type: ignore[dict-item]
+    ("cisco_logging", "logging"): LoggingTemplateConverter,
 }
 
 
@@ -29,8 +37,10 @@ def choose_parcel_converter(template_type: str) -> FeatureTemplateConverter:
     """
     for key in supported_parcel_converters.keys():
         if template_type in key:
-            return supported_parcel_converters[key]
-    raise ValueError(f"Template type {template_type} not supported")
+            converter = supported_parcel_converters[key]
+            logger.debug(f"Choosen converter {converter} based on template type {template_type}")
+            return converter
+    raise CatalystwanException(f"Template type {template_type} not supported")
 
 
 def create_parcel_from_template(template: FeatureTemplateInformation) -> AnySystemParcel:
@@ -47,12 +57,8 @@ def create_parcel_from_template(template: FeatureTemplateInformation) -> AnySyst
         ValueError: If the given template type is not supported.
     """
     converter = choose_parcel_converter(template.template_type)
-    template_values = template_definition_normalization(template.template_definiton)
-    return converter.create_parcel(template.name, template.description, template_values)
-
-
-__all__ = ["create_parcel_from_template"]
-
-
-def __dir__() -> "List[str]":
-    return list(__all__)
+    template_definition_as_dict = json.loads(cast(str, template.template_definiton))
+    template_values = find_template_values(template_definition_as_dict)
+    template_values_normalized = template_definition_normalization(template_values)
+    logger.debug(f"Normalized template {template.name}: {template_values_normalized}")
+    return converter.create_parcel(template.name, template.description, template_values_normalized)
