@@ -35,13 +35,6 @@ class _ParcelBase(BaseModel):
     )
     _parcel_data_key: str = PrivateAttr(default="data")
 
-    @classmethod
-    def _get_parcel_type(cls) -> str:
-        field_info = cls.model_fields.get("type_")
-        if field_info is not None:
-            return str(field_info.default)
-        raise CatalystwanException("Cannot obtain parcel type string")
-
     @model_serializer(mode="wrap")
     def envelope_parcel_data(self, handler: SerializerFunctionWrapHandler) -> Dict[str, Any]:
         """
@@ -66,6 +59,13 @@ class _ParcelBase(BaseModel):
         for key in remove_keys:
             del model_dict[key]
         return model_dict
+
+    @classmethod
+    def _get_parcel_type(cls) -> str:
+        field_info = cls.model_fields.get("type_")
+        if field_info is not None:
+            return str(field_info.default)
+        raise CatalystwanException("Field parcel type is not set.")
 
 
 class OptionType(str, Enum):
