@@ -13,8 +13,6 @@ from pydantic import (
 
 from catalystwan.exceptions import CatalystwanException
 
-from catalystwan.exceptions import CatalystwanException
-
 T = TypeVar("T")
 
 
@@ -36,13 +34,6 @@ class _ParcelBase(BaseModel):
         description="Set the parcel description",
     )
     _parcel_data_key: str = PrivateAttr(default="data")
-
-    @classmethod
-    def _get_parcel_type(cls) -> str:
-        field_info = cls.model_fields.get("type_")
-        if field_info is not None:
-            return str(field_info.default)
-        raise CatalystwanException("Cannot obtain parcel type string")
 
     @model_serializer(mode="wrap")
     def envelope_parcel_data(self, handler: SerializerFunctionWrapHandler) -> Dict[str, Any]:
