@@ -1,5 +1,5 @@
 # mypy: disable-error-code="empty-body"
-from typing import List, Optional
+from typing import Dict, List, Optional, Union
 
 from pydantic.v1 import BaseModel, Field
 
@@ -13,7 +13,7 @@ class SubTaskData(BaseModel):
     action: Optional[str]
     activity: List[str]
     current_activity: Optional[str] = Field(alias="currentActivity")
-    action_config: Optional[str] = Field(alias="actionConfig")
+    action_config: Optional[Union[str, Dict]] = Field(alias="actionConfig")
     order: Optional[int]
     uuid: Optional[str]
     hostname: Optional[str] = Field(alias="host-name")
@@ -50,7 +50,7 @@ class Validation(BaseModel):
     rid: Optional[int] = Field(alias="@rid")
     status_id: str = Field(alias="statusId")
     process_id: Optional[str] = Field(alias="processId")
-    action_config: Optional[str] = Field(alias="actionConfig")
+    action_config: Optional[Union[str, Dict]] = Field(alias="actionConfig")
     current_activity: Optional[str] = Field(alias="currentActivity")
     action: Optional[str] = Field(alias="action")
     start_time: Optional[int] = Field(alias="startTime")
