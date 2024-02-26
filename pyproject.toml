@@ -19,6 +19,7 @@ clint = "^0.5.1"
 requests-toolbelt = "^1.0.0"
 packaging = "^23.0"
 pydantic = "2.5"
+typing-extensions = "4.10.0"
 
 [tool.poetry.dev-dependencies]
 parameterized = "^0.8.1"

@@ -2,10 +2,10 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field
 
+from catalystwan.api.templates.bool_str import BoolStr
 from catalystwan.api.templates.feature_template import FeatureTemplate
-from catalystwan.utils.pydantic_validators import ConvertBoolToStringModel
 
 
 class Version(str, Enum):
@@ -18,7 +18,7 @@ class AuthType(str, Enum):
     MUTUAL = "Mutual"
 
 
-class TlsProfile(ConvertBoolToStringModel):
+class TlsProfile(BaseModel):
     profile: str
     version: Optional[Version] = Field(Version.TLSV11, json_schema_extra={"data_path": ["tls-version"]})
     auth_type: AuthType = Field(json_schema_extra={"vmanage_key": "auth-type"})
@@ -39,36 +39,40 @@ class Priority(str, Enum):
     EMERGENCY = "emergency"
 
 
-class Server(ConvertBoolToStringModel):
+class Server(BaseModel):
     name: str
     vpn: Optional[int] = None
     source_interface: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "source-interface"})
     priority: Optional[Priority] = Priority.INFORMATION
-    enable_tls: Optional[bool] = Field(False, json_schema_extra={"data_path": ["tls"], "vmanage_key": "enable-tls"})
-    custom_profile: Optional[bool] = Field(
-        False, json_schema_extra={"data_path": ["tls", "tls-properties"], "vmanage_key": "custom-profile"}
+    enable_tls: Optional[BoolStr] = Field(
+        default=False, json_schema_extra={"data_path": ["tls"], "vmanage_key": "enable-tls"}
+    )
+    custom_profile: Optional[BoolStr] = Field(
+        default=False, json_schema_extra={"data_path": ["tls", "tls-properties"], "vmanage_key": "custom-profile"}
     )
     profile: Optional[str] = Field(default=None, json_schema_extra={"data_path": ["tls", "tls-properties"]})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Ipv6Server(ConvertBoolToStringModel):
+class Ipv6Server(BaseModel):
     name: str
     vpn: Optional[int] = None
     source_interface: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "source-interface"})
     priority: Optional[Priority] = Priority.INFORMATION
-    enable_tls: Optional[bool] = Field(False, json_schema_extra={"data_path": ["tls"], "vmanage_key": "enable-tls"})
-    custom_profile: Optional[bool] = Field(
-        False, json_schema_extra={"data_path": ["tls", "tls-properties"], "vmanage_key": "custom-profile"}
+    enable_tls: Optional[BoolStr] = Field(
+        default=False, json_schema_extra={"data_path": ["tls"], "vmanage_key": "enable-tls"}
+    )
+    custom_profile: Optional[BoolStr] = Field(
+        default=False, json_schema_extra={"data_path": ["tls", "tls-properties"], "vmanage_key": "custom-profile"}
     )
     profile: Optional[str] = Field(default=None, json_schema_extra={"data_path": ["tls", "tls-properties"]})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class CiscoLoggingModel(FeatureTemplate, ConvertBoolToStringModel):
+class CiscoLoggingModel(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    enable: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["disk"]})
+    enable: Optional[BoolStr] = Field(default=None, json_schema_extra={"data_path": ["disk"]})
     size: Optional[int] = Field(default=None, json_schema_extra={"data_path": ["disk", "file"]})
     rotate: Optional[int] = Field(default=None, json_schema_extra={"data_path": ["disk", "file"]})
     tls_profile: Optional[List[TlsProfile]] = Field(default=None, json_schema_extra={"vmanage_key": "tls-profile"})

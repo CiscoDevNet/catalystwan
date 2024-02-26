@@ -3,10 +3,10 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field
 
+from catalystwan.api.templates.bool_str import BoolStr
 from catalystwan.api.templates.feature_template import FeatureTemplate
-from catalystwan.utils.pydantic_validators import ConvertBoolToStringModel, ConvertIPToStringModel
 
 DEFAULT_OSPF_HELLO_INTERVAL = 10
 DEFAULT_OSPF_DEAD_INTERVAL = 40
@@ -35,10 +35,10 @@ class Protocol(str, Enum):
     EIGRP = "eigrp"
 
 
-class Redistribute(ConvertBoolToStringModel):
+class Redistribute(BaseModel):
     protocol: Protocol
     route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
-    dia: Optional[bool] = True
+    dia: Optional[BoolStr] = True
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -47,7 +47,7 @@ class AdType(str, Enum):
     ON_STARTUP = "on-startup"
 
 
-class RouterLsa(ConvertBoolToStringModel):
+class RouterLsa(BaseModel):
     ad_type: AdType = Field(json_schema_extra={"vmanage_key": "ad-type"})
     time: int
     model_config = ConfigDict(populate_by_name=True)
@@ -57,7 +57,7 @@ class Direction(str, Enum):
     IN = "in"
 
 
-class RoutePolicy(ConvertBoolToStringModel):
+class RoutePolicy(BaseModel):
     direction: Direction
     pol_name: str = Field(json_schema_extra={"vmanage_key": "pol-name"})
     model_config = ConfigDict(populate_by_name=True)
@@ -76,7 +76,7 @@ class Type(str, Enum):
     NULL = "null"
 
 
-class Interface(ConvertBoolToStringModel):
+class Interface(BaseModel):
     name: str
     hello_interval: Optional[int] = Field(
         DEFAULT_OSPF_DEAD_INTERVAL, json_schema_extra={"vmanage_key": "hello-interval"}
@@ -88,7 +88,7 @@ class Interface(ConvertBoolToStringModel):
     cost: Optional[int] = None
     priority: Optional[int] = DEFAULT_OSPF_INTERFACE_PRIORITY
     network: Optional[Network] = Network.BROADCAST
-    passive_interface: Optional[bool] = Field(False, json_schema_extra={"vmanage_key": "passive-interface"})
+    passive_interface: Optional[BoolStr] = Field(default=False, json_schema_extra={"vmanage_key": "passive-interface"})
     type: Optional[Type] = Field(default=None, json_schema_extra={"data_path": ["authentication"]})
     message_digest_key: Optional[int] = Field(
         default=None,
@@ -98,23 +98,27 @@ class Interface(ConvertBoolToStringModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Range(ConvertBoolToStringModel, ConvertIPToStringModel):
+class Range(BaseModel):
     address: ipaddress.IPv4Interface
     cost: Optional[int] = None
-    no_advertise: Optional[bool] = Field(False, json_schema_extra={"vmanage_key": "no-advertise"})
+    no_advertise: Optional[BoolStr] = Field(default=False, json_schema_extra={"vmanage_key": "no-advertise"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Area(ConvertBoolToStringModel):
+class Area(BaseModel):
     a_num: int = Field(json_schema_extra={"vmanage_key": "a-num"})
-    stub: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "no-summary", "data_path": ["stub"]})
-    nssa: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "no-summary", "data_path": ["nssa"]})
+    stub: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"vmanage_key": "no-summary", "data_path": ["stub"]}
+    )
+    nssa: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"vmanage_key": "no-summary", "data_path": ["nssa"]}
+    )
     interface: Optional[List[Interface]] = None
     range: Optional[List[Range]] = None
     model_config = ConfigDict(populate_by_name=True)
 
 
-class CiscoOSPFModel(FeatureTemplate, ConvertBoolToStringModel):
+class CiscoOSPFModel(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     router_id: Optional[str] = Field(
@@ -124,9 +128,9 @@ class CiscoOSPFModel(FeatureTemplate, ConvertBoolToStringModel):
         DEFAULT_OSPF_REFERENCE_BANDWIDTH,
         json_schema_extra={"data_path": ["ospf", "auto-cost"], "vmanage_key": "reference-bandwidth"},
     )
-    rfc1583: Optional[bool] = Field(True, json_schema_extra={"data_path": ["ospf", "compatible"]})
-    originate: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["ospf", "default-information"]})
-    always: Optional[bool] = Field(
+    rfc1583: Optional[BoolStr] = Field(default=True, json_schema_extra={"data_path": ["ospf", "compatible"]})
+    originate: Optional[BoolStr] = Field(default=None, json_schema_extra={"data_path": ["ospf", "default-information"]})
+    always: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"data_path": ["ospf", "default-information", "originate"]}
     )
     metric: Optional[int] = Field(

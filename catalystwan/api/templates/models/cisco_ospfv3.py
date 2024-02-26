@@ -3,11 +3,10 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import ConfigDict
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
+from catalystwan.api.templates.bool_str import BoolStr
 from catalystwan.api.templates.feature_template import FeatureTemplate
-from catalystwan.utils.pydantic_validators import ConvertBoolToStringModel, ConvertIPToStringModel
 
 
 class MetricType(str, Enum):
@@ -26,10 +25,10 @@ class Protocol(str, Enum):
     STATIC = "static"
 
 
-class Redistribute(ConvertBoolToStringModel):
+class Redistribute(BaseModel):
     protocol: Protocol
     route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
-    dia: Optional[bool] = True
+    dia: Optional[BoolStr] = True
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -82,12 +81,16 @@ class Range(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Area(ConvertBoolToStringModel):
+class Area(BaseModel):
     a_num: int = Field(json_schema_extra={"vmanage_key": "a-num"})
-    stub: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "no-summary", "data_path": ["stub"]})
-    nssa: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "no-summary", "data_path": ["nssa"]})
+    stub: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"vmanage_key": "no-summary", "data_path": ["stub"]}
+    )
+    nssa: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"vmanage_key": "no-summary", "data_path": ["nssa"]}
+    )
     translate: Optional[Translate] = Field(default=None, json_schema_extra={"data_path": ["nssa"]})
-    normal: Optional[bool] = None
+    normal: Optional[BoolStr] = None
     interface: Optional[List[Interface]] = None
     range: Optional[List[Range]] = None
     model_config = ConfigDict(populate_by_name=True)
@@ -122,18 +125,22 @@ class RangeV6(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class AreaV6(ConvertBoolToStringModel):
+class AreaV6(BaseModel):
     a_num: int = Field(json_schema_extra={"vmanage_key": "a-num"})
-    stub: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "no-summary", "data_path": ["stub"]})
-    nssa: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "no-summary", "data_path": ["nssa"]})
+    stub: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"vmanage_key": "no-summary", "data_path": ["stub"]}
+    )
+    nssa: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"vmanage_key": "no-summary", "data_path": ["nssa"]}
+    )
     translate: Optional[Translate] = Field(default=None, json_schema_extra={"data_path": ["nssa"]})
-    normal: Optional[bool] = None
+    normal: Optional[BoolStr] = None
     interface: Optional[List[InterfaceV6]] = None
     range: Optional[List[RangeV6]] = None
     model_config = ConfigDict(populate_by_name=True)
 
 
-class CiscoOspfv3Model(FeatureTemplate, ConvertIPToStringModel, ConvertBoolToStringModel):
+class CiscoOspfv3Model(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     router_id_v4: Optional[ipaddress.IPv4Address] = Field(
@@ -146,18 +153,18 @@ class CiscoOspfv3Model(FeatureTemplate, ConvertIPToStringModel, ConvertBoolToStr
             "data_path": ["ospfv3", "address-family", "ipv4", "auto-cost"],
         },
     )
-    rfc1583_v4: Optional[bool] = Field(
-        True,
+    rfc1583_v4: Optional[BoolStr] = Field(
+        default=True,
         json_schema_extra={"vmanage_key": "rfc1583", "data_path": ["ospfv3", "address-family", "ipv4", "compatible"]},
     )
-    originate_v4: Optional[bool] = Field(
+    originate_v4: Optional[BoolStr] = Field(
         default=None,
         json_schema_extra={
             "vmanage_key": "originate",
             "data_path": ["ospfv3", "address-family", "ipv4", "default-information"],
         },
     )
-    always_v4: Optional[bool] = Field(
+    always_v4: Optional[BoolStr] = Field(
         default=None,
         json_schema_extra={
             "vmanage_key": "always",
@@ -231,7 +238,7 @@ class CiscoOspfv3Model(FeatureTemplate, ConvertIPToStringModel, ConvertBoolToStr
         default=None,
         json_schema_extra={"vmanage_key": "name", "data_path": ["ospfv3", "address-family", "ipv4", "table-map"]},
     )
-    filter_v4: Optional[bool] = Field(
+    filter_v4: Optional[BoolStr] = Field(
         default=None,
         json_schema_extra={"vmanage_key": "filter", "data_path": ["ospfv3", "address-family", "ipv4", "table-map"]},
     )
@@ -259,18 +266,18 @@ class CiscoOspfv3Model(FeatureTemplate, ConvertIPToStringModel, ConvertBoolToStr
             "data_path": ["ospfv3", "address-family", "ipv6", "auto-cost"],
         },
     )
-    rfc1583_v6: Optional[bool] = Field(
-        True,
+    rfc1583_v6: Optional[BoolStr] = Field(
+        default=True,
         json_schema_extra={"vmanage_key": "rfc1583", "data_path": ["ospfv3", "address-family", "ipv6", "compatible"]},
     )
-    originate_v6: Optional[bool] = Field(
+    originate_v6: Optional[BoolStr] = Field(
         default=None,
         json_schema_extra={
             "vmanage_key": "originate",
             "data_path": ["ospfv3", "address-family", "ipv6", "default-information"],
         },
     )
-    always_v6: Optional[bool] = Field(
+    always_v6: Optional[BoolStr] = Field(
         default=None,
         json_schema_extra={
             "vmanage_key": "always",
@@ -344,7 +351,7 @@ class CiscoOspfv3Model(FeatureTemplate, ConvertIPToStringModel, ConvertBoolToStr
         default=None,
         json_schema_extra={"vmanage_key": "name", "data_path": ["ospfv3", "address-family", "ipv6", "table-map"]},
     )
-    filter_v6: Optional[bool] = Field(
+    filter_v6: Optional[BoolStr] = Field(
         default=None,
         json_schema_extra={"vmanage_key": "filter", "data_path": ["ospfv3", "address-family", "ipv6", "table-map"]},
     )

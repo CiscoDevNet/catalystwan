@@ -29,7 +29,7 @@ class FeatureTemplate(BaseModel, ABC):
             undefined=DebugUndefined,
         )
         template = env.get_template(self.payload_path.name)
-        output = template.render(self.model_dump())
+        output = template.render(self.model_dump(mode="json"))
 
         ast = env.parse(output)
         if meta.find_undeclared_variables(ast):
