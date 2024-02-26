@@ -1,8 +1,9 @@
 # mypy: disable-error-code="empty-body"
 from datetime import datetime
 from typing import List, Optional
+from uuid import UUID
 
-from pydantic.v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put, versions
 from catalystwan.models.configuration.common import Solution
@@ -11,7 +12,7 @@ from catalystwan.typed_list import DataSequence
 
 
 class ProfileId(BaseModel):
-    id: str
+    id: UUID
 
 
 # TODO Get mode from schema
@@ -35,10 +36,24 @@ class FeatureProfile(BaseModel):
 
 
 class ConfigGroup(BaseModel):
+    id: UUID
     name: str
     description: Optional[str]
     solution: Solution
     profiles: Optional[List[FeatureProfile]]
+    source: Optional[str] = None
+    state: Optional[str] = None
+    devices: List = Field(default=[])
+    created_by: Optional[str] = Field(alias="createdBy")
+    last_updated_by: Optional[str] = Field(alias="lastUpdatedBy")
+    created_on: Optional[datetime] = Field(alias="createdOn")
+    last_updated_on: Optional[datetime] = Field(alias="lastUpdatedOn")
+    version: int
+    number_of_devices: int = Field(alias="numberOfDevices")
+    number_of_devices_up_to_date: int = Field(alias="numberOfDevicesUpToDate")
+    origin: Optional[str]
+    topology: Optional[str] = None
+    full_config_cli: bool = Field(alias="fullConfigCli")
 
 
 class ConfigGroupResponsePayload(BaseModel):
@@ -104,7 +119,7 @@ class ConfigGroupDisassociateResponse(BaseModel):
 
 
 class ConfigGroupCreationResponse(BaseModel):
-    id: str
+    id: UUID
 
 
 class EditedProfileId(BaseModel):

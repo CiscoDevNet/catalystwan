@@ -46,12 +46,12 @@ from catalystwan.models.policy import (
     PrefixList,
     RegionList,
     SiteList,
-    SLAClassList,
     TLOCList,
     TrafficDataPolicy,
     VPNList,
     VPNMembershipPolicy,
 )
+from catalystwan.models.policy.lists import SLAClassList
 
 logger = logging.getLogger(__name__)
 
@@ -184,7 +184,7 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[ConfigItem]:
     configured_items.append(ConfigItem(ClassMapList, class_map.name, class_map_id))
 
     app_probe_class = AppProbeClassList(name="MyAppProbeClass")
-    app_probe_class.assign_forwarding_class("MyClassMap").add_color_mapping("3g", 5)
+    app_probe_class.assign_forwarding_class("MyClassMap").add_color_mapping("green", 5)
     app_probe_class_id = api.lists.create(app_probe_class)
     configured_items.append(ConfigItem(AppProbeClassList, app_probe_class.name, app_probe_class_id))
 

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Literal
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
@@ -13,6 +13,7 @@ class FQDNListEntry(BaseModel):
 
 
 class FQDNDomainParcel(_ParcelBase):
+    type_: Literal["security-fqdn"] = Field(default="security-fqdn", exclude=True)
     entries: List[FQDNListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def from_fqdns(self, fqdns: List[str]):

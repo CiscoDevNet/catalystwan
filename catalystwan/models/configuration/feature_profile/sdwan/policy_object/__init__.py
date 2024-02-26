@@ -1,4 +1,4 @@
-from typing import List, Mapping, Union
+from typing import List, Union
 
 from pydantic import Field
 from typing_extensions import Annotated
@@ -32,64 +32,43 @@ from .security.security_port import SecurityPortListEntry, SecurityPortParcel
 from .security.url import BaseURLListEntry, URLAllowParcel, URLBlockParcel
 from .security.zone import SecurityZoneListEntry, SecurityZoneListParcel
 
+AnyURLParcel = Annotated[
+    Union[
+        URLAllowParcel,
+        URLBlockParcel,
+    ],
+    Field(discriminator="parcel_type"),
+]
+
 AnyPolicyObjectParcel = Annotated[
     Union[
-        AppProbeParcel,
+        # AnyURLParcel,
         ApplicationListParcel,
+        AppProbeParcel,
         ColorParcel,
         DataPrefixParcel,
         ExpandedCommunityParcel,
         FowardingClassParcel,
+        FQDNDomainParcel,
+        GeoLocationListParcel,
+        IPSSignatureParcel,
         IPv6DataPrefixParcel,
         IPv6PrefixListParcel,
-        PrefixListParcel,
+        LocalDomainParcel,
         PolicierParcel,
         PreferredColorGroupParcel,
-        SLAClassParcel,
-        TlocParcel,
-        StandardCommunityParcel,
-        LocalDomainParcel,
-        FQDNDomainParcel,
-        IPSSignatureParcel,
-        URLAllowParcel,
-        URLBlockParcel,
-        SecurityPortParcel,
+        PrefixListParcel,
         ProtocolListParcel,
-        GeoLocationListParcel,
-        SecurityZoneListParcel,
         SecurityApplicationListParcel,
         SecurityDataPrefixParcel,
+        SecurityPortParcel,
+        SecurityZoneListParcel,
+        SLAClassParcel,
+        StandardCommunityParcel,
+        TlocParcel,
     ],
-    Field(discriminator="type"),
+    Field(discriminator="type_"),
 ]
-
-POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING: Mapping[type, str] = {
-    AppProbeParcel: "app-probe",
-    ApplicationListParcel: "app-list",
-    ColorParcel: "color",
-    DataPrefixParcel: "data-prefix",
-    ExpandedCommunityParcel: "expanded-community",
-    FowardingClassParcel: "class",
-    IPv6DataPrefixParcel: "data-ipv6-prefix",
-    IPv6PrefixListParcel: "ipv6-prefix",
-    PrefixListParcel: "prefix",
-    PolicierParcel: "policer",
-    PreferredColorGroupParcel: "preferred-color-group",
-    SLAClassParcel: "sla-class",
-    TlocParcel: "tloc",
-    StandardCommunityParcel: "standard-community",
-    LocalDomainParcel: "security-localdomain",
-    FQDNDomainParcel: "security-fqdn",
-    IPSSignatureParcel: "security-ipssignature",
-    URLAllowParcel: "security-urllist",
-    URLBlockParcel: "security-urllist",
-    SecurityPortParcel: "security-port",
-    ProtocolListParcel: "security-protocolname",
-    GeoLocationListParcel: "security-geolocation",
-    SecurityZoneListParcel: "security-zone",
-    SecurityApplicationListParcel: "security-localapp",
-    SecurityDataPrefixParcel: "security-data-ip-prefix",
-}
 
 __all__ = (
     "AnyPolicyObjectParcel",

@@ -1,10 +1,15 @@
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, model_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 from catalystwan.models.common import TLOCColor
-from catalystwan.models.policy.lists_entries import PathPreference
+
+PathPreference = Literal[
+    "direct-path",
+    "multi-hop-path",
+    "all-paths",
+]
 
 
 class Preference(BaseModel):
@@ -35,6 +40,7 @@ class PreferredColorGroupEntry(BaseModel):
 
 
 class PreferredColorGroupParcel(_ParcelBase):
+    type_: Literal["preferred-color-group"] = Field(default="preferred-color-group", exclude=True)
     entries: List[PreferredColorGroupEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_primary(self, color_preference: List[TLOCColor], path_preference: PathPreference):

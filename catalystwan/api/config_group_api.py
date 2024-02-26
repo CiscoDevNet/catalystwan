@@ -1,11 +1,15 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, Union
+from uuid import UUID
+
+from catalystwan.typed_list import DataSequence
 
 if TYPE_CHECKING:
     from catalystwan.session import ManagerSession
 
 from catalystwan.endpoints.configuration_group import (
+    ConfigGroup,
     ConfigGroupAssociatePayload,
     ConfigGroupCreationPayload,
     ConfigGroupCreationResponse,
@@ -14,7 +18,6 @@ from catalystwan.endpoints.configuration_group import (
     ConfigGroupDisassociateResponse,
     ConfigGroupEditPayload,
     ConfigGroupEditResponse,
-    ConfigGroupResponsePayload,
     ConfigGroupVariablesCreatePayload,
     ConfigGroupVariablesCreateResponse,
     ConfigGroupVariablesEditPayload,
@@ -108,11 +111,14 @@ class ConfigGroupAPI:
 
         return self.endpoint.edit_config_group(config_group_id=cg_id, payload=payload)
 
-    def get(self) -> ConfigGroupResponsePayload:
+    def get(self, group_id: Optional[UUID] = None) -> Union[DataSequence[ConfigGroup], ConfigGroup, None]:
         """
-        Gets list of existing config-groups
+        Gets list of existing config-groups or single config-group with given ID
+         If given ID is not correct return None
         """
-        return self.endpoint.get()
+        if group_id is None:
+            return self.endpoint.get()
+        return self.endpoint.get().filter(id=group_id).single_or_default()
 
     def update_variables(self, cg_id: str, solution: Solution, device_variables: list) -> None:
         """
