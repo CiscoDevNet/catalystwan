@@ -4,10 +4,7 @@ from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
 from catalystwan.models.common import TLOCColor
-from catalystwan.models.configuration.feature_profile.converters.recast import (
-    DefaultGlobalBool,
-    DefaultGlobalColorLiteral,
-)
+from catalystwan.utils.config_migration.converters.recast import DefaultGlobalBool, DefaultGlobalColorLiteral
 
 DEFAULT_BFD_COLOR_MULTIPLIER = as_global(7)
 DEFAULT_BFD_DSCP = as_global(48)
@@ -29,7 +26,7 @@ class Color(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class BFD(_ParcelBase):
+class BFDParcel(_ParcelBase):
     type_: Literal["bfd"] = Field(default="bfd", exclude=True)
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 

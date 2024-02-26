@@ -1,9 +1,9 @@
-from catalystwan.models.configuration.feature_profile.sdwan.system import AAA
+from catalystwan.models.configuration.feature_profile.sdwan.system import AAAParcel
 
 
 class AAATemplateConverter:
     @staticmethod
-    def create_parcel(name: str, description: str, template_values: dict) -> AAA:
+    def create_parcel(name: str, description: str, template_values: dict) -> AAAParcel:
         """
         Creates an AAA object based on the provided template values.
 
@@ -27,4 +27,4 @@ class AAATemplateConverter:
             if template_values.get(prop) is not None:
                 del template_values[prop]
 
-        return AAA(**template_values)
+        return AAAParcel(**template_values)
