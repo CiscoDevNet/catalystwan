@@ -1,9 +1,12 @@
 import unittest
 from ipaddress import IPv4Address, IPv6Address
-from typing import List
+from typing import List, Literal
+from unittest.mock import patch
 
 from catalystwan.api.configuration_groups.parcel import Global
 from catalystwan.utils.config_migration.converters.feature_template import template_definition_normalization
+
+TestLiteral = Literal["castable_literal"]
 
 
 class TestNormalizer(unittest.TestCase):
@@ -53,15 +56,15 @@ class TestNormalizer(unittest.TestCase):
             "ipv6addr": Global[IPv6Address](value=IPv6Address("2000:0:2:3::")),
         }
 
-    def test_normalizer(self):
+    def test_normalizer_handles_various_types_of_input(self):
         # Arrange
         expected_result = self.expected_result
         # Act
         returned_result = template_definition_normalization(self.template_values)
         # Assert
-        assert expected_result == returned_result
+        self.assertDictEqual(expected_result, returned_result)
 
-    def test_super_nested(self):
+    def test_normalizer_handles_super_nested_input(self):
         # Arrange
         super_nested_input = {
             "super_nested": {"level1": {"level2": {"level3": {"key_one": "value_one", "key_two": "value_two"}}}}
@@ -80,4 +83,16 @@ class TestNormalizer(unittest.TestCase):
         returned_result = template_definition_normalization(super_nested_input)
 
         # Assert
-        assert expected_result == returned_result
+        self.assertDictEqual(expected_result, returned_result)
+
+    @patch("catalystwan.models.configuration.feature_profile.sdwan.system.literals.SYSTEM_LITERALS", [TestLiteral])
+    def test_normalizer_literal_casting_when_literal_in_system_literals(self):
+        # Arrange
+        simple_input = {"in": "castable_literal"}
+        expected_result = {"in": Global[TestLiteral](value="castable_literal")}
+
+        # Act
+        returned_result = template_definition_normalization(simple_input)
+
+        # Assert
+        self.assertDictEqual(expected_result, returned_result)

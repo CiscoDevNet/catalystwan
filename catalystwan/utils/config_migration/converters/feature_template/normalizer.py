@@ -1,7 +1,8 @@
 from ipaddress import AddressValueError, IPv4Address, IPv6Address
-from typing import List, Union
+from typing import List, Union, get_args
 
 from catalystwan.api.configuration_groups.parcel import Global, as_global
+from catalystwan.models.configuration.feature_profile.sdwan.system import SYSTEM_LITERALS
 
 CastedTypes = Union[
     Global[bool],
@@ -40,6 +41,9 @@ def cast_value_to_global(value: Union[str, int, List[str], List[int]]) -> Casted
             return Global[IPv6Address](value=ipv6_address)
         except AddressValueError:
             pass
+        for literal in SYSTEM_LITERALS:
+            if value in get_args(literal):
+                return Global[literal](value=value)  # type: ignore
 
     return as_global(value)  # type: ignore
 
