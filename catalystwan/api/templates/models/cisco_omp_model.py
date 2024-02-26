@@ -4,8 +4,8 @@ from typing import ClassVar, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from catalystwan.api.templates.bool_str import BoolStr
 from catalystwan.api.templates.feature_template import FeatureTemplate
-from catalystwan.utils.pydantic_validators import ConvertBoolToStringModel
 
 DEFAULT_OMP_HOLDTIME = 60
 DEFAULT_OMP_EOR_TIMER = 300
@@ -64,16 +64,16 @@ class SiteTypes(str, Enum):
     SPOKE = "spoke"
 
 
-class CiscoOMPModel(FeatureTemplate, ConvertBoolToStringModel):
+class CiscoOMPModel(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    graceful_restart: Optional[bool] = Field(True, json_schema_extra={"vmanage_key": "graceful-restart"})
+    graceful_restart: Optional[BoolStr] = Field(default=True, json_schema_extra={"vmanage_key": "graceful-restart"})
     overlay_as: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "overlay-as"})
     send_path_limit: Optional[int] = Field(
         DEFAULT_OMP_SENDPATH_LIMIT, json_schema_extra={"vmanage_key": "send-path-limit"}
     )
     ecmp_limit: Optional[int] = Field(DEFAULT_OMP_ECMP_LIMIT, json_schema_extra={"vmanage_key": "ecmp-limit"})
-    shutdown: Optional[bool]
+    shutdown: Optional[BoolStr] = None
     omp_admin_distance_ipv4: Optional[int] = Field(
         default=None, json_schema_extra={"vmanage_key": "omp-admin-distance-ipv4"}
     )
@@ -96,14 +96,14 @@ class CiscoOMPModel(FeatureTemplate, ConvertBoolToStringModel):
     ipv6_advertise: Optional[List[IPv6Advertise]] = Field(
         default=None, json_schema_extra={"vmanage_key": "ipv6-advertise"}
     )
-    ignore_region_path_length: Optional[bool] = Field(
-        False, json_schema_extra={"vmanage_key": "ignore-region-path-length"}
+    ignore_region_path_length: Optional[BoolStr] = Field(
+        default=False, json_schema_extra={"vmanage_key": "ignore-region-path-length"}
     )
     transport_gateway: Optional[TransportGateway] = Field(
         default=None, json_schema_extra={"vmanage_key": "transport-gateway"}
     )
     site_types: Optional[List[SiteTypes]] = Field(default=None, json_schema_extra={"vmanage_key": "site-types"})
-    auto_translate: Optional[bool] = Field(False, json_schema_extra={"vmanage_key": "auto-translate"})
+    auto_translate: Optional[BoolStr] = Field(default=False, json_schema_extra={"vmanage_key": "auto-translate"})
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
     type: ClassVar[str] = "cisco_omp"

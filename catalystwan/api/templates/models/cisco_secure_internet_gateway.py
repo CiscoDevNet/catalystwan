@@ -6,7 +6,6 @@ from typing import ClassVar, List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 from catalystwan.api.templates.feature_template import FeatureTemplate
-from catalystwan.utils.pydantic_validators import ConvertIPToStringModel
 
 DEFAULT_TRACKER_THRESHOLD = 300
 DEFAULT_TRACKER_INTERVAL = 60
@@ -73,7 +72,7 @@ class PerfectForwardSecrecy(str, Enum):
     NONE = "none"
 
 
-class Interface(ConvertIPToStringModel):
+class Interface(BaseModel):
     if_name: str = Field(json_schema_extra={"vmanage_key": "if-name"})
     auto: bool
     shutdown: bool
@@ -201,7 +200,7 @@ class Tracker(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class CiscoSecureInternetGatewayModel(FeatureTemplate, ConvertIPToStringModel):
+class CiscoSecureInternetGatewayModel(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     vpn_id: int = Field(DEFAULT_SIG_VPN_ID, json_schema_extra={"vmanage_key": "vpn-id"})

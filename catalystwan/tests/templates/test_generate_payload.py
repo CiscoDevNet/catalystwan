@@ -73,14 +73,16 @@ class DataPathFeatureTemplate(FeatureTemplate):
     as_num: str = Field(alias="as-num", json_schema_extra={"data_path": ["authentication", "dot1x", "default"]})
 
 
+password = "pass"  # pragma: allowlist secret
+
 mocked_feature_template_children_1 = MockedFeatureTemplateChildren(
-    user=[User(name="user1", password="pass"), User(name="user2", password="pass")]
+    user=[User(name="user1", password=password), User(name="user2", password=password)]
 )
 
 mocked_feature_template_children_2 = MockedFeatureTemplateChildren(
     user=[
-        User(name="user1", password="pass", pubkey_chain=[RSA(key="*****", key_type="RSA")]),
-        User(name="user2", password="pass"),
+        User(name="user1", password=password, pubkey_chain=[RSA(key="*****", key_type="RSA")]),
+        User(name="user2", password=password),
     ]
 )
 
@@ -122,7 +124,7 @@ class TestFeatureTemplate(TestCase):
 
         # Act
         a = templates_api.generate_feature_template_payload(mocked_template, schema).model_dump(
-            by_alias=True, exclude_none=True
+            by_alias=True, exclude_none=True, mode="json"
         )["templateDefinition"]
         print(json.dumps(a))
         # Assert

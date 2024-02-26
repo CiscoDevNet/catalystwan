@@ -4,9 +4,9 @@ from typing import ClassVar, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from catalystwan.api.templates.bool_str import BoolStr
 from catalystwan.api.templates.device_variable import DeviceVariable
 from catalystwan.api.templates.feature_template import FeatureTemplate
-from catalystwan.utils.pydantic_validators import ConvertBoolToStringModel
 from catalystwan.utils.timezone import Timezone
 
 
@@ -118,7 +118,7 @@ class Epfr(str, Enum):
     CONSERVATIVE = "conservative"
 
 
-class CiscoSystemModel(FeatureTemplate, ConvertBoolToStringModel):
+class CiscoSystemModel(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     timezone: Optional[Timezone] = Field(default=None, json_schema_extra={"data_path": ["clock"]})
@@ -131,15 +131,15 @@ class CiscoSystemModel(FeatureTemplate, ConvertBoolToStringModel):
     latitude: Optional[float] = Field(default=None, json_schema_extra={"data_path": ["gps-location"]})
     longitude: Optional[float] = Field(default=None, json_schema_extra={"data_path": ["gps-location"]})
     range: Optional[int] = Field(100, json_schema_extra={"data_path": ["gps-location", "geo-fencing"]})
-    enable_fencing: Optional[bool] = Field(
+    enable_fencing: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"data_path": ["gps-location", "geo-fencing"], "vmanage_key": "enable"}
     )
     mobile_number: Optional[List[MobileNumber]] = Field(
         default=None,
         json_schema_extra={"vmanage_key": "mobile-number", "data_path": ["gps-location", "geo-fencing", "sms"]},
     )
-    enable_sms: Optional[bool] = Field(
-        False, json_schema_extra={"data_path": ["gps-location", "geo-fencing", "sms"], "vmanage_key": "enable"}
+    enable_sms: Optional[BoolStr] = Field(
+        default=False, json_schema_extra={"data_path": ["gps-location", "geo-fencing", "sms"], "vmanage_key": "enable"}
     )
     device_groups: Optional[List[str]] = Field(default=None, json_schema_extra={"vmanage_key": "device-groups"})
     controller_group_list: Optional[List[int]] = Field(
@@ -152,22 +152,22 @@ class CiscoSystemModel(FeatureTemplate, ConvertBoolToStringModel):
     site_id: int = Field(default=DeviceVariable(name="system_site_id"), json_schema_extra={"vmanage_key": "site-id"})
     site_type: Optional[List[SiteType]] = Field(default=None, json_schema_extra={"vmanage_key": "site-type"})
     port_offset: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "port-offset"})
-    port_hop: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "port-hop"})
+    port_hop: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "port-hop"})
     control_session_pps: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "control-session-pps"})
-    track_transport: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "track-transport"})
+    track_transport: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "track-transport"})
     track_interface_tag: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "track-interface-tag"})
     console_baud_rate: Optional[ConsoleBaudRate] = Field(
         default=None, json_schema_extra={"vmanage_key": "console-baud-rate"}
     )
     max_omp_sessions: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "max-omp-sessions"})
-    multi_tenant: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "multi-tenant"})
-    track_default_gateway: Optional[bool] = Field(
+    multi_tenant: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "multi-tenant"})
+    track_default_gateway: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "track-default-gateway"}
     )
-    admin_tech_on_failure: Optional[bool] = Field(
+    admin_tech_on_failure: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "admin-tech-on-failure"}
     )
-    enable_tunnel: Optional[bool] = Field(
+    enable_tunnel: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "enable", "data_path": ["on-demand"]}
     )
     idle_timeout: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "idle-timeout"})
@@ -183,22 +183,22 @@ class CiscoSystemModel(FeatureTemplate, ConvertBoolToStringModel):
         default=None, json_schema_extra={"vmanage_key": "affinity-group-number", "data_path": ["affinity-group"]}
     )
     preference: Optional[List[int]] = Field(default=None, json_schema_extra={"data_path": ["affinity-group"]})
-    preference_auto: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "preference-auto"})
+    preference_auto: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "preference-auto"})
     affinity_per_vrf: Optional[List[AffinityPerVrf]] = Field(
         default=None, json_schema_extra={"vmanage_key": "affinity-per-vrf"}
     )
-    transport_gateway: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "transport-gateway"})
+    transport_gateway: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "transport-gateway"})
     enable_mrf_migration: Optional[EnableMrfMigration] = Field(
         default=None, json_schema_extra={"vmanage_key": "enable-mrf-migration"}
     )
     migration_bgp_community: Optional[int] = Field(
         default=None, json_schema_extra={"vmanage_key": "migration-bgp-community"}
     )
-    enable_management_region: Optional[bool] = Field(
+    enable_management_region: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "enable-management-region"}
     )
     vrf: Optional[List[Vrf]] = None
-    management_gateway: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "management-gateway"})
+    management_gateway: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "management-gateway"})
     epfr: Optional[Epfr] = None
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"

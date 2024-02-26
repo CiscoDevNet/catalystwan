@@ -3,11 +3,11 @@ from typing import ClassVar, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from catalystwan.api.templates.bool_str import BoolStr
 from catalystwan.api.templates.feature_template import FeatureTemplate
-from catalystwan.utils.pydantic_validators import ConvertBoolToStringModel
 
 
-class Server(ConvertBoolToStringModel):
+class Server(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     name: str
@@ -15,7 +15,7 @@ class Server(ConvertBoolToStringModel):
     vpn: Optional[int] = None
     version: Optional[int] = None
     source_interface: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "source-interface"})
-    prefer: Optional[bool] = None
+    prefer: Optional[BoolStr] = None
 
 
 class Authentication(BaseModel):
@@ -25,13 +25,13 @@ class Authentication(BaseModel):
     md5: str
 
 
-class CiscoNTPModel(FeatureTemplate, ConvertBoolToStringModel):
+class CiscoNTPModel(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     server: List[Server] = Field(default=[])
     authentication: Optional[List[Authentication]] = Field(default=None, json_schema_extra={"data_path": ["keys"]})
     trusted: Optional[List[int]] = Field(default=None, json_schema_extra={"data_path": ["keys"]})
-    enable: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["master"]})
+    enable: Optional[BoolStr] = Field(default=None, json_schema_extra={"data_path": ["master"]})
     stratum: Optional[int] = Field(default=None, json_schema_extra={"data_path": ["master"]})
     source: Optional[str] = Field(default=None, json_schema_extra={"data_path": ["master"]})
 

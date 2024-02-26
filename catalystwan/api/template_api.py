@@ -382,7 +382,9 @@ class TemplatesAPI:
         if self.is_created_by_generator(template):
             debug = False
             schema = self.get_feature_template_schema(template, debug)
-            payload = self.generate_feature_template_payload(template, schema, debug).model_dump(by_alias=True)
+            payload = self.generate_feature_template_payload(template, schema, debug).model_dump(
+                by_alias=True, mode="json"
+            )
         else:
             payload = json.loads(template.generate_payload(self.session))
 
@@ -541,7 +543,7 @@ class TemplatesAPI:
         payload = self.generate_feature_template_payload(template, schema, debug)
 
         endpoint = "/dataservice/template/feature"
-        response = self.session.post(endpoint, json=payload.model_dump(by_alias=True, exclude_none=True))
+        response = self.session.post(endpoint, json=payload.model_dump(by_alias=True, exclude_none=True, mode="json"))
 
         return response.json()["templateId"]
 
@@ -557,9 +559,9 @@ class TemplatesAPI:
         )  # type: ignore
 
         fr_template_fields = [FeatureTemplateField(**field) for field in schema["fields"]]  # TODO
-
+        json_dumped_template = template.model_dump(mode="json")
         # "name"
-        for i, field in enumerate(fr_template_fields):
+        for field in fr_template_fields:
             value = None
             priority_order = None
             # TODO How to discover Device specific variable
@@ -575,16 +577,19 @@ class TemplatesAPI:
                     ):
                         priority_order = get_extra_field(field_value, "priority_order")  # type: ignore
                         value = getattr(template, field_name)
+                        json_dumped_value = json_dumped_template.get(field_name)
                         break
                 if value is None:
                     continue
 
-            # print(field.payload_scheme(value))
-            payload.definition = merge(payload.definition, field.payload_scheme(value, priority_order=priority_order))
+            payload.definition = merge(
+                payload.definition,
+                field.payload_scheme(value, json_dumped_value=json_dumped_value, priority_order=priority_order),
+            )
 
         if debug:
             with open(f"payload_{template.type}.json", "w") as f:
-                f.write(json.dumps(payload.model_dump(by_alias=True), indent=4))
+                f.write(json.dumps(payload.model_dump(by_alias=True, mode="json"), indent=4))
 
         return payload
 

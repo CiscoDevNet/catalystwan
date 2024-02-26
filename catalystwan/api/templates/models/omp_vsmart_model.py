@@ -3,18 +3,18 @@ from typing import ClassVar, Optional
 
 from pydantic import ConfigDict, Field
 
+from catalystwan.api.templates.bool_str import BoolStr
 from catalystwan.api.templates.feature_template import FeatureTemplate
-from catalystwan.utils.pydantic_validators import ConvertBoolToStringModel
 
 
-class OMPvSmart(FeatureTemplate, ConvertBoolToStringModel):
+class OMPvSmart(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    graceful_restart: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "graceful-restart"})
+    graceful_restart: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "graceful-restart"})
     send_path_limit: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "send-path-limit"})
-    send_backup_paths: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "send-backup-paths"})
-    discard_rejected: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "discard-rejected"})
-    shutdown: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "shutdown"})
+    send_backup_paths: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "send-backup-paths"})
+    discard_rejected: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "discard-rejected"})
+    shutdown: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "shutdown"})
     graceful_restart_timer: Optional[int] = Field(
         default=None, json_schema_extra={"vmanage_key": "graceful-restart-timer", "data_path": ["timers"]}
     )
@@ -24,7 +24,7 @@ class OMPvSmart(FeatureTemplate, ConvertBoolToStringModel):
     holdtime: Optional[int] = Field(
         default=None, json_schema_extra={"vmanage_key": "holdtime", "data_path": ["timers"]}
     )
-    affinity_group_preference: Optional[bool] = Field(
+    affinity_group_preference: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "affinity-group-preference"}
     )
     advertisement_interval: Optional[int] = Field(

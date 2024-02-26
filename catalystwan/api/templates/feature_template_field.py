@@ -89,7 +89,7 @@ class FeatureTemplateField(BaseModel):
 
     # value must be JSON serializable, return JSON serializable dict
     def payload_scheme(
-        self, value: Any = None, help=None, current_path=None, priority_order=None, vip_type=None
+        self, value: Any = None, json_dumped_value: Any = None, priority_order=None, vip_type=None
     ) -> dict:
         output: dict = {}
         rel_output: dict = {}
@@ -119,10 +119,9 @@ class FeatureTemplateField(BaseModel):
                 if self.children:
                     children_output = []
                     for obj in value:  # obj is User, atomic value. Loop every child
+                        obj_json_dump = obj.model_dump(mode="json")
                         child_payload: dict = {}
                         for child in self.children:  # Child in schema
-                            if current_path is None:
-                                current_path = []
                             obj: FeatureTemplate  # type: ignore
                             model_tuple = next(
                                 filter(
@@ -137,14 +136,14 @@ class FeatureTemplateField(BaseModel):
                             )
                             model_field = model_tuple[1]
                             obj_value = getattr(obj, model_tuple[0])
+                            obj_json_value = obj_json_dump.get(model_tuple[0])
                             po = get_extra_field(model_field, "priority_order")
                             vip_type = get_extra_field(model_field, "vip_type")
                             merge(
                                 child_payload,
                                 child.payload_scheme(
                                     obj_value,
-                                    help=output,
-                                    current_path=self.dataPath + [self.key],
+                                    json_dumped_value=obj_json_value,
                                     priority_order=po,
                                     vip_type=vip_type,
                                 ),
@@ -154,7 +153,7 @@ class FeatureTemplateField(BaseModel):
                         children_output.append(child_payload)
                     output["vipValue"] = children_output
                 else:
-                    output["vipValue"] = value
+                    output["vipValue"] = json_dumped_value
             else:
                 if value is None:
                     return {}
