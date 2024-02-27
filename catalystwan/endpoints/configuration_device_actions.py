@@ -15,6 +15,8 @@ def convert_to_list(element: Union[str, List[str]]) -> List[str]:
 
 DeviceType = Literal["vedge", "controller", "vmanage"]
 
+VersionType = Literal["vmanage", "remote"]
+
 PartitionActionType = Literal["removepartition", "defaultpartition", "changepartition"]
 
 
@@ -76,19 +78,20 @@ class InstallData(BaseModel):
     family: str
     version: str
     version_id: str = Field(serialization_alias="versionId", validation_alias="versionId")
+    remote_server_id: str = Field(serialization_alias="remoteServerId", validation_alias="remoteServerId")
 
 
 class InstallInput(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     data: Optional[List[InstallData]] = Field(default=None)
-    family: Optional[str]
+    family: Optional[str] = Field(default=None)
     reboot: bool
     sync: bool
     v_edge_vpn: int = Field(serialization_alias="vEdgeVPN", validation_alias="vEdgeVPN")
     v_smart_vpn: int = Field(serialization_alias="vSmartVPN", validation_alias="vSmartVPN")
-    version: str = Field(default=None)
-    version_type: str = Field(serialization_alias="versionType", validation_alias="versionType")
+    version: Optional[str] = Field(default=None)
+    version_type: VersionType = Field(serialization_alias="versionType", validation_alias="versionType")
 
 
 class InstallDevice(BaseModel):

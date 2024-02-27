@@ -3,20 +3,20 @@ from unittest.mock import MagicMock, Mock, patch
 
 from catalystwan.api.partition_manager_api import PartitionManagerAPI
 from catalystwan.api.versions_utils import DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
-from catalystwan.dataclasses import Device
 from catalystwan.endpoints.configuration_device_actions import ActionId, RemovePartitionDevice
+from catalystwan.endpoints.configuration_device_inventory import DeviceDetailsResponse
 from catalystwan.typed_list import DataSequence
 
 
 class TestPartitionManagerAPI(unittest.TestCase):
     def setUp(self):
         self.device = DataSequence(
-            Device,
+            DeviceDetailsResponse,
             [
-                Device(
+                DeviceDetailsResponse(
                     personality="vedge",
                     uuid="mock_uuid",
-                    id="mock_ip",
+                    device_ip="mock_ip",
                     hostname="mock_host",
                     reachability="reachable",
                     local_system_ip="mock_ip",

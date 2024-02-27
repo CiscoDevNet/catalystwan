@@ -5,14 +5,15 @@ from typing import TYPE_CHECKING, List, Optional, cast
 
 from catalystwan.api.task_status_api import Task
 from catalystwan.api.versions_utils import DeviceVersions, RepositoryAPI
-from catalystwan.dataclasses import Device
 from catalystwan.endpoints.configuration_device_actions import (
     InstallActionPayload,
+    InstallData,
     InstallDevice,
     InstallInput,
     PartitionActionPayload,
 )
-from catalystwan.exceptions import EmptyVersionPayloadError, VersionDeclarationError  # type: ignore
+from catalystwan.endpoints.configuration_device_inventory import DeviceDetailsResponse
+from catalystwan.exceptions import EmptyVersionPayloadError, ImageNotInRepositoryError  # type: ignore
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.personality import Personality
 from catalystwan.utils.upgrades_helper import get_install_specification, validate_personality_homogeneity
@@ -54,7 +55,7 @@ class SoftwareActionAPI:
 
     def activate(
         self,
-        devices: DataSequence[Device],
+        devices: DataSequence[DeviceDetailsResponse],
         version_to_activate: Optional[str] = "",
         image: Optional[str] = "",
     ) -> Task:
@@ -78,7 +79,7 @@ class SoftwareActionAPI:
         elif version_to_activate and not image:
             version = cast(str, version_to_activate)
         else:
-            raise VersionDeclarationError("You can not provide software_image and image version at the same time!")
+            raise ValueError("You can not provide software_image and image version at the same time!")
 
         payload_devices = self.device_versions.get_device_available(version, devices)
         for device in payload_devices:
@@ -98,12 +99,16 @@ class SoftwareActionAPI:
 
     def install(
         self,
-        devices: DataSequence[Device],
+        devices: DataSequence[DeviceDetailsResponse],
         reboot: bool = False,
         sync: bool = True,
-        image: str = "",
-        image_version: str = "",
+        v_edge_vpn: int = 0,
+        v_smart_vpn: int = 0,
+        image: Optional[str] = None,
+        image_version: Optional[str] = None,
         downgrade_check: bool = True,
+        remote_server_name: Optional[str] = None,
+        remote_image_filename: Optional[str] = None,
     ) -> Task:
         """
         Method to install new software
@@ -126,27 +131,72 @@ class SoftwareActionAPI:
             Task: Task object representing started install process
         """
         validate_personality_homogeneity(devices)
-        if image and not image_version:
-            version = cast(str, self.repository.get_image_version(image))
-        elif image_version and not image:
-            version = cast(str, image_version)
-        else:
-            raise VersionDeclarationError("You can not provide image and image version at the same time")
 
-        install_specification = get_install_specification(devices.first())
+        if (
+            sum(
+                [
+                    image is not None,
+                    image_version is not None,
+                    all([remote_server_name is not None, remote_image_filename is not None]),
+                ]
+            )
+            != 1
+        ):
+            raise ValueError(
+                "Please provide one option to detect software to install."
+                "Pick either 'image', 'image_version', or both 'remote_server_name' and 'remote_image_filename'."
+            )
+
+        # FIXME downgrade_check will be supported when software images from Remote Server will have versions fields
+        if remote_server_name and remote_image_filename and downgrade_check:
+            raise ValueError("Downgrade check is not supported for install action for images from Remote Server.")
+
+        version, remote_image_details = None, None
+        if image:
+            version = cast(str, self.repository.get_image_version(image))
+        if image_version:
+            version = cast(str, image_version)
+        if remote_server_name and remote_image_filename:
+            remote_image_details = self.repository.get_remote_image(remote_image_filename, remote_server_name)
+
+        if not any([version, remote_image_details]):
+            raise ImageNotInRepositoryError(
+                "Based on provided arguments, software version to install on device(s) cannot be detected."
+            )
+
+        install_specification = get_install_specification(devices.first(), remote=bool(remote_image_details))
         install_devices = [
             InstallDevice(**device.model_dump(by_alias=True))
             for device in self.device_versions.get_device_list(devices)
         ]
-        input = InstallInput(
-            v_edge_vpn=0,
-            v_smart_vpn=0,
-            family=install_specification.family.value,
-            version=version,
-            version_type=install_specification.version_type.value,
-            reboot=reboot,
-            sync=sync,
-        )
+
+        if version:
+            input = InstallInput(
+                v_edge_vpn=v_edge_vpn,
+                v_smart_vpn=v_smart_vpn,
+                family=install_specification.family.value,
+                version=version,
+                version_type=install_specification.version_type.value,
+                reboot=reboot,
+                sync=sync,
+            )
+        else:
+            input = InstallInput(
+                v_edge_vpn=v_edge_vpn,
+                v_smart_vpn=v_smart_vpn,
+                data=[
+                    InstallData(
+                        family=install_specification.family.value,
+                        version=remote_image_details.version_id,  # type: ignore
+                        remote_server_id=remote_image_details.remote_server_id,  # type: ignore
+                        version_id=remote_image_details.version_id,  # type: ignore
+                    )
+                ],
+                version_type=install_specification.version_type.value,
+                reboot=reboot,
+                sync=sync,
+            )
+
         device_type = install_specification.device_type.value
         install_payload = InstallActionPayload(
             action="install", input=input, devices=install_devices, device_type=device_type
@@ -154,7 +204,9 @@ class SoftwareActionAPI:
 
         if downgrade_check and devices.first().personality in (Personality.VMANAGE, Personality.EDGE):
             self._downgrade_check(
-                install_payload.devices, install_payload.input.version, install_specification.family.value
+                install_payload.devices,
+                install_payload.input.version,  # type: ignore
+                install_specification.family.value,  # type: ignore
             )
 
         install_action = self.session.endpoints.configuration_device_actions.process_install_operation(

@@ -2,18 +2,18 @@ import unittest
 from unittest.mock import MagicMock, Mock, patch
 
 from catalystwan.api.versions_utils import DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
-from catalystwan.dataclasses import Device
 from catalystwan.endpoints.configuration.software_actions import SoftwareImageDetails
 from catalystwan.endpoints.configuration_device_actions import InstalledDeviceData, PartitionDevice
+from catalystwan.endpoints.configuration_device_inventory import DeviceDetailsResponse
 from catalystwan.typed_list import DataSequence
 
 
 class TestRepositoryAPI(unittest.TestCase):
     def setUp(self):
-        self.device = Device(
+        self.device = DeviceDetailsResponse(
             personality="vedge",
             uuid="mock_uuid",
-            id="mock_ip",
+            device_ip="mock_ip",
             hostname="mock_host",
             reachability="reachable",
             local_system_ip="mock_ip",

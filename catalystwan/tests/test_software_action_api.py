@@ -3,18 +3,18 @@ from unittest.mock import MagicMock, Mock, patch
 
 from catalystwan.api.software_action_api import SoftwareActionAPI
 from catalystwan.api.versions_utils import DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
-from catalystwan.dataclasses import Device
 from catalystwan.endpoints.configuration_device_actions import ActionId, InstallDevice
+from catalystwan.endpoints.configuration_device_inventory import DeviceDetailsResponse
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.upgrades_helper import Family, InstallSpecHelper
 
 
 class TestSoftwareAcionAPI(unittest.TestCase):
     def setUp(self):
-        self.device = Device(
+        self.device = DeviceDetailsResponse(
             personality="vedge",
             uuid="mock_uuid",
-            id="mock_ip",
+            device_ip="mock_ip",
             hostname="mock_host",
             reachability="reachable",
             local_system_ip="mock_ip",
@@ -57,7 +57,7 @@ class TestSoftwareAcionAPI(unittest.TestCase):
 
         # Assert
         answer = self.mock_software_action_obj.install(
-            devices=DataSequence(Device, [self.device]),
+            devices=DataSequence(DeviceDetailsResponse, [self.device]),
             reboot=True,
             sync=True,
             image="path",

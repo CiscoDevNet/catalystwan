@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING, Dict, List, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from catalystwan.dataclasses import Device
 from catalystwan.endpoints.configuration.software_actions import SoftwareImageDetails
 from catalystwan.endpoints.configuration_device_actions import PartitionDevice
+from catalystwan.endpoints.configuration_device_inventory import DeviceDetailsResponse
 from catalystwan.exceptions import ImageNotInRepositoryError
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.upgrades_helper import SoftwarePackageUploadPayload
@@ -112,6 +112,41 @@ class RepositoryAPI:
         logger.error(f"Software image {image_name} is not in available images")
         return None
 
+    def get_remote_image(
+        self, remote_image_filename: str, remote_server_name: str
+    ) -> Union[SoftwareImageDetails, None]:
+        """
+        Get remote software image details, based on name in available files and remote server name.
+
+        Args:
+            remote_image_filename (str): path to software image on remote server
+            remote_server_name (str): remote server name
+
+        Returns:
+            Union[SoftwareImageDetails, None]: remote image image details
+        """
+
+        image_name = PurePath(remote_image_filename).name
+        software_images = self.get_all_software_images()
+        for image_details in software_images:
+            if (
+                image_details.available_files
+                and image_details.version_type
+                and image_name in image_details.available_files
+                and remote_server_name in image_details.version_type
+            ):
+                if not (image_details.remote_server_id and image_details.version_id):
+                    raise ValueError(
+                        f"Requested image: '{image_name}' does not include include required fields for this operation:"
+                        f"image_details.remote_server_id - (current value: {image_details.remote_server_id})"
+                        f"image_details.version_id - (current value: {image_details.version_id})"
+                    )
+                return image_details
+        logger.error(
+            f"Software image {image_name} is not in available in images from remote server {remote_server_name}"
+        )
+        return None
+
     def upload_image(self, image_path: str) -> None:
         """
         Upload software image ('tar.gz' or 'SPA.bin') to vManage software repository
@@ -157,8 +192,17 @@ class DeviceVersions:
     def __init__(self, session: ManagerSession):
         self.repository = RepositoryAPI(session)
 
+    def _validate_devices_required_fields(self, devices: DataSequence[DeviceDetailsResponse]):
+        for device in devices:
+            if not device.uuid or not device.device_ip:
+                raise ValueError(
+                    f"Provided device '{device.host_name}' doesn't include required fields for this operation:"
+                    f"device.uuid (current value: {device.uuid})"
+                    f"device.device_ip (current value: {device.device_ip})"
+                )
+
     def _get_device_list_in(
-        self, version_to_set_up: str, devices: DataSequence[Device], version_type: str
+        self, version_to_set_up: str, devices: DataSequence[DeviceDetailsResponse], version_type: str
     ) -> DataSequence[PartitionDevice]:
         """
         Create devices payload list included requested version, if requested version
@@ -166,15 +210,16 @@ class DeviceVersions:
 
         Args:
             version_to_set_up (str): requested version
-            devices List[Device]: list of Device dataclass instances
+            devices List[DeviceDetailsResponse]: list of Device dataclass instances
             version_type: type of version (installed, available, etc.)
 
         Returns:
             list : list of devices
         """
+        self._validate_devices_required_fields(devices)
         devices_payload = DataSequence(
             PartitionDevice,
-            [PartitionDevice(device_id=device.uuid, device_ip=device.id) for device in devices],
+            [PartitionDevice(device_id=device.uuid, device_ip=device.device_ip) for device in devices],  # type: ignore
         )
         all_dev_versions = self.repository.get_devices_versions_repository()
         for device in devices_payload:
@@ -192,7 +237,7 @@ class DeviceVersions:
         return devices_payload
 
     def get_device_list_in_installed(
-        self, version_to_set_up: str, devices: DataSequence[Device]
+        self, version_to_set_up: str, devices: DataSequence[DeviceDetailsResponse]
     ) -> DataSequence[PartitionDevice]:
         """
         Create devices payload list included requested version, if requested version
@@ -200,7 +245,7 @@ class DeviceVersions:
 
         Args:
             version_to_set_up (str): requested version
-            devices (List[Device]): devices on which action going to be performed
+            devices (List[DeviceDetailsResponse]): devices on which action going to be performed
 
         Returns:
             list : list of devices
@@ -208,7 +253,7 @@ class DeviceVersions:
         return self._get_device_list_in(version_to_set_up, devices, "installed_versions")
 
     def get_device_available(
-        self, version_to_set_up: str, devices: DataSequence[Device]
+        self, version_to_set_up: str, devices: DataSequence[DeviceDetailsResponse]
     ) -> DataSequence[PartitionDevice]:
         """
         Create devices payload list included requested, if requested version
@@ -216,7 +261,7 @@ class DeviceVersions:
 
         Args:
             version_to_set_up (str): requested version
-            devices (List[Device]): devices on which action going to be performed
+            devices (List[DeviceDetailsResponse]): devices on which action going to be performed
 
 
         Returns:
@@ -225,7 +270,7 @@ class DeviceVersions:
         return self._get_device_list_in(version_to_set_up, devices, "available_versions")
 
     def _get_devices_chosen_version(
-        self, devices: DataSequence[Device], version_type: str
+        self, devices: DataSequence[DeviceDetailsResponse], version_type: str
     ) -> DataSequence[PartitionDevice]:
         """
         Create devices payload list included software version key
@@ -233,28 +278,32 @@ class DeviceVersions:
 
         Args:
             version_to_set_up (str): requested version
-            devices (List[Device]): devices on which action going to be performed
+            devices (List[DeviceDetailsResponse]): devices on which action going to be performed
 
         Returns:
             list : list of devices
         """
+        self._validate_devices_required_fields(devices)
+
         devices_payload = DataSequence(
             PartitionDevice,
-            [PartitionDevice(device_id=device.uuid, device_ip=device.id) for device in devices],
+            [PartitionDevice(device_id=device.uuid, device_ip=device.device_ip) for device in devices],  # type: ignore
         )
         all_dev_versions = self.repository.get_devices_versions_repository()
         for device in devices_payload:
             device.version = getattr(all_dev_versions[device.device_id], version_type)
         return devices_payload
 
-    def get_devices_current_version(self, devices: DataSequence[Device]) -> DataSequence[PartitionDevice]:
+    def get_devices_current_version(
+        self, devices: DataSequence[DeviceDetailsResponse]
+    ) -> DataSequence[PartitionDevice]:
         """
         Create devices payload list included current software version key
         for every device in devices list
 
         Args:
             version_to_set_up (str): requested version
-            devices (List[Device]): devices on which action going to be performed
+            devices (List[DeviceDetailsResponse]): devices on which action going to be performed
 
         Returns:
             list : list of devices
@@ -262,13 +311,15 @@ class DeviceVersions:
 
         return self._get_devices_chosen_version(devices, "current_version")
 
-    def get_devices_available_versions(self, devices: DataSequence[Device]) -> DataSequence[PartitionDevice]:
+    def get_devices_available_versions(
+        self, devices: DataSequence[DeviceDetailsResponse]
+    ) -> DataSequence[PartitionDevice]:
         """
         Create devices payload list included available software versions key
         for every device in devices list
 
         Args:
-            devices (List[Device]): devices on which action going to be performed
+            devices (List[DeviceDetailsResponse]): devices on which action going to be performed
 
         Returns:
             list : list of devices
@@ -276,5 +327,9 @@ class DeviceVersions:
 
         return self._get_devices_chosen_version(devices, "available_versions")
 
-    def get_device_list(self, devices: DataSequence[Device]) -> List[PartitionDevice]:
-        return [PartitionDevice(device_id=device.uuid, device_ip=device.id) for device in devices]  # type: ignore
+    def get_device_list(self, devices: DataSequence[DeviceDetailsResponse]) -> List[PartitionDevice]:
+        self._validate_devices_required_fields(devices)
+
+        return [
+            PartitionDevice(device_id=device.uuid, device_ip=device.device_ip) for device in devices  # type: ignore
+        ]
