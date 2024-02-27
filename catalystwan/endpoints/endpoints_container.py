@@ -64,8 +64,8 @@ from catalystwan.endpoints.configuration.policy.list.region import Configuration
 from catalystwan.endpoints.configuration.policy.list.site import ConfigurationPolicySiteList
 from catalystwan.endpoints.configuration.policy.list.sla import ConfigurationPolicySLAClassList
 from catalystwan.endpoints.configuration.policy.list.tloc import ConfigurationPolicyTLOCList
-from catalystwan.endpoints.configuration.policy.list.url_black_list import ConfigurationPolicyURLBlackList
-from catalystwan.endpoints.configuration.policy.list.url_white_list import ConfigurationPolicyURLWhiteList
+from catalystwan.endpoints.configuration.policy.list.url_black_list import ConfigurationPolicyURLBlockList
+from catalystwan.endpoints.configuration.policy.list.url_white_list import ConfigurationPolicyURLAllowList
 from catalystwan.endpoints.configuration.policy.list.vpn import ConfigurationPolicyVPNList
 from catalystwan.endpoints.configuration.policy.list.zone import ConfigurationPolicyZoneList
 from catalystwan.endpoints.configuration.policy.security_template import ConfigurationSecurityTemplatePolicy
@@ -123,8 +123,8 @@ class ConfigurationPolicyListContainer:
         self.site = ConfigurationPolicySiteList(session)
         self.sla = ConfigurationPolicySLAClassList(session)
         self.tloc = ConfigurationPolicyTLOCList(session)
-        self.url_black_list = ConfigurationPolicyURLBlackList(session)
-        self.url_white_list = ConfigurationPolicyURLWhiteList(session)
+        self.url_black_list = ConfigurationPolicyURLBlockList(session)
+        self.url_white_list = ConfigurationPolicyURLAllowList(session)
         self.vpn = ConfigurationPolicyVPNList(session)
         self.zone = ConfigurationPolicyZoneList(session)
 

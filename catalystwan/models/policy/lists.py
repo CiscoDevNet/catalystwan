@@ -165,12 +165,12 @@ class IPSSignatureList(PolicyListBase):
     entries: List[IPSSignatureListEntry] = []
 
 
-class URLWhiteList(PolicyListBase):
+class URLAllowList(PolicyListBase):
     type: Literal["urlWhiteList"] = "urlWhiteList"
     entries: List[URLListEntry] = []
 
 
-class URLBlackList(PolicyListBase):
+class URLBlockList(PolicyListBase):
     type: Literal["urlBlackList"] = "urlBlackList"
     entries: List[URLListEntry] = []
 

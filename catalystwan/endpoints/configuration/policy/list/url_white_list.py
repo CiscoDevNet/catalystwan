@@ -4,7 +4,7 @@
 from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
-from catalystwan.models.policy.lists import URLWhiteList
+from catalystwan.models.policy.lists import URLAllowList
 from catalystwan.models.policy.policy_list import (
     InfoTag,
     PolicyListEndpoints,
@@ -15,17 +15,17 @@ from catalystwan.models.policy.policy_list import (
 from catalystwan.typed_list import DataSequence
 
 
-class URLWhiteListEditPayload(URLWhiteList, PolicyListId):
+class URLAllowListEditPayload(URLAllowList, PolicyListId):
     pass
 
 
-class URLWhiteListInfo(URLWhiteList, PolicyListInfo):
+class URLAllowListInfo(URLAllowList, PolicyListInfo):
     pass
 
 
-class ConfigurationPolicyURLWhiteList(APIEndpoints, PolicyListEndpoints):
+class ConfigurationPolicyURLAllowList(APIEndpoints, PolicyListEndpoints):
     @post("/template/policy/list/urlwhitelist")
-    def create_policy_list(self, payload: URLWhiteList) -> PolicyListId:
+    def create_policy_list(self, payload: URLAllowList) -> PolicyListId:
         ...
 
     @delete("/template/policy/list/urlwhitelist/{id}")
@@ -37,23 +37,23 @@ class ConfigurationPolicyURLWhiteList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/urlwhitelist/{id}")
-    def edit_policy_list(self, id: UUID, payload: URLWhiteListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: URLAllowListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/urlwhitelist/{id}")
-    def get_lists_by_id(self, id: UUID) -> URLWhiteListInfo:
+    def get_lists_by_id(self, id: UUID) -> URLAllowListInfo:
         ...
 
     @get("/template/policy/list/urlwhitelist", "data")
-    def get_policy_lists(self) -> DataSequence[URLWhiteListInfo]:
+    def get_policy_lists(self) -> DataSequence[URLAllowListInfo]:
         ...
 
     @get("/template/policy/list/urlwhitelist/filtered", "data")
-    def get_policy_lists_with_info_tag(self, params: InfoTag) -> DataSequence[URLWhiteListInfo]:
+    def get_policy_lists_with_info_tag(self, params: InfoTag) -> DataSequence[URLAllowListInfo]:
         ...
 
     @post("/template/policy/list/urlwhitelist/preview")
-    def preview_policy_list(self, payload: URLWhiteList) -> PolicyListPreview:
+    def preview_policy_list(self, payload: URLAllowList) -> PolicyListPreview:
         ...
 
     @get("/template/policy/list/urlwhitelist/preview/{id}")

@@ -162,7 +162,7 @@ def run_demo(args: CmdArguments):
                 | INTERACTIVE_VIDEO | High     |   34 |                        4 |
                 +-------------------+----------+------+--------------------------+
             12. Click Save Policy.
-            13. Click Save Policy Changes to save the changes to the localized master policy.
+            13. Click Save Policy Changes to save the changes to the localized parent policy.
         """
         logger.info("II.C. Configure Localized Policy: Create Re-write Policy")
         from catalystwan.models.policy import RewritePolicy
