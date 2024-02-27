@@ -124,13 +124,13 @@ from catalystwan.endpoints.configuration.policy.list.region import Configuration
 from catalystwan.endpoints.configuration.policy.list.site import ConfigurationPolicySiteList, SiteListInfo
 from catalystwan.endpoints.configuration.policy.list.sla import ConfigurationPolicySLAClassList, SLAClassListInfo
 from catalystwan.endpoints.configuration.policy.list.tloc import ConfigurationPolicyTLOCList, TLOCListInfo
-from catalystwan.endpoints.configuration.policy.list.url_black_list import (
-    ConfigurationPolicyURLBlockList,
-    URLBlockListInfo,
-)
-from catalystwan.endpoints.configuration.policy.list.url_white_list import (
+from catalystwan.endpoints.configuration.policy.list.url_allow_list import (
     ConfigurationPolicyURLAllowList,
     URLAllowListInfo,
+)
+from catalystwan.endpoints.configuration.policy.list.url_block_list import (
+    ConfigurationPolicyURLBlockList,
+    URLBlockListInfo,
 )
 from catalystwan.endpoints.configuration.policy.list.vpn import ConfigurationPolicyVPNList, VPNListInfo
 from catalystwan.endpoints.configuration.policy.list.zone import ConfigurationPolicyZoneList, ZoneListInfo
