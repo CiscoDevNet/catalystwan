@@ -1,5 +1,8 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 import unittest
 from unittest.mock import patch
+from uuid import uuid4
 
 from parameterized import parameterized  # type: ignore
 
@@ -85,7 +88,7 @@ class TestRadiusAPI(unittest.TestCase):
                 "vpn": 1,
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
-                "secretKey": "cisco123",
+                "secretKey": str(uuid4()),
                 "priority": 1,
             },
             {
@@ -95,7 +98,7 @@ class TestRadiusAPI(unittest.TestCase):
                 "vpn": 1,
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
-                "secretKey": "cisco123",
+                "secretKey": str(uuid4()),
                 "priority": 1,
             },
             {
@@ -105,7 +108,7 @@ class TestRadiusAPI(unittest.TestCase):
                 "vpn": 1,
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
-                "secretKey": "cisco123",
+                "secretKey": str(uuid4()),
                 "priority": 1,
             },
         ]
@@ -118,7 +121,7 @@ class TestRadiusAPI(unittest.TestCase):
                 "vpn": 1,
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
-                "secretKey": "cisco123",
+                "secretKey": str(uuid4()),
                 "priority": 1,
             },
             {
@@ -128,7 +131,7 @@ class TestRadiusAPI(unittest.TestCase):
                 "vpn": 1,
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
-                "secretKey": "cisco123",
+                "secretKey": str(uuid4()),
                 "priority": 1,
             },
         ]
@@ -194,7 +197,7 @@ class TestTacacsAPI(unittest.TestCase):
                 "vpn": 1,
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
-                "secretKey": "cisco123",
+                "secretKey": str(uuid4()),
                 "priority": 1,
             },
             {
@@ -203,7 +206,7 @@ class TestTacacsAPI(unittest.TestCase):
                 "vpn": 1,
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
-                "secretKey": "cisco123",
+                "secretKey": str(uuid4()),
                 "priority": 2,
             },
             {
@@ -212,7 +215,7 @@ class TestTacacsAPI(unittest.TestCase):
                 "vpn": 1,
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
-                "secretKey": "cisco123",
+                "secretKey": str(uuid4()),
                 "priority": 3,
             },
         ]
@@ -224,7 +227,7 @@ class TestTacacsAPI(unittest.TestCase):
                 "vpn": 1,
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
-                "secretKey": "cisco123",
+                "secretKey": str(uuid4()),
                 "priority": 1,
             },
             {
@@ -233,7 +236,7 @@ class TestTacacsAPI(unittest.TestCase):
                 "vpn": 1,
                 "vpnIpSubnet": "192.168.1.0/24",
                 "key": "testing",
-                "secretKey": "cisco123",
+                "secretKey": str(uuid4()),
                 "priority": 2,
             },
         ]

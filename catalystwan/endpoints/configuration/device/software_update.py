@@ -1,3 +1,5 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 # mypy: disable-error-code="empty-body"
 from catalystwan.endpoints import APIEndpoints, post
 from catalystwan.utils.upgrades_helper import SoftwarePackageUploadPayload

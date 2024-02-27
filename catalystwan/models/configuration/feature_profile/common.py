@@ -1,3 +1,5 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 from datetime import datetime
 from typing import Generic, List, Literal, Optional, TypeVar, Union
 from uuid import UUID

@@ -1,3 +1,5 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+
 from typing import Literal, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field

@@ -1,3 +1,5 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+
 import logging
 import sys
 from dataclasses import dataclass

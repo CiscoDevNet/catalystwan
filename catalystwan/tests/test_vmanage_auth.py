@@ -1,3 +1,5 @@
+# Copyright 2022 Cisco Systems, Inc. and its affiliates
+
 import unittest
 from unittest import TestCase, mock
 
@@ -43,7 +45,7 @@ def mocked_requests_method(*args, **kwargs):
 class TestvManageAuth(TestCase):
     def setUp(self):
         self.base_url = "https://1.1.1.1:1111"
-        self.password = "admin"
+        self.password = "admin"  # pragma: allowlist secret
 
     @mock.patch("requests.post", side_effect=mocked_requests_method)
     def test_get_cookie(self, mock_post):
@@ -51,7 +53,7 @@ class TestvManageAuth(TestCase):
         username = "admin"
         security_payload = {
             "j_username": username,
-            "j_password": "admin",
+            "j_password": "admin",  # pragma: allowlist secret
         }
         auth = vManageAuth(self.base_url, username, self.password)
         # Act
@@ -71,7 +73,7 @@ class TestvManageAuth(TestCase):
         username = "invalid_username"
         security_payload = {
             "j_username": username,
-            "j_password": "admin",
+            "j_password": "admin",  # pragma: allowlist secret
         }
         auth = vManageAuth(self.base_url, username, self.password)
         # Act

@@ -1,3 +1,5 @@
+# Copyright 2022 Cisco Systems, Inc. and its affiliates
+
 import datetime as dt
 from typing import Any, ClassVar, Dict, Iterable, List, Protocol, Type, TypeVar, runtime_checkable
 

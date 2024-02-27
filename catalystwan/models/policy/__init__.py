@@ -1,3 +1,5 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+
 # This stub provide top-level "public" policy models to be used with PolicyAPI()
 from typing import List, Union
 

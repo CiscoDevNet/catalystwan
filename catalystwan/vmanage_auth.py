@@ -1,3 +1,5 @@
+# Copyright 2022 Cisco Systems, Inc. and its affiliates
+
 import logging
 from typing import Optional
 from urllib.parse import urljoin
