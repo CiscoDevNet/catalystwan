@@ -36,13 +36,12 @@ class SoftwareActionAPI:
     session = create_manager_session(...)
 
     # Prepare devices list
-    devices = session.api.devices.get()
-    vsmarts = devices.filter(personality=Personality.VSMART)
+    controllers = session.endpoints.configuration_device_inventory.get_device_details('controllers')
+    vsmarts = controllers.filter(personality=Personality.VSMART)
     software_image = "viptela-20.7.2-x86_64.tar.gz"
 
     # Upgrade
-    upgrade_id = SoftwareActionAPI(session).install(devices = vmanages,
-    software_image=software_image)
+    upgrade_id = SoftwareActionAPI(session).install(devices = vsmarts, software_image=software_image)
 
     # Check upgrade status
     TaskAPI(session, software_action_id).wait_for_completed()
@@ -60,15 +59,18 @@ class SoftwareActionAPI:
         image: Optional[str] = "",
     ) -> Task:
         """
-        Set chosen version as current version
+        Set chosen version as current version. Requires that selected devices have already version_to_activate
+        or image present in their available files.
 
         Args:
-            devices (List[Device]): For those devices software will be activated
+            devices (List[DeviceDetailsResponse]): For those devices software will be activated
             version_to_activate (Optional[str]): version to be set as current version
-            image (Optional[str]): path to software image or its name from available files
+            image (Optional[str]): software image name in available files
 
-            Notice: Have to pass one of those arguments (version_to_activate,
-            image)
+            Notice: Have to pass one of those arguments (version_to_activate, image)
+
+        Raises:
+            EmptyVersionPayloadError: If selected version_to_activate or image not detected in available files
 
         Returns:
             str: Activate software action id
@@ -114,18 +116,25 @@ class SoftwareActionAPI:
         Method to install new software
 
         Args:
-            devices (List[Device]): For those devices software will be activated
-            reboot (bool): reboot device after action end
+            devices (List[DeviceDetailsResponse]): For those devices software will be activated
+            reboot (bool, optional): reboot device after action end
             sync (bool, optional): Synchronize settings. Defaults to True.
+            v_edge_vpn (int, optional): vEdge VPN
+            v_smart_vpn (int, optional): vSmart VPN
             image (str): path to software image or its name from available files
             image_version (str): version of software image
-            downgrade_check (bool): perform a downgrade check when applicable
+            downgrade_check (bool, optional): perform a downgrade check when applicable
+            remote_server_name (str): name of configured Remote Server
+            remote_image_filename (str): filename to choose from selected Remote Server
 
-            Notice: Have to pass one of those arguments (image_version,
-            image)
+            Notice: Have to pass one of those:
+                - image_version
+                - image
+                - remote_server_name and remote_image_filename
 
         Raises:
-            ValueError: Raise error if downgrade in certain cases
+            ValueError: Raise error if downgrade in certain cases or wrong arguments combination provided
+            ImageNotInRepositoryError: If selected image, image_version or remote_image_filename not found
 
         Returns:
             Task: Task object representing started install process
@@ -222,10 +231,10 @@ class SoftwareActionAPI:
 
         Args:
             version_to_upgrade (str): version to upgrade
-            devices_category (DeviceCategory): devices category
+            payload_devices List[InstallDevice]: list of Devices to check downgrade possibility
 
-        Returns:
-            List[str]: list of devices with no permission to downgrade
+        Raises:
+            ValueError: If for any of the devices upgrade action is denied
         """
         incorrect_devices = []
         devices_versions_repo = self.repository.get_devices_versions_repository()

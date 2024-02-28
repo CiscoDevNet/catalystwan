@@ -94,7 +94,9 @@ class RepositoryAPI:
 
     def get_image_version(self, software_image: str) -> Union[str, None]:
         """
-        Get proper software image version, based on name in available files
+        Get proper software image version, based on name in available files.
+
+        If software_image detected in available files, but doesn't include version_name, software_image won't be used.
 
         Args:
             software_image (str): path to software image
@@ -107,8 +109,11 @@ class RepositoryAPI:
         software_images = self.get_all_software_images()
         for image in software_images:
             if image.available_files and image_name in image.available_files:
-                image_version = image.version_name
-                return image_version
+                if image.version_name:
+                    return image.version_name
+                logger.warning(
+                    f"Detected image {image_name} in available files has version_name 'None' value. Image excluded."
+                )
         logger.error(f"Software image {image_name} is not in available images")
         return None
 
