@@ -4,7 +4,7 @@ from typing import List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase, as_default
 from catalystwan.utils.timezone import Timezone
 
 ConsoleBaudRate = Literal["1200", "2400", "4800", "9600", "19200", "38400", "57600", "115200"]
@@ -18,7 +18,7 @@ DefaultTimezone = Literal["UTC"]
 
 class Clock(BaseModel):
     timezone: Union[Variable, Global[Timezone], Default[DefaultTimezone]] = Field(
-        default="UTC", description="Set the timezone"
+        default=as_default("UTC"), description="Set the timezone"
     )
 
 
@@ -28,7 +28,7 @@ class MobileNumberItem(BaseModel):
 
 class Sms(BaseModel):
     enable: Optional[Union[Global[bool], Default[Literal[False]]]] = Field(
-        default=False, description="Global[bool] device’s geo fencing SMS"
+        None, description="Global[bool] device’s geo fencing SMS"
     )
     mobile_number: Optional[List[MobileNumberItem]] = Field(
         None,
@@ -48,10 +48,10 @@ class GeoFencing(BaseModel):
 
 class GpsVariable(BaseModel):
     longitude: Union[Variable, Global[float], Default[None]] = Field(
-        default=None, description="Set the device physical longitude"
+        default=as_default(None), description="Set the device physical longitude"
     )
     latitude: Union[Variable, Global[float], Default[None]] = Field(
-        default=None, description="Set the device physical latitude"
+        default=as_default(None), description="Set the device physical latitude"
     )
     geo_fencing: Optional[GeoFencing] = Field(
         None,
@@ -72,7 +72,7 @@ class OnDemand(BaseModel):
         Global[int],
         Default[int],
     ] = Field(
-        default=10,
+        default=as_default(10),
         serialization_alias="onDemandVariable",
         validation_alias="onDemandVariable",
         description="Set the idle timeout for on-demand tunnels",
@@ -88,13 +88,13 @@ class AffinityPerVrfItem(BaseModel):
         Global[int],
         Default[None],
     ] = Field(
-        default=None,
+        default=as_default(None),
         serialization_alias="affinityGroupNumber",
         validation_alias="affinityGroupNumber",
         description="Affinity Group Number",
     )
     vrf_range: Union[Variable, Global[str], Default[None]] = Field(
-        default=None,
+        default=as_default(None),
         serialization_alias="vrfRange",
         validation_alias="vrfRange",
         description="Range of VRFs",
@@ -109,10 +109,10 @@ class BasicParcel(_ParcelBase):
     )
     clock: Clock
     description: Union[Variable, Global[str], Default[None]] = Field(
-        default=None, description="Set a text description of the device"
+        default=as_default(None), description="Set a text description of the device"
     )
     location: Union[Variable, Global[str], Default[None]] = Field(
-        default=None, description="Set the location of the device"
+        default=as_default(None), description="Set the location of the device"
     )
     gps_location: GpsVariable = Field(
         ...,
@@ -120,7 +120,7 @@ class BasicParcel(_ParcelBase):
         validation_alias="gpsVariable",
     )
     device_groups: Union[Variable, Global[List[str]], Default[None]] = Field(
-        default=None,
+        default=as_default(None),
         serialization_alias="deviceGroups",
         validation_alias="deviceGroups",
         description="Device groups",
@@ -138,13 +138,13 @@ class BasicParcel(_ParcelBase):
         description="Configure a list of comma-separated controller groups",
     )
     overlay_id: Union[Variable, Global[int], Default[int]] = Field(
-        default=1,
+        default=as_default(1),
         serialization_alias="overlayId",
         validation_alias="overlayId",
         description="Set the Overlay ID",
     )
     port_offset: Union[Variable, Global[int], Default[int]] = Field(
-        default=0,
+        default=as_default(0),
         serialization_alias="portOffset",
         validation_alias="portOffset",
         description="Set the TLOC port offset when multiple devices are behind a NAT",
@@ -174,13 +174,13 @@ class BasicParcel(_ParcelBase):
         description="OMP Tag attached to routes based on interface tracking",
     )
     console_baud_rate: Union[Variable, Global[ConsoleBaudRate], Default[DefaultConsoleBaudRate]] = Field(
-        default="9600",
+        default=as_default("9600"),
         serialization_alias="consoleBaudRate",
         validation_alias="consoleBaudRate",
         description="Set the console baud rate",
     )
     max_omp_sessions: Union[Variable, Global[int], Default[None]] = Field(
-        default=None,
+        default=as_default(None),
         serialization_alias="maxOmpSessions",
         validation_alias="maxOmpSessions",
         description="Set the maximum number of OMP sessions <1..100> the device can have",
@@ -216,7 +216,7 @@ class BasicParcel(_ParcelBase):
         description="Enable or disable endpoint tracker diaStabilize status",
     )
     admin_tech_on_failure: Union[Variable, Global[bool], Default[Literal[True]]] = Field(
-        default=True,
+        default=as_default(True),
         serialization_alias="adminTechOnFailure",
         validation_alias="adminTechOnFailure",
         description="Collect admin-tech before reboot due to daemon failure",
