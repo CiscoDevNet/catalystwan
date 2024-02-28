@@ -384,7 +384,7 @@ class SystemFeatureProfileAPI:
         Update System Parcel for selected profile_id based on payload type
         """
 
-        return self.endpoint.update(profile_id, payload._get_parcel_type(), parcel_id, payload=payload)
+        return self.endpoint.update(profile_id, payload._get_parcel_type(), parcel_id, payload)
 
     @overload
     def delete(
