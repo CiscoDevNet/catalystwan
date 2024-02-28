@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List, Literal, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
 
@@ -13,6 +13,7 @@ Role = Literal["edge-router", "border-router"]
 class ManagementRegion(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
+        populate_by_name=True,
     )
     vrf_id: Optional[Union[Global[int], Default[None], Variable]] = Field(
         None, serialization_alias="vrfId", validation_alias="vrfId", description="VRF name for management region"
@@ -36,35 +37,33 @@ class MRFParcel(_ParcelBase):
 
     model_config = ConfigDict(
         extra="forbid",
+        populate_by_name=True,
     )
     secondary_region: Optional[Union[Global[int], Variable, Default[None]]] = Field(
         None,
-        serialization_alias="secondaryRegion",
-        validation_alias="secondaryRegion",
+        validation_alias=AliasPath("data", "secondaryRegion"),
         description="Set secondary region ID",
     )
-    role: Optional[Union[Global[Role], Variable, Default[None]]] = Field(None, description="Set the role for router")
+    role: Optional[Union[Global[Role], Variable, Default[None]]] = Field(
+        None, validation_alias=AliasPath("data", "role"), description="Set the role for router"
+    )
     enable_mrf_migration: Optional[Union[Global[EnableMrfMigration], Default[None]]] = Field(
         None,
-        serialization_alias="enableMrfMigration",
-        validation_alias="enableMrfMigration",
+        validation_alias=AliasPath("data", "enableMrfMigration"),
         description="Enable migration mode to Multi-Region Fabric",
     )
     migration_bgp_community: Optional[Union[Global[int], Default[None]]] = Field(
         None,
-        serialization_alias="migrationBgpCommunity",
-        validation_alias="migrationBgpCommunity",
+        validation_alias=AliasPath("data", "migrationBgpCommunity"),
         description="Set BGP community during migration from BGP-core based network",
     )
     enable_management_region: Optional[Union[Global[bool], Default[Literal[False]], Variable]] = Field(
         None,
-        serialization_alias="enableManagementRegion",
-        validation_alias="enableManagementRegion",
+        validation_alias=AliasPath("data", "enableManagementRegion"),
         description="Enable management region",
     )
     management_region: Optional[ManagementRegion] = Field(
         None,
-        serialization_alias="managementRegion",
-        validation_alias="managementRegion",
+        validation_alias=AliasPath("data", "managementRegion"),
         description="Management Region",
     )

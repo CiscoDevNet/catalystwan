@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List, Literal, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase, as_default
 from catalystwan.utils.timezone import Timezone
@@ -27,6 +27,10 @@ class MobileNumberItem(BaseModel):
 
 
 class Sms(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
     enable: Optional[Union[Global[bool], Default[Literal[False]]]] = Field(
         None, description="Global[bool] device’s geo fencing SMS"
     )
@@ -47,6 +51,10 @@ class GeoFencing(BaseModel):
 
 
 class GpsVariable(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
     longitude: Union[Variable, Global[float], Default[None]] = Field(
         default=as_default(None), description="Set the device physical longitude"
     )
@@ -61,8 +69,12 @@ class GpsVariable(BaseModel):
 
 
 class OnDemand(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
     on_demand_enable: Union[Variable, Global[bool], Default[Literal[False]]] = Field(
-        default=False,
+        default=as_default(False),
         serialization_alias="onDemandEnable",
         validation_alias="onDemandEnable",
         description="Enable or disable On-demand Tunnel",
@@ -82,6 +94,7 @@ class OnDemand(BaseModel):
 class AffinityPerVrfItem(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
+        populate_by_name=True,
     )
     affinity_group_number: Union[
         Variable,
@@ -106,23 +119,26 @@ class BasicParcel(_ParcelBase):
 
     model_config = ConfigDict(
         extra="forbid",
+        populate_by_name=True,
     )
-    clock: Clock
+    clock: Clock = Field(validation_alias=AliasPath("data", "clock"))
     description: Union[Variable, Global[str], Default[None]] = Field(
-        default=as_default(None), description="Set a text description of the device"
+        default=as_default(None),
+        validation_alias=AliasPath("data", "description"),
+        description="Set a text description of the device",
     )
     location: Union[Variable, Global[str], Default[None]] = Field(
-        default=as_default(None), description="Set the location of the device"
+        default=as_default(None),
+        validation_alias=AliasPath("data", "location"),
+        description="Set the location of the device",
     )
     gps_location: GpsVariable = Field(
         ...,
-        serialization_alias="gpsVariable",
-        validation_alias="gpsVariable",
+        validation_alias=AliasPath("data", "gpsVariable"),
     )
     device_groups: Union[Variable, Global[List[str]], Default[None]] = Field(
         default=as_default(None),
-        serialization_alias="deviceGroups",
-        validation_alias="deviceGroups",
+        validation_alias=AliasPath("data", "deviceGroups"),
         description="Device groups",
     )
     controller_group_list: Optional[
@@ -133,62 +149,52 @@ class BasicParcel(_ParcelBase):
         ]
     ] = Field(
         None,
-        serialization_alias="controllerGroupList",
-        validation_alias="controllerGroupList",
+        validation_alias=AliasPath("data", "controllerGroupList"),
         description="Configure a list of comma-separated controller groups",
     )
     overlay_id: Union[Variable, Global[int], Default[int]] = Field(
         default=as_default(1),
-        serialization_alias="overlayId",
-        validation_alias="overlayId",
+        validation_alias=AliasPath("data", "overlayId"),
         description="Set the Overlay ID",
     )
     port_offset: Union[Variable, Global[int], Default[int]] = Field(
         default=as_default(0),
-        serialization_alias="portOffset",
-        validation_alias="portOffset",
+        validation_alias=AliasPath("data", "portOffset"),
         description="Set the TLOC port offset when multiple devices are behind a NAT",
     )
     port_hop: Union[Variable, Global[bool], Default[Literal[True]]] = Field(
         default=True,
-        serialization_alias="portHop",
-        validation_alias="portHop",
+        validation_alias=AliasPath("data", "portHop"),
         description="Enable port hopping",
     )
     control_session_pps: Optional[Union[Variable, Global[int], Default[int]]] = Field(
         None,
-        serialization_alias="controlSessionPps",
-        validation_alias="controlSessionPps",
+        validation_alias=AliasPath("data", "controlSessionPps"),
         description="Set the policer rate for control sessions",
     )
     track_transport: Optional[Union[Variable, Global[bool], Default[Literal[True]]]] = Field(
         None,
-        serialization_alias="trackTransport",
-        validation_alias="trackTransport",
+        validation_alias=AliasPath("data", "trackTransport"),
         description="Configure tracking of transport",
     )
     track_interface_tag: Optional[Union[Variable, Global[int], Default[None]]] = Field(
         None,
-        serialization_alias="trackInterfaceTag",
-        validation_alias="trackInterfaceTag",
+        validation_alias=AliasPath("data", "trackInterfaceTag"),
         description="OMP Tag attached to routes based on interface tracking",
     )
     console_baud_rate: Union[Variable, Global[ConsoleBaudRate], Default[DefaultConsoleBaudRate]] = Field(
         default=as_default("9600"),
-        serialization_alias="consoleBaudRate",
-        validation_alias="consoleBaudRate",
+        validation_alias=AliasPath("data", "consoleBaudRate"),
         description="Set the console baud rate",
     )
     max_omp_sessions: Union[Variable, Global[int], Default[None]] = Field(
         default=as_default(None),
-        serialization_alias="maxOmpSessions",
-        validation_alias="maxOmpSessions",
+        validation_alias=AliasPath("data", "maxOmpSessions"),
         description="Set the maximum number of OMP sessions <1..100> the device can have",
     )
     multi_tenant: Optional[Union[Variable, Global[bool], Default[Literal[False]]]] = Field(
         None,
-        serialization_alias="multiTenant",
-        validation_alias="multiTenant",
+        validation_alias=AliasPath("data", "multiTenant"),
         description="Device is multi-tenant",
     )
     track_default_gateway: Optional[
@@ -199,8 +205,7 @@ class BasicParcel(_ParcelBase):
         ]
     ] = Field(
         None,
-        serialization_alias="trackDefaultGateway",
-        validation_alias="trackDefaultGateway",
+        validation_alias=AliasPath("data", "trackDefaultGateway"),
         description="Enable or disable default gateway tracking",
     )
     tracker_dia_stabilize_status: Optional[
@@ -211,41 +216,36 @@ class BasicParcel(_ParcelBase):
         ]
     ] = Field(
         None,
-        serialization_alias="trackerDiaStabilizeStatus",
-        validation_alias="trackerDiaStabilizeStatus",
+        validation_alias=AliasPath("data", "trackerDiaStabilizeStatus"),
         description="Enable or disable endpoint tracker diaStabilize status",
     )
     admin_tech_on_failure: Union[Variable, Global[bool], Default[Literal[True]]] = Field(
         default=as_default(True),
-        serialization_alias="adminTechOnFailure",
-        validation_alias="adminTechOnFailure",
+        validation_alias=AliasPath("data", "adminTechOnFailure"),
         description="Collect admin-tech before reboot due to daemon failure",
     )
     idle_timeout: Optional[Union[Variable, Global[int], Default[None]]] = Field(
         None,
-        serialization_alias="idleTimeout",
-        validation_alias="idleTimeout",
+        validation_alias=AliasPath("data", "idleTimeout"),
         description="Idle CLI timeout in minutes",
     )
     on_demand: OnDemand = Field(
         ...,
-        serialization_alias="onDemand",
-        validation_alias="onDemand",
+        validation_alias=AliasPath("data", "onDemand"),
     )
     transport_gateway: Optional[Union[Global[bool], Variable, Default[Literal[False]]]] = Field(
         None,
-        serialization_alias="transportGateway",
-        validation_alias="transportGateway",
+        validation_alias=AliasPath("data", "transportGateway"),
         description="Enable transport gateway",
     )
     epfr: Optional[Union[Global[Epfr], Default[DefaultEpfr], Variable]] = Field(
         None,
+        validation_alias=AliasPath("data", "epfr"),
         description="Enable SLA Dampening and Enhanced App Routing.",
     )
     site_type: Optional[Union[Variable, Global[List[SiteType]], Default[None]]] = Field(
         None,
-        serialization_alias="siteType",
-        validation_alias="siteType",
+        validation_alias=AliasPath("data", "siteType"),
         description="Site Type",
     )
     affinity_group_number: Optional[
@@ -256,9 +256,8 @@ class BasicParcel(_ParcelBase):
         ]
     ] = Field(
         None,
-        serialization_alias="affinityGroupGlobal[str]",
-        validation_alias="affinityGroupGlobal[str]",
-        description="Affinity Group Global[str]",
+        validation_alias=AliasPath("data", "affinityGroupNumber"),
+        description="Affinity Group Number",
     )
     affinity_group_preference: Optional[
         Union[
@@ -268,8 +267,7 @@ class BasicParcel(_ParcelBase):
         ]
     ] = Field(
         None,
-        serialization_alias="affinityGroupPreference",
-        validation_alias="affinityGroupPreference",
+        validation_alias=AliasPath("data", "affinityGroupPreference"),
         description="Affinity Group Preference",
     )
     affinity_preference_auto: Optional[
@@ -280,15 +278,13 @@ class BasicParcel(_ParcelBase):
         ]
     ] = Field(
         None,
-        serialization_alias="affinityPreferenceAuto",
-        validation_alias="affinityPreferenceAuto",
+        validation_alias=AliasPath("data", "affinityPreferenceAuto"),
         description="Affinity Group Preference Auto",
     )
     affinity_per_vrf: Optional[List[AffinityPerVrfItem]] = Field(
         None,
-        serialization_alias="affinityPerVrf",
-        validation_alias="affinityPerVrf",
-        description="Affinity Group Global[str] for VRFs",
+        validation_alias=AliasPath("data", "affinityPerVrf"),
+        description="Affinity Group Range for VRFs",
         max_length=4,
         min_length=0,
     )

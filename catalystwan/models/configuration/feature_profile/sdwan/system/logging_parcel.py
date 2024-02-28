@@ -77,7 +77,10 @@ class Disk(BaseModel):
 
 class LoggingParcel(_ParcelBase):
     type_: Literal["logging"] = Field(default="logging", exclude=True)
-
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
     disk: Optional[Disk] = Field(default=None, validation_alias=AliasPath("data", "disk"))
     tls_profile: Optional[List[TlsProfile]] = Field(default=[], validation_alias=AliasPath("data", "tlsProfile"))
     server: Optional[List[Server]] = Field(default=[], validation_alias=AliasPath("data", "server"))
