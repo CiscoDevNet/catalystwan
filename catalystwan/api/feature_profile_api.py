@@ -150,13 +150,13 @@ class SystemFeatureProfileAPI:
         Create System Feature Profile
         """
         payload = FeatureProfileCreationPayload(name=name, description=description)
-        return self.endpoint.create_sdwan_system_feature_profile(payload=payload)
+        return self.endpoint.create_sdwan_system_feature_profile(payload)
 
     def delete_profile(self, profile_id: UUID) -> None:
         """
         Delete System Feature Profile
         """
-        self.endpoint.delete_sdwan_system_feature_profile(profile_id=profile_id)
+        self.endpoint.delete_sdwan_system_feature_profile(profile_id)
 
     def get_schema(
         self,
@@ -167,7 +167,7 @@ class SystemFeatureProfileAPI:
         Get all System Parcels for selected profile_id and selected type or get one Policy Object given parcel id
         """
 
-        return self.endpoint.get_schema(profile_id=profile_id, parcel_type=parcel_type._get_parcel_type())
+        return self.endpoint.get_schema(profile_id, parcel_type._get_parcel_type())
 
     @overload
     def get(
@@ -369,26 +369,22 @@ class SystemFeatureProfileAPI:
         """
 
         if not parcel_id:
-            return self.endpoint.get_all(profile_id=profile_id, parcel_type=parcel_type._get_parcel_type())
-        return self.endpoint.get_by_id(
-            profile_id=profile_id, parcel_type=parcel_type._get_parcel_type(), parcel_id=parcel_id
-        )
+            return self.endpoint.get_all(profile_id, parcel_type._get_parcel_type())
+        return self.endpoint.get_by_id(profile_id, parcel_type._get_parcel_type(), parcel_id)
 
     def create(self, profile_id: UUID, payload: AnySystemParcel) -> ParcelCreationResponse:
         """
         Create System Parcel for selected profile_id based on payload type
         """
 
-        return self.endpoint.create(profile_id=profile_id, parcel_type=payload._get_parcel_type(), payload=payload)
+        return self.endpoint.create(profile_id, payload._get_parcel_type(), payload)
 
     def update(self, profile_id: UUID, payload: AnySystemParcel, parcel_id: UUID) -> ParcelCreationResponse:
         """
         Update System Parcel for selected profile_id based on payload type
         """
 
-        return self.endpoint.update(
-            profile_id=profile_id, parcel_type=payload._get_parcel_type(), parcel_id=parcel_id, payload=payload
-        )
+        return self.endpoint.update(profile_id, payload._get_parcel_type(), parcel_id, payload=payload)
 
     @overload
     def delete(
@@ -493,9 +489,7 @@ class SystemFeatureProfileAPI:
         """
         Delete System Parcel for selected profile_id based on payload type
         """
-        return self.endpoint.delete(
-            profile_id=profile_id, parcel_type=parcel_type._get_parcel_type(), parcel_id=parcel_id
-        )
+        return self.endpoint.delete(profile_id, parcel_type._get_parcel_type(), parcel_id)
 
 
 class PolicyObjectFeatureProfileAPI:
