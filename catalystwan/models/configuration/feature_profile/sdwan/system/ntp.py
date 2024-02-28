@@ -11,6 +11,7 @@ from catalystwan.api.configuration_groups.parcel import Default, Global, Variabl
 class ServerItem(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
+        populate_by_name=True,
     )
     name: Union[Variable, Global[IPv6Address]] = Field(..., description="Set hostname or IP address of server")
     key: Optional[Union[Variable, Global[int], Default[None]]] = Field(
@@ -34,6 +35,7 @@ class ServerItem(BaseModel):
 class AuthenticationVariable(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
+        populate_by_name=True,
     )
     key_id: Union[Variable, Global[int]] = Field(
         ..., serialization_alias="keyId", validation_alias="keyId", description="MD5 authentication key ID"
@@ -50,6 +52,7 @@ class AuthenticationVariable(BaseModel):
 class Authentication(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
+        populate_by_name=True,
     )
     authentication_keys: List[AuthenticationVariable] = Field(
         ...,
@@ -81,6 +84,7 @@ class NTPParcel(_ParcelBase):
     type_: Literal["ntp"] = Field(default="ntp", exclude=True)
     model_config = ConfigDict(
         extra="forbid",
+        populate_by_name=True,
     )
     server: List[ServerItem] = Field(..., description="Configure NTP servers")
     authentication: Optional[Authentication] = None
