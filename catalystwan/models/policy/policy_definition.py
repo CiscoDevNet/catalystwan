@@ -515,6 +515,11 @@ class AppListEntry(BaseModel):
     ref: UUID
 
 
+class AppListFlatEntry(BaseModel):
+    field: Literal["appListFlat"] = "appListFlat"
+    ref: UUID
+
+
 class SourceFQDNListEntry(BaseModel):
     field: Literal["sourceFqdnList"] = "sourceFqdnList"
     ref: UUID
@@ -750,6 +755,16 @@ class PolicerAction(BaseModel):
     parameter: Reference
 
 
+class ConnectionEventsAction(BaseModel):
+    type: Literal["connectionEvents"] = "connectionEvents"
+    parameter: str = ""
+
+
+class AdvancedInspectionProfileAction(BaseModel):
+    type: Literal["advancedInspectionProfile"] = "advancedInspectionProfile"
+    parameter: Reference
+
+
 ActionSetEntry = Annotated[
     Union[
         AffinityEntry,
@@ -784,8 +799,10 @@ class ActionSet(BaseModel):
 ActionEntry = Annotated[
     Union[
         ActionSet,
+        AdvancedInspectionProfileAction,
         CFlowDAction,
         ClassMapAction,
+        ConnectionEventsAction,
         CountAction,
         DREOptimizationAction,
         FallBackToRoutingAction,
@@ -808,6 +825,7 @@ ActionEntry = Annotated[
 MatchEntry = Annotated[
     Union[
         AppListEntry,
+        AppListFlatEntry,
         CarrierEntry,
         ClassMapListEntry,
         ColorListEntry,
@@ -909,7 +927,9 @@ class PolicyDefinitionSequenceBase(BaseModel):
         default="drop", serialization_alias="baseAction", validation_alias="baseAction"
     )
     sequence_type: SequenceType = Field(serialization_alias="sequenceType", validation_alias="sequenceType")
-    sequence_ip_type: SequenceIpType = Field(serialization_alias="sequenceIpType", validation_alias="sequenceIpType")
+    sequence_ip_type: Optional[SequenceIpType] = Field(
+        default="ipv4", serialization_alias="sequenceIpType", validation_alias="sequenceIpType"
+    )
     ruleset: Optional[bool] = None
     match: Match
     actions: Sequence[ActionEntry]
