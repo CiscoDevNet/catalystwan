@@ -93,6 +93,7 @@ def create_manager_session(
     """
     session = ManagerSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
     session.auth = vManageAuth(session.base_url, username, password, verify=False)
+
     if logger:
         session.logger = logger
         session.auth.logger = logger
@@ -129,7 +130,7 @@ def create_manager_session(
     session.logger.info(
         f"Logged to vManage({session.platform_version}) as {username}. The session type is {session.session_type}"
     )
-
+    session.cookies.set("JSESSIONID", session.auth.set_cookie.get("JSESSIONID"))
     return session
 
 
@@ -210,9 +211,10 @@ class ManagerSession(vManageResponseAdapter, APIEndpointClient):
             self.logger.error(exception)
             raise ManagerRequestException(request=exception.request, response=exception.response)
 
-        if self.enable_relogin and self.__is_jsession_updated(response):
-            self.logger.warning("Logging to session again. Reason: JSESSIONID cookie updated by response")
+        if self.enable_relogin and response.jsessionid_expired:
+            self.logger.warning("Logging to session again. Reason: expired JSESSIONID detected in response headers")
             self.auth = vManageAuth(self.base_url, self.username, self.password, verify=False)
+            self.cookies.set("JSESSIONID", self.auth.set_cookie.get("JSESSIONID"))
             return self.request(method, url, *args, **kwargs)
 
         if response.request.url and "passwordReset.html" in response.request.url:
