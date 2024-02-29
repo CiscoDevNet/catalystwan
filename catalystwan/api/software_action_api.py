@@ -83,6 +83,11 @@ class SoftwareActionAPI:
         else:
             raise ValueError("You can not provide software_image and image version at the same time!")
 
+        if not version:
+            raise ImageNotInRepositoryError(
+                "Based on provided arguments, software version to activate on device(s) cannot be detected."
+            )
+
         payload_devices = self.device_versions.get_device_available(version, devices)
         for device in payload_devices:
             if not device.version:
@@ -152,7 +157,7 @@ class SoftwareActionAPI:
             != 1
         ):
             raise ValueError(
-                "Please provide one option to detect software to install."
+                "Please provide one option to detect software to install. "
                 "Pick either 'image', 'image_version', or both 'remote_server_name' and 'remote_image_filename'."
             )
 

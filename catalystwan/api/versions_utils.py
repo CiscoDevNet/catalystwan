@@ -109,10 +109,11 @@ class RepositoryAPI:
         software_images = self.get_all_software_images()
         for image in software_images:
             if image.available_files and image_name in image.available_files:
-                if image.version_name:
+                if image.version_name and not image.version_name == "--":
                     return image.version_name
                 logger.warning(
-                    f"Detected image {image_name} in available files has version_name 'None' value. Image excluded."
+                    f"Detected image {image_name} in available files has version_name: {image.version_name} as value."
+                    "Image will not be used and image version won't be returned."
                 )
         logger.error(f"Software image {image_name} is not in available images")
         return None
