@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
@@ -76,6 +76,7 @@ class Disk(BaseModel):
 
 
 class LoggingParcel(_ParcelBase):
+    type_: Literal["logging"] = Field(default="logging", exclude=True)
     disk: Optional[Disk] = Field(default=None, validation_alias=AliasPath("data", "disk"))
     tls_profile: Optional[List[TlsProfile]] = Field(default=[], validation_alias=AliasPath("data", "tlsProfile"))
     server: Optional[List[Server]] = Field(default=[], validation_alias=AliasPath("data", "server"))

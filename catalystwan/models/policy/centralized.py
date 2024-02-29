@@ -159,12 +159,27 @@ class MeshPolicyItem(AssemblyItemBase):
     type: Literal["mesh"] = "mesh"
 
 
+class AppRoutePolicyItem(AssemblyItemBase):
+    type: Literal["appRoute"] = "appRoute"
+
+
+class CFlowDPolicyItem(AssemblyItemBase):
+    type: Literal["cflowd"] = "cflowd"
+
+
+class VpnMembershipGroupPolicyItem(AssemblyItemBase):
+    type: Literal["vpnMembershipGroup"] = "vpnMembershipGroup"
+
+
 AnyAssemblyItem = Annotated[
     Union[
         TrafficDataPolicyItem,
         ControlPolicyItem,
         MeshPolicyItem,
         HubAndSpokePolicyItem,
+        AppRoutePolicyItem,
+        CFlowDPolicyItem,
+        VpnMembershipGroupPolicyItem,
     ],
     Field(discriminator="type"),
 ]
