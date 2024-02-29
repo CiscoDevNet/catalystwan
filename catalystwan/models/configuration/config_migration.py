@@ -8,6 +8,8 @@ from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import Annotated
 
 from catalystwan.api.template_api import DeviceTemplateInformation, FeatureTemplateInformation
+from catalystwan.endpoints.configuration_group import ConfigGroup
+from catalystwan.models.configuration.feature_profile.common import FeatureProfileCreationPayload
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object import AnyPolicyObjectParcel
 from catalystwan.models.configuration.feature_profile.sdwan.system import AnySystemParcel
 from catalystwan.models.policy import (
@@ -47,8 +49,12 @@ class UX1Policies(BaseModel):
 
 
 class UX1Templates(BaseModel):
-    features: List[FeatureTemplateInformation] = Field(default=[])
-    devices: List[DeviceTemplateInformation] = Field(default=[])
+    feature_templates: List[FeatureTemplateInformation] = Field(
+        default=[], serialization_alias="featureTemplates", validation_alias="featureTemplates"
+    )
+    device_templates: List[DeviceTemplateInformation] = Field(
+        default=[], serialization_alias="deviceTemplates", validation_alias="deviceTemplates"
+    )
 
 
 class ConfigGroupPreset(BaseModel):
@@ -68,8 +74,17 @@ class UX1Config(BaseModel):
 
 class UX2Config(BaseModel):
     # All UX2 Configuration items - Mega Model
+    # All UX2 Configuration items - Mega Model
     model_config = ConfigDict(populate_by_name=True)
-    # TODO: config group name
-    config_group_presets: List[ConfigGroupPreset] = Field(
-        default=[], serialization_alias="configGroupPresets", validation_alias="configGroupPresets"
+    config_groups: List[ConfigGroup] = Field(
+        default=[], serialization_alias="configurationGroups", validation_alias="configurationGroups"
+    )
+    policy_groups: List[ConfigGroup] = Field(
+        default=[], serialization_alias="policyGroups", validation_alias="policyGroups"
+    )
+    feature_profiles: List[FeatureProfileCreationPayload] = Field(
+        default=[], serialization_alias="featureProfiles", validation_alias="featureProfiles"
+    )
+    profile_parcels: List[AnyParcel] = Field(
+        default=[], serialization_alias="profileParcels", validation_alias="profileParcels"
     )

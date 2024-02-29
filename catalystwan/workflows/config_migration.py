@@ -3,7 +3,7 @@ from typing import Callable
 
 from catalystwan.api.policy_api import POLICY_LIST_ENDPOINTS_MAP
 from catalystwan.endpoints.configuration_group import ConfigGroup
-from catalystwan.models.configuration.config_migration import ConfigGroupPreset, UX1Config, UX2Config
+from catalystwan.models.configuration.config_migration import UX1Config, UX2Config
 from catalystwan.session import ManagerSession
 from catalystwan.utils.config_migration.converters.feature_template import create_parcel_from_template
 from catalystwan.utils.config_migration.creators.config_group import ConfigGroupCreator
@@ -19,16 +19,14 @@ def log_progress(task: str, completed: int, total: int) -> None:
 
 def transform(ux1: UX1Config) -> UX2Config:
     ux2 = UX2Config()
-    ux2.config_group_presets.append(ConfigGroupPreset(config_group_name="Default_Config_Group"))
-    profile_parcels = ux2.config_group_presets[0].profile_parcels
     # Feature Templates
-    for ft in ux1.templates.features:
+    for ft in ux1.templates.feature_templates:
         if ft.template_type in SUPPORTED_TEMPLATE_TYPES:
-            profile_parcels.append(create_parcel_from_template(ft))
+            ux2.profile_parcels.append(create_parcel_from_template(ft))
     # Policy Lists
     for policy_list in ux1.policies.policy_lists:
         if (parcel := policy_list.to_policy_object_parcel()) is not None:
-            profile_parcels.append(parcel)
+            ux2.profile_parcels.append(parcel)
     return ux2
 
 
@@ -71,10 +69,10 @@ def collect_ux1_config(session: ManagerSession, progress: Callable[[str, int, in
     template_api = session.api.templates
     progress("Collecting Templates Info", 0, 2)
 
-    ux1.templates.features = [t for t in template_api.get_feature_templates()]
+    ux1.templates.feature_templates = [t for t in template_api.get_feature_templates()]
     progress("Collecting Templates Info", 1, 2)
 
-    ux1.templates.devices = [t for t in template_api.get_device_templates()]
+    ux1.templates.device_templates = [t for t in template_api.get_device_templates()]
     progress("Collecting Templates Info", 2, 2)
 
     return ux1
@@ -98,7 +96,7 @@ def push_ux2_config(session: ManagerSession, config: UX2Config) -> ConfigGroup:
     config_group_creator = ConfigGroupCreator(session, config, logger)
     config_group = config_group_creator.create()
     feature_profiles = config_group.profiles  # noqa: F841
-    for parcels in config.config_group_presets:
+    for parcels in config.profile_parcels:
         # TODO: Create API that supports parcel creation on feature profiles
         # Example: session.api.parcels.create(parcels=parcels, feature_profiles=feature_profiles)
         pass

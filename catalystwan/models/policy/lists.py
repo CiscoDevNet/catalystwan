@@ -1,6 +1,7 @@
 # Copyright 2023 Cisco Systems, Inc. and its affiliates
 
 from ipaddress import IPv4Address, IPv4Network, IPv6Network
+from ipaddress import IPv4Address, IPv4Network, IPv6Interface
 from typing import Any, List, Literal, Optional, Set, Tuple
 from uuid import UUID
 
@@ -186,7 +187,7 @@ class DataIPv6PrefixList(PolicyListBase):
     type: Literal["dataIpv6Prefix"] = "dataIpv6Prefix"
     entries: List[DataIPv6PrefixListEntry] = []
 
-    def add_prefix(self, ipv6_prefix: IPv6Network) -> None:
+    def add_prefix(self, ipv6_prefix: IPv6Interface) -> None:
         self._add_entry(DataIPv6PrefixListEntry(ipv6_prefix=ipv6_prefix))
 
 
