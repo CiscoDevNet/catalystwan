@@ -2,9 +2,11 @@
 
 import unittest
 from unittest import TestCase, mock
+from uuid import uuid4
 
 from requests import Request
 
+from catalystwan import USER_AGENT
 from catalystwan.vmanage_auth import UnauthorizedAccessError, vManageAuth
 
 
@@ -45,7 +47,7 @@ def mocked_requests_method(*args, **kwargs):
 class TestvManageAuth(TestCase):
     def setUp(self):
         self.base_url = "https://1.1.1.1:1111"
-        self.password = "admin"  # pragma: allowlist secret
+        self.password = str(uuid4())
 
     @mock.patch("requests.post", side_effect=mocked_requests_method)
     def test_get_cookie(self, mock_post):
@@ -53,7 +55,7 @@ class TestvManageAuth(TestCase):
         username = "admin"
         security_payload = {
             "j_username": username,
-            "j_password": "admin",  # pragma: allowlist secret
+            "j_password": self.password,
         }
         auth = vManageAuth(self.base_url, username, self.password)
         # Act
@@ -64,7 +66,7 @@ class TestvManageAuth(TestCase):
             url="https://1.1.1.1:1111/j_security_check",
             data=security_payload,
             verify=False,
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            headers={"Content-Type": "application/x-www-form-urlencoded", "User-Agent": USER_AGENT},
         )
 
     @mock.patch("requests.post", side_effect=mocked_requests_method)
@@ -73,7 +75,7 @@ class TestvManageAuth(TestCase):
         username = "invalid_username"
         security_payload = {
             "j_username": username,
-            "j_password": "admin",  # pragma: allowlist secret
+            "j_password": self.password,
         }
         auth = vManageAuth(self.base_url, username, self.password)
         # Act
@@ -85,7 +87,7 @@ class TestvManageAuth(TestCase):
             url="https://1.1.1.1:1111/j_security_check",
             data=security_payload,
             verify=False,
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            headers={"Content-Type": "application/x-www-form-urlencoded", "User-Agent": USER_AGENT},
         )
 
     @mock.patch("requests.cookies.RequestsCookieJar")
@@ -102,7 +104,7 @@ class TestvManageAuth(TestCase):
         mock_get.assert_called_with(
             url=valid_url,
             verify=False,
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "User-Agent": USER_AGENT},
             cookies=cookies,
         )
 
