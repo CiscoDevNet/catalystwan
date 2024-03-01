@@ -12,6 +12,7 @@ from catalystwan.endpoints.configuration_group import ConfigGroup
 from catalystwan.models.configuration.feature_profile.common import FeatureProfileCreationPayload
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object import AnyPolicyObjectParcel
 from catalystwan.models.configuration.feature_profile.sdwan.system import AnySystemParcel
+from catalystwan.models.configuration.topology_group import TopologyGroup
 from catalystwan.models.policy import (
     AnyPolicyDefinition,
     AnyPolicyList,
@@ -74,8 +75,10 @@ class UX1Config(BaseModel):
 
 class UX2Config(BaseModel):
     # All UX2 Configuration items - Mega Model
-    # All UX2 Configuration items - Mega Model
     model_config = ConfigDict(populate_by_name=True)
+    topology_groups: List[TopologyGroup] = Field(
+        default=[], serialization_alias="topologyGroups", validation_alias="topologyGroups"
+    )
     config_groups: List[ConfigGroup] = Field(
         default=[], serialization_alias="configurationGroups", validation_alias="configurationGroups"
     )
