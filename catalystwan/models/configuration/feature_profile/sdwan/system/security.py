@@ -4,11 +4,11 @@ from typing import List, Literal, Optional, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase, as_default
+from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase, as_default, as_variable
 
 IntegrityType = Literal["esp", "ip-udp-esp", "none", "ip-udp-esp-no-id"]
 ReplayWindow = Literal["64", "128", "256", "512", "1024", "2048", "4096", "8192"]
-ReplayWindow2 = Literal["512"]
+DefaultReplayWindow = Literal["512"]
 Tcp = Literal["aes-128-cmac", "hmac-sha-1", "hmac-sha-256"]
 
 
@@ -26,7 +26,7 @@ class OneOfendChoice1(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    infinite: Union[Variable, Global[bool], Default[Literal[True]]] = Field(
+    infinite: Union[Variable, Global[bool], Default[bool]] = Field(
         default=as_default(True), description="Infinite lifetime"
     )
 
@@ -56,7 +56,7 @@ class SendLifetime(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    local: Optional[Union[Variable, Global[bool], Default[Literal[False]]]] = Field(
+    local: Optional[Union[Variable, Global[bool], Default[bool]]] = Field(
         default=None, description="Configure Send lifetime Local"
     )
     start_epoch: Global[float] = Field(
@@ -79,7 +79,7 @@ class AcceptLifetime(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    local: Optional[Union[Variable, Global[bool], Default[Literal[False]]]] = Field(
+    local: Optional[Union[Variable, Global[bool], Default[bool]]] = Field(
         default=None, description="Configure Send lifetime Local"
     )
     start_epoch: Global[float] = Field(
@@ -106,13 +106,13 @@ class KeyItem(BaseModel):
     recv_id: Union[Global[int], Variable] = Field(
         ..., serialization_alias="recvId", validation_alias="recvId", description="Specify the Receiver ID"
     )
-    include_tcp_options: Optional[Union[Variable, Global[bool], Default[Literal[False]]]] = Field(
+    include_tcp_options: Optional[Union[Variable, Global[bool], Default[bool]]] = Field(
         default=None,
         serialization_alias="includeTcpOptions",
         validation_alias="includeTcpOptions",
         description="Configure Include TCP Options",
     )
-    accept_ao_mismatch: Optional[Union[Variable, Global[bool], Default[Literal[False]]]] = Field(
+    accept_ao_mismatch: Optional[Union[Variable, Global[bool], Default[bool]]] = Field(
         default=None,
         serialization_alias="acceptAoMismatch",
         validation_alias="acceptAoMismatch",
@@ -146,12 +146,13 @@ class SecurityParcel(_ParcelBase):
         extra="forbid",
         populate_by_name=True,
     )
-    rekey: Optional[Union[Global[int], Variable, Default[int]]] = Field(
-        default=None,
+    rekey: Union[Global[int], Variable, Default[int]] = Field(
+        default=as_default(86400),
+        validation_alias=AliasPath("data", "rekey"),
         description="Set how often to change the AES key for DTLS connections",
     )
-    replay_window: Optional[Union[Global[ReplayWindow], Variable, Default[ReplayWindow2]]] = Field(
-        default=None,
+    replay_window: Optional[Union[Global[ReplayWindow], Variable, Default[DefaultReplayWindow]]] = Field(
+        default=as_default("512", DefaultReplayWindow),
         validation_alias=AliasPath("data", "replayWindow"),
         description="Set the sliding replay window size",
     )
@@ -160,15 +161,17 @@ class SecurityParcel(_ParcelBase):
         validation_alias=AliasPath("data", "extendedArWindow"),
         description="Extended Anti-Replay Window",
     )
-    integrity_type: Optional[Union[Global[List[IntegrityType]], Variable]] = Field(
-        default=None,
+    integrity_type: Union[Global[List[IntegrityType]], Variable] = Field(
+        default=as_variable("{{security_auth_type_inte}}"),
         validation_alias=AliasPath("data", "integrityType"),
         description="Set the authentication type for DTLS connections",
     )
-    pairwise_keying: Optional[Union[Variable, Global[bool], Default[Literal[False]]]] = Field(
-        default=None,
+    pairwise_keying: Union[Variable, Global[bool], Default[bool]] = Field(
+        default=as_default(False),
         validation_alias=AliasPath("data", "pairwiseKeying"),
         description="Enable or disable IPsec pairwise-keying",
     )
-    keychain: Optional[List[KeychainItem]] = Field(default=None, description="Configure a Keychain")
-    key: Optional[List[KeyItem]] = Field(default=None, description="Configure a Key")
+    keychain: List[KeychainItem] = Field(
+        default=[], validation_alias=AliasPath("data", "keychain"), description="Configure a Keychain"
+    )
+    key: List[KeyItem] = Field(default=[], validation_alias=AliasPath("data", "key"), description="Configure a Key")

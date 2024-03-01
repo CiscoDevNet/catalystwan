@@ -3,7 +3,7 @@ from __future__ import annotations
 from ipaddress import IPv6Address
 from typing import List, Literal, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase, as_default
 
@@ -55,22 +55,26 @@ class Authentication(BaseModel):
         populate_by_name=True,
     )
     authentication_keys: List[AuthenticationVariable] = Field(
-        ...,
-        serialization_alias="authenticationVariables",
-        validation_alias="authenticationVariables",
+        default=[],
+        serialization_alias="authenticationKeys",
+        validation_alias="authenticationKeys",
         description="Set MD5 authentication key",
     )
     trusted_keys: Optional[Union[Variable, Global[List[int]], Default[None]]] = Field(
         None,
-        serialization_alias="trustedVariables",
-        validation_alias="trustedVariables",
+        serialization_alias="trustedKeys",
+        validation_alias="trustedKeys",
         description="Designate authentication key as trustworthy",
     )
 
 
 class Leader(BaseModel):
-    enable: Optional[Union[Variable, Global[bool], Default[Literal[False]]]] = Field(
-        None, description="Variable device as NTP Leader"
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+    )
+    enable: Union[Variable, Global[bool], Default[bool]] = Field(
+        default=as_default(False), description="Variable device as NTP Leader"
     )
     stratum: Optional[Union[Variable, Global[int], Default[None]]] = Field(
         None, description="Variable device as NTP Leader"
@@ -86,6 +90,10 @@ class NTPParcel(_ParcelBase):
         extra="forbid",
         populate_by_name=True,
     )
-    server: List[ServerItem] = Field(..., description="Configure NTP servers")
-    authentication: Optional[Authentication] = None
-    leader: Optional[Leader] = None
+    server: List[ServerItem] = Field(
+        default=[], validation_alias=AliasPath("data", "server"), description="Configure NTP servers"
+    )
+    authentication: Authentication = Field(
+        default_factory=Authentication, validation_alias=AliasPath("data", "authentication")  # type: ignore
+    )
+    leader: Leader = Field(default_factory=Leader, validation_alias=AliasPath("data", "leader"))  # type: ignore
