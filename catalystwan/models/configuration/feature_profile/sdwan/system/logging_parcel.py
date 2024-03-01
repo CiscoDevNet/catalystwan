@@ -3,16 +3,24 @@ from typing import List, Literal, Literal, Optional, Union
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
 from catalystwan.api.configuration_groups.parcel import Default, Global, _ParcelBase, as_default, as_global
-from catalystwan.models.configuration.feature_profile.sdwan.system.literals import (
-    AuthType,
-    CypherSuite,
-    Priority,
-    TlsVersion,
-)
-from catalystwan.utils.pydantic_validators import ConvertBoolToStringModel
+
+Priority = Literal["information", "debugging", "notice", "warn", "error", "critical", "alert", "emergency"]
+TlsVersion = Literal["TLSv1.1", "TLSv1.2"]
+AuthType = Literal["Server", "Mutual"]
+CypherSuite = Literal[
+    "rsa-aes-cbc-sha2",
+    "rsa-aes-gcm-sha2",
+    "ecdhe-rsa-aes-gcm-sha2",
+    "aes-128-cbc-sha",
+    "aes-256-cbc-sha",
+    "dhe-aes-cbc-sha2",
+    "dhe-aes-gcm-sha2",
+    "ecdhe-ecdsa-aes-gcm-sha2",
+    "ecdhe-rsa-aes-cbc-sha2",
+]
 
 
-class TlsProfile(ConvertBoolToStringModel):
+class TlsProfile(BaseModel):
     profile: Global[str]
     version: Union[Global[TlsVersion], Default[TlsVersion]] = Field(
         default=as_default("TLSv1.1", TlsVersion), serialization_alias="tlsVersion", validation_alias="tlsVersion"

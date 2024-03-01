@@ -85,7 +85,7 @@ class TestNormalizer(unittest.TestCase):
         # Assert
         self.assertDictEqual(expected_result, returned_result)
 
-    @patch("catalystwan.models.configuration.feature_profile.sdwan.system.literals.SYSTEM_LITERALS", [TestLiteral])
+    @patch("catalystwan.utils.config_migration.converters.feature_template.normalizer.CastableLiterals", [TestLiteral])
     def test_normalizer_literal_casting_when_literal_in_system_literals(self):
         # Arrange
         simple_input = {"in": "castable_literal"}
