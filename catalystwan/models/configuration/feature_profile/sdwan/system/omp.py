@@ -14,41 +14,31 @@ class AdvertiseIpv4(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    bgp: Union[Variable, Global[bool], Default[Literal[False]]] = Field(default=as_default(False), description="BGP")
-    ospf: Union[Variable, Global[bool], Default[Literal[False]]] = Field(default=as_default(False), description="OSPF")
-    ospfv3: Union[Variable, Global[bool], Default[Literal[False]]] = Field(
-        default=as_default(False), description="OSPFV3"
-    )
+    bgp: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="BGP")
+    ospf: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="OSPF")
+    ospfv3: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="OSPFV3")
     connected: Union[Variable, Global[bool], Default[Optional[Literal[True, False]]]] = Field(
         default=as_default(False), description="Variable"
     )
     static: Union[Variable, Global[bool], Default[Optional[Literal[True, False]]]] = Field(
         default=as_default(False), description="Variable"
     )
-    eigrp: Union[Variable, Global[bool], Default[Literal[False]]] = Field(
-        default=as_default(False), description="EIGRP"
-    )
-    lisp: Union[Variable, Global[bool], Default[Literal[False]]] = Field(default=as_default(False), description="LISP")
-    isis: Union[Variable, Global[bool], Default[Literal[False]]] = Field(default=as_default(False), description="ISIS")
+    eigrp: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="EIGRP")
+    lisp: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="LISP")
+    isis: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="ISIS")
 
 
 class AdvertiseIpv6(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    bgp: Union[Variable, Global[bool], Default[Literal[False]]] = Field(default=as_default(False), description="BGP")
-    ospf: Union[Variable, Global[bool], Default[Literal[False]]] = Field(default=as_default(False), description="OSPF")
-    connected: Union[Variable, Global[bool], Default[Literal[False]]] = Field(
-        default=as_default(False), description="Variable"
-    )
-    static: Union[Variable, Global[bool], Default[Literal[False]]] = Field(
-        default=as_default(False), description="Variable"
-    )
-    eigrp: Union[Variable, Global[bool], Default[Literal[False]]] = Field(
-        default=as_default(False), description="EIGRP"
-    )
-    lisp: Union[Variable, Global[bool], Default[Literal[False]]] = Field(default=as_default(False), description="LISP")
-    isis: Union[Variable, Global[bool], Default[Literal[False]]] = Field(default=as_default(False), description="ISIS")
+    bgp: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="BGP")
+    ospf: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="OSPF")
+    connected: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="Variable")
+    static: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="Variable")
+    eigrp: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="EIGRP")
+    lisp: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="LISP")
+    isis: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="ISIS")
 
 
 class OMPParcel(_ParcelBase):
@@ -58,13 +48,15 @@ class OMPParcel(_ParcelBase):
         extra="forbid",
         populate_by_name=True,
     )
-    graceful_restart: Union[Variable, Global[bool], Default[Literal[True]]] = Field(
+    graceful_restart: Union[Variable, Global[bool], Default[bool]] = Field(
         default=as_default(True),
         validation_alias=AliasPath("data", "gracefulRestart"),
         description="Graceful Restart for OMP",
     )
     overlay_as: Union[Variable, Global[float], Default[None]] = Field(
-        default=as_default(None), validation_alias=AliasPath("data", "overlayAs"), description="Overlay AS Number"
+        default=Default[None](value=None),
+        validation_alias=AliasPath("data", "overlayAs"),
+        description="Overlay AS Number",
     )
     send_path_limit: Union[Variable, Global[int], Default[int]] = Field(
         default=as_default(4),
@@ -76,7 +68,7 @@ class OMPParcel(_ParcelBase):
         validation_alias=AliasPath("data", "ecmpLimit"),
         description="Set maximum number of OMP paths to install in cEdge route table",
     )
-    shutdown: Union[Variable, Global[bool], Default[Literal[False]]] = Field(
+    shutdown: Union[Variable, Global[bool], Default[bool]] = Field(
         default=as_default(False), validation_alias=AliasPath("data", "shutdown"), description="Variable"
     )
     omp_admin_distance_ipv4: Union[Variable, Global[int], Default[Optional[int]]] = Field(
@@ -107,7 +99,7 @@ class OMPParcel(_ParcelBase):
     )
     advertise_ipv4: AdvertiseIpv4 = Field(..., validation_alias="advertiseIpv4")
     advertise_ipv6: AdvertiseIpv6 = Field(..., validation_alias="advertiseIpv6")
-    ignore_region_path_length: Optional[Union[Variable, Global[bool], Default[Literal[False]]]] = Field(
+    ignore_region_path_length: Optional[Union[Variable, Global[bool], Default[bool]]] = Field(
         None,
         validation_alias=AliasPath("data", "ignoreRegionPathLength"),
         description="Treat hierarchical and direct (secondary region) paths equally",

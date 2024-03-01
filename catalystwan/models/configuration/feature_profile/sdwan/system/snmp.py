@@ -5,7 +5,7 @@ from typing import List, Literal, Optional, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase
+from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase, as_default
 
 Authorization = Literal["read-only", "read-write"]
 Priv = Literal["aes-cfb-128", "aes-256-cfb-128"]
@@ -140,31 +140,33 @@ class SNMPParcel(_ParcelBase):
         extra="forbid",
         populate_by_name=True,
     )
-    shutdown: Optional[Union[Global[bool], Variable]] = Field(
-        default=None, validation_alias=AliasPath("data", "shutdown"), description="Enable or disable SNMP"
+    shutdown: Union[Global[bool], Variable, Default[bool]] = Field(
+        default=as_default(False), validation_alias=AliasPath("data", "shutdown"), description="Enable or disable SNMP"
     )
-    contact: Optional[Union[Global[str], Variable, Default[None]]] = Field(
-        default=None, validation_alias=AliasPath("data", "contact"), description="Set the contact for this managed node"
+    contact: Union[Global[str], Variable, Default[None]] = Field(
+        default=Default[None](value=None),
+        validation_alias=AliasPath("data", "contact"),
+        description="Set the contact for this managed node",
     )
-    location: Optional[Union[Global[str], Variable, Default[None]]] = Field(
-        default=None,
+    location: Union[Global[str], Variable, Default[None]] = Field(
+        default=Default[None](value=None),
         validation_alias=AliasPath("data", "location"),
         description="Set the physical location of this managed node",
     )
-    view: Optional[List[ViewItem]] = Field(
-        default=None, validation_alias=AliasPath("data", "view"), description="Configure a view record"
+    view: List[ViewItem] = Field(
+        default=[], validation_alias=AliasPath("data", "view"), description="Configure a view record"
     )
-    community: Optional[List[CommunityItem]] = Field(
-        default=None, validation_alias=AliasPath("data", "community"), description="Configure SNMP community"
+    community: List[CommunityItem] = Field(
+        default=[], validation_alias=AliasPath("data", "community"), description="Configure SNMP community"
     )
-    group: Optional[List[GroupItem]] = Field(
-        default=None, validation_alias=AliasPath("data", "group"), description="Configure an SNMP group"
+    group: List[GroupItem] = Field(
+        default=[], validation_alias=AliasPath("data", "group"), description="Configure an SNMP group"
     )
-    user: Optional[List[UserItem]] = Field(
-        default=None, validation_alias=AliasPath("data", "user"), description="Configure an SNMP user"
+    user: List[UserItem] = Field(
+        default=[], validation_alias=AliasPath("data", "user"), description="Configure an SNMP user"
     )
-    target: Optional[List[TargetItem]] = Field(
-        default=None,
+    target: List[TargetItem] = Field(
+        default=[],
         validation_alias=AliasPath("data", "target"),
         description="Configure SNMP server to receive SNMP traps",
     )

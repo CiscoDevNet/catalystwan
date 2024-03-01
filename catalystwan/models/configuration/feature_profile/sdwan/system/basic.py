@@ -12,13 +12,12 @@ DefaultConsoleBaudRate = Literal["9600"]
 Epfr = Literal["disabled", "aggressive", "moderate", "conservative"]
 DefaultEpfr = Literal["disabled"]
 SiteType = Literal["type-1", "type-2", "type-3", "cloud", "branch", "br", "spoke"]
-
 DefaultTimezone = Literal["UTC"]
 
 
 class Clock(BaseModel):
     timezone: Union[Variable, Global[Timezone], Default[DefaultTimezone]] = Field(
-        default=as_default("UTC"), description="Set the timezone"
+        default=as_default("UTC", DefaultTimezone), description="Set the timezone"
     )
 
 
@@ -31,8 +30,8 @@ class Sms(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    enable: Optional[Union[Global[bool], Default[Literal[False]]]] = Field(
-        None, description="Global[bool] device’s geo fencing SMS"
+    enable: Union[Global[bool], Default[bool]] = Field(
+        default=as_default(False), description="Enable device’s geo fencing SMS"
     )
     mobile_number: Optional[List[MobileNumberItem]] = Field(
         None,
@@ -43,11 +42,11 @@ class Sms(BaseModel):
 
 
 class GeoFencing(BaseModel):
-    enable: Optional[Union[Global[bool], Default[Literal[False]]]] = Field(None, description="Enable Geo fencing")
-    range: Optional[Union[Global[int], Variable, Default[int]]] = Field(
-        None, description="Set the device’s geo fencing range"
+    enable: Union[Global[bool], Default[bool]] = Field(default=as_default(False), description="Enable Geo fencing")
+    range: Union[Global[int], Variable, Default[int]] = Field(
+        default=as_default(100), description="Set the device’s geo fencing range"
     )
-    sms: Optional[Sms] = None
+    sms: Sms = Field(default_factory=Sms, description="Set device’s geo fencing SMS")  # type: ignore
 
 
 class GpsVariable(BaseModel):
@@ -56,13 +55,13 @@ class GpsVariable(BaseModel):
         populate_by_name=True,
     )
     longitude: Union[Variable, Global[float], Default[None]] = Field(
-        default=as_default(None), description="Set the device physical longitude"
+        default=Default[None](value=None), description="Set the device physical longitude"
     )
     latitude: Union[Variable, Global[float], Default[None]] = Field(
-        default=as_default(None), description="Set the device physical latitude"
+        default=Default[None](value=None), description="Set the device physical latitude"
     )
-    geo_fencing: Optional[GeoFencing] = Field(
-        None,
+    geo_fencing: GeoFencing = Field(
+        default_factory=GeoFencing,
         serialization_alias="geoFencing",
         validation_alias="geoFencing",
     )
@@ -73,7 +72,7 @@ class OnDemand(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    on_demand_enable: Union[Variable, Global[bool], Default[Literal[False]]] = Field(
+    on_demand_enable: Union[Variable, Global[bool], Default[bool]] = Field(
         default=as_default(False),
         serialization_alias="onDemandEnable",
         validation_alias="onDemandEnable",
@@ -85,8 +84,8 @@ class OnDemand(BaseModel):
         Default[int],
     ] = Field(
         default=as_default(10),
-        serialization_alias="onDemandVariable",
-        validation_alias="onDemandVariable",
+        serialization_alias="onDemandIdleTimeout",
+        validation_alias="onDemandIdleTimeout",
         description="Set the idle timeout for on-demand tunnels",
     )
 
@@ -101,13 +100,13 @@ class AffinityPerVrfItem(BaseModel):
         Global[int],
         Default[None],
     ] = Field(
-        default=as_default(None),
+        default=Default[None](value=None),
         serialization_alias="affinityGroupNumber",
         validation_alias="affinityGroupNumber",
         description="Affinity Group Number",
     )
     vrf_range: Union[Variable, Global[str], Default[None]] = Field(
-        default=as_default(None),
+        default=Default[None](value=None),
         serialization_alias="vrfRange",
         validation_alias="vrfRange",
         description="Range of VRFs",
@@ -121,23 +120,23 @@ class BasicParcel(_ParcelBase):
         extra="forbid",
         populate_by_name=True,
     )
-    clock: Clock = Field(validation_alias=AliasPath("data", "clock"))
+    clock: Clock = Field(default_factory=Clock, validation_alias=AliasPath("data", "clock"))
     description: Union[Variable, Global[str], Default[None]] = Field(
-        default=as_default(None),
+        default=Default[None](value=None),
         validation_alias=AliasPath("data", "description"),
         description="Set a text description of the device",
     )
     location: Union[Variable, Global[str], Default[None]] = Field(
-        default=as_default(None),
+        default=Default[None](value=None),
         validation_alias=AliasPath("data", "location"),
         description="Set the location of the device",
     )
     gps_location: GpsVariable = Field(
-        ...,
-        validation_alias=AliasPath("data", "gpsVariable"),
+        default_factory=GpsVariable,
+        validation_alias=AliasPath("data", "gpsLocation"),
     )
     device_groups: Union[Variable, Global[List[str]], Default[None]] = Field(
-        default=as_default(None),
+        default=Default[None](value=None),
         validation_alias=AliasPath("data", "deviceGroups"),
         description="Device groups",
     )
@@ -162,8 +161,8 @@ class BasicParcel(_ParcelBase):
         validation_alias=AliasPath("data", "portOffset"),
         description="Set the TLOC port offset when multiple devices are behind a NAT",
     )
-    port_hop: Union[Variable, Global[bool], Default[Literal[True]]] = Field(
-        default=True,
+    port_hop: Union[Variable, Global[bool], Default[bool]] = Field(
+        default=as_default(True),
         validation_alias=AliasPath("data", "portHop"),
         description="Enable port hopping",
     )
@@ -172,7 +171,7 @@ class BasicParcel(_ParcelBase):
         validation_alias=AliasPath("data", "controlSessionPps"),
         description="Set the policer rate for control sessions",
     )
-    track_transport: Optional[Union[Variable, Global[bool], Default[Literal[True]]]] = Field(
+    track_transport: Optional[Union[Variable, Global[bool], Default[bool]]] = Field(
         None,
         validation_alias=AliasPath("data", "trackTransport"),
         description="Configure tracking of transport",
@@ -183,16 +182,16 @@ class BasicParcel(_ParcelBase):
         description="OMP Tag attached to routes based on interface tracking",
     )
     console_baud_rate: Union[Variable, Global[ConsoleBaudRate], Default[DefaultConsoleBaudRate]] = Field(
-        default=as_default("9600"),
+        default=as_default("9600", DefaultConsoleBaudRate),
         validation_alias=AliasPath("data", "consoleBaudRate"),
         description="Set the console baud rate",
     )
     max_omp_sessions: Union[Variable, Global[int], Default[None]] = Field(
-        default=as_default(None),
+        default=Default[None](value=None),
         validation_alias=AliasPath("data", "maxOmpSessions"),
         description="Set the maximum number of OMP sessions <1..100> the device can have",
     )
-    multi_tenant: Optional[Union[Variable, Global[bool], Default[Literal[False]]]] = Field(
+    multi_tenant: Optional[Union[Variable, Global[bool], Default[bool]]] = Field(
         None,
         validation_alias=AliasPath("data", "multiTenant"),
         description="Device is multi-tenant",
@@ -201,7 +200,7 @@ class BasicParcel(_ParcelBase):
         Union[
             Variable,
             Global[bool],
-            Default[Literal[True]],
+            Default[bool],
         ]
     ] = Field(
         None,
@@ -212,14 +211,14 @@ class BasicParcel(_ParcelBase):
         Union[
             Variable,
             Global[bool],
-            Default[Literal[False]],
+            Default[bool],
         ]
     ] = Field(
         None,
         validation_alias=AliasPath("data", "trackerDiaStabilizeStatus"),
         description="Enable or disable endpoint tracker diaStabilize status",
     )
-    admin_tech_on_failure: Union[Variable, Global[bool], Default[Literal[True]]] = Field(
+    admin_tech_on_failure: Union[Variable, Global[bool], Default[bool]] = Field(
         default=as_default(True),
         validation_alias=AliasPath("data", "adminTechOnFailure"),
         description="Collect admin-tech before reboot due to daemon failure",
@@ -230,10 +229,10 @@ class BasicParcel(_ParcelBase):
         description="Idle CLI timeout in minutes",
     )
     on_demand: OnDemand = Field(
-        ...,
+        default_factory=OnDemand,
         validation_alias=AliasPath("data", "onDemand"),
     )
-    transport_gateway: Optional[Union[Global[bool], Variable, Default[Literal[False]]]] = Field(
+    transport_gateway: Optional[Union[Global[bool], Variable, Default[bool]]] = Field(
         None,
         validation_alias=AliasPath("data", "transportGateway"),
         description="Enable transport gateway",
@@ -274,7 +273,7 @@ class BasicParcel(_ParcelBase):
         Union[
             Variable,
             Global[bool],
-            Default[Literal[False]],
+            Default[bool],
         ]
     ] = Field(
         None,

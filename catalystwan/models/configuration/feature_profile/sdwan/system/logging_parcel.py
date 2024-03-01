@@ -2,54 +2,42 @@ from typing import List, Literal, Optional, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, _ParcelBase, as_global
-from catalystwan.models.configuration.feature_profile.sdwan.system.literals import AuthType, Priority, Version
+from catalystwan.api.configuration_groups.parcel import Default, Global, _ParcelBase, as_default, as_global
+from catalystwan.models.configuration.feature_profile.sdwan.system.literals import (
+    AuthType,
+    CypherSuite,
+    Priority,
+    TlsVersion,
+)
 from catalystwan.utils.pydantic_validators import ConvertBoolToStringModel
 
 
 class TlsProfile(ConvertBoolToStringModel):
-    profile: str
-    version: Optional[Version] = Field(default="TLSv1.1", json_schema_extra={"data_path": ["tls-version"]})
-    auth_type: AuthType = Field(json_schema_extra={"vmanage_key": "auth-type"})
-    ciphersuite_list: Optional[List] = Field(
-        default=None, json_schema_extra={"data_path": ["ciphersuite"], "vmanage_key": "ciphersuite-list"}
+    profile: Global[str]
+    version: Union[Global[TlsVersion], Default[TlsVersion]] = Field(
+        default=as_default("TLSv1.1", TlsVersion), serialization_alias="tlsVersion", validation_alias="tlsVersion"
+    )
+    auth_type: Default[AuthType] = Field(
+        default=as_default("Server", AuthType), serialization_alias="authType", validation_alias="authType"
+    )  # Value can't be changed in the UI
+    ciphersuite_list: Union[Global[List[CypherSuite]], Default[None]] = Field(
+        default=Default[None](value=None), serialization_alias="cipherSuiteList", validation_alias="cipherSuiteList"
     )
     model_config = ConfigDict(populate_by_name=True)
 
 
 class Server(BaseModel):
     name: Global[str]
-    vpn: Optional[Global[str]] = None
-    source_interface: Optional[Global[str]] = Field(
-        default=None, serialization_alias="sourceInterface", validation_alias="sourceInterface"
+    vpn: Union[Global[int], Default[int]] = Field(default=as_default(0))
+    source_interface: Union[Global[str], Default[None]] = Field(
+        default=Default[None](value=None), serialization_alias="sourceInterface", validation_alias="sourceInterface"
     )
-    priority: Optional[Global[Priority]] = Field(default="information")
-    enable_tls: Optional[Global[bool]] = Field(
-        default=as_global(False), serialization_alias="tlsEnable", validation_alias="tlsEnable"
+    priority: Union[Global[Priority], Default[Priority]] = Field(default=as_default("information", Priority))
+    enable_tls: Union[Global[bool], Default[bool]] = Field(
+        default=as_default(False), serialization_alias="tlsEnable", validation_alias="tlsEnable"
     )
-    custom_profile: Optional[Global[bool]] = Field(
-        default=as_global(False),
-        serialization_alias="tlsPropertiesCustomProfile",
-        validation_alias="tlsPropertiesCustomProfile",
-    )
-    profile_properties: Optional[Global[str]] = Field(
-        default=None, serialization_alias="tlsPropertiesProfile", validation_alias="tlsPropertiesProfile"
-    )
-    model_config = ConfigDict(populate_by_name=True)
-
-
-class Ipv6Server(BaseModel):
-    name: Global[str]
-    vpn: Optional[Global[str]] = None
-    source_interface: Optional[Global[str]] = Field(
-        default=None, serialization_alias="sourceInterface", validation_alias="sourceInterface"
-    )
-    priority: Optional[Global[Priority]] = Field(default="information")
-    enable_tls: Optional[Global[bool]] = Field(
-        default=as_global(False), serialization_alias="tlsEnable", validation_alias="tlsEnable"
-    )
-    custom_profile: Optional[Global[bool]] = Field(
-        default=as_global(False),
+    custom_profile: Optional[Union[Global[bool], Default[bool]]] = Field(
+        default=None,
         serialization_alias="tlsPropertiesCustomProfile",
         validation_alias="tlsPropertiesCustomProfile",
     )
@@ -61,18 +49,18 @@ class Ipv6Server(BaseModel):
 
 class File(BaseModel):
     disk_file_size: Optional[Union[Global[int], Default[int]]] = Field(
-        default=Default[int](value=10), serialization_alias="diskFileSize", validation_alias="diskFileSize"
+        default=as_default(10), serialization_alias="diskFileSize", validation_alias="diskFileSize"
     )
     disk_file_rotate: Optional[Union[Global[int], Default[int]]] = Field(
-        default=Default[int](value=10), serialization_alias="diskFileRotate", validation_alias="diskFileRotate"
+        default=as_default(10), serialization_alias="diskFileRotate", validation_alias="diskFileRotate"
     )
 
 
 class Disk(BaseModel):
     disk_enable: Optional[Global[bool]] = Field(
-        default=False, serialization_alias="diskEnable", validation_alias="diskEnable"
+        default=None, serialization_alias="diskEnable", validation_alias="diskEnable"
     )
-    file: File
+    file: File = Field(default_factory=File)
 
 
 class LoggingParcel(_ParcelBase):
@@ -81,7 +69,83 @@ class LoggingParcel(_ParcelBase):
         extra="forbid",
         populate_by_name=True,
     )
-    disk: Optional[Disk] = Field(default=None, validation_alias=AliasPath("data", "disk"))
+    disk: Disk = Field(default_factory=Disk, validation_alias=AliasPath("data", "disk"))
     tls_profile: Optional[List[TlsProfile]] = Field(default=[], validation_alias=AliasPath("data", "tlsProfile"))
     server: Optional[List[Server]] = Field(default=[], validation_alias=AliasPath("data", "server"))
-    ipv6_server: Optional[List[Ipv6Server]] = Field(default=[], validation_alias=AliasPath("data", "ipv6Server"))
+    ipv6_server: Optional[List[Server]] = Field(default=[], validation_alias=AliasPath("data", "ipv6Server"))
+
+    def set_disk(self, enable: bool, disk_file_size: int = 10, disk_file_rotate: int = 10):
+        self.disk.disk_enable = as_global(enable)
+        self.disk.file.disk_file_size = as_global(disk_file_size)
+        self.disk.file.disk_file_rotate = as_global(disk_file_rotate)
+
+    def add_tls_profile(
+        self, profile: str, version: TlsVersion = "TLSv1.1", ciphersuite_list: Optional[List[CypherSuite]] = None
+    ):
+        if not self.tls_profile:
+            self.tls_profile = []
+        self.tls_profile.append(
+            TlsProfile(
+                profile=as_global(profile),
+                version=as_global(version, TlsVersion),
+                ciphersuite_list=Global[List[CypherSuite]](value=ciphersuite_list)
+                if ciphersuite_list
+                else Default[None](value=None),
+            )
+        )
+
+    def add_ipv4_server(
+        self,
+        name: str,
+        vpn: int = 0,
+        source_interface: Optional[str] = None,
+        priority: Priority = "information",
+        enable_tls: bool = False,
+        custom_profile: bool = False,
+        profile_properties: Optional[str] = None,
+    ):
+        item = self._create_server_item(
+            name, vpn, source_interface, priority, enable_tls, custom_profile, profile_properties
+        )
+        if not self.server:
+            self.server = []
+        self.server.append(item)
+        return item
+
+    def add_ipv6_server(
+        self,
+        name: str,
+        vpn: int = 0,
+        source_interface: Optional[str] = None,
+        priority: Priority = "information",
+        enable_tls: bool = False,
+        custom_profile: bool = False,
+        profile_properties: Optional[str] = None,
+    ):
+        item = self._create_server_item(
+            name, vpn, source_interface, priority, enable_tls, custom_profile, profile_properties
+        )
+        if not self.ipv6_server:
+            self.ipv6_server = []
+        self.ipv6_server.append(item)
+        return item
+
+    def _create_server_item(
+        self,
+        name: str,
+        vpn: int,
+        source_interface: Optional[str] = None,
+        priority: Priority = "information",
+        enable_tls: bool = False,
+        custom_profile: bool = False,
+        profile_properties: Optional[str] = None,
+    ):
+        return Server(
+            name=as_global(name),
+            vpn=as_global(vpn),
+            source_interface=as_global(source_interface) if source_interface else Default[None](value=None),
+            priority=as_global(priority, Priority),
+            enable_tls=as_global(enable_tls),
+            custom_profile=as_global(custom_profile) if custom_profile else None,
+            profile_properties=as_global(profile_properties) if profile_properties else None,
+        )
