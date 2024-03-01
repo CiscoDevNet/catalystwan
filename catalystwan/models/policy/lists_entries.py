@@ -1,4 +1,4 @@
-from ipaddress import IPv4Address, IPv4Network, IPv6Network
+from ipaddress import IPv4Address, IPv4Network, IPv6Interface, IPv6Network
 from typing import List, Literal, Optional, Set
 from uuid import UUID
 
@@ -235,7 +235,7 @@ class ColorListEntry(BaseModel):
 class DataIPv6PrefixListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    ipv6_prefix: IPv6Network = Field(serialization_alias="ipv6Prefix", validation_alias="ipv6Prefix")
+    ipv6_prefix: IPv6Interface = Field(serialization_alias="ipv6Prefix", validation_alias="ipv6Prefix")
 
 
 class LocalDomainListEntry(BaseModel):
