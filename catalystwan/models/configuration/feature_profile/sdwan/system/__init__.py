@@ -8,7 +8,6 @@ from .banner import BannerParcel
 from .basic import BasicParcel
 from .bfd import BFDParcel
 from .global_parcel import GlobalParcel
-from .literals import SYSTEM_LITERALS
 from .logging_parcel import LoggingParcel
 from .mrf import MRFParcel
 from .ntp import NTPParcel
@@ -46,7 +45,6 @@ __all__ = [
     "SecurityParcel",
     "SNMPParcel",
     "AnySystemParcel",
-    "SYSTEM_LITERALS",
 ]
 
 
