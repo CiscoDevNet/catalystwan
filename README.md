@@ -11,27 +11,89 @@ Cisco Catalyst WAN SDK is a package for creating simple and parallel automatic r
 pip install catalystwan
 ```
 
-## Session usage example
-Our session is an extension to `requests.Session` designed to make it easier to communicate via API calls with SDWAN Manager. We provide ready to use authentication, you have to simply provide the Manager url, username and password as as if you were doing it through a GUI. 
+## Manager Session
+In order to execute SDK APIs **ManagerSession** needs to be created. The fastest way to get started is to use `create_manager_session()` method which configures session, performs authentication for given credentials and returns **ManagerSession** instance in operational state. **ManagerSession** provides a collection of supported APIs in `api` instance variable.
+Please check example below:
+
 ```python
 from catalystwan.session import create_manager_session
+
+url = "sandbox-sdwan-2.cisco.com"
+username = "devnetuser"
+password = "RG!_Yw919_83"
+
+with create_manager_session(url=url, username=username, password=password) as session:
+    devices = session.api.devices.get()
+    print(devices)
+```
+**ManagerSession** extends [requests.Session](https://requests.readthedocs.io/en/latest/user/advanced/#session-objects) so all functionality from [requests](https://requests.readthedocs.io/en/latest/) library is avaiable to user, it also implements python [contextmanager](https://docs.python.org/3.8/library/contextlib.html#contextlib.contextmanager) and automatically frees server resources on exit.
+
+<details>
+    <summary> <b>Configure Manager Session before using</b> <i>(click to expand)</i></summary>
+
+It is possible to configure **ManagerSession** prior sending any request.
+
+```python
+from catalystwan.session import ManagerSession
 
 url = "example.com"
 username = "admin"
 password = "password123"
-with create_manager_session(url=url, username=username, password=password) as session:
-    session.get("/dataservice/device")
 
-# When interacting with the SDWAN Manager API without using a context manager, it's important 
-# to manually execute the `close()` method to release the user session resource.
-
-session = create_manager_session(url=url, username=username, password=password)
+# configure session using constructor - nothing will be sent to target server yet
+session = ManagerSession(url=url, username=username, password=password)
+# login and send requests
+session.login()
 session.get("/dataservice/device")
 session.close()
 ```
+When interacting with the SDWAN Manager API without using a context manager, it's important 
+to manually execute the `close()` method to release the user session resource.
 Ensure that the `close()` method is called after you have finished using the session to maintain optimal resource management and avoid potential errors.
 
+</details>
+
+<details>
+    <summary> <b>Login as Tenant</b> <i>(click to expand)</i></summary>
+
+Tenant domain needs to be provided in url together with Tenant credentials.
+
+```python
+from catalystwan.session import create_manager_session
+
+url = "tenant.example.com"
+username = "tenant_user"
+password = "password123"
+
+with create_manager_session(url=url, username=username, password=password) as session:
+    print(session.session_type)
+```
+
+</details>
+
+<details>
+    <summary> <b>Login as Provider-as-Tenant</b> <i>(click to expand)</i></summary>
+
+Tenant `subdomain` needs to be provided as additional argument together with Provider credentials.
+
+```python
+from catalystwan.session import create_manager_session
+
+url = "example.com"
+username = "provider"
+password = "password123"
+subdomain = "tenant.example.com"
+
+with create_manager_session(url=url, username=username, password=password, subdomain=subdomain) as session:
+    print(session.session_type)
+```
+
+</details>
+
+
+
 ## API usage examples
+All examples below assumes `session` contains logged-in [ManagerSession](#Manager-Session)
 
 <details>
     <summary> <b>Get devices</b> <i>(click to expand)</i></summary>
