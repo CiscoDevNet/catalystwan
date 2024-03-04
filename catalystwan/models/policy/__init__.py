@@ -1,3 +1,5 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+
 # This stub provide top-level "public" policy models to be used with PolicyAPI()
 from typing import List, Union
 
@@ -45,8 +47,8 @@ from .lists import (
     SiteList,
     SLAClassList,
     TLOCList,
-    URLBlackList,
-    URLWhiteList,
+    URLAllowList,
+    URLBlockList,
     VPNList,
     ZoneList,
 )
@@ -112,8 +114,8 @@ AnyPolicyList = Annotated[
         SiteList,
         SLAClassList,
         TLOCList,
-        URLBlackList,
-        URLWhiteList,
+        URLBlockList,
+        URLAllowList,
         VPNList,
         ZoneList,
     ],
@@ -179,8 +181,8 @@ __all__ = (
     "TrafficDataDirection",
     "TrafficDataPolicy",
     "UnifiedSecurityPolicy",
-    "URLBlackList",
-    "URLWhiteList",
+    "URLBlockList",
+    "URLAllowList",
     "VPNList",
     "VPNMembershipPolicy",
     "ZoneBasedFWPolicy",

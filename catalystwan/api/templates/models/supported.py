@@ -1,3 +1,5 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+
 from catalystwan.api.templates.models.cisco_aaa_model import CiscoAAAModel
 from catalystwan.api.templates.models.cisco_banner_model import CiscoBannerModel
 from catalystwan.api.templates.models.cisco_bfd_model import CiscoBFDModel

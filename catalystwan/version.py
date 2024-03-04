@@ -1,3 +1,5 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 import re
 
 from packaging._structures import NegativeInfinity  # type: ignore

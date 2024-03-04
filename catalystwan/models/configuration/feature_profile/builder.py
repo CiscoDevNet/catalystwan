@@ -1,3 +1,5 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+
 # from typing import Dict, Generic, Type, TypeVar
 
 # from vmngclient.api.configuration_groups.parcel import Parcel

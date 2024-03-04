@@ -1,8 +1,10 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 # mypy: disable-error-code="empty-body"
 from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
-from catalystwan.models.policy.lists import URLBlackList
+from catalystwan.models.policy.lists import URLBlockList
 from catalystwan.models.policy.policy_list import (
     InfoTag,
     PolicyListEndpoints,
@@ -13,17 +15,17 @@ from catalystwan.models.policy.policy_list import (
 from catalystwan.typed_list import DataSequence
 
 
-class URLBlackListEditPayload(URLBlackList, PolicyListId):
+class URLBlockListEditPayload(URLBlockList, PolicyListId):
     pass
 
 
-class URLBlackListInfo(URLBlackList, PolicyListInfo):
+class URLBlockListInfo(URLBlockList, PolicyListInfo):
     pass
 
 
-class ConfigurationPolicyURLBlackList(APIEndpoints, PolicyListEndpoints):
+class ConfigurationPolicyURLBlockList(APIEndpoints, PolicyListEndpoints):
     @post("/template/policy/list/urlblacklist")
-    def create_policy_list(self, payload: URLBlackList) -> PolicyListId:
+    def create_policy_list(self, payload: URLBlockList) -> PolicyListId:
         ...
 
     @delete("/template/policy/list/urlblacklist/{id}")
@@ -35,23 +37,23 @@ class ConfigurationPolicyURLBlackList(APIEndpoints, PolicyListEndpoints):
         ...
 
     @put("/template/policy/list/urlblacklist/{id}")
-    def edit_policy_list(self, id: UUID, payload: URLBlackListEditPayload) -> None:
+    def edit_policy_list(self, id: UUID, payload: URLBlockListEditPayload) -> None:
         ...
 
     @get("/template/policy/list/urlblacklist/{id}")
-    def get_lists_by_id(self, id: UUID) -> URLBlackListInfo:
+    def get_lists_by_id(self, id: UUID) -> URLBlockListInfo:
         ...
 
     @get("/template/policy/list/urlblacklist", "data")
-    def get_policy_lists(self) -> DataSequence[URLBlackListInfo]:
+    def get_policy_lists(self) -> DataSequence[URLBlockListInfo]:
         ...
 
     @get("/template/policy/list/urlblacklist/filtered", "data")
-    def get_policy_lists_with_info_tag(self, params: InfoTag) -> DataSequence[URLBlackListInfo]:
+    def get_policy_lists_with_info_tag(self, params: InfoTag) -> DataSequence[URLBlockListInfo]:
         ...
 
     @post("/template/policy/list/urlblacklist/preview")
-    def preview_policy_list(self, payload: URLBlackList) -> PolicyListPreview:
+    def preview_policy_list(self, payload: URLBlockList) -> PolicyListPreview:
         ...
 
     @get("/template/policy/list/urlblacklist/preview/{id}")

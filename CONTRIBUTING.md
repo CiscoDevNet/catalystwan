@@ -3,8 +3,7 @@
 We're really glad you want to help.
 
 ## Here are some important resources:
-
-  * Want to add something from yourself? [Make a PR](https://github.com/CiscoDevNet/catalystwan/pulls) - remember to follow code guidelines.
+  * Want to add something from yourself? [Make a PR](https://github.com/CiscoDevNet/catalystwan/pulls) - remember to follow [code guidelines](#code-guidelines).
     ### Contributors from CiscoDevNet organization:
     To make a PR - pull the repository, create branch for your changes, make said changes and make the pull request. Now just wait for the review and feedback from our developers.  
     ### Contributors outside CiscoDevNet organization

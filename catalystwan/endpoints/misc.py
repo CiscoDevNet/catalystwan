@@ -1,3 +1,5 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 # mypy: disable-error-code="empty-body"
 from catalystwan.endpoints import APIEndpointClient, APIEndpoints, get
 from catalystwan.models.misc.application_protocols import ApplicationProtocolMap

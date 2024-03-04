@@ -1,3 +1,5 @@
+# Copyright 2022 Cisco Systems, Inc. and its affiliates
+
 """Methods covering essential API endpoints and related data classes."""
 from __future__ import annotations
 

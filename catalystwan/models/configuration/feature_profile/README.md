@@ -6,8 +6,8 @@ This README document provides guidelines on creating configuration groups within
 
 Cellular controller Parcel will be used for example purposes. Please change the parcel according to which one you are implementing.
 
-1. Add new endpoints following the guide: https://github.com/CiscoDevNet/vManage-client/blob/main/CONTRIBUTING.md
-2. Download a schema with new endpoint (TODO where to add):
+1. Add new endpoints following the guide: https://github.com/CiscoDevNet/catalystwan/blob/main/CONTRIBUTING.md
+2. Download a schema with new endpoint:
 ```python
     @versions(supported_versions=(">=20.9"), raises=False)
     @get("/v1/feature-profile/sdwan/transport/cellular-controller/schema", resp_json_key="request")
@@ -25,13 +25,9 @@ with open("sdwan_transport_cellular_controller_parcel_schema.json", "w") as f:
     json.dump(schema, f, indent=4)
 ```
 
-TODO: Possible to automate this step
-
 3. Generate `model.py`
 
 `datamodel-codegen --input sdwan_transport_cellular_controller_parcel_schema.json --output model.py --output-model-type pydantic_v2.BaseModel  --enum-field-as-literal all --input-file-type jsonschema --field-constraints --target-python-version 3.8 --snake-case-field`
-
-TODO: Improve `cmd` & check if there is a possibility to improve generator
 
 `model.py`
 ```python
@@ -251,7 +247,7 @@ class CellularController(BaseModel):
     )
 ```
 
-5. FIx `model.py` file
+5. Fix `model.py` file
 
 `cellular_controller.py`
 ```python
@@ -287,6 +283,9 @@ class CellularControllerParcel(Parcel):
     config_type: Default[ConfigTypeValue] = Field(default=Default(value=ConfigTypeValue.NON_E_SIM), alias="configType")
     controller_config: ControllerConfig = Field(alias="controllerConfig")
 ```
+
+6. Add `cellular_controller.py` file to folder `catalystwan/models/configuration/feature_profile/sdwan/transport`
+
 ## Guidelines for Creating Config Groups
 
 ### 1. Directory Structure
@@ -336,9 +335,10 @@ https://peps.python.org/pep-0008/#descriptive-naming-styles
 
 Utilize `model_validator` for two or more excluding values.
 
-### 7. Pipeline and Integration Tests
-
-- Implement a pipeline and integration tests. (TODO: Provide details)
-
-
 If you have any questions or need further clarification, please reach out to the project maintainers. Thank you for your contribution!
+
+### 8. Future Features
+
+- Automate model generation step
+- Improve model generator
+- Implement a pipeline and integration tests.

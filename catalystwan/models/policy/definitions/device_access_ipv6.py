@@ -1,3 +1,5 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+
 from ipaddress import IPv6Network
 from typing import Any, List, Literal, Optional, Set, Tuple, Union
 from uuid import UUID

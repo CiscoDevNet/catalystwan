@@ -1,3 +1,5 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+
 from typing import Any, List, Optional
 
 from pydantic import BaseModel, Field

@@ -1,3 +1,5 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 import unittest
 
 from packaging.version import Version  # type: ignore
