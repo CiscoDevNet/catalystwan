@@ -10,7 +10,7 @@ from catalystwan.utils.config_migration.creators.config_group import ConfigGroup
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_TEMPLATE_TYPES = ["cedge_aaa", "cedge_aaa"]
+SUPPORTED_TEMPLATE_TYPES = ["cedge_aaa"]
 
 
 def log_progress(task: str, completed: int, total: int) -> None:
