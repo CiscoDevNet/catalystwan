@@ -4,12 +4,12 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
-from catalystwan.api.templates.feature_template import FeatureTemplate
+from catalystwan.api.templates.feature_template import FeatureTemplate, FeatureTemplateValidator
 
 
-class User(BaseModel):
+class User(FeatureTemplateValidator):
     name: str
     password: Optional[str] = None
     secret: Optional[str] = None
@@ -17,7 +17,7 @@ class User(BaseModel):
     pubkey_chain: List[str] = Field(default=[], json_schema_extra={"vmanage_key": "pubkey-chain", "vip_type": "ignore"})
 
 
-class RadiusServer(BaseModel):
+class RadiusServer(FeatureTemplateValidator):
     model_config = ConfigDict(populate_by_name=True)
 
     address: str
@@ -31,7 +31,7 @@ class RadiusServer(BaseModel):
     key_type: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "key-type"})
 
 
-class RadiusGroup(BaseModel):
+class RadiusGroup(FeatureTemplateValidator):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     group_name: str = Field(json_schema_extra={"vmanage_key": "group-name"})
@@ -46,7 +46,7 @@ class DomainStripping(str, Enum):
     RIGHT_TO_LEFT = "right-to-left"
 
 
-class TacacsServer(BaseModel):
+class TacacsServer(FeatureTemplateValidator):
     model_config = ConfigDict(populate_by_name=True)
 
     address: str
@@ -57,7 +57,7 @@ class TacacsServer(BaseModel):
     key_enum: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "key-enum"})
 
 
-class TacacsGroup(BaseModel):
+class TacacsGroup(FeatureTemplateValidator):
     model_config = ConfigDict(populate_by_name=True)
 
     group_name: str = Field(json_schema_extra={"vmanage_key": "group-name"})

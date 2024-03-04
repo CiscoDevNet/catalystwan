@@ -5,9 +5,9 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
-from catalystwan.api.templates.feature_template import FeatureTemplate
+from catalystwan.api.templates.feature_template import FeatureTemplate, FeatureTemplateValidator
 
 DEFAULT_TRACKER_THRESHOLD = 300
 DEFAULT_TRACKER_INTERVAL = 60
@@ -74,7 +74,7 @@ class PerfectForwardSecrecy(str, Enum):
     NONE = "none"
 
 
-class Interface(BaseModel):
+class Interface(FeatureTemplateValidator):
     if_name: str = Field(json_schema_extra={"vmanage_key": "if-name"})
     auto: bool
     shutdown: bool
@@ -131,7 +131,7 @@ class SvcType(str, Enum):
     SIG = "sig"
 
 
-class InterfacePair(BaseModel):
+class InterfacePair(FeatureTemplateValidator):
     active_interface: str = Field(json_schema_extra={"vmanage_key": "active-interface"})
     active_interface_weight: int = Field(
         DEFAULT_INTERFACE_PAIR_ACTIVE_INTERFACE_WEIGHT, json_schema_extra={"vmanage_key": "active-interface-weight"}
@@ -155,7 +155,7 @@ class RefreshTimeUnit(str, Enum):
     DAY = "DAY"
 
 
-class Service(BaseModel):
+class Service(FeatureTemplateValidator):
     svc_type: SvcType = Field(SvcType.SIG, json_schema_extra={"vmanage_key": "svc-type"})
     interface_pair: List[InterfacePair] = Field(json_schema_extra={"vmanage_key": "interface-pair"})
     auth_required: Optional[bool] = Field(False, json_schema_extra={"vmanage_key": "auth-required"})
@@ -192,7 +192,7 @@ class TrackerType(str, Enum):
     SIG = "SIG"
 
 
-class Tracker(BaseModel):
+class Tracker(FeatureTemplateValidator):
     name: str
     endpoint_api_url: str = Field(json_schema_extra={"vmanage_key": "endpoint-api-url"})
     threshold: Optional[int] = DEFAULT_TRACKER_THRESHOLD

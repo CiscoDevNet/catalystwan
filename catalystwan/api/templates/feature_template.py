@@ -5,19 +5,47 @@ from __future__ import annotations
 import json
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Union, cast
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
 from pydantic import BaseModel, model_validator
 
 from catalystwan.api.templates.device_variable import DeviceVariable
 from catalystwan.utils.device_model import DeviceModel
+from catalystwan.utils.pydantic_field import get_extra_field
 
 if TYPE_CHECKING:
     from catalystwan.session import ManagerSession
+    from catalystwan.utils.feature_template import FlattenedTemplateValue
 
 
-class FeatureTemplate(BaseModel, ABC):
+class FeatureTemplateValidator(BaseModel, ABC):
+    @model_validator(mode="before")
+    @classmethod
+    def map_fields(cls, values: Union[Any, Dict[str, Union[List[FlattenedTemplateValue], Any]]]):
+        from catalystwan.utils.feature_template import FlattenedTemplateValue
+
+        if not isinstance(values, dict):
+            return values
+        mapped_values = {}
+        for field_name, field_info in cls.model_fields.items():
+            payload_name = get_extra_field(field_info, "vmanage_key") or field_info.alias or field_name
+            data_path = get_extra_field(field_info, "data_path", [])
+            if payload_name not in values:
+                continue
+            else:
+                value = values[payload_name]
+            if value and isinstance(value, list) and all([isinstance(v, FlattenedTemplateValue)] for v in value):
+                for template_value in value:
+                    if template_value.data_path == data_path:
+                        mapped_values[field_name] = template_value.value
+                        break
+            else:
+                mapped_values[field_name] = value
+        return mapped_values
+
+
+class FeatureTemplate(FeatureTemplateValidator, ABC):
     template_name: str
     template_description: str
     device_models: List[DeviceModel] = []
@@ -82,12 +110,11 @@ class FeatureTemplate(BaseModel, ABC):
         Returns:
             FeatureTemplate: filed out feature template model
         """
-        from catalystwan.utils.feature_template import choose_model, find_template_values
+        from catalystwan.utils.feature_template import choose_model, find_template_values, flatten_template_definition
 
         template_info = (
             session.api.templates._get_feature_templates(summary=False).filter(name=name).single_or_default()
         )
-
         template_definition_as_dict = json.loads(cast(str, template_info.template_definiton))
 
         feature_template_model = choose_model(type_value=template_info.template_type)
@@ -96,11 +123,12 @@ class FeatureTemplate(BaseModel, ABC):
         values_from_template_definition = find_template_values(
             template_definition_as_dict, device_specific_variables=device_specific_variables
         )
+        flattened_values = flatten_template_definition(values_from_template_definition)
 
         return feature_template_model(
             template_name=template_info.name,
             template_description=template_info.description,
             device_models=[DeviceModel(model) for model in template_info.device_type],
             device_specific_variables=device_specific_variables,
-            **values_from_template_definition,
+            **flattened_values,
         )

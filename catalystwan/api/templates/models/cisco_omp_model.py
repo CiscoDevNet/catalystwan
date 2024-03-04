@@ -4,10 +4,10 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from catalystwan.api.templates.bool_str import BoolStr
-from catalystwan.api.templates.feature_template import FeatureTemplate
+from catalystwan.api.templates.feature_template import FeatureTemplate, FeatureTemplateValidator
 
 DEFAULT_OMP_HOLDTIME = 60
 DEFAULT_OMP_EOR_TIMER = 300
@@ -32,7 +32,7 @@ class Route(str, Enum):
     EXTERNAL = "external"
 
 
-class IPv4Advertise(BaseModel):
+class IPv4Advertise(FeatureTemplateValidator):
     protocol: IPv4AdvertiseProtocol
     route: Route
 
@@ -47,7 +47,7 @@ class IPv6AdvertiseProtocol(str, Enum):
     ISIS = "isis"
 
 
-class IPv6Advertise(BaseModel):
+class IPv6Advertise(FeatureTemplateValidator):
     protocol: IPv6AdvertiseProtocol
 
 

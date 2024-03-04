@@ -4,15 +4,15 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from catalystwan.api.templates.bool_str import BoolStr
 from catalystwan.api.templates.device_variable import DeviceVariable
-from catalystwan.api.templates.feature_template import FeatureTemplate
+from catalystwan.api.templates.feature_template import FeatureTemplate, FeatureTemplateValidator
 from catalystwan.utils.timezone import Timezone
 
 
-class MobileNumber(BaseModel):
+class MobileNumber(FeatureTemplateValidator):
     number: str
 
 
@@ -52,7 +52,7 @@ class Type(str, Enum):
     STATIC_ROUTE = "static-route"
 
 
-class Tracker(BaseModel):
+class Tracker(FeatureTemplateValidator):
     name: str
     endpoint_ip: str = Field(json_schema_extra={"vmanage_key": "endpoint-ip"})
     endpoint_ip_transport_port: str = Field(
@@ -71,11 +71,11 @@ class Tracker(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Object(BaseModel):
+class Object(FeatureTemplateValidator):
     number: int
 
 
-class ObjectTrack(BaseModel):
+class ObjectTrack(FeatureTemplateValidator):
     object_number: int = Field(json_schema_extra={"vmanage_key": "object-number"})
     interface: str
     sig: str
@@ -92,7 +92,7 @@ class Role(str, Enum):
     BORDER_ROUTER = "border-router"
 
 
-class AffinityPerVrf(BaseModel):
+class AffinityPerVrf(FeatureTemplateValidator):
     affinity_group_number: Optional[int] = Field(
         default=None, json_schema_extra={"vmanage_key": "affinity-group-number"}
     )
@@ -105,7 +105,7 @@ class EnableMrfMigration(str, Enum):
     ENABLE_FROM_BGP_CORE = "enabled-from-bgp-core"
 
 
-class Vrf(BaseModel):
+class Vrf(FeatureTemplateValidator):
     vrf_id: int = Field(json_schema_extra={"vmanage_key": "vrf-id"})
     gateway_preference: Optional[List[int]] = Field(
         default=None, json_schema_extra={"vmanage_key": "gateway-preference"}

@@ -5,10 +5,10 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from catalystwan.api.templates.bool_str import BoolStr
-from catalystwan.api.templates.feature_template import FeatureTemplate
+from catalystwan.api.templates.feature_template import FeatureTemplate, FeatureTemplateValidator
 
 DEFAULT_STATIC_NAT64_SOURCE_VPN_ID = 0
 DEFAULT_STATIC_NAT_SOURCE_VPN_ID = 0
@@ -22,11 +22,11 @@ DEFAULT_IPV6_VRRP_PRIORITY = 100
 DEFAULT_IPV6_VRRP_TIMER = 1000
 
 
-class SecondaryIPv4Address(BaseModel):
+class SecondaryIPv4Address(FeatureTemplateValidator):
     address: Optional[ipaddress.IPv4Interface] = None
 
 
-class SecondaryIPv6Address(BaseModel):
+class SecondaryIPv6Address(FeatureTemplateValidator):
     address: Optional[ipaddress.IPv6Interface] = None
 
 
@@ -35,13 +35,13 @@ class Direction(str, Enum):
     OUT = "out"
 
 
-class AccessList(BaseModel):
+class AccessList(FeatureTemplateValidator):
     direction: Direction
     acl_name: str = Field(json_schema_extra={"vmanage_key": "acl-name"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class DhcpHelperV6(BaseModel):
+class DhcpHelperV6(FeatureTemplateValidator):
     address: ipaddress.IPv6Address
     vpn: Optional[int] = None
 
@@ -52,7 +52,7 @@ class NatChoice(str, Enum):
     LOOPBACK = "Loopback"
 
 
-class StaticNat66(BaseModel):
+class StaticNat66(FeatureTemplateValidator):
     source_prefix: ipaddress.IPv6Interface = Field(json_schema_extra={"vmanage_key": "source-prefix"})
     translated_source_prefix: str = Field(json_schema_extra={"vmanage_key": "translated-source-prefix"})
     source_vpn_id: int = Field(DEFAULT_STATIC_NAT64_SOURCE_VPN_ID, json_schema_extra={"vmanage_key": "source-vpn-id"})
@@ -64,7 +64,7 @@ class StaticNatDirection(str, Enum):
     OUTSIDE = "outside"
 
 
-class Static(BaseModel):
+class Static(FeatureTemplateValidator):
     source_ip: ipaddress.IPv4Address = Field(json_schema_extra={"vmanage_key": "source-ip"})
     translate_ip: ipaddress.IPv4Address = Field(json_schema_extra={"vmanage_key": "translate-ip"})
     static_nat_direction: StaticNatDirection = Field(
@@ -79,7 +79,7 @@ class Proto(str, Enum):
     UDP = "udp"
 
 
-class StaticPortForward(BaseModel):
+class StaticPortForward(FeatureTemplateValidator):
     source_ip: ipaddress.IPv4Address = Field(json_schema_extra={"vmanage_key": "source-ip"})
     translate_ip: ipaddress.IPv4Address = Field(json_schema_extra={"vmanage_key": "translate-ip"})
     static_nat_direction: StaticNatDirection = Field(
@@ -110,7 +110,7 @@ class Encap(str, Enum):
     IPSEC = "ipsec"
 
 
-class Encapsulation(BaseModel):
+class Encapsulation(FeatureTemplateValidator):
     encap: Encap
     preference: Optional[int] = None
     weight: int = DEFAULT_ENCAPSULATION_WEIGHT
@@ -178,12 +178,12 @@ class Duplex(str, Enum):
     AUTO = "auto"
 
 
-class Ip(BaseModel):
+class Ip(FeatureTemplateValidator):
     addr: ipaddress.IPv4Address
     mac: str
 
 
-class Ipv4Secondary(BaseModel):
+class Ipv4Secondary(FeatureTemplateValidator):
     address: ipaddress.IPv4Address
 
 
@@ -192,14 +192,14 @@ class TrackAction(str, Enum):
     SHUTDOWN = "Shutdown"
 
 
-class TrackingObject(BaseModel):
+class TrackingObject(FeatureTemplateValidator):
     name: int
     track_action: TrackAction = Field(TrackAction.DECREMENT, json_schema_extra={"vmanage_key": "track-action"})
     decrement: int
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Vrrp(BaseModel):
+class Vrrp(FeatureTemplateValidator):
     grp_id: int = Field(json_schema_extra={"vmanage_key": "grp-id"})
     priority: int = DEFAULT_VRRP_PRIORITY
     timer: int = DEFAULT_VRRP_TIMER
@@ -219,13 +219,13 @@ class Vrrp(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Ipv6(BaseModel):
+class Ipv6(FeatureTemplateValidator):
     ipv6_link_local: ipaddress.IPv6Address = Field(json_schema_extra={"vmanage_key": "ipv6-link-local"})
     prefix: Optional[ipaddress.IPv6Interface] = None
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Ipv6Vrrp(BaseModel):
+class Ipv6Vrrp(FeatureTemplateValidator):
     grp_id: int = Field(json_schema_extra={"vmanage_key": "grp-id"})
     priority: int = DEFAULT_IPV6_VRRP_PRIORITY
     timer: int = DEFAULT_IPV6_VRRP_TIMER
@@ -245,12 +245,16 @@ class CiscoVpnInterfaceModel(FeatureTemplate):
     secondary_ipv4_address: Optional[List[SecondaryIPv4Address]] = Field(
         default=None, json_schema_extra={"data_path": ["ip"], "vmanage_key": "secondary-address"}
     )
-    dhcp_ipv4_client: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "dhcp-client"})
+    dhcp_ipv4_client: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"data_path": ["ip"], "vmanage_key": "dhcp-client"}
+    )
     dhcp_distance: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "dhcp-distance"})
     ipv6_address: Optional[ipaddress.IPv6Interface] = Field(
         default=None, json_schema_extra={"data_path": ["ipv6"], "vmanage_key": "address"}
     )
-    dhcp_ipv6_client: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "dhcp-client"})
+    dhcp_ipv6_client: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"data_path": ["ipv6"], "vmanage_key": "dhcp-client"}
+    )
     secondary_ipv6_address: Optional[List[SecondaryIPv6Address]] = Field(
         default=None, json_schema_extra={"data_path": ["ipv6"], "vmanage_key": "secondary-address"}
     )
