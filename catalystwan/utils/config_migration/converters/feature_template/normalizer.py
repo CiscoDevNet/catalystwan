@@ -2,6 +2,7 @@ from ipaddress import AddressValueError, IPv4Address, IPv6Address
 from typing import List, Union, get_args
 
 from catalystwan.api.configuration_groups.parcel import Global, as_global
+from catalystwan.models.common import TLOCColor
 from catalystwan.models.configuration.feature_profile.sdwan.system.logging_parcel import (
     AuthType,
     CypherSuite,
@@ -10,7 +11,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.system.logging_parce
 )
 from catalystwan.models.configuration.feature_profile.sdwan.system.mrf import EnableMrfMigration, Role
 
-CastableLiterals = [Priority, TlsVersion, AuthType, CypherSuite, Role, EnableMrfMigration]
+CastableLiterals = [Priority, TlsVersion, AuthType, CypherSuite, Role, EnableMrfMigration, TLOCColor]
 
 CastedTypes = Union[
     Global[bool],
