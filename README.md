@@ -93,7 +93,7 @@ with create_manager_session(url=url, username=username, password=password, subdo
 
 
 ## API usage examples
-All examples below assumes `session` contains logged-in [ManagerSession](#Manager-Session)
+All examples below assumes `session` variable contains logged-in [Manager Session](#Manager-Session) instance.
 
 <details>
     <summary> <b>Get devices</b> <i>(click to expand)</i></summary>
