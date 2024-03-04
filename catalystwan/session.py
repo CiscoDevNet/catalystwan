@@ -204,15 +204,26 @@ class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
             self.state = ManagerSessionState.OPERATIVE
         return
 
-    def restart_imminent(self):
-        """
-        Notify session that restart is imminent.
+    def restart_imminent(self, restart_timeout_override: Optional[int] = None):
+        """Notify session that restart is imminent.
         ConnectionError and status code 503 will cause session to wait for connectivity and perform login again
+
+        Args:
+            restart_timeout_override (Optional[int], optional): override session property which controls restart timeout
         """
+        if restart_timeout_override is not None:
+            self.restart_timeout = restart_timeout_override
         self.state = ManagerSessionState.RESTART_IMMINENT
 
-    def login(self) -> None:
-        """Performs login to SDWAN Manager and fetches important server info to instance variables"""
+    def login(self) -> ManagerSession:
+        """Performs login to SDWAN Manager and fetches important server info to instance variables
+
+        Raises:
+            SessionNotCreatedError: indicates session configuration is not consistent
+
+        Returns:
+            ManagerSession: (self)
+        """
 
         self.auth = vManageAuth(self.base_url, self.username, self.password, verify=False)
         self.auth.logger = self.logger
@@ -248,7 +259,7 @@ class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
             f"Logged to vManage({self.platform_version}) as {self.username}. The session type is {self.session_type}"
         )
         self.cookies.set("JSESSIONID", self.auth.set_cookie.get("JSESSIONID"))
-        return
+        return self
 
     def wait_server_ready(self, timeout: int, poll_period: int = 10) -> None:
         """Waits until server is ready for API requests with given timeout in seconds"""
