@@ -12,13 +12,15 @@ from .base import FeatureTemplateConverter
 from .bfd import BFDTemplateConverter
 from .logging_ import LoggingTemplateConverter
 from .normalizer import template_definition_normalization
+from .security import SecurityTemplateConverter
 
 logger = logging.getLogger(__name__)
 
 supported_parcel_converters: Dict[Any, FeatureTemplateConverter] = {
     ("cisco_aaa", "cedge_aaa"): AAATemplateConverter,  # type: ignore[dict-item]
     ("cisco_bfd",): BFDTemplateConverter,  # type: ignore[dict-item]
-    ("cisco_logging", "logging"): LoggingTemplateConverter,
+    ("cisco_logging", "logging"): LoggingTemplateConverter,  # type: ignore[dict-item]
+    ("cisco_security", "security"): SecurityTemplateConverter,  # type: ignore[dict-item]
 }
 
 
