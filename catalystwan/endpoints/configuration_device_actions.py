@@ -100,7 +100,7 @@ class InstallDevice(BaseModel):
     device_id: str = Field(serialization_alias="deviceId", validation_alias="deviceId")
     device_ip: str = Field(serialization_alias="deviceIP", validation_alias="deviceIP")
     is_nutella_migration: Optional[bool] = Field(
-        default=None, serialization_alias="isNutellaMigration", validation_alias="isNutellaMigration"
+        default=False, serialization_alias="isNutellaMigration", validation_alias="isNutellaMigration"
     )
 
 
