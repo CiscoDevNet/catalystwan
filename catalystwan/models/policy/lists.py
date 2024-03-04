@@ -1,3 +1,5 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 from ipaddress import IPv4Address, IPv4Network, IPv6Network
 from typing import Any, List, Literal, Optional, Set, Tuple
 from uuid import UUID
@@ -163,12 +165,12 @@ class IPSSignatureList(PolicyListBase):
     entries: List[IPSSignatureListEntry] = []
 
 
-class URLWhiteList(PolicyListBase):
+class URLAllowList(PolicyListBase):
     type: Literal["urlWhiteList"] = "urlWhiteList"
     entries: List[URLListEntry] = []
 
 
-class URLBlackList(PolicyListBase):
+class URLBlockList(PolicyListBase):
     type: Literal["urlBlackList"] = "urlBlackList"
     entries: List[URLListEntry] = []
 

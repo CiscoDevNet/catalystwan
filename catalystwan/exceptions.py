@@ -1,3 +1,5 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 from typing import Any, Optional, Union
 
 from pydantic import BaseModel

@@ -1,3 +1,5 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+
 # mypy: disable-error-code="empty-body"
 from ipaddress import IPv4Address
 from typing import List, Union

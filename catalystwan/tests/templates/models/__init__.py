@@ -1,3 +1,5 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+
 #  type: ignore
 from catalystwan.tests.templates.models.cisco_aaa import cisco_aaa, complex_aaa_model
 from catalystwan.tests.templates.models.cisco_banner import banner_model

@@ -1,3 +1,5 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+
 from pydantic import PlainSerializer
 from typing_extensions import Annotated
 

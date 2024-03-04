@@ -25,14 +25,12 @@ These steps will help you to automate feature template creation. We'll explain w
 	```python
 	from pathlib import Path
 	from typing import ClassVar
+	from pydantic import ConfigDict
 	from catalystwan.api.templates.feature_template import FeatureTemplate
 
 
 	class OMPvSmart(FeatureTemplate):
-		class Config:
-			arbitrary_types_allowed = True
-			allow_population_by_field_name = True
-			
+		model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 			
 		payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"
 		type: ClassVar[str] = "omp-vsmart"
@@ -42,7 +40,7 @@ These steps will help you to automate feature template creation. We'll explain w
 	```python
 	ported_templates = (..., OMPvSmart)
 	```
-
+	NOTE: This step will be removed once all template payloads will be generated automatically.
 4. (This step is temporary) Find `available_models` definition in 'supported' and add your new template class.
 	```python
 	available_models = {
@@ -50,7 +48,7 @@ These steps will help you to automate feature template creation. We'll explain w
 		'omp_vsmart': OMPvSmart
 	}
 	```
-
+	NOTE: This step will be removed once all template payloads will be generated dynamically.
 5. We can try to create our first template with default values.
    ```python
 	omp_vsmart = OMPvSmart(
@@ -67,7 +65,7 @@ These steps will help you to automate feature template creation. We'll explain w
 
 6. We can check whether our template is created sucessfully in Manager manually. If there is an error, please create an issue with error and try go to the 7th step.
    
-### Custimize Feature Template fields.
+### Customize Feature Template fields.
 7. Run below code with already created session and changed corresponding variables.
 
     ```python
@@ -87,8 +85,3 @@ These steps will help you to automate feature template creation. We'll explain w
 
 8. Open `response_{template_type}.json` file.
 9. Find `fields` key. The value should be list of dictionaries. Get every possible key in the dictionary and fill our class with every possible key. You can find the code in `catalystwan\api\templates\models\omp_vsmart_model.py` file.
-
-TODO:
-- Nested fields
-- Handle 3 types of variables
-

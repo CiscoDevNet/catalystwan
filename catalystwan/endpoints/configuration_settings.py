@@ -1,3 +1,5 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 # mypy: disable-error-code="empty-body"
 import datetime
 from enum import Enum

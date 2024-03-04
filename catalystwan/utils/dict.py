@@ -1,3 +1,6 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
+
 def merge(a, b, path=None):
     if path is None:
         path = []
