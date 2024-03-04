@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from enum import Enum
 from pathlib import Path
-from time import monotonic
+from time import monotonic, sleep
 from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
 from urllib.parse import urljoin, urlparse, urlunparse
 
@@ -174,8 +174,8 @@ class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
         self.endpoints = APIEndpointContainter(self)
         self._platform_version: str = ""
         self._api_version: Version
-        self._state: ManagerSessionState = ManagerSessionState.WAIT_SERVER_READY_AFTER_RESTART
-        self.restart_timeout: int = 600
+        self._state: ManagerSessionState = ManagerSessionState.OPERATIVE
+        self.restart_timeout: int = 1200
         self.polling_requests_timeout: int = 10
 
     @property
@@ -203,6 +203,13 @@ class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
             self.login()
             self.state = ManagerSessionState.OPERATIVE
         return
+
+    def restart_imminent(self):
+        """
+        Notify session that restart is imminent.
+        ConnectionError and status code 503 will cause session to wait for connectivity and perform login again
+        """
+        self.state = ManagerSessionState.RESTART_IMMINENT
 
     def login(self) -> None:
         """Performs login to SDWAN Manager and fetches important server info to instance variables"""
@@ -243,7 +250,7 @@ class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
         self.cookies.set("JSESSIONID", self.auth.set_cookie.get("JSESSIONID"))
         return
 
-    def wait_server_ready(self, timeout: int) -> None:
+    def wait_server_ready(self, timeout: int, poll_period: int = 10) -> None:
         """Waits until server is ready for API requests with given timeout in seconds"""
 
         begin = monotonic()
@@ -252,8 +259,9 @@ class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
         def elapsed() -> float:
             return monotonic() - begin
 
-        # wait for http connectivity
+        # wait for http available
         while elapsed() < timeout:
+            available = False
             try:
                 resp = head(
                     self.base_url,
@@ -262,8 +270,12 @@ class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
                     headers={"User-Agent": USER_AGENT},
                 )
                 self.logger.debug(self.response_trace(resp, None))
+                if resp.status_code != 503:
+                    available = True
             except ConnectionError as error:
                 self.logger.debug(self.response_trace(error.response, error.request))
+            if not available:
+                sleep(poll_period)
                 continue
             break
 
@@ -278,9 +290,12 @@ class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
                     headers={"User-Agent": USER_AGENT},
                 )
                 self.logger.debug(self.response_trace(resp, None))
-                if resp.json().get("isServerReady") is True:
-                    self.logger.debug(f"Waiting for server ready took: {elapsed()} seconds.")
-                    return
+                if resp.status_code == 200:
+                    if resp.json().get("isServerReady") is True:
+                        self.logger.debug(f"Waiting for server ready took: {elapsed()} seconds.")
+                        return
+                sleep(poll_period)
+                continue
             except RequestException as exception:
                 self.logger.debug(self.response_trace(exception.response, exception.request))
                 raise ManagerRequestException(request=exception.request, response=exception.response)
@@ -292,15 +307,17 @@ class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
         try:
             response = super(ManagerSession, self).request(method, full_url, *args, **kwargs)
             self.logger.debug(self.response_trace(response, None))
+            if self.state == ManagerSessionState.RESTART_IMMINENT and response.status_code == 503:
+                self.state = ManagerSessionState.WAIT_SERVER_READY_AFTER_RESTART
         except RequestException as exception:
             self.logger.debug(self.response_trace(exception.response, exception.request))
-            if isinstance(exception, ConnectionError) and self.state == ManagerSessionState.RESTART_IMMINENT:
+            if self.state == ManagerSessionState.RESTART_IMMINENT and isinstance(exception, ConnectionError):
                 self.state = ManagerSessionState.WAIT_SERVER_READY_AFTER_RESTART
                 return self.request(method, url, *args, **kwargs)
             self.logger.error(exception)
             raise ManagerRequestException(request=exception.request, response=exception.response)
 
-        if self.enable_relogin and response.jsessionid_expired and self.state != ManagerSessionState.LOGIN:
+        if self.enable_relogin and response.jsessionid_expired and self.state == ManagerSessionState.OPERATIVE:
             self.logger.warning("Logging to session. Reason: expired JSESSIONID detected in response headers")
             self.state = ManagerSessionState.LOGIN
             return self.request(method, url, *args, **kwargs)
