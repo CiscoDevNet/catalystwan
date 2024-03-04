@@ -27,22 +27,26 @@ class FeatureTemplateValidator(BaseModel, ABC):
 
         if not isinstance(values, dict):
             return values
-        mapped_values = {}
         for field_name, field_info in cls.model_fields.items():
-            payload_name = get_extra_field(field_info, "vmanage_key") or field_info.alias or field_name
-            data_path = get_extra_field(field_info, "data_path", [])
-            if payload_name not in values:
-                continue
+            vmanage_key = get_extra_field(field_info, "vmanage_key")
+            if vmanage_key in values:
+                payload_name = vmanage_key
+            elif field_info.alias in values:
+                payload_name = field_info.alias
+            elif field_name in values:
+                payload_name = field_name
             else:
-                value = values[payload_name]
-            if value and isinstance(value, list) and all([isinstance(v, FlattenedTemplateValue)] for v in value):
+                continue
+            data_path = get_extra_field(field_info, "data_path", [])
+            value = values.pop(payload_name)
+            if value and isinstance(value, list) and all([isinstance(v, FlattenedTemplateValue) for v in value]):
                 for template_value in value:
                     if template_value.data_path == data_path:
-                        mapped_values[field_name] = template_value.value
+                        values[field_name] = template_value.value
                         break
             else:
-                mapped_values[field_name] = value
-        return mapped_values
+                values[field_name] = value
+        return values
 
 
 class FeatureTemplate(FeatureTemplateValidator, ABC):
