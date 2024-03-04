@@ -171,7 +171,7 @@ class TenantMigrationPreconditionsError(CatalystwanException):
 
 
 class ManagerReadyTimeout(CatalystwanException):
-    """Raised when wainting for server ready flag took longer than expected"""
+    """Raised when waiting for server ready flag took longer than expected"""
 
     pass
 
