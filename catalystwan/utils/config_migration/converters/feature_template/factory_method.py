@@ -10,8 +10,10 @@ from catalystwan.utils.feature_template import find_template_values
 from .aaa import AAATemplateConverter
 from .base import FeatureTemplateConverter
 from .bfd import BFDTemplateConverter
+from .global_ import GlobalTemplateConverter
 from .logging_ import LoggingTemplateConverter
 from .normalizer import template_definition_normalization
+from .omp import OMPTemplateConverter
 from .security import SecurityTemplateConverter
 
 logger = logging.getLogger(__name__)
@@ -21,6 +23,8 @@ supported_parcel_converters: Dict[Any, FeatureTemplateConverter] = {
     ("cisco_bfd",): BFDTemplateConverter,  # type: ignore[dict-item]
     ("cisco_logging", "logging"): LoggingTemplateConverter,  # type: ignore[dict-item]
     ("cisco_security", "security"): SecurityTemplateConverter,  # type: ignore[dict-item]
+    ("cisco_omp",): OMPTemplateConverter,
+    ("cedge_global",): GlobalTemplateConverter,
 }
 
 
@@ -61,6 +65,7 @@ def create_parcel_from_template(template: FeatureTemplateInformation) -> AnySyst
     converter = choose_parcel_converter(template.template_type)
     template_definition_as_dict = json.loads(cast(str, template.template_definiton))
     template_values = find_template_values(template_definition_as_dict)
+    print(template_values)
     template_values_normalized = template_definition_normalization(template_values)
     logger.debug(f"Normalized template {template.name}: {template_values_normalized}")
     return converter.create_parcel(template.name, template.description, template_values_normalized)

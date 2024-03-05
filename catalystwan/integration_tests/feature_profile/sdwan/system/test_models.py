@@ -10,6 +10,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.system import (
     LoggingParcel,
     MRFParcel,
     NTPParcel,
+    OMPParcel,
     SecurityParcel,
     SNMPParcel,
 )
@@ -197,6 +198,17 @@ class TestSystemFeatureProfileModels(unittest.TestCase):
         )
         # Act
         parcel_id = self.session.api.sdwan_feature_profiles.system.create(self.profile_id, snmp_parcel).id
+        # Assert
+        assert parcel_id
+
+    def test_when_default_values_omp_parcel_expect_successful_post(self):
+        # Arrange
+        omp_parcel = OMPParcel(
+            parcel_name="OMPDefault",
+            parcel_description="OMP Parcel",
+        )
+        # Act
+        parcel_id = self.session.api.sdwan_feature_profiles.system.create(self.profile_id, omp_parcel).id
         # Assert
         assert parcel_id
 
