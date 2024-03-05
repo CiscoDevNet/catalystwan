@@ -3,6 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from catalystwan.models.common import IntStr
 from catalystwan.models.policy.policy_definition import PolicyDefinitionBase
 
 QoSScheduling = Literal[
@@ -17,11 +18,17 @@ QoSDropType = Literal[
 
 
 class QoSScheduler(BaseModel):
-    queue: str
-    class_map_ref: Union[UUID, Literal[""]] = Field(serialization_alias="classMapRef", validation_alias="classMapRef")
-    bandwidth_percent: str = Field("1", serialization_alias="bandwidthPercent", validation_alias="bandwidthPercent")
-    buffer_percent: str = Field("1", serialization_alias="bufferPercent", validation_alias="bufferPercent")
-    burst: Optional[str] = None
+    queue: IntStr = Field(ge=0, le=8)
+    class_map_ref: Optional[UUID] = Field(
+        default=None, serialization_alias="classMapRef", validation_alias="classMapRef"
+    )
+    bandwidth_percent: IntStr = Field(
+        default=1, ge=1, le=100, serialization_alias="bandwidthPercent", validation_alias="bandwidthPercent"
+    )
+    buffer_percent: IntStr = Field(
+        default=1, ge=1, le=100, serialization_alias="bufferPercent", validation_alias="bufferPercent"
+    )
+    burst: Optional[IntStr] = Field(default=None, ge=5000, le=10_000_000)
     scheduling: QoSScheduling = "wrr"
     drops: QoSDropType = "tail-drop"
     temp_key_values: Optional[str] = Field(
@@ -31,35 +38,23 @@ class QoSScheduler(BaseModel):
     @staticmethod
     def get_default_control_scheduler() -> "QoSScheduler":
         return QoSScheduler(
-            queue="0",
-            class_map_ref="",
-            bandwidth_percent="100",
-            buffer_percent="100",
-            burst="15000",
+            queue=0,
+            bandwidth_percent=100,
+            buffer_percent=100,
+            burst=15000,
             scheduling="llq",
             drops="tail-drop",
         )
 
     model_config = ConfigDict(populate_by_name=True)
 
-    @field_validator("queue")
+    @field_validator("class_map_ref", mode="before")
     @classmethod
-    def check_queue(cls, queue_str: str):
-        assert 0 <= int(queue_str) <= 7
-        return queue_str
-
-    @field_validator("bandwidth_percent", "buffer_percent")
-    @classmethod
-    def check_bandwidth_and_buffer_percent(cls, percent_str: str):
-        assert 1 <= int(percent_str) <= 100
-        return percent_str
-
-    @field_validator("burst")
-    @classmethod
-    def check_burst(cls, burst_val: Union[str, None]):
-        if burst_val is not None:
-            assert 5000 <= int(burst_val) <= 10_000_000
-        return burst_val
+    def check_optional_class_map_ref(cls, class_map_ref: Union[str, None]):
+        # None and "" indicates missing value, both can be found in server responses
+        if not class_map_ref:
+            return None
+        return class_map_ref
 
 
 class QoSMapDefinition(BaseModel):
@@ -84,11 +79,11 @@ class QoSMapPolicy(PolicyDefinitionBase):
     ) -> None:
         self.definition.qos_schedulers.append(
             QoSScheduler(
-                queue=str(queue),
+                queue=queue,
                 class_map_ref=class_map_ref,
-                bandwidth_percent=str(bandwidth),
-                buffer_percent=str(buffer),
-                burst=str(burst) if burst is not None else None,
+                bandwidth_percent=bandwidth,
+                buffer_percent=buffer,
+                burst=burst,
                 scheduling=scheduling,
                 drops=drops,
             )

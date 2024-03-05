@@ -156,8 +156,8 @@ class ZoneBasedFWPolicySequence(PolicyDefinitionSequenceBase):
     def match_protocol_name_list(self, protocol_name_list_id: UUID) -> None:
         self._insert_match(ProtocolNameListEntry(ref=protocol_name_list_id))
 
-    def match_source_data_prefix_list(self, data_prefix_list_id: UUID) -> None:
-        self._insert_match(SourceDataPrefixListEntry(ref=data_prefix_list_id))
+    def match_source_data_prefix_list(self, data_prefix_lists: List[UUID]) -> None:
+        self._insert_match(SourceDataPrefixListEntry(ref=data_prefix_lists))
 
     def match_source_fqdn(self, fqdn: str) -> None:
         self._insert_match(SourceFQDNEntry(value=fqdn))
