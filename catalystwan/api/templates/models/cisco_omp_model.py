@@ -34,7 +34,7 @@ class Route(str, Enum):
 
 class IPv4Advertise(FeatureTemplateValidator):
     protocol: IPv4AdvertiseProtocol
-    route: Route
+    route: Optional[Route] = None
 
 
 class IPv6AdvertiseProtocol(str, Enum):

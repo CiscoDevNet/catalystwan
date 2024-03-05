@@ -12,19 +12,18 @@ from pydantic import BaseModel, model_validator
 
 from catalystwan.api.templates.device_variable import DeviceVariable
 from catalystwan.utils.device_model import DeviceModel
+from catalystwan.utils.dict import FlattenedDictValue, flatten_dict
+from catalystwan.utils.feature_template.find_template_values import find_template_values
 from catalystwan.utils.pydantic_field import get_extra_field
 
 if TYPE_CHECKING:
     from catalystwan.session import ManagerSession
-    from catalystwan.utils.feature_template import FlattenedTemplateValue
 
 
 class FeatureTemplateValidator(BaseModel, ABC):
     @model_validator(mode="before")
     @classmethod
-    def map_fields(cls, values: Union[Any, Dict[str, Union[List[FlattenedTemplateValue], Any]]]):
-        from catalystwan.utils.feature_template import FlattenedTemplateValue
-
+    def map_fields(cls, values: Union[Any, Dict[str, Union[List[FlattenedDictValue], Any]]]):
         if not isinstance(values, dict):
             return values
         for field_name, field_info in cls.model_fields.items():
@@ -39,7 +38,7 @@ class FeatureTemplateValidator(BaseModel, ABC):
                 continue
             data_path = get_extra_field(field_info, "data_path", [])
             value = values.pop(payload_name)
-            if value and isinstance(value, list) and all([isinstance(v, FlattenedTemplateValue) for v in value]):
+            if value and isinstance(value, list) and all([isinstance(v, FlattenedDictValue) for v in value]):
                 for template_value in value:
                     if template_value.data_path == data_path:
                         values[field_name] = template_value.value
@@ -114,7 +113,7 @@ class FeatureTemplate(FeatureTemplateValidator, ABC):
         Returns:
             FeatureTemplate: filed out feature template model
         """
-        from catalystwan.utils.feature_template import choose_model, find_template_values, flatten_template_definition
+        from catalystwan.utils.feature_template.choose_model import choose_model
 
         template_info = (
             session.api.templates._get_feature_templates(summary=False).filter(name=name).single_or_default()
@@ -127,7 +126,7 @@ class FeatureTemplate(FeatureTemplateValidator, ABC):
         values_from_template_definition = find_template_values(
             template_definition_as_dict, device_specific_variables=device_specific_variables
         )
-        flattened_values = flatten_template_definition(values_from_template_definition)
+        flattened_values = flatten_dict(values_from_template_definition)
 
         return feature_template_model(
             template_name=template_info.name,
