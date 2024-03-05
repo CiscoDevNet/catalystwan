@@ -4,18 +4,18 @@ import unittest
 from unittest.mock import MagicMock, Mock, patch
 
 from catalystwan.api.versions_utils import DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
-from catalystwan.dataclasses import Device
 from catalystwan.endpoints.configuration.software_actions import SoftwareImageDetails
 from catalystwan.endpoints.configuration_device_actions import InstalledDeviceData, PartitionDevice
+from catalystwan.endpoints.configuration_device_inventory import DeviceDetailsResponse
 from catalystwan.typed_list import DataSequence
 
 
 class TestRepositoryAPI(unittest.TestCase):
     def setUp(self):
-        self.device = Device(
+        self.device = DeviceDetailsResponse(
             personality="vedge",
             uuid="mock_uuid",
-            id="mock_ip",
+            device_ip="mock_ip",
             hostname="mock_host",
             reachability="reachable",
             local_system_ip="mock_ip",
@@ -56,6 +56,104 @@ class TestRepositoryAPI(unittest.TestCase):
         answer = RepositoryAPI(mock_session).get_image_version("vmanage-20.9.1-x86_64.tar.gz")
 
         self.assertEqual(answer, image_version, "not same version")
+
+    def test_get_remote_image(self):
+        versions_response = DataSequence(
+            SoftwareImageDetails,
+            [
+                SoftwareImageDetails(
+                    **{
+                        "availableFiles": "vmanage-20.9.1-x86_64.tar.gz",
+                        "versionType": "remote-server-test",
+                        "remoteServerId": "123456789-abcdabcd",
+                        "versionId": "abcd-1234",
+                    }
+                )
+            ],
+        )
+        self.mock_repository_object.get_all_software_images = MagicMock(return_value=versions_response)
+        answer = self.mock_repository_object.get_remote_image("vmanage-20.9.1-x86_64.tar.gz", "remote-server-test")
+
+        self.assertEqual(answer.version_id, "abcd-1234", "not same version")
+
+    def test_get_remote_image_non_existing(self):
+        versions_response = DataSequence(
+            SoftwareImageDetails,
+            [
+                SoftwareImageDetails(
+                    **{
+                        "availableFiles": "vmanage-20.9.1-x86_64.tar.gz",
+                        "versionType": "remote-server-test",
+                        "remoteServerId": "123456789-abcdabcd",
+                        "versionId": "abcd-1234",
+                    }
+                )
+            ],
+        )
+        self.mock_repository_object.get_all_software_images = MagicMock(return_value=versions_response)
+        answer = self.mock_repository_object.get_remote_image("vmanage-20.10.1-x86_64.tar.gz", "remote-server-test")
+
+        self.assertEqual(answer, None, "not same version")
+
+    def test_get_remote_image_no_version_id(self):
+        versions_response = DataSequence(
+            SoftwareImageDetails,
+            [
+                SoftwareImageDetails(
+                    **{
+                        "availableFiles": "vmanage-20.9.1-x86_64.tar.gz",
+                        "versionType": "remote-server-test",
+                        "remoteServerId": "123456789-abcdabcd",
+                        "versionId": None,
+                    }
+                )
+            ],
+        )
+        self.mock_repository_object.get_all_software_images = MagicMock(return_value=versions_response)
+
+        with self.assertRaises(ValueError):
+            self.mock_repository_object.get_remote_image("vmanage-20.9.1-x86_64.tar.gz", "remote-server-test")
+
+    def test_get_version_when_same_available_file_present_for_remote_version(self):
+        versions_response = DataSequence(
+            SoftwareImageDetails,
+            [
+                SoftwareImageDetails(
+                    **{
+                        "availableFiles": "vmanage-20.9.1-x86_64.tar.gz",
+                        "versionType": "remote-server-test",
+                        "remoteServerId": "123456789-abcdabcd",
+                        "versionId": "abcd-1234",
+                    }
+                ),
+                SoftwareImageDetails(**{"availableFiles": "vmanage-20.9.1-x86_64.tar.gz", "versionName": "20.9.1"}),
+            ],
+        )
+        self.mock_repository_object.get_all_software_images = MagicMock(return_value=versions_response)
+        image_version = "20.9.1"
+        answer = self.mock_repository_object.get_image_version("vmanage-20.9.1-x86_64.tar.gz")
+
+        self.assertEqual(answer, image_version, "not same version")
+
+    def test_get_version_when_remote_available_file_is_matching(self):
+        versions_response = DataSequence(
+            SoftwareImageDetails,
+            [
+                SoftwareImageDetails(
+                    **{
+                        "availableFiles": "vmanage-20.9.1-x86_64.tar.gz",
+                        "versionType": "remote-server-test",
+                        "remoteServerId": "123456789-abcdabcd",
+                        "versionId": "abcd-1234",
+                    }
+                ),
+                SoftwareImageDetails(**{"availableFiles": "vmanage-20.10.1-x86_64.tar.gz", "versionName": "20.9.1"}),
+            ],
+        )
+        self.mock_repository_object.get_all_software_images = MagicMock(return_value=versions_response)
+        answer = self.mock_repository_object.get_image_version("vmanage-20.9.1-x86_64.tar.gz")
+
+        self.assertEqual(answer, None)
 
     @patch("catalystwan.session.Session")
     def test_get_devices_versions_repository(self, mock_session):

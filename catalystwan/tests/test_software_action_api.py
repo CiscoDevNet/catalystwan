@@ -5,18 +5,20 @@ from unittest.mock import MagicMock, Mock, patch
 
 from catalystwan.api.software_action_api import SoftwareActionAPI
 from catalystwan.api.versions_utils import DeviceSoftwareRepository, DeviceVersions, RepositoryAPI
-from catalystwan.dataclasses import Device
-from catalystwan.endpoints.configuration_device_actions import ActionId, InstallDevice
+from catalystwan.endpoints.configuration.software_actions import SoftwareImageDetails
+from catalystwan.endpoints.configuration_device_actions import ActionId, InstallDevice, PartitionDevice
+from catalystwan.endpoints.configuration_device_inventory import DeviceDetailsResponse
+from catalystwan.exceptions import ImageNotInRepositoryError
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.upgrades_helper import Family, InstallSpecHelper
 
 
 class TestSoftwareAcionAPI(unittest.TestCase):
     def setUp(self):
-        self.device = Device(
+        self.device = DeviceDetailsResponse(
             personality="vedge",
             uuid="mock_uuid",
-            id="mock_ip",
+            device_ip="mock_ip",
             hostname="mock_host",
             reachability="reachable",
             local_system_ip="mock_ip",
@@ -43,12 +45,9 @@ class TestSoftwareAcionAPI(unittest.TestCase):
         self.mock_device_versions = DeviceVersions(self.mock_repository_object)
         self.mock_software_action_obj = SoftwareActionAPI(mock_session)
 
-    @patch("catalystwan.session.ManagerSession")
     @patch.object(SoftwareActionAPI, "_downgrade_check")
     @patch.object(RepositoryAPI, "get_image_version")
-    def test_upgrade_software_if_downgrade_check_is_none(
-        self, mock_get_image_version, mock_downgrade_check, mock_session
-    ):
+    def test_upgrade_software_if_downgrade_check_is_none(self, mock_get_image_version, mock_downgrade_check):
         # Prepare mock data
         mock_downgrade_check.return_value = False
         expected_id = ActionId(id="mock_action_id")
@@ -59,10 +58,38 @@ class TestSoftwareAcionAPI(unittest.TestCase):
 
         # Assert
         answer = self.mock_software_action_obj.install(
-            devices=DataSequence(Device, [self.device]),
+            devices=DataSequence(DeviceDetailsResponse, [self.device]),
             reboot=True,
             sync=True,
             image="path",
+        )
+        self.assertEqual(answer.task_id, "mock_action_id")
+
+    @patch.object(DeviceVersions, "get_device_available")
+    @patch.object(RepositoryAPI, "get_all_software_images")
+    @patch.object(RepositoryAPI, "get_devices_versions_repository")
+    def test_activate_software(
+        self, mock_get_devices_versions_repository, mock_get_all_software_images, mock_get_device_available
+    ):
+        # Prepare mock data
+        expected_id = ActionId(id="mock_action_id")
+        mock_get_devices_versions_repository.return_value = self.DeviceSoftwareRepository_obj
+        mock_get_device_available.return_value = DataSequence(
+            PartitionDevice, [PartitionDevice(device_id="mock_uuid", device_ip="mock_ip", version="ver2")]
+        )
+        mock_get_all_software_images.return_value = DataSequence(
+            SoftwareImageDetails,
+            [SoftwareImageDetails(**{"availableFiles": "vmanage-20.9.1-x86_64.tar.gz", "versionName": "ver2"})],
+        )
+
+        self.mock_software_action_obj.session.endpoints.configuration_device_actions.process_mark_change_partition = (
+            MagicMock(return_value=expected_id)
+        )
+
+        # Assert
+        answer = self.mock_software_action_obj.activate(
+            devices=DataSequence(DeviceDetailsResponse, [self.device]),
+            image="vmanage-20.9.1-x86_64.tar.gz",
         )
         self.assertEqual(answer.task_id, "mock_action_id")
 
@@ -93,3 +120,35 @@ class TestSoftwareAcionAPI(unittest.TestCase):
             upgrade_version,
             Family.VMANAGE.value,
         )
+
+    def test_install_software_from_remote_image_not_available_with_downgrade_check(self):
+        with self.assertRaises(ValueError):
+            self.mock_software_action_obj.install(
+                devices=DataSequence(DeviceDetailsResponse, [self.device]),
+                remote_server_name="dummy",
+                remote_image_filename="dummy",
+            )
+
+    @patch.object(RepositoryAPI, "get_all_software_images")
+    def test_install_software_from_remote_image_with_wrong_version(self, mock_get_all_software_images):
+        mock_get_all_software_images.return_value = DataSequence(
+            SoftwareImageDetails,
+            [
+                SoftwareImageDetails(
+                    **{
+                        "availableFiles": "vmanage-20.9.1-x86_64.tar.gz",
+                        "versionType": "remote-server-test",
+                        "remoteServerId": "123456789-abcdabcd",
+                        "versionId": "ver1",
+                    }
+                )
+            ],
+        )
+
+        with self.assertRaises(ImageNotInRepositoryError):
+            self.mock_software_action_obj.install(
+                devices=DataSequence(DeviceDetailsResponse, [self.device]),
+                remote_server_name="remote-server-test",
+                remote_image_filename="not-ver1",
+                downgrade_check=False,
+            )

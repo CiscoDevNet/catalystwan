@@ -7,8 +7,8 @@ from attr import define  # type: ignore
 from clint.textui.progress import Bar as ProgressBar  # type: ignore
 from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
 
-from catalystwan.dataclasses import Device
 from catalystwan.endpoints import CustomPayloadType, PreparedPayload
+from catalystwan.endpoints.configuration_device_inventory import DeviceDetailsResponse
 from catalystwan.exceptions import MultiplePersonalityError
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.personality import Personality
@@ -17,10 +17,13 @@ from catalystwan.utils.personality import Personality
 class Family(Enum):
     VEDGE = "vedge"
     VMANAGE = "vmanage"
+    VEDGE_X86 = "vedge-x86"
+    C8000V = "c8000v"
 
 
 class VersionType(Enum):
     VMANAGE = "vmanage"
+    REMOTE = "remote"
 
 
 class DeviceType(Enum):
@@ -47,19 +50,23 @@ class InstallSpecHelper(Enum):
     VSMART = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)  # type: ignore
     VBOND = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.CONTROLLER)  # type: ignore
     VEDGE = InstallSpecification(Family.VEDGE, VersionType.VMANAGE, DeviceType.VEDGE)  # type: ignore
+    REMOTE_VMANAGE = InstallSpecification(Family.VMANAGE, VersionType.REMOTE, DeviceType.VMANAGE)  # type: ignore
+    REMOTE_VSMART = InstallSpecification(Family.VEDGE_X86, VersionType.REMOTE, DeviceType.CONTROLLER)  # type: ignore
+    REMOTE_VBOND = InstallSpecification(Family.VEDGE_X86, VersionType.REMOTE, DeviceType.CONTROLLER)  # type: ignore
+    REMOTE_VEDGE = InstallSpecification(Family.C8000V, VersionType.REMOTE, DeviceType.VEDGE)  # type: ignore
 
 
-def get_install_specification(device: Device):
+def get_install_specification(device: DeviceDetailsResponse, remote: bool = False):
     specification_container = {
-        Personality.VMANAGE: InstallSpecHelper.VMANAGE.value,
-        Personality.VBOND: InstallSpecHelper.VBOND.value,
-        Personality.VSMART: InstallSpecHelper.VSMART.value,
-        Personality.EDGE: InstallSpecHelper.VEDGE.value,
+        Personality.VMANAGE: InstallSpecHelper.REMOTE_VMANAGE.value if remote else InstallSpecHelper.VMANAGE.value,
+        Personality.VBOND: InstallSpecHelper.REMOTE_VBOND.value if remote else InstallSpecHelper.VBOND.value,
+        Personality.VSMART: InstallSpecHelper.REMOTE_VSMART.value if remote else InstallSpecHelper.VSMART.value,
+        Personality.EDGE: InstallSpecHelper.REMOTE_VEDGE.value if remote else InstallSpecHelper.VEDGE.value,
     }
-    return specification_container[device.personality]
+    return specification_container[device.personality]  # type: ignore
 
 
-def validate_personality_homogeneity(devices: DataSequence[Device]):
+def validate_personality_homogeneity(devices: DataSequence[DeviceDetailsResponse]):
     personalities = set([device.personality for device in devices])
     if not len(personalities) == 1:
         raise MultiplePersonalityError(

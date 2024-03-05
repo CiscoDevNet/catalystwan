@@ -7,12 +7,12 @@ from typing import TYPE_CHECKING, List, Optional, cast
 
 from catalystwan.api.task_status_api import Task
 from catalystwan.api.versions_utils import DeviceVersions, RepositoryAPI
-from catalystwan.dataclasses import Device
 from catalystwan.endpoints.configuration_device_actions import (
     PartitionActionPayload,
     RemovePartitionActionPayload,
     RemovePartitionDevice,
 )
+from catalystwan.endpoints.configuration_device_inventory import DeviceDetailsResponse
 from catalystwan.exceptions import EmptyVersionPayloadError
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.upgrades_helper import get_install_specification, validate_personality_homogeneity
@@ -50,7 +50,9 @@ class PartitionManagerAPI:
         self.repository = RepositoryAPI(self.session)
         self.device_version = DeviceVersions(self.session)
 
-    def set_default_partition(self, devices: DataSequence[Device], partition: Optional[str] = None) -> Task:
+    def set_default_partition(
+        self, devices: DataSequence[DeviceDetailsResponse], partition: Optional[str] = None
+    ) -> Task:
         """
         Set default software versions for devices
 
@@ -84,7 +86,7 @@ class PartitionManagerAPI:
         return Task(self.session, partition_action.id)
 
     def remove_partition(
-        self, devices: DataSequence[Device], partition: Optional[str] = None, force: bool = False
+        self, devices: DataSequence[DeviceDetailsResponse], partition: Optional[str] = None, force: bool = False
     ) -> Task:
         """
         Remove chosen software version from device
