@@ -10,25 +10,7 @@ SiteTypesForTransportGateway = Literal["type-1", "type-2", "type-3", "cloud", "b
 TransportGateway = Literal["prefer", "ecmp-with-direct-path"]
 
 
-class AdvertiseIpv4(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    bgp: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="BGP")
-    ospf: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="OSPF")
-    ospfv3: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="OSPFV3")
-    connected: Union[Variable, Global[bool], Default[Optional[Literal[True, False]]]] = Field(
-        default=as_default(False), description="Variable"
-    )
-    static: Union[Variable, Global[bool], Default[Optional[Literal[True, False]]]] = Field(
-        default=as_default(False), description="Variable"
-    )
-    eigrp: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="EIGRP")
-    lisp: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="LISP")
-    isis: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="ISIS")
-
-
-class AdvertiseIpv6(BaseModel):
+class AdvertiseIp(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
@@ -39,6 +21,14 @@ class AdvertiseIpv6(BaseModel):
     eigrp: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="EIGRP")
     lisp: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="LISP")
     isis: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="ISIS")
+
+
+class AdvertiseIpv6(AdvertiseIp):
+    pass
+
+
+class AdvertiseIpv4(AdvertiseIp):
+    ospfv3: Union[Variable, Global[bool], Default[bool]] = Field(default=as_default(False), description="OSPF")
 
 
 class OMPParcel(_ParcelBase):
@@ -97,8 +87,12 @@ class OMPParcel(_ParcelBase):
     holdtime: Union[Variable, Global[int], Default[int]] = Field(
         default=as_default(60), validation_alias=AliasPath("data", "holdtime"), description="Hold Time (seconds)"
     )
-    advertise_ipv4: AdvertiseIpv4 = Field(..., validation_alias="advertiseIpv4")
-    advertise_ipv6: AdvertiseIpv6 = Field(..., validation_alias="advertiseIpv6")
+    advertise_ipv4: AdvertiseIpv4 = Field(
+        default_factory=AdvertiseIpv4, validation_alias=AliasPath("data", "advertiseIpv4")
+    )
+    advertise_ipv6: AdvertiseIpv6 = Field(
+        default_factory=AdvertiseIpv6, validation_alias=AliasPath("data", "advertiseIpv6")
+    )
     ignore_region_path_length: Optional[Union[Variable, Global[bool], Default[bool]]] = Field(
         None,
         validation_alias=AliasPath("data", "ignoreRegionPathLength"),
