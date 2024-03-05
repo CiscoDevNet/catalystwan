@@ -1,6 +1,6 @@
 # Copyright 2023 Cisco Systems, Inc. and its affiliates
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
@@ -34,9 +34,13 @@ def flatten_dict(original_dict: Dict[str, Any]) -> Dict[str, List[FlattenedDictV
 
     def get_flattened_dict(
         original_dict: Dict[str, Any],
-        flattened_dict: Dict[str, List[FlattenedDictValue]] = {},
-        path: List[str] = [],
+        flattened_dict: Optional[Dict[str, List[FlattenedDictValue]]] = None,
+        path: Optional[List[str]] = None,
     ):
+        if flattened_dict is None:
+            flattened_dict = {}
+        if path is None:
+            path = []
         for key, value in original_dict.items():
             if isinstance(value, dict):
                 get_flattened_dict(value, flattened_dict, path=path + [key])

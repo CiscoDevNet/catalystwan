@@ -5,7 +5,7 @@ from catalystwan.api.templates.device_variable import DeviceVariable
 
 def find_template_values(
     template_definition: dict,
-    templated_values: dict = {},
+    templated_values: Optional[dict] = None,
     target_key: str = "vipType",
     target_key_value_to_ignore: str = "ignore",
     target_key_for_template_value: str = "vipValue",
@@ -29,6 +29,8 @@ def find_template_values(
     """
     if path is None:
         path = []
+    if templated_values is None:
+        templated_values = {}
 
     # if value object is reached, try to extract the value
     if target_key in template_definition:
