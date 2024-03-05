@@ -170,6 +170,12 @@ class TenantMigrationPreconditionsError(CatalystwanException):
     pass
 
 
+class ManagerReadyTimeout(CatalystwanException):
+    """Raised when waiting for server ready flag took longer than expected"""
+
+    pass
+
+
 class CatalystwanDeprecationWarning(DeprecationWarning):
     """Warning issued when using deprecated features or functionality in the Catalystwan SDK.
 

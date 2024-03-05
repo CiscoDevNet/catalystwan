@@ -3,19 +3,18 @@
 from __future__ import annotations
 
 import logging
-import time
 from enum import Enum
-from importlib import metadata
 from pathlib import Path
+from time import monotonic, sleep
 from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
 from urllib.parse import urljoin, urlparse, urlunparse
 
 from packaging.version import Version  # type: ignore
-from requests import PreparedRequest, Request, Response, Session, head
+from requests import PreparedRequest, Request, Response, Session, get, head
 from requests.auth import AuthBase
 from requests.exceptions import ConnectionError, HTTPError, RequestException
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
+from catalystwan import USER_AGENT
 from catalystwan.api.api_container import APIContainer
 from catalystwan.endpoints import APIEndpointClient
 from catalystwan.endpoints.client import AboutInfo, ServerInfo
@@ -23,6 +22,7 @@ from catalystwan.endpoints.endpoints_container import APIEndpointContainter
 from catalystwan.exceptions import (
     DefaultPasswordError,
     ManagerHTTPError,
+    ManagerReadyTimeout,
     ManagerRequestException,
     SessionNotCreatedError,
     TenantSubdomainNotFound,
@@ -34,7 +34,6 @@ from catalystwan.version import NullVersion, parse_api_version
 from catalystwan.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
-USER_AGENT = f"{__package__}/{metadata.version(__package__)}"
 
 
 class UserMode(str, Enum):
@@ -50,6 +49,15 @@ class ViewMode(str, Enum):
 class TenancyMode(str, Enum):
     SINGLE_TENANT = "SingleTenant"
     MULTI_TENANT = "MultiTenant"
+
+
+class ManagerSessionState(Enum):
+    # there are some similiarities to state-machine but flow is only in one direction
+    # and does not depend on external inputs
+    RESTART_IMMINENT = 0
+    WAIT_SERVER_READY_AFTER_RESTART = 1
+    LOGIN = 2
+    OPERATIVE = 3
 
 
 def determine_session_type(
@@ -77,7 +85,7 @@ def create_manager_session(
     subdomain: Optional[str] = None,
     logger: Optional[logging.Logger] = None,
 ) -> ManagerSession:
-    """Factory function that creates session object based on provided arguments.
+    """Factory method that creates session object and performs login according to parameters
 
     Args:
         url (str): IP address or domain name
@@ -86,54 +94,22 @@ def create_manager_session(
         port (int): port
         subdomain: subdomain specifying to which view switch when creating provider as a tenant session,
             works only on provider user mode
-        logger: logger for logging API requests
+        logger: override default module logger
 
     Returns:
-        ManagerSession: Configured Session to perform tasks on vManage.
+        ManagerSession: logged-in and operative session to perform tasks on SDWAN Manager.
     """
     session = ManagerSession(url=url, username=username, password=password, port=port, subdomain=subdomain)
-    session.auth = vManageAuth(session.base_url, username, password, verify=False)
+
     if logger:
         session.logger = logger
-        session.auth.logger = logger
 
-    if subdomain:
-        tenant_id = session.get_tenant_id()
-        vsession_id = session.get_virtual_session_id(tenant_id)
-        session.headers.update({"VSessionId": vsession_id})
-
-    try:
-        server_info = session.server()
-    except DefaultPasswordError:
-        server_info = ServerInfo.parse_obj({})
-
-    session.server_name = server_info.server
+    session.state = ManagerSessionState.LOGIN
     session.on_session_create_hook()
-
-    tenancy_mode = server_info.tenancy_mode
-    user_mode = server_info.user_mode
-    view_mode = server_info.view_mode
-
-    session._session_type = determine_session_type(tenancy_mode, user_mode, view_mode)
-    if user_mode is UserMode.TENANT and subdomain:
-        raise SessionNotCreatedError(
-            f"Session not created. Subdomain {subdomain} passed to tenant session, "
-            "cannot switch to tenant from tenant user mode."
-        )
-    elif session._session_type is SessionType.NOT_DEFINED:
-        session.logger.warning(
-            "Cannot determine session type for "
-            f"tenancy-mode: {tenancy_mode}, user-mode: {user_mode}, view-mode: {view_mode}"
-        )
-
-    session.logger.info(
-        f"Logged to vManage({session.platform_version}) as {username}. The session type is {session.session_type}"
-    )
-
     return session
 
 
-class vManageResponseAdapter(Session):
+class ManagerResponseAdapter(Session):
     def request(self, method, url, *args, **kwargs) -> ManagerResponse:
         return ManagerResponse(super().request(method, url, *args, **kwargs))
 
@@ -150,7 +126,7 @@ class vManageResponseAdapter(Session):
         return ManagerResponse(super().delete(url, *args, **kwargs))
 
 
-class ManagerSession(vManageResponseAdapter, APIEndpointClient):
+class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
     """Base class for API sessions for vManage client.
 
     Defines methods and handles session connectivity available for provider, provider as tenant, and tenant.
@@ -184,7 +160,6 @@ class ManagerSession(vManageResponseAdapter, APIEndpointClient):
         self.username = username
         self.password = password
         self.subdomain = subdomain
-
         self._session_type = SessionType.NOT_DEFINED
         self.server_name: Optional[str] = None
         self.logger = logging.getLogger(__name__)
@@ -199,20 +174,163 @@ class ManagerSession(vManageResponseAdapter, APIEndpointClient):
         self.endpoints = APIEndpointContainter(self)
         self._platform_version: str = ""
         self._api_version: Version
+        self._state: ManagerSessionState = ManagerSessionState.OPERATIVE
+        self.restart_timeout: int = 1200
+        self.polling_requests_timeout: int = 10
+
+    @property
+    def state(self) -> ManagerSessionState:
+        return self._state
+
+    @state.setter
+    def state(self, state: ManagerSessionState) -> None:
+        """Resets the session to given state and manages transition to desired OPERATIONAL state"""
+        self._state = state
+        self.logger.debug(f"Session entered state: {self.state.name}")
+
+        if state == ManagerSessionState.OPERATIVE:
+            # this is desired state, nothing to be done
+            return
+        elif state == ManagerSessionState.RESTART_IMMINENT:
+            # in this state we process requests normally
+            # but when ConnectionError is caught we enter WAIT_SERVER_READY_AFTER_RESTART
+            # state change is achieved with cooperation with request method
+            return
+        elif state == ManagerSessionState.WAIT_SERVER_READY_AFTER_RESTART:
+            self.wait_server_ready(self.restart_timeout)
+            self.state = ManagerSessionState.LOGIN
+        elif state == ManagerSessionState.LOGIN:
+            self.login()
+            self.state = ManagerSessionState.OPERATIVE
+        return
+
+    def restart_imminent(self, restart_timeout_override: Optional[int] = None):
+        """Notify session that restart is imminent.
+        ConnectionError and status code 503 will cause session to wait for connectivity and perform login again
+
+        Args:
+            restart_timeout_override (Optional[int], optional): override session property which controls restart timeout
+        """
+        if restart_timeout_override is not None:
+            self.restart_timeout = restart_timeout_override
+        self.state = ManagerSessionState.RESTART_IMMINENT
+
+    def login(self) -> ManagerSession:
+        """Performs login to SDWAN Manager and fetches important server info to instance variables
+
+        Raises:
+            SessionNotCreatedError: indicates session configuration is not consistent
+
+        Returns:
+            ManagerSession: (self)
+        """
+
+        self.auth = vManageAuth(self.base_url, self.username, self.password, verify=False)
+        self.auth.logger = self.logger
+
+        if self.subdomain:
+            tenant_id = self.get_tenant_id()
+            vsession_id = self.get_virtual_session_id(tenant_id)
+            self.headers.update({"VSessionId": vsession_id})
+        try:
+            server_info = self.server()
+        except DefaultPasswordError:
+            server_info = ServerInfo.parse_obj({})
+
+        self.server_name = server_info.server
+
+        tenancy_mode = server_info.tenancy_mode
+        user_mode = server_info.user_mode
+        view_mode = server_info.view_mode
+
+        self._session_type = determine_session_type(tenancy_mode, user_mode, view_mode)
+        if user_mode is UserMode.TENANT and self.subdomain:
+            raise SessionNotCreatedError(
+                f"Session not created. Subdomain {self.subdomain} passed to tenant session, "
+                "cannot switch to tenant from tenant user mode."
+            )
+        elif self._session_type is SessionType.NOT_DEFINED:
+            self.logger.warning(
+                "Cannot determine session type for "
+                f"tenancy-mode: {tenancy_mode}, user-mode: {user_mode}, view-mode: {view_mode}"
+            )
+
+        self.logger.info(
+            f"Logged to vManage({self.platform_version}) as {self.username}. The session type is {self.session_type}"
+        )
+        self.cookies.set("JSESSIONID", self.auth.set_cookie.get("JSESSIONID"))
+        return self
+
+    def wait_server_ready(self, timeout: int, poll_period: int = 10) -> None:
+        """Waits until server is ready for API requests with given timeout in seconds"""
+
+        begin = monotonic()
+        self.logger.info(f"Waiting for server ready with timeout {timeout} seconds.")
+
+        def elapsed() -> float:
+            return monotonic() - begin
+
+        # wait for http available
+        while elapsed() < timeout:
+            available = False
+            try:
+                resp = head(
+                    self.base_url,
+                    timeout=self.polling_requests_timeout,
+                    verify=False,
+                    headers={"User-Agent": USER_AGENT},
+                )
+                self.logger.debug(self.response_trace(resp, None))
+                if resp.status_code != 503:
+                    available = True
+            except ConnectionError as error:
+                self.logger.debug(self.response_trace(error.response, error.request))
+            if not available:
+                sleep(poll_period)
+                continue
+            break
+
+        # wait server ready flag
+        server_ready_url = self.get_full_url("/dataservice/client/server/ready")
+        while elapsed() < timeout:
+            try:
+                resp = get(
+                    server_ready_url,
+                    timeout=self.polling_requests_timeout,
+                    verify=False,
+                    headers={"User-Agent": USER_AGENT},
+                )
+                self.logger.debug(self.response_trace(resp, None))
+                if resp.status_code == 200:
+                    if resp.json().get("isServerReady") is True:
+                        self.logger.debug(f"Waiting for server ready took: {elapsed()} seconds.")
+                        return
+                sleep(poll_period)
+                continue
+            except RequestException as exception:
+                self.logger.debug(self.response_trace(exception.response, exception.request))
+                raise ManagerRequestException(request=exception.request, response=exception.response)
+
+        raise ManagerReadyTimeout(f"Waiting for server ready took longer than {timeout} seconds.")
 
     def request(self, method, url, *args, **kwargs) -> ManagerResponse:
         full_url = self.get_full_url(url)
         try:
             response = super(ManagerSession, self).request(method, full_url, *args, **kwargs)
             self.logger.debug(self.response_trace(response, None))
+            if self.state == ManagerSessionState.RESTART_IMMINENT and response.status_code == 503:
+                self.state = ManagerSessionState.WAIT_SERVER_READY_AFTER_RESTART
         except RequestException as exception:
             self.logger.debug(self.response_trace(exception.response, exception.request))
+            if self.state == ManagerSessionState.RESTART_IMMINENT and isinstance(exception, ConnectionError):
+                self.state = ManagerSessionState.WAIT_SERVER_READY_AFTER_RESTART
+                return self.request(method, url, *args, **kwargs)
             self.logger.error(exception)
             raise ManagerRequestException(request=exception.request, response=exception.response)
 
-        if self.enable_relogin and self.__is_jsession_updated(response):
-            self.logger.warning("Logging to session again. Reason: JSESSIONID cookie updated by response")
-            self.auth = vManageAuth(self.base_url, self.username, self.password, verify=False)
+        if self.enable_relogin and response.jsessionid_expired and self.state == ManagerSessionState.OPERATIVE:
+            self.logger.warning("Logging to session. Reason: expired JSESSIONID detected in response headers")
+            self.state = ManagerSessionState.LOGIN
             return self.request(method, url, *args, **kwargs)
 
         if response.request.url and "passwordReset.html" in response.request.url:
@@ -278,40 +396,6 @@ class ManagerSession(vManageResponseAdapter, APIEndpointClient):
                 file.write(response.content)
         return response
 
-    def wait_for_server_reachability(self, retries: int, delay: int, initial_delay: int = 0) -> bool:
-        """Checks if vManage API is reachable by sending server request.
-
-        Retries on HTTPError for specified number of times.
-        Delays between each request are configurable,
-        It is intended to be used as a probe, so it doesn't raise original error from exception.
-
-        Args:
-            retries: total number of retires
-            delay: time to wait between each retry
-            initial_delay: time before sending first request
-
-        Returns:
-            Bool: True if device is reachable, False if not
-        """
-
-        def _log_exception(retry_state):
-            self.logger.error(f"Cannot reach server, original exception: {retry_state.outcome.exception()}")
-            return False
-
-        if initial_delay:
-            time.sleep(initial_delay)
-
-        @retry(
-            wait=wait_fixed(delay),
-            retry=retry_if_exception_type(HTTPError),
-            stop=stop_after_attempt(retries),
-            retry_error_callback=_log_exception,
-        )
-        def _send_server_request():
-            return self.server()
-
-        return True if _send_server_request() else False
-
     def get_tenant_id(self) -> str:
         """Gets tenant UUID for its subdomain.
 
@@ -365,20 +449,6 @@ class ManagerSession(vManageResponseAdapter, APIEndpointClient):
     def __prepare_session(self, verify: bool, auth: Optional[AuthBase]) -> None:
         self.auth = auth
         self.verify = verify
-
-    def __is_jsession_updated(self, response: ManagerResponse) -> bool:
-        if (jsessionid := response.cookies.get("JSESSIONID")) and isinstance(self.auth, vManageAuth):
-            if jsessionid != self.auth.set_cookie.get("JSESSIONID"):
-                return True
-        return False
-
-    def check_vmanage_server_connection(self) -> bool:
-        try:
-            head(self.base_url, timeout=15, verify=False)
-        except ConnectionError:
-            return False
-        else:
-            return True
 
     @property
     def session_type(self) -> SessionType:
