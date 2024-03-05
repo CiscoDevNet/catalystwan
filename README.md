@@ -18,9 +18,9 @@ Please check example below:
 ```python
 from catalystwan.session import create_manager_session
 
-url = "sandbox-sdwan-2.cisco.com"
-username = "devnetuser"
-password = "RG!_Yw919_83"
+url = "example.com"
+username = "admin"
+password = "password123"
 
 with create_manager_session(url=url, username=username, password=password) as session:
     devices = session.api.devices.get()
