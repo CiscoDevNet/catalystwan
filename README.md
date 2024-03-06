@@ -129,7 +129,8 @@ speedtest = session.api.speedtest.speedtest(devices[0], devices[1])
 
 ```python
 # Prepare devices list
-vsmarts = session.api.devices.get().filter(personality=Personality.VSMART)
+controllers = session.endpoints.configuration_device_inventory.get_device_details('controllers')
+vsmarts = controllers.filter(personality=Personality.VSMART)
 image = "viptela-20.7.2-x86_64.tar.gz"
 
 # Upload image
