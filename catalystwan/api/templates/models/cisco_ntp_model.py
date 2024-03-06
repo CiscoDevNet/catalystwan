@@ -3,13 +3,13 @@
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from catalystwan.api.templates.bool_str import BoolStr
-from catalystwan.api.templates.feature_template import FeatureTemplate
+from catalystwan.api.templates.feature_template import FeatureTemplate, FeatureTemplateValidator
 
 
-class Server(BaseModel):
+class Server(FeatureTemplateValidator):
     model_config = ConfigDict(populate_by_name=True)
 
     name: str
@@ -20,7 +20,7 @@ class Server(BaseModel):
     prefer: Optional[BoolStr] = None
 
 
-class Authentication(BaseModel):
+class Authentication(FeatureTemplateValidator):
     model_config = ConfigDict(populate_by_name=True)
 
     number: int

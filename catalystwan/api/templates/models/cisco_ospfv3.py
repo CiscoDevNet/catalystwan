@@ -5,10 +5,10 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from catalystwan.api.templates.bool_str import BoolStr
-from catalystwan.api.templates.feature_template import FeatureTemplate
+from catalystwan.api.templates.feature_template import FeatureTemplate, FeatureTemplateValidator
 
 
 class MetricType(str, Enum):
@@ -27,7 +27,7 @@ class Protocol(str, Enum):
     STATIC = "static"
 
 
-class Redistribute(BaseModel):
+class Redistribute(FeatureTemplateValidator):
     protocol: Protocol
     route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
     dia: Optional[BoolStr] = True
@@ -38,7 +38,7 @@ class AdType(str, Enum):
     ON_STARTUP = "on-startup"
 
 
-class RouterLsa(BaseModel):
+class RouterLsa(FeatureTemplateValidator):
     ad_type: AdType = Field(json_schema_extra={"vmanage_key": "ad-type"})
     time: int
     model_config = ConfigDict(populate_by_name=True)
@@ -60,7 +60,7 @@ class Type(str, Enum):
     SHA1 = "sha1"
 
 
-class Interface(BaseModel):
+class Interface(FeatureTemplateValidator):
     name: str
     hello_interval: Optional[int] = Field(10, json_schema_extra={"vmanage_key": "hello-interval"})
     dead_interval: Optional[int] = Field(40, json_schema_extra={"vmanage_key": "dead-interval"})
@@ -76,14 +76,14 @@ class Interface(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Range(BaseModel):
+class Range(FeatureTemplateValidator):
     address: ipaddress.IPv4Interface
     cost: Optional[int] = None
     no_advertise: Optional[bool] = Field(False, json_schema_extra={"vmanage_key": "no-advertise"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Area(BaseModel):
+class Area(FeatureTemplateValidator):
     a_num: int = Field(json_schema_extra={"vmanage_key": "a-num"})
     stub: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "no-summary", "data_path": ["stub"]}
@@ -98,13 +98,13 @@ class Area(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class RedistributeV6(BaseModel):
+class RedistributeV6(FeatureTemplateValidator):
     protocol: Protocol
     route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class InterfaceV6(BaseModel):
+class InterfaceV6(FeatureTemplateValidator):
     name: str
     hello_interval: Optional[int] = Field(10, json_schema_extra={"vmanage_key": "hello-interval"})
     dead_interval: Optional[int] = Field(40, json_schema_extra={"vmanage_key": "dead-interval"})
@@ -120,14 +120,14 @@ class InterfaceV6(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class RangeV6(BaseModel):
+class RangeV6(FeatureTemplateValidator):
     address: ipaddress.IPv6Interface
     cost: Optional[int] = None
     no_advertise: Optional[bool] = Field(False, json_schema_extra={"vmanage_key": "no-advertise"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class AreaV6(BaseModel):
+class AreaV6(FeatureTemplateValidator):
     a_num: int = Field(json_schema_extra={"vmanage_key": "a-num"})
     stub: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "no-summary", "data_path": ["stub"]}

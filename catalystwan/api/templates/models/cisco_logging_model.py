@@ -4,10 +4,10 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from catalystwan.api.templates.bool_str import BoolStr
-from catalystwan.api.templates.feature_template import FeatureTemplate
+from catalystwan.api.templates.feature_template import FeatureTemplate, FeatureTemplateValidator
 
 
 class Version(str, Enum):
@@ -20,7 +20,7 @@ class AuthType(str, Enum):
     MUTUAL = "Mutual"
 
 
-class TlsProfile(BaseModel):
+class TlsProfile(FeatureTemplateValidator):
     profile: str
     version: Optional[Version] = Field(Version.TLSV11, json_schema_extra={"data_path": ["tls-version"]})
     auth_type: AuthType = Field(json_schema_extra={"vmanage_key": "auth-type"})
@@ -41,7 +41,7 @@ class Priority(str, Enum):
     EMERGENCY = "emergency"
 
 
-class Server(BaseModel):
+class Server(FeatureTemplateValidator):
     name: str
     vpn: Optional[int] = None
     source_interface: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "source-interface"})
@@ -56,7 +56,7 @@ class Server(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Ipv6Server(BaseModel):
+class Ipv6Server(FeatureTemplateValidator):
     name: str
     vpn: Optional[int] = None
     source_interface: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "source-interface"})
