@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 from catalystwan.models.configuration.feature_profile.sdwan.system import NTPParcel
 
 
@@ -14,7 +12,4 @@ class NTPTemplateConverter:
         Returns:
             Logging: An Logging object with the provided template values.
         """
-        parcel_values = deepcopy(template_values)
-        parcel_values["parcel_name"] = name
-        parcel_values["parcel_description"] = description
-        return NTPParcel(**parcel_values)
+        return NTPParcel(parcel_name=name, parcel_description=description, **template_values)
