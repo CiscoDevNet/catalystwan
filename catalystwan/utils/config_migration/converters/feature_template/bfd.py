@@ -2,6 +2,8 @@ from catalystwan.models.configuration.feature_profile.sdwan.system import BFDPar
 
 
 class BFDTemplateConverter:
+    supported_template_types = ("cisco_bfd",)
+
     @staticmethod
     def create_parcel(name: str, description: str, template_values: dict) -> BFDParcel:
         """

@@ -3,6 +3,8 @@ from catalystwan.models.configuration.feature_profile.sdwan.system import OMPPar
 
 
 class OMPTemplateConverter:
+    supported_template_types = ("cisco_omp", "omp-vedge", "omp-vsmart")
+
     @staticmethod
     def create_parcel(name: str, description: str, template_values: dict) -> OMPParcel:
         """

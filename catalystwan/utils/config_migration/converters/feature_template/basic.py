@@ -4,6 +4,8 @@ from catalystwan.models.configuration.feature_profile.sdwan.system.basic import 
 
 
 class SystemToBasicTemplateConverter:
+    supported_template_types = ("cisco_system", "system-vsmart", "system-vedge")
+
     @staticmethod
     def create_parcel(name: str, description: str, template_values: dict) -> BasicParcel:
         """
