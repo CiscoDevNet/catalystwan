@@ -36,6 +36,6 @@ class SecurityZoneListParcel(_ParcelBase):
     def add_vpn(self, vpn: str):
         self.entries.append(
             SecurityZoneListEntry(
-                vpn=as_global(vpn, InterfaceType),
+                vpn=as_global(vpn),
             )
         )
