@@ -1,4 +1,6 @@
-from catalystwan.api.configuration_groups.parcel import Global
+from typing import Dict, List
+
+from catalystwan.api.configuration_groups.parcel import Global, as_default, as_global
 from catalystwan.models.configuration.feature_profile.sdwan.system import OMPParcel
 
 
@@ -8,34 +10,26 @@ class OMPTemplateConverter:
     @staticmethod
     def create_parcel(name: str, description: str, template_values: dict) -> OMPParcel:
         """
-        Creates an Logging object based on the provided template values.
+        Creates an OMPParcel object based on the provided template values.
+
+        Args:
+            name (str): The name of the OMPParcel.
+            description (str): The description of the OMPParcel.
+            template_values (dict): A dictionary containing the template values.
 
         Returns:
-            Logging: An Logging object with the provided template values.
+            OMPParcel: An OMPParcel object with the provided template values.
         """
-        template_values["name"] = name
-        template_values["description"] = description
 
-        # advertise_ipv4: AdvertiseIpv4 = AdvertiseIpv4,
-        # advertise_ipv6: AdvertiseIpv6 = AdvertiseIpv6,
+        def create_advertise_dict(advertise_list: List) -> Dict:
+            return {definition["protocol"].value: Global[bool](value=True) for definition in advertise_list}
 
-        if template_values.get("advertise") is not None:
-            template_values["advertise_ipv4"] = template_values["advertise"]
-            del template_values["advertise"]
-            set_true_protocols = {}
-            for definition in template_values["advertise_ipv4"]:
-                protocol = definition["protocol"].value
-                set_true_protocols[protocol] = Global[bool](value=True)
-            template_values["advertise_ipv4"] = set_true_protocols
+        parcel_values = {
+            "parcel_name": name,
+            "parcel_description": description,
+            "ecmp_limit": as_global(float(template_values.get("ecmp_limit", as_default(4)).value)),
+            "advertise_ipv4": create_advertise_dict(template_values.get("advertise", [])),
+            "advertise_ipv6": create_advertise_dict(template_values.get("ipv6_advertise", [])),
+        }
 
-        if template_values.get("ipv6_advertise") is not None:
-            template_values["advertise_ipv6"] = template_values["ipv6_advertise"]
-            del template_values["ipv6_advertise"]
-            set_true_protocols = {}
-            for definition in template_values["advertise_ipv6"]:
-                protocol = definition["protocol"].value
-                set_true_protocols[protocol] = Global[bool](value=True)
-            template_values["advertise_ipv6"] = set_true_protocols
-
-        print(template_values)
-        return OMPParcel(**template_values)
+        return OMPParcel(**parcel_values)

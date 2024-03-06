@@ -7,11 +7,14 @@ class BannerTemplateConverter:
     @staticmethod
     def create_parcel(name: str, description: str, template_values: dict) -> BannerParcel:
         """
-        Creates an AAA object based on the provided template values.
+        Creates a BannerParcel object based on the provided template values.
+
+        Args:
+            name (str): The name of the BannerParcel.
+            description (str): The description of the BannerParcel.
+            template_values (dict): A dictionary containing the template values.
 
         Returns:
-            AAA: An AAA object with the provided template values.
+            BannerParcel: A BannerParcel object with the provided template values.
         """
-        template_values["name"] = name
-        template_values["description"] = description
-        return BannerParcel(**template_values)
+        return BannerParcel(parcel_name=name, parcel_description=description, **template_values)
