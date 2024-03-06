@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from catalystwan.api.templates.device_variable import DeviceVariable
 
@@ -51,13 +51,7 @@ def find_template_values(
             current_nesting = get_nested_dict(templated_values, path[:-1])
             current_nesting[field_key] = []
             for item in template_value:
-                if isinstance(item, dict):
-                    if target_key in item:
-                        current_nesting[field_key].append(item[target_key_for_template_value])
-                    else:
-                        current_nesting[field_key].append(find_template_values(item, device_specific_variables))
-                else:
-                    current_nesting[field_key].append(item)
+                current_nesting[field_key].append(process_list_value(item))
         elif template_definition["vipObjectType"] != "tree":
             current_nesting = get_nested_dict(templated_values, path[:-1])
             current_nesting[field_key] = template_value
@@ -90,3 +84,21 @@ def get_nested_dict(d: dict, path: List[str], populate: bool = True):
             current_dict[path_key] = {}
         current_dict = current_dict[path_key]
     return current_dict
+
+
+def process_list_value(item: Any, target_key: str = "vipType", target_key_for_template_value: str = "vipValue"):
+    if isinstance(item, dict):
+        if target_key in item:
+            if item["vipObjectType"] == "list":
+                result = []
+                for nested_item in item[target_key_for_template_value]:
+                    result.append(process_list_value(nested_item))
+                return result
+            elif item["vipObjectType"] == "tree":
+                return find_template_values(item[target_key_for_template_value])
+            else:
+                return item[target_key_for_template_value]
+        else:
+            return find_template_values(item)
+    else:
+        return item
