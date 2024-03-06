@@ -89,8 +89,8 @@ class AclPolicySequence(PolicyDefinitionSequenceBase):
     def match_protocols(self, protocols: Set[int]) -> None:
         self._insert_match(ProtocolEntry.from_protocol_set(protocols))
 
-    def match_source_data_prefix_list(self, data_prefix_list_id: UUID) -> None:
-        self._insert_match(SourceDataPrefixListEntry(ref=data_prefix_list_id))
+    def match_source_data_prefix_list(self, data_prefix_lists: List[UUID]) -> None:
+        self._insert_match(SourceDataPrefixListEntry(ref=data_prefix_lists))
 
     def match_source_ip(self, networks: List[IPv4Network]) -> None:
         self._insert_match(SourceIPEntry.from_ipv4_networks(networks))

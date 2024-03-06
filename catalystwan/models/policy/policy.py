@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Literal, Optional, Sequence
+from typing import List, Literal, Optional, Sequence, Union
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -68,7 +68,7 @@ class PolicyCreationPayload(BaseModel):
         default="default description", serialization_alias="policyDescription", validation_alias="policyDescription"
     )
     policy_type: str = Field(serialization_alias="policyType", validation_alias="policyType")
-    policy_definition: PolicyDefinition = Field(
+    policy_definition: Union[PolicyDefinition, str] = Field(
         serialization_alias="policyDefinition", validation_alias="policyDefinition"
     )
     is_policy_activated: bool = Field(
