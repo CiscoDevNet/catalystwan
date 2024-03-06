@@ -15,6 +15,7 @@ from .bfd import BFDTemplateConverter
 from .global_ import GlobalTemplateConverter
 from .logging_ import LoggingTemplateConverter
 from .normalizer import template_definition_normalization
+from .ntp import NTPTemplateConverter
 from .omp import OMPTemplateConverter
 from .security import SecurityTemplateConverter
 
@@ -29,6 +30,7 @@ available_converters = [
     GlobalTemplateConverter,
     LoggingTemplateConverter,
     OMPTemplateConverter,
+    NTPTemplateConverter,
 ]
 
 

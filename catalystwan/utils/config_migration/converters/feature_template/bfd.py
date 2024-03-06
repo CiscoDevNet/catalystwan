@@ -2,21 +2,24 @@ from catalystwan.models.configuration.feature_profile.sdwan.system import BFDPar
 
 
 class BFDTemplateConverter:
-    supported_template_types = ("cisco_bfd",)
+    supported_template_types = ("cisco_bfd", "bfd-vedge")
 
     @staticmethod
     def create_parcel(name: str, description: str, template_values: dict) -> BFDParcel:
         """
-        Creates an BFD object based on the provided template values.
+        Creates a BFDParcel object based on the provided template values.
+
+        Args:
+            name (str): The name of the BFDParcel.
+            description (str): The description of the BFDParcel.
+            template_values (dict): A dictionary containing the template values.
 
         Returns:
-            BFD: An BFD object with the provided template values.
+            BFDParcel: A BFDParcel object with the provided template values.
         """
-        template_values["name"] = name
-        template_values["description"] = description
-
-        if template_values.get("color") is not None:
-            template_values["colors"] = template_values["color"]
-            del template_values["color"]
-
-        return BFDParcel(**template_values)
+        parcel_values = {
+            "parcel_name": name,
+            "parcel_description": description,
+            "colors": template_values.get("color"),
+        }
+        return BFDParcel(**parcel_values)  # type: ignore

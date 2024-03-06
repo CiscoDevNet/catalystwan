@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import List
 
 from catalystwan.api.configuration_groups.parcel import Global
@@ -10,15 +11,44 @@ class AAATemplateConverter:
     @staticmethod
     def create_parcel(name: str, description: str, template_values: dict) -> AAAParcel:
         """
-        Creates an AAA object based on the provided template values.
+        Creates an AAAParcel object based on the provided template values.
+
+        Args:
+            name (str): The name of the AAAParcel.
+            description (str): The description of the AAAParcel.
+            template_values (dict): A dictionary containing the template values.
 
         Returns:
-            AAA: An AAA object with the provided template values.
+            AAAParcel: An AAAParcel object with the provided template values.
         """
-        template_values["name"] = name
-        template_values["description"] = description
 
-        delete_properties = (
+        def assign_authorization_servers(auth_server_list: List) -> None:
+            for auth_server in auth_server_list:
+                servers = auth_server.get("server", {})
+                for server in servers:
+                    key_enum = server.get("key_enum")
+                    server["key_enum"] = Global[str](value=str(key_enum.value))
+
+        def assign_rules(rules: List) -> None:
+            for rule_item in rules:
+                rule_item["group"] = Global[List[str]](value=rule_item["group"].value.split(","))
+
+        parcel_values = deepcopy(template_values)
+        parcel_values["parcel_name"] = name
+        parcel_values["parcel_description"] = description
+
+        if server_auth_order := template_values.get("server_auth_order"):
+            parcel_values["server_auth_order"] = Global[List[str]](value=server_auth_order.value.split(","))
+
+        for server in ["radius", "tacacs"]:
+            if auth_server_list := parcel_values.get(server):
+                assign_authorization_servers(auth_server_list)
+
+        for rule in ["accounting_rule", "authorization_rule"]:
+            if existing_rule := parcel_values.get(rule):
+                assign_rules(existing_rule)
+
+        for key in [
             "radius_client",
             "radius_trustsec_group",
             "rda_server_key",
@@ -26,41 +56,7 @@ class AAATemplateConverter:
             "auth_type",
             "port",
             "cts_auth_list",
-        )
+        ]:
+            parcel_values.pop(key, None)
 
-        if template_values.get("server_auth_order") is not None:
-            global_object = template_values["server_auth_order"]
-            template_values["server_auth_order"] = Global[List[str]](value=global_object.value.split(","))
-
-        if template_values.get("radius") is not None:
-            print(template_values["radius"])
-            radius_list = template_values["radius"]
-            for radius in radius_list:
-                servers = radius.get("server", {})
-                for server in servers:
-                    key_enum = server.get("key_enum")
-                    server["key_enum"] = Global[str](value=str(key_enum.value))
-
-        if template_values.get("tacacs") is not None:
-            tacacs_list = template_values["tacacs"]
-            for tacacs in tacacs_list:
-                servers = tacacs.get("server", {})
-                for server in servers:
-                    key_enum = server.get("key_enum")
-                    server["key_enum"] = Global[str](value=str(key_enum.value))
-
-        if template_values.get("accounting_rule") is not None:
-            accounting_rule = template_values["accounting_rule"]
-            for rule_item in accounting_rule:
-                rule_item["group"] = Global[List[str]](value=rule_item["group"].value.split(","))
-
-        if template_values.get("authorization_rule") is not None:
-            authorization_rule = template_values["authorization_rule"]
-            for rule_item in authorization_rule:
-                rule_item["group"] = Global[List[str]](value=rule_item["group"].value.split(","))
-
-        for prop in delete_properties:
-            if template_values.get(prop) is not None:
-                del template_values[prop]
-
-        return AAAParcel(**template_values)
+        return AAAParcel(**parcel_values)

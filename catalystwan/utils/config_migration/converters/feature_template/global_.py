@@ -1,3 +1,6 @@
+from copy import deepcopy
+
+from catalystwan.api.configuration_groups.parcel import as_variable
 from catalystwan.models.configuration.feature_profile.sdwan.system import GlobalParcel
 
 
@@ -10,19 +13,15 @@ class GlobalTemplateConverter:
         Creates an Logging object based on the provided template values.
 
         Returns:
-            Logging: An Logging object with the provided template values.
+            GlobalParcel: A GlobalParcel object with the provided template values.
         """
-        template_values["services_global"] = {}
-        template_values["services_global"]["services_ip"] = {}
+        values = deepcopy(template_values)
+        if source_intrf := values.get("source_intrf"):
+            values["source_intrf"] = as_variable(source_intrf.value)
 
-        keys_to_delete = []
-        for key, value in template_values.items():
-            template_values["services_global"]["services_ip"][key] = value
-            keys_to_delete.append(key)
-
-        for key in keys_to_delete:
-            del template_values[key]
-
-        template_values["name"] = name
-        template_values["description"] = description
-        return GlobalParcel(**template_values)
+        parcel_values = {
+            "parcel_name": name,
+            "parcel_description": description,
+            "services_global": {"services_ip": {key: value for key, value in values.items()}},
+        }
+        return GlobalParcel(**parcel_values)  # type: ignore
