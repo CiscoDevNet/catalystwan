@@ -6,6 +6,13 @@ from catalystwan.models.configuration.feature_profile.sdwan.system.security impo
 
 
 class SecurityTemplateConverter:
+    supported_template_types = (
+        "cisco_security",
+        "security",
+        "security-vsmart",
+        "security-vedge",
+    )
+
     @staticmethod
     def create_parcel(name: str, description: str, template_values: dict) -> SecurityParcel:
         """

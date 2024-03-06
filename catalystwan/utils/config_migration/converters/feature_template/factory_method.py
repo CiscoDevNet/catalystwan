@@ -20,21 +20,20 @@ from .security import SecurityTemplateConverter
 
 logger = logging.getLogger(__name__)
 
-# TODO: Move tuples inside of template converter classes then assamble them here
-supported_parcel_converters: Dict[Any, FeatureTemplateConverter] = {
-    ("cisco_aaa", "cedge_aaa", "aaa"): AAATemplateConverter,  # type: ignore[dict-item]
-    ("cisco_bfd",): BFDTemplateConverter,  # type: ignore[dict-item]
-    ("cisco_logging", "logging"): LoggingTemplateConverter,  # type: ignore[dict-item]
-    (
-        "cisco_security",
-        "security",
-        "security-vsmart",
-        "security-vedge",
-    ): SecurityTemplateConverter,  # type: ignore[dict-item]
-    ("cisco_omp", "omp-vedge", "omp-vsmart"): OMPTemplateConverter,
-    ("cedge_global",): GlobalTemplateConverter,
-    ("cisco_banner",): BannerTemplateConverter,
-    ("cisco_system", "system-vsmart", "system-vedge"): SystemToBasicTemplateConverter,
+available_converters = [
+    AAATemplateConverter,
+    BannerTemplateConverter,
+    SecurityTemplateConverter,
+    SystemToBasicTemplateConverter,
+    BFDTemplateConverter,
+    GlobalTemplateConverter,
+    LoggingTemplateConverter,
+    OMPTemplateConverter,
+]
+
+
+supported_parcel_converters: Dict[Any, Any] = {
+    converter.supported_template_types: converter for converter in available_converters  # type: ignore
 }
 
 
