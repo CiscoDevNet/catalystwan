@@ -15,13 +15,13 @@ class Role(str, Enum):
 
 
 class Dns(FeatureTemplateValidator):
-    dns_addr: str = Field(json_schema_extra={"vmanage_key": "dns-addr"})
+    dns_addr: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "dns-addr"})
     role: Role = Role.PRIMARY
     model_config = ConfigDict(populate_by_name=True)
 
 
 class DnsIpv6(FeatureTemplateValidator):
-    dns_addr: str = Field(json_schema_extra={"vmanage_key": "dns-addr"})
+    dns_addr: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "dns-addr"})
     role: Optional[Role] = Role.PRIMARY
     model_config = ConfigDict(populate_by_name=True)
 
@@ -45,8 +45,8 @@ class SvcType(str, Enum):
 
 class Service(FeatureTemplateValidator):
     svc_type: SvcType = Field(json_schema_extra={"vmanage_key": "svc-type"})
-    address: List[str]
-    interface: str
+    address: Optional[List[str]] = None
+    interface: Optional[str] = None
     track_enable: bool = Field(True, json_schema_extra={"vmanage_key": "track-enable"})
     model_config = ConfigDict(populate_by_name=True)
 
@@ -67,18 +67,18 @@ class ServiceRoute(FeatureTemplateValidator):
 
 
 class NextHop(FeatureTemplateValidator):
-    address: str
+    address: Optional[str] = None
     distance: Optional[int] = 1
 
 
 class NextHopWithTrack(FeatureTemplateValidator):
-    address: str
+    address: Optional[str] = None
     distance: Optional[int] = 1
     tracker: str
 
 
 class Routev4(FeatureTemplateValidator):
-    prefix: str
+    prefix: Optional[str] = None
     next_hop: Optional[List[NextHop]] = Field(
         default=None, json_schema_extra={"vmanage_key": "next-hop", "priority_order": ["address", "distance"]}
     )
@@ -217,9 +217,9 @@ class Overload(str, Enum):
 
 class Natpool(FeatureTemplateValidator):
     name: int
-    prefix_length: int = Field(json_schema_extra={"vmanage_key": "prefix-length"})
-    range_start: str = Field(json_schema_extra={"vmanage_key": "range-start"})
-    range_end: str = Field(json_schema_extra={"vmanage_key": "range-end"})
+    prefix_length: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "prefix-length"})
+    range_start: str = Field(default=None, json_schema_extra={"vmanage_key": "range-start"})
+    range_end: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "range-end"})
     overload: Overload = Overload.TRUE
     direction: Direction
     tracker_id: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "tracker-id"})
@@ -232,9 +232,9 @@ class StaticNatDirection(str, Enum):
 
 
 class Static(FeatureTemplateValidator):
-    pool_name: Optional[int] = Field(json_schema_extra={"vmanage_key": "pool-name"})
-    source_ip: str = Field(json_schema_extra={"vmanage_key": "source-ip"})
-    translate_ip: str = Field(json_schema_extra={"vmanage_key": "translate-ip"})
+    pool_name: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "pool-name"})
+    source_ip: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "source-ip"})
+    translate_ip: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "translate-ip"})
     static_nat_direction: StaticNatDirection = Field(json_schema_extra={"vmanage_key": "static-nat-direction"})
     tracker_id: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "tracker-id"})
     model_config = ConfigDict(populate_by_name=True)

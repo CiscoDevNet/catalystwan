@@ -54,15 +54,15 @@ class Type(str, Enum):
 
 class Tracker(FeatureTemplateValidator):
     name: str
-    endpoint_ip: str = Field(json_schema_extra={"vmanage_key": "endpoint-ip"})
-    endpoint_ip_transport_port: str = Field(
-        json_schema_extra={"vmanage_key": "endpoint-ip", "data_path": ["endpoint-ip-transport-port"]}
+    endpoint_ip: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "endpoint-ip"})
+    endpoint_ip_transport_port: Optional[str] = Field(
+        default=None, json_schema_extra={"vmanage_key": "endpoint-ip", "data_path": ["endpoint-ip-transport-port"]}
     )
-    protocol: Protocol = Field(json_schema_extra={"data_path": ["endpoint-ip-transport-port"]})
-    port: int = Field(json_schema_extra={"data_path": ["endpoint-ip-transport-port"]})
-    endpoint_dns_name: str = Field(json_schema_extra={"vmanage_key": "endpoint-dns-name"})
-    endpoint_api_url: str = Field(json_schema_extra={"vmanage_key": "endpoint-api-url"})
-    elements: List[str]
+    protocol: Optional[Protocol] = Field(default=None, json_schema_extra={"data_path": ["endpoint-ip-transport-port"]})
+    port: Optional[int] = Field(default=None, json_schema_extra={"data_path": ["endpoint-ip-transport-port"]})
+    endpoint_dns_name: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "endpoint-dns-name"})
+    endpoint_api_url: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "endpoint-api-url"})
+    elements: Optional[List[str]] = None
     boolean: Optional[Boolean] = Boolean.OR
     threshold: Optional[int] = 300
     interval: Optional[int] = 60

@@ -31,7 +31,6 @@ def find_template_values(
         path = []
     if templated_values is None:
         templated_values = {}
-
     # if value object is reached, try to extract the value
     if target_key in template_definition:
         if template_definition[target_key] == target_key_value_to_ignore:
@@ -42,8 +41,23 @@ def find_template_values(
 
         field_key = path[-1]
         # TODO: Handle nested DeviceVariable
-        if value == "variableName" and (device_specific_variables is not None):
-            device_specific_variables[field_key] = DeviceVariable(name=template_definition["vipVariableName"])
+        if value == "variableName":
+            if device_specific_variables is not None:
+                device_specific_variables[field_key] = DeviceVariable(name=template_definition["vipVariableName"])
+        elif template_definition["vipType"] == "variable":
+            if device_specific_variables is not None and template_value:
+                device_specific_variables[field_key] = DeviceVariable(name=template_value)
+        elif template_definition["vipObjectType"] == "list":
+            current_nesting = get_nested_dict(templated_values, path[:-1])
+            current_nesting[field_key] = []
+            for item in template_value:
+                if isinstance(item, dict):
+                    if target_key in item:
+                        current_nesting[field_key].append(item[target_key_for_template_value])
+                    else:
+                        current_nesting[field_key].append(find_template_values(item, device_specific_variables))
+                else:
+                    current_nesting[field_key].append(item)    
         elif template_definition["vipObjectType"] != "tree":
             current_nesting = get_nested_dict(templated_values, path[:-1])
             current_nesting[field_key] = template_value
@@ -55,10 +69,9 @@ def find_template_values(
             current_nesting = get_nested_dict(templated_values, path[:-1])
             current_nesting[field_key] = []
             for item in template_value:
-                current_nesting[field_key].append(
-                    find_template_values(item, {}, device_specific_variables=device_specific_variables)
-                )
-
+                item_value = find_template_values(item, {}, device_specific_variables=device_specific_variables)
+                if item_value:
+                    current_nesting[field_key].append(item_value)
         return templated_values
 
     # iterate the dict to extract values and assign them to their fields

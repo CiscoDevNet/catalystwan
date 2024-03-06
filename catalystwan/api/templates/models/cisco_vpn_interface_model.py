@@ -238,7 +238,7 @@ class Ipv6Vrrp(FeatureTemplateValidator):
 class CiscoVpnInterfaceModel(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    if_name: str = Field(json_schema_extra={"vmanage_key": "if-name"})
+    if_name: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "if-name"})
     interface_description: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "description"})
     poe: Optional[BoolStr] = None
     ipv4_address: Optional[str] = Field(default=None, json_schema_extra={"data_path": ["ip"], "vmanage_key": "address"})

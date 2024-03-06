@@ -18,7 +18,7 @@ class User(FeatureTemplateValidator):
 
 
 class RadiusServer(FeatureTemplateValidator):
-    model_config = ConfigDict(populate_by_name=True)
+    model_config = ConfigDict(populate_by_name=True, coerce_numbers_to_str=True)
 
     address: str
     auth_port: int = Field(default=1812, json_schema_extra={"vmanage_key": "auth-port"})

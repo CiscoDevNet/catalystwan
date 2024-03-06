@@ -1,6 +1,10 @@
 import os
 import unittest
 from typing import Any, List, cast
+import json
+
+from pydantic import ValidationError
+from catalystwan.exceptions import TemplateTypeError
 
 from catalystwan.session import create_manager_session
 from catalystwan.utils.feature_template.find_template_values import find_template_values
@@ -14,11 +18,11 @@ class TestFindTemplateValues(unittest.TestCase):
             username=cast(str, os.environ.get("TEST_VMANAGE_USERNAME")),
             password=cast(str, os.environ.get("TEST_VMANAGE_PASSWORD")),
         )
-        self.templates = self.session.api.templates._get_feature_templates()
-
+        self.templates = self.session.api.templates._get_feature_templates(summary=False)
+    
     def test_find_template_value(self):
         for template in self.templates:
-            definition = template.template_definiton
+            definition = json.loads(template.template_definiton)
             with self.subTest(template_name=template.name):
                 parsed_values = find_template_values(definition)
                 self.assertFalse(
@@ -37,8 +41,9 @@ class TestFindTemplateValues(unittest.TestCase):
                     return True
             if isinstance(value, list):
                 for v in value:
-                    if self.is_key_present(v, keys):
-                        return True
+                    if isinstance(v, dict):
+                        if self.is_key_present(v, keys):
+                            return True
         return False
 
     def tearDown(self) -> None:
