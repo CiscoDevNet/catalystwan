@@ -81,8 +81,12 @@ class Interface(FeatureTemplateValidator):
     description: Optional[str] = None
     unnumbered: bool = True
     address: Optional[ipaddress.IPv4Interface] = None
-    tunnel_source: Optional[ipaddress.IPv4Address] = Field(default=None, json_schema_extra={"vmanage_key": "tunnel-source"})
-    tunnel_source_interface: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "tunnel-source-interface"})
+    tunnel_source: Optional[ipaddress.IPv4Address] = Field(
+        default=None, json_schema_extra={"vmanage_key": "tunnel-source"}
+    )
+    tunnel_source_interface: Optional[str] = Field(
+        default=None, json_schema_extra={"vmanage_key": "tunnel-source-interface"}
+    )
     tunnel_route_via: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "tunnel-route-via"})
     tunnel_destination: str = Field(json_schema_extra={"vmanage_key": "tunnel-destination"})
     application: Application = Application.SIG
@@ -157,7 +161,9 @@ class RefreshTimeUnit(str, Enum):
 
 class Service(FeatureTemplateValidator):
     svc_type: SvcType = Field(SvcType.SIG, json_schema_extra={"vmanage_key": "svc-type"})
-    interface_pair: List[InterfacePair] = Field(json_schema_extra={"data_path": ["ha-pairs"], "vmanage_key": "interface-pair"})
+    interface_pair: List[InterfacePair] = Field(
+        json_schema_extra={"data_path": ["ha-pairs"], "vmanage_key": "interface-pair"}
+    )
     auth_required: Optional[bool] = Field(False, json_schema_extra={"vmanage_key": "auth-required"})
     xff_forward_enabled: Optional[bool] = Field(False, json_schema_extra={"vmanage_key": "xff-forward-enabled"})
     ofw_enabled: Optional[bool] = Field(False, json_schema_extra={"vmanage_key": "ofw-enabled"})
@@ -208,7 +214,9 @@ class CiscoSecureInternetGatewayModel(FeatureTemplate):
     vpn_id: int = Field(DEFAULT_SIG_VPN_ID, json_schema_extra={"vmanage_key": "vpn-id"})
     interface: List[Interface]
     service: List[Service]
-    tracker_src_ip: Optional[ipaddress.IPv4Interface] = Field(default=None, json_schema_extra={"vmanage_key": "tracker-src-ip"})
+    tracker_src_ip: Optional[ipaddress.IPv4Interface] = Field(
+        default=None, json_schema_extra={"vmanage_key": "tracker-src-ip"}
+    )
     tracker: Optional[List[Tracker]] = None
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"

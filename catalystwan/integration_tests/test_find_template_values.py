@@ -1,10 +1,7 @@
+import json
 import os
 import unittest
 from typing import Any, List, cast
-import json
-
-from pydantic import ValidationError
-from catalystwan.exceptions import TemplateTypeError
 
 from catalystwan.session import create_manager_session
 from catalystwan.utils.feature_template.find_template_values import find_template_values
@@ -19,7 +16,7 @@ class TestFindTemplateValues(unittest.TestCase):
             password=cast(str, os.environ.get("TEST_VMANAGE_PASSWORD")),
         )
         self.templates = self.session.api.templates._get_feature_templates(summary=False)
-    
+
     def test_find_template_value(self):
         for template in self.templates:
             definition = json.loads(template.template_definiton)

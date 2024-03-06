@@ -57,7 +57,7 @@ def find_template_values(
                     else:
                         current_nesting[field_key].append(find_template_values(item, device_specific_variables))
                 else:
-                    current_nesting[field_key].append(item)    
+                    current_nesting[field_key].append(item)
         elif template_definition["vipObjectType"] != "tree":
             current_nesting = get_nested_dict(templated_values, path[:-1])
             current_nesting[field_key] = template_value
