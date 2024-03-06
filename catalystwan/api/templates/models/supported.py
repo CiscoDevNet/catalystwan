@@ -5,6 +5,7 @@ from catalystwan.api.templates.models.cisco_banner_model import CiscoBannerModel
 from catalystwan.api.templates.models.cisco_bfd_model import CiscoBFDModel
 from catalystwan.api.templates.models.cisco_logging_model import CiscoLoggingModel
 from catalystwan.api.templates.models.cisco_ntp_model import CiscoNTPModel
+from catalystwan.api.templates.models.cisco_omp_model import CiscoOMPModel
 from catalystwan.api.templates.models.cisco_ospf import CiscoOSPFModel
 from catalystwan.api.templates.models.cisco_secure_internet_gateway import CiscoSecureInternetGatewayModel
 from catalystwan.api.templates.models.cisco_snmp_model import CiscoSNMPModel
@@ -31,4 +32,5 @@ available_models = {
     "cisco_snmp": CiscoSNMPModel,
     "cisco_system": CiscoSystemModel,
     "cisco_secure_internet_gateway": CiscoSecureInternetGatewayModel,
+    "cisco_omp": CiscoOMPModel,
 }

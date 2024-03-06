@@ -4,37 +4,37 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from catalystwan.api.templates.bool_str import BoolStr
-from catalystwan.api.templates.feature_template import FeatureTemplate
+from catalystwan.api.templates.feature_template import FeatureTemplate, FeatureTemplateValidator
 
 
-class Export(BaseModel):
+class Export(FeatureTemplateValidator):
     asn_ip: str = Field(json_schema_extra={"vmanage_key": "asn-ip"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Import(BaseModel):
+class Import(FeatureTemplateValidator):
     asn_ip: str = Field(json_schema_extra={"vmanage_key": "asn-ip"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class RouteTargetIpv4(BaseModel):
+class RouteTargetIpv4(FeatureTemplateValidator):
     vpn_id: int = Field(json_schema_extra={"vmanage_key": "vpn-id"})
     export: List[Export]
     import_: List[Import] = Field(json_schema_extra={"vmanage_key": "import"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class RouteTargetIpv6(BaseModel):
+class RouteTargetIpv6(FeatureTemplateValidator):
     vpn_id: int = Field(json_schema_extra={"vmanage_key": "vpn-id"})
     export: List[Export]
     import_: List[Import] = Field(json_schema_extra={"vmanage_key": "import"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class MplsInterface(BaseModel):
+class MplsInterface(FeatureTemplateValidator):
     if_name: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "if-name"})
     model_config = ConfigDict(populate_by_name=True)
 
@@ -43,25 +43,25 @@ class AddressFamilyType(str, Enum):
     IPV4_UNICAST = "ipv4-unicast"
 
 
-class AggregateAddress(BaseModel):
+class AggregateAddress(FeatureTemplateValidator):
     prefix: str
     as_set: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "as-set"})
     summary_only: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "summary-only"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Ipv6AggregateAddress(BaseModel):
+class Ipv6AggregateAddress(FeatureTemplateValidator):
     prefix: str
     as_set: Optional[bool] = Field(False, json_schema_extra={"vmanage_key": "as-set"})
     summary_only: Optional[bool] = Field(False, json_schema_extra={"vmanage_key": "summary-only"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Network(BaseModel):
+class Network(FeatureTemplateValidator):
     prefix: str
 
 
-class Ipv6Network(BaseModel):
+class Ipv6Network(FeatureTemplateValidator):
     prefix: str
 
 
@@ -75,13 +75,13 @@ class Protocol(str, Enum):
     NAT = "nat"
 
 
-class Redistribute(BaseModel):
+class Redistribute(FeatureTemplateValidator):
     protocol: Protocol
     route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class AddressFamily(BaseModel):
+class AddressFamily(FeatureTemplateValidator):
     family_type: AddressFamilyType = Field(json_schema_extra={"vmanage_key": "family-type"})
     aggregate_address: Optional[List[AggregateAddress]] = Field(
         default=None, json_schema_extra={"vmanage_key": "aggregate-address"}
@@ -112,13 +112,13 @@ class Direction(str, Enum):
     OUT = "out"
 
 
-class RoutePolicy(BaseModel):
+class RoutePolicy(FeatureTemplateValidator):
     direction: Direction
     pol_name: str = Field(json_schema_extra={"vmanage_key": "pol-name"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class NeighborAddressFamily(BaseModel):
+class NeighborAddressFamily(FeatureTemplateValidator):
     family_type: NeighborFamilyType = Field(json_schema_extra={"vmanage_key": "family-type"})
     prefix_num: Optional[int] = Field(
         default=None, json_schema_extra={"data_path": ["maximum-prefixes"], "vmanage_key": "prefix-num"}
@@ -132,7 +132,7 @@ class NeighborAddressFamily(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Neighbor(BaseModel):
+class Neighbor(FeatureTemplateValidator):
     address: str
     description: Optional[str] = None
     shutdown: Optional[BoolStr] = None
@@ -165,7 +165,7 @@ class IPv6NeighborFamilyType(str, Enum):
     IPV6_UNICAST = "ipv6-unicast"
 
 
-class IPv6NeighborAddressFamily(BaseModel):
+class IPv6NeighborAddressFamily(FeatureTemplateValidator):
     family_type: IPv6NeighborFamilyType = Field(json_schema_extra={"vmanage_key": "family-type"})
     prefix_num: Optional[int] = Field(
         0, json_schema_extra={"data_path": ["maximum-prefixes"], "vmanage_key": "prefix-num"}
@@ -179,7 +179,7 @@ class IPv6NeighborAddressFamily(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Ipv6Neighbor(BaseModel):
+class Ipv6Neighbor(FeatureTemplateValidator):
     address: str
     description: Optional[str] = None
     shutdown: Optional[BoolStr] = None

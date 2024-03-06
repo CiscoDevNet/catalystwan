@@ -5,10 +5,10 @@ from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
 from catalystwan.api.templates.bool_str import BoolStr
-from catalystwan.api.templates.feature_template import FeatureTemplate
+from catalystwan.api.templates.feature_template import FeatureTemplate, FeatureTemplateValidator
 
 DEFAULT_OSPF_HELLO_INTERVAL = 10
 DEFAULT_OSPF_DEAD_INTERVAL = 40
@@ -37,7 +37,7 @@ class Protocol(str, Enum):
     EIGRP = "eigrp"
 
 
-class Redistribute(BaseModel):
+class Redistribute(FeatureTemplateValidator):
     protocol: Protocol
     route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
     dia: Optional[BoolStr] = True
@@ -49,7 +49,7 @@ class AdType(str, Enum):
     ON_STARTUP = "on-startup"
 
 
-class RouterLsa(BaseModel):
+class RouterLsa(FeatureTemplateValidator):
     ad_type: AdType = Field(json_schema_extra={"vmanage_key": "ad-type"})
     time: int
     model_config = ConfigDict(populate_by_name=True)
@@ -59,7 +59,7 @@ class Direction(str, Enum):
     IN = "in"
 
 
-class RoutePolicy(BaseModel):
+class RoutePolicy(FeatureTemplateValidator):
     direction: Direction
     pol_name: str = Field(json_schema_extra={"vmanage_key": "pol-name"})
     model_config = ConfigDict(populate_by_name=True)
@@ -78,7 +78,7 @@ class Type(str, Enum):
     NULL = "null"
 
 
-class Interface(BaseModel):
+class Interface(FeatureTemplateValidator):
     name: str
     hello_interval: Optional[int] = Field(
         DEFAULT_OSPF_DEAD_INTERVAL, json_schema_extra={"vmanage_key": "hello-interval"}
@@ -100,14 +100,14 @@ class Interface(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Range(BaseModel):
+class Range(FeatureTemplateValidator):
     address: ipaddress.IPv4Interface
     cost: Optional[int] = None
     no_advertise: Optional[BoolStr] = Field(default=False, json_schema_extra={"vmanage_key": "no-advertise"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Area(BaseModel):
+class Area(FeatureTemplateValidator):
     a_num: int = Field(json_schema_extra={"vmanage_key": "a-num"})
     stub: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "no-summary", "data_path": ["stub"]}

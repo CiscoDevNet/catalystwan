@@ -9,7 +9,7 @@ from catalystwan.api.templates.models.cisco_system import CiscoSystemModel
 from catalystwan.api.templates.models.omp_vsmart_model import OMPvSmart
 from catalystwan.api.templates.models.security_vsmart_model import SecurityvSmart
 from catalystwan.api.templates.models.system_vsmart_model import SystemVsmart
-from catalystwan.utils.feature_template import choose_model
+from catalystwan.utils.feature_template.choose_model import choose_model
 
 
 class TestChooseModel(unittest.TestCase):
