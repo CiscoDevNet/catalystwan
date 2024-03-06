@@ -56,7 +56,6 @@ class Task:
         failure_statuses_ids: List[OperationStatusId] = [
             OperationStatusId.FAILURE,
         ],
-        activity_text: str = "",
     ) -> TaskResult:
         """
         Method to check subtasks statuses of the task
@@ -89,7 +88,6 @@ class Task:
             success_statuses_ids (Union[List[OperationStatus], str]): list of positive sub-tasks statuses id's
             fails_statuses_id (Union[List[OperationStatusId], str]): list of negative sub-tasks statuses
             fails_statuses_ids (Union[List[OperationStatusId], str]): list of negative sub-tasks statuses id's
-            activity_text (str): activity text
 
         Returns:
             TaskResult(): result attr is True if all subtasks are success
@@ -103,7 +101,6 @@ class Task:
         failure_statuses_ids = [
             cast(OperationStatusId, exit_status_id.value) for exit_status_id in failure_statuses_ids
         ]
-        activity_text = activity_text
 
         def check_status(task_data: List[SubTaskData]) -> bool:
             """
@@ -122,13 +119,15 @@ class Task:
             task_statuses_failure = [task.status in failure_statuses for task in task_data]
             task_statuses_id_success = [task.status_id in success_statuses_ids for task in task_data]
             task_statuses_id_failure = [task.status_id in failure_statuses_ids for task in task_data]
-            task_activities = [activity_text in task.activity for task in task_data]
 
-            if all(task_statuses_success + task_statuses_id_success) or any(
-                task_statuses_failure + task_statuses_id_failure
-            ):
-                if not activity_text or all(task_activities):
-                    return False
+            all_subtasks_completed_status: List[bool] = [
+                any(task_status) for task_status in zip(task_statuses_success, task_statuses_failure)
+            ]
+            all_subtasks_completed_status_id: List[bool] = [
+                any(task_status_id) for task_status_id in zip(task_statuses_id_success, task_statuses_id_failure)
+            ]
+            if all(all_subtasks_completed_status) or all(all_subtasks_completed_status_id):
+                return False
             return True
 
         def log_exception(self) -> None:
