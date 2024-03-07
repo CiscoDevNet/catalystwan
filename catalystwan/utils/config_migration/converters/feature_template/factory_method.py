@@ -8,17 +8,34 @@ from catalystwan.models.configuration.feature_profile.sdwan.system import AnySys
 from catalystwan.utils.feature_template import find_template_values
 
 from .aaa import AAATemplateConverter
+from .banner import BannerTemplateConverter
 from .base import FeatureTemplateConverter
+from .basic import SystemToBasicTemplateConverter
 from .bfd import BFDTemplateConverter
+from .global_ import GlobalTemplateConverter
 from .logging_ import LoggingTemplateConverter
 from .normalizer import template_definition_normalization
+from .ntp import NTPTemplateConverter
+from .omp import OMPTemplateConverter
+from .security import SecurityTemplateConverter
 
 logger = logging.getLogger(__name__)
 
-supported_parcel_converters: Dict[Any, FeatureTemplateConverter] = {
-    ("cisco_aaa", "cedge_aaa"): AAATemplateConverter,  # type: ignore[dict-item]
-    ("cisco_bfd",): BFDTemplateConverter,  # type: ignore[dict-item]
-    ("cisco_logging", "logging"): LoggingTemplateConverter,
+available_converters = [
+    AAATemplateConverter,
+    BannerTemplateConverter,
+    SecurityTemplateConverter,
+    SystemToBasicTemplateConverter,
+    BFDTemplateConverter,
+    GlobalTemplateConverter,
+    LoggingTemplateConverter,
+    OMPTemplateConverter,
+    NTPTemplateConverter,
+]
+
+
+supported_parcel_converters: Dict[Any, Any] = {
+    converter.supported_template_types: converter for converter in available_converters  # type: ignore
 }
 
 

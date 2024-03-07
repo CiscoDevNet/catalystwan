@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ipaddress import IPv6Address
+from ipaddress import IPv4Address, IPv6Address
 from typing import List, Literal, Optional, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
@@ -13,21 +13,23 @@ class ServerItem(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    name: Union[Variable, Global[IPv6Address]] = Field(..., description="Set hostname or IP address of server")
+    name: Union[Variable, Global[str], Global[IPv6Address], Global[IPv4Address]] = Field(
+        ..., description="Set hostname or IP address of server"
+    )
     key: Optional[Union[Variable, Global[int], Default[None]]] = Field(
         None, description="Set authentication key for the server"
     )
     vpn: Union[Variable, Global[int], Default[int]] = Field(
         default=as_default(0), description="Set VPN in which NTP server is located"
     )
-    version: Union[Variable, Global[int], Default[int]] = Field(..., description="Set NTP version")
+    version: Union[Variable, Global[int], Default[int]] = Field(default=as_default(4), description="Set NTP version")
     source_interface: Optional[Union[Variable, Global[str], Default[None]]] = Field(
         None,
         serialization_alias="sourceInterface",
         validation_alias="sourceInterface",
         description="Set interface to use to reach NTP server",
     )
-    prefer: Union[Variable, Global[bool], Default[Literal[False]]] = Field(
+    prefer: Union[Variable, Global[bool], Default[bool]] = Field(
         default=as_default(False), description="Variable this NTP server"
     )
 

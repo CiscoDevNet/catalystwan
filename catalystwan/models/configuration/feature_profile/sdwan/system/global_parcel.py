@@ -57,7 +57,7 @@ class ServicesIp(BaseModel):
         serialization_alias="servicesGlobalServicesIpLldp",
         validation_alias="servicesGlobalServicesIpLldp",
     )
-    source_intrf: Union[Variable, Global[bool], Default[None]] = Field(
+    source_intrf: Union[Variable, Global[str], Default[None]] = Field(
         default=Default[None](value=None),
         serialization_alias="servicesGlobalServicesIpSourceIntrf",
         validation_alias="servicesGlobalServicesIpSourceIntrf",
