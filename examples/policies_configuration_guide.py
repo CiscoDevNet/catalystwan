@@ -1,5 +1,3 @@
-# Copyright 2024 Cisco Systems, Inc. and its affiliates
-
 """
 This example demonstrates usage of PolicyAPI in catalystwan
 Code below provides same results as obtained after executing workflow manually via WEB-UI according to:
@@ -22,7 +20,7 @@ python examples/policies_configuration_guide.py 127.0.0.1 433 admin p4s$w0rD
 import logging
 import sys
 from dataclasses import dataclass
-from ipaddress import IPv4Address, IPv4Network, IPv6Network
+from ipaddress import IPv4Address, IPv4Network, IPv6Interface
 from typing import List, Optional, Sequence
 from uuid import UUID
 
@@ -48,12 +46,12 @@ from catalystwan.models.policy import (
     PrefixList,
     RegionList,
     SiteList,
-    SLAClassList,
     TLOCList,
     TrafficDataPolicy,
     VPNList,
     VPNMembershipPolicy,
 )
+from catalystwan.models.policy.lists import SLAClassList
 
 logger = logging.getLogger(__name__)
 
@@ -129,8 +127,8 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[ConfigItem]:
     configured_items.append(ConfigItem(DataPrefixList, data_prefix_list.name, data_prefix_list_id))
 
     data_ipv6_prefix_list = DataIPv6PrefixList(name="MyDataIPv6Prefixes")
-    data_ipv6_prefix_list.add_prefix(IPv6Network("2001:db8::1000/124"))
-    data_ipv6_prefix_list.add_prefix(IPv6Network("2001:db9::1000/124"))
+    data_ipv6_prefix_list.add_prefix(IPv6Interface("2001:db8::1000/124"))
+    data_ipv6_prefix_list.add_prefix(IPv6Interface("2001:db9::1000/124"))
     data_ipv6_prefix_list_id = api.lists.create(data_ipv6_prefix_list)
     configured_items.append(ConfigItem(DataIPv6PrefixList, data_ipv6_prefix_list.name, data_ipv6_prefix_list_id))
 
@@ -186,7 +184,7 @@ def configure_groups_of_interest(api: PolicyAPI) -> List[ConfigItem]:
     configured_items.append(ConfigItem(ClassMapList, class_map.name, class_map_id))
 
     app_probe_class = AppProbeClassList(name="MyAppProbeClass")
-    app_probe_class.assign_forwarding_class("MyClassMap").add_color_mapping("3g", 5)
+    app_probe_class.assign_forwarding_class("MyClassMap").add_color_mapping("green", 5)
     app_probe_class_id = api.lists.create(app_probe_class)
     configured_items.append(ConfigItem(AppProbeClassList, app_probe_class.name, app_probe_class_id))
 
@@ -367,7 +365,7 @@ def create_traffic_data_policy(api: PolicyAPI, items: List[ConfigItem]) -> Confi
     seq_2.match_dns_response()
     seq_2.match_low_plp()
     seq_2.match_secondary_destination_region()
-    seq_2.match_source_data_prefix_list(find_id(items, "MyDataPrefixes"))
+    seq_2.match_source_data_prefix_list([find_id(items, "MyDataPrefixes")])
     seq_2.match_traffic_to_core()
     seq_2.match_destination_data_prefix_list(find_id(items, "MyDataPrefixes"))
     seq_2.associate_loss_correction_packet_duplication_action()

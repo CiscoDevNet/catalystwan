@@ -1,6 +1,6 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
-from typing import List
+from typing import List, Literal
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
@@ -13,6 +13,7 @@ class ProtocolListEntry(BaseModel):
 
 
 class ProtocolListParcel(_ParcelBase):
+    type_: Literal["security-protocolname"] = Field(default="security-protocolname", exclude=True)
     entries: List[ProtocolListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_protocol(self, protocol: str):

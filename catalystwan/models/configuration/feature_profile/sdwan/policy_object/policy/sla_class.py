@@ -115,6 +115,7 @@ class SLAClassListEntry(BaseModel):
 
 
 class SLAClassParcel(_ParcelBase):
+    type_: Literal["sla-class"] = Field(default="sla-class", exclude=True)
     entries: List[SLAClassListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_entry(

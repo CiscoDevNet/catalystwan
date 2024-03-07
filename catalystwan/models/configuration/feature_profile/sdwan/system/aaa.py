@@ -1,7 +1,7 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
 from ipaddress import IPv4Address, IPv6Address
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
@@ -29,7 +29,8 @@ class PubkeyChainItem(BaseModel):
 
 
 class UserItem(BaseModel):
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     name: Union[Global[str], Variable] = Field(description="Set the username")
     password: Union[Global[str], Variable] = Field(
@@ -112,7 +113,8 @@ class RadiusServerItem(BaseModel):
 
 
 class Radius(BaseModel):
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
     group_name: Global[str] = Field(
         validation_alias="groupName", serialization_alias="groupName", description="Set Radius server Group Name"
     )
@@ -260,7 +262,8 @@ class AuthorizationRuleItem(BaseModel):
     )
 
 
-class AAA(_ParcelBase):
+class AAAParcel(_ParcelBase):
+    type_: Literal["aaa"] = Field(default="aaa", exclude=True)
     authentication_group: Union[Variable, Global[bool], Default[bool]] = Field(
         default=as_default(False),
         validation_alias=AliasPath("data", "authenticationGroup"),
@@ -278,7 +281,9 @@ class AAA(_ParcelBase):
         max_length=4,
         description="ServerGroups priority order",
     )
-    user: Optional[List[UserItem]] = Field(default=None, description="Create local login account", min_length=1)
+    user: Optional[List[UserItem]] = Field(
+        default=None, validation_alias=AliasPath("data", "user"), description="Create local login account", min_length=1
+    )
     radius: Optional[List[Radius]] = Field(
         default=None, validation_alias=AliasPath("data", "radius"), description="Configure the Radius serverGroup"
     )

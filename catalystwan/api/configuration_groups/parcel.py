@@ -3,13 +3,25 @@
 from enum import Enum
 from typing import Any, Dict, Generic, Literal, Optional, TypeVar, get_origin
 
-from pydantic import AliasPath, BaseModel, ConfigDict, Field, PrivateAttr, model_serializer
+from pydantic import (
+    AliasPath,
+    BaseModel,
+    ConfigDict,
+    Field,
+    PrivateAttr,
+    SerializerFunctionWrapHandler,
+    model_serializer,
+)
+
+from catalystwan.exceptions import CatalystwanException
 
 T = TypeVar("T")
 
 
 class _ParcelBase(BaseModel):
-    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(
+        extra="allow", arbitrary_types_allowed=True, populate_by_name=True, json_schema_mode_override="validation"
+    )
     parcel_name: str = Field(
         min_length=1,
         max_length=128,
@@ -23,11 +35,18 @@ class _ParcelBase(BaseModel):
         validation_alias="description",
         description="Set the parcel description",
     )
-    data: Optional[Any] = None
     _parcel_data_key: str = PrivateAttr(default="data")
 
     @model_serializer(mode="wrap")
-    def envelope_parcel_data(self, handler) -> Dict[str, Any]:
+    def envelope_parcel_data(self, handler: SerializerFunctionWrapHandler) -> Dict[str, Any]:
+        """
+        serializes model fields with respect to field validation_alias,
+        sub-classing parcel fields can be defined like following:
+        >>> entries: List[SecurityZoneListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
+
+        "data" is default _parcel_data_key which must match validation_alias prefix,
+        this attribute can be overriden in sub-class when needed
+        """
         model_dict = handler(self)
         model_dict[self._parcel_data_key] = {}
         remove_keys = []
@@ -43,6 +62,13 @@ class _ParcelBase(BaseModel):
             del model_dict[key]
         return model_dict
 
+    @classmethod
+    def _get_parcel_type(cls) -> str:
+        field_info = cls.model_fields.get("type_")
+        if field_info is not None:
+            return str(field_info.default)
+        raise CatalystwanException("Field parcel type is not set.")
+
 
 class OptionType(str, Enum):
     GLOBAL = "global"
@@ -51,7 +77,7 @@ class OptionType(str, Enum):
 
 
 class ParcelAttribute(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
     option_type: OptionType = Field(serialization_alias="optionType", validation_alias="optionType")
 
 

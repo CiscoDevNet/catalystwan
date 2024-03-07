@@ -1,11 +1,15 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
-from typing import List
+from typing import List, Literal
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field, field_validator
 
 from catalystwan.api.configuration_groups.parcel import Global, _ParcelBase, as_global
-from catalystwan.models.policy.lists_entries import PolicerExceedAction
+
+PolicerExceedAction = Literal[
+    "drop",
+    "remark",
+]
 
 
 class PolicierEntry(BaseModel):
@@ -28,6 +32,7 @@ class PolicierEntry(BaseModel):
 
 
 class PolicierParcel(_ParcelBase):
+    type_: Literal["policer"] = Field(default="policer", exclude=True)
     entries: List[PolicierEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_entry(self, burst: int, exceed: PolicerExceedAction, rate: int):
