@@ -10,7 +10,29 @@ from catalystwan.utils.config_migration.creators.config_group import ConfigGroup
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_TEMPLATE_TYPES = ["cedge_aaa"]
+SUPPORTED_TEMPLATE_TYPES = [
+    "cisco_aaa",
+    "cedge_aaa",
+    "aaa",
+    "cisco_banner",
+    "cisco_security",
+    "security",
+    "security-vsmart",
+    "security-vedge",
+    "cisco_system",
+    "system-vsmart",
+    "system-vedge",
+    "cisco_bfd",
+    "bfd-vedge",
+    "cedge_global",
+    "cisco_logging",
+    "logging",
+    "cisco_omp",
+    "omp-vedge",
+    "omp-vsmart",
+    "cisco_ntp",
+    "ntp",
+]
 
 
 def log_progress(task: str, completed: int, total: int) -> None:

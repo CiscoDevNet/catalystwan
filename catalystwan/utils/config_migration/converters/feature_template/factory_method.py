@@ -76,7 +76,6 @@ def create_parcel_from_template(template: FeatureTemplateInformation) -> AnySyst
     converter = choose_parcel_converter(template.template_type)
     template_definition_as_dict = json.loads(cast(str, template.template_definiton))
     template_values = find_template_values(template_definition_as_dict)
-    print(template_values)
     template_values_normalized = template_definition_normalization(template_values)
     logger.debug(f"Normalized template {template.name}: {template_values_normalized}")
     return converter.create_parcel(template.name, template.description, template_values_normalized)

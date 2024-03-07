@@ -12,9 +12,4 @@ class GlobalTemplateConverter:
         Returns:
             GlobalParcel: A GlobalParcel object with the provided template values.
         """
-        parcel_values = {
-            "parcel_name": name,
-            "parcel_description": description,
-            "services_global": {"services_ip": {key: value for key, value in template_values.items()}},
-        }
-        return GlobalParcel(**parcel_values)  # type: ignore
+        return GlobalParcel(parcel_name=name, parcel_description=description, **template_values)  # type: ignore

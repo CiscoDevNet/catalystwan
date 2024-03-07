@@ -12,4 +12,16 @@ class NTPTemplateConverter:
         Returns:
             Logging: An Logging object with the provided template values.
         """
-        return NTPParcel(parcel_name=name, parcel_description=description, **template_values)
+        parcel_values = {
+            "parcel_name": name,
+            "parcel_description": description,
+            "server": template_values.get("server", []),
+        }
+
+        if keys := template_values.get("keys", {}):
+            parcel_values["authentication"] = {
+                "authentication_keys": keys.get("authentication_keys", []),
+                "trusted_keys": keys.get("trusted", None),
+            }
+
+        return NTPParcel(**parcel_values)
