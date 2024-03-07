@@ -1,3 +1,5 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 import ipaddress
 from enum import Enum
 from pathlib import Path
@@ -5,8 +7,8 @@ from typing import ClassVar, List, Optional
 
 from pydantic import ConfigDict, Field
 
-from catalystwan.api.templates.feature_template import FeatureTemplate
-from catalystwan.utils.pydantic_validators import ConvertBoolToStringModel, ConvertIPToStringModel
+from catalystwan.api.templates.bool_str import BoolStr
+from catalystwan.api.templates.feature_template import FeatureTemplate, FeatureTemplateValidator
 
 DEFAULT_STATIC_NAT64_SOURCE_VPN_ID = 0
 DEFAULT_STATIC_NAT_SOURCE_VPN_ID = 0
@@ -20,11 +22,11 @@ DEFAULT_IPV6_VRRP_PRIORITY = 100
 DEFAULT_IPV6_VRRP_TIMER = 1000
 
 
-class SecondaryIPv4Address(ConvertBoolToStringModel, ConvertIPToStringModel):
+class SecondaryIPv4Address(FeatureTemplateValidator):
     address: Optional[ipaddress.IPv4Interface] = None
 
 
-class SecondaryIPv6Address(ConvertBoolToStringModel, ConvertIPToStringModel):
+class SecondaryIPv6Address(FeatureTemplateValidator):
     address: Optional[ipaddress.IPv6Interface] = None
 
 
@@ -33,13 +35,13 @@ class Direction(str, Enum):
     OUT = "out"
 
 
-class AccessList(ConvertBoolToStringModel):
+class AccessList(FeatureTemplateValidator):
     direction: Direction
     acl_name: str = Field(json_schema_extra={"vmanage_key": "acl-name"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class DhcpHelperV6(ConvertBoolToStringModel, ConvertIPToStringModel):
+class DhcpHelperV6(FeatureTemplateValidator):
     address: ipaddress.IPv6Address
     vpn: Optional[int] = None
 
@@ -50,7 +52,7 @@ class NatChoice(str, Enum):
     LOOPBACK = "Loopback"
 
 
-class StaticNat66(ConvertBoolToStringModel, ConvertIPToStringModel):
+class StaticNat66(FeatureTemplateValidator):
     source_prefix: ipaddress.IPv6Interface = Field(json_schema_extra={"vmanage_key": "source-prefix"})
     translated_source_prefix: str = Field(json_schema_extra={"vmanage_key": "translated-source-prefix"})
     source_vpn_id: int = Field(DEFAULT_STATIC_NAT64_SOURCE_VPN_ID, json_schema_extra={"vmanage_key": "source-vpn-id"})
@@ -62,7 +64,7 @@ class StaticNatDirection(str, Enum):
     OUTSIDE = "outside"
 
 
-class Static(ConvertBoolToStringModel, ConvertIPToStringModel):
+class Static(FeatureTemplateValidator):
     source_ip: ipaddress.IPv4Address = Field(json_schema_extra={"vmanage_key": "source-ip"})
     translate_ip: ipaddress.IPv4Address = Field(json_schema_extra={"vmanage_key": "translate-ip"})
     static_nat_direction: StaticNatDirection = Field(
@@ -77,7 +79,7 @@ class Proto(str, Enum):
     UDP = "udp"
 
 
-class StaticPortForward(ConvertBoolToStringModel, ConvertIPToStringModel):
+class StaticPortForward(FeatureTemplateValidator):
     source_ip: ipaddress.IPv4Address = Field(json_schema_extra={"vmanage_key": "source-ip"})
     translate_ip: ipaddress.IPv4Address = Field(json_schema_extra={"vmanage_key": "translate-ip"})
     static_nat_direction: StaticNatDirection = Field(
@@ -108,7 +110,7 @@ class Encap(str, Enum):
     IPSEC = "ipsec"
 
 
-class Encapsulation(ConvertBoolToStringModel):
+class Encapsulation(FeatureTemplateValidator):
     encap: Encap
     preference: Optional[int] = None
     weight: int = DEFAULT_ENCAPSULATION_WEIGHT
@@ -176,12 +178,12 @@ class Duplex(str, Enum):
     AUTO = "auto"
 
 
-class Ip(ConvertBoolToStringModel, ConvertIPToStringModel):
+class Ip(FeatureTemplateValidator):
     addr: ipaddress.IPv4Address
     mac: str
 
 
-class Ipv4Secondary(ConvertBoolToStringModel, ConvertIPToStringModel):
+class Ipv4Secondary(FeatureTemplateValidator):
     address: ipaddress.IPv4Address
 
 
@@ -190,18 +192,18 @@ class TrackAction(str, Enum):
     SHUTDOWN = "Shutdown"
 
 
-class TrackingObject(ConvertBoolToStringModel):
+class TrackingObject(FeatureTemplateValidator):
     name: int
     track_action: TrackAction = Field(TrackAction.DECREMENT, json_schema_extra={"vmanage_key": "track-action"})
     decrement: int
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Vrrp(ConvertBoolToStringModel, ConvertIPToStringModel):
+class Vrrp(FeatureTemplateValidator):
     grp_id: int = Field(json_schema_extra={"vmanage_key": "grp-id"})
     priority: int = DEFAULT_VRRP_PRIORITY
     timer: int = DEFAULT_VRRP_TIMER
-    track_omp: bool = Field(False, json_schema_extra={"vmanage_key": "track-omp"})
+    track_omp: BoolStr = Field(default=False, json_schema_extra={"vmanage_key": "track-omp"})
     track_prefix_list: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "track-prefix-list"})
     address: Optional[ipaddress.IPv4Address] = Field(
         default=None, json_schema_extra={"data_path": ["ipv4"], "vmanage_key": "address"}
@@ -209,7 +211,7 @@ class Vrrp(ConvertBoolToStringModel, ConvertIPToStringModel):
     ipv4_secondary: Optional[List[Ipv4Secondary]] = Field(
         default=None, json_schema_extra={"vmanage_key": "ipv4-secondary"}
     )
-    tloc_change_pref: bool = Field(False, json_schema_extra={"vmanage_key": "tloc-change-pref"})
+    tloc_change_pref: BoolStr = Field(default=False, json_schema_extra={"vmanage_key": "tloc-change-pref"})
     value: int
     tracking_object: Optional[List[TrackingObject]] = Field(
         default=None, json_schema_extra={"vmanage_key": "tracking-object"}
@@ -217,38 +219,42 @@ class Vrrp(ConvertBoolToStringModel, ConvertIPToStringModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Ipv6(ConvertBoolToStringModel, ConvertIPToStringModel):
+class Ipv6(FeatureTemplateValidator):
     ipv6_link_local: ipaddress.IPv6Address = Field(json_schema_extra={"vmanage_key": "ipv6-link-local"})
     prefix: Optional[ipaddress.IPv6Interface] = None
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Ipv6Vrrp(ConvertBoolToStringModel):
+class Ipv6Vrrp(FeatureTemplateValidator):
     grp_id: int = Field(json_schema_extra={"vmanage_key": "grp-id"})
     priority: int = DEFAULT_IPV6_VRRP_PRIORITY
     timer: int = DEFAULT_IPV6_VRRP_TIMER
-    track_omp: bool = Field(False, json_schema_extra={"vmanage_key": "track-omp"})
+    track_omp: BoolStr = Field(default=False, json_schema_extra={"vmanage_key": "track-omp"})
     track_prefix_list: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "track-prefix-list"})
     ipv6: Optional[List[Ipv6]] = None
     model_config = ConfigDict(populate_by_name=True)
 
 
-class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel, ConvertIPToStringModel):
+class CiscoVpnInterfaceModel(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    if_name: str = Field(json_schema_extra={"vmanage_key": "if-name"})
+    if_name: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "if-name"})
     interface_description: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "description"})
-    poe: Optional[bool] = None
+    poe: Optional[BoolStr] = None
     ipv4_address: Optional[str] = Field(default=None, json_schema_extra={"data_path": ["ip"], "vmanage_key": "address"})
     secondary_ipv4_address: Optional[List[SecondaryIPv4Address]] = Field(
         default=None, json_schema_extra={"data_path": ["ip"], "vmanage_key": "secondary-address"}
     )
-    dhcp_ipv4_client: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "dhcp-client"})
+    dhcp_ipv4_client: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"data_path": ["ip"], "vmanage_key": "dhcp-client"}
+    )
     dhcp_distance: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "dhcp-distance"})
     ipv6_address: Optional[ipaddress.IPv6Interface] = Field(
         default=None, json_schema_extra={"data_path": ["ipv6"], "vmanage_key": "address"}
     )
-    dhcp_ipv6_client: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "dhcp-client"})
+    dhcp_ipv6_client: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"data_path": ["ipv6"], "vmanage_key": "dhcp-client"}
+    )
     secondary_ipv6_address: Optional[List[SecondaryIPv6Address]] = Field(
         default=None, json_schema_extra={"data_path": ["ipv6"], "vmanage_key": "secondary-address"}
     )
@@ -260,13 +266,13 @@ class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel, ConvertI
         default=None, json_schema_extra={"vmanage_key": "dhcp-helper-v6"}
     )
     tracker: Optional[List[str]] = None
-    auto_bandwidth_detect: Optional[bool] = Field(
+    auto_bandwidth_detect: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "auto-bandwidth-detect"}
     )
     iperf_server: Optional[ipaddress.IPv4Address] = Field(
         default=None, json_schema_extra={"vmanage_key": "iperf-server"}
     )
-    nat: Optional[bool] = None
+    nat: Optional[BoolStr] = None
     nat_choice: Optional[NatChoice] = Field(default=None, json_schema_extra={"vmanage_key": "nat-choice"})
     udp_timeout: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "udp-timeout"})
     tcp_timeout: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "tcp-timeout"})
@@ -274,12 +280,12 @@ class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel, ConvertI
         default=None, json_schema_extra={"vmanage_key": "range-start"}
     )
     nat_range_end: Optional[ipaddress.IPv4Address] = Field(default=None, json_schema_extra={"vmanage_key": "range-end"})
-    overload: Optional[bool] = None
+    overload: Optional[BoolStr] = None
     loopback_interface: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "loopback-interface"})
     prefix_length: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "prefix-length"})
-    enable: Optional[bool] = None
-    nat64: Optional[bool] = None
-    nat66: Optional[bool] = None
+    enable: Optional[BoolStr] = None
+    nat64: Optional[BoolStr] = None
+    nat66: Optional[BoolStr] = None
     static_nat66: Optional[List[StaticNat66]] = Field(default=None, json_schema_extra={"vmanage_key": "static-nat66"})
     static: Optional[List[Static]] = Field(
         default=None, json_schema_extra={"data_path": ["nat"], "vmanage_key": "static"}
@@ -287,7 +293,7 @@ class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel, ConvertI
     static_port_forward: Optional[List[StaticPortForward]] = Field(
         default=None, json_schema_extra={"vmanage_key": "static-port-forward"}
     )
-    enable_core_region: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "enable-core-region"})
+    enable_core_region: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "enable-core-region"})
     core_region: Optional[CoreRegion] = Field(default=None, json_schema_extra={"vmanage_key": "core-region"})
     secondary_region: Optional[SecondaryRegion] = Field(
         default=None, json_schema_extra={"vmanage_key": "secondary-region"}
@@ -295,9 +301,9 @@ class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel, ConvertI
     tloc_encapsulation: Optional[List[Encapsulation]] = Field(
         default=None, json_schema_extra={"vmanage_key": "encapsulation", "data_path": ["tunnel-interface"]}
     )
-    border: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface"]})
-    per_tunnel_qos: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "per-tunnel-qos"})
-    per_tunnel_qos_aggregator: Optional[bool] = Field(
+    border: Optional[BoolStr] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface"]})
+    per_tunnel_qos: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "per-tunnel-qos"})
+    per_tunnel_qos_aggregator: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "per-tunnel-qos-aggregator"}
     )
     mode: Optional[Mode] = None
@@ -307,10 +313,10 @@ class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel, ConvertI
     max_control_connections: Optional[int] = Field(
         default=None, json_schema_extra={"vmanage_key": "max-control-connections", "data_path": ["tunnel-interface"]}
     )
-    control_connections: Optional[bool] = Field(
+    control_connections: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "control-connections", "data_path": ["tunnel-interface"]}
     )
-    vbond_as_stun_server: Optional[bool] = Field(
+    vbond_as_stun_server: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "vbond-as-stun-server", "data_path": ["tunnel-interface"]}
     )
     exclude_controller_group_list: Optional[List[int]] = Field(
@@ -321,10 +327,10 @@ class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel, ConvertI
         default=None,
         json_schema_extra={"vmanage_key": "vmanage-connection-preference", "data_path": ["tunnel-interface"]},
     )
-    port_hop: Optional[bool] = Field(
+    port_hop: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "port-hop", "data_path": ["tunnel-interface"]}
     )
-    restrict: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "color"]})
+    restrict: Optional[BoolStr] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "color"]})
     dst_ip: Optional[ipaddress.IPv4Address] = Field(
         default=None,
         json_schema_extra={"vmanage_key": "dst-ip", "data_path": ["tunnel-interface", "tloc-extension-gre-to"]},
@@ -340,38 +346,52 @@ class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel, ConvertI
         default=None, json_schema_extra={"vmanage_key": "hello-tolerance", "data_path": ["tunnel-interface"]}
     )
     bind: Optional[str] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface"]})
-    last_resort_circuit: Optional[bool] = Field(
+    last_resort_circuit: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "last-resort-circuit", "data_path": ["tunnel-interface"]}
     )
-    low_bandwidth_link: Optional[bool] = Field(
+    low_bandwidth_link: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "low-bandwidth-link", "data_path": ["tunnel-interface"]}
     )
     tunnel_tcp_mss_adjust: Optional[int] = Field(
         default=None, json_schema_extra={"vmanage_key": "tunnel-tcp-mss-adjust", "data_path": ["tunnel-interface"]}
     )
-    clear_dont_fragment: Optional[bool] = Field(
+    clear_dont_fragment: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "clear-dont-fragment", "data_path": ["tunnel-interface"]}
     )
-    propagate_sgt: Optional[bool] = Field(
+    propagate_sgt: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"data_path": ["tunnel-interface"], "vmanage_key": "propagate-sgt"}
     )
-    network_broadcast: Optional[bool] = Field(
+    network_broadcast: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "network-broadcast", "data_path": ["tunnel-interface"]}
     )
-    all: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
-    bgp: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
-    dhcp: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
-    dns: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
-    icmp: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
-    sshd: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
-    netconf: Optional[bool] = Field(
+    all: Optional[BoolStr] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
+    bgp: Optional[BoolStr] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
+    dhcp: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]}
     )
-    ntp: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
-    ospf: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
-    stun: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
-    snmp: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
-    https: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
+    dns: Optional[BoolStr] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
+    icmp: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]}
+    )
+    sshd: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]}
+    )
+    netconf: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]}
+    )
+    ntp: Optional[BoolStr] = Field(default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]})
+    ospf: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]}
+    )
+    stun: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]}
+    )
+    snmp: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]}
+    )
+    https: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"data_path": ["tunnel-interface", "allow-service"]}
+    )
     media_type: Optional[MediaType] = Field(default=None, json_schema_extra={"vmanage_key": "media-type"})
     intrf_mtu: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "intrf-mtu"})
     mtu: Optional[int] = None
@@ -385,16 +405,16 @@ class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel, ConvertI
     mac_address: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "mac-address"})
     speed: Optional[Speed] = None
     duplex: Optional[Duplex] = None
-    shutdown: Optional[bool] = False
+    shutdown: Optional[BoolStr] = False
     arp_timeout: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "arp-timeout"})
-    autonegotiate: Optional[bool] = None
-    ip_directed_broadcast: Optional[bool] = Field(
+    autonegotiate: Optional[BoolStr] = None
+    ip_directed_broadcast: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "ip-directed-broadcast"}
     )
-    icmp_redirect_disable: Optional[bool] = Field(
+    icmp_redirect_disable: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"vmanage_key": "icmp-redirect-disable"}
     )
-    qos_adaptive: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "qos-adaptive"})
+    qos_adaptive: Optional[BoolStr] = Field(default=None, json_schema_extra={"vmanage_key": "qos-adaptive"})
     period: Optional[int] = Field(default=None, json_schema_extra={"data_path": ["qos-adaptive"]})
     bandwidth_down: Optional[int] = Field(
         default=None, json_schema_extra={"vmanage_key": "bandwidth-down", "data_path": ["qos-adaptive", "downstream"]}
@@ -412,7 +432,9 @@ class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel, ConvertI
     service_provider: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "service-provider"})
     bandwidth_upstream: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "bandwidth-upstream"})
     bandwidth_downstream: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "bandwidth-downstream"})
-    block_non_source_ip: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "block-non-source-ip"})
+    block_non_source_ip: Optional[BoolStr] = Field(
+        default=None, json_schema_extra={"vmanage_key": "block-non-source-ip"}
+    )
     rule_name: Optional[str] = Field(
         default=None, json_schema_extra={"vmanage_key": "rule-name", "data_path": ["rewrite-rule"]}
     )
@@ -422,17 +444,17 @@ class CiscoVpnInterfaceModel(FeatureTemplate, ConvertBoolToStringModel, ConvertI
     ip: Optional[List[Ip]] = Field(default=None, json_schema_extra={"data_path": ["arp"]})
     vrrp: Optional[List[Vrrp]] = Field(default=None, json_schema_extra={"vmanage_key": "vrrp"})
     ipv6_vrrp: Optional[List[Ipv6Vrrp]] = Field(default=None, json_schema_extra={"vmanage_key": "ipv6-vrrp"})
-    enable_sgt_propagation: Optional[bool] = Field(
+    enable_sgt_propagation: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"data_path": ["trustsec", "propagate"], "vmanage_key": "sgt"}
     )
     security_group_tag: Optional[int] = Field(
         default=None, json_schema_extra={"data_path": ["trustsec", "static"], "vmanage_key": "sgt"}
     )
-    trusted: Optional[bool] = Field(default=None, json_schema_extra={"data_path": ["trustsec", "static"]})
-    enable_sgt_authorization_and_forwarding: Optional[bool] = Field(
+    trusted: Optional[BoolStr] = Field(default=None, json_schema_extra={"data_path": ["trustsec", "static"]})
+    enable_sgt_authorization_and_forwarding: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"data_path": ["trustsec"], "vmanage_key": "enable"}
     )
-    enable_sgt_enforcement: Optional[bool] = Field(
+    enable_sgt_enforcement: Optional[BoolStr] = Field(
         default=None, json_schema_extra={"data_path": ["trustsec", "enforcement"], "vmanage_key": "enable"}
     )
     enforcement_sgt: Optional[int] = Field(

@@ -1,3 +1,5 @@
+# Copyright 2022 Cisco Systems, Inc. and its affiliates
+
 import logging
 import logging.config
 import multiprocessing
@@ -10,6 +12,8 @@ from traceback import FrameSummary, StackSummary, extract_stack
 from typing import Callable, Final, List, Optional
 
 import urllib3
+
+USER_AGENT = f"{__package__}/{metadata.version(__package__)}"
 
 
 def with_proc_info_header(method: Callable[..., str]) -> Callable[..., str]:

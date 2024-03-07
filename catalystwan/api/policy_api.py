@@ -1,3 +1,5 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Type, overload
@@ -122,13 +124,13 @@ from catalystwan.endpoints.configuration.policy.list.region import Configuration
 from catalystwan.endpoints.configuration.policy.list.site import ConfigurationPolicySiteList, SiteListInfo
 from catalystwan.endpoints.configuration.policy.list.sla import ConfigurationPolicySLAClassList, SLAClassListInfo
 from catalystwan.endpoints.configuration.policy.list.tloc import ConfigurationPolicyTLOCList, TLOCListInfo
-from catalystwan.endpoints.configuration.policy.list.url_black_list import (
-    ConfigurationPolicyURLBlackList,
-    URLBlackListInfo,
+from catalystwan.endpoints.configuration.policy.list.url_allow_list import (
+    ConfigurationPolicyURLAllowList,
+    URLAllowListInfo,
 )
-from catalystwan.endpoints.configuration.policy.list.url_white_list import (
-    ConfigurationPolicyURLWhiteList,
-    URLWhiteListInfo,
+from catalystwan.endpoints.configuration.policy.list.url_block_list import (
+    ConfigurationPolicyURLBlockList,
+    URLBlockListInfo,
 )
 from catalystwan.endpoints.configuration.policy.list.vpn import ConfigurationPolicyVPNList, VPNListInfo
 from catalystwan.endpoints.configuration.policy.list.zone import ConfigurationPolicyZoneList, ZoneListInfo
@@ -181,8 +183,8 @@ from catalystwan.models.policy.lists import (
     SiteList,
     SLAClassList,
     TLOCList,
-    URLBlackList,
-    URLWhiteList,
+    URLAllowList,
+    URLBlockList,
     VPNList,
     ZoneList,
 )
@@ -238,8 +240,8 @@ POLICY_LIST_ENDPOINTS_MAP: Mapping[type, type] = {
     SiteList: ConfigurationPolicySiteList,
     SLAClassList: ConfigurationPolicySLAClassList,
     TLOCList: ConfigurationPolicyTLOCList,
-    URLBlackList: ConfigurationPolicyURLBlackList,
-    URLWhiteList: ConfigurationPolicyURLWhiteList,
+    URLBlockList: ConfigurationPolicyURLBlockList,
+    URLAllowList: ConfigurationPolicyURLAllowList,
     VPNList: ConfigurationPolicyVPNList,
     ZoneList: ConfigurationPolicyZoneList,
 }
@@ -498,11 +500,11 @@ class PolicyListsAPI:
         ...
 
     @overload
-    def get(self, type: Type[URLBlackList]) -> DataSequence[URLBlackListInfo]:
+    def get(self, type: Type[URLBlockList]) -> DataSequence[URLBlockListInfo]:
         ...
 
     @overload
-    def get(self, type: Type[URLWhiteList]) -> DataSequence[URLWhiteListInfo]:
+    def get(self, type: Type[URLAllowList]) -> DataSequence[URLAllowListInfo]:
         ...
 
     @overload
@@ -616,11 +618,11 @@ class PolicyListsAPI:
         ...
 
     @overload
-    def get(self, type: Type[URLBlackList], id: UUID) -> URLBlackListInfo:
+    def get(self, type: Type[URLBlockList], id: UUID) -> URLBlockListInfo:
         ...
 
     @overload
-    def get(self, type: Type[URLWhiteList], id: UUID) -> URLWhiteListInfo:
+    def get(self, type: Type[URLAllowList], id: UUID) -> URLAllowListInfo:
         ...
 
     @overload

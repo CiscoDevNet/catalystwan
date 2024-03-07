@@ -1,3 +1,5 @@
+# Copyright 2022 Cisco Systems, Inc. and its affiliates
+
 import logging
 from typing import Optional
 from urllib.parse import urljoin
@@ -7,7 +9,7 @@ from requests import PreparedRequest, Response
 from requests.auth import AuthBase
 from requests.cookies import RequestsCookieJar
 
-from catalystwan import with_proc_info_header
+from catalystwan import USER_AGENT, with_proc_info_header
 from catalystwan.exceptions import CatalystwanException
 
 
@@ -83,7 +85,7 @@ class vManageAuth(AuthBase):
             "j_password": self.password,
         }
         full_url = urljoin(self.base_url, "/j_security_check")
-        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        headers = {"Content-Type": "application/x-www-form-urlencoded", "User-Agent": USER_AGENT}
         response = requests.post(
             url=full_url,
             data=security_payload,
@@ -108,7 +110,7 @@ class vManageAuth(AuthBase):
             str: Valid token.
         """
         full_url = urljoin(self.base_url, "/dataservice/client/token")
-        headers = {"Content-Type": "application/json"}
+        headers = {"Content-Type": "application/json", "User-Agent": USER_AGENT}
         response = requests.get(
             url=full_url,
             cookies=cookies,

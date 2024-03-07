@@ -1,10 +1,12 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import ConfigDict, Field, field_validator
 
-from catalystwan.api.templates.feature_template import FeatureTemplate
+from catalystwan.api.templates.feature_template import FeatureTemplate, FeatureTemplateValidator
 
 
 class Role(str, Enum):
@@ -12,19 +14,19 @@ class Role(str, Enum):
     SECONDARY = "secondary"
 
 
-class Dns(BaseModel):
-    dns_addr: str = Field(json_schema_extra={"vmanage_key": "dns-addr"})
+class Dns(FeatureTemplateValidator):
+    dns_addr: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "dns-addr"})
     role: Role = Role.PRIMARY
     model_config = ConfigDict(populate_by_name=True)
 
 
-class DnsIpv6(BaseModel):
-    dns_addr: str = Field(json_schema_extra={"vmanage_key": "dns-addr"})
+class DnsIpv6(FeatureTemplateValidator):
+    dns_addr: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "dns-addr"})
     role: Optional[Role] = Role.PRIMARY
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Host(BaseModel):
+class Host(FeatureTemplateValidator):
     hostname: str
     ip: List[str]
 
@@ -41,10 +43,10 @@ class SvcType(str, Enum):
     APPQOE = "appqoe"
 
 
-class Service(BaseModel):
+class Service(FeatureTemplateValidator):
     svc_type: SvcType = Field(json_schema_extra={"vmanage_key": "svc-type"})
-    address: List[str]
-    interface: str
+    address: Optional[List[str]] = None
+    interface: Optional[str] = None
     track_enable: bool = Field(True, json_schema_extra={"vmanage_key": "track-enable"})
     model_config = ConfigDict(populate_by_name=True)
 
@@ -58,25 +60,25 @@ class ServiceRouteService(str, Enum):
     SIG = "sig"
 
 
-class ServiceRoute(BaseModel):
+class ServiceRoute(FeatureTemplateValidator):
     prefix: str
     vpn: int
     service: ServiceRouteService = ServiceRouteService.SIG
 
 
-class NextHop(BaseModel):
-    address: str
+class NextHop(FeatureTemplateValidator):
+    address: Optional[str] = None
     distance: Optional[int] = 1
 
 
-class NextHopWithTrack(BaseModel):
-    address: str
+class NextHopWithTrack(FeatureTemplateValidator):
+    address: Optional[str] = None
     distance: Optional[int] = 1
     tracker: str
 
 
-class Routev4(BaseModel):
-    prefix: str
+class Routev4(FeatureTemplateValidator):
+    prefix: Optional[str] = None
     next_hop: Optional[List[NextHop]] = Field(
         default=None, json_schema_extra={"vmanage_key": "next-hop", "priority_order": ["address", "distance"]}
     )
@@ -90,7 +92,7 @@ class Routev4(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class NextHopv6(BaseModel):
+class NextHopv6(FeatureTemplateValidator):
     address: str
     distance: Optional[int] = 1
 
@@ -100,7 +102,7 @@ class Nat(str, Enum):
     NAT66 = "NAT66"
 
 
-class Routev6(BaseModel):
+class Routev6(FeatureTemplateValidator):
     prefix: str
     next_hop: Optional[List[NextHopv6]] = Field(default=None, json_schema_extra={"vmanage_key": "next-hop"})
     null0: Optional[bool] = None
@@ -109,13 +111,13 @@ class Routev6(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class GreRoute(BaseModel):
+class GreRoute(FeatureTemplateValidator):
     prefix: str
     vpn: int
     interface: Optional[List[str]] = None
 
 
-class IpsecRoute(BaseModel):
+class IpsecRoute(FeatureTemplateValidator):
     prefix: str
     vpn: int
     interface: Optional[List[str]] = None
@@ -143,14 +145,14 @@ class Region(str, Enum):
     ACCESS = "access"
 
 
-class PrefixList(BaseModel):
+class PrefixList(FeatureTemplateValidator):
     prefix_entry: str = Field(json_schema_extra={"vmanage_key": "prefix-entry"})
     aggregate_only: Optional[bool] = Field(default=None, json_schema_extra={"vmanage_key": "aggregate-only"})
     region: Optional[Region]
     model_config = ConfigDict(populate_by_name=True)
 
 
-class Advertise(BaseModel):
+class Advertise(FeatureTemplateValidator):
     protocol: AdvertiseProtocol
     route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
     protocol_sub_type: Optional[List[AdvertiseProtocolSubType]] = Field(
@@ -173,7 +175,7 @@ class Ipv6AdvertiseProtocolSubType(str, Enum):
     EXTERNAL = "external"
 
 
-class Ipv6Advertise(BaseModel):
+class Ipv6Advertise(FeatureTemplateValidator):
     protocol: Ipv6AdvertiseProtocol
     route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
     protocol_sub_type: Optional[List[Ipv6AdvertiseProtocolSubType]] = Field(
@@ -192,7 +194,7 @@ class LeakFromGlobalProtocol(str, Enum):
     ODR = "odr"
 
 
-class Pool(BaseModel):
+class Pool(FeatureTemplateValidator):
     name: str
     start_address: str = Field(json_schema_extra={"vmanage_key": "start-address"})
     end_address: str = Field(json_schema_extra={"vmanage_key": "end-address"})
@@ -213,11 +215,11 @@ class Overload(str, Enum):
     FALSE = "false"
 
 
-class Natpool(BaseModel):
+class Natpool(FeatureTemplateValidator):
     name: int
-    prefix_length: int = Field(json_schema_extra={"vmanage_key": "prefix-length"})
-    range_start: str = Field(json_schema_extra={"vmanage_key": "range-start"})
-    range_end: str = Field(json_schema_extra={"vmanage_key": "range-end"})
+    prefix_length: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "prefix-length"})
+    range_start: str = Field(default=None, json_schema_extra={"vmanage_key": "range-start"})
+    range_end: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "range-end"})
     overload: Overload = Overload.TRUE
     direction: Direction
     tracker_id: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "tracker-id"})
@@ -229,16 +231,16 @@ class StaticNatDirection(str, Enum):
     OUTSIDE = "outside"
 
 
-class Static(BaseModel):
-    pool_name: Optional[int] = Field(json_schema_extra={"vmanage_key": "pool-name"})
-    source_ip: str = Field(json_schema_extra={"vmanage_key": "source-ip"})
-    translate_ip: str = Field(json_schema_extra={"vmanage_key": "translate-ip"})
+class Static(FeatureTemplateValidator):
+    pool_name: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "pool-name"})
+    source_ip: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "source-ip"})
+    translate_ip: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "translate-ip"})
     static_nat_direction: StaticNatDirection = Field(json_schema_extra={"vmanage_key": "static-nat-direction"})
     tracker_id: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "tracker-id"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class SubnetStatic(BaseModel):
+class SubnetStatic(FeatureTemplateValidator):
     source_ip_subnet: str = Field(json_schema_extra={"vmanage_key": "source-ip-subnet"})
     translate_ip_subnet: str = Field(json_schema_extra={"vmanage_key": "translate-ip-subnet"})
     prefix_length: int = Field(json_schema_extra={"vmanage_key": "prefix-length"})
@@ -252,7 +254,7 @@ class Proto(str, Enum):
     UDP = "udp"
 
 
-class PortForward(BaseModel):
+class PortForward(FeatureTemplateValidator):
     pool_name: Optional[int] = Field(default=None, json_schema_extra={"vmanage_key": "pool-name"})
     source_port: int = Field(json_schema_extra={"vmanage_key": "source-port"})
     translate_port: int = Field(json_schema_extra={"vmanage_key": "translate-port"})
@@ -279,13 +281,13 @@ class RouteImportRedistributeProtocol(str, Enum):
     OSPF = "ospf"
 
 
-class RouteImportRedistribute(BaseModel):
+class RouteImportRedistribute(FeatureTemplateValidator):
     protocol: RouteImportRedistributeProtocol
     route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class RouteImport(BaseModel):
+class RouteImport(FeatureTemplateValidator):
     protocol: RouteImportProtocol
     protocol_sub_type: List[RouteImportProtocolSubType] = Field(json_schema_extra={"vmanage_key": "protocol-sub-type"})
     route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
@@ -311,13 +313,13 @@ class RouteImportFromRedistributeProtocol(str, Enum):
     OSPF = "ospf"
 
 
-class RouteImportFromRedistribute(BaseModel):
+class RouteImportFromRedistribute(FeatureTemplateValidator):
     protocol: RouteImportFromRedistributeProtocol
     route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class RouteImportFrom(BaseModel):
+class RouteImportFrom(FeatureTemplateValidator):
     source_vpn: int = Field(json_schema_extra={"vmanage_key": "source-vpn"})
     protocol: RouteImportFromProtocol
     protocol_sub_type: List[RouteImportFromProtocolSubType] = Field(
@@ -345,13 +347,13 @@ class RouteExportRedistributeProtocol(str, Enum):
     OSPF = "ospf"
 
 
-class RouteExportRedistribute(BaseModel):
+class RouteExportRedistribute(FeatureTemplateValidator):
     protocol: RouteExportRedistributeProtocol
     route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})
     model_config = ConfigDict(populate_by_name=True)
 
 
-class RouteExport(BaseModel):
+class RouteExport(FeatureTemplateValidator):
     protocol: RouteExportProtocol
     protocol_sub_type: List[RouteExportProtocolSubType] = Field(json_schema_extra={"vmanage_key": "protocol-sub-type"})
     route_policy: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "route-policy"})

@@ -1,6 +1,9 @@
+# Copyright 2022 Cisco Systems, Inc. and its affiliates
+
 import unittest
 from typing import Optional
 from unittest.mock import patch
+from uuid import uuid4
 
 import pytest  # type: ignore
 from parameterized import parameterized  # type: ignore
@@ -15,7 +18,7 @@ class TestSession(unittest.TestCase):
     def setUp(self):
         self.url = "example.com"
         self.username = "admin"
-        self.password = "admin_password"  # pragma: allowlist secret
+        self.password = str(uuid4())
 
     def test_session_str(self):
         # Arrange, Act

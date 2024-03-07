@@ -1,3 +1,5 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 from typing import Any, Optional, Union
 
 from pydantic import BaseModel
@@ -64,6 +66,8 @@ class ImageNotInRepositoryError(CatalystwanException):
 
 class EmptyVersionPayloadError(CatalystwanException):
     """Used when a version is not found in device available or current versions."""
+
+    pass
 
 
 class TemplateNotFoundError(CatalystwanException):
@@ -162,6 +166,12 @@ class TenantMigrationExportFileNotFound(CatalystwanException):
 
 class TenantMigrationPreconditionsError(CatalystwanException):
     """Raised when preconditions for tenant migration fail"""
+
+    pass
+
+
+class ManagerReadyTimeout(CatalystwanException):
+    """Raised when waiting for server ready flag took longer than expected"""
 
     pass
 

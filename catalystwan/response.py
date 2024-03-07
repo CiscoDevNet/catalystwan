@@ -1,4 +1,8 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 import re
+from datetime import datetime
+from email.utils import parsedate_to_datetime
 from functools import wraps
 from pprint import pformat
 from typing import Any, Callable, Dict, Optional, Sequence, Type, TypeVar, Union, cast
@@ -134,14 +138,25 @@ class ManagerResponse(Response, APIEndpointClientResponse):
 
     def __init__(self, response: Response):
         self.__dict__.update(response.__dict__)
-        if not self.cookies.keys():
-            self.cookies = self.__parse_set_cookie_from_headers()
+        self.jsessionid_expired = self._detect_expired_jsessionid()
         try:
             self.payload = JsonPayload(response.json())
         except JSONDecodeError:
             self.payload = JsonPayload()
 
-    def __parse_set_cookie_from_headers(self) -> RequestsCookieJar:
+    def _detect_expired_jsessionid(self) -> bool:
+        """Determines if server sent expired JSESSIONID"""
+        cookies = self._parse_set_cookie_from_headers()
+        if (expires := cookies.get("Expires")) and cookies.get("JSESSIONID"):
+            # get current server time, when not present use local time
+            # local time might be innacurate but "Expires" is usually set to year 1970
+            response_date = self.headers.get("date")
+            compare_date = parsedate_to_datetime(response_date) if response_date is not None else datetime.now()
+            if parsedate_to_datetime(expires) <= compare_date:
+                return True
+        return False
+
+    def _parse_set_cookie_from_headers(self) -> RequestsCookieJar:
         """Parses "set-cookie" content from response headers"""
         jar = RequestsCookieJar()
         cookies_string = self.headers.get("set-cookie", "")

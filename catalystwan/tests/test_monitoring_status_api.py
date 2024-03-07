@@ -1,3 +1,5 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+
 # type: ignore
 import unittest
 from unittest.mock import MagicMock, patch

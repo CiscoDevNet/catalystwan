@@ -1,3 +1,5 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+
 from typing import Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field

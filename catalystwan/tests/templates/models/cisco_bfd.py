@@ -1,3 +1,5 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 from catalystwan.api.templates.models.cisco_bfd_model import CiscoBFDModel, Color, ColorType
 
 bfd_model = CiscoBFDModel(  # type: ignore

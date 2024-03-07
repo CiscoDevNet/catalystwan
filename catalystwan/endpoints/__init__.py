@@ -1,3 +1,5 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 """This modules defines APIEndpoints class which is used to define
 vManage API endpoint handlers in declarative way.
 Just create a sub-class and define endpoints using using included decorators: request, view, versions.

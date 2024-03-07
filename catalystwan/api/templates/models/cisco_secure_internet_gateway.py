@@ -1,12 +1,13 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 import ipaddress
 from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
 
-from catalystwan.api.templates.feature_template import FeatureTemplate
-from catalystwan.utils.pydantic_validators import ConvertIPToStringModel
+from catalystwan.api.templates.feature_template import FeatureTemplate, FeatureTemplateValidator
 
 DEFAULT_TRACKER_THRESHOLD = 300
 DEFAULT_TRACKER_INTERVAL = 60
@@ -73,16 +74,20 @@ class PerfectForwardSecrecy(str, Enum):
     NONE = "none"
 
 
-class Interface(ConvertIPToStringModel):
+class Interface(FeatureTemplateValidator):
     if_name: str = Field(json_schema_extra={"vmanage_key": "if-name"})
     auto: bool
     shutdown: bool
     description: Optional[str] = None
     unnumbered: bool = True
     address: Optional[ipaddress.IPv4Interface] = None
-    tunnel_source: ipaddress.IPv4Address = Field(json_schema_extra={"vmanage_key": "tunnel-source"})
-    tunnel_source_interface: str = Field(json_schema_extra={"vmanage_key": "tunnel-source-interface"})
-    tunnel_route_via: str = Field(json_schema_extra={"vmanage_key": "tunnel-route-via"})
+    tunnel_source: Optional[ipaddress.IPv4Address] = Field(
+        default=None, json_schema_extra={"vmanage_key": "tunnel-source"}
+    )
+    tunnel_source_interface: Optional[str] = Field(
+        default=None, json_schema_extra={"vmanage_key": "tunnel-source-interface"}
+    )
+    tunnel_route_via: Optional[str] = Field(default=None, json_schema_extra={"vmanage_key": "tunnel-route-via"})
     tunnel_destination: str = Field(json_schema_extra={"vmanage_key": "tunnel-destination"})
     application: Application = Application.SIG
     tunnel_set: TunnelSet = Field(
@@ -130,7 +135,7 @@ class SvcType(str, Enum):
     SIG = "sig"
 
 
-class InterfacePair(BaseModel):
+class InterfacePair(FeatureTemplateValidator):
     active_interface: str = Field(json_schema_extra={"vmanage_key": "active-interface"})
     active_interface_weight: int = Field(
         DEFAULT_INTERFACE_PAIR_ACTIVE_INTERFACE_WEIGHT, json_schema_extra={"vmanage_key": "active-interface-weight"}
@@ -154,9 +159,11 @@ class RefreshTimeUnit(str, Enum):
     DAY = "DAY"
 
 
-class Service(BaseModel):
+class Service(FeatureTemplateValidator):
     svc_type: SvcType = Field(SvcType.SIG, json_schema_extra={"vmanage_key": "svc-type"})
-    interface_pair: List[InterfacePair] = Field(json_schema_extra={"vmanage_key": "interface-pair"})
+    interface_pair: List[InterfacePair] = Field(
+        json_schema_extra={"data_path": ["ha-pairs"], "vmanage_key": "interface-pair"}
+    )
     auth_required: Optional[bool] = Field(False, json_schema_extra={"vmanage_key": "auth-required"})
     xff_forward_enabled: Optional[bool] = Field(False, json_schema_extra={"vmanage_key": "xff-forward-enabled"})
     ofw_enabled: Optional[bool] = Field(False, json_schema_extra={"vmanage_key": "ofw-enabled"})
@@ -176,12 +183,12 @@ class Service(BaseModel):
     refresh_time_unit: Optional[RefreshTimeUnit] = Field(
         RefreshTimeUnit.MINUTE, json_schema_extra={"vmanage_key": "refresh-time-unit"}
     )
-    enabled: Optional[bool]
+    enabled: Optional[bool] = None
     block_internet_until_accepted: Optional[bool] = Field(
         False, json_schema_extra={"vmanage_key": "block-internet-until-accepted"}
     )
     force_ssl_inspection: Optional[bool] = Field(False, json_schema_extra={"vmanage_key": "force-ssl-inspection"})
-    timeout: Optional[int]
+    timeout: Optional[int] = None
     data_center_primary: Optional[str] = Field("Auto", json_schema_extra={"vmanage_key": "data-center-primary"})
     data_center_secondary: Optional[str] = Field("Auto", json_schema_extra={"vmanage_key": "data-center-secondary"})
     model_config = ConfigDict(populate_by_name=True)
@@ -191,7 +198,7 @@ class TrackerType(str, Enum):
     SIG = "SIG"
 
 
-class Tracker(BaseModel):
+class Tracker(FeatureTemplateValidator):
     name: str
     endpoint_api_url: str = Field(json_schema_extra={"vmanage_key": "endpoint-api-url"})
     threshold: Optional[int] = DEFAULT_TRACKER_THRESHOLD
@@ -201,13 +208,15 @@ class Tracker(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class CiscoSecureInternetGatewayModel(FeatureTemplate, ConvertIPToStringModel):
+class CiscoSecureInternetGatewayModel(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     vpn_id: int = Field(DEFAULT_SIG_VPN_ID, json_schema_extra={"vmanage_key": "vpn-id"})
     interface: List[Interface]
     service: List[Service]
-    tracker_src_ip: ipaddress.IPv4Interface = Field(json_schema_extra={"vmanage_key": "tracker-src-ip"})
+    tracker_src_ip: Optional[ipaddress.IPv4Interface] = Field(
+        default=None, json_schema_extra={"vmanage_key": "tracker-src-ip"}
+    )
     tracker: Optional[List[Tracker]] = None
 
     payload_path: ClassVar[Path] = Path(__file__).parent / "DEPRECATED"

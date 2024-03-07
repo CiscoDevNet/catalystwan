@@ -1,3 +1,5 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+
 # mypy: disable-error-code="empty-body"
 
 from enum import Enum
@@ -156,6 +158,7 @@ class SoftwareImageDetails(BaseModel):
     vnf_properties_json: Optional[str] = Field(
         default=None, serialization_alias="vnfPropertiesJson", validation_alias="vnfPropertiesJson"
     )
+    remote_server_id: str = Field(default=None, serialization_alias="remoteServerId", validation_alias="remoteServerId")
 
 
 class ConfigurationSoftwareActions(APIEndpoints):

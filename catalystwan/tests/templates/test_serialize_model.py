@@ -1,3 +1,5 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 import json
 import unittest
 from pathlib import Path
@@ -43,7 +45,7 @@ class TestFeatureTemplate2(TestCase):
         self.maxDiff = 10000
         self.assertDictEqual(
             definition["templateDefinition"],
-            feature_template_payload.model_dump(by_alias=True)["templateDefinition"],
+            feature_template_payload.model_dump(by_alias=True, mode="json")["templateDefinition"],
         )
 
 

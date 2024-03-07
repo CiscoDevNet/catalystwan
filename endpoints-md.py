@@ -1,3 +1,5 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 # Grabs API meta data collected while decorating API methods and prepares markdown documentation
 from __future__ import annotations
 

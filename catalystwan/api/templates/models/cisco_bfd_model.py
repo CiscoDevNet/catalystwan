@@ -1,11 +1,13 @@
+# Copyright 2023 Cisco Systems, Inc. and its affiliates
+
 from enum import Enum
 from pathlib import Path
 from typing import ClassVar, List, Optional
 
 from pydantic import ConfigDict, Field
 
-from catalystwan.api.templates.feature_template import FeatureTemplate
-from catalystwan.utils.pydantic_validators import ConvertBoolToStringModel
+from catalystwan.api.templates.bool_str import BoolStr
+from catalystwan.api.templates.feature_template import FeatureTemplate, FeatureTemplateValidator
 
 DEFAULT_BFD_COLOR_MULTIPLIER = 7
 DEFAULT_BFD_DSCP = 48
@@ -39,18 +41,18 @@ class ColorType(str, Enum):
     PRIVATE6 = "private6"
 
 
-class Color(ConvertBoolToStringModel):
+class Color(FeatureTemplateValidator):
     color: ColorType
     hello_interval: Optional[int] = Field(
         DEFAULT_BFD_HELLO_INTERVAL, json_schema_extra={"vmanage_key": "hello-interval"}
     )
     multiplier: Optional[int] = DEFAULT_BFD_COLOR_MULTIPLIER
-    pmtu_discovery: Optional[bool] = Field(True, json_schema_extra={"vmanage_key": "pmtu-discovery"})
+    pmtu_discovery: Optional[BoolStr] = Field(default=True, json_schema_extra={"vmanage_key": "pmtu-discovery"})
     dscp: Optional[int] = DEFAULT_BFD_DSCP
     model_config = ConfigDict(populate_by_name=True)
 
 
-class CiscoBFDModel(FeatureTemplate, ConvertBoolToStringModel):
+class CiscoBFDModel(FeatureTemplate):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
     multiplier: Optional[int] = Field(DEFAULT_BFD_MULTIPLIER, json_schema_extra={"data_path": ["app-route"]})
