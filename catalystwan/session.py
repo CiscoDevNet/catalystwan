@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import logging
 from enum import Enum
+from functools import cached_property
 from pathlib import Path
 from time import monotonic, sleep
-from typing import Any, Callable, ClassVar, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Dict, List, Optional, Union
 from urllib.parse import urljoin, urlparse, urlunparse
 
 from packaging.version import Version  # type: ignore
@@ -15,10 +16,8 @@ from requests.auth import AuthBase
 from requests.exceptions import ConnectionError, HTTPError, RequestException
 
 from catalystwan import USER_AGENT
-from catalystwan.api.api_container import APIContainer
 from catalystwan.endpoints import APIEndpointClient
 from catalystwan.endpoints.client import AboutInfo, ServerInfo
-from catalystwan.endpoints.endpoints_container import APIEndpointContainter
 from catalystwan.exceptions import (
     DefaultPasswordError,
     ManagerHTTPError,
@@ -34,6 +33,10 @@ from catalystwan.version import NullVersion, parse_api_version
 from catalystwan.vmanage_auth import vManageAuth
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
+
+if TYPE_CHECKING:
+    from catalystwan.api.api_container import APIContainer
+    from catalystwan.endpoints.endpoints_container import APIEndpointContainter
 
 
 class UserMode(str, Enum):
@@ -170,13 +173,25 @@ class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
         super(ManagerSession, self).__init__()
         self.headers.update({"User-Agent": USER_AGENT})
         self.__prepare_session(verify, auth)
-        self.api = APIContainer(self)
-        self.endpoints = APIEndpointContainter(self)
         self._platform_version: str = ""
         self._api_version: Version
         self._state: ManagerSessionState = ManagerSessionState.OPERATIVE
         self.restart_timeout: int = 1200
         self.polling_requests_timeout: int = 10
+
+    @cached_property
+    def api(self) -> APIContainer:
+        from catalystwan.api.api_container import APIContainer
+
+        self._api = APIContainer(self)
+        return self._api
+
+    @cached_property
+    def endpoints(self) -> APIEndpointContainter:
+        from catalystwan.endpoints.endpoints_container import APIEndpointContainter
+
+        self._endpoints = APIEndpointContainter(self)
+        return self._endpoints
 
     @property
     def state(self) -> ManagerSessionState:
