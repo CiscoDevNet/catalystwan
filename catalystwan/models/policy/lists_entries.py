@@ -1,6 +1,5 @@
 # Copyright 2023 Cisco Systems, Inc. and its affiliates
 
-from ipaddress import IPv4Address, IPv4Network, IPv6Network
 from ipaddress import IPv4Address, IPv4Network, IPv6Interface, IPv6Network
 from typing import List, Literal, Optional, Set
 from uuid import UUID

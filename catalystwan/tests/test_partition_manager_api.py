@@ -36,21 +36,12 @@ class TestPartitionManagerAPI(unittest.TestCase):
                 version="curr_ver",
                 defaultVersion="def_ver",
                 uuid="mock_uuid",
-                installed_versions=["ver1", "ver2", "curr_ver"],
-                availableVersions=["ver1", "ver2"],
-                version="curr_ver",
-                defaultVersion="def_ver",
-                uuid="mock_uuid",
             ),
         }
 
         self.mock_devices = [{"deviceId": "mock_uuid", "deviceIP": "mock_ip", "version": "ver1"}]
         self.mock_device_version_payload = DataSequence(
-<<<<<<< HEAD
             RemovePartitionDevice, [RemovePartitionDevice(device_id="mock_uuid", device_ip="mock_ip", version="ver1")]
-=======
-            DeviceVersionPayload, [DeviceVersionPayload(device_id="mock_uuid", device_ip="mock_ip", version="ver1")]
->>>>>>> cb90331 (Migration - Software and Versions)
         )
         mock_session = Mock()
         self.mock_repository_object = RepositoryAPI(mock_session)

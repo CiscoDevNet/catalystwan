@@ -6,15 +6,14 @@ import logging
 from pathlib import PurePath
 from typing import TYPE_CHECKING, Dict, List, Union
 
-from clint.textui.progress import Bar as ProgressBar  # type: ignore
 from pydantic import BaseModel, ConfigDict, Field
-from pydantic.functional_validators import BeforeValidator
-from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor  # type: ignore
-from typing_extensions import Annotated
 
-from catalystwan.dataclasses import Device
+from catalystwan.endpoints.configuration.software_actions import SoftwareImageDetails
+from catalystwan.endpoints.configuration_device_actions import PartitionDevice
+from catalystwan.endpoints.configuration_device_inventory import DeviceDetailsResponse
 from catalystwan.exceptions import ImageNotInRepositoryError
 from catalystwan.typed_list import DataSequence
+from catalystwan.utils.upgrades_helper import SoftwarePackageUploadPayload
 
 if TYPE_CHECKING:
     from catalystwan.session import ManagerSession
@@ -37,25 +36,6 @@ class DeviceSoftwareRepository(BaseModel):
     )
     default_version: str = Field(default="", serialization_alias="defaultVersion", validation_alias="defaultVersion")
     device_id: str = Field(default="", serialization_alias="uuid", validation_alias="uuid")
-
-
-class DeviceVersionPayload(BaseModel):
-    device_id: str = Field(serialization_alias="deviceId")
-    device_ip: str = Field(serialization_alias="deviceIP")
-    version: Union[str, List[str]] = Field(default="")
-
-
-def convert_to_list(element: Union[str, List[str]]) -> List[str]:
-    return [element] if isinstance(element, str) else element
-
-
-VersionList = Annotated[Union[str, List[str]], BeforeValidator(convert_to_list)]
-
-
-class RemovePartitionPayload(BaseModel):
-    device_id: str = Field(serialization_alias="deviceId")
-    device_ip: str = Field(serialization_alias="deviceIP")
-    version: VersionList
 
 
 class RepositoryAPI:
@@ -107,8 +87,8 @@ class RepositoryAPI:
             device_type="vmanage"
         )
         devices_versions_repository = {}
-        for device in controllers_versions_info + edges_versions_info:
-            device_software_repository = DeviceSoftwareRepository(**device)
+        for device in controllers_versions_info + edges_versions_info + vmanages_versions_info:
+            device_software_repository = DeviceSoftwareRepository(**device.model_dump(by_alias=True))
             device_software_repository.installed_versions = [a for a in device_software_repository.available_versions]
             device_software_repository.installed_versions.append(device_software_repository.current_version)
             devices_versions_repository[device_software_repository.device_id] = device_software_repository
@@ -246,8 +226,8 @@ class DeviceVersions:
         """
         self._validate_devices_required_fields(devices)
         devices_payload = DataSequence(
-            DeviceVersionPayload,
-            [DeviceVersionPayload(device_id=device.uuid, device_ip=device.id) for device in devices],
+            PartitionDevice,
+            [PartitionDevice(device_id=device.uuid, device_ip=device.device_ip) for device in devices],  # type: ignore
         )
         all_dev_versions = self.repository.get_devices_versions_repository()
         for device in devices_payload:
@@ -314,8 +294,8 @@ class DeviceVersions:
         self._validate_devices_required_fields(devices)
 
         devices_payload = DataSequence(
-            DeviceVersionPayload,
-            [DeviceVersionPayload(device_id=device.uuid, device_ip=device.id) for device in devices],
+            PartitionDevice,
+            [PartitionDevice(device_id=device.uuid, device_ip=device.device_ip) for device in devices],  # type: ignore
         )
         all_dev_versions = self.repository.get_devices_versions_repository()
         for device in devices_payload:
@@ -355,5 +335,9 @@ class DeviceVersions:
 
         return self._get_devices_chosen_version(devices, "available_versions")
 
-    def get_device_list(self, devices: DataSequence[Device]) -> List[DeviceVersionPayload]:
-        return [DeviceVersionPayload(device_id=device.uuid, device_ip=device.id) for device in devices]  # type: ignore
+    def get_device_list(self, devices: DataSequence[DeviceDetailsResponse]) -> List[PartitionDevice]:
+        self._validate_devices_required_fields(devices)
+
+        return [
+            PartitionDevice(device_id=device.uuid, device_ip=device.device_ip) for device in devices  # type: ignore
+        ]
