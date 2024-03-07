@@ -5,7 +5,7 @@ from typing import Any, Dict, cast
 from catalystwan.api.template_api import FeatureTemplateInformation
 from catalystwan.exceptions import CatalystwanException
 from catalystwan.models.configuration.feature_profile.sdwan.system import AnySystemParcel
-from catalystwan.utils.feature_template import find_template_values
+from catalystwan.utils.feature_template.find_template_values import find_template_values
 
 from .aaa import AAATemplateConverter
 from .banner import BannerTemplateConverter
@@ -76,6 +76,7 @@ def create_parcel_from_template(template: FeatureTemplateInformation) -> AnySyst
     converter = choose_parcel_converter(template.template_type)
     template_definition_as_dict = json.loads(cast(str, template.template_definiton))
     template_values = find_template_values(template_definition_as_dict)
+    print(template_values)
     template_values_normalized = template_definition_normalization(template_values)
     logger.debug(f"Normalized template {template.name}: {template_values_normalized}")
     return converter.create_parcel(template.name, template.description, template_values_normalized)

@@ -9,9 +9,7 @@ from catalystwan.api.configuration_groups.parcel import Default, Global, Variabl
 
 
 class PubkeyChainItem(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
     key_string: Global[str] = Field(
         validation_alias="keyString",
         serialization_alias="keyString",
@@ -29,7 +27,6 @@ class PubkeyChainItem(BaseModel):
 
 
 class UserItem(BaseModel):
-    model_config = ConfigDict(extra="ignore", populate_by_name=True)
     model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     name: Union[Global[str], Variable] = Field(description="Set the username")
@@ -113,8 +110,7 @@ class RadiusServerItem(BaseModel):
 
 
 class Radius(BaseModel):
-    model_config = ConfigDict(extra="ignore", populate_by_name=True)
-    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
     group_name: Global[str] = Field(
         validation_alias="groupName", serialization_alias="groupName", description="Set Radius server Group Name"
     )
@@ -264,6 +260,7 @@ class AuthorizationRuleItem(BaseModel):
 
 class AAAParcel(_ParcelBase):
     type_: Literal["aaa"] = Field(default="aaa", exclude=True)
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
     authentication_group: Union[Variable, Global[bool], Default[bool]] = Field(
         default=as_default(False),
         validation_alias=AliasPath("data", "authenticationGroup"),
