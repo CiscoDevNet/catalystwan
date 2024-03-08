@@ -32,8 +32,6 @@ SUPPORTED_TEMPLATE_TYPES = [
     "omp-vsmart",
     "cisco_ntp",
     "ntp",
-    "bgp",
-    "cisco_bgp",
 ]
 
 

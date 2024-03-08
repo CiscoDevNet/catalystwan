@@ -47,21 +47,16 @@ class AAATemplateConverter:
         if accounting := parcel_values.get("accounting"):
             parcel_values["accounting_group"] = accounting["dot1x"]["default"]["start_stop"]["accounting_group"]
 
-        if authentication := parcel_values.get("authentication"):
-            parcel_values["authentication_group"] = authentication["dot1x"]["default"]["authentication_group"]
+        if authorization := parcel_values.get("authentication"):
+            parcel_values["authentication_group"] = authorization["dot1x"]["default"]["authentication_group"]
 
         for server in ["radius", "tacacs"]:
             if auth_server_list := parcel_values.get(server):
                 assign_authorization_servers(auth_server_list)
 
-        # Those rules differ by models too
         for rule in ["accounting_rule", "authorization_rule"]:
             if existing_rule := parcel_values.get(rule):
                 assign_rules(existing_rule)
-
-        if authorization := parcel_values.get("authorization"):
-            assign_rules(authorization.get("authorization_rule", []))
-            parcel_values.update(authorization)
 
         for key in [
             "radius_client",
@@ -78,8 +73,6 @@ class AAATemplateConverter:
             "accounting",
             "authentication",
             "radius_trustsec",
-            "radius_dynamic_author",
-            "authorization",
         ]:
             parcel_values.pop(key, None)
 

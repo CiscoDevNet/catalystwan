@@ -39,7 +39,7 @@ class ControllerConfig(BaseModel):
     )
 
 
-class CellularControllerParcel(_ParcelBase):
+class CellularController(_ParcelBase):
     config_type: Default[ConfigTypeValue] = Field(
         default=Default(value="non-eSim"), validation_alias=AliasPath("data", "configType")
     )
