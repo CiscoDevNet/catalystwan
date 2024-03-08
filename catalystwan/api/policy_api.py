@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Type, overload
+from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Tuple, Type, overload
 from uuid import UUID
 
 from catalystwan.api.task_status_api import Task
@@ -639,6 +639,12 @@ class PolicyListsAPI:
             return endpoints.get_lists_by_id(id=id)
         return endpoints.get_policy_lists()
 
+    def get_all(self) -> List[AnyPolicyList]:
+        infos: List[AnyPolicyList] = []
+        for list_type, _ in POLICY_LIST_ENDPOINTS_MAP.items():
+            infos.extend(self.get(list_type))
+        return infos
+
 
 class PolicyDefinitionsAPI:
     def __init__(self, session: ManagerSession):
@@ -781,6 +787,12 @@ class PolicyDefinitionsAPI:
         if id is not None:
             return endpoints.get_policy_definition(id=id)
         return endpoints.get_definitions()
+
+    def get_all(self) -> List[Tuple[type, PolicyDefinitionInfo]]:
+        all_items: List[Tuple[type, PolicyDefinitionInfo]] = []
+        for definition_type, _ in POLICY_DEFINITION_ENDPOINTS_MAP.items():
+            all_items.extend([(definition_type, info) for info in self.get(definition_type)])
+        return all_items
 
 
 class PolicyAPI:

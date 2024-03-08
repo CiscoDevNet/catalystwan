@@ -1,6 +1,6 @@
 # Copyright 2023 Cisco Systems, Inc. and its affiliates
 
-from ipaddress import IPv4Address, IPv4Network, IPv6Network
+from ipaddress import IPv4Address, IPv4Network, IPv6Interface, IPv6Network
 from typing import List, Literal, Optional, Set
 from uuid import UUID
 
@@ -9,18 +9,21 @@ from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, field_validato
 from catalystwan.models.common import InterfaceType, TLOCColor, check_fields_exclusive
 
 
-def check_jitter_ms(jitter_str: str) -> str:
-    assert 1 <= int(jitter_str) <= 1000
+def check_jitter_ms(jitter_str: Optional[str]) -> Optional[str]:
+    if jitter_str is not None:
+        assert 1 <= int(jitter_str) <= 1000
     return jitter_str
 
 
-def check_latency_ms(latency_str: str) -> str:
-    assert 1 <= int(latency_str) <= 1000
+def check_latency_ms(latency_str: Optional[str]) -> Optional[str]:
+    if latency_str is not None:
+        assert 1 <= int(latency_str) <= 1000
     return latency_str
 
 
-def check_loss_percent(loss_str: str) -> str:
-    assert 0 <= int(loss_str) <= 100
+def check_loss_percent(loss_str: Optional[str]) -> Optional[str]:
+    if loss_str is not None:
+        assert 0 <= int(loss_str) <= 100
     return loss_str
 
 
@@ -234,7 +237,7 @@ class ColorListEntry(BaseModel):
 class DataIPv6PrefixListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    ipv6_prefix: IPv6Network = Field(serialization_alias="ipv6Prefix", validation_alias="ipv6Prefix")
+    ipv6_prefix: IPv6Interface = Field(serialization_alias="ipv6Prefix", validation_alias="ipv6Prefix")
 
 
 class LocalDomainListEntry(BaseModel):
@@ -328,7 +331,9 @@ class SLAClassListEntry(BaseModel):
     latency: Optional[str] = None
     loss: Optional[str] = None
     jitter: Optional[str] = None
-    app_probe_class: Optional[UUID] = Field(serialization_alias="appProbeClass", validation_alias="appProbeClass")
+    app_probe_class: Optional[UUID] = Field(
+        default=None, serialization_alias="appProbeClass", validation_alias="appProbeClass"
+    )
     fallback_best_tunnel: Optional[FallbackBestTunnel] = Field(
         default=None, serialization_alias="fallbackBestTunnel", validation_alias="fallbackBestTunnel"
     )

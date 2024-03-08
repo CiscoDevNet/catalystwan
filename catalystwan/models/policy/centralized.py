@@ -3,7 +3,7 @@
 from typing import List, Literal, Optional, Union, overload
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Annotated
 
 from catalystwan.models.policy.policy import (
@@ -161,12 +161,27 @@ class MeshPolicyItem(AssemblyItemBase):
     type: Literal["mesh"] = "mesh"
 
 
+class AppRoutePolicyItem(AssemblyItemBase):
+    type: Literal["appRoute"] = "appRoute"
+
+
+class CFlowDPolicyItem(AssemblyItemBase):
+    type: Literal["cflowd"] = "cflowd"
+
+
+class VpnMembershipGroupPolicyItem(AssemblyItemBase):
+    type: Literal["vpnMembershipGroup"] = "vpnMembershipGroup"
+
+
 AnyAssemblyItem = Annotated[
     Union[
         TrafficDataPolicyItem,
         ControlPolicyItem,
         MeshPolicyItem,
         HubAndSpokePolicyItem,
+        AppRoutePolicyItem,
+        CFlowDPolicyItem,
+        VpnMembershipGroupPolicyItem,
     ],
     Field(discriminator="type"),
 ]
@@ -186,7 +201,7 @@ class CentralizedPolicy(PolicyCreationPayload):
         serialization_alias="policyDefinition",
         validation_alias="policyDefinition",
     )
-    policy_type: Literal["feature"] = Field(
+    policy_type: Literal["feature", "cli"] = Field(
         default="feature", serialization_alias="policyType", validation_alias="policyType"
     )
 
@@ -206,19 +221,23 @@ class CentralizedPolicy(PolicyCreationPayload):
     def add_hub_and_spoke_policy(self, hub_and_spoke_policy_id: UUID) -> None:
         self.policy_definition.assembly.append(HubAndSpokePolicyItem(definition_id=hub_and_spoke_policy_id))
 
-    @field_validator("policy_definition", mode="before")
+    @model_validator(mode="before")
     @classmethod
-    def try_parse(cls, policy_definition):
+    def try_parse_policy_definition_string(cls, values):
         # this is needed because GET /template/policy/vsmart contains string in policyDefinition field
         # while POST /template/policy/vsmart requires a regular object
         # it makes sense to reuse that model for both requests and present parsed data to the user
-        if isinstance(policy_definition, str):
-            return CentralizedPolicyDefinition.parse_raw(policy_definition)
-        return policy_definition
+        # TODO: this is workaround, probably it is better to provide separate models for "cli" and "feature"
+        if policy_definition := values.get("policyDefinition") and values.get("policyType") != "cli":
+            if isinstance(policy_definition, str):
+                values["policyDefinition"] = CentralizedPolicyDefinition.model_validate_json(policy_definition)
+        else:
+            values["policyDefinition"] = CentralizedPolicyDefinition()
+        return values
 
 
 class CentralizedPolicyEditPayload(PolicyEditPayload, CentralizedPolicy):
-    rid: Optional[str] = Field(default=None, serialization_alias="@rid", validation_alias="@rid")
+    rid: Optional[int] = Field(default=None, serialization_alias="@rid", validation_alias="@rid")
 
 
 class CentralizedPolicyInfo(PolicyInfo, CentralizedPolicyEditPayload):

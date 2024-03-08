@@ -1,6 +1,11 @@
 # Copyright 2023 Cisco Systems, Inc. and its affiliates
 
-from typing import Dict, List, Literal, Set, Tuple
+from typing import Dict, List, Literal, Sequence, Set, Tuple, Union
+from uuid import UUID
+
+from pydantic import PlainSerializer
+from pydantic.functional_validators import BeforeValidator
+from typing_extensions import Annotated
 
 
 def check_fields_exclusive(values: Dict, field_names: Set[str], at_least_one: bool = False) -> bool:
@@ -46,6 +51,25 @@ def check_any_of_exclusive_field_sets(values: Dict, field_sets: List[Tuple[Set[s
     if not any_assigned:
         all_sets_field_names = [s[0] for s in field_sets]
         raise ValueError(f"One of {all_sets_field_names} must be assigned")
+
+
+IntStr = Annotated[
+    int,
+    PlainSerializer(lambda x: str(x), return_type=str, when_used="json-unless-none"),
+    BeforeValidator(lambda x: int(x)),
+]
+
+
+def str_as_uuid_list(val: Union[str, Sequence[UUID]]) -> Sequence[UUID]:
+    if isinstance(val, str):
+        return [UUID(uuid_) for uuid_ in val.split()]
+    return val
+
+
+def str_as_str_list(val: Union[str, Sequence[str]]) -> Sequence[str]:
+    if isinstance(val, str):
+        return [s for s in val.split()]
+    return val
 
 
 InterfaceType = Literal[
@@ -115,4 +139,8 @@ ServiceChainNumber = Literal[
     "SC14",
     "SC15",
     "SC16",
+]
+
+ICMPMessageType = Literal[
+    "echo", "echo-reply", "unreachable", "net-unreachable", "host-unreachable", "protocol-unreachable"
 ]
