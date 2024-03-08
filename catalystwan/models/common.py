@@ -68,7 +68,7 @@ def str_as_uuid_list(val: Union[str, Sequence[UUID]]) -> Sequence[UUID]:
 
 def str_as_str_list(val: Union[str, Sequence[str]]) -> Sequence[str]:
     if isinstance(val, str):
-        return [s for s in val.split()]
+        return val.split()
     return val
 
 

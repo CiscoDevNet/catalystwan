@@ -12,6 +12,7 @@ from .banner import BannerTemplateConverter
 from .base import FeatureTemplateConverter
 from .basic import SystemToBasicTemplateConverter
 from .bfd import BFDTemplateConverter
+from .bgp import BGPTemplateConverter
 from .global_ import GlobalTemplateConverter
 from .logging_ import LoggingTemplateConverter
 from .normalizer import template_definition_normalization
@@ -31,6 +32,7 @@ available_converters = [
     LoggingTemplateConverter,
     OMPTemplateConverter,
     NTPTemplateConverter,
+    BGPTemplateConverter,
 ]
 
 
