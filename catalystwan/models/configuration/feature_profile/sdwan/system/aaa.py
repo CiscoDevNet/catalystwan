@@ -1,7 +1,7 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
 from ipaddress import IPv4Address, IPv6Address
-from typing import List, Literal, Optional, Union
+from typing import List, Optional, Union
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
@@ -9,7 +9,9 @@ from catalystwan.api.configuration_groups.parcel import Default, Global, Variabl
 
 
 class PubkeyChainItem(BaseModel):
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    model_config = ConfigDict(
+        extra="forbid",
+    )
     key_string: Global[str] = Field(
         validation_alias="keyString",
         serialization_alias="keyString",
@@ -27,7 +29,7 @@ class PubkeyChainItem(BaseModel):
 
 
 class UserItem(BaseModel):
-    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
     name: Union[Global[str], Variable] = Field(description="Set the username")
     password: Union[Global[str], Variable] = Field(
@@ -258,9 +260,7 @@ class AuthorizationRuleItem(BaseModel):
     )
 
 
-class AAAParcel(_ParcelBase):
-    type_: Literal["aaa"] = Field(default="aaa", exclude=True)
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+class AAA(_ParcelBase):
     authentication_group: Union[Variable, Global[bool], Default[bool]] = Field(
         default=as_default(False),
         validation_alias=AliasPath("data", "authenticationGroup"),
@@ -278,9 +278,7 @@ class AAAParcel(_ParcelBase):
         max_length=4,
         description="ServerGroups priority order",
     )
-    user: Optional[List[UserItem]] = Field(
-        default=None, validation_alias=AliasPath("data", "user"), description="Create local login account", min_length=1
-    )
+    user: Optional[List[UserItem]] = Field(default=None, description="Create local login account", min_length=1)
     radius: Optional[List[Radius]] = Field(
         default=None, validation_alias=AliasPath("data", "radius"), description="Configure the Radius serverGroup"
     )

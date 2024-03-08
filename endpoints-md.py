@@ -201,7 +201,7 @@ if __name__ == "__main__":
 
     # this instantiates APIEndpoints classes triggering method decorators
     # endpoints not attached to container will be not documented !
-    APIEndpointContainter(MagicMock())
+    _ = APIEndpointContainter(MagicMock())
 
     endpoint_registry = EndpointRegistry(
         meta_lookup=request.request_lookup,
