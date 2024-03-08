@@ -9,10 +9,7 @@ from typing_extensions import Annotated
 
 from catalystwan.models.misc.application_protocols import ApplicationProtocol
 from catalystwan.models.policy.policy_definition import (
-    AdvancedInspectionProfileAction,
     AppListEntry,
-    AppListFlatEntry,
-    ConnectionEventsAction,
     DefinitionWithSequencesCommonBase,
     DestinationDataPrefixListEntry,
     DestinationFQDNEntry,
@@ -43,7 +40,6 @@ from catalystwan.models.policy.policy_definition import (
 ZoneBasedFWPolicySequenceEntry = Annotated[
     Union[
         AppListEntry,
-        AppListFlatEntry,
         DestinationDataPrefixListEntry,
         DestinationFQDNEntry,
         DestinationGeoLocationEntry,
@@ -75,15 +71,6 @@ ZoneBasedFWPolicySequenceEntryWithRuleSets = Annotated[
     Field(discriminator="field"),
 ]
 
-ZoneBasedFWPolicyActions = Annotated[
-    Union[
-        AdvancedInspectionProfileAction,
-        ConnectionEventsAction,
-        LogAction,
-    ],
-    Field(discriminator="type"),
-]
-
 
 class ZoneBasedFWPolicyMatches(Match):
     entries: List[ZoneBasedFWPolicySequenceEntry] = []
@@ -95,7 +82,7 @@ class ZoneBasedFWPolicySequenceWithRuleSets(PolicyDefinitionSequenceBase):
     )
     match: ZoneBasedFWPolicyMatches
     ruleset: bool = True
-    actions: List[ZoneBasedFWPolicyActions] = []
+    actions: List[LogAction] = []
     model_config = ConfigDict(populate_by_name=True)
 
     def match_rule_set_lists(self, rule_set_ids: Set[UUID]) -> None:
@@ -158,8 +145,8 @@ class ZoneBasedFWPolicySequence(PolicyDefinitionSequenceBase):
     def match_protocol_name_list(self, protocol_name_list_id: UUID) -> None:
         self._insert_match(ProtocolNameListEntry(ref=protocol_name_list_id))
 
-    def match_source_data_prefix_list(self, data_prefix_lists: List[UUID]) -> None:
-        self._insert_match(SourceDataPrefixListEntry(ref=data_prefix_lists))
+    def match_source_data_prefix_list(self, data_prefix_list_id: UUID) -> None:
+        self._insert_match(SourceDataPrefixListEntry(ref=data_prefix_list_id))
 
     def match_source_fqdn(self, fqdn: str) -> None:
         self._insert_match(SourceFQDNEntry(value=fqdn))
@@ -204,7 +191,7 @@ class ZoneBasedFWPolicyDefinition(DefinitionWithSequencesCommonBase):
 
 class ZoneBasedFWPolicy(ZoneBasedFWPolicyHeader):
     type: Literal["zoneBasedFW"] = "zoneBasedFW"
-    mode: Literal["security", "unified"] = "security"
+    mode: Literal["security"] = "security"
     definition: ZoneBasedFWPolicyDefinition = ZoneBasedFWPolicyDefinition()
 
     def add_ipv4_rule(

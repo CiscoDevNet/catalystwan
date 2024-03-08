@@ -2,12 +2,9 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional, Protocol, Type, Union, overload
+from typing import TYPE_CHECKING, Any, Protocol, Type, Union, overload
 from uuid import UUID
 
-from pydantic import Json
-
-from catalystwan.endpoints.configuration.feature_profile.sdwan.system import SystemFeatureProfile
 from catalystwan.typed_list import DataSequence
 
 if TYPE_CHECKING:
@@ -19,12 +16,11 @@ from catalystwan.endpoints.configuration_feature_profile import SDRoutingConfigu
 from catalystwan.models.configuration.feature_profile.common import (
     FeatureProfileCreationPayload,
     FeatureProfileCreationResponse,
-    FeatureProfileInfo,
-    GetFeatureProfilesPayload,
     Parcel,
     ParcelCreationResponse,
 )
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object import (
+    POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING,
     AnyPolicyObjectParcel,
     ApplicationListParcel,
     AppProbeParcel,
@@ -48,32 +44,15 @@ from catalystwan.models.configuration.feature_profile.sdwan.policy_object import
     SecurityZoneListParcel,
     StandardCommunityParcel,
     TlocParcel,
-)
-from catalystwan.models.configuration.feature_profile.sdwan.system import (
-    AAAParcel,
-    AnySystemParcel,
-    BannerParcel,
-    BasicParcel,
-    BFDParcel,
-    GlobalParcel,
-    LoggingParcel,
-    MRFParcel,
-    NTPParcel,
-    OMPParcel,
-    SecurityParcel,
-    SNMPParcel,
+    URLAllowParcel,
+    URLBlockParcel,
 )
 
 
 class SDRoutingFeatureProfilesAPI:
     def __init__(self, session: ManagerSession):
         self.cli = SDRoutingCLIFeatureProfileAPI(session=session)
-
-
-class SDWANFeatureProfilesAPI:
-    def __init__(self, session: ManagerSession):
         self.policy_object = PolicyObjectFeatureProfileAPI(session=session)
-        self.system = SystemFeatureProfileAPI(session=session)
 
 
 class FeatureProfileAPI(Protocol):
@@ -124,372 +103,6 @@ class SDRoutingCLIFeatureProfileAPI(FeatureProfileAPI):
         Deletes CLI feature-profile
         """
         self.endpoint.delete_cli_feature_profile(cli_fp_id=fp_id)
-
-
-class SystemFeatureProfileAPI:
-    """
-    SDWAN Feature Profile System APIs
-    """
-
-    def __init__(self, session: ManagerSession):
-        self.session = session
-        self.endpoint = SystemFeatureProfile(session)
-
-    def get_profiles(
-        self, limit: Optional[int] = None, offset: Optional[int] = None
-    ) -> DataSequence[FeatureProfileInfo]:
-        """
-        Get all System Feature Profiles
-        """
-        payload = GetFeatureProfilesPayload(limit=limit if limit else None, offset=offset if offset else None)
-
-        return self.endpoint.get_sdwan_system_feature_profiles(payload)
-
-    def create_profile(self, name: str, description: str) -> FeatureProfileCreationResponse:
-        """
-        Create System Feature Profile
-        """
-        payload = FeatureProfileCreationPayload(name=name, description=description)
-        return self.endpoint.create_sdwan_system_feature_profile(payload)
-
-    def delete_profile(self, profile_id: UUID) -> None:
-        """
-        Delete System Feature Profile
-        """
-        self.endpoint.delete_sdwan_system_feature_profile(profile_id)
-
-    def get_schema(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[AnySystemParcel],
-    ) -> Json:
-        """
-        Get all System Parcels for selected profile_id and selected type or get one Policy Object given parcel id
-        """
-
-        return self.endpoint.get_schema(profile_id, parcel_type._get_parcel_type())
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[AAAParcel],
-    ) -> DataSequence[Parcel[AAAParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[BFDParcel],
-    ) -> DataSequence[Parcel[BFDParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[LoggingParcel],
-    ) -> DataSequence[Parcel[LoggingParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[BannerParcel],
-    ) -> DataSequence[Parcel[BannerParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[BasicParcel],
-    ) -> DataSequence[Parcel[BasicParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[GlobalParcel],
-    ) -> DataSequence[Parcel[GlobalParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[NTPParcel],
-    ) -> DataSequence[Parcel[NTPParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[MRFParcel],
-    ) -> DataSequence[Parcel[MRFParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[OMPParcel],
-    ) -> DataSequence[Parcel[OMPParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[SecurityParcel],
-    ) -> DataSequence[Parcel[SecurityParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[SNMPParcel],
-    ) -> DataSequence[Parcel[SNMPParcel]]:
-        ...
-
-    # get by id
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[AAAParcel],
-        parcel_id: UUID,
-    ) -> DataSequence[Parcel[AAAParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[BFDParcel],
-        parcel_id: UUID,
-    ) -> DataSequence[Parcel[BFDParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[LoggingParcel],
-        parcel_id: UUID,
-    ) -> DataSequence[Parcel[LoggingParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[BannerParcel],
-        parcel_id: UUID,
-    ) -> DataSequence[Parcel[BannerParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[BasicParcel],
-        parcel_id: UUID,
-    ) -> DataSequence[Parcel[BasicParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[GlobalParcel],
-        parcel_id: UUID,
-    ) -> DataSequence[Parcel[GlobalParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[NTPParcel],
-        parcel_id: UUID,
-    ) -> DataSequence[Parcel[NTPParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[MRFParcel],
-        parcel_id: UUID,
-    ) -> DataSequence[Parcel[MRFParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[OMPParcel],
-        parcel_id: UUID,
-    ) -> DataSequence[Parcel[OMPParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[SecurityParcel],
-        parcel_id: UUID,
-    ) -> DataSequence[Parcel[SecurityParcel]]:
-        ...
-
-    @overload
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[SNMPParcel],
-        parcel_id: UUID,
-    ) -> DataSequence[Parcel[SNMPParcel]]:
-        ...
-
-    def get(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[AnySystemParcel],
-        parcel_id: Union[UUID, None] = None,
-    ) -> DataSequence[Parcel[Any]]:
-        """
-        Get all System Parcels for selected profile_id and selected type or get one System Parcel given parcel id
-        """
-
-        if not parcel_id:
-            return self.endpoint.get_all(profile_id, parcel_type._get_parcel_type())
-        return self.endpoint.get_by_id(profile_id, parcel_type._get_parcel_type(), parcel_id)
-
-    def create(self, profile_id: UUID, payload: AnySystemParcel) -> ParcelCreationResponse:
-        """
-        Create System Parcel for selected profile_id based on payload type
-        """
-
-        return self.endpoint.create(profile_id, payload._get_parcel_type(), payload)
-
-    def update(self, profile_id: UUID, payload: AnySystemParcel, parcel_id: UUID) -> ParcelCreationResponse:
-        """
-        Update System Parcel for selected profile_id based on payload type
-        """
-
-        return self.endpoint.update(profile_id, payload._get_parcel_type(), parcel_id, payload)
-
-    @overload
-    def delete(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[AAAParcel],
-        parcel_id: UUID,
-    ) -> None:
-        ...
-
-    @overload
-    def delete(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[BFDParcel],
-        parcel_id: UUID,
-    ) -> None:
-        ...
-
-    @overload
-    def delete(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[LoggingParcel],
-        parcel_id: UUID,
-    ) -> None:
-        ...
-
-    @overload
-    def delete(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[BannerParcel],
-        parcel_id: UUID,
-    ) -> None:
-        ...
-
-    @overload
-    def delete(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[BasicParcel],
-        parcel_id: UUID,
-    ) -> None:
-        ...
-
-    @overload
-    def delete(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[GlobalParcel],
-        parcel_id: UUID,
-    ) -> None:
-        ...
-
-    @overload
-    def delete(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[NTPParcel],
-        parcel_id: UUID,
-    ) -> None:
-        ...
-
-    @overload
-    def delete(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[MRFParcel],
-        parcel_id: UUID,
-    ) -> None:
-        ...
-
-    @overload
-    def delete(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[OMPParcel],
-        parcel_id: UUID,
-    ) -> None:
-        ...
-
-    @overload
-    def delete(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[SecurityParcel],
-        parcel_id: UUID,
-    ) -> None:
-        ...
-
-    @overload
-    def delete(
-        self,
-        profile_id: UUID,
-        parcel_type: Type[SNMPParcel],
-        parcel_id: UUID,
-    ) -> None:
-        ...
-
-    def delete(self, profile_id: UUID, parcel_type: Type[AnySystemParcel], parcel_id: UUID) -> None:
-        """
-        Delete System Parcel for selected profile_id based on payload type
-        """
-        return self.endpoint.delete(profile_id, parcel_type._get_parcel_type(), parcel_id)
 
 
 class PolicyObjectFeatureProfileAPI:
@@ -589,13 +202,13 @@ class PolicyObjectFeatureProfileAPI:
     def get(self, profile_id: UUID, parcel_type: Type[TlocParcel]) -> DataSequence[Parcel[Any]]:
         ...
 
-    # @overload
-    # def get(self, profile_id: UUID, parcel_type: Type[URLAllowParcel]) -> DataSequence[Parcel[Any]]:
-    #     ...
+    @overload
+    def get(self, profile_id: UUID, parcel_type: Type[URLAllowParcel]) -> DataSequence[Parcel[Any]]:
+        ...
 
-    # @overload
-    # def get(self, profile_id: UUID, parcel_type: Type[URLBlockParcel]) -> DataSequence[Parcel[Any]]:
-    #     ...
+    @overload
+    def get(self, profile_id: UUID, parcel_type: Type[URLBlockParcel]) -> DataSequence[Parcel[Any]]:
+        ...
 
     # get by id
 
@@ -715,13 +328,13 @@ class PolicyObjectFeatureProfileAPI:
     def get(self, profile_id: UUID, parcel_type: Type[TlocParcel], parcel_id: UUID) -> DataSequence[Parcel[Any]]:
         ...
 
-    # @overload
-    # def get(self, profile_id: UUID, parcel_type: Type[URLAllowParcel], parcel_id: UUID) -> DataSequence[Parcel[Any]]:
-    #     ...
+    @overload
+    def get(self, profile_id: UUID, parcel_type: Type[URLAllowParcel], parcel_id: UUID) -> DataSequence[Parcel[Any]]:
+        ...
 
-    # @overload
-    # def get(self, profile_id: UUID, parcel_type: Type[URLBlockParcel], parcel_id: UUID) -> DataSequence[Parcel[Any]]:
-    #     ...
+    @overload
+    def get(self, profile_id: UUID, parcel_type: Type[URLBlockParcel], parcel_id: UUID) -> DataSequence[Parcel[Any]]:
+        ...
 
     def get(
         self,
@@ -733,7 +346,7 @@ class PolicyObjectFeatureProfileAPI:
         Get all Policy Objects for selected profile_id and selected type or get one Policy Object given parcel id
         """
 
-        policy_object_list_type = parcel_type._get_parcel_type()
+        policy_object_list_type = POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING[parcel_type]
         if not parcel_id:
             return self.endpoint.get_all(profile_id=profile_id, policy_object_list_type=policy_object_list_type)
         parcel = self.endpoint.get_by_id(
@@ -746,7 +359,7 @@ class PolicyObjectFeatureProfileAPI:
         Create Policy Object for selected profile_id based on payload type
         """
 
-        policy_object_list_type = payload._get_parcel_type()
+        policy_object_list_type = POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING[type(payload)]
         return self.endpoint.create(
             profile_id=profile_id, policy_object_list_type=policy_object_list_type, payload=payload
         )
@@ -756,7 +369,7 @@ class PolicyObjectFeatureProfileAPI:
         Update Policy Object for selected profile_id based on payload type
         """
 
-        policy_type = payload._get_parcel_type()
+        policy_type = POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING[type(payload)]
         return self.endpoint.update(
             profile_id=profile_id, policy_object_list_type=policy_type, list_object_id=list_object_id, payload=payload
         )
@@ -849,20 +462,20 @@ class PolicyObjectFeatureProfileAPI:
     def delete(self, profile_id: UUID, parcel_type: Type[TlocParcel], list_object_id: UUID) -> None:
         ...
 
-    # @overload
-    # def delete(self, profile_id: UUID, parcel_type: Type[URLAllowParcel], list_object_id: UUID) -> None:
-    #     ...
+    @overload
+    def delete(self, profile_id: UUID, parcel_type: Type[URLAllowParcel], list_object_id: UUID) -> None:
+        ...
 
-    # @overload
-    # def delete(self, profile_id: UUID, parcel_type: Type[URLBlockParcel], list_object_id: UUID) -> None:
-    #     ...
+    @overload
+    def delete(self, profile_id: UUID, parcel_type: Type[URLBlockParcel], list_object_id: UUID) -> None:
+        ...
 
     def delete(self, profile_id: UUID, parcel_type: Type[AnyPolicyObjectParcel], list_object_id: UUID) -> None:
         """
         Delete Policy Object for selected profile_id based on payload type
         """
 
-        policy_object_list_type = parcel_type._get_parcel_type()
+        policy_object_list_type = POLICY_OBJECT_PAYLOAD_ENDPOINT_MAPPING[parcel_type]
         return self.endpoint.delete(
             profile_id=profile_id, policy_object_list_type=policy_object_list_type, list_object_id=list_object_id
         )

@@ -6,17 +6,10 @@ from ipaddress import IPv4Address, IPv4Network, IPv6Network
 from typing import Any, Dict, List, MutableSequence, Optional, Protocol, Sequence, Set, Tuple, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, RootModel, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, RootModel, model_validator
 from typing_extensions import Annotated, Literal
 
-from catalystwan.models.common import (
-    ICMPMessageType,
-    ServiceChainNumber,
-    TLOCColor,
-    check_fields_exclusive,
-    str_as_str_list,
-    str_as_uuid_list,
-)
+from catalystwan.models.common import ServiceChainNumber, TLOCColor, check_fields_exclusive
 from catalystwan.models.misc.application_protocols import ApplicationProtocol
 from catalystwan.models.policy.lists_entries import EncapType
 from catalystwan.typed_list import DataSequence
@@ -494,18 +487,9 @@ class NATVPNEntry(RootModel):
         return NATVPNEntry(root=[UseVPNEntry(value=str(vpn))])
 
 
-class ICMPMessageEntry(BaseModel):
-    field: Literal["icmpMessage"] = "icmpMessage"
-    value: List[ICMPMessageType]
-
-    _value = field_validator("value", mode="before")(str_as_str_list)
-
-
 class SourceDataPrefixListEntry(BaseModel):
     field: Literal["sourceDataPrefixList"] = "sourceDataPrefixList"
-    ref: List[UUID]
-
-    _ref = field_validator("ref", mode="before")(str_as_uuid_list)
+    ref: UUID
 
 
 class SourceDataIPv6PrefixListEntry(BaseModel):
@@ -530,11 +514,6 @@ class DNSAppListEntry(BaseModel):
 
 class AppListEntry(BaseModel):
     field: Literal["appList"] = "appList"
-    ref: UUID
-
-
-class AppListFlatEntry(BaseModel):
-    field: Literal["appListFlat"] = "appListFlat"
     ref: UUID
 
 
@@ -773,16 +752,6 @@ class PolicerAction(BaseModel):
     parameter: Reference
 
 
-class ConnectionEventsAction(BaseModel):
-    type: Literal["connectionEvents"] = "connectionEvents"
-    parameter: str = ""
-
-
-class AdvancedInspectionProfileAction(BaseModel):
-    type: Literal["advancedInspectionProfile"] = "advancedInspectionProfile"
-    parameter: Reference
-
-
 ActionSetEntry = Annotated[
     Union[
         AffinityEntry,
@@ -817,10 +786,8 @@ class ActionSet(BaseModel):
 ActionEntry = Annotated[
     Union[
         ActionSet,
-        AdvancedInspectionProfileAction,
         CFlowDAction,
         ClassMapAction,
-        ConnectionEventsAction,
         CountAction,
         DREOptimizationAction,
         FallBackToRoutingAction,
@@ -843,7 +810,6 @@ ActionEntry = Annotated[
 MatchEntry = Annotated[
     Union[
         AppListEntry,
-        AppListFlatEntry,
         CarrierEntry,
         ClassMapListEntry,
         ColorListEntry,
@@ -865,7 +831,6 @@ MatchEntry = Annotated[
         DSCPEntry,
         ExpandedCommunityListEntry,
         GroupIDEntry,
-        ICMPMessageEntry,
         NextHeaderEntry,
         OMPTagEntry,
         OriginatorEntry,
@@ -946,9 +911,7 @@ class PolicyDefinitionSequenceBase(BaseModel):
         default="drop", serialization_alias="baseAction", validation_alias="baseAction"
     )
     sequence_type: SequenceType = Field(serialization_alias="sequenceType", validation_alias="sequenceType")
-    sequence_ip_type: Optional[SequenceIpType] = Field(
-        default="ipv4", serialization_alias="sequenceIpType", validation_alias="sequenceIpType"
-    )
+    sequence_ip_type: SequenceIpType = Field(serialization_alias="sequenceIpType", validation_alias="sequenceIpType")
     ruleset: Optional[bool] = None
     match: Match
     actions: Sequence[ActionEntry]

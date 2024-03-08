@@ -1,7 +1,7 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
 from ipaddress import IPv6Address, IPv6Network
-from typing import List, Literal
+from typing import List
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
@@ -15,7 +15,6 @@ class IPv6DataPrefixEntry(BaseModel):
 
 
 class IPv6DataPrefixParcel(_ParcelBase):
-    type_: Literal["data-ipv6-prefix"] = Field(default="data-ipv6-prefix", exclude=True)
     entries: List[IPv6DataPrefixEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_prefix(self, ipv6_network: IPv6Network):

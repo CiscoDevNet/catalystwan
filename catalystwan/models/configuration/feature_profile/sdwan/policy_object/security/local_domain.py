@@ -1,6 +1,6 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
-from typing import List, Literal
+from typing import List
 
 from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
@@ -15,7 +15,6 @@ class LocalDomainListEntry(BaseModel):
 
 
 class LocalDomainParcel(_ParcelBase):
-    type_: Literal["security-localdomain"] = Field(default="security-localdomain", exclude=True)
     entries: List[LocalDomainListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def from_local_domains(self, domains: List[str]):

@@ -1,19 +1,12 @@
 # Copyright 2023 Cisco Systems, Inc. and its affiliates
 
-from ipaddress import IPv4Address, IPv4Network, IPv6Interface
+from ipaddress import IPv4Address, IPv4Network, IPv6Network
 from typing import Any, List, Literal, Optional, Set, Tuple
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
 from catalystwan.models.common import InterfaceType, TLOCColor, WellKnownBGPCommunities
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object import AnyPolicyObjectParcel
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.policy.data_prefix import (
-    DataPrefixEntry,
-    DataPrefixParcel,
-)
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.policy.tloc_list import TlocParcel
-from catalystwan.models.configuration.feature_profile.sdwan.policy_object.security.zone import SecurityZoneListParcel
 from catalystwan.models.policy.lists_entries import (
     AppListEntry,
     AppProbeClassListEntry,
@@ -64,9 +57,6 @@ class PolicyListBase(BaseModel):
         else:
             self.entries.append(entry)
 
-    def to_policy_object_parcel(self) -> Optional[AnyPolicyObjectParcel]:
-        return None
-
 
 class DataPrefixList(PolicyListBase):
     type: Literal["dataPrefix"] = "dataPrefix"
@@ -74,13 +64,6 @@ class DataPrefixList(PolicyListBase):
 
     def add_prefix(self, ip_prefix: IPv4Network) -> None:
         self._add_entry(DataPrefixListEntry(ip_prefix=ip_prefix))
-
-    def to_policy_object_parcel(self) -> DataPrefixParcel:
-        return DataPrefixParcel(
-            parcel_name=self.name,
-            parcel_description=self.description,
-            entries=[DataPrefixEntry.from_ipv4_network(i.ip_prefix) for i in self.entries],
-        )
 
 
 class SiteList(PolicyListBase):
@@ -95,9 +78,6 @@ class SiteList(PolicyListBase):
         entry = SiteListEntry(site_id=f"{site_range[0]}-{site_range[1]}")
         self._add_entry(entry)
 
-    def to_policy_object_parcel(self) -> None:
-        return None
-
 
 class VPNList(PolicyListBase):
     type: Literal["vpn"] = "vpn"
@@ -111,9 +91,6 @@ class VPNList(PolicyListBase):
         entry = VPNListEntry(vpn=f"{vpn_range[0]}-{vpn_range[1]}")
         self._add_entry(entry)
 
-    def to_policy_object_parcel(self) -> None:
-        return None
-
 
 class ZoneList(PolicyListBase):
     type: Literal["zone"] = "zone"
@@ -124,18 +101,6 @@ class ZoneList(PolicyListBase):
 
     def assign_interfaces(self, ifs: Set[InterfaceType]) -> None:
         self.entries = [ZoneListEntry(interface=interface) for interface in ifs]
-
-    def to_policy_object_parcel(self) -> SecurityZoneListParcel:
-        parcel = SecurityZoneListParcel(
-            parcel_name=self.name,
-            parcel_description=self.description,
-        )
-        for e in self.entries:
-            if e.vpn is not None:
-                parcel.add_vpn(e.vpn)
-            if e.interface is not None:
-                parcel.add_interface(e.interface)
-        return parcel
 
 
 class FQDNList(PolicyListBase):
@@ -186,7 +151,7 @@ class DataIPv6PrefixList(PolicyListBase):
     type: Literal["dataIpv6Prefix"] = "dataIpv6Prefix"
     entries: List[DataIPv6PrefixListEntry] = []
 
-    def add_prefix(self, ipv6_prefix: IPv6Interface) -> None:
+    def add_prefix(self, ipv6_prefix: IPv6Network) -> None:
         self._add_entry(DataIPv6PrefixListEntry(ipv6_prefix=ipv6_prefix))
 
 
@@ -308,15 +273,6 @@ class TLOCList(PolicyListBase):
     def add_tloc(self, tloc: IPv4Address, color: TLOCColor, encap: EncapType, preference: Optional[int] = None) -> None:
         _preference = str(preference) if preference is not None else None
         self.entries.append(TLOCListEntry(tloc=tloc, color=color, encap=encap, preference=_preference))
-
-    def to_policy_object_parcel(self) -> TlocParcel:
-        parcel = TlocParcel(
-            parcel_name=self.name,
-            parcel_description=self.description,
-        )
-        for i in self.entries:
-            parcel.add_entry(i.tloc, i.color, i.encap, i.preference)
-        return parcel
 
 
 class PreferredColorGroupList(PolicyListBase):

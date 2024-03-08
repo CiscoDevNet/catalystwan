@@ -7,7 +7,7 @@ from uuid import UUID
 from pydantic import ConfigDict, Field
 from typing_extensions import Annotated
 
-from catalystwan.models.common import ICMPMessageType, ServiceChainNumber, TLOCColor
+from catalystwan.models.common import ServiceChainNumber, TLOCColor
 from catalystwan.models.policy.lists_entries import EncapType
 from catalystwan.models.policy.policy_definition import (
     AppListEntry,
@@ -26,7 +26,6 @@ from catalystwan.models.policy.policy_definition import (
     DSCPEntry,
     FallBackToRoutingAction,
     ForwardingClassEntry,
-    ICMPMessageEntry,
     LocalTLOCListEntry,
     LocalTLOCListEntryValue,
     LogAction,
@@ -67,25 +66,24 @@ from catalystwan.models.policy.policy_definition import (
 
 TrafficDataPolicySequenceEntry = Annotated[
     Union[
-        AppListEntry,
-        DestinationDataIPv6PrefixListEntry,
-        DestinationDataPrefixListEntry,
-        DestinationIPEntry,
-        DestinationPortEntry,
-        DestinationRegionEntry,
-        DNSAppListEntry,
-        DNSEntry,
-        DSCPEntry,
-        ICMPMessageEntry,
         PacketLengthEntry,
         PLPEntry,
         ProtocolEntry,
-        SourceDataIPv6PrefixListEntry,
-        SourceDataPrefixListEntry,
+        DSCPEntry,
         SourceIPEntry,
         SourcePortEntry,
+        DestinationIPEntry,
+        DestinationPortEntry,
         TCPEntry,
+        DNSEntry,
         TrafficToEntry,
+        SourceDataPrefixListEntry,
+        DestinationDataPrefixListEntry,
+        SourceDataIPv6PrefixListEntry,
+        DestinationDataIPv6PrefixListEntry,
+        DestinationRegionEntry,
+        DNSAppListEntry,
+        AppListEntry,
     ],
     Field(discriminator="field"),
 ]
@@ -102,7 +100,7 @@ class TrafficDataPolicySequenceMatch(Match):
 
 
 class TrafficDataPolicySequence(PolicyDefinitionSequenceBase):
-    sequence_type: Literal["applicationFirewall", "qos", "serviceChaining", "trafficEngineering", "data"] = Field(
+    sequence_type: Literal["data"] = Field(
         default="data", serialization_alias="sequenceType", validation_alias="sequenceType"
     )
     match: TrafficDataPolicySequenceMatch = TrafficDataPolicySequenceMatch()
@@ -124,9 +122,6 @@ class TrafficDataPolicySequence(PolicyDefinitionSequenceBase):
     def match_dscp(self, dscp: int) -> None:
         self._insert_match(DSCPEntry(value=str(dscp)))
 
-    def match_icmp(self, icmp_message_types: List[ICMPMessageType]) -> None:
-        self._insert_match(ICMPMessageEntry(value=icmp_message_types))
-
     def match_packet_length(self, packet_lengths: Tuple[int, int]) -> None:
         self._insert_match(PacketLengthEntry.from_range(packet_lengths))
 
@@ -139,8 +134,8 @@ class TrafficDataPolicySequence(PolicyDefinitionSequenceBase):
     def match_protocols(self, protocols: Set[int]) -> None:
         self._insert_match(ProtocolEntry.from_protocol_set(protocols))
 
-    def match_source_data_prefix_list(self, data_prefix_lists: List[UUID]) -> None:
-        self._insert_match(SourceDataPrefixListEntry(ref=data_prefix_lists))
+    def match_source_data_prefix_list(self, data_prefix_list_id: UUID) -> None:
+        self._insert_match(SourceDataPrefixListEntry(ref=data_prefix_list_id))
 
     def match_source_ip(self, networks: List[IPv4Network]) -> None:
         self._insert_match(SourceIPEntry.from_ipv4_networks(networks))
