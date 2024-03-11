@@ -7,7 +7,9 @@ from uuid import UUID
 
 from pydantic import Json
 
+from catalystwan.endpoints.configuration.feature_profile.sdwan.other import OtherFeatureProfile
 from catalystwan.endpoints.configuration.feature_profile.sdwan.system import SystemFeatureProfile
+from catalystwan.models.configuration.feature_profile.sdwan.other import AnyOtherParcel
 from catalystwan.typed_list import DataSequence
 
 if TYPE_CHECKING:
@@ -74,6 +76,7 @@ class SDWANFeatureProfilesAPI:
     def __init__(self, session: ManagerSession):
         self.policy_object = PolicyObjectFeatureProfileAPI(session=session)
         self.system = SystemFeatureProfileAPI(session=session)
+        self.other = OtherFeatureProfileAPI(session=session)
 
 
 class FeatureProfileAPI(Protocol):
@@ -124,6 +127,73 @@ class SDRoutingCLIFeatureProfileAPI(FeatureProfileAPI):
         Deletes CLI feature-profile
         """
         self.endpoint.delete_cli_feature_profile(cli_fp_id=fp_id)
+
+
+class OtherFeatureProfileAPI:
+    """
+    SDWAN Feature Profile System APIs
+    """
+
+    def __init__(self, session: ManagerSession):
+        self.session = session
+        self.endpoint = OtherFeatureProfile(session)
+
+    def get_profiles(
+        self, limit: Optional[int] = None, offset: Optional[int] = None
+    ) -> DataSequence[FeatureProfileInfo]:
+        """
+        Get all Other Feature Profiles
+        """
+        payload = GetFeatureProfilesPayload(limit=limit if limit else None, offset=offset if offset else None)
+
+        return self.endpoint.get_sdwan_other_feature_profiles(payload)
+
+    def create_profile(self, name: str, description: str) -> FeatureProfileCreationResponse:
+        """
+        Create Other Feature Profile
+        """
+        payload = FeatureProfileCreationPayload(name=name, description=description)
+        return self.endpoint.create_sdwan_other_feature_profile(payload)
+
+    def delete_profile(self, profile_id: UUID) -> None:
+        """
+        Delete Other Feature Profile
+        """
+        self.endpoint.delete_sdwan_other_feature_profile(profile_id)
+
+    def get(
+        self,
+        profile_id: UUID,
+        parcel_type: Type[AnyOtherParcel],  # UCSE, 1000-eyes, cybervision
+        parcel_id: Union[UUID, None] = None,
+    ) -> DataSequence[Parcel[Any]]:
+        """
+        Get all Other Parcels for selected profile_id and selected type or get one Other Parcel given parcel id
+        """
+
+        if not parcel_id:
+            return self.endpoint.get_all(profile_id, parcel_type._get_parcel_type())
+        return self.endpoint.get_by_id(profile_id, parcel_type._get_parcel_type(), parcel_id)
+
+    def create(self, profile_id: UUID, payload: AnyOtherParcel) -> ParcelCreationResponse:
+        """
+        Create Other Parcel for selected profile_id based on payload type
+        """
+
+        return self.endpoint.create(profile_id, payload._get_parcel_type(), payload)
+
+    def update(self, profile_id: UUID, payload: AnyOtherParcel, parcel_id: UUID) -> ParcelCreationResponse:
+        """
+        Update Other Parcel for selected profile_id based on payload type
+        """
+
+        return self.endpoint.update(profile_id, payload._get_parcel_type(), parcel_id, payload)
+
+    def delete(self, profile_id: UUID, parcel_type: Type[AnyOtherParcel], parcel_id: UUID) -> None:
+        """
+        Delete Other Parcel for selected profile_id based on payload type
+        """
+        return self.endpoint.delete(profile_id, parcel_type._get_parcel_type(), parcel_id)
 
 
 class SystemFeatureProfileAPI:
