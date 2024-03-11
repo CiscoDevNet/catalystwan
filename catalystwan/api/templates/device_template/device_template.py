@@ -9,8 +9,6 @@ from typing import TYPE_CHECKING, Final, List
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from catalystwan.utils.device_model import DeviceModel
-
 if TYPE_CHECKING:
     from catalystwan.session import ManagerSession
 
@@ -46,9 +44,9 @@ class DeviceTemplate(BaseModel):
 
     template_name: str = Field(alias="templateName")
     template_description: str = Field(alias="templateDescription")
-    general_templates: List[GeneralTemplate] = Field(alias="generalTemplates")
+    general_templates: List[GeneralTemplate] = Field(default=[], alias="generalTemplates")
     device_role: str = Field(default="sdwan-edge", alias="deviceRole")
-    device_type: DeviceModel = Field(alias="deviceType")
+    device_type: str = Field(alias="deviceType")
     security_policy_id: str = Field(default="", alias="securityPolicyId")
     policy_id: str = Field(default="", alias="policyId")
 
