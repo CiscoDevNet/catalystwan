@@ -228,7 +228,7 @@ class CentralizedPolicy(PolicyCreationPayload):
         # while POST /template/policy/vsmart requires a regular object
         # it makes sense to reuse that model for both requests and present parsed data to the user
         # TODO: this is workaround, probably it is better to provide separate models for "cli" and "feature"
-        if policy_definition := values.get("policyDefinition") and values.get("policyType") != "cli":
+        if (policy_definition := values.get("policyDefinition")) and values.get("policyType") != "cli":
             if isinstance(policy_definition, str):
                 values["policyDefinition"] = CentralizedPolicyDefinition.model_validate_json(policy_definition)
         else:

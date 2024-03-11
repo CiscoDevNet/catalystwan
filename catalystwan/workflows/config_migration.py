@@ -63,18 +63,12 @@ def collect_ux1_config(session: ManagerSession, progress: Callable[[str, int, in
 
     """Collect Policies"""
     policy_api = session.api.policy
-    progress("Collecting Policy Info", 0, 3)
 
-    centralized_policy_ids = [info.policy_id for info in policy_api.centralized.get()]
-    progress("Collecting Policy Info", 1, 3)
-
-    localized_policy_ids = [info.policy_id for info in policy_api.localized.get()]
-    progress("Collecting Policy Info", 2, 3)
-
+    progress("Collecting Policy Info", 0, 1)
     policy_definition_types_and_ids = [
         (policy_type, info.definition_id) for policy_type, info in policy_api.definitions.get_all()
     ]
-    progress("Collecting Policy Info", 3, 3)
+    progress("Collecting Policy Info", 1, 1)
 
     policy_list_types = POLICY_LIST_ENDPOINTS_MAP.keys()
     for i, policy_list_type in enumerate(policy_list_types):
@@ -85,13 +79,17 @@ def collect_ux1_config(session: ManagerSession, progress: Callable[[str, int, in
         ux1.policies.policy_definitions.append(policy_api.definitions.get(*type_and_id))
         progress("Collecting Policy Definitions", i + 1, len(policy_definition_types_and_ids))
 
-    for i, cpid in enumerate(centralized_policy_ids):
-        ux1.policies.centralized_policies.append(policy_api.centralized.get(id=cpid))
-        progress("Collecting Centralized Policies", i + 1, len(centralized_policy_ids))
+    progress("Collecting Centralized Policies", 0, 1)
+    ux1.policies.centralized_policies = [item for item in policy_api.centralized.get()]
+    progress("Collecting Centralized Policies", 1, 1)
 
-    for i, lpid in enumerate(localized_policy_ids):
-        ux1.policies.localized_policies.append(policy_api.localized.get(id=lpid))
-        progress("Collecting Localized Policies", i + 1, len(localized_policy_ids))
+    progress("Collecting Localized Policies", 0, 1)
+    ux1.policies.localized_policies = [item for item in policy_api.localized.get()]
+    progress("Collecting Localized Policies", 1, 1)
+
+    progress("Collecting Security Policies", 0, 1)
+    ux1.policies.security_policies = [item for item in policy_api.security.get()]
+    progress("Collecting Security Policies", 1, 1)
 
     """Collect Templates"""
     template_api = session.api.templates
