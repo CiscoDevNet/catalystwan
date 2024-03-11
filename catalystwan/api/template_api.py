@@ -746,3 +746,8 @@ class TemplatesAPI:
         params = {"feature": "all"}
         templates = self.session.get(url=endpoint, params=params)
         return templates.dataseq(DeviceTemplateInformation)
+
+    def get_device_template(self, template_id: str) -> DeviceTemplate:
+        endpoint = f"/dataservice/template/device/object/{template_id}"
+        response = self.session.get(endpoint)
+        return DeviceTemplate(**response.json())

@@ -5,7 +5,8 @@ from typing import List, Literal, Union
 from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import Annotated
 
-from catalystwan.api.template_api import DeviceTemplateInformation, FeatureTemplateInformation
+from catalystwan.api.template_api import FeatureTemplateInformation
+from catalystwan.api.templates.device_template.device_template import DeviceTemplate
 from catalystwan.endpoints.configuration_group import ConfigGroup
 from catalystwan.models.configuration.feature_profile.common import FeatureProfileCreationPayload
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object import AnyPolicyObjectParcel
@@ -51,7 +52,7 @@ class UX1Templates(BaseModel):
     feature_templates: List[FeatureTemplateInformation] = Field(
         default=[], serialization_alias="featureTemplates", validation_alias="featureTemplates"
     )
-    device_templates: List[DeviceTemplateInformation] = Field(
+    device_templates: List[DeviceTemplate] = Field(
         default=[], serialization_alias="deviceTemplates", validation_alias="deviceTemplates"
     )
 
