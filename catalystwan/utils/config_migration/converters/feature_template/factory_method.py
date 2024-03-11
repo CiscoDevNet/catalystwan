@@ -19,6 +19,7 @@ from .normalizer import template_definition_normalization
 from .ntp import NTPTemplateConverter
 from .omp import OMPTemplateConverter
 from .security import SecurityTemplateConverter
+from .thousandeyes import ThousandEyesTemplateConverter
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +34,7 @@ available_converters = [
     OMPTemplateConverter,
     NTPTemplateConverter,
     BGPTemplateConverter,
+    ThousandEyesTemplateConverter,
 ]
 
 

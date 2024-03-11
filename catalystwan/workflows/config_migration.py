@@ -34,6 +34,7 @@ SUPPORTED_TEMPLATE_TYPES = [
     "ntp",
     "bgp",
     "cisco_bgp",
+    "cisco_thousandeyes",
 ]
 
 
