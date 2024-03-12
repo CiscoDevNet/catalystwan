@@ -37,14 +37,18 @@ def find_template_values(
             return templated_values
 
         value = template_definition[target_key]
-        template_value = template_definition[target_key_for_template_value]
+        template_value = template_definition.get(target_key_for_template_value)
 
         field_key = path[-1]
         # TODO: Handle nested DeviceVariable
         if value == "variableName":
             if device_specific_variables is not None:
                 device_specific_variables[field_key] = DeviceVariable(name=template_definition["vipVariableName"])
-        elif template_definition["vipType"] == "variable":
+            return template_definition
+        if template_value is None:
+            return template_definition
+
+        if template_definition["vipType"] == "variable":
             if device_specific_variables is not None and template_value:
                 device_specific_variables[field_key] = DeviceVariable(name=template_value)
         elif template_definition["vipObjectType"] == "list":
