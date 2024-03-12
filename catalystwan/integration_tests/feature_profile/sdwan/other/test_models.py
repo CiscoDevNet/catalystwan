@@ -2,7 +2,9 @@ import os
 import unittest
 from typing import cast
 
-from catalystwan.models.configuration.feature_profile.sdwan.other import ThousandEyesParcel
+from catalystwan.api.configuration_groups.parcel import Global, as_global
+from catalystwan.models.configuration.feature_profile.sdwan.other import ThousandEyesParcel, UcseParcel
+from catalystwan.models.configuration.feature_profile.sdwan.other.ucse import AccessPort, Imc, LomType, SharedLom
 from catalystwan.session import create_manager_session
 
 
@@ -24,6 +26,26 @@ class TestSystemOtherProfileModels(unittest.TestCase):
         )
         # Act
         parcel_id = self.session.api.sdwan_feature_profiles.other.create(self.profile_id, te_parcel).id
+        # Assert
+        assert parcel_id
+
+    def test_when_default_values_ucse_parcel_expect_successful_post(self):
+        # Arrange
+        ucse_parcel = UcseParcel(
+            parcel_name="UcseDefault",
+            parcel_description="Ucse Parcel",
+            bay=as_global(1),
+            slot=as_global(2),
+            imc=Imc(
+                access_port=AccessPort(
+                    shared_lom=SharedLom(
+                        lom_type=Global[LomType](value="te2"),
+                    )
+                )
+            ),
+        )
+        # Act
+        parcel_id = self.session.api.sdwan_feature_profiles.other.create(self.profile_id, ucse_parcel).id
         # Assert
         assert parcel_id
 
