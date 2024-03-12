@@ -35,6 +35,7 @@ SUPPORTED_TEMPLATE_TYPES = [
     "bgp",
     "cisco_bgp",
     "cisco_thousandeyes",
+    "ucse",
 ]
 
 

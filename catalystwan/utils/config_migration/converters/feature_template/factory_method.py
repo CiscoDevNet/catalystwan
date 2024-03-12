@@ -20,6 +20,7 @@ from .ntp import NTPTemplateConverter
 from .omp import OMPTemplateConverter
 from .security import SecurityTemplateConverter
 from .thousandeyes import ThousandEyesTemplateConverter
+from .ucse import UcseTemplateConverter
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,7 @@ available_converters = [
     NTPTemplateConverter,
     BGPTemplateConverter,
     ThousandEyesTemplateConverter,
+    UcseTemplateConverter,
 ]
 
 
