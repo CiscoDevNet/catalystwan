@@ -36,6 +36,8 @@ SUPPORTED_TEMPLATE_TYPES = [
     "cisco_bgp",
     "cisco_thousandeyes",
     "ucse",
+    "dhcp",
+    "cisco_dhcp_server",
 ]
 
 
