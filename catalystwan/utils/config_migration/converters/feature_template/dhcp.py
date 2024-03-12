@@ -62,8 +62,8 @@ class DhcpTemplateConverter:
             for i, entry in enumerate(static_leases):
                 static_lease.append(
                     {
-                        "mac_address": entry.get("mac_address", as_variable(mac_address_variable.format(i))),
-                        "ip": entry.get("ip", as_variable(ip_variable.format(i))),
+                        "mac_address": entry.get("mac_address", as_variable(mac_address_variable.format(i + 1))),
+                        "ip": entry.get("ip", as_variable(ip_variable.format(i + 1))),
                     }
                 )
             values["static_lease"] = static_lease
