@@ -44,6 +44,7 @@ class DhcpTemplateConverter:
 
         values = deepcopy(template_values)
         values.update(values.pop("options", {}))
+        print(values)
 
         if address_pool := values.get("address_pool"):
             value = address_pool.value
@@ -56,17 +57,14 @@ class DhcpTemplateConverter:
             convert_str_list_to_ipv4_list(values, key)
 
         if static_leases := values.get("static_lease", []):
-            # UX1 dhcp has field "static_lease": [{"host_name": Global[str](value="test.com")}]
-            # UX2 needs to have "mac_address" and "ip" fields
-            # that's why we need to add them and populate with variables
             mac_address_variable = "{{{{dhcp_1_staticLease_{}_macAddress}}}}"
             ip_variable = "{{{{dhcp_1_staticLease_{}_ip}}}}"
             static_lease = []
-            for i, _ in enumerate(static_leases):
+            for i, entry in enumerate(static_leases):
                 static_lease.append(
                     {
-                        "mac_address": as_variable(mac_address_variable.format(i)),
-                        "ip": as_variable(ip_variable.format(i)),
+                        "mac_address": entry.get("mac_address", as_variable(mac_address_variable.format(i))),
+                        "ip": entry.get("ip", as_variable(ip_variable.format(i))),
                     }
                 )
             values["static_lease"] = static_lease
