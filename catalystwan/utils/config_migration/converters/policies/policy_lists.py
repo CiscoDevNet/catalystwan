@@ -94,6 +94,8 @@ def color(in_: ColorList) -> ColorParcel:
 
 def community(in_: CommunityList) -> StandardCommunityParcel:
     out = StandardCommunityParcel(**_get_parcel_name_desc(in_))
+    for entry in in_.entries:
+        out._add_community(entry.community)
     return out
 
 
