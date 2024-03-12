@@ -44,7 +44,6 @@ class DhcpTemplateConverter:
 
         values = deepcopy(template_values)
         values.update(values.pop("options", {}))
-        print(values)
 
         if address_pool := values.get("address_pool"):
             value = address_pool.value
