@@ -264,7 +264,7 @@ class ClassMapList(PolicyListBase):
 
     def assign_queue(self, queue: int) -> None:
         # Class map list must have only one entry!
-        entry = ClassMapListEntry(queue=str(queue))
+        entry = ClassMapListEntry(queue=queue)
         self._add_entry(entry, single=True)
 
 

@@ -80,11 +80,15 @@ def app_list(in_: AppList) -> ApplicationListParcel:
 
 def class_map(in_: ClassMapList) -> FowardingClassParcel:
     out = FowardingClassParcel(**_get_parcel_name_desc(in_))
+    for entry in in_.entries:
+        out.add_queue(entry.queue)
     return out
 
 
 def color(in_: ColorList) -> ColorParcel:
     out = ColorParcel(**_get_parcel_name_desc(in_))
+    for entry in in_.entries:
+        out.add_color(entry.color)
     return out
 
 

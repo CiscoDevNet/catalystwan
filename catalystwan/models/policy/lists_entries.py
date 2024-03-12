@@ -6,7 +6,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, field_validator, model_validator
 
-from catalystwan.models.common import InterfaceType, TLOCColor, check_fields_exclusive
+from catalystwan.models.common import InterfaceType, IntStr, TLOCColor, check_fields_exclusive
 
 
 def check_jitter_ms(jitter_str: Optional[str]) -> Optional[str]:
@@ -299,13 +299,7 @@ class ASPathListEntry(BaseModel):
 
 
 class ClassMapListEntry(BaseModel):
-    queue: str
-
-    @field_validator("queue")
-    @classmethod
-    def check_queue(cls, queue_str: str):
-        assert 0 <= int(queue_str) <= 7
-        return queue_str
+    queue: IntStr = Field(ge=0, le=7)
 
 
 class MirrorListEntry(BaseModel):
