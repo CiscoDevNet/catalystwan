@@ -8,6 +8,9 @@ from pydantic import BaseModel, Field
 
 from catalystwan.models.common import InterfaceType, TLOCColor, WellKnownBGPCommunities
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object import AnyPolicyObjectParcel
+from catalystwan.models.configuration.feature_profile.sdwan.policy_object.policy.application_list import (
+    ApplicationListParcel,
+)
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object.policy.data_prefix import (
     DataPrefixEntry,
     DataPrefixParcel,
@@ -172,6 +175,18 @@ class AppList(PolicyListBase):
 
     def add_app_family(self, app_family: str) -> None:
         self._add_entry(AppListEntry(app_family=app_family))
+
+    def to_policy_object_parcel(self) -> ApplicationListParcel:
+        parcel = ApplicationListParcel(
+            parcel_name=self.name,
+            parcel_description=self.description,
+        )
+        for entry in self.entries:
+            if entry.app is not None:
+                parcel.add_application(entry.app)
+            elif entry.app_family is not None:
+                parcel.add_application_family(entry.app_family)
+        return parcel
 
 
 class ColorList(PolicyListBase):

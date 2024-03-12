@@ -44,7 +44,7 @@ AnyURLParcel = Annotated[
 
 AnyPolicyObjectParcel = Annotated[
     Union[
-        # AnyURLParcel,
+        AnyURLParcel,
         ApplicationListParcel,
         AppProbeParcel,
         ColorParcel,
