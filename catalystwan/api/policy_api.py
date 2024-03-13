@@ -143,19 +143,19 @@ from catalystwan.endpoints.configuration.policy.vsmart_template import (
 from catalystwan.models.misc.application_protocols import ApplicationProtocol
 from catalystwan.models.policy import AnyPolicyDefinition, AnyPolicyList
 from catalystwan.models.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
-from catalystwan.models.policy.definitions.access_control_list import AclPolicy
-from catalystwan.models.policy.definitions.access_control_list_ipv6 import AclIPv6Policy
-from catalystwan.models.policy.definitions.control import ControlPolicy
-from catalystwan.models.policy.definitions.device_access import DeviceAccessPolicy
-from catalystwan.models.policy.definitions.device_access_ipv6 import DeviceAccessIPv6Policy
-from catalystwan.models.policy.definitions.hub_and_spoke import HubAndSpokePolicy
-from catalystwan.models.policy.definitions.mesh import MeshPolicy
-from catalystwan.models.policy.definitions.qos_map import QoSMapPolicy
-from catalystwan.models.policy.definitions.rewrite import RewritePolicy
-from catalystwan.models.policy.definitions.rule_set import RuleSet
-from catalystwan.models.policy.definitions.security_group import SecurityGroup
-from catalystwan.models.policy.definitions.vpn_membership import VPNMembershipPolicy
-from catalystwan.models.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy
+from catalystwan.models.policy.definition.access_control_list import AclPolicy
+from catalystwan.models.policy.definition.access_control_list_ipv6 import AclIPv6Policy
+from catalystwan.models.policy.definition.control import ControlPolicy
+from catalystwan.models.policy.definition.device_access import DeviceAccessPolicy
+from catalystwan.models.policy.definition.device_access_ipv6 import DeviceAccessIPv6Policy
+from catalystwan.models.policy.definition.hub_and_spoke import HubAndSpokePolicy
+from catalystwan.models.policy.definition.mesh import MeshPolicy
+from catalystwan.models.policy.definition.qos_map import QoSMapPolicy
+from catalystwan.models.policy.definition.rewrite import RewritePolicy
+from catalystwan.models.policy.definition.rule_set import RuleSet
+from catalystwan.models.policy.definition.security_group import SecurityGroup
+from catalystwan.models.policy.definition.vpn_membership import VPNMembershipPolicy
+from catalystwan.models.policy.definition.zone_based_firewall import ZoneBasedFWPolicy
 from catalystwan.models.policy.lists import (
     AppList,
     AppProbeClassList,

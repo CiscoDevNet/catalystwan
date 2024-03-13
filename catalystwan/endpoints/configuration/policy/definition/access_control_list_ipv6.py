@@ -4,7 +4,7 @@
 from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
-from catalystwan.models.policy.definitions.access_control_list_ipv6 import AclIPv6Policy
+from catalystwan.models.policy.definition.access_control_list_ipv6 import AclIPv6Policy
 from catalystwan.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,

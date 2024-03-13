@@ -7,20 +7,20 @@ from pydantic import Field
 from typing_extensions import Annotated
 
 from .centralized import CentralizedPolicy, TrafficDataDirection
-from .definitions.access_control_list import AclPolicy
-from .definitions.access_control_list_ipv6 import AclIPv6Policy
-from .definitions.control import ControlPolicy
-from .definitions.device_access import DeviceAccessPolicy
-from .definitions.device_access_ipv6 import DeviceAccessIPv6Policy
-from .definitions.hub_and_spoke import HubAndSpokePolicy
-from .definitions.mesh import MeshPolicy
-from .definitions.qos_map import QoSDropType, QoSMapPolicy
-from .definitions.rewrite import RewritePolicy
-from .definitions.rule_set import RuleSet
-from .definitions.security_group import SecurityGroup
-from .definitions.traffic_data import TrafficDataPolicy
-from .definitions.vpn_membership import VPNMembershipPolicy
-from .definitions.zone_based_firewall import ZoneBasedFWPolicy
+from .definition.access_control_list import AclPolicy
+from .definition.access_control_list_ipv6 import AclIPv6Policy
+from .definition.control import ControlPolicy
+from .definition.device_access import DeviceAccessPolicy
+from .definition.device_access_ipv6 import DeviceAccessIPv6Policy
+from .definition.hub_and_spoke import HubAndSpokePolicy
+from .definition.mesh import MeshPolicy
+from .definition.qos_map import QoSDropType, QoSMapPolicy
+from .definition.rewrite import RewritePolicy
+from .definition.rule_set import RuleSet
+from .definition.security_group import SecurityGroup
+from .definition.traffic_data import TrafficDataPolicy
+from .definition.vpn_membership import VPNMembershipPolicy
+from .definition.zone_based_firewall import ZoneBasedFWPolicy
 from .lists import (
     AppList,
     AppProbeClassList,
@@ -52,7 +52,7 @@ from .lists import (
     VPNList,
     ZoneList,
 )
-from .lists_entries import EncapType, PathPreference, PolicerExceedAction
+from .lists_entries import PathPreference, PolicerExceedAction
 from .localized import LocalizedPolicy
 from .policy_definition import (
     Carrier,
@@ -142,7 +142,6 @@ __all__ = (
     "DeviceAccessIPv6Policy",
     "DeviceAccessPolicy",
     "DNSTypeEntryType",
-    "EncapType",
     "ExpandedCommunityList",
     "FQDNList",
     "GeoLocationList",

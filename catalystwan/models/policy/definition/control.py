@@ -7,8 +7,7 @@ from uuid import UUID
 from pydantic import ConfigDict, Field
 from typing_extensions import Annotated
 
-from catalystwan.models.common import TLOCColor
-from catalystwan.models.policy.lists_entries import EncapType
+from catalystwan.models.common import EncapType, TLOCColor
 from catalystwan.models.policy.policy_definition import (
     AffinityEntry,
     Carrier,

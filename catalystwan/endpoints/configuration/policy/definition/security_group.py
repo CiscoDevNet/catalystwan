@@ -4,7 +4,7 @@
 from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
-from catalystwan.models.policy.definitions.security_group import SecurityGroup
+from catalystwan.models.policy.definition.security_group import SecurityGroup
 from catalystwan.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,

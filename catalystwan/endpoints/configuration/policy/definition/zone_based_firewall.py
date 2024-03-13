@@ -4,7 +4,7 @@
 from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
-from catalystwan.models.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy
+from catalystwan.models.policy.definition.zone_based_firewall import ZoneBasedFWPolicy
 from catalystwan.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,

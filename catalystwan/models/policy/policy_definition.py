@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, RootModel, field_validator, m
 from typing_extensions import Annotated, Literal
 
 from catalystwan.models.common import (
+    EncapType,
     ICMPMessageType,
     ServiceChainNumber,
     TLOCColor,
@@ -18,7 +19,6 @@ from catalystwan.models.common import (
     str_as_uuid_list,
 )
 from catalystwan.models.misc.application_protocols import ApplicationProtocol
-from catalystwan.models.policy.lists_entries import EncapType
 from catalystwan.typed_list import DataSequence
 
 

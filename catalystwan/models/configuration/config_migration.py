@@ -1,6 +1,6 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
-from typing import List, Literal, Union
+from typing import List, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import Annotated
@@ -51,14 +51,6 @@ class UX1Templates(BaseModel):
     )
     device_templates: List[DeviceTemplate] = Field(
         default=[], serialization_alias="deviceTemplates", validation_alias="deviceTemplates"
-    )
-
-
-class ConfigGroupPreset(BaseModel):
-    config_group_name: str = Field(serialization_alias="name", validation_alias="name")
-    solution: Literal["sdwan"] = "sdwan"
-    profile_parcels: List[AnyParcel] = Field(
-        default=[], serialization_alias="profileParcels", validation_alias="profileParcels"
     )
 
 

@@ -4,7 +4,7 @@
 from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
-from catalystwan.models.policy.definitions.hub_and_spoke import HubAndSpokePolicy
+from catalystwan.models.policy.definition.hub_and_spoke import HubAndSpokePolicy
 from catalystwan.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionEndpoints,

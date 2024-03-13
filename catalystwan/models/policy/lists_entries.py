@@ -7,6 +7,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, field_validator, model_validator
 
 from catalystwan.models.common import (
+    EncapType,
     InterfaceType,
     IntRangeStr,
     IntStr,
@@ -37,11 +38,6 @@ def check_loss_percent(loss_str: Optional[str]) -> Optional[str]:
 PolicerExceedAction = Literal[
     "drop",
     "remark",
-]
-
-EncapType = Literal[
-    "ipsec",
-    "gre",
 ]
 
 PathPreference = Literal[
