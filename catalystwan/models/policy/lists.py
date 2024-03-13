@@ -8,7 +8,6 @@ from pydantic import BaseModel, Field
 
 from catalystwan.models.common import InterfaceType, TLOCColor, WellKnownBGPCommunities
 from catalystwan.models.policy.lists_entries import (
-    ClassMapListEntry,
     ColorGroupPreference,
     ColorListEntry,
     CommunityListEntry,
@@ -185,16 +184,6 @@ class PolicerList(PolicyListBase):
     def police(self, burst: int, rate: int, exceed: PolicerExceedAction = "drop") -> None:
         # Policer list must have only single entry!
         entry = PolicerListEntry(burst=burst, exceed=exceed, rate=rate)
-        self._add_entry(entry, single=True)
-
-
-class ClassMapList(PolicyListBase):
-    type: Literal["class"] = "class"
-    entries: List[ClassMapListEntry] = []
-
-    def assign_queue(self, queue: int) -> None:
-        # Class map list must have only one entry!
-        entry = ClassMapListEntry(queue=queue)
         self._add_entry(entry, single=True)
 
 

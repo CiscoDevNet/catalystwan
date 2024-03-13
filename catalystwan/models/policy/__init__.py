@@ -9,6 +9,7 @@ from typing_extensions import Annotated
 from catalystwan.models.policy.list.app import AppList
 from catalystwan.models.policy.list.app_probe import AppProbeClassList
 from catalystwan.models.policy.list.as_path import ASPathList
+from catalystwan.models.policy.list.class_map import ClassMapList
 
 from .centralized import CentralizedPolicy, TrafficDataDirection
 from .definition.access_control_list import AclPolicy
@@ -26,7 +27,6 @@ from .definition.traffic_data import TrafficDataPolicy
 from .definition.vpn_membership import VPNMembershipPolicy
 from .definition.zone_based_firewall import ZoneBasedFWPolicy
 from .lists import (
-    ClassMapList,
     ColorList,
     CommunityList,
     DataIPv6PrefixList,
