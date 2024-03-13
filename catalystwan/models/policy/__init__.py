@@ -13,6 +13,7 @@ from catalystwan.models.policy.list.class_map import ClassMapList
 from catalystwan.models.policy.list.color import ColorList
 from catalystwan.models.policy.list.communities import CommunityList, ExpandedCommunityList
 from catalystwan.models.policy.list.data_ipv6_prefix import DataIPv6PrefixList
+from catalystwan.models.policy.list.data_prefix import DataPrefixList
 
 from .centralized import CentralizedPolicy, TrafficDataDirection
 from .definition.access_control_list import AclPolicy
@@ -30,7 +31,6 @@ from .definition.traffic_data import TrafficDataPolicy
 from .definition.vpn_membership import VPNMembershipPolicy
 from .definition.zone_based_firewall import ZoneBasedFWPolicy
 from .lists import (
-    DataPrefixList,
     FQDNList,
     GeoLocationList,
     IPSSignatureList,
