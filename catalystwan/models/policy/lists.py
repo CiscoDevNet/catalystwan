@@ -8,7 +8,6 @@ from pydantic import BaseModel, Field
 
 from catalystwan.models.common import InterfaceType, TLOCColor, WellKnownBGPCommunities
 from catalystwan.models.policy.lists_entries import (
-    AppListEntry,
     ASPathListEntry,
     ClassMapListEntry,
     ColorGroupPreference,
@@ -124,17 +123,6 @@ class ProtocolNameList(PolicyListBase):
 class LocalAppList(PolicyListBase):
     type: Literal["localApp"] = "localApp"
     entries: List[LocalAppListEntry] = []
-
-
-class AppList(PolicyListBase):
-    type: Literal["app"] = "app"
-    entries: List[AppListEntry] = []
-
-    def add_app(self, app: str) -> None:
-        self._add_entry(AppListEntry(app=app))
-
-    def add_app_family(self, app_family: str) -> None:
-        self._add_entry(AppListEntry(app_family=app_family))
 
 
 class ColorList(PolicyListBase):

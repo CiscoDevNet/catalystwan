@@ -5,17 +5,9 @@ from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
 from catalystwan.endpoints.configuration.policy.abstractions import PolicyListEndpoints
-from catalystwan.models.policy.lists import AppList
-from catalystwan.models.policy.policy_list import InfoTag, PolicyListId, PolicyListInfo, PolicyListPreview
+from catalystwan.models.policy.list.app import AppList, AppListEditPayload, AppListInfo
+from catalystwan.models.policy.policy_list import InfoTag, PolicyListId, PolicyListPreview
 from catalystwan.typed_list import DataSequence
-
-
-class AppListEditPayload(AppList, PolicyListId):
-    pass
-
-
-class AppListInfo(AppList, PolicyListInfo):
-    pass
 
 
 class ConfigurationPolicyApplicationList(APIEndpoints, PolicyListEndpoints):
