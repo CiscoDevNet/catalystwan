@@ -8,7 +8,6 @@ from pydantic import BaseModel, Field
 
 from catalystwan.models.common import InterfaceType, TLOCColor, WellKnownBGPCommunities
 from catalystwan.models.policy.lists_entries import (
-    ASPathListEntry,
     ClassMapListEntry,
     ColorGroupPreference,
     ColorListEntry,
@@ -187,11 +186,6 @@ class PolicerList(PolicyListBase):
         # Policer list must have only single entry!
         entry = PolicerListEntry(burst=burst, exceed=exceed, rate=rate)
         self._add_entry(entry, single=True)
-
-
-class ASPathList(PolicyListBase):
-    type: Literal["asPath"] = "asPath"
-    entries: List[ASPathListEntry] = []
 
 
 class ClassMapList(PolicyListBase):
