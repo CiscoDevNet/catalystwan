@@ -6,6 +6,7 @@ from catalystwan.endpoints.configuration_group import ConfigGroup
 from catalystwan.models.configuration.config_migration import UX1Config, UX2Config
 from catalystwan.session import ManagerSession
 from catalystwan.utils.config_migration.converters.feature_template import create_parcel_from_template
+from catalystwan.utils.config_migration.converters.policy.policy_lists import convert_all as convert_policy_lists
 from catalystwan.utils.config_migration.creators.config_group import ConfigGroupCreator
 
 logger = logging.getLogger(__name__)
@@ -52,9 +53,7 @@ def transform(ux1: UX1Config) -> UX2Config:
         if ft.template_type in SUPPORTED_TEMPLATE_TYPES:
             ux2.profile_parcels.append(create_parcel_from_template(ft))
     # Policy Lists
-    for policy_list in ux1.policies.policy_lists:
-        if (parcel := policy_list.to_policy_object_parcel()) is not None:
-            ux2.profile_parcels.append(parcel)
+    ux2.profile_parcels.extend(convert_policy_lists(ux1.policies.policy_lists).output)
     return ux2
 
 

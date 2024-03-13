@@ -13,7 +13,7 @@ from .policy.expanded_community_list import ExpandedCommunityParcel
 from .policy.fowarding_class import FowardingClassParcel, FowardingClassQueueEntry
 from .policy.ipv6_data_prefix import IPv6DataPrefixEntry, IPv6DataPrefixParcel
 from .policy.ipv6_prefix_list import IPv6PrefixListEntry, IPv6PrefixListParcel
-from .policy.policier import PolicierEntry, PolicierParcel
+from .policy.policer import PolicerEntry, PolicerParcel
 from .policy.prefered_group_color import Preference, PreferredColorGroupEntry, PreferredColorGroupParcel
 from .policy.prefix_list import PrefixListEntry, PrefixListParcel
 from .policy.sla_class import FallbackBestTunnel, SLAAppProbeClass, SLAClassCriteria, SLAClassListEntry, SLAClassParcel
@@ -57,7 +57,7 @@ AnyPolicyObjectParcel = Annotated[
         IPv6DataPrefixParcel,
         IPv6PrefixListParcel,
         LocalDomainParcel,
-        PolicierParcel,
+        PolicerParcel,
         PreferredColorGroupParcel,
         PrefixListParcel,
         ProtocolListParcel,
@@ -101,8 +101,8 @@ __all__ = (
     "IPv6PrefixListParcel",
     "LocalDomainListEntry",
     "LocalDomainParcel",
-    "PolicierEntry",
-    "PolicierParcel",
+    "PolicerEntry",
+    "PolicerParcel",
     "Preference",
     "PreferredColorGroupEntry",
     "PreferredColorGroupParcel",

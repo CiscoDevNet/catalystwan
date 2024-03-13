@@ -1,12 +1,19 @@
 # Copyright 2023 Cisco Systems, Inc. and its affiliates
 
-from ipaddress import IPv4Address, IPv4Network, IPv6Interface, IPv6Network
+from ipaddress import IPv4Address, IPv4Network, IPv6Interface
 from typing import List, Literal, Optional, Set
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, field_validator, model_validator
 
-from catalystwan.models.common import InterfaceType, IntStr, TLOCColor, check_fields_exclusive
+from catalystwan.models.common import (
+    InterfaceType,
+    IntRangeStr,
+    IntStr,
+    TLOCColor,
+    check_fields_exclusive,
+    str_as_str_list,
+)
 
 
 def check_jitter_ms(jitter_str: Optional[str]) -> Optional[str]:
@@ -52,14 +59,16 @@ class ColorDSCPMap(BaseModel):
 class ColorGroupPreference(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    color_preference: str = Field(serialization_alias="colorPreference", validation_alias="colorPreference")
+    color_preference: Set[TLOCColor] = Field(serialization_alias="colorPreference", validation_alias="colorPreference")
     path_preference: PathPreference = Field(serialization_alias="pathPreference", validation_alias="pathPreference")
+
+    _color_pref = field_validator("color_preference", mode="before")(str_as_str_list)
 
     @staticmethod
     def from_color_set_and_path(
         color_preference: Set[TLOCColor], path_preference: PathPreference
     ) -> "ColorGroupPreference":
-        return ColorGroupPreference(color_preference=" ".join(color_preference), path_preference=path_preference)
+        return ColorGroupPreference(color_preference=color_preference, path_preference=path_preference)
 
 
 class FallbackBestTunnel(BaseModel):
@@ -144,29 +153,28 @@ class SiteListEntry(BaseModel):
 
 
 class VPNListEntry(BaseModel):
-    vpn: str = Field(description="0-65530 range or single number")
+    vpn: IntRangeStr = Field(description="0-65530 range or single number")
 
     @field_validator("vpn")
     @classmethod
-    def check_vpn_range(cls, vpns_str: str):
-        vpns = [int(vpn) for vpn in vpns_str.split("-")]
-        assert len(vpns) <= 2
-        for vpn in vpns:
-            assert 0 <= vpn <= 65530
-        if len(vpns) == 2:
-            assert vpns[0] <= vpns[1]
-        return vpns_str
+    def check_vpn_range(cls, vpn: IntRangeStr):
+        for i in vpn:
+            if i is not None:
+                assert 0 <= i <= 65_530
+        return vpn
 
 
 class ZoneListEntry(BaseModel):
-    vpn: Optional[str] = Field(default=None, description="0-65530 single number")
+    vpn: Optional[IntRangeStr] = Field(default=None, description="0-65530 single number")
     interface: Optional[InterfaceType] = None
 
     @field_validator("vpn")
     @classmethod
-    def check_vpn_range(cls, vpn_str: str):
-        assert 0 <= int(vpn_str) <= 65530
-        return vpn_str
+    def check_vpn_range(cls, vpn: IntRangeStr):
+        for i in vpn:
+            if i is not None:
+                assert 0 <= i <= 65_530
+        return vpn
 
     @model_validator(mode="after")
     def check_vpn_xor_interface(self):
@@ -191,13 +199,15 @@ class GeoLocationListEntry(BaseModel):
 
 
 class PortListEntry(BaseModel):
-    port: str
+    port: IntRangeStr
 
     @field_validator("port")
     @classmethod
-    def check_port_range(cls, port_str: str):
-        assert 0 <= int(port_str) <= 65535
-        return port_str
+    def check_port(cls, port: IntRangeStr):
+        for i in port:
+            if i is not None:
+                assert 0 <= i <= 65_535
+        return port
 
 
 class ProtocolNameListEntry(BaseModel):
@@ -275,21 +285,9 @@ class CommunityListEntry(BaseModel):
 class PolicerListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    burst: str = Field(description="bytes: integer in range 15000-10000000")
+    burst: IntStr = Field(description="bytes", ge=15_000, le=10_000_000)
     exceed: PolicerExceedAction = "drop"
-    rate: str = Field(description="bps: integer in range 8-100000000000")
-
-    @field_validator("burst")
-    @classmethod
-    def check_burst(cls, burst_str: str):
-        assert 15000 <= int(burst_str) <= 10_000_000
-        return burst_str
-
-    @field_validator("rate")
-    @classmethod
-    def check_rate(cls, rate_str: str):
-        assert 8 <= int(rate_str) <= 100_000_000_000
-        return rate_str
+    rate: IntStr = Field(description="bps", ge=8, le=100_000_000_000)
 
 
 class ASPathListEntry(BaseModel):
@@ -398,30 +396,16 @@ class PrefixListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     ip_prefix: IPv4Network = Field(serialization_alias="ipPrefix", validation_alias="ipPrefix")
-    ge: Optional[str] = None
-    le: Optional[str] = None
-
-    @field_validator("ge", "le", check_fields=False)
-    @classmethod
-    def check_ge_and_le(cls, ge_le_str: Optional[str]):
-        if ge_le_str is not None:
-            assert 0 <= int(ge_le_str) <= 32
-        return ge_le_str
+    ge: Optional[IntStr] = Field(default=None, ge=0, le=32)
+    le: Optional[IntStr] = Field(default=None, ge=0, le=32)
 
 
 class IPv6PrefixListEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    ipv6_prefix: IPv6Network = Field(serialization_alias="ipv6Prefix", validation_alias="ipv6Prefix")
-    ge: Optional[str] = None
-    le: Optional[str] = None
-
-    @field_validator("ge", "le", check_fields=False)
-    @classmethod
-    def check_ge_and_le(cls, ge_le_str: Optional[str]):
-        if ge_le_str is not None:
-            assert 0 <= int(ge_le_str) <= 128
-        return ge_le_str
+    ipv6_prefix: IPv6Interface = Field(serialization_alias="ipv6Prefix", validation_alias="ipv6Prefix")
+    ge: Optional[IntStr] = Field(default=None, ge=0, le=128)
+    le: Optional[IntStr] = Field(default=None, ge=0, le=128)
 
 
 class RegionListEntry(BaseModel):
