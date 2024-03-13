@@ -9,7 +9,6 @@ from pydantic import BaseModel, Field
 from catalystwan.models.common import InterfaceType, TLOCColor
 from catalystwan.models.policy.lists_entries import (
     ColorGroupPreference,
-    DataIPv6PrefixListEntry,
     DataPrefixListEntry,
     EncapType,
     FQDNListEntry,
@@ -119,14 +118,6 @@ class ProtocolNameList(PolicyListBase):
 class LocalAppList(PolicyListBase):
     type: Literal["localApp"] = "localApp"
     entries: List[LocalAppListEntry] = []
-
-
-class DataIPv6PrefixList(PolicyListBase):
-    type: Literal["dataIpv6Prefix"] = "dataIpv6Prefix"
-    entries: List[DataIPv6PrefixListEntry] = []
-
-    def add_prefix(self, ipv6_prefix: IPv6Interface) -> None:
-        self._add_entry(DataIPv6PrefixListEntry(ipv6_prefix=ipv6_prefix))
 
 
 class LocalDomainList(PolicyListBase):
