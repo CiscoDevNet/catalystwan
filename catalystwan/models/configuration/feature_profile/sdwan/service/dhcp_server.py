@@ -118,7 +118,7 @@ class LanVpnDhcpServerParcel(_ParcelBase):
         validation_alias=AliasPath("data", "addressPool"),
         description="Configure IPv4 prefix range of the DHCP address pool",
     )
-    exclude: Union[Global[List[IPv4Address]], Variable, Default[None]] = Field(
+    exclude: Union[Global[List[IPv4Address]], Global[List[str]], Variable, Default[None]] = Field(
         default=Default[None](value=None),
         validation_alias=AliasPath("data", "exclude"),
         description="Configure IPv4 address to exclude from DHCP address pool",
