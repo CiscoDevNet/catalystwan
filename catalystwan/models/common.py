@@ -1,6 +1,6 @@
 # Copyright 2023 Cisco Systems, Inc. and its affiliates
 
-from typing import Dict, List, Literal, Sequence, Set, Tuple, Union
+from typing import Dict, List, Literal, Optional, Sequence, Set, Tuple, Union
 from uuid import UUID
 
 from pydantic import PlainSerializer
@@ -57,6 +57,35 @@ IntStr = Annotated[
     int,
     PlainSerializer(lambda x: str(x), return_type=str, when_used="json-unless-none"),
     BeforeValidator(lambda x: int(x)),
+]
+
+IntRange = Tuple[int, Optional[int]]
+
+
+def int_range_str_validator(value: Union[str, IntRange], ascending: bool = True) -> IntRange:
+    """Validates input given as string containing integer pair separated by hyphen eg: '1-3' or single number '1'"""
+    if isinstance(value, str):
+        int_list = [int(i) for i in value.strip().split("-")]
+        assert 0 < len(int_list) <= 2, "Number range must contain one or two numbers"
+        first = int_list[0]
+        second = None if len(int_list) == 1 else int_list[1]
+        int_range = (first, second)
+    else:
+        int_range = value
+    if ascending and int_range[1] is not None:
+        assert int_range[0] < int_range[1], "Numbers in range must be in ascending order"
+    return int_range
+
+
+def int_range_serializer(value: IntRange) -> str:
+    """Serializes integer pair as string separated by hyphen eg: '1-3' or single number '1'"""
+    return "-".join((str(i) for i in value if i is not None))
+
+
+IntRangeStr = Annotated[
+    IntRange,
+    PlainSerializer(int_range_serializer, return_type=str, when_used="json-unless-none"),
+    BeforeValidator(int_range_str_validator),
 ]
 
 

@@ -12,13 +12,10 @@ from catalystwan.models.configuration.feature_profile.common import FeatureProfi
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object import AnyPolicyObjectParcel
 from catalystwan.models.configuration.feature_profile.sdwan.system import AnySystemParcel
 from catalystwan.models.configuration.topology_group import TopologyGroup
-from catalystwan.models.policy import (
-    AnyPolicyDefinition,
-    AnyPolicyList,
-    CentralizedPolicy,
-    LocalizedPolicy,
-    SecurityPolicy,
-)
+from catalystwan.models.policy import AnyPolicyDefinition, AnyPolicyList
+from catalystwan.models.policy.centralized import CentralizedPolicyInfo
+from catalystwan.models.policy.localized import LocalizedPolicyInfo
+from catalystwan.models.policy.security import AnySecurityPolicyInfo
 
 AnyParcel = Annotated[
     Union[
@@ -31,13 +28,13 @@ AnyParcel = Annotated[
 
 class UX1Policies(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-    centralized_policies: List[CentralizedPolicy] = Field(
+    centralized_policies: List[CentralizedPolicyInfo] = Field(
         default=[], serialization_alias="centralizedPolicies", validation_alias="centralizedPolicies"
     )
-    localized_policies: List[LocalizedPolicy] = Field(
+    localized_policies: List[LocalizedPolicyInfo] = Field(
         default=[], serialization_alias="localizedPolicies", validation_alias="localizedPolicies"
     )
-    security_policies: List[SecurityPolicy] = Field(
+    security_policies: List[AnySecurityPolicyInfo] = Field(
         default=[], serialization_alias="securityPolicies", validation_alias="securityPolicies"
     )
     policy_definitions: List[AnyPolicyDefinition] = Field(

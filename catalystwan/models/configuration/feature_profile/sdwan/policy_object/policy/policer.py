@@ -12,7 +12,7 @@ PolicerExceedAction = Literal[
 ]
 
 
-class PolicierEntry(BaseModel):
+class PolicerEntry(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
     burst: Global[int]
     exceed: Global[PolicerExceedAction]
@@ -31,13 +31,13 @@ class PolicierEntry(BaseModel):
         return rate_str
 
 
-class PolicierParcel(_ParcelBase):
+class PolicerParcel(_ParcelBase):
     type_: Literal["policer"] = Field(default="policer", exclude=True)
-    entries: List[PolicierEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
+    entries: List[PolicerEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_entry(self, burst: int, exceed: PolicerExceedAction, rate: int):
         self.entries.append(
-            PolicierEntry(
+            PolicerEntry(
                 burst=as_global(burst),
                 exceed=as_global(exceed, PolicerExceedAction),
                 rate=as_global(rate),

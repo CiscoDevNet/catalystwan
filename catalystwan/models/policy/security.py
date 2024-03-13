@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, RootModel, fie
 from typing_extensions import Annotated
 
 from catalystwan.models.policy.policy import (
+    AdvancedInspectionProfileAssemblyItem,
     AdvancedMalwareProtectionAssemblyItem,
     DNSSecurityAssemblyItem,
     IntrusionPreventionAssemblyItem,
@@ -21,20 +22,21 @@ from catalystwan.models.policy.policy import (
 
 SecurityPolicyAssemblyItem = Annotated[
     Union[
-        ZoneBasedFWAssemblyItem,
-        IntrusionPreventionAssemblyItem,
-        URLFilteringAssemblyItem,
         AdvancedMalwareProtectionAssemblyItem,
         DNSSecurityAssemblyItem,
+        IntrusionPreventionAssemblyItem,
         SSLDecryptionAssemblyItem,
+        URLFilteringAssemblyItem,
+        ZoneBasedFWAssemblyItem,
     ],
     Field(discriminator="type"),
 ]
 
 UnifiedSecurityPolicyAssemblyItem = Annotated[
     Union[
-        NGFirewallAssemblyItem,
+        AdvancedInspectionProfileAssemblyItem,
         DNSSecurityAssemblyItem,
+        NGFirewallAssemblyItem,
     ],
     Field(discriminator="type"),
 ]
@@ -52,9 +54,9 @@ ZoneToNoZoneInternet = Literal[
 
 class HighSpeedLoggingEntry(BaseModel):
     vrf: str
-    server_ip: IPvAnyAddress = Field(alias="serverIp")
+    server_ip: IPvAnyAddress = Field(serialization_alias="serverIp", validation_alias="serverIp")
     port: str
-    source_interface: Optional[str] = Field(alias="sourceInterface")
+    source_interface: Optional[str] = Field(serialization_alias="sourceInterface", validation_alias="sourceInterface")
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -64,27 +66,47 @@ class HighSpeedLoggingList(BaseModel):
 
 class LoggingEntry(BaseModel):
     vpn: str
-    server_ip: IPvAnyAddress = Field(alias="serverIP")
+    server_ip: IPvAnyAddress = Field(serialization_alias="serverIP", validation_alias="serverIP")
     model_config = ConfigDict(populate_by_name=True)
 
 
 class SecurityPolicySettings(BaseModel):
     logging: Optional[List[LoggingEntry]] = None
-    failure_mode: Optional[FailureMode] = Field(default=None, alias="failureMode")
-    zone_to_no_zone_internet: ZoneToNoZoneInternet = Field(default="deny", alias="zoneToNozoneInternet")
-    tcp_syn_flood_limit: Optional[str] = Field(default=None, alias="tcpSynFloodLimit")
-    high_speed_logging: Optional[HighSpeedLoggingEntry] = Field(default=None, alias="highSpeedLogging")
-    audit_trail: Optional[str] = Field(default=None, alias="auditTrail")
-    platform_match: Optional[str] = Field(default=None, alias="platformMatch")
+    failure_mode: Optional[FailureMode] = Field(
+        default=None, serialization_alias="failureMode", validation_alias="failureMode"
+    )
+    zone_to_no_zone_internet: ZoneToNoZoneInternet = Field(
+        default="deny", serialization_alias="zoneToNozoneInternet", validation_alias="zoneToNozoneInternet"
+    )
+    tcp_syn_flood_limit: Optional[str] = Field(
+        default=None, serialization_alias="tcpSynFloodLimit", validation_alias="tcpSynFloodLimit"
+    )
+    high_speed_logging: Optional[HighSpeedLoggingEntry] = Field(
+        default=None, serialization_alias="highSpeedLogging", validation_alias="highSpeedLogging"
+    )
+    audit_trail: Optional[str] = Field(default=None, serialization_alias="auditTrail", validation_alias="auditTrail")
+    platform_match: Optional[str] = Field(
+        default=None, serialization_alias="platformMatch", validation_alias="platformMatch"
+    )
     model_config = ConfigDict(populate_by_name=True)
 
 
 class UnifiedSecurityPolicySettings(BaseModel):
-    tcp_syn_flood_limit: Optional[str] = Field(default=None, alias="tcpSynFloodLimit")
-    max_incomplete_tcp_limit: Optional[str] = Field(default=None, alias="maxIncompleteTcpLimit")
-    max_incomplete_udp_limit: Optional[str] = Field(default=None, alias="maxIncompleteUdpLimit")
-    max_incomplete_icmp_limit: Optional[str] = Field(default=None, alias="maxIncompleteIcmpLimit")
-    high_speed_logging: Optional[HighSpeedLoggingList] = Field(default=None, alias="highSpeedLogging")
+    tcp_syn_flood_limit: Optional[str] = Field(
+        default=None, serialization_alias="tcpSynFloodLimit", validation_alias="tcpSynFloodLimit"
+    )
+    max_incomplete_tcp_limit: Optional[str] = Field(
+        default=None, serialization_alias="maxIncompleteTcpLimit", validation_alias="maxIncompleteTcpLimit"
+    )
+    max_incomplete_udp_limit: Optional[str] = Field(
+        default=None, serialization_alias="maxIncompleteUdpLimit", validation_alias="maxIncompleteUdpLimit"
+    )
+    max_incomplete_icmp_limit: Optional[str] = Field(
+        default=None, serialization_alias="maxIncompleteIcmpLimit", validation_alias="maxIncompleteIcmpLimit"
+    )
+    high_speed_logging: Optional[HighSpeedLoggingList] = Field(
+        default=None, serialization_alias="highSpeedLogging", validation_alias="highSpeedLogging"
+    )
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -99,10 +121,16 @@ class UnifiedSecurityPolicyDefinition(PolicyDefinition):
 
 
 class SecurityPolicy(PolicyCreationPayload):
-    policy_mode: Literal["security"] = Field(default="security", alias="policyMode")
-    policy_type: str = Field(default="feature", alias="policyType")
-    policy_use_case: str = Field(default="custom", alias="policyUseCase")
-    policy_definition: SecurityPolicyDefinition = Field(default=SecurityPolicyDefinition(), alias="policyDefinition")
+    policy_mode: Union[Literal["security"], None] = Field(
+        default="security", serialization_alias="policyMode", validation_alias="policyMode"
+    )
+    policy_type: str = Field(default="feature", serialization_alias="policyType", validation_alias="policyType")
+    policy_use_case: str = Field(
+        default="custom", serialization_alias="policyUseCase", validation_alias="policyUseCase"
+    )
+    policy_definition: SecurityPolicyDefinition = Field(
+        default=SecurityPolicyDefinition(), serialization_alias="policyDefinition", validation_alias="policyDefinition"
+    )
 
     def add_item(self, item: SecurityPolicyAssemblyItem) -> None:
         self.policy_definition.assembly.append(item)
@@ -134,15 +162,20 @@ class SecurityPolicy(PolicyCreationPayload):
 
 
 class UnifiedSecurityPolicy(PolicyCreationPayload):
-    policy_mode: Literal["unified"] = Field("unified", alias="policyMode")
-    policy_type: str = Field("feature", alias="policyType")
-    policy_use_case: str = Field("custom", alias="policyUseCase")
+    policy_mode: Literal["unified"] = Field("unified", serialization_alias="policyMode", validation_alias="policyMode")
+    policy_type: str = Field("feature", serialization_alias="policyType", validation_alias="policyType")
+    policy_use_case: str = Field("custom", serialization_alias="policyUseCase", validation_alias="policyUseCase")
     policy_definition: UnifiedSecurityPolicyDefinition = Field(
-        default=UnifiedSecurityPolicyDefinition(), alias="policyDefinition"
+        default=UnifiedSecurityPolicyDefinition(),
+        serialization_alias="policyDefinition",
+        validation_alias="policyDefinition",
     )
 
     def add_item(self, item: UnifiedSecurityPolicyAssemblyItem) -> None:
         self.policy_definition.assembly.append(item)
+
+    def add_advanced_inspection_profile_(self, definition_id: UUID) -> None:
+        self.add_item(AdvancedInspectionProfileAssemblyItem(definition_id=definition_id))
 
     def add_ng_firewall(self, definition_id: UUID) -> NGFirewallAssemblyItem:
         ng_fw = NGFirewallAssemblyItem(definition_id=definition_id)
@@ -160,7 +193,7 @@ class UnifiedSecurityPolicy(PolicyCreationPayload):
         return policy_definition
 
 
-AnySecurityPolicy = Annotated[Union[SecurityPolicy, UnifiedSecurityPolicy], Field(discriminator="policy_mode")]
+AnySecurityPolicy = Union[SecurityPolicy, UnifiedSecurityPolicy]
 
 
 class SecurityPolicyRoot(RootModel):
@@ -168,22 +201,26 @@ class SecurityPolicyRoot(RootModel):
 
 
 class SecurityPolicyEditResponse(BaseModel):
-    master_templates_affected: List[str] = Field(default=[], alias="masterTemplatesAffected")
+    master_templates_affected: List[str] = Field(
+        default=[], serialization_alias="masterTemplatesAffected", validation_alias="masterTemplatesAffected"
+    )
 
 
 class SecurityPolicyInfo(SecurityPolicy, PolicyInfo):
-    virtual_application_templates: List[str] = Field(alias="virtualApplicationTemplates")
-    supported_devices: List[str] = Field(alias="supportedDevices")
+    virtual_application_templates: List[str] = Field(
+        serialization_alias="virtualApplicationTemplates", validation_alias="virtualApplicationTemplates"
+    )
+    supported_devices: List[str] = Field(serialization_alias="supportedDevices", validation_alias="supportedDevices")
 
 
 class UnifiedSecurityPolicyInfo(UnifiedSecurityPolicy, PolicyInfo):
-    virtual_application_templates: List[str] = Field(alias="virtualApplicationTemplates")
-    supported_devices: List[str] = Field(alias="supportedDevices")
+    virtual_application_templates: List[str] = Field(
+        serialization_alias="virtualApplicationTemplates", validation_alias="virtualApplicationTemplates"
+    )
+    supported_devices: List[str] = Field(serialization_alias="supportedDevices", validation_alias="supportedDevices")
 
 
-AnySecurityPolicyInfo = Annotated[
-    Union[SecurityPolicyInfo, UnifiedSecurityPolicyInfo], Field(discriminator="policy_mode")
-]
+AnySecurityPolicyInfo = Union[SecurityPolicyInfo, UnifiedSecurityPolicyInfo]
 
 
 class SecurityPolicyInfoRoot(RootModel):

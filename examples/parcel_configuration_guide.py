@@ -3,7 +3,7 @@
 import logging
 import sys
 from dataclasses import dataclass
-from ipaddress import IPv4Address, IPv4Network, IPv6Network
+from ipaddress import IPv4Address, IPv4Network, IPv6Interface
 from typing import Any, List, Optional, Tuple
 from uuid import UUID
 
@@ -23,7 +23,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.policy_object import
     IPv6DataPrefixParcel,
     IPv6PrefixListParcel,
     LocalDomainParcel,
-    PolicierParcel,
+    PolicerParcel,
     PreferredColorGroupParcel,
     PrefixListParcel,
     ProtocolListParcel,
@@ -115,9 +115,9 @@ def configure_groups_of_interest(profile_id: UUID, api: PolicyObjectFeatureProfi
 
     # Create security port parcel and add ports
     security_port = SecurityPortParcel(parcel_name="SecurityPortParcelExmaple")
-    security_port.add_port("10")
-    security_port.add_port("50-100")
-    security_port.add_port("400-999")
+    security_port.add_port(10)
+    security_port.add_port_range(50, 100)
+    security_port.add_port_range(400, 999)
 
     # Create Geolocation parcel and add geolocations
     geolocation = GeoLocationListParcel(parcel_name="GeoLocationListParcelExample")
@@ -169,15 +169,15 @@ def configure_groups_of_interest(profile_id: UUID, api: PolicyObjectFeatureProfi
 
     # Create IPv6 data prefix parcel and add IPv6 prefixes
     ipv6_data_prefix = IPv6DataPrefixParcel(parcel_name="IPv6DataPrefixExample")
-    ipv6_data_prefix.add_prefix(IPv6Network("2000:0:0:0::/128"))
-    ipv6_data_prefix.add_prefix(IPv6Network("2001:0:0:0::/128"))
-    ipv6_data_prefix.add_prefix(IPv6Network("2002:0:0:0::/128"))
+    ipv6_data_prefix.add_prefix(IPv6Interface("2000:0:0:0::/128"))
+    ipv6_data_prefix.add_prefix(IPv6Interface("2001:0:0:0::/128"))
+    ipv6_data_prefix.add_prefix(IPv6Interface("2002:0:0:0::/128"))
 
     # Create IPv6 prefix parcel and add IPv6 prefixes
     ipv6_prefix_list = IPv6PrefixListParcel(parcel_name="IPv6PrefixListExample")
-    ipv6_prefix_list.add_prefix(IPv6Network("2000:0:0:0::/64"))
-    ipv6_prefix_list.add_prefix(IPv6Network("2001:0:0:0::/64"))
-    ipv6_prefix_list.add_prefix(IPv6Network("2002:0:0:0::/64"))
+    ipv6_prefix_list.add_prefix(IPv6Interface("2000:0:0:0::/64"))
+    ipv6_prefix_list.add_prefix(IPv6Interface("2001:0:0:0::/64"))
+    ipv6_prefix_list.add_prefix(IPv6Interface("2002:0:0:0::/64"), ge=10, le=100)
 
     # Create Application family parcel and add application families
     application_list_parcel = ApplicationListParcel(parcel_name="AppListExample")
@@ -194,7 +194,7 @@ def configure_groups_of_interest(profile_id: UUID, api: PolicyObjectFeatureProfi
     preferred_group_color.add_tertiary(color_preference=["metro-ethernet"], path_preference="multi-hop-path")
 
     # Create Policier parcel and add policiers
-    policier = PolicierParcel(parcel_name="PolicierParcelExmaple")
+    policier = PolicerParcel(parcel_name="PolicierParcelExmaple")
     policier.add_entry(burst=17000, exceed="drop", rate=1000)
 
     # Create Fowarding Class parcel and add fowarding classes
@@ -208,9 +208,10 @@ def configure_groups_of_interest(profile_id: UUID, api: PolicyObjectFeatureProfi
 
     # Create Standard Community Parcel and add standard communities
     standard_community = StandardCommunityParcel(parcel_name="StandardCommunityParcelExample")
-    standard_community.add_community("internet")
-    standard_community.add_community("local-AS")
-    standard_community.add_community("no-advertise")
+    standard_community.add_well_known_community("internet")
+    standard_community.add_well_known_community("local-AS")
+    standard_community.add_well_known_community("no-advertise")
+    standard_community.add_community(100, 1000)
 
     # Create Expanded Community Parcel and add expanded communities
     expanded_community = ExpandedCommunityParcel(parcel_name="ExpandedCommunityParcel")
@@ -256,18 +257,18 @@ def configure_groups_of_interest(profile_id: UUID, api: PolicyObjectFeatureProfi
     for item in items:
         items_ids.append((api.create(profile_id, item), item.__class__))
 
-    _id, _ = items_ids[-1]
+    id_, _ = items_ids[-1]
 
     sla = SLAClassParcel(parcel_name="SLAClassParcelExample")
-    sla.add_entry(app_probe_class_id=_id.id, jitter=20, latency=50, loss=100)
+    sla.add_entry(app_probe_class_id=id_.id, jitter=20, latency=50, loss=100)
     sla.add_fallback(criteria="jitter-latency-loss", latency_variance=10, jitter_variance=10, loss_variance=10)
 
     items_ids.append((api.create(profile_id, sla), sla.__class__))
 
     input("Press enter to delete...")
 
-    for _id, item_type in reversed(items_ids):
-        api.delete(profile_id, item_type, _id.id)
+    for id_, item_type in reversed(items_ids):
+        api.delete(profile_id, item_type, id_.id)
 
 
 def retrive_groups_of_interest(profile_id: UUID, api: PolicyObjectFeatureProfileAPI):

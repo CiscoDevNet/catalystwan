@@ -32,5 +32,11 @@ class SecurityPortParcel(_ParcelBase):
     type_: Literal["security-port"] = Field(default="security-port", exclude=True)
     entries: List[SecurityPortListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
-    def add_port(self, port: str):
+    def _add_port(self, port: str):
         self.entries.append(SecurityPortListEntry(port=as_global(port)))
+
+    def add_port(self, port: int):
+        self._add_port(str(port))
+
+    def add_port_range(self, start_port: int, end_port: int):
+        self._add_port(f"{start_port}-{end_port}")

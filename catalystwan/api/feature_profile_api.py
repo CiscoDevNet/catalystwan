@@ -41,7 +41,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.policy_object import
     IPv6DataPrefixParcel,
     IPv6PrefixListParcel,
     LocalDomainParcel,
-    PolicierParcel,
+    PolicerParcel,
     PreferredColorGroupParcel,
     PrefixListParcel,
     ProtocolListParcel,
@@ -655,7 +655,7 @@ class PolicyObjectFeatureProfileAPI:
         ...
 
     @overload
-    def get(self, profile_id: UUID, parcel_type: Type[PolicierParcel]) -> DataSequence[Parcel[Any]]:
+    def get(self, profile_id: UUID, parcel_type: Type[PolicerParcel]) -> DataSequence[Parcel[Any]]:
         ...
 
     @overload
@@ -767,7 +767,7 @@ class PolicyObjectFeatureProfileAPI:
         ...
 
     @overload
-    def get(self, profile_id: UUID, parcel_type: Type[PolicierParcel], parcel_id: UUID) -> DataSequence[Parcel[Any]]:
+    def get(self, profile_id: UUID, parcel_type: Type[PolicerParcel], parcel_id: UUID) -> DataSequence[Parcel[Any]]:
         ...
 
     @overload
@@ -915,7 +915,7 @@ class PolicyObjectFeatureProfileAPI:
         ...
 
     @overload
-    def delete(self, profile_id: UUID, parcel_type: Type[PolicierParcel], list_object_id: UUID) -> None:
+    def delete(self, profile_id: UUID, parcel_type: Type[PolicerParcel], list_object_id: UUID) -> None:
         ...
 
     @overload

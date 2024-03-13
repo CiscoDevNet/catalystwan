@@ -47,6 +47,10 @@ class URLFilteringAssemblyItem(AssemblyItemBase):
     type: Literal["urlFiltering"] = "urlFiltering"
 
 
+class AdvancedInspectionProfileAssemblyItem(AssemblyItemBase):
+    type: Literal["advancedInspectionProfile"] = "advancedInspectionProfile"
+
+
 class AdvancedMalwareProtectionAssemblyItem(AssemblyItemBase):
     type: Literal["advancedMalwareProtection"] = "advancedMalwareProtection"
 
