@@ -8,6 +8,7 @@ from uuid import UUID
 from pydantic import Json
 
 from catalystwan.endpoints.configuration.feature_profile.sdwan.other import OtherFeatureProfile
+from catalystwan.endpoints.configuration.feature_profile.sdwan.service import ServiceFeatureProfile
 from catalystwan.endpoints.configuration.feature_profile.sdwan.system import SystemFeatureProfile
 from catalystwan.models.configuration.feature_profile.sdwan.other import AnyOtherParcel
 from catalystwan.typed_list import DataSequence
@@ -77,6 +78,7 @@ class SDWANFeatureProfilesAPI:
         self.policy_object = PolicyObjectFeatureProfileAPI(session=session)
         self.system = SystemFeatureProfileAPI(session=session)
         self.other = OtherFeatureProfileAPI(session=session)
+        self.service = ServiceFeatureProfileAPI(session=session)
 
 
 class FeatureProfileAPI(Protocol):
@@ -194,6 +196,39 @@ class OtherFeatureProfileAPI:
         Delete Other Parcel for selected profile_id based on payload type
         """
         return self.endpoint.delete(profile_id, parcel_type._get_parcel_type(), parcel_id)
+
+
+class ServiceFeatureProfileAPI:
+    """
+    SDWAN Feature Profile Service APIs
+    """
+
+    def __init__(self, session: ManagerSession):
+        self.session = session
+        self.endpoint = ServiceFeatureProfile(session)
+
+    def get_profiles(
+        self, limit: Optional[int] = None, offset: Optional[int] = None
+    ) -> DataSequence[FeatureProfileInfo]:
+        """
+        Get all Service Feature Profiles
+        """
+        payload = GetFeatureProfilesPayload(limit=limit if limit else None, offset=offset if offset else None)
+
+        return self.endpoint.get_sdwan_service_feature_profiles(payload)
+
+    def create_profile(self, name: str, description: str) -> FeatureProfileCreationResponse:
+        """
+        Create Service Feature Profile
+        """
+        payload = FeatureProfileCreationPayload(name=name, description=description)
+        return self.endpoint.create_sdwan_service_feature_profile(payload)
+
+    def delete_profile(self, profile_id: UUID) -> None:
+        """
+        Delete Service Feature Profile
+        """
+        self.endpoint.delete_sdwan_service_feature_profile(profile_id)
 
 
 class SystemFeatureProfileAPI:
