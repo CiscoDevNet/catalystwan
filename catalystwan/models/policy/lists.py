@@ -9,9 +9,7 @@ from pydantic import BaseModel, Field
 from catalystwan.models.common import InterfaceType, TLOCColor
 from catalystwan.models.policy.lists_entries import (
     ColorGroupPreference,
-    DataPrefixListEntry,
     EncapType,
-    FQDNListEntry,
     GeoLocationListEntry,
     IPSSignatureListEntry,
     IPv6PrefixListEntry,
@@ -51,14 +49,6 @@ class PolicyListBase(BaseModel):
             self.entries.append(entry)
 
 
-class DataPrefixList(PolicyListBase):
-    type: Literal["dataPrefix"] = "dataPrefix"
-    entries: List[DataPrefixListEntry] = []
-
-    def add_prefix(self, ip_prefix: IPv4Network) -> None:
-        self._add_entry(DataPrefixListEntry(ip_prefix=ip_prefix))
-
-
 class SiteList(PolicyListBase):
     type: Literal["site"] = "site"
     entries: List[SiteListEntry] = []
@@ -93,11 +83,6 @@ class ZoneList(PolicyListBase):
 
     def assign_interfaces(self, ifs: Set[InterfaceType]) -> None:
         self.entries = [ZoneListEntry(interface=interface) for interface in ifs]
-
-
-class FQDNList(PolicyListBase):
-    type: Literal["fqdn"] = "fqdn"
-    entries: List[FQDNListEntry] = []
 
 
 class GeoLocationList(PolicyListBase):
