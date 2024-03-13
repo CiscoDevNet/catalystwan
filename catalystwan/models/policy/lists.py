@@ -10,7 +10,6 @@ from catalystwan.models.common import InterfaceType, TLOCColor
 from catalystwan.models.policy.lists_entries import (
     ColorGroupPreference,
     EncapType,
-    GeoLocationListEntry,
     IPSSignatureListEntry,
     IPv6PrefixListEntry,
     LocalAppListEntry,
@@ -83,11 +82,6 @@ class ZoneList(PolicyListBase):
 
     def assign_interfaces(self, ifs: Set[InterfaceType]) -> None:
         self.entries = [ZoneListEntry(interface=interface) for interface in ifs]
-
-
-class GeoLocationList(PolicyListBase):
-    type: Literal["geoLocation"] = "geoLocation"
-    entries: List[GeoLocationListEntry] = []
 
 
 class PortList(PolicyListBase):

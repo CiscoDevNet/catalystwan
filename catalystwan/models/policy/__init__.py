@@ -15,6 +15,7 @@ from catalystwan.models.policy.list.communities import CommunityList, ExpandedCo
 from catalystwan.models.policy.list.data_ipv6_prefix import DataIPv6PrefixList
 from catalystwan.models.policy.list.data_prefix import DataPrefixList
 from catalystwan.models.policy.list.fqdn import FQDNList
+from catalystwan.models.policy.list.geo_location import GeoLocationList
 
 from .centralized import CentralizedPolicy, TrafficDataDirection
 from .definition.access_control_list import AclPolicy
@@ -32,7 +33,6 @@ from .definition.traffic_data import TrafficDataPolicy
 from .definition.vpn_membership import VPNMembershipPolicy
 from .definition.zone_based_firewall import ZoneBasedFWPolicy
 from .lists import (
-    GeoLocationList,
     IPSSignatureList,
     IPv6PrefixList,
     LocalAppList,
