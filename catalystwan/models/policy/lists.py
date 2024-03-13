@@ -6,11 +6,9 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from catalystwan.models.common import InterfaceType, TLOCColor, WellKnownBGPCommunities
+from catalystwan.models.common import InterfaceType, TLOCColor
 from catalystwan.models.policy.lists_entries import (
     ColorGroupPreference,
-    ColorListEntry,
-    CommunityListEntry,
     DataIPv6PrefixListEntry,
     DataPrefixListEntry,
     EncapType,
@@ -123,14 +121,6 @@ class LocalAppList(PolicyListBase):
     entries: List[LocalAppListEntry] = []
 
 
-class ColorList(PolicyListBase):
-    type: Literal["color"] = "color"
-    entries: List[ColorListEntry] = []
-
-    def add_color(self, color: TLOCColor) -> None:
-        self._add_entry(ColorListEntry(color=color))
-
-
 class DataIPv6PrefixList(PolicyListBase):
     type: Literal["dataIpv6Prefix"] = "dataIpv6Prefix"
     entries: List[DataIPv6PrefixListEntry] = []
@@ -157,24 +147,6 @@ class URLAllowList(PolicyListBase):
 class URLBlockList(PolicyListBase):
     type: Literal["urlBlackList"] = "urlBlackList"
     entries: List[URLListEntry] = []
-
-
-class _CommunityListBase(PolicyListBase):
-    entries: List[CommunityListEntry] = []
-
-    def add_well_known_community(self, community: WellKnownBGPCommunities) -> None:
-        self._add_entry(CommunityListEntry(community=community))
-
-    def add_community(self, as_number: int, community_number: int) -> None:
-        self._add_entry(CommunityListEntry(community=f"{as_number}:{community_number}"))
-
-
-class CommunityList(_CommunityListBase):
-    type: Literal["community"] = "community"
-
-
-class ExpandedCommunityList(_CommunityListBase):
-    type: Literal["expandedCommunity"] = "expandedCommunity"
 
 
 class PolicerList(PolicyListBase):
