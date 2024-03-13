@@ -4,10 +4,10 @@
 from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
+from catalystwan.endpoints.configuration.policy.abstractions import PolicyDefinitionEndpoints
 from catalystwan.models.policy.definition.control import ControlPolicy
 from catalystwan.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
-    PolicyDefinitionEndpoints,
     PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,

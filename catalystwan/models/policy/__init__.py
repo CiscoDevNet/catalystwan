@@ -6,6 +6,8 @@ from typing import List, Union
 from pydantic import Field
 from typing_extensions import Annotated
 
+from catalystwan.models.policy.list.app_probe import AppProbeClassList
+
 from .centralized import CentralizedPolicy, TrafficDataDirection
 from .definition.access_control_list import AclPolicy
 from .definition.access_control_list_ipv6 import AclIPv6Policy
@@ -23,7 +25,6 @@ from .definition.vpn_membership import VPNMembershipPolicy
 from .definition.zone_based_firewall import ZoneBasedFWPolicy
 from .lists import (
     AppList,
-    AppProbeClassList,
     ASPathList,
     ClassMapList,
     ColorList,

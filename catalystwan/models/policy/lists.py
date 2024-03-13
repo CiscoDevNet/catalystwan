@@ -9,7 +9,6 @@ from pydantic import BaseModel, Field
 from catalystwan.models.common import InterfaceType, TLOCColor, WellKnownBGPCommunities
 from catalystwan.models.policy.lists_entries import (
     AppListEntry,
-    AppProbeClassListEntry,
     ASPathListEntry,
     ClassMapListEntry,
     ColorGroupPreference,
@@ -220,17 +219,6 @@ class ClassMapList(PolicyListBase):
 class MirrorList(PolicyListBase):
     type: Literal["mirror"] = "mirror"
     entries: List[MirrorListEntry] = []
-
-
-class AppProbeClassList(PolicyListBase):
-    type: Literal["appProbe"] = "appProbe"
-    entries: List[AppProbeClassListEntry] = []
-
-    def assign_forwarding_class(self, name: str) -> AppProbeClassListEntry:
-        # App probe class list must have only one entry!
-        entry = AppProbeClassListEntry(forwarding_class=name)
-        self._add_entry(entry, single=True)
-        return entry
 
 
 class SLAClassList(PolicyListBase):

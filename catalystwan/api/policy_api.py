@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Tuple, Typ
 from uuid import UUID
 
 from catalystwan.api.task_status_api import Task
+from catalystwan.endpoints.configuration.policy.abstractions import PolicyDefinitionEndpoints, PolicyListEndpoints
 from catalystwan.endpoints.configuration.policy.definition.access_control_list import (
     AclPolicyGetResponse,
     ConfigurationPolicyAclDefinition,
@@ -141,22 +142,9 @@ from catalystwan.endpoints.configuration.policy.vsmart_template import (
     VSmartConnectivityStatus,
 )
 from catalystwan.models.misc.application_protocols import ApplicationProtocol
-from catalystwan.models.policy import AnyPolicyDefinition, AnyPolicyList
-from catalystwan.models.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
-from catalystwan.models.policy.definition.access_control_list import AclPolicy
-from catalystwan.models.policy.definition.access_control_list_ipv6 import AclIPv6Policy
-from catalystwan.models.policy.definition.control import ControlPolicy
-from catalystwan.models.policy.definition.device_access import DeviceAccessPolicy
-from catalystwan.models.policy.definition.device_access_ipv6 import DeviceAccessIPv6Policy
-from catalystwan.models.policy.definition.hub_and_spoke import HubAndSpokePolicy
-from catalystwan.models.policy.definition.mesh import MeshPolicy
-from catalystwan.models.policy.definition.qos_map import QoSMapPolicy
-from catalystwan.models.policy.definition.rewrite import RewritePolicy
-from catalystwan.models.policy.definition.rule_set import RuleSet
-from catalystwan.models.policy.definition.security_group import SecurityGroup
-from catalystwan.models.policy.definition.vpn_membership import VPNMembershipPolicy
-from catalystwan.models.policy.definition.zone_based_firewall import ZoneBasedFWPolicy
-from catalystwan.models.policy.lists import (
+from catalystwan.models.policy import (
+    AnyPolicyDefinition,
+    AnyPolicyList,
     AppList,
     AppProbeClassList,
     ASPathList,
@@ -174,7 +162,6 @@ from catalystwan.models.policy.lists import (
     LocalDomainList,
     MirrorList,
     PolicerList,
-    PolicyListBase,
     PortList,
     PreferredColorGroupList,
     PrefixList,
@@ -188,6 +175,21 @@ from catalystwan.models.policy.lists import (
     VPNList,
     ZoneList,
 )
+from catalystwan.models.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
+from catalystwan.models.policy.definition.access_control_list import AclPolicy
+from catalystwan.models.policy.definition.access_control_list_ipv6 import AclIPv6Policy
+from catalystwan.models.policy.definition.control import ControlPolicy
+from catalystwan.models.policy.definition.device_access import DeviceAccessPolicy
+from catalystwan.models.policy.definition.device_access_ipv6 import DeviceAccessIPv6Policy
+from catalystwan.models.policy.definition.hub_and_spoke import HubAndSpokePolicy
+from catalystwan.models.policy.definition.mesh import MeshPolicy
+from catalystwan.models.policy.definition.qos_map import QoSMapPolicy
+from catalystwan.models.policy.definition.rewrite import RewritePolicy
+from catalystwan.models.policy.definition.rule_set import RuleSet
+from catalystwan.models.policy.definition.security_group import SecurityGroup
+from catalystwan.models.policy.definition.vpn_membership import VPNMembershipPolicy
+from catalystwan.models.policy.definition.zone_based_firewall import ZoneBasedFWPolicy
+from catalystwan.models.policy.lists import PolicyListBase
 from catalystwan.models.policy.localized import (
     LocalizedPolicy,
     LocalizedPolicyDeviceInfo,
@@ -197,10 +199,8 @@ from catalystwan.models.policy.localized import (
 from catalystwan.models.policy.policy_definition import (
     PolicyDefinitionBase,
     PolicyDefinitionEditResponse,
-    PolicyDefinitionEndpoints,
     PolicyDefinitionInfo,
 )
-from catalystwan.models.policy.policy_list import PolicyListEndpoints
 from catalystwan.models.policy.security import (
     AnySecurityPolicy,
     AnySecurityPolicyInfo,

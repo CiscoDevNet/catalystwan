@@ -1,13 +1,10 @@
 # Copyright 2023 Cisco Systems, Inc. and its affiliates
 
 import datetime
-from typing import List, Optional, Protocol
+from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
-
-from catalystwan.models.policy import AnyPolicyList
-from catalystwan.typed_list import DataSequence
 
 
 class InfoTag(BaseModel):
@@ -30,20 +27,3 @@ class PolicyListInfo(PolicyListId, InfoTag):
 
 class PolicyListPreview(BaseModel):
     preview: str
-
-
-class PolicyListEndpoints(Protocol):
-    def create_policy_list(self, payload: AnyPolicyList) -> PolicyListId:
-        ...
-
-    def delete_policy_list(self, id: UUID) -> None:
-        ...
-
-    def edit_policy_list(self, id: UUID, payload: AnyPolicyList) -> None:
-        ...
-
-    def get_lists_by_id(self, id: UUID) -> PolicyListInfo:
-        ...
-
-    def get_policy_lists(self) -> DataSequence[PolicyListInfo]:
-        ...
