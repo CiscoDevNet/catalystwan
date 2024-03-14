@@ -3,8 +3,18 @@
 from ipaddress import IPv4Network
 from typing import List, Literal, Optional
 
-from catalystwan.models.policy.lists_entries import PrefixListEntry
+from pydantic import BaseModel, ConfigDict, Field
+
+from catalystwan.models.common import IntStr
 from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
+
+
+class PrefixListEntry(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    ip_prefix: IPv4Network = Field(serialization_alias="ipPrefix", validation_alias="ipPrefix")
+    ge: Optional[IntStr] = Field(default=None, ge=0, le=32)
+    le: Optional[IntStr] = Field(default=None, ge=0, le=32)
 
 
 class PrefixList(PolicyListBase):

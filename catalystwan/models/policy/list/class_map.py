@@ -2,8 +2,14 @@
 
 from typing import List, Literal
 
-from catalystwan.models.policy.lists_entries import ClassMapListEntry
+from pydantic import BaseModel, Field
+
+from catalystwan.models.common import IntStr
 from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
+
+
+class ClassMapListEntry(BaseModel):
+    queue: IntStr = Field(ge=0, le=7)
 
 
 class ClassMapList(PolicyListBase):

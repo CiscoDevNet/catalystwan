@@ -2,8 +2,13 @@
 
 from typing import List, Literal
 
-from catalystwan.models.policy.lists_entries import FQDNListEntry
+from pydantic import BaseModel
+
 from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
+
+
+class FQDNListEntry(BaseModel):
+    pattern: str
 
 
 class FQDNList(PolicyListBase):

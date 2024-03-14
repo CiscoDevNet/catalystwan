@@ -54,7 +54,6 @@ from .definition.security_group import SecurityGroup, SecurityGroupGetResponse
 from .definition.traffic_data import TrafficDataPolicy, TrafficDataPolicyGetResponse
 from .definition.vpn_membership import VPNMembershipPolicy, VPNMembershipPolicyGetResponse
 from .definition.zone_based_firewall import ZoneBasedFWPolicy, ZoneBasedFWPolicyGetResponse
-from .lists_entries import PathPreference, PolicerExceedAction
 from .localized import LocalizedPolicy
 from .policy_definition import (
     Carrier,
@@ -212,10 +211,8 @@ __all__ = (
     "MirrorList",
     "MultiRegionRole",
     "OriginProtocol",
-    "PathPreference",
     "PathType",
     "PLPEntryType",
-    "PolicerExceedAction",
     "PolicerList",
     "PolicyActionType",
     "PortList",

@@ -3,9 +3,17 @@
 from ipaddress import IPv4Address
 from typing import List, Literal, Optional
 
-from catalystwan.models.common import EncapType, TLOCColor
-from catalystwan.models.policy.lists_entries import TLOCListEntry
+from pydantic import BaseModel, Field
+
+from catalystwan.models.common import EncapType, IntStr, TLOCColor
 from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
+
+
+class TLOCListEntry(BaseModel):
+    tloc: IPv4Address
+    color: TLOCColor
+    encap: EncapType
+    preference: Optional[IntStr] = Field(default=None, ge=0, le=2**32 - 1)
 
 
 class TLOCList(PolicyListBase):

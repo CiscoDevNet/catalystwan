@@ -3,8 +3,15 @@
 from ipaddress import IPv6Interface
 from typing import List, Literal
 
-from catalystwan.models.policy.lists_entries import DataIPv6PrefixListEntry
+from pydantic import BaseModel, ConfigDict, Field
+
 from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
+
+
+class DataIPv6PrefixListEntry(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    ipv6_prefix: IPv6Interface = Field(serialization_alias="ipv6Prefix", validation_alias="ipv6Prefix")
 
 
 class DataIPv6PrefixList(PolicyListBase):

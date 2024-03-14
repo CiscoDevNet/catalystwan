@@ -2,8 +2,22 @@
 
 from typing import List, Literal
 
-from catalystwan.models.policy.lists_entries import LocalDomainListEntry
+from pydantic import BaseModel, ConfigDict, Field
+
 from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
+
+
+class LocalDomainListEntry(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    name_server: str = Field(
+        pattern="^[^*+].*",
+        serialization_alias="nameServer",
+        validation_alias="nameServer",
+        max_length=240,
+        description="Must be valid std regex."
+        "String cannot start with a '*' or a '+', be empty, or be more than 240 characters",
+    )
 
 
 class LocalDomainList(PolicyListBase):

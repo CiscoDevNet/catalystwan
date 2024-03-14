@@ -2,8 +2,16 @@
 
 from typing import List, Literal
 
-from catalystwan.models.policy.lists_entries import MirrorListEntry
+from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress
+
 from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
+
+
+class MirrorListEntry(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    remote_dest: IPvAnyAddress = Field(serialization_alias="remoteDest", validation_alias="remoteDest")
+    source: IPvAnyAddress
 
 
 class MirrorList(PolicyListBase):

@@ -2,9 +2,16 @@
 
 from typing import List, Literal
 
+from pydantic import BaseModel, ConfigDict, Field
+
 from catalystwan.models.common import WellKnownBGPCommunities
-from catalystwan.models.policy.lists_entries import CommunityListEntry
 from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
+
+
+class CommunityListEntry(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    community: str = Field(examples=["1000:10000", "internet", "local-AS"])
 
 
 class CommunityListBase(PolicyListBase):

@@ -2,8 +2,22 @@
 
 from typing import List, Literal, Set, Tuple
 
-from catalystwan.models.policy.lists_entries import VPNListEntry
+from pydantic import BaseModel, Field, field_validator
+
+from catalystwan.models.common import IntRangeStr
 from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
+
+
+class VPNListEntry(BaseModel):
+    vpn: IntRangeStr = Field(description="0-65530 range or single number")
+
+    @field_validator("vpn")
+    @classmethod
+    def check_vpn_range(cls, vpn: IntRangeStr):
+        for i in vpn:
+            if i is not None:
+                assert 0 <= i <= 65_530
+        return vpn
 
 
 class VPNList(PolicyListBase):

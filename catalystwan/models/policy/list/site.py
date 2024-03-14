@@ -2,8 +2,15 @@
 
 from typing import List, Literal, Set, Tuple
 
-from catalystwan.models.policy.lists_entries import SiteListEntry
+from pydantic import BaseModel, ConfigDict, Field
+
 from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
+
+
+class SiteListEntry(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    site_id: str = Field(serialization_alias="siteId", validation_alias="siteId")
 
 
 class SiteList(PolicyListBase):

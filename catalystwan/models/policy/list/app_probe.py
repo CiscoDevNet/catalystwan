@@ -2,8 +2,25 @@
 
 from typing import List, Literal
 
-from catalystwan.models.policy.lists_entries import AppProbeClassListEntry
+from pydantic import BaseModel, ConfigDict, Field
+
+from catalystwan.models.common import TLOCColor
 from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
+
+
+class ColorDSCPMap(BaseModel):
+    color: TLOCColor
+    dscp: int = Field(ge=0, le=63)
+
+
+class AppProbeClassListEntry(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    forwarding_class: str = Field(serialization_alias="forwardingClass", validation_alias="forwardingClass")
+    map: List[ColorDSCPMap] = []
+
+    def add_color_mapping(self, color: TLOCColor, dscp: int) -> None:
+        self.map.append(ColorDSCPMap(color=color, dscp=dscp))
 
 
 class AppProbeClassList(PolicyListBase):

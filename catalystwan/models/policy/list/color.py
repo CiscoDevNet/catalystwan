@@ -2,9 +2,14 @@
 
 from typing import List, Literal
 
+from pydantic import BaseModel
+
 from catalystwan.models.common import TLOCColor
-from catalystwan.models.policy.lists_entries import ColorListEntry
 from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
+
+
+class ColorListEntry(BaseModel):
+    color: TLOCColor
 
 
 class ColorList(PolicyListBase):

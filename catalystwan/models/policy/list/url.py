@@ -2,8 +2,15 @@
 
 from typing import List, Literal
 
-from catalystwan.models.policy.lists_entries import URLListEntry
+from pydantic import BaseModel, ConfigDict
+
 from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
+
+
+class URLListEntry(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    pattern: str
 
 
 class URLAllowList(PolicyListBase):
