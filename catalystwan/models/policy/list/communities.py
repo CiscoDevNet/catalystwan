@@ -6,7 +6,7 @@ from catalystwan.models.policy.lists_entries import CommunityListEntry
 from catalystwan.models.policy.policy_list import PolicyListId, PolicyListInfo
 
 
-class _CommunityListBase(PolicyListBase):
+class CommunityListBase(PolicyListBase):
     entries: List[CommunityListEntry] = []
 
     def add_well_known_community(self, community: WellKnownBGPCommunities) -> None:
@@ -16,7 +16,7 @@ class _CommunityListBase(PolicyListBase):
         self._add_entry(CommunityListEntry(community=f"{as_number}:{community_number}"))
 
 
-class CommunityList(_CommunityListBase):
+class CommunityList(CommunityListBase):
     type: Literal["community"] = "community"
 
 
@@ -28,7 +28,7 @@ class CommunityListInfo(CommunityList, PolicyListInfo):
     pass
 
 
-class ExpandedCommunityList(_CommunityListBase):
+class ExpandedCommunityList(CommunityListBase):
     type: Literal["expandedCommunity"] = "expandedCommunity"
 
 
