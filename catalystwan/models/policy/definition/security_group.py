@@ -6,7 +6,13 @@ from typing import Literal, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from catalystwan.models.common import check_any_of_exclusive_field_sets, check_fields_exclusive
-from catalystwan.models.policy.policy_definition import PolicyDefinitionBase, Reference, VariableName
+from catalystwan.models.policy.policy_definition import (
+    PolicyDefinitionBase,
+    PolicyDefinitionGetResponse,
+    PolicyDefinitionId,
+    Reference,
+    VariableName,
+)
 
 SequenceIPType = Literal[
     "ipv4",
@@ -67,3 +73,11 @@ class SecurityGroup(PolicyDefinitionBase):
         ):
             raise ValueError(f"Incompatible definition for {self.sequence_ip_type} sequence")
         return self
+
+
+class SecurityGroupEditPayload(SecurityGroup, PolicyDefinitionId):
+    pass
+
+
+class SecurityGroupGetResponse(SecurityGroup, PolicyDefinitionGetResponse):
+    pass

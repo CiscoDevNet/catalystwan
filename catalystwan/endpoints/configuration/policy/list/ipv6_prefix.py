@@ -4,23 +4,10 @@
 from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
-from catalystwan.models.policy.lists import IPv6PrefixList
-from catalystwan.models.policy.policy_list import (
-    InfoTag,
-    PolicyListEndpoints,
-    PolicyListId,
-    PolicyListInfo,
-    PolicyListPreview,
-)
+from catalystwan.endpoints.configuration.policy.abstractions import PolicyListEndpoints
+from catalystwan.models.policy.list.ipv6_prefix import IPv6PrefixList, IPv6PrefixListEditPayload, IPv6PrefixListInfo
+from catalystwan.models.policy.policy_list import InfoTag, PolicyListId, PolicyListPreview
 from catalystwan.typed_list import DataSequence
-
-
-class IPv6PrefixListEditPayload(IPv6PrefixList, PolicyListId):
-    pass
-
-
-class IPv6PrefixListInfo(IPv6PrefixList, PolicyListInfo):
-    pass
 
 
 class ConfigurationPolicyIPv6PrefixList(APIEndpoints, PolicyListEndpoints):

@@ -3,13 +3,14 @@
 import datetime
 from functools import wraps
 from ipaddress import IPv4Address, IPv4Network, IPv6Network
-from typing import Any, Dict, List, MutableSequence, Optional, Protocol, Sequence, Set, Tuple, Union
+from typing import Any, Dict, List, MutableSequence, Optional, Sequence, Set, Tuple, Union
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, RootModel, field_validator, model_validator
 from typing_extensions import Annotated, Literal
 
 from catalystwan.models.common import (
+    EncapType,
     ICMPMessageType,
     ServiceChainNumber,
     TLOCColor,
@@ -18,8 +19,6 @@ from catalystwan.models.common import (
     str_as_uuid_list,
 )
 from catalystwan.models.misc.application_protocols import ApplicationProtocol
-from catalystwan.models.policy.lists_entries import EncapType
-from catalystwan.typed_list import DataSequence
 
 
 def port_set_and_ranges_to_str(ports: Set[int] = set(), port_ranges: List[Tuple[int, int]] = []) -> str:
@@ -1146,20 +1145,3 @@ class PolicyDefinitionEditResponse(BaseModel):
 
 class PolicyDefinitionPreview(BaseModel):
     preview: str
-
-
-class PolicyDefinitionEndpoints(Protocol):
-    def create_policy_definition(self, payload: BaseModel) -> PolicyDefinitionId:
-        ...
-
-    def delete_policy_definition(self, id: UUID) -> None:
-        ...
-
-    def edit_policy_definition(self, id: UUID, payload: BaseModel) -> PolicyDefinitionEditResponse:
-        ...
-
-    def get_definitions(self) -> DataSequence[PolicyDefinitionInfo]:
-        ...
-
-    def get_policy_definition(self, id: UUID) -> PolicyDefinitionGetResponse:
-        ...

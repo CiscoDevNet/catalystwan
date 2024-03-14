@@ -26,6 +26,8 @@ from catalystwan.models.policy.policy_definition import (
     PolicerAction,
     PolicyActionType,
     PolicyDefinitionBase,
+    PolicyDefinitionGetResponse,
+    PolicyDefinitionId,
     PolicyDefinitionSequenceBase,
     ProtocolEntry,
     Reference,
@@ -161,3 +163,11 @@ class AclPolicy(AclPolicyHeader, DefinitionWithSequencesCommonBase):
         )
         self.add(seq)
         return seq
+
+
+class AclPolicyEditPayload(AclPolicy, PolicyDefinitionId):
+    pass
+
+
+class AclPolicyGetResponse(AclPolicy, PolicyDefinitionGetResponse):
+    pass

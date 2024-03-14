@@ -6,108 +6,48 @@ from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional, Tuple, Typ
 from uuid import UUID
 
 from catalystwan.api.task_status_api import Task
-from catalystwan.endpoints.configuration.policy.definition.access_control_list import (
-    AclPolicyGetResponse,
-    ConfigurationPolicyAclDefinition,
-)
+from catalystwan.endpoints.configuration.policy.abstractions import PolicyDefinitionEndpoints, PolicyListEndpoints
+from catalystwan.endpoints.configuration.policy.definition.access_control_list import ConfigurationPolicyAclDefinition
 from catalystwan.endpoints.configuration.policy.definition.access_control_list_ipv6 import (
-    AclIPv6PolicyGetResponse,
     ConfigurationPolicyAclIPv6Definition,
 )
-from catalystwan.endpoints.configuration.policy.definition.control import (
-    ConfigurationPolicyControlDefinition,
-    ControlPolicyGetResponse,
-)
+from catalystwan.endpoints.configuration.policy.definition.control import ConfigurationPolicyControlDefinition
 from catalystwan.endpoints.configuration.policy.definition.device_access import (
     ConfigurationPolicyDeviceAccessDefinition,
-    DeviceAccessPolicyGetResponse,
 )
 from catalystwan.endpoints.configuration.policy.definition.device_access_ipv6 import (
     ConfigurationPolicyDeviceAccessIPv6Definition,
-    DeviceAccessIPv6PolicyGetResponse,
 )
-from catalystwan.endpoints.configuration.policy.definition.hub_and_spoke import (
-    ConfigurationPolicyHubAndSpokeDefinition,
-    HubAndSpokePolicyGetResponse,
-)
-from catalystwan.endpoints.configuration.policy.definition.mesh import (
-    ConfigurationPolicyMeshDefinition,
-    MeshPolicyGetResponse,
-)
-from catalystwan.endpoints.configuration.policy.definition.qos_map import (
-    ConfigurationPolicyQoSMapDefinition,
-    QoSMapPolicyGetResponse,
-)
-from catalystwan.endpoints.configuration.policy.definition.rewrite import (
-    ConfigurationPolicyRewriteRuleDefinition,
-    RewritePolicyGetResponse,
-)
-from catalystwan.endpoints.configuration.policy.definition.rule_set import (
-    ConfigurationPolicyRuleSetDefinition,
-    RuleSetGetResponse,
-)
+from catalystwan.endpoints.configuration.policy.definition.hub_and_spoke import ConfigurationPolicyHubAndSpokeDefinition
+from catalystwan.endpoints.configuration.policy.definition.mesh import ConfigurationPolicyMeshDefinition
+from catalystwan.endpoints.configuration.policy.definition.qos_map import ConfigurationPolicyQoSMapDefinition
+from catalystwan.endpoints.configuration.policy.definition.rewrite import ConfigurationPolicyRewriteRuleDefinition
+from catalystwan.endpoints.configuration.policy.definition.rule_set import ConfigurationPolicyRuleSetDefinition
 from catalystwan.endpoints.configuration.policy.definition.security_group import (
     ConfigurationPolicySecurityGroupDefinition,
-    SecurityGroupGetResponse,
 )
-from catalystwan.endpoints.configuration.policy.definition.traffic_data import (
-    ConfigurationPolicyDataDefinition,
-    TrafficDataPolicy,
-    TrafficDataPolicyGetResponse,
-)
+from catalystwan.endpoints.configuration.policy.definition.traffic_data import ConfigurationPolicyDataDefinition
 from catalystwan.endpoints.configuration.policy.definition.vpn_membership import (
     ConfigurationPolicyVPNMembershipGroupDefinition,
-    VPNMembershipPolicyGetResponse,
 )
 from catalystwan.endpoints.configuration.policy.definition.zone_based_firewall import (
     ConfigurationPolicyZoneBasedFirewallDefinition,
-    ZoneBasedFWPolicyGetResponse,
 )
 from catalystwan.endpoints.configuration.policy.list.app import AppListInfo, ConfigurationPolicyApplicationList
-from catalystwan.endpoints.configuration.policy.list.app_probe import (
-    AppProbeClassListInfo,
-    ConfigurationPolicyAppProbeClassList,
-)
+from catalystwan.endpoints.configuration.policy.list.app_probe import ConfigurationPolicyAppProbeClassList
 from catalystwan.endpoints.configuration.policy.list.as_path import ASPathListInfo, ConfigurationPolicyASPathList
-from catalystwan.endpoints.configuration.policy.list.class_map import (
-    ClassMapListInfo,
-    ConfigurationPolicyForwardingClassList,
-)
+from catalystwan.endpoints.configuration.policy.list.class_map import ConfigurationPolicyForwardingClassList
 from catalystwan.endpoints.configuration.policy.list.color import ColorListInfo, ConfigurationPolicyColorList
-from catalystwan.endpoints.configuration.policy.list.community import (
-    CommunityListInfo,
-    ConfigurationPolicyCommunityList,
-)
-from catalystwan.endpoints.configuration.policy.list.data_ipv6_prefix import (
-    ConfigurationPolicyDataIPv6PrefixList,
-    DataIPv6PrefixListInfo,
-)
-from catalystwan.endpoints.configuration.policy.list.data_prefix import (
-    ConfigurationPolicyDataPrefixList,
-    DataPrefixListInfo,
-)
-from catalystwan.endpoints.configuration.policy.list.expanded_community import (
-    ConfigurationPolicyExpandedCommunityList,
-    ExpandedCommunityListInfo,
-)
+from catalystwan.endpoints.configuration.policy.list.community import ConfigurationPolicyCommunityList
+from catalystwan.endpoints.configuration.policy.list.data_ipv6_prefix import ConfigurationPolicyDataIPv6PrefixList
+from catalystwan.endpoints.configuration.policy.list.data_prefix import ConfigurationPolicyDataPrefixList
+from catalystwan.endpoints.configuration.policy.list.expanded_community import ConfigurationPolicyExpandedCommunityList
 from catalystwan.endpoints.configuration.policy.list.fqdn import ConfigurationPolicyFQDNList, FQDNListInfo
-from catalystwan.endpoints.configuration.policy.list.geo_location import (
-    ConfigurationPolicyGeoLocationList,
-    GeoLocationListInfo,
-)
-from catalystwan.endpoints.configuration.policy.list.ips_signature import (
-    ConfigurationPolicyIPSSignatureList,
-    IPSSignatureListInfo,
-)
-from catalystwan.endpoints.configuration.policy.list.ipv6_prefix import (
-    ConfigurationPolicyIPv6PrefixList,
-    IPv6PrefixListInfo,
-)
+from catalystwan.endpoints.configuration.policy.list.geo_location import ConfigurationPolicyGeoLocationList
+from catalystwan.endpoints.configuration.policy.list.ips_signature import ConfigurationPolicyIPSSignatureList
+from catalystwan.endpoints.configuration.policy.list.ipv6_prefix import ConfigurationPolicyIPv6PrefixList
 from catalystwan.endpoints.configuration.policy.list.local_app import ConfigurationPolicyLocalAppList, LocalAppListInfo
-from catalystwan.endpoints.configuration.policy.list.local_domain import (
-    ConfigurationPolicyLocalDomainList,
-    LocalDomainListInfo,
-)
+from catalystwan.endpoints.configuration.policy.list.local_domain import ConfigurationPolicyLocalDomainList
 from catalystwan.endpoints.configuration.policy.list.mirror import ConfigurationPolicyMirrorList, MirrorListInfo
 from catalystwan.endpoints.configuration.policy.list.policer import ConfigurationPolicyPolicerClassList, PolicerListInfo
 from catalystwan.endpoints.configuration.policy.list.port import ConfigurationPolicyPortList, PortListInfo
@@ -141,22 +81,9 @@ from catalystwan.endpoints.configuration.policy.vsmart_template import (
     VSmartConnectivityStatus,
 )
 from catalystwan.models.misc.application_protocols import ApplicationProtocol
-from catalystwan.models.policy import AnyPolicyDefinition, AnyPolicyList
-from catalystwan.models.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
-from catalystwan.models.policy.definitions.access_control_list import AclPolicy
-from catalystwan.models.policy.definitions.access_control_list_ipv6 import AclIPv6Policy
-from catalystwan.models.policy.definitions.control import ControlPolicy
-from catalystwan.models.policy.definitions.device_access import DeviceAccessPolicy
-from catalystwan.models.policy.definitions.device_access_ipv6 import DeviceAccessIPv6Policy
-from catalystwan.models.policy.definitions.hub_and_spoke import HubAndSpokePolicy
-from catalystwan.models.policy.definitions.mesh import MeshPolicy
-from catalystwan.models.policy.definitions.qos_map import QoSMapPolicy
-from catalystwan.models.policy.definitions.rewrite import RewritePolicy
-from catalystwan.models.policy.definitions.rule_set import RuleSet
-from catalystwan.models.policy.definitions.security_group import SecurityGroup
-from catalystwan.models.policy.definitions.vpn_membership import VPNMembershipPolicy
-from catalystwan.models.policy.definitions.zone_based_firewall import ZoneBasedFWPolicy
-from catalystwan.models.policy.lists import (
+from catalystwan.models.policy import (
+    AnyPolicyDefinition,
+    AnyPolicyList,
     AppList,
     AppProbeClassList,
     ASPathList,
@@ -174,7 +101,6 @@ from catalystwan.models.policy.lists import (
     LocalDomainList,
     MirrorList,
     PolicerList,
-    PolicyListBase,
     PortList,
     PreferredColorGroupList,
     PrefixList,
@@ -188,6 +114,33 @@ from catalystwan.models.policy.lists import (
     VPNList,
     ZoneList,
 )
+from catalystwan.models.policy.centralized import CentralizedPolicy, CentralizedPolicyEditPayload, CentralizedPolicyInfo
+from catalystwan.models.policy.definition.access_control_list import AclPolicy, AclPolicyGetResponse
+from catalystwan.models.policy.definition.access_control_list_ipv6 import AclIPv6Policy, AclIPv6PolicyGetResponse
+from catalystwan.models.policy.definition.control import ControlPolicy, ControlPolicyGetResponse
+from catalystwan.models.policy.definition.device_access import DeviceAccessPolicy, DeviceAccessPolicyGetResponse
+from catalystwan.models.policy.definition.device_access_ipv6 import (
+    DeviceAccessIPv6Policy,
+    DeviceAccessIPv6PolicyGetResponse,
+)
+from catalystwan.models.policy.definition.hub_and_spoke import HubAndSpokePolicy, HubAndSpokePolicyGetResponse
+from catalystwan.models.policy.definition.mesh import MeshPolicy, MeshPolicyGetResponse
+from catalystwan.models.policy.definition.qos_map import QoSMapPolicy, QoSMapPolicyGetResponse
+from catalystwan.models.policy.definition.rewrite import RewritePolicy, RewritePolicyGetResponse
+from catalystwan.models.policy.definition.rule_set import RuleSet, RuleSetGetResponse
+from catalystwan.models.policy.definition.security_group import SecurityGroup, SecurityGroupGetResponse
+from catalystwan.models.policy.definition.traffic_data import TrafficDataPolicy, TrafficDataPolicyGetResponse
+from catalystwan.models.policy.definition.vpn_membership import VPNMembershipPolicy, VPNMembershipPolicyGetResponse
+from catalystwan.models.policy.definition.zone_based_firewall import ZoneBasedFWPolicy, ZoneBasedFWPolicyGetResponse
+from catalystwan.models.policy.list.app_probe import AppProbeClassListInfo
+from catalystwan.models.policy.list.class_map import ClassMapListInfo
+from catalystwan.models.policy.list.communities import CommunityListInfo, ExpandedCommunityListInfo
+from catalystwan.models.policy.list.data_ipv6_prefix import DataIPv6PrefixListInfo
+from catalystwan.models.policy.list.data_prefix import DataPrefixListInfo
+from catalystwan.models.policy.list.geo_location import GeoLocationListInfo
+from catalystwan.models.policy.list.ips_signature import IPSSignatureListInfo
+from catalystwan.models.policy.list.ipv6_prefix import IPv6PrefixListInfo
+from catalystwan.models.policy.list.local_domain import LocalDomainListInfo
 from catalystwan.models.policy.localized import (
     LocalizedPolicy,
     LocalizedPolicyDeviceInfo,
@@ -197,10 +150,9 @@ from catalystwan.models.policy.localized import (
 from catalystwan.models.policy.policy_definition import (
     PolicyDefinitionBase,
     PolicyDefinitionEditResponse,
-    PolicyDefinitionEndpoints,
     PolicyDefinitionInfo,
 )
-from catalystwan.models.policy.policy_list import PolicyListEndpoints
+from catalystwan.models.policy.policy_list import PolicyListBase
 from catalystwan.models.policy.security import (
     AnySecurityPolicy,
     AnySecurityPolicyInfo,

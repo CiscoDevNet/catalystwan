@@ -4,24 +4,19 @@
 from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
-from catalystwan.models.policy.definitions.access_control_list import AclPolicy
+from catalystwan.endpoints.configuration.policy.abstractions import PolicyDefinitionEndpoints
+from catalystwan.models.policy.definition.access_control_list import (
+    AclPolicy,
+    AclPolicyEditPayload,
+    AclPolicyGetResponse,
+)
 from catalystwan.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
-    PolicyDefinitionEndpoints,
-    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
 )
 from catalystwan.typed_list import DataSequence
-
-
-class AclPolicyEditPayload(AclPolicy, PolicyDefinitionId):
-    pass
-
-
-class AclPolicyGetResponse(AclPolicy, PolicyDefinitionGetResponse):
-    pass
 
 
 class ConfigurationPolicyAclDefinition(APIEndpoints, PolicyDefinitionEndpoints):

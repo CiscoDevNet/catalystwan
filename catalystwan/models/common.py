@@ -101,6 +101,12 @@ def str_as_str_list(val: Union[str, Sequence[str]]) -> Sequence[str]:
     return val
 
 
+EncapType = Literal[
+    "ipsec",
+    "gre",
+]
+
+
 InterfaceType = Literal[
     "Ethernet",
     "FastEthernet",

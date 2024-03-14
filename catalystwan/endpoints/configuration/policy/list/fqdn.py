@@ -4,23 +4,10 @@
 from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
-from catalystwan.models.policy.lists import FQDNList
-from catalystwan.models.policy.policy_list import (
-    InfoTag,
-    PolicyListEndpoints,
-    PolicyListId,
-    PolicyListInfo,
-    PolicyListPreview,
-)
+from catalystwan.endpoints.configuration.policy.abstractions import PolicyListEndpoints
+from catalystwan.models.policy.list.fqdn import FQDNList, FQDNListEditPayload, FQDNListInfo
+from catalystwan.models.policy.policy_list import InfoTag, PolicyListId, PolicyListPreview
 from catalystwan.typed_list import DataSequence
-
-
-class FQDNListEditPayload(FQDNList, PolicyListId):
-    pass
-
-
-class FQDNListInfo(FQDNList, PolicyListInfo):
-    pass
 
 
 class ConfigurationPolicyFQDNList(APIEndpoints, PolicyListEndpoints):

@@ -4,23 +4,10 @@
 from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
-from catalystwan.models.policy.lists import DataPrefixList
-from catalystwan.models.policy.policy_list import (
-    InfoTag,
-    PolicyListEndpoints,
-    PolicyListId,
-    PolicyListInfo,
-    PolicyListPreview,
-)
+from catalystwan.endpoints.configuration.policy.abstractions import PolicyListEndpoints
+from catalystwan.models.policy.list.data_prefix import DataPrefixList, DataPrefixListEditPayload, DataPrefixListInfo
+from catalystwan.models.policy.policy_list import InfoTag, PolicyListId, PolicyListPreview
 from catalystwan.typed_list import DataSequence
-
-
-class DataPrefixListEditPayload(DataPrefixList, PolicyListId):
-    pass
-
-
-class DataPrefixListInfo(DataPrefixList, PolicyListInfo):
-    pass
 
 
 class ConfigurationPolicyDataPrefixList(APIEndpoints, PolicyListEndpoints):

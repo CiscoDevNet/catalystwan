@@ -26,6 +26,8 @@ from catalystwan.models.policy.policy_definition import (
     PolicerAction,
     PolicyActionType,
     PolicyDefinitionBase,
+    PolicyDefinitionGetResponse,
+    PolicyDefinitionId,
     PolicyDefinitionSequenceBase,
     Reference,
     SourceDataIPv6PrefixListEntry,
@@ -161,3 +163,11 @@ class AclIPv6Policy(AclIPv6PolicyHeader, DefinitionWithSequencesCommonBase):
         )
         self.add(seq)
         return seq
+
+
+class AclIPv6PolicyEditPayload(AclIPv6Policy, PolicyDefinitionId):
+    pass
+
+
+class AclIPv6PolicyGetResponse(AclIPv6Policy, PolicyDefinitionGetResponse):
+    pass

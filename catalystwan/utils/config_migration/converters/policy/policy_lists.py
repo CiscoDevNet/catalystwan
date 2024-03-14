@@ -216,7 +216,8 @@ def sla_class(in_: SLAClassList) -> SLAClassParcel:
 def tloc(in_: TLOCList) -> TlocParcel:
     out = TlocParcel(**_get_parcel_name_desc(in_))
     for entry in in_.entries:
-        out.add_entry(tloc=entry.tloc, color=entry.color, encapsulation=entry.encap, preference=entry.preference)
+        _preference = str(entry.preference) if entry.preference is not None else None
+        out.add_entry(tloc=entry.tloc, color=entry.color, encapsulation=entry.encap, preference=_preference)
     return out
 
 
@@ -281,8 +282,15 @@ CONVERTERS: Mapping[Type[Input], Callable[[Any], Output]] = {
 }
 
 
+def _find_converter(in_: Input) -> Optional[Callable[[Any], Output]]:
+    for key in CONVERTERS.keys():
+        if isinstance(in_, key):
+            return CONVERTERS[key]
+    return None
+
+
 def convert(in_: Input) -> Optional[Output]:
-    if converter := CONVERTERS.get(type(in_)):
+    if converter := _find_converter(in_):
         return converter(in_)
     return None
 

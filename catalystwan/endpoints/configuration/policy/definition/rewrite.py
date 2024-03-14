@@ -4,24 +4,19 @@
 from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
-from catalystwan.models.policy.definitions.rewrite import RewritePolicy
+from catalystwan.endpoints.configuration.policy.abstractions import PolicyDefinitionEndpoints
+from catalystwan.models.policy.definition.rewrite import (
+    RewritePolicy,
+    RewritePolicyEditPayload,
+    RewritePolicyGetResponse,
+)
 from catalystwan.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
-    PolicyDefinitionEndpoints,
-    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
 )
 from catalystwan.typed_list import DataSequence
-
-
-class RewritePolicyEditPayload(RewritePolicy, PolicyDefinitionId):
-    pass
-
-
-class RewritePolicyGetResponse(RewritePolicy, PolicyDefinitionGetResponse):
-    pass
 
 
 class ConfigurationPolicyRewriteRuleDefinition(APIEndpoints, PolicyDefinitionEndpoints):
