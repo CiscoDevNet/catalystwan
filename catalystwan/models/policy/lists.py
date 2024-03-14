@@ -11,7 +11,6 @@ from catalystwan.models.policy.lists_entries import (
     ColorGroupPreference,
     EncapType,
     PathPreference,
-    PortListEntry,
     PreferredColorGroupListEntry,
     PrefixListEntry,
     ProtocolNameListEntry,
@@ -75,11 +74,6 @@ class ZoneList(PolicyListBase):
 
     def assign_interfaces(self, ifs: Set[InterfaceType]) -> None:
         self.entries = [ZoneListEntry(interface=interface) for interface in ifs]
-
-
-class PortList(PolicyListBase):
-    type: Literal["port"] = "port"
-    entries: List[PortListEntry] = []
 
 
 class ProtocolNameList(PolicyListBase):

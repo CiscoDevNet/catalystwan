@@ -22,6 +22,7 @@ from catalystwan.models.policy.list.local_app import LocalAppList
 from catalystwan.models.policy.list.local_domain import LocalDomainList
 from catalystwan.models.policy.list.mirror import MirrorList
 from catalystwan.models.policy.list.policer import PolicerList
+from catalystwan.models.policy.list.port import PortList
 
 from .centralized import CentralizedPolicy, TrafficDataDirection
 from .definition.access_control_list import AclPolicy
@@ -39,7 +40,6 @@ from .definition.traffic_data import TrafficDataPolicy
 from .definition.vpn_membership import VPNMembershipPolicy
 from .definition.zone_based_firewall import ZoneBasedFWPolicy
 from .lists import (
-    PortList,
     PreferredColorGroupList,
     PrefixList,
     ProtocolNameList,
