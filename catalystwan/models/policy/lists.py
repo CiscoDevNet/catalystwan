@@ -11,8 +11,6 @@ from catalystwan.models.policy.lists_entries import (
     ColorGroupPreference,
     EncapType,
     PathPreference,
-    PolicerExceedAction,
-    PolicerListEntry,
     PortListEntry,
     PreferredColorGroupListEntry,
     PrefixListEntry,
@@ -97,16 +95,6 @@ class URLAllowList(PolicyListBase):
 class URLBlockList(PolicyListBase):
     type: Literal["urlBlackList"] = "urlBlackList"
     entries: List[URLListEntry] = []
-
-
-class PolicerList(PolicyListBase):
-    type: Literal["policer"] = "policer"
-    entries: List[PolicerListEntry] = []
-
-    def police(self, burst: int, rate: int, exceed: PolicerExceedAction = "drop") -> None:
-        # Policer list must have only single entry!
-        entry = PolicerListEntry(burst=burst, exceed=exceed, rate=rate)
-        self._add_entry(entry, single=True)
 
 
 class SLAClassList(PolicyListBase):
