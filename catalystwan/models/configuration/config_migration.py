@@ -63,8 +63,8 @@ class UX1Config(BaseModel):
 
 
 class TransformHeader(BaseModel):
-    type: str
-    id: UUID
+    type: str = Field(description="Needed because type discriminator is not present in many UX2 item payloads")
+    origin: UUID = Field(decription="Original UUID of converted item")
     subelements: List[UUID] = []
 
 

@@ -15,6 +15,7 @@ from catalystwan.models.configuration.config_migration import (
 from catalystwan.models.configuration.feature_profile.common import FeatureProfileCreationPayload
 from catalystwan.session import ManagerSession
 from catalystwan.utils.config_migration.converters.feature_template import create_parcel_from_template
+from catalystwan.utils.config_migration.converters.policy.policy_lists import convert as convert_policy_list
 from catalystwan.utils.config_migration.creators.config_group import ConfigGroupCreator
 from catalystwan.utils.config_migration.device_templates import flatten_general_templates
 
@@ -99,7 +100,7 @@ def transform(ux1: UX1Config) -> UX2Config:
         transformed_fp_system = TransformedFeatureProfile(
             header=TransformHeader(
                 type="system",
-                id=fp_system_uuid,
+                origin=fp_system_uuid,
             ),
             feature_profile=FeatureProfileCreationPayload(
                 name=f"{dt.template_name}_system",
@@ -110,7 +111,7 @@ def transform(ux1: UX1Config) -> UX2Config:
         transformed_fp_transport = TransformedFeatureProfile(
             header=TransformHeader(
                 type="transport",
-                id=fp_transport_uuid,
+                origin=fp_transport_uuid,
             ),
             feature_profile=FeatureProfileCreationPayload(
                 name=f"{dt.template_name}_transport",
@@ -121,7 +122,7 @@ def transform(ux1: UX1Config) -> UX2Config:
         transformed_fp_other = TransformedFeatureProfile(
             header=TransformHeader(
                 type="other",
-                id=fp_other_uuid,
+                origin=fp_other_uuid,
             ),
             feature_profile=FeatureProfileCreationPayload(
                 name=f"{dt.template_name}_other",
@@ -141,7 +142,7 @@ def transform(ux1: UX1Config) -> UX2Config:
         transformed_cg = TransformedConfigGroup(
             header=TransformHeader(
                 type="config_group",
-                id=uuid4(),
+                origin=uuid4(),
                 subelements=[fp_system_uuid, fp_transport_uuid, fp_other_uuid],
             ),
             config_group=ConfigGroupCreationPayload(
@@ -163,13 +164,21 @@ def transform(ux1: UX1Config) -> UX2Config:
             transformed_parcel = TransformedParcel(
                 header=TransformHeader(
                     type=parcel._get_parcel_type(),
-                    id=UUID(ft.id),
+                    origin=UUID(ft.id),
                 ),
                 parcel=parcel,
             )
             # Add to UX2. We can indentify the parcels as subelements of the feature profiles by the UUIDs
             ux2.profile_parcels.append(transformed_parcel)
 
+    # Policy Lists
+    for policy_list in ux1.policies.policy_lists:
+        policy_parcel = convert_policy_list(policy_list)
+        if policy_parcel is not None:
+            header = TransformHeader(type=policy_parcel._get_parcel_type(), origin=policy_list.list_id)
+            ux2.profile_parcels.append(TransformedParcel(header=header, parcel=policy_parcel))
+        else:
+            logger.warning(f"{policy_list.type} {policy_list.list_id} {policy_list.name} was not converted")
     return ux2
 
 
