@@ -9,7 +9,6 @@ from pydantic import BaseModel, Field
 from catalystwan.models.common import InterfaceType, TLOCColor
 from catalystwan.models.policy.lists_entries import (
     EncapType,
-    RegionListEntry,
     SiteListEntry,
     SLAClassListEntry,
     TLOCListEntry,
@@ -120,16 +119,3 @@ class TLOCList(PolicyListBase):
     def add_tloc(self, tloc: IPv4Address, color: TLOCColor, encap: EncapType, preference: Optional[int] = None) -> None:
         _preference = str(preference) if preference is not None else None
         self.entries.append(TLOCListEntry(tloc=tloc, color=color, encap=encap, preference=_preference))
-
-
-class RegionList(PolicyListBase):
-    type: Literal["region"] = "region"
-    entries: List[RegionListEntry] = []
-
-    def add_regions(self, regions: Set[int]):
-        for region in regions:
-            self._add_entry(RegionListEntry(region_id=str(region)))
-
-    def add_region_range(self, region_range: Tuple[int, int]):
-        entry = RegionListEntry(region_id=f"{region_range[0]}-{region_range[1]}")
-        self._add_entry(entry)
