@@ -1,11 +1,11 @@
 # Copyright 2023 Cisco Systems, Inc. and its affiliates
 
-from typing import Any, List, Literal, Optional, Set, Tuple
+from typing import Any, List, Literal, Optional, Set
 
 from pydantic import BaseModel, Field
 
 from catalystwan.models.common import InterfaceType
-from catalystwan.models.policy.lists_entries import VPNListEntry, ZoneListEntry
+from catalystwan.models.policy.lists_entries import ZoneListEntry
 
 
 class PolicyListBase(BaseModel):
@@ -22,18 +22,6 @@ class PolicyListBase(BaseModel):
             del self.entries[1:]
         else:
             self.entries.append(entry)
-
-
-class VPNList(PolicyListBase):
-    type: Literal["vpn"] = "vpn"
-    entries: List[VPNListEntry] = []
-
-    def add_vpns(self, vpns: Set[int]):
-        for vpn in vpns:
-            self._add_entry(VPNListEntry(vpn=(vpn, None)))
-
-    def add_vpn_range(self, vpn_range: Tuple[int, int]):
-        self._add_entry(VPNListEntry(vpn=vpn_range))
 
 
 class ZoneList(PolicyListBase):
