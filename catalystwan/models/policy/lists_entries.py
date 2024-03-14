@@ -359,14 +359,7 @@ class TLOCListEntry(BaseModel):
     tloc: IPv4Address
     color: TLOCColor
     encap: EncapType
-    preference: Optional[str] = None
-
-    @field_validator("preference")
-    @classmethod
-    def check_preference(cls, preference_str: str):
-        if preference_str is not None:
-            assert 0 <= int(preference_str) <= 2**32 - 1
-            return preference_str
+    preference: Optional[IntStr] = Field(default=None, ge=0, le=2**32 - 1)
 
 
 class PreferredColorGroupListEntry(BaseModel):

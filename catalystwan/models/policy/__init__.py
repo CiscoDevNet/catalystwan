@@ -29,6 +29,7 @@ from catalystwan.models.policy.list.protocol_name import ProtocolNameList
 from catalystwan.models.policy.list.region import RegionList
 from catalystwan.models.policy.list.site import SiteList
 from catalystwan.models.policy.list.sla import SLAClassList
+from catalystwan.models.policy.list.tloc import TLOCList
 
 from .centralized import CentralizedPolicy, TrafficDataDirection
 from .definition.access_control_list import AclPolicy
@@ -45,7 +46,7 @@ from .definition.security_group import SecurityGroup
 from .definition.traffic_data import TrafficDataPolicy
 from .definition.vpn_membership import VPNMembershipPolicy
 from .definition.zone_based_firewall import ZoneBasedFWPolicy
-from .lists import TLOCList, URLAllowList, URLBlockList, VPNList, ZoneList
+from .lists import URLAllowList, URLBlockList, VPNList, ZoneList
 from .lists_entries import PathPreference, PolicerExceedAction
 from .localized import LocalizedPolicy
 from .policy_definition import (

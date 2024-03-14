@@ -1,12 +1,11 @@
 # Copyright 2023 Cisco Systems, Inc. and its affiliates
 
-from ipaddress import IPv4Address
 from typing import Any, List, Literal, Optional, Set, Tuple
 
 from pydantic import BaseModel, Field
 
-from catalystwan.models.common import InterfaceType, TLOCColor
-from catalystwan.models.policy.lists_entries import EncapType, TLOCListEntry, URLListEntry, VPNListEntry, ZoneListEntry
+from catalystwan.models.common import InterfaceType
+from catalystwan.models.policy.lists_entries import URLListEntry, VPNListEntry, ZoneListEntry
 
 
 class PolicyListBase(BaseModel):
@@ -56,12 +55,3 @@ class URLAllowList(PolicyListBase):
 class URLBlockList(PolicyListBase):
     type: Literal["urlBlackList"] = "urlBlackList"
     entries: List[URLListEntry] = []
-
-
-class TLOCList(PolicyListBase):
-    type: Literal["tloc"] = "tloc"
-    entries: List[TLOCListEntry] = []
-
-    def add_tloc(self, tloc: IPv4Address, color: TLOCColor, encap: EncapType, preference: Optional[int] = None) -> None:
-        _preference = str(preference) if preference is not None else None
-        self.entries.append(TLOCListEntry(tloc=tloc, color=color, encap=encap, preference=_preference))
