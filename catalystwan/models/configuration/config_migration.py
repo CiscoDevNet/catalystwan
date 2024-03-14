@@ -1,16 +1,20 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
 from typing import List, Union
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import Annotated
 
 from catalystwan.api.template_api import FeatureTemplateInformation
 from catalystwan.api.templates.device_template.device_template import DeviceTemplate
-from catalystwan.endpoints.configuration_group import ConfigGroup
+from catalystwan.endpoints.configuration_group import ConfigGroupCreationPayload
 from catalystwan.models.configuration.feature_profile.common import FeatureProfileCreationPayload
+from catalystwan.models.configuration.feature_profile.sdwan.other import AnyOtherParcel
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object import AnyPolicyObjectParcel
+from catalystwan.models.configuration.feature_profile.sdwan.service import AnyServiceParcel
 from catalystwan.models.configuration.feature_profile.sdwan.system import AnySystemParcel
+from catalystwan.models.configuration.feature_profile.sdwan.transport import AnyTransportParcel
 from catalystwan.models.configuration.topology_group import TopologyGroup
 from catalystwan.models.policy import AnyPolicyDefinitionInfo, AnyPolicyListInfo
 from catalystwan.models.policy.centralized import CentralizedPolicyInfo
@@ -18,10 +22,7 @@ from catalystwan.models.policy.localized import LocalizedPolicyInfo
 from catalystwan.models.policy.security import AnySecurityPolicyInfo
 
 AnyParcel = Annotated[
-    Union[
-        AnySystemParcel,
-        AnyPolicyObjectParcel,
-    ],
+    Union[AnySystemParcel, AnyPolicyObjectParcel, AnyServiceParcel, AnyOtherParcel, AnyTransportParcel],
     Field(discriminator="type_"),
 ]
 
@@ -61,21 +62,47 @@ class UX1Config(BaseModel):
     templates: UX1Templates = UX1Templates()
 
 
+class TransformHeader(BaseModel):
+    type: str
+    id: UUID
+    subelements: List[UUID] = []
+
+
+class TransformedTopologyGroup(BaseModel):
+    header: TransformHeader
+    topology_group: TopologyGroup
+
+
+class TransformedConfigGroup(BaseModel):
+    header: TransformHeader
+    config_group: ConfigGroupCreationPayload
+
+
+class TransformedFeatureProfile(BaseModel):
+    header: TransformHeader
+    feature_profile: FeatureProfileCreationPayload
+
+
+class TransformedParcel(BaseModel):
+    header: TransformHeader
+    parcel: AnyParcel
+
+
 class UX2Config(BaseModel):
     # All UX2 Configuration items - Mega Model
     model_config = ConfigDict(populate_by_name=True)
-    topology_groups: List[TopologyGroup] = Field(
+    topology_groups: List[TransformedTopologyGroup] = Field(
         default=[], serialization_alias="topologyGroups", validation_alias="topologyGroups"
     )
-    config_groups: List[ConfigGroup] = Field(
+    config_groups: List[TransformedConfigGroup] = Field(
         default=[], serialization_alias="configurationGroups", validation_alias="configurationGroups"
     )
-    policy_groups: List[ConfigGroup] = Field(
+    policy_groups: List[TransformedConfigGroup] = Field(
         default=[], serialization_alias="policyGroups", validation_alias="policyGroups"
     )
-    feature_profiles: List[FeatureProfileCreationPayload] = Field(
+    feature_profiles: List[TransformedFeatureProfile] = Field(
         default=[], serialization_alias="featureProfiles", validation_alias="featureProfiles"
     )
-    profile_parcels: List[AnyParcel] = Field(
+    profile_parcels: List[TransformedParcel] = Field(
         default=[], serialization_alias="profileParcels", validation_alias="profileParcels"
     )

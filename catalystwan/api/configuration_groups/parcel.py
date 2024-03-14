@@ -67,7 +67,7 @@ class _ParcelBase(BaseModel):
         field_info = cls.model_fields.get("type_")
         if field_info is not None:
             return str(field_info.default)
-        raise CatalystwanException("Field parcel type is not set.")
+        raise CatalystwanException(f"{cls.__name__} field parcel type is not set.")
 
 
 class OptionType(str, Enum):

@@ -1,13 +1,22 @@
 import logging
 from typing import Callable
+from uuid import UUID, uuid4
 
 from catalystwan.api.policy_api import POLICY_LIST_ENDPOINTS_MAP
-from catalystwan.endpoints.configuration_group import ConfigGroup
-from catalystwan.models.configuration.config_migration import UX1Config, UX2Config
+from catalystwan.endpoints.configuration_group import ConfigGroup, ConfigGroupCreationPayload
+from catalystwan.models.configuration.config_migration import (
+    TransformedConfigGroup,
+    TransformedFeatureProfile,
+    TransformedParcel,
+    TransformHeader,
+    UX1Config,
+    UX2Config,
+)
+from catalystwan.models.configuration.feature_profile.common import FeatureProfileCreationPayload
 from catalystwan.session import ManagerSession
 from catalystwan.utils.config_migration.converters.feature_template import create_parcel_from_template
-from catalystwan.utils.config_migration.converters.policy.policy_lists import convert_all as convert_policy_lists
 from catalystwan.utils.config_migration.creators.config_group import ConfigGroupCreator
+from catalystwan.utils.config_migration.device_templates import flatten_general_templates
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +50,39 @@ SUPPORTED_TEMPLATE_TYPES = [
     "cisco_dhcp_server",
 ]
 
+FEATURE_PROFILE_SYSTEM = [
+    "cisco_aaa",
+    "cedge_aaa",
+    "aaa",
+    "cisco_banner",
+    "cisco_security",
+    "security",
+    "security-vsmart",
+    "security-vedge",
+    "cisco_system",
+    "system-vsmart",
+    "system-vedge",
+    "cisco_bfd",
+    "bfd-vedge",
+    "cedge_global",
+    "cisco_logging",
+    "logging",
+    "cisco_omp",
+    "omp-vedge",
+    "omp-vsmart",
+    "cisco_ntp",
+    "ntp",
+    "bgp",
+    "cisco_bgp",
+]
+
+FEATURE_PROFILE_TRANSPORT = ["dhcp", "cisco_dhcp_server", "dhcp-server"]
+
+FEATURE_PROFILE_OTHER = [
+    "cisco_thousandeyes",
+    "ucse",
+]
+
 
 def log_progress(task: str, completed: int, total: int) -> None:
     logger.info(f"{task} {completed}/{total}")
@@ -48,12 +90,86 @@ def log_progress(task: str, completed: int, total: int) -> None:
 
 def transform(ux1: UX1Config) -> UX2Config:
     ux2 = UX2Config()
-    # Feature Templates
+    # Create Feature Profiles and Config Group
+    for dt in ux1.templates.device_templates:
+        templates = flatten_general_templates(dt.general_templates)
+
+        # Create Feature Profiles
+        fp_system_uuid = uuid4()
+        transformed_fp_system = TransformedFeatureProfile(
+            header=TransformHeader(
+                type="system",
+                id=fp_system_uuid,
+            ),
+            feature_profile=FeatureProfileCreationPayload(
+                name=f"{dt.template_name}_system",
+                description="system",
+            ),
+        )
+        fp_transport_uuid = uuid4()
+        transformed_fp_transport = TransformedFeatureProfile(
+            header=TransformHeader(
+                type="transport",
+                id=fp_transport_uuid,
+            ),
+            feature_profile=FeatureProfileCreationPayload(
+                name=f"{dt.template_name}_transport",
+                description="transport",
+            ),
+        )
+        fp_other_uuid = uuid4()
+        transformed_fp_other = TransformedFeatureProfile(
+            header=TransformHeader(
+                type="other",
+                id=fp_other_uuid,
+            ),
+            feature_profile=FeatureProfileCreationPayload(
+                name=f"{dt.template_name}_other",
+                description="other",
+            ),
+        )
+
+        for template in templates:
+            # Those feature templates IDs are real UUIDs and are used to map to the feature profiles
+            if template.templateType in FEATURE_PROFILE_SYSTEM:
+                transformed_fp_system.header.subelements.append(UUID(template.templateId))
+            elif template.templateType in FEATURE_PROFILE_TRANSPORT:
+                transformed_fp_transport.header.subelements.append(UUID(template.templateId))
+            elif template.templateType in FEATURE_PROFILE_OTHER:
+                transformed_fp_other.header.subelements.append(UUID(template.templateId))
+
+        transformed_cg = TransformedConfigGroup(
+            header=TransformHeader(
+                type="config_group",
+                id=uuid4(),
+                subelements=[fp_system_uuid, fp_transport_uuid, fp_other_uuid],
+            ),
+            config_group=ConfigGroupCreationPayload(
+                name=dt.template_name,
+                description=dt.template_description,
+                solution="sdwan",
+                profiles=[],
+            ),
+        )
+        # Add to UX2
+        ux2.feature_profiles.append(transformed_fp_system)
+        ux2.feature_profiles.append(transformed_fp_transport)
+        ux2.feature_profiles.append(transformed_fp_other)
+        ux2.config_groups.append(transformed_cg)
+
     for ft in ux1.templates.feature_templates:
         if ft.template_type in SUPPORTED_TEMPLATE_TYPES:
-            ux2.profile_parcels.append(create_parcel_from_template(ft))
-    # Policy Lists
-    ux2.profile_parcels.extend(convert_policy_lists(ux1.policies.policy_lists).output)
+            parcel = create_parcel_from_template(ft)
+            transformed_parcel = TransformedParcel(
+                header=TransformHeader(
+                    type=parcel._get_parcel_type(),
+                    id=UUID(ft.id),
+                ),
+                parcel=parcel,
+            )
+            # Add to UX2. We can indentify the parcels as subelements of the feature profiles by the UUIDs
+            ux2.profile_parcels.append(transformed_parcel)
+
     return ux2
 
 

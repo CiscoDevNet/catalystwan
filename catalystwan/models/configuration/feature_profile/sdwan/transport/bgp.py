@@ -588,6 +588,7 @@ class MplsInterfaceItem(BaseModel):
 
 
 class WanRoutingBgpParcel(_ParcelBase):
+    type_: Literal["bgp"] = Field(default="bgp", exclude=True)
     model_config = ConfigDict(
         extra="forbid",
         populate_by_name=True,
