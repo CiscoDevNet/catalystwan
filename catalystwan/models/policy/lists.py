@@ -1,6 +1,6 @@
 # Copyright 2023 Cisco Systems, Inc. and its affiliates
 
-from ipaddress import IPv4Address, IPv4Network
+from ipaddress import IPv4Address
 from typing import Any, List, Literal, Optional, Set, Tuple
 from uuid import UUID
 
@@ -9,7 +9,6 @@ from pydantic import BaseModel, Field
 from catalystwan.models.common import InterfaceType, TLOCColor
 from catalystwan.models.policy.lists_entries import (
     EncapType,
-    PrefixListEntry,
     ProtocolNameListEntry,
     RegionListEntry,
     SiteListEntry,
@@ -127,14 +126,6 @@ class TLOCList(PolicyListBase):
     def add_tloc(self, tloc: IPv4Address, color: TLOCColor, encap: EncapType, preference: Optional[int] = None) -> None:
         _preference = str(preference) if preference is not None else None
         self.entries.append(TLOCListEntry(tloc=tloc, color=color, encap=encap, preference=_preference))
-
-
-class PrefixList(PolicyListBase):
-    type: Literal["prefix"] = "prefix"
-    entries: List[PrefixListEntry] = []
-
-    def add_prefix(self, prefix: IPv4Network, ge: Optional[int] = None, le: Optional[int] = None) -> None:
-        self._add_entry(PrefixListEntry(ip_prefix=prefix, ge=ge, le=le))
 
 
 class RegionList(PolicyListBase):
