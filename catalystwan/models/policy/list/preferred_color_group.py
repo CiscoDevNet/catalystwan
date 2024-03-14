@@ -1,3 +1,5 @@
+# Copyright 2022 Cisco Systems, Inc. and its affiliates
+
 from typing import List, Literal, Optional, Set, Tuple
 
 from catalystwan.models.common import TLOCColor

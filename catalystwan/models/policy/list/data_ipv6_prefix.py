@@ -1,3 +1,5 @@
+# Copyright 2022 Cisco Systems, Inc. and its affiliates
+
 from ipaddress import IPv6Interface
 from typing import List, Literal
 

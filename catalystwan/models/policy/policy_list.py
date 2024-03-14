@@ -24,21 +24,23 @@ class PolicyListBase(BaseModel):
 
 
 class InfoTag(BaseModel):
-    info_tag: Optional[str] = Field("", alias="infoTag")
+    info_tag: Optional[str] = Field("", serialization_alias="infoTag", validation_alias="infoTag")
 
 
 class PolicyListId(BaseModel):
-    list_id: UUID = Field(alias="listId")
+    list_id: UUID = Field(serialization_alias="listId", validation_alias="listId")
 
 
 class PolicyListInfo(PolicyListId, InfoTag):
-    last_updated: datetime.datetime = Field(alias="lastUpdated")
+    last_updated: datetime.datetime = Field(serialization_alias="lastUpdated", validation_alias="lastUpdated")
     owner: str
-    read_only: bool = Field(alias="readOnly")
+    read_only: bool = Field(serialization_alias="readOnly", validation_alias="readOnly")
     version: str
-    reference_count: int = Field(alias="referenceCount")
+    reference_count: int = Field(serialization_alias="referenceCount", validation_alias="referenceCount")
     references: List
-    is_activated_by_vsmart: Optional[bool] = Field(None, alias="isActivatedByVsmart")
+    is_activated_by_vsmart: Optional[bool] = Field(
+        None, serialization_alias="isActivatedByVsmart", validation_alias="isActivatedByVsmart"
+    )
 
 
 class PolicyListPreview(BaseModel):

@@ -1,3 +1,5 @@
+# Copyright 2022 Cisco Systems, Inc. and its affiliates
+
 from typing import List, Literal, Set, Tuple
 
 from catalystwan.models.policy.lists_entries import SiteListEntry
