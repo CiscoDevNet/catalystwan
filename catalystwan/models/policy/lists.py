@@ -9,7 +9,6 @@ from pydantic import BaseModel, Field
 from catalystwan.models.common import InterfaceType, TLOCColor
 from catalystwan.models.policy.lists_entries import (
     EncapType,
-    ProtocolNameListEntry,
     RegionListEntry,
     SiteListEntry,
     SLAClassListEntry,
@@ -70,11 +69,6 @@ class ZoneList(PolicyListBase):
 
     def assign_interfaces(self, ifs: Set[InterfaceType]) -> None:
         self.entries = [ZoneListEntry(interface=interface) for interface in ifs]
-
-
-class ProtocolNameList(PolicyListBase):
-    type: Literal["protocolName"] = "protocolName"
-    entries: List[ProtocolNameListEntry] = []
 
 
 class URLAllowList(PolicyListBase):

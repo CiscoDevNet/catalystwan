@@ -5,17 +5,13 @@ from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
 from catalystwan.endpoints.configuration.policy.abstractions import PolicyListEndpoints
-from catalystwan.models.policy.lists import ProtocolNameList
-from catalystwan.models.policy.policy_list import InfoTag, PolicyListId, PolicyListInfo, PolicyListPreview
+from catalystwan.models.policy.list.protocol_name import (
+    ProtocolNameList,
+    ProtocolNameListEditPayload,
+    ProtocolNameListInfo,
+)
+from catalystwan.models.policy.policy_list import InfoTag, PolicyListId, PolicyListPreview
 from catalystwan.typed_list import DataSequence
-
-
-class ProtocolNameListEditPayload(ProtocolNameList, PolicyListId):
-    pass
-
-
-class ProtocolNameListInfo(ProtocolNameList, PolicyListInfo):
-    pass
 
 
 class ConfigurationPolicyProtocolNameList(APIEndpoints, PolicyListEndpoints):
