@@ -1,6 +1,6 @@
 # Copyright 2023 Cisco Systems, Inc. and its affiliates
 
-from ipaddress import IPv4Address, IPv4Network, IPv6Interface
+from ipaddress import IPv4Address, IPv4Network
 from typing import Any, List, Literal, Optional, Set, Tuple
 from uuid import UUID
 
@@ -10,9 +10,6 @@ from catalystwan.models.common import InterfaceType, TLOCColor
 from catalystwan.models.policy.lists_entries import (
     ColorGroupPreference,
     EncapType,
-    IPSSignatureListEntry,
-    IPv6PrefixListEntry,
-    LocalAppListEntry,
     LocalDomainListEntry,
     MirrorListEntry,
     PathPreference,
@@ -94,19 +91,9 @@ class ProtocolNameList(PolicyListBase):
     entries: List[ProtocolNameListEntry] = []
 
 
-class LocalAppList(PolicyListBase):
-    type: Literal["localApp"] = "localApp"
-    entries: List[LocalAppListEntry] = []
-
-
 class LocalDomainList(PolicyListBase):
     type: Literal["localDomain"] = "localDomain"
     entries: List[LocalDomainListEntry] = []
-
-
-class IPSSignatureList(PolicyListBase):
-    type: Literal["ipsSignature"] = "ipsSignature"
-    entries: List[IPSSignatureListEntry] = []
 
 
 class URLAllowList(PolicyListBase):
@@ -208,14 +195,6 @@ class PrefixList(PolicyListBase):
 
     def add_prefix(self, prefix: IPv4Network, ge: Optional[int] = None, le: Optional[int] = None) -> None:
         self._add_entry(PrefixListEntry(ip_prefix=prefix, ge=ge, le=le))
-
-
-class IPv6PrefixList(PolicyListBase):
-    type: Literal["ipv6prefix"] = "ipv6prefix"
-    entries: List[IPv6PrefixListEntry] = []
-
-    def add_prefix(self, prefix: IPv6Interface, ge: Optional[int] = None, le: Optional[int] = None) -> None:
-        self._add_entry(IPv6PrefixListEntry(ipv6_prefix=prefix, ge=ge, le=le))
 
 
 class RegionList(PolicyListBase):
