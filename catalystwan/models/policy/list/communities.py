@@ -1,9 +1,8 @@
 from typing import List, Literal
 
 from catalystwan.models.common import WellKnownBGPCommunities
-from catalystwan.models.policy.lists import PolicyListBase
 from catalystwan.models.policy.lists_entries import CommunityListEntry
-from catalystwan.models.policy.policy_list import PolicyListId, PolicyListInfo
+from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
 
 
 class CommunityListBase(PolicyListBase):

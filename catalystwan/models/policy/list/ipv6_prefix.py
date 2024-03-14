@@ -1,9 +1,8 @@
 from ipaddress import IPv6Interface
 from typing import List, Literal, Optional
 
-from catalystwan.models.policy.lists import PolicyListBase
 from catalystwan.models.policy.lists_entries import IPv6PrefixListEntry
-from catalystwan.models.policy.policy_list import PolicyListId, PolicyListInfo
+from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
 
 
 class IPv6PrefixList(PolicyListBase):

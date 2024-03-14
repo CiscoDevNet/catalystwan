@@ -1,9 +1,8 @@
 from typing import List, Literal, Optional
 from uuid import UUID
 
-from catalystwan.models.policy.lists import PolicyListBase
 from catalystwan.models.policy.lists_entries import SLAClassListEntry
-from catalystwan.models.policy.policy_list import PolicyListId, PolicyListInfo
+from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
 
 
 class SLAClassList(PolicyListBase):

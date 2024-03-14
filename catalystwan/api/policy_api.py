@@ -189,7 +189,6 @@ from catalystwan.models.policy.definition.rule_set import RuleSet
 from catalystwan.models.policy.definition.security_group import SecurityGroup
 from catalystwan.models.policy.definition.vpn_membership import VPNMembershipPolicy
 from catalystwan.models.policy.definition.zone_based_firewall import ZoneBasedFWPolicy
-from catalystwan.models.policy.lists import PolicyListBase
 from catalystwan.models.policy.localized import (
     LocalizedPolicy,
     LocalizedPolicyDeviceInfo,
@@ -201,6 +200,7 @@ from catalystwan.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
     PolicyDefinitionInfo,
 )
+from catalystwan.models.policy.policy_list import PolicyListBase
 from catalystwan.models.policy.security import (
     AnySecurityPolicy,
     AnySecurityPolicyInfo,

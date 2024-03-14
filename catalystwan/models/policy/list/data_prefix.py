@@ -1,9 +1,8 @@
 from ipaddress import IPv4Network
 from typing import List, Literal
 
-from catalystwan.models.policy.lists import PolicyListBase
 from catalystwan.models.policy.lists_entries import DataPrefixListEntry
-from catalystwan.models.policy.policy_list import PolicyListId, PolicyListInfo
+from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
 
 
 class DataPrefixList(PolicyListBase):

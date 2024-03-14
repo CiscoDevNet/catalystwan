@@ -2,9 +2,8 @@ from ipaddress import IPv4Address
 from typing import List, Literal, Optional
 
 from catalystwan.models.common import EncapType, TLOCColor
-from catalystwan.models.policy.lists import PolicyListBase
 from catalystwan.models.policy.lists_entries import TLOCListEntry
-from catalystwan.models.policy.policy_list import PolicyListId, PolicyListInfo
+from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
 
 
 class TLOCList(PolicyListBase):

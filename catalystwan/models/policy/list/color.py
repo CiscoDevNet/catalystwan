@@ -1,9 +1,8 @@
 from typing import List, Literal
 
 from catalystwan.models.common import TLOCColor
-from catalystwan.models.policy.lists import PolicyListBase
 from catalystwan.models.policy.lists_entries import ColorListEntry
-from catalystwan.models.policy.policy_list import PolicyListId, PolicyListInfo
+from catalystwan.models.policy.policy_list import PolicyListBase, PolicyListId, PolicyListInfo
 
 
 class ColorList(PolicyListBase):
