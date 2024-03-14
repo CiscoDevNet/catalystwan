@@ -5,7 +5,7 @@ from typing import Any, List, Literal, Optional, Set, Tuple
 from pydantic import BaseModel, Field
 
 from catalystwan.models.common import InterfaceType
-from catalystwan.models.policy.lists_entries import URLListEntry, VPNListEntry, ZoneListEntry
+from catalystwan.models.policy.lists_entries import VPNListEntry, ZoneListEntry
 
 
 class PolicyListBase(BaseModel):
@@ -45,13 +45,3 @@ class ZoneList(PolicyListBase):
 
     def assign_interfaces(self, ifs: Set[InterfaceType]) -> None:
         self.entries = [ZoneListEntry(interface=interface) for interface in ifs]
-
-
-class URLAllowList(PolicyListBase):
-    type: Literal["urlWhiteList"] = "urlWhiteList"
-    entries: List[URLListEntry] = []
-
-
-class URLBlockList(PolicyListBase):
-    type: Literal["urlBlackList"] = "urlBlackList"
-    entries: List[URLListEntry] = []
