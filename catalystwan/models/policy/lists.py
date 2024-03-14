@@ -10,8 +10,6 @@ from catalystwan.models.common import InterfaceType, TLOCColor
 from catalystwan.models.policy.lists_entries import (
     ColorGroupPreference,
     EncapType,
-    LocalDomainListEntry,
-    MirrorListEntry,
     PathPreference,
     PolicerExceedAction,
     PolicerListEntry,
@@ -91,11 +89,6 @@ class ProtocolNameList(PolicyListBase):
     entries: List[ProtocolNameListEntry] = []
 
 
-class LocalDomainList(PolicyListBase):
-    type: Literal["localDomain"] = "localDomain"
-    entries: List[LocalDomainListEntry] = []
-
-
 class URLAllowList(PolicyListBase):
     type: Literal["urlWhiteList"] = "urlWhiteList"
     entries: List[URLListEntry] = []
@@ -114,11 +107,6 @@ class PolicerList(PolicyListBase):
         # Policer list must have only single entry!
         entry = PolicerListEntry(burst=burst, exceed=exceed, rate=rate)
         self._add_entry(entry, single=True)
-
-
-class MirrorList(PolicyListBase):
-    type: Literal["mirror"] = "mirror"
-    entries: List[MirrorListEntry] = []
 
 
 class SLAClassList(PolicyListBase):

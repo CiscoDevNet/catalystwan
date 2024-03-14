@@ -20,6 +20,7 @@ from catalystwan.models.policy.list.ips_signature import IPSSignatureList
 from catalystwan.models.policy.list.ipv6_prefix import IPv6PrefixList
 from catalystwan.models.policy.list.local_app import LocalAppList
 from catalystwan.models.policy.list.local_domain import LocalDomainList
+from catalystwan.models.policy.list.mirror import MirrorList
 
 from .centralized import CentralizedPolicy, TrafficDataDirection
 from .definition.access_control_list import AclPolicy
@@ -37,7 +38,6 @@ from .definition.traffic_data import TrafficDataPolicy
 from .definition.vpn_membership import VPNMembershipPolicy
 from .definition.zone_based_firewall import ZoneBasedFWPolicy
 from .lists import (
-    MirrorList,
     PolicerList,
     PortList,
     PreferredColorGroupList,
