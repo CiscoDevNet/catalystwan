@@ -2,20 +2,11 @@
 
 from ipaddress import IPv4Address
 from typing import Any, List, Literal, Optional, Set, Tuple
-from uuid import UUID
 
 from pydantic import BaseModel, Field
 
 from catalystwan.models.common import InterfaceType, TLOCColor
-from catalystwan.models.policy.lists_entries import (
-    EncapType,
-    SiteListEntry,
-    SLAClassListEntry,
-    TLOCListEntry,
-    URLListEntry,
-    VPNListEntry,
-    ZoneListEntry,
-)
+from catalystwan.models.policy.lists_entries import EncapType, TLOCListEntry, URLListEntry, VPNListEntry, ZoneListEntry
 
 
 class PolicyListBase(BaseModel):
@@ -32,19 +23,6 @@ class PolicyListBase(BaseModel):
             del self.entries[1:]
         else:
             self.entries.append(entry)
-
-
-class SiteList(PolicyListBase):
-    type: Literal["site"] = "site"
-    entries: List[SiteListEntry] = []
-
-    def add_sites(self, sites: Set[int]):
-        for site in sites:
-            self._add_entry(SiteListEntry(site_id=str(site)))
-
-    def add_site_range(self, site_range: Tuple[int, int]):
-        entry = SiteListEntry(site_id=f"{site_range[0]}-{site_range[1]}")
-        self._add_entry(entry)
 
 
 class VPNList(PolicyListBase):
@@ -78,38 +56,6 @@ class URLAllowList(PolicyListBase):
 class URLBlockList(PolicyListBase):
     type: Literal["urlBlackList"] = "urlBlackList"
     entries: List[URLListEntry] = []
-
-
-class SLAClassList(PolicyListBase):
-    type: Literal["sla"] = "sla"
-    entries: List[SLAClassListEntry] = []
-
-    def assign_app_probe_class(
-        self,
-        app_probe_class_id: UUID,
-        latency: Optional[int] = None,
-        loss: Optional[int] = None,
-        jitter: Optional[int] = None,
-    ) -> SLAClassListEntry:
-        # SLA class list must have only one entry!
-        _latency = str(latency) if latency is not None else None
-        _loss = str(loss) if loss is not None else None
-        _jitter = str(jitter) if jitter is not None else None
-        entry = SLAClassListEntry(latency=_latency, loss=_loss, jitter=_jitter, app_probe_class=app_probe_class_id)
-        self._add_entry(entry, single=True)
-        return entry
-
-    def add_fallback_jitter_criteria(self, jitter_variance: int) -> None:
-        assert self.entries, "Assign app probe class before configuring best fallback tunnel"
-        self.entries[0].add_fallback_jitter_criteria(jitter_variance)
-
-    def add_fallback_latency_criteria(self, latency_variance: int) -> None:
-        assert self.entries, "Assign app probe class before configuring best fallback tunnel"
-        self.entries[0].add_fallback_latency_criteria(latency_variance)
-
-    def add_fallback_loss_criteria(self, loss_variance: int) -> None:
-        assert self.entries, "Assign app probe class before configuring best fallback tunnel"
-        self.entries[0].add_fallback_loss_criteria(loss_variance)
 
 
 class TLOCList(PolicyListBase):
