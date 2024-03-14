@@ -31,20 +31,12 @@ from .security.ips_signature import IPSSignatureListEntry, IPSSignatureParcel
 from .security.local_domain import LocalDomainListEntry, LocalDomainParcel
 from .security.protocol_list import ProtocolListEntry, ProtocolListParcel
 from .security.security_port import SecurityPortListEntry, SecurityPortParcel
-from .security.url import BaseURLListEntry, URLAllowParcel, URLBlockParcel
+from .security.url import BaseURLListEntry, URLAllowParcel, URLBlockParcel, URLParcel
 from .security.zone import SecurityZoneListEntry, SecurityZoneListParcel
-
-AnyURLParcel = Annotated[
-    Union[
-        URLAllowParcel,
-        URLBlockParcel,
-    ],
-    Field(discriminator="parcel_type"),
-]
 
 AnyPolicyObjectParcel = Annotated[
     Union[
-        AnyURLParcel,
+        URLParcel,
         ApplicationListParcel,
         AppProbeParcel,
         ColorParcel,
@@ -127,6 +119,7 @@ __all__ = (
     "StandardCommunityParcel",
     "TlocEntry",
     "TlocParcel",
+    "URLParcel",
     "URLAllowParcel",
     "URLBlockParcel",
 )
