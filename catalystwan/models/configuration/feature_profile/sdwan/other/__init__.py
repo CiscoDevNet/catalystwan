@@ -7,7 +7,7 @@ from .thousandeyes import ThousandEyesParcel
 from .ucse import UcseParcel
 
 AnyOtherParcel = Annotated[
-    Union[ThousandEyesParcel, UcseParcel],  # noqa: #231
+    Union[ThousandEyesParcel, UcseParcel],
     Field(discriminator="type_"),
 ]
 
