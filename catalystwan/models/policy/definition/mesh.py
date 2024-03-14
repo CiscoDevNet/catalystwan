@@ -5,7 +5,11 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from catalystwan.models.policy.policy_definition import PolicyDefinitionBase
+from catalystwan.models.policy.policy_definition import (
+    PolicyDefinitionBase,
+    PolicyDefinitionGetResponse,
+    PolicyDefinitionId,
+)
 
 
 class Region(BaseModel):
@@ -33,3 +37,11 @@ class MeshPolicy(PolicyDefinitionBase):
         region = Region(name=name, site_lists=site_lists)
         self.definition.regions.append(region)
         return region
+
+
+class MeshPolicyEditPayload(MeshPolicy, PolicyDefinitionId):
+    pass
+
+
+class MeshPolicyGetResponse(MeshPolicy, PolicyDefinitionGetResponse):
+    pass

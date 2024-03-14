@@ -5,23 +5,18 @@ from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
 from catalystwan.endpoints.configuration.policy.abstractions import PolicyDefinitionEndpoints
-from catalystwan.models.policy.definition.security_group import SecurityGroup
+from catalystwan.models.policy.definition.security_group import (
+    SecurityGroup,
+    SecurityGroupEditPayload,
+    SecurityGroupGetResponse,
+)
 from catalystwan.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
-    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
 )
 from catalystwan.typed_list import DataSequence
-
-
-class SecurityGroupEditPayload(SecurityGroup, PolicyDefinitionId):
-    pass
-
-
-class SecurityGroupGetResponse(SecurityGroup, PolicyDefinitionGetResponse):
-    pass
 
 
 class ConfigurationPolicySecurityGroupDefinition(APIEndpoints, PolicyDefinitionEndpoints):

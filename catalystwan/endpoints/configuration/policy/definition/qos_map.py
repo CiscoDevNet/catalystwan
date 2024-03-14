@@ -5,23 +5,14 @@ from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
 from catalystwan.endpoints.configuration.policy.abstractions import PolicyDefinitionEndpoints
-from catalystwan.models.policy.definition.qos_map import QoSMapPolicy
+from catalystwan.models.policy.definition.qos_map import QoSMapPolicy, QoSMapPolicyEditPayload, QoSMapPolicyGetResponse
 from catalystwan.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
-    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
 )
 from catalystwan.typed_list import DataSequence
-
-
-class QoSMapPolicyEditPayload(QoSMapPolicy, PolicyDefinitionId):
-    pass
-
-
-class QoSMapPolicyGetResponse(QoSMapPolicy, PolicyDefinitionGetResponse):
-    pass
 
 
 class ConfigurationPolicyQoSMapDefinition(APIEndpoints, PolicyDefinitionEndpoints):

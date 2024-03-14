@@ -25,6 +25,8 @@ from catalystwan.models.policy.policy_definition import (
     Match,
     PolicyActionType,
     PolicyDefinitionBase,
+    PolicyDefinitionGetResponse,
+    PolicyDefinitionId,
     PolicyDefinitionSequenceBase,
     ProtocolEntry,
     ProtocolNameEntry,
@@ -251,3 +253,11 @@ class ZoneBasedFWPolicy(ZoneBasedFWPolicyHeader):
             destination_zone_id=destination_zone_id,
         )
         self.definition.entries.append(entry)
+
+
+class ZoneBasedFWPolicyEditPayload(ZoneBasedFWPolicy, PolicyDefinitionId):
+    pass
+
+
+class ZoneBasedFWPolicyGetResponse(ZoneBasedFWPolicy, PolicyDefinitionGetResponse):
+    pass

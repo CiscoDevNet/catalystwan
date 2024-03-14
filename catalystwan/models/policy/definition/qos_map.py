@@ -6,7 +6,11 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from catalystwan.models.common import IntStr
-from catalystwan.models.policy.policy_definition import PolicyDefinitionBase
+from catalystwan.models.policy.policy_definition import (
+    PolicyDefinitionBase,
+    PolicyDefinitionGetResponse,
+    PolicyDefinitionId,
+)
 
 QoSScheduling = Literal[
     "llq",
@@ -97,3 +101,11 @@ class QoSMapPolicy(PolicyDefinitionBase):
             # Only when creating (not when value obtained from remote is present)
             self.definition = QoSMapDefinition(qos_schedulers=[QoSScheduler.get_default_control_scheduler()])
         return self
+
+
+class QoSMapPolicyEditPayload(QoSMapPolicy, PolicyDefinitionId):
+    pass
+
+
+class QoSMapPolicyGetResponse(QoSMapPolicy, PolicyDefinitionGetResponse):
+    pass

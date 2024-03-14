@@ -42,6 +42,8 @@ from catalystwan.models.policy.policy_definition import (
     PolicerListEntry,
     PolicyActionType,
     PolicyDefinitionBase,
+    PolicyDefinitionGetResponse,
+    PolicyDefinitionId,
     PolicyDefinitionSequenceBase,
     PrefferedColorGroupListEntry,
     ProtocolEntry,
@@ -375,3 +377,11 @@ class TrafficDataPolicy(TrafficDataPolicyHeader, DefinitionWithSequencesCommonBa
         )
         self.add(seq)
         return seq
+
+
+class TrafficDataPolicyEditPayload(TrafficDataPolicy, PolicyDefinitionId):
+    pass
+
+
+class TrafficDataPolicyGetResponse(TrafficDataPolicy, PolicyDefinitionGetResponse):
+    pass

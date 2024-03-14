@@ -6,49 +6,54 @@ from typing import List, Union
 from pydantic import Field
 from typing_extensions import Annotated
 
-from catalystwan.models.policy.list.app import AppList
-from catalystwan.models.policy.list.app_probe import AppProbeClassList
-from catalystwan.models.policy.list.as_path import ASPathList
-from catalystwan.models.policy.list.class_map import ClassMapList
-from catalystwan.models.policy.list.color import ColorList
-from catalystwan.models.policy.list.communities import CommunityList, ExpandedCommunityList
-from catalystwan.models.policy.list.data_ipv6_prefix import DataIPv6PrefixList
-from catalystwan.models.policy.list.data_prefix import DataPrefixList
-from catalystwan.models.policy.list.fqdn import FQDNList
-from catalystwan.models.policy.list.geo_location import GeoLocationList
-from catalystwan.models.policy.list.ips_signature import IPSSignatureList
-from catalystwan.models.policy.list.ipv6_prefix import IPv6PrefixList
-from catalystwan.models.policy.list.local_app import LocalAppList
-from catalystwan.models.policy.list.local_domain import LocalDomainList
-from catalystwan.models.policy.list.mirror import MirrorList
-from catalystwan.models.policy.list.policer import PolicerList
-from catalystwan.models.policy.list.port import PortList
-from catalystwan.models.policy.list.preferred_color_group import PreferredColorGroupList
-from catalystwan.models.policy.list.prefix import PrefixList
-from catalystwan.models.policy.list.protocol_name import ProtocolNameList
-from catalystwan.models.policy.list.region import RegionList
-from catalystwan.models.policy.list.site import SiteList
-from catalystwan.models.policy.list.sla import SLAClassList
-from catalystwan.models.policy.list.tloc import TLOCList
-from catalystwan.models.policy.list.url import URLAllowList, URLBlockList
-from catalystwan.models.policy.list.vpn import VPNList
-from catalystwan.models.policy.list.zone import ZoneList
+from catalystwan.models.policy.list.app import AppList, AppListInfo
+from catalystwan.models.policy.list.app_probe import AppProbeClassList, AppProbeClassListInfo
+from catalystwan.models.policy.list.as_path import ASPathList, ASPathListInfo
+from catalystwan.models.policy.list.class_map import ClassMapList, ClassMapListInfo
+from catalystwan.models.policy.list.color import ColorList, ColorListInfo
+from catalystwan.models.policy.list.communities import (
+    CommunityList,
+    CommunityListInfo,
+    ExpandedCommunityList,
+    ExpandedCommunityListInfo,
+)
+from catalystwan.models.policy.list.data_ipv6_prefix import DataIPv6PrefixList, DataIPv6PrefixListInfo
+from catalystwan.models.policy.list.data_prefix import DataPrefixList, DataPrefixListInfo
+from catalystwan.models.policy.list.fqdn import FQDNList, FQDNListInfo
+from catalystwan.models.policy.list.geo_location import GeoLocationList, GeoLocationListInfo
+from catalystwan.models.policy.list.ips_signature import IPSSignatureList, IPSSignatureListInfo
+from catalystwan.models.policy.list.ipv6_prefix import IPv6PrefixList, IPv6PrefixListInfo
+from catalystwan.models.policy.list.local_app import LocalAppList, LocalAppListInfo
+from catalystwan.models.policy.list.local_domain import LocalDomainList, LocalDomainListInfo
+from catalystwan.models.policy.list.mirror import MirrorList, MirrorListInfo
+from catalystwan.models.policy.list.policer import PolicerList, PolicerListInfo
+from catalystwan.models.policy.list.port import PortList, PortListInfo
+from catalystwan.models.policy.list.preferred_color_group import PreferredColorGroupList, PreferredColorGroupListInfo
+from catalystwan.models.policy.list.prefix import PrefixList, PrefixListInfo
+from catalystwan.models.policy.list.protocol_name import ProtocolNameList, ProtocolNameListInfo
+from catalystwan.models.policy.list.region import RegionList, RegionListInfo
+from catalystwan.models.policy.list.site import SiteList, SiteListInfo
+from catalystwan.models.policy.list.sla import SLAClassList, SLAClassListInfo
+from catalystwan.models.policy.list.tloc import TLOCList, TLOCListInfo
+from catalystwan.models.policy.list.url import URLAllowList, URLAllowListInfo, URLBlockList, URLBlockListInfo
+from catalystwan.models.policy.list.vpn import VPNList, VPNListInfo
+from catalystwan.models.policy.list.zone import ZoneList, ZoneListInfo
 
 from .centralized import CentralizedPolicy, TrafficDataDirection
-from .definition.access_control_list import AclPolicy
-from .definition.access_control_list_ipv6 import AclIPv6Policy
-from .definition.control import ControlPolicy
-from .definition.device_access import DeviceAccessPolicy
-from .definition.device_access_ipv6 import DeviceAccessIPv6Policy
-from .definition.hub_and_spoke import HubAndSpokePolicy
-from .definition.mesh import MeshPolicy
-from .definition.qos_map import QoSDropType, QoSMapPolicy
-from .definition.rewrite import RewritePolicy
-from .definition.rule_set import RuleSet
-from .definition.security_group import SecurityGroup
-from .definition.traffic_data import TrafficDataPolicy
-from .definition.vpn_membership import VPNMembershipPolicy
-from .definition.zone_based_firewall import ZoneBasedFWPolicy
+from .definition.access_control_list import AclPolicy, AclPolicyGetResponse
+from .definition.access_control_list_ipv6 import AclIPv6Policy, AclIPv6PolicyGetResponse
+from .definition.control import ControlPolicy, ControlPolicyGetResponse
+from .definition.device_access import DeviceAccessPolicy, DeviceAccessPolicyGetResponse
+from .definition.device_access_ipv6 import DeviceAccessIPv6Policy, DeviceAccessIPv6PolicyGetResponse
+from .definition.hub_and_spoke import HubAndSpokePolicy, HubAndSpokePolicyGetResponse
+from .definition.mesh import MeshPolicy, MeshPolicyGetResponse
+from .definition.qos_map import QoSDropType, QoSMapPolicy, QoSMapPolicyGetResponse
+from .definition.rewrite import RewritePolicy, RewritePolicyGetResponse
+from .definition.rule_set import RuleSet, RuleSetGetResponse
+from .definition.security_group import SecurityGroup, SecurityGroupGetResponse
+from .definition.traffic_data import TrafficDataPolicy, TrafficDataPolicyGetResponse
+from .definition.vpn_membership import VPNMembershipPolicy, VPNMembershipPolicyGetResponse
+from .definition.zone_based_firewall import ZoneBasedFWPolicy, ZoneBasedFWPolicyGetResponse
 from .lists_entries import PathPreference, PolicerExceedAction
 from .localized import LocalizedPolicy
 from .policy_definition import (
@@ -119,12 +124,67 @@ AnyPolicyList = Annotated[
     Field(discriminator="type"),
 ]
 
+AnyPolicyListInfo = Annotated[
+    Union[
+        AppListInfo,
+        AppProbeClassListInfo,
+        ASPathListInfo,
+        ClassMapListInfo,
+        ColorListInfo,
+        CommunityListInfo,
+        DataIPv6PrefixListInfo,
+        DataPrefixListInfo,
+        ExpandedCommunityListInfo,
+        FQDNListInfo,
+        GeoLocationListInfo,
+        IPSSignatureListInfo,
+        IPv6PrefixListInfo,
+        LocalAppListInfo,
+        LocalDomainListInfo,
+        MirrorListInfo,
+        PolicerListInfo,
+        PortListInfo,
+        PreferredColorGroupListInfo,
+        PrefixListInfo,
+        ProtocolNameListInfo,
+        RegionListInfo,
+        SiteListInfo,
+        SLAClassListInfo,
+        TLOCListInfo,
+        URLBlockListInfo,
+        URLAllowListInfo,
+        VPNListInfo,
+        ZoneListInfo,
+    ],
+    Field(discriminator="type"),
+]
+
+AnyPolicyDefinitionInfo = Annotated[
+    Union[
+        TrafficDataPolicyGetResponse,
+        RuleSetGetResponse,
+        SecurityGroupGetResponse,
+        ZoneBasedFWPolicyGetResponse,
+        QoSMapPolicyGetResponse,
+        RewritePolicyGetResponse,
+        ControlPolicyGetResponse,
+        VPNMembershipPolicyGetResponse,
+        HubAndSpokePolicyGetResponse,
+        MeshPolicyGetResponse,
+        AclPolicyGetResponse,
+        AclIPv6PolicyGetResponse,
+        DeviceAccessPolicyGetResponse,
+        DeviceAccessIPv6PolicyGetResponse,
+    ],
+    Field(discriminator="type"),
+]
+
 
 __all__ = (
     "AclIPv6Policy",
     "AclPolicy",
     "AnyPolicyList",
-    "AnyPolicyList",
+    "AnyPolicyDefinitionInfo",
     "AppList",
     "AppProbeClassList",
     "ASPathList",

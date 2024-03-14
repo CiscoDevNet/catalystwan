@@ -5,23 +5,18 @@ from uuid import UUID
 
 from catalystwan.endpoints import APIEndpoints, delete, get, post, put
 from catalystwan.endpoints.configuration.policy.abstractions import PolicyDefinitionEndpoints
-from catalystwan.models.policy.definition.zone_based_firewall import ZoneBasedFWPolicy
+from catalystwan.models.policy.definition.zone_based_firewall import (
+    ZoneBasedFWPolicy,
+    ZoneBasedFWPolicyEditPayload,
+    ZoneBasedFWPolicyGetResponse,
+)
 from catalystwan.models.policy.policy_definition import (
     PolicyDefinitionEditResponse,
-    PolicyDefinitionGetResponse,
     PolicyDefinitionId,
     PolicyDefinitionInfo,
     PolicyDefinitionPreview,
 )
 from catalystwan.typed_list import DataSequence
-
-
-class ZoneBasedFWPolicyEditPayload(ZoneBasedFWPolicy, PolicyDefinitionId):
-    pass
-
-
-class ZoneBasedFWPolicyGetResponse(ZoneBasedFWPolicy, PolicyDefinitionGetResponse):
-    pass
 
 
 class ConfigurationPolicyZoneBasedFirewallDefinition(APIEndpoints, PolicyDefinitionEndpoints):

@@ -9,6 +9,8 @@ from catalystwan.models.policy.policy_definition import (
     DefinitionWithSequencesCommonBase,
     PLPEntryType,
     PolicyDefinitionBase,
+    PolicyDefinitionGetResponse,
+    PolicyDefinitionId,
 )
 
 
@@ -35,3 +37,11 @@ class RewritePolicy(RewritePolicyHeader, DefinitionWithSequencesCommonBase):
         self.definition.rules.append(RewritePolicyRule(class_=class_map_ref, plp=plp, dscp=str(dscp), l2cos=str(l2cos)))
 
     model_config = ConfigDict(populate_by_name=True)
+
+
+class RewritePolicyEditPayload(RewritePolicy, PolicyDefinitionId):
+    pass
+
+
+class RewritePolicyGetResponse(RewritePolicy, PolicyDefinitionGetResponse):
+    pass

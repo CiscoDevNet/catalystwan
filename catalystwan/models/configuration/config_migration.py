@@ -12,7 +12,7 @@ from catalystwan.models.configuration.feature_profile.common import FeatureProfi
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object import AnyPolicyObjectParcel
 from catalystwan.models.configuration.feature_profile.sdwan.system import AnySystemParcel
 from catalystwan.models.configuration.topology_group import TopologyGroup
-from catalystwan.models.policy import AnyPolicyDefinition, AnyPolicyList
+from catalystwan.models.policy import AnyPolicyDefinition, AnyPolicyListInfo
 from catalystwan.models.policy.centralized import CentralizedPolicyInfo
 from catalystwan.models.policy.localized import LocalizedPolicyInfo
 from catalystwan.models.policy.security import AnySecurityPolicyInfo
@@ -40,7 +40,7 @@ class UX1Policies(BaseModel):
     policy_definitions: List[AnyPolicyDefinition] = Field(
         default=[], serialization_alias="policyDefinitions", validation_alias="policyDefinitions"
     )
-    policy_lists: List[AnyPolicyList] = Field(
+    policy_lists: List[AnyPolicyListInfo] = Field(
         default=[], serialization_alias="policyLists", validation_alias="policyLists"
     )
 

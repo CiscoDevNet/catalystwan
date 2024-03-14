@@ -32,6 +32,8 @@ from catalystwan.models.policy.policy_definition import (
     PathTypeEntry,
     PolicyActionType,
     PolicyDefinitionBase,
+    PolicyDefinitionGetResponse,
+    PolicyDefinitionId,
     PolicyDefinitionSequenceBase,
     PreferenceEntry,
     PrefixListEntry,
@@ -340,3 +342,11 @@ class ControlPolicy(ControlPolicyHeader, DefinitionWithSequencesCommonBase):
         )
         self.add(seq)
         return seq
+
+
+class ControlPolicyEditPayload(ControlPolicy, PolicyDefinitionId):
+    pass
+
+
+class ControlPolicyGetResponse(ControlPolicy, PolicyDefinitionGetResponse):
+    pass
