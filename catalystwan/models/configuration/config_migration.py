@@ -1,6 +1,6 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
-from typing import List, Union
+from typing import List, Set, Union
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -68,7 +68,7 @@ class TransformHeader(BaseModel):
         "Type discriminator is not present in many UX2 item payloads"
     )
     origin: UUID = Field(description="Original UUID of converted item")
-    subelements: List[UUID] = []
+    subelements: Set[UUID] = Field(default_factory=set)
 
 
 class TransformedTopologyGroup(BaseModel):

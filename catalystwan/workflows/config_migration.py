@@ -1,9 +1,9 @@
 import logging
-from typing import Callable
+from typing import Callable, List, Literal, Tuple
 from uuid import UUID, uuid4
 
 from catalystwan.api.policy_api import POLICY_LIST_ENDPOINTS_MAP
-from catalystwan.endpoints.configuration_group import ConfigGroup, ConfigGroupCreationPayload
+from catalystwan.endpoints.configuration_group import ConfigGroupCreationPayload
 from catalystwan.models.configuration.config_migration import (
     TransformedConfigGroup,
     TransformedFeatureProfile,
@@ -16,7 +16,6 @@ from catalystwan.models.configuration.feature_profile.common import FeatureProfi
 from catalystwan.session import ManagerSession
 from catalystwan.utils.config_migration.converters.feature_template import create_parcel_from_template
 from catalystwan.utils.config_migration.converters.policy.policy_lists import convert as convert_policy_list
-from catalystwan.utils.config_migration.creators.config_group import ConfigGroupCreator
 from catalystwan.utils.config_migration.device_templates import flatten_general_templates
 
 logger = logging.getLogger(__name__)
@@ -43,8 +42,8 @@ SUPPORTED_TEMPLATE_TYPES = [
     "omp-vsmart",
     "cisco_ntp",
     "ntp",
-    "bgp",
-    "cisco_bgp",
+    # "bgp",
+    # "cisco_bgp",
     "cisco_thousandeyes",
     "ucse",
     "dhcp",
@@ -73,8 +72,8 @@ FEATURE_PROFILE_SYSTEM = [
     "omp-vsmart",
     "cisco_ntp",
     "ntp",
-    "bgp",
-    "cisco_bgp",
+    # "bgp",
+    # "cisco_bgp",
 ]
 
 FEATURE_PROFILE_TRANSPORT = ["dhcp", "cisco_dhcp_server", "dhcp-server"]
@@ -133,17 +132,17 @@ def transform(ux1: UX1Config) -> UX2Config:
         for template in templates:
             # Those feature templates IDs are real UUIDs and are used to map to the feature profiles
             if template.templateType in FEATURE_PROFILE_SYSTEM:
-                transformed_fp_system.header.subelements.append(UUID(template.templateId))
+                transformed_fp_system.header.subelements.add(UUID(template.templateId))
             elif template.templateType in FEATURE_PROFILE_TRANSPORT:
-                transformed_fp_transport.header.subelements.append(UUID(template.templateId))
+                transformed_fp_transport.header.subelements.add(UUID(template.templateId))
             elif template.templateType in FEATURE_PROFILE_OTHER:
-                transformed_fp_other.header.subelements.append(UUID(template.templateId))
+                transformed_fp_other.header.subelements.add(UUID(template.templateId))
 
         transformed_cg = TransformedConfigGroup(
             header=TransformHeader(
                 type="config_group",
-                origin=uuid4(),
-                subelements=[fp_system_uuid, fp_transport_uuid, fp_other_uuid],
+                origin=dt.id,
+                subelements=set([fp_system_uuid, fp_transport_uuid, fp_other_uuid]),
             ),
             config_group=ConfigGroupCreationPayload(
                 name=dt.template_name,
@@ -230,27 +229,97 @@ def collect_ux1_config(session: ManagerSession, progress: Callable[[str, int, in
     return ux1
 
 
-def push_ux2_config(session: ManagerSession, config: UX2Config) -> ConfigGroup:
-    """
-    Creates configuration group and pushes a UX2 configuration to the Cisco vManage.
+def push_ux2_config(
+    session: ManagerSession, config: UX2Config, progress: Callable[[str, int, int], None] = log_progress
+):
+    # Create mapping from origin ids
+    # do dataclass
+    mapping = {
+        "config_group": {item.header.origin: item for item in config.config_groups},
+        "feature_profile": {item.header.origin: item for item in config.feature_profiles},
+        "profile_parcels": {item.header.origin: item for item in config.profile_parcels},
+    }
+    rollback_config_groups_ids: List[UUID] = []
+    rollback_feature_profiles_ids: List[Tuple[UUID, Literal["system", "other", "transport"]]] = []
 
-    Args:
-        session (ManagerSession): A valid Manager API session.
-        config (UX2Config): The UX2 configuration to push.
+    try:
+        for config_group in config.config_groups:
+            config_group_profiles = []
 
-    Returns:
-        UX2ConfigPushResult
+            for feature_profile_id in config_group.header.subelements:
+                feature_profile = mapping["feature_profile"][feature_profile_id]
 
-    Raises:
-        ManagerHTTPError: If the configuration cannot be pushed.
-    """
+                if feature_profile.header.type == "system":
+                    # Feature Profile System Parcels don't have references to other parcels so we can create them directly
+                    system_api = session.api.sdwan_feature_profiles.system
 
-    config_group_creator = ConfigGroupCreator(session, config, logger)
-    config_group = config_group_creator.create()
-    feature_profiles = config_group.profiles  # noqa: F841
-    for parcels in config.profile_parcels:
-        # TODO: Create API that supports parcel creation on feature profiles
-        # Example: session.api.parcels.create(parcels=parcels, feature_profiles=feature_profiles)
-        pass
+                    feature_profile_system = system_api.create_profile(
+                        name=feature_profile.feature_profile.name,
+                        description=feature_profile.feature_profile.description,
+                    )
+                    config_group_profiles.append(feature_profile_system)
+                    rollback_feature_profiles_ids.append((feature_profile_system.id, "system"))
 
-    return config_group
+                    logger.info(
+                        f"Creating Feature Profile {feature_profile_system.id} {feature_profile.feature_profile.name}"
+                    )
+                    logger.info(
+                        f"Subelements Feature Profile {feature_profile_system.id} {feature_profile.header.subelements}"
+                    )
+
+                    for parcel_id in feature_profile.header.subelements:
+                        logger.info(f"Creating Parcel {parcel_id} in Feature Profile {feature_profile_system.id}")
+
+                        parcel = mapping["profile_parcels"][parcel_id]
+                        system_api.create_parcel(feature_profile_system.id, parcel.parcel)
+
+                elif feature_profile.header.type == "other":
+                    # Feature Profile Other Parcels don't have references to other parcels so we can create them directly
+                    other_api = session.api.sdwan_feature_profiles.other
+
+                    feature_profile_other = other_api.create_profile(
+                        name=feature_profile.feature_profile.name,
+                        description=feature_profile.feature_profile.description,
+                    )
+                    config_group_profiles.append(feature_profile_other)
+                    rollback_feature_profiles_ids.append((feature_profile_other.id, "other"))
+
+                    for parcel_id in feature_profile.header.subelements:
+                        parcel = mapping["profile_parcels"][parcel_id]
+                        other_api.create_parcel(feature_profile_other.id, parcel.parcel)
+
+                elif feature_profile.header.type == "transport":
+                    # Feature Profile Transport Parcels have references to other parcels so we need to create them in order
+                    pass
+
+            # Create Config Group and add created Feature Profiles
+            config_group_payload = config_group.config_group
+            config_group_payload.profiles = config_group_profiles
+            cg_id = session.endpoints.configuration_group.create_config_group(config_group_payload).id
+            rollback_config_groups_ids.append(cg_id)
+
+    except Exception as e:
+        logger.error(f"Error pushing UX2 config: {e}")
+        rollback_ux2_config(session, rollback_config_groups_ids, rollback_feature_profiles_ids)
+        raise e
+
+    return rollback_config_groups_ids, rollback_feature_profiles_ids
+
+
+def rollback_ux2_config(
+    session: ManagerSession,
+    rollback_config_groups_ids: List[UUID],
+    rollback_feature_profiles_ids: List[Tuple[UUID, Literal["system", "other", "transport"]]],
+):
+    for cg_id in rollback_config_groups_ids:
+        session.endpoints.configuration_group.delete_config_group(cg_id)
+
+    for feature_profile_id, type in rollback_feature_profiles_ids:
+        if type == "system":
+            session.api.sdwan_feature_profiles.system.delete_profile(feature_profile_id)
+        elif type == "other":
+            session.api.sdwan_feature_profiles.other.delete_profile(feature_profile_id)
+        elif type == "transport":
+            pass
+        else:
+            print(f"Unknown feature profile type {type}")

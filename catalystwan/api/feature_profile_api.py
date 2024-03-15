@@ -178,21 +178,21 @@ class OtherFeatureProfileAPI:
             return self.endpoint.get_all(profile_id, parcel_type._get_parcel_type())
         return self.endpoint.get_by_id(profile_id, parcel_type._get_parcel_type(), parcel_id)
 
-    def create(self, profile_id: UUID, payload: AnyOtherParcel) -> ParcelCreationResponse:
+    def create_parcel(self, profile_id: UUID, payload: AnyOtherParcel) -> ParcelCreationResponse:
         """
         Create Other Parcel for selected profile_id based on payload type
         """
 
         return self.endpoint.create(profile_id, payload._get_parcel_type(), payload)
 
-    def update(self, profile_id: UUID, payload: AnyOtherParcel, parcel_id: UUID) -> ParcelCreationResponse:
+    def update_parcel(self, profile_id: UUID, payload: AnyOtherParcel, parcel_id: UUID) -> ParcelCreationResponse:
         """
         Update Other Parcel for selected profile_id based on payload type
         """
 
         return self.endpoint.update(profile_id, payload._get_parcel_type(), parcel_id, payload)
 
-    def delete(self, profile_id: UUID, parcel_type: Type[AnyOtherParcel], parcel_id: UUID) -> None:
+    def delete_parcel(self, profile_id: UUID, parcel_type: Type[AnyOtherParcel], parcel_id: UUID) -> None:
         """
         Delete Other Parcel for selected profile_id based on payload type
         """
@@ -276,7 +276,7 @@ class SystemFeatureProfileAPI:
         return self.endpoint.get_schema(profile_id, parcel_type._get_parcel_type())
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[AAAParcel],
@@ -284,7 +284,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[BFDParcel],
@@ -292,7 +292,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[LoggingParcel],
@@ -300,7 +300,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[BannerParcel],
@@ -308,7 +308,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[BasicParcel],
@@ -316,7 +316,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[GlobalParcel],
@@ -324,7 +324,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[NTPParcel],
@@ -332,7 +332,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[MRFParcel],
@@ -340,7 +340,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[OMPParcel],
@@ -348,7 +348,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[SecurityParcel],
@@ -356,7 +356,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[SNMPParcel],
@@ -366,7 +366,7 @@ class SystemFeatureProfileAPI:
     # get by id
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[AAAParcel],
@@ -375,7 +375,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[BFDParcel],
@@ -384,7 +384,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[LoggingParcel],
@@ -393,7 +393,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[BannerParcel],
@@ -402,7 +402,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[BasicParcel],
@@ -411,7 +411,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[GlobalParcel],
@@ -420,7 +420,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[NTPParcel],
@@ -429,7 +429,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[MRFParcel],
@@ -438,7 +438,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[OMPParcel],
@@ -447,7 +447,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[SecurityParcel],
@@ -456,7 +456,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[SNMPParcel],
@@ -464,7 +464,7 @@ class SystemFeatureProfileAPI:
     ) -> DataSequence[Parcel[SNMPParcel]]:
         ...
 
-    def get(
+    def get_parcels(
         self,
         profile_id: UUID,
         parcel_type: Type[AnySystemParcel],
@@ -478,7 +478,7 @@ class SystemFeatureProfileAPI:
             return self.endpoint.get_all(profile_id, parcel_type._get_parcel_type())
         return self.endpoint.get_by_id(profile_id, parcel_type._get_parcel_type(), parcel_id)
 
-    def create(self, profile_id: UUID, payload: AnySystemParcel) -> ParcelCreationResponse:
+    def create_parcel(self, profile_id: UUID, payload: AnySystemParcel) -> ParcelCreationResponse:
         """
         Create System Parcel for selected profile_id based on payload type
         """
@@ -493,7 +493,7 @@ class SystemFeatureProfileAPI:
         return self.endpoint.update(profile_id, payload._get_parcel_type(), parcel_id, payload)
 
     @overload
-    def delete(
+    def delete_parcel(
         self,
         profile_id: UUID,
         parcel_type: Type[AAAParcel],
@@ -502,7 +502,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def delete(
+    def delete_parcel(
         self,
         profile_id: UUID,
         parcel_type: Type[BFDParcel],
@@ -511,7 +511,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def delete(
+    def delete_parcel(
         self,
         profile_id: UUID,
         parcel_type: Type[LoggingParcel],
@@ -520,7 +520,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def delete(
+    def delete_parcel(
         self,
         profile_id: UUID,
         parcel_type: Type[BannerParcel],
@@ -529,7 +529,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def delete(
+    def delete_parcel(
         self,
         profile_id: UUID,
         parcel_type: Type[BasicParcel],
@@ -538,7 +538,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def delete(
+    def delete_parcel(
         self,
         profile_id: UUID,
         parcel_type: Type[GlobalParcel],
@@ -547,7 +547,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def delete(
+    def delete_parcel(
         self,
         profile_id: UUID,
         parcel_type: Type[NTPParcel],
@@ -556,7 +556,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def delete(
+    def delete_parcel(
         self,
         profile_id: UUID,
         parcel_type: Type[MRFParcel],
@@ -565,7 +565,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def delete(
+    def delete_parcel(
         self,
         profile_id: UUID,
         parcel_type: Type[OMPParcel],
@@ -574,7 +574,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def delete(
+    def delete_parcel(
         self,
         profile_id: UUID,
         parcel_type: Type[SecurityParcel],
@@ -583,7 +583,7 @@ class SystemFeatureProfileAPI:
         ...
 
     @overload
-    def delete(
+    def delete_parcel(
         self,
         profile_id: UUID,
         parcel_type: Type[SNMPParcel],
@@ -591,7 +591,7 @@ class SystemFeatureProfileAPI:
     ) -> None:
         ...
 
-    def delete(self, profile_id: UUID, parcel_type: Type[AnySystemParcel], parcel_id: UUID) -> None:
+    def delete_parcel(self, profile_id: UUID, parcel_type: Type[AnySystemParcel], parcel_id: UUID) -> None:
         """
         Delete System Parcel for selected profile_id based on payload type
         """

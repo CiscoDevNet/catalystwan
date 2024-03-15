@@ -48,7 +48,7 @@ class TestSystemFeatureProfileAPI(unittest.TestCase):
         api.endpoint = mock_endpoint
 
         # Act
-        api.delete(self.profile_uuid, parcel, self.parcel_uuid)
+        api.delete_parcel(self.profile_uuid, parcel, self.parcel_uuid)
 
         # Assert
         mock_endpoint.delete.assert_called_once_with(self.profile_uuid, expected_path, self.parcel_uuid)
@@ -62,7 +62,7 @@ class TestSystemFeatureProfileAPI(unittest.TestCase):
         api.endpoint = mock_endpoint
 
         # Act
-        api.get(self.profile_uuid, parcel, self.parcel_uuid)
+        api.get_parcels(self.profile_uuid, parcel, self.parcel_uuid)
 
         # Assert
         mock_endpoint.get_by_id.assert_called_once_with(self.profile_uuid, expected_path, self.parcel_uuid)
@@ -76,7 +76,7 @@ class TestSystemFeatureProfileAPI(unittest.TestCase):
         api.endpoint = mock_endpoint
 
         # Act
-        api.get(self.profile_uuid, parcel)
+        api.get_parcels(self.profile_uuid, parcel)
 
         # Assert
         mock_endpoint.get_all.assert_called_once_with(self.profile_uuid, expected_path)
@@ -90,7 +90,7 @@ class TestSystemFeatureProfileAPI(unittest.TestCase):
         api.endpoint = mock_endpoint
 
         # Act
-        api.create(self.profile_uuid, parcel)
+        api.create_parcel(self.profile_uuid, parcel)
 
         # Assert
         mock_endpoint.create.assert_called_once_with(self.profile_uuid, expected_path, parcel)
