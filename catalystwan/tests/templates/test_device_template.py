@@ -3,7 +3,7 @@ import unittest
 from catalystwan.api.templates.device_template.device_template import DeviceTemplate, GeneralTemplate
 
 
-class TestFlattenGeneralTemplates(unittest.TestCase):
+class TestDeviceTemplate(unittest.TestCase):
     def setUp(self):
         self.device_template = DeviceTemplate(
             template_name="DT-example",
