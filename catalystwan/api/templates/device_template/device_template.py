@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Final, List
-from uuid import UUID
 
 from jinja2 import DebugUndefined, Environment, FileSystemLoader, meta  # type: ignore
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -43,7 +42,6 @@ class DeviceTemplate(BaseModel):
     >>> session.api.templates.create(device_template)
     """
 
-    id: UUID = Field(alias="templateId")
     template_name: str = Field(alias="templateName")
     template_description: str = Field(alias="templateDescription")
     general_templates: List[GeneralTemplate] = Field(default=[], alias="generalTemplates")
