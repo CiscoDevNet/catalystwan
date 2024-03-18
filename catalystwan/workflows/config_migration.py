@@ -74,8 +74,9 @@ FEATURE_PROFILE_SYSTEM = [
     "omp-vsmart",
     "cisco_ntp",
     "ntp",
-    # "bgp",
-    # "cisco_bgp",
+    "bgp",
+    "cisco_bgp",
+    "cisco_snmp",
 ]
 
 FEATURE_PROFILE_TRANSPORT = ["dhcp", "cisco_dhcp_server", "dhcp-server"]
