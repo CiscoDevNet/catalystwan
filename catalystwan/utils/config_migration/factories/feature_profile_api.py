@@ -1,6 +1,7 @@
-from typing import Annotated, Callable, Mapping, Union
+from typing import Callable, Mapping, Union
 
 from pydantic import Field
+from typing_extensions import Annotated
 
 from catalystwan.api.feature_profile_api import (
     OtherFeatureProfileAPI,
