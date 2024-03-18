@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, List, Tuple, cast
 from uuid import UUID
 from venv import logger
@@ -18,10 +18,10 @@ class ConfigurationMapping:
     parcel_map: Dict[UUID, TransformedParcel]
 
 
+@dataclass
 class UX2ConfigRollback:
-    def __init__(self) -> None:
-        self.config_groups_ids: List[UUID] = []
-        self.feature_profiles_ids: List[Tuple[UUID, ProfileType]] = []
+    config_groups_ids: List[UUID] = field(default_factory=list)
+    feature_profiles_ids: List[Tuple[UUID, ProfileType]] = field(default_factory=list)
 
     def add_config_group(self, config_group_id: UUID) -> None:
         self.config_groups_ids.append(config_group_id)

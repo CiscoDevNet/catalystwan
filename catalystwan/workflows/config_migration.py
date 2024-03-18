@@ -220,77 +220,12 @@ def collect_ux1_config(session: ManagerSession, progress: Callable[[str, int, in
 def push_ux2_config(
     session: ManagerSession, config: UX2Config, progress: Callable[[str, int, int], None] = log_progress
 ) -> UX2ConfigRollback:
-    # Create mapping from origin ids
-    # do dataclass
-    # mapping = {
-    #     "config_group": {item.header.origin: item for item in config.config_groups},
-    #     "feature_profile": {item.header.origin: item for item in config.feature_profiles},
-    #     "profile_parcels": {item.header.origin: item for item in config.profile_parcels},
-    # }
-    # rollback_config_groups_ids: List[UUID] = []
-    # rollback_feature_profiles_ids: List[Tuple[UUID, Literal["system", "other", "transport"]]] = []
-
     config_pusher = UX2ConfigPusher(session, config)
     rollback = config_pusher.push()
-    # for config_group in config.config_groups:
-    #     config_group_profiles = []
-
-    #     for feature_profile_id in config_group.header.subelements:
-    #         feature_profile = mapping["feature_profile"][feature_profile_id]
-
-    #         if feature_profile.header.type == "system":
-    #             # Feature Profile System Parcels don't have references to other parcels so we can create them directly
-    #             system_api = session.api.sdwan_feature_profiles.system
-
-    #             feature_profile_system = system_api.create_profile(
-    #                 name=feature_profile.feature_profile.name,
-    #                 description=feature_profile.feature_profile.description,
-    #             )
-    #             config_group_profiles.append(feature_profile_system)
-    #             rollback_feature_profiles_ids.append((feature_profile_system.id, "system"))
-
-    #             logger.info(
-    #                 f"Creating Feature Profile {feature_profile_system.id} {feature_profile.feature_profile.name}"
-    #             )
-    #             logger.info(
-    #                 f"Subelements Feature Profile {feature_profile_system.id} {feature_profile.header.subelements}"
-    #             )
-
-    #             for parcel_id in feature_profile.header.subelements:
-    #                 logger.info(f"Creating Parcel {parcel_id} in Feature Profile {feature_profile_system.id}")
-
-    #                 parcel = mapping["profile_parcels"][parcel_id]
-    #                 system_api.create_parcel(feature_profile_system.id, parcel.parcel)
-
-    #         elif feature_profile.header.type == "other":
-    #             # Feature Profile Other Parcels don't have references to other parcels so we can create them directly
-    #             other_api = session.api.sdwan_feature_profiles.other
-
-    #             feature_profile_other = other_api.create_profile(
-    #                 name=feature_profile.feature_profile.name,
-    #                 description=feature_profile.feature_profile.description,
-    #             )
-    #             config_group_profiles.append(feature_profile_other)
-    #             rollback_feature_profiles_ids.append((feature_profile_other.id, "other"))
-
-    #             for parcel_id in feature_profile.header.subelements:
-    #                 parcel = mapping["profile_parcels"][parcel_id]
-    #                 other_api.create_parcel(feature_profile_other.id, parcel.parcel)
-
-    #         elif feature_profile.header.type == "transport":
-    #             # Feature Profile Transport Parcels have references to other parcels
-    #               so we need to create them in order
-    #             pass
-
-    #     # Create Config Group and add created Feature Profiles
-    #     config_group_payload = config_group.config_group
-    #     config_group_payload.profiles = config_group_profiles
-    #     cg_id = session.endpoints.configuration_group.create_config_group(config_group_payload).id
-    #     rollback_config_groups_ids.append(cg_id)
-
     return rollback
 
 
-def rollback_ux2_config(session: ManagerSession, rollback_config: UX2ConfigRollback):
+def rollback_ux2_config(session: ManagerSession, rollback_config: UX2ConfigRollback) -> bool:
     config_reverter = UX2ConfigReverter(session)
-    config_reverter.rollback(rollback_config)
+    status = config_reverter.rollback(rollback_config)
+    return status
