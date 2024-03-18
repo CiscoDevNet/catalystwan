@@ -10,7 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase, as_variable
 
 FamilyType = Literal["ipv4-unicast", "vpnv4-unicast", "vpnv6-unicast"]
-FamilyType1 = Literal["ipv6-unicast", "vpnv6-unicast"]
+FamilyTypeIpv6 = Literal["ipv6-unicast", "vpnv6-unicast"]
 Mask = Literal[
     "255.255.255.255",
     "255.255.255.254",
@@ -157,7 +157,7 @@ class AddressFamilyItem(BaseModel):
         serialization_alias="maxPrefixConfig",
         validation_alias="maxPrefixConfig",
         description="Set maximum number of prefixes accepted from BGP peer"
-        "and threshold exceeded policy actions(restart or warning)",
+        "and threshold exceeded policy actions (restart or warning)",
     )
     in_route_policy: Optional[Union[RefIdItem, Default[None]]] = Field(
         default=None,
@@ -279,7 +279,7 @@ class VariableFamilyItem1(BaseModel):
         extra="forbid",
         populate_by_name=True,
     )
-    family_type: Global[FamilyType1] = Field(
+    family_type: Global[FamilyTypeIpv6] = Field(
         ...,
         serialization_alias="familyType",
         validation_alias="familyType",
