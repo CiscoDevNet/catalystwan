@@ -30,7 +30,6 @@ class BGPTemplateConverter:
         Returns:
             BannerParcel: A BannerParcel object with the provided template values.
         """
-        print(template_values)
         device_specific_ipv4_neighbor_address = "{{{{lbgp_1_neighbor_{index}_address}}}}"
         device_specific_ipv6_neighbor_address = "{{{{lbgp_1_ipv6_neighbor_{index}_address}}}}"
 
