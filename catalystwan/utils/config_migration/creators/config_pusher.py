@@ -1,7 +1,8 @@
-from dataclasses import dataclass, field
 from typing import Dict, List, Tuple, cast
 from uuid import UUID
 from venv import logger
+
+from pydantic import BaseModel, Field
 
 from catalystwan.endpoints.configuration_group import ProfileId
 from catalystwan.exceptions import CatalystwanException
@@ -12,16 +13,14 @@ from catalystwan.utils.config_migration.factories.feature_profile_api import Fea
 from catalystwan.utils.config_migration.factories.parcel_pusher import ParcelPusherFactory
 
 
-@dataclass
-class ConfigurationMapping:
+class ConfigurationMapping(BaseModel):
     feature_profile_map: Dict[UUID, TransformedFeatureProfile]
     parcel_map: Dict[UUID, TransformedParcel]
 
 
-@dataclass
-class UX2ConfigRollback:
-    config_groups_ids: List[UUID] = field(default_factory=list)
-    feature_profiles_ids: List[Tuple[UUID, ProfileType]] = field(default_factory=list)
+class UX2ConfigRollback(BaseModel):
+    config_groups_ids: List[UUID] = Field(default_factory=list)
+    feature_profiles_ids: List[Tuple[UUID, ProfileType]] = Field(default_factory=list)
 
     def add_config_group(self, config_group_id: UUID) -> None:
         self.config_groups_ids.append(config_group_id)
