@@ -1,10 +1,11 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
+from ipaddress import IPv4Address
 from typing import List, Literal, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 
-from catalystwan.api.configuration_groups.parcel import Default, Global, Variable
+from catalystwan.api.configuration_groups.parcel import Default, Global, Variable, _ParcelBase, as_default, as_global
 
 VirtualApplicationType = Literal["dreopt"]
 
@@ -26,6 +27,40 @@ AppqoeDeviceRole = Literal[
 
 AppnavControllerGroupName = Literal["ACG-APPQOE"]
 ServiceNodeGroupName = Literal["SNG-APPQOE"]
+ServiceNodeGroupsNames = Literal[
+    "SNG-APPQOE",
+    "SNG-APPQOE1",
+    "SNG-APPQOE2",
+    "SNG-APPQOE3",
+    "SNG-APPQOE4",
+    "SNG-APPQOE5",
+    "SNG-APPQOE6",
+    "SNG-APPQOE7",
+    "SNG-APPQOE8",
+    "SNG-APPQOE9",
+    "SNG-APPQOE10",
+    "SNG-APPQOE11",
+    "SNG-APPQOE12",
+    "SNG-APPQOE13",
+    "SNG-APPQOE14",
+    "SNG-APPQOE15",
+    "SNG-APPQOE16",
+    "SNG-APPQOE17",
+    "SNG-APPQOE18",
+    "SNG-APPQOE19",
+    "SNG-APPQOE20",
+    "SNG-APPQOE21",
+    "SNG-APPQOE22",
+    "SNG-APPQOE23",
+    "SNG-APPQOE24",
+    "SNG-APPQOE25",
+    "SNG-APPQOE26",
+    "SNG-APPQOE27",
+    "SNG-APPQOE28",
+    "SNG-APPQOE29",
+    "SNG-APPQOE30",
+    "SNG-APPQOE31",
+]
 ForwarderAndServiceNodeAddress = Literal["192.168.2.2"]  # TODO: 1.Is it really constant? 2.Use ipaddress.IPv4Address?
 ForwarderAndServiceNodeControllerAddress = Literal[
     "192.168.2.1"
@@ -66,8 +101,8 @@ class Appqoe(BaseModel):
         serialization_alias="serviceNodeGroup",
         validation_alias="serviceNodeGroup",
     )
-    service_node_groups: List[Global[ServiceNodeGroupName]] = Field(
-        default=[Global[ServiceNodeGroupName](value="SNG-APPQOE")],
+    service_node_groups: List[Global[ServiceNodeGroupsNames]] = Field(
+        default=[Global[ServiceNodeGroupsNames](value="SNG-APPQOE")],
         serialization_alias="serviceNodeGroups",
         validation_alias="serviceNodeGroups",
     )
@@ -84,14 +119,16 @@ class ServiceContext(BaseModel):
 
 
 class ServiceNodeInformation(BaseModel):
-    address: Global[str]
+    address: Global[IPv4Address]
 
 
 class ForwarderController(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    address: Union[Global[str], Variable]
-    vpn: Global[int] = Global[int](value=1)
+    address: Union[Global[str], Global[IPv4Address], Variable]
+    vpn: Global[int] = Field(
+        default=Global[int](value=1), description="This is field is a depended on the Service VPN value."
+    )
 
 
 class ForwarderAppnavControllerGroup(BaseModel):
@@ -210,26 +247,21 @@ class ServiceNodeRole(BaseModel):
     )
 
 
-class AppqoeData(BaseModel):
+class AppqoeParcel(_ParcelBase):
     model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
 
-    dreopt: Optional[Union[Global[bool], Default[bool]]] = Default[bool](value=False)
+    dreopt: Optional[Union[Global[bool], Default[bool]]] = Field(
+        default=as_default(False), validation_alias=AliasPath("data", "dreopt")
+    )
     virtual_application: Optional[List[VirtualApplication]] = Field(
-        serialization_alias="virtualApplication", validation_alias="virtualApplication"
+        default=None, validation_alias=AliasPath("data", "virtualApplication")
     )
     appqoe_device_role: Global[str] = Field(
-        default=Global(value="forwarder"), serialization_alias="appqoeDeviceRole", validation_alias="appqoeDeviceRole"
+        default=as_global("forwarder"), validation_alias=AliasPath("data", "appqoeDeviceRole")
     )
 
-    forwarder: Optional[ForwarderRole]
+    forwarder: Optional[ForwarderRole] = Field(default=None, validation_alias=AliasPath("data", "forwarder"))
     forwarder_and_service_node: Optional[ForwarderAndServiceNodeRole] = Field(
-        serialization_alias="forwarderAndServiceNode", validation_alias="forwarderAndServiceNode"
+        default=None, validation_alias=AliasPath("data", "forwarderAndServiceNode")
     )
-    service_node: Optional[ServiceNodeRole] = Field(serialization_alias="serviceNode", validation_alias="serviceNode")
-
-
-class AppqoeCreationPayload(BaseModel):
-    name: str
-    description: Optional[str] = None
-    data: AppqoeData
-    metadata: Optional[dict] = None
+    service_node: Optional[ServiceNodeRole] = Field(default=None, validation_alias=AliasPath("data", "serviceNode"))
