@@ -106,7 +106,7 @@ class TargetItem(BaseModel):
         validation_alias="vpnId",
         description="Set VPN in which SNMP server is located",
     )
-    ip: Union[Global[Union[IPv4Address, IPv6Address]], Variable] = Field(
+    ip: Union[Global[IPv4Address], Global[IPv6Address], Variable] = Field(
         ..., description="Set IPv4/IPv6 address of SNMP server"
     )
     port: Union[Global[int], Variable] = Field(..., description="Set UDP port number to connect to SNMP server")
