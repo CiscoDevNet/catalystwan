@@ -3,7 +3,7 @@ from typing import Callable
 from uuid import UUID, uuid4
 
 from catalystwan.api.policy_api import POLICY_LIST_ENDPOINTS_MAP
-from catalystwan.endpoints.configuration_group import ConfigGroup, ConfigGroupCreationPayload
+from catalystwan.endpoints.configuration_group import ConfigGroupCreationPayload
 from catalystwan.models.configuration.config_migration import (
     TransformedConfigGroup,
     TransformedFeatureProfile,
@@ -16,8 +16,9 @@ from catalystwan.models.configuration.feature_profile.common import FeatureProfi
 from catalystwan.session import ManagerSession
 from catalystwan.utils.config_migration.converters.feature_template import create_parcel_from_template
 from catalystwan.utils.config_migration.converters.policy.policy_lists import convert as convert_policy_list
-from catalystwan.utils.config_migration.creators.config_group import ConfigGroupCreator
+from catalystwan.utils.config_migration.creators.config_pusher import UX2ConfigPusher, UX2ConfigRollback
 from catalystwan.utils.config_migration.device_templates import flatten_general_templates
+from catalystwan.utils.config_migration.reverters.config_reverter import UX2ConfigReverter
 
 logger = logging.getLogger(__name__)
 
@@ -43,8 +44,8 @@ SUPPORTED_TEMPLATE_TYPES = [
     "omp-vsmart",
     "cisco_ntp",
     "ntp",
-    "bgp",
-    "cisco_bgp",
+    # "bgp",
+    # "cisco_bgp",
     "cisco_thousandeyes",
     "ucse",
     "dhcp",
@@ -73,8 +74,8 @@ FEATURE_PROFILE_SYSTEM = [
     "omp-vsmart",
     "cisco_ntp",
     "ntp",
-    "bgp",
-    "cisco_bgp",
+    # "bgp",
+    # "cisco_bgp",
 ]
 
 FEATURE_PROFILE_TRANSPORT = ["dhcp", "cisco_dhcp_server", "dhcp-server"]
@@ -107,17 +108,6 @@ def transform(ux1: UX1Config) -> UX2Config:
                 description="system",
             ),
         )
-        fp_transport_uuid = uuid4()
-        transformed_fp_transport = TransformedFeatureProfile(
-            header=TransformHeader(
-                type="transport",
-                origin=fp_transport_uuid,
-            ),
-            feature_profile=FeatureProfileCreationPayload(
-                name=f"{dt.template_name}_transport",
-                description="transport",
-            ),
-        )
         fp_other_uuid = uuid4()
         transformed_fp_other = TransformedFeatureProfile(
             header=TransformHeader(
@@ -133,17 +123,15 @@ def transform(ux1: UX1Config) -> UX2Config:
         for template in templates:
             # Those feature templates IDs are real UUIDs and are used to map to the feature profiles
             if template.templateType in FEATURE_PROFILE_SYSTEM:
-                transformed_fp_system.header.subelements.append(UUID(template.templateId))
-            elif template.templateType in FEATURE_PROFILE_TRANSPORT:
-                transformed_fp_transport.header.subelements.append(UUID(template.templateId))
+                transformed_fp_system.header.subelements.add(UUID(template.templateId))
             elif template.templateType in FEATURE_PROFILE_OTHER:
-                transformed_fp_other.header.subelements.append(UUID(template.templateId))
+                transformed_fp_other.header.subelements.add(UUID(template.templateId))
 
         transformed_cg = TransformedConfigGroup(
             header=TransformHeader(
                 type="config_group",
                 origin=uuid4(),
-                subelements=[fp_system_uuid, fp_transport_uuid, fp_other_uuid],
+                subelements=set([fp_system_uuid, fp_other_uuid]),
             ),
             config_group=ConfigGroupCreationPayload(
                 name=dt.template_name,
@@ -154,7 +142,6 @@ def transform(ux1: UX1Config) -> UX2Config:
         )
         # Add to UX2
         ux2.feature_profiles.append(transformed_fp_system)
-        ux2.feature_profiles.append(transformed_fp_transport)
         ux2.feature_profiles.append(transformed_fp_other)
         ux2.config_groups.append(transformed_cg)
 
@@ -230,27 +217,15 @@ def collect_ux1_config(session: ManagerSession, progress: Callable[[str, int, in
     return ux1
 
 
-def push_ux2_config(session: ManagerSession, config: UX2Config) -> ConfigGroup:
-    """
-    Creates configuration group and pushes a UX2 configuration to the Cisco vManage.
+def push_ux2_config(
+    session: ManagerSession, config: UX2Config, progress: Callable[[str, int, int], None] = log_progress
+) -> UX2ConfigRollback:
+    config_pusher = UX2ConfigPusher(session, config)
+    rollback = config_pusher.push()
+    return rollback
 
-    Args:
-        session (ManagerSession): A valid Manager API session.
-        config (UX2Config): The UX2 configuration to push.
 
-    Returns:
-        UX2ConfigPushResult
-
-    Raises:
-        ManagerHTTPError: If the configuration cannot be pushed.
-    """
-
-    config_group_creator = ConfigGroupCreator(session, config, logger)
-    config_group = config_group_creator.create()
-    feature_profiles = config_group.profiles  # noqa: F841
-    for parcels in config.profile_parcels:
-        # TODO: Create API that supports parcel creation on feature profiles
-        # Example: session.api.parcels.create(parcels=parcels, feature_profiles=feature_profiles)
-        pass
-
-    return config_group
+def rollback_ux2_config(session: ManagerSession, rollback_config: UX2ConfigRollback) -> bool:
+    config_reverter = UX2ConfigReverter(session)
+    status = config_reverter.rollback(rollback_config)
+    return status

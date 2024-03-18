@@ -68,6 +68,7 @@ ProfileType = Literal[
     "application-priority",
     "policy-object",
     "embedded-security",
+    "other",
 ]
 
 SchemaType = Literal[

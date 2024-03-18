@@ -25,7 +25,7 @@ class TestSystemOtherProfileModels(unittest.TestCase):
             parcel_description="ThousandEyes Parcel",
         )
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.other.create(self.profile_id, te_parcel).id
+        parcel_id = self.session.api.sdwan_feature_profiles.other.create_parcel(self.profile_id, te_parcel).id
         # Assert
         assert parcel_id
 
@@ -45,7 +45,7 @@ class TestSystemOtherProfileModels(unittest.TestCase):
             ),
         )
         # Act
-        parcel_id = self.session.api.sdwan_feature_profiles.other.create(self.profile_id, ucse_parcel).id
+        parcel_id = self.session.api.sdwan_feature_profiles.other.create_parcel(self.profile_id, ucse_parcel).id
         # Assert
         assert parcel_id
 
