@@ -1,6 +1,6 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
-from typing import List, Set, Union
+from typing import List, Set, Tuple, Union
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -9,7 +9,7 @@ from typing_extensions import Annotated
 from catalystwan.api.template_api import FeatureTemplateInformation
 from catalystwan.api.templates.device_template.device_template import DeviceTemplate
 from catalystwan.endpoints.configuration_group import ConfigGroupCreationPayload
-from catalystwan.models.configuration.feature_profile.common import FeatureProfileCreationPayload
+from catalystwan.models.configuration.feature_profile.common import FeatureProfileCreationPayload, ProfileType
 from catalystwan.models.configuration.feature_profile.sdwan.other import AnyOtherParcel
 from catalystwan.models.configuration.feature_profile.sdwan.policy_object import AnyPolicyObjectParcel
 from catalystwan.models.configuration.feature_profile.sdwan.service import AnyServiceParcel
@@ -109,3 +109,14 @@ class UX2Config(BaseModel):
     profile_parcels: List[TransformedParcel] = Field(
         default=[], serialization_alias="profileParcels", validation_alias="profileParcels"
     )
+
+
+class UX2ConfigRollback(BaseModel):
+    config_groups_ids: List[UUID] = Field(default_factory=list)
+    feature_profiles_ids: List[Tuple[UUID, ProfileType]] = Field(default_factory=list)
+
+    def add_config_group(self, config_group_id: UUID) -> None:
+        self.config_groups_ids.append(config_group_id)
+
+    def add_feature_profile(self, feature_profile_id: UUID, profile_type: ProfileType) -> None:
+        self.feature_profiles_ids.append((feature_profile_id, profile_type))

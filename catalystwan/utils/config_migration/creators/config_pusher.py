@@ -1,12 +1,17 @@
-from typing import Dict, List, Tuple, cast
+from typing import Callable, Dict, List, cast
 from uuid import UUID
 from venv import logger
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from catalystwan.endpoints.configuration_group import ProfileId
 from catalystwan.exceptions import CatalystwanException
-from catalystwan.models.configuration.config_migration import TransformedFeatureProfile, TransformedParcel, UX2Config
+from catalystwan.models.configuration.config_migration import (
+    TransformedFeatureProfile,
+    TransformedParcel,
+    UX2Config,
+    UX2ConfigRollback,
+)
 from catalystwan.models.configuration.feature_profile.common import ProfileType
 from catalystwan.session import ManagerSession
 from catalystwan.utils.config_migration.factories.feature_profile_api import FeatureProfileAPIFactory
@@ -18,23 +23,15 @@ class ConfigurationMapping(BaseModel):
     parcel_map: Dict[UUID, TransformedParcel]
 
 
-class UX2ConfigRollback(BaseModel):
-    config_groups_ids: List[UUID] = Field(default_factory=list)
-    feature_profiles_ids: List[Tuple[UUID, ProfileType]] = Field(default_factory=list)
-
-    def add_config_group(self, config_group_id: UUID) -> None:
-        self.config_groups_ids.append(config_group_id)
-
-    def add_feature_profile(self, feature_profile_id: UUID, profile_type: ProfileType) -> None:
-        self.feature_profiles_ids.append((feature_profile_id, profile_type))
-
-
 class UX2ConfigPusher:
-    def __init__(self, session: ManagerSession, ux2_config: UX2Config) -> None:
+    def __init__(
+        self, session: ManagerSession, ux2_config: UX2Config, progress: Callable[[str, int, int], None]
+    ) -> None:
         self._session = session
         self._config_map = self._create_config_map(ux2_config)
         self._config_rollback = UX2ConfigRollback()
         self._ux2_config = ux2_config
+        self._progress = progress
 
     def _create_config_map(self, ux2_config: UX2Config) -> ConfigurationMapping:
         return ConfigurationMapping(
@@ -50,12 +47,15 @@ class UX2ConfigPusher:
         return self._config_rollback
 
     def _create_config_groups(self):
-        for transformed_config_group in self._ux2_config.config_groups:
+        config_groups = self._ux2_config.config_groups
+        config_groups_length = len(config_groups)
+        for i, transformed_config_group in enumerate(config_groups):
             config_group_payload = transformed_config_group.config_group
             config_group_payload.profiles = self._create_feature_profile_and_parcels(
                 transformed_config_group.header.subelements
             )
             cg_id = self._session.endpoints.configuration_group.create_config_group(config_group_payload).id
+            self._progress(f"Created: {config_group_payload.name} with Id: {cg_id}", i + 1, config_groups_length)
             self._config_rollback.add_config_group(cg_id)
 
     def _create_feature_profile_and_parcels(self, feature_profiles_ids: List[UUID]) -> List[ProfileId]:
