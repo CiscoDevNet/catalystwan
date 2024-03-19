@@ -225,6 +225,7 @@ class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
             ManagerSession: (self)
         """
 
+        self.cookies.clear_session_cookies()
         self.auth = vManageAuth(self.base_url, self.username, self.password, verify=False)
         self.auth.logger = self.logger
 
