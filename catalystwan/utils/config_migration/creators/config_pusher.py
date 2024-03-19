@@ -25,13 +25,13 @@ class ConfigurationMapping(BaseModel):
 
 class UX2ConfigPusher:
     def __init__(
-        self, session: ManagerSession, ux2_config: UX2Config, progress: Callable[[str, int, int], None]
+        self, session: ManagerSession, ux2_config: UX2Config, logger: Callable[[str, int, int], None]
     ) -> None:
         self._session = session
         self._config_map = self._create_config_map(ux2_config)
         self._config_rollback = UX2ConfigRollback()
         self._ux2_config = ux2_config
-        self._progress = progress
+        self._logger = logger
 
     def _create_config_map(self, ux2_config: UX2Config) -> ConfigurationMapping:
         return ConfigurationMapping(
@@ -55,7 +55,7 @@ class UX2ConfigPusher:
                 transformed_config_group.header.subelements
             )
             cg_id = self._session.endpoints.configuration_group.create_config_group(config_group_payload).id
-            self._progress(f"Created: {config_group_payload.name} with Id: {cg_id}", i + 1, config_groups_length)
+            self._logger(f"Creating Configuration Groups", i + 1, config_groups_length)
             self._config_rollback.add_config_group(cg_id)
 
     def _create_feature_profile_and_parcels(self, feature_profiles_ids: List[UUID]) -> List[ProfileId]:
