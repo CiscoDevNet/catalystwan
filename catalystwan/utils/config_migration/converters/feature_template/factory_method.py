@@ -10,6 +10,7 @@ from catalystwan.utils.config_migration.converters.feature_template.snmp import 
 from catalystwan.utils.feature_template.find_template_values import find_template_values
 
 from .aaa import AAATemplateConverter
+from .appqoe import AppqoeTemplateConverter
 from .banner import BannerTemplateConverter
 from .base import FeatureTemplateConverter
 from .basic import SystemToBasicTemplateConverter
@@ -41,6 +42,7 @@ available_converters = [
     UcseTemplateConverter,
     DhcpTemplateConverter,
     SNMPTemplateConverter,
+    AppqoeTemplateConverter,
 ]
 
 
