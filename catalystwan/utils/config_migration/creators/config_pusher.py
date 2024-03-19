@@ -55,7 +55,7 @@ class UX2ConfigPusher:
                 transformed_config_group.header.subelements
             )
             cg_id = self._session.endpoints.configuration_group.create_config_group(config_group_payload).id
-            self._logger(f"Creating Configuration Groups", i + 1, config_groups_length)
+            self._logger("Creating Configuration Groups", i + 1, config_groups_length)
             self._config_rollback.add_config_group(cg_id)
 
     def _create_feature_profile_and_parcels(self, feature_profiles_ids: List[UUID]) -> List[ProfileId]:
