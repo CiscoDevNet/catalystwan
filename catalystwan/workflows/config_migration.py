@@ -221,7 +221,7 @@ def collect_ux1_config(session: ManagerSession, progress: Callable[[str, int, in
 def push_ux2_config(
     session: ManagerSession, config: UX2Config, progress: Callable[[str, int, int], None] = log_progress
 ) -> UX2ConfigRollback:
-    config_pusher = UX2ConfigPusher(session, config)
+    config_pusher = UX2ConfigPusher(session, config, progress)
     rollback = config_pusher.push()
     return rollback
 
