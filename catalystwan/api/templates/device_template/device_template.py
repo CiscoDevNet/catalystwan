@@ -50,6 +50,26 @@ class DeviceTemplate(BaseModel):
     security_policy_id: str = Field(default="", alias="securityPolicyId")
     policy_id: str = Field(default="", alias="policyId")
 
+    def get_flattened_general_templates(self) -> List[GeneralTemplate]:
+        """
+        Recursively flattens the general templates by removing the sub-templates
+        and returning a list of flattened templates.
+
+        Returns:
+            A list of GeneralTemplate objects representing the flattened templates.
+        """
+
+        def flatten_general_templates(general_templates: List[GeneralTemplate]) -> List[GeneralTemplate]:
+            result = []
+            for gt in general_templates:
+                sub_templates = gt.subTemplates
+                gt.subTemplates = []
+                result.append(gt)
+                result.extend(flatten_general_templates(sub_templates))
+            return result
+
+        return flatten_general_templates(self.general_templates)
+
     def generate_payload(self) -> str:
         env = Environment(
             loader=FileSystemLoader(self.payload_path.parent),
