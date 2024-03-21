@@ -326,7 +326,7 @@ class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
             if self.state == ManagerSessionState.RESTART_IMMINENT and isinstance(exception, ConnectionError):
                 self.state = ManagerSessionState.WAIT_SERVER_READY_AFTER_RESTART
                 return self.request(method, url, *args, **kwargs)
-            self.logger.error(exception)
+            self.logger.debug(exception)
             raise ManagerRequestException(request=exception.request, response=exception.response)
 
         if self.enable_relogin and response.jsessionid_expired and self.state == ManagerSessionState.OPERATIVE:
@@ -340,7 +340,7 @@ class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
         try:
             response.raise_for_status()
         except HTTPError as error:
-            self.logger.error(error)
+            self.logger.debug(error)
             error_info = response.get_error_info()
             raise ManagerHTTPError(error_info=error_info, request=error.request, response=error.response)
         return response
