@@ -238,7 +238,7 @@ class SoftwareInstallTimeout(BaseModel):
     @validator("activate_timeout")
     def check_activate_timeout(cls, activate_timeout_str: str):
         activate_timeout = int(activate_timeout_str)
-        if activate_timeout < 60 or activate_timeout > 180:
+        if activate_timeout < 30 or activate_timeout > 180:
             raise ValueError("activate timeout should be in range 30-180")
         return activate_timeout_str
 
