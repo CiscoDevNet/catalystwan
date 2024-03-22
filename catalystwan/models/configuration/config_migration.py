@@ -112,11 +112,15 @@ class UX2Config(BaseModel):
 
 
 class UX2ConfigRollback(BaseModel):
-    config_groups_ids: List[UUID] = Field(default_factory=list)
-    feature_profiles_ids: List[Tuple[UUID, ProfileType]] = Field(default_factory=list)
+    config_group_ids: List[UUID] = Field(
+        default_factory=list, serialization_alias="ConfigGroupIds", validation_alias="ConfigGroupIds"
+    )
+    feature_profile_ids: List[Tuple[UUID, ProfileType]] = Field(
+        default_factory=list, serialization_alias="FeatureProfileIds", validation_alias="FeatureProfileIds"
+    )
 
     def add_config_group(self, config_group_id: UUID) -> None:
-        self.config_groups_ids.append(config_group_id)
+        self.config_group_ids.append(config_group_id)
 
     def add_feature_profile(self, feature_profile_id: UUID, profile_type: ProfileType) -> None:
-        self.feature_profiles_ids.append((feature_profile_id, profile_type))
+        self.feature_profile_ids.append((feature_profile_id, profile_type))

@@ -11,9 +11,9 @@ class UX2ConfigReverter:
 
     def rollback(self, rollback_config: UX2ConfigRollback) -> bool:
         try:
-            for cg_id in rollback_config.config_groups_ids:
+            for cg_id in rollback_config.config_group_ids:
                 self._session.endpoints.configuration_group.delete_config_group(cg_id)
-            for feature_profile_id, type_ in rollback_config.feature_profiles_ids:
+            for feature_profile_id, type_ in rollback_config.feature_profile_ids:
                 api = FeatureProfileAPIFactory.get_api(type_, self._session)
                 if type_ == "policy-object":
                     continue
