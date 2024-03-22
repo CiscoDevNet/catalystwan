@@ -226,7 +226,11 @@ def push_ux2_config(
     return rollback
 
 
-def rollback_ux2_config(session: ManagerSession, rollback_config: UX2ConfigRollback) -> bool:
+def rollback_ux2_config(
+    session: ManagerSession,
+    rollback_config: UX2ConfigRollback,
+    progress: Callable[[str, int, int], None] = log_progress,
+) -> bool:
     config_reverter = UX2ConfigReverter(session)
-    status = config_reverter.rollback(rollback_config)
+    status = config_reverter.rollback(rollback_config, progress)
     return status
