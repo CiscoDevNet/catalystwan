@@ -426,11 +426,23 @@ class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
         return response.json()["VSessionId"]
 
     def logout(self) -> Optional[ManagerResponse]:
+        response = None
         if isinstance((version := self.api_version), NullVersion):
             self.logger.warning("Cannot perform logout operation without known api_version.")
-            return None
+            return response
         else:
-            return self.post("/logout") if version >= Version("20.12") else self.get("/logout")
+            # disable automatic relogin before performing logout request
+            _relogin = self.enable_relogin
+            try:
+                self.enable_relogin = False
+                if version >= Version("20.12"):
+                    response = self.post("/logout")
+                else:
+                    response = self.get("/logout")
+            finally:
+                # restore original setting after performing logout request
+                self.enable_relogin = _relogin
+        return response
 
     def close(self) -> None:
         """Closes the ManagerSession.
@@ -443,7 +455,6 @@ class ManagerSession(ManagerResponseAdapter, APIEndpointClient):
         using the `with` statement, which ensures that the session is properly
         closed and resources are cleaned up even in case of exceptions.
         """
-        self.enable_relogin = False
         self.logout()
         super().close()
 
