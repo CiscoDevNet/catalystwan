@@ -5,6 +5,7 @@ from uuid import UUID, uuid4
 from catalystwan.api.policy_api import POLICY_LIST_ENDPOINTS_MAP
 from catalystwan.endpoints.configuration_group import ConfigGroupCreationPayload
 from catalystwan.models.configuration.config_migration import (
+    DeviceTemplateWithInfo,
     TransformedConfigGroup,
     TransformedFeatureProfile,
     TransformedParcel,
@@ -213,9 +214,8 @@ def collect_ux1_config(session: ManagerSession, progress: Callable[[str, int, in
     device_templates_information = template_api.get_device_templates()
     for i, device_template_information in enumerate(device_templates_information):
         device_template = template_api.get_device_template(device_template_information.id)
-        device_template.id = device_template_information.id
-        device_template.devices_attached = device_template_information.devices_attached
-        ux1.templates.device_templates.append(device_template)
+        device_template_with_info = DeviceTemplateWithInfo.from_merged(device_template, device_template_information)
+        ux1.templates.device_templates.append(device_template_with_info)
         progress("Collecting Device Templates", i + 1, len(device_templates_information))
 
     return ux1
