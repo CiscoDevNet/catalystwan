@@ -16,6 +16,7 @@ from catalystwan.api.templates.cli_template import CLITemplate
 from catalystwan.api.templates.device_template.device_template import (
     DeviceSpecificValue,
     DeviceTemplate,
+    DeviceTemplateWithTracking,
     GeneralTemplate,
 )
 from catalystwan.api.templates.feature_template import FeatureTemplate
@@ -747,7 +748,7 @@ class TemplatesAPI:
         templates = self.session.get(url=endpoint, params=params)
         return templates.dataseq(DeviceTemplateInformation)
 
-    def get_device_template(self, template_id: str) -> DeviceTemplate:
+    def get_device_template(self, template_id: str) -> DeviceTemplateWithTracking:
         endpoint = f"/dataservice/template/device/object/{template_id}"
         response = self.session.get(endpoint)
-        return DeviceTemplate(**response.json())
+        return DeviceTemplateWithTracking(**response.json())

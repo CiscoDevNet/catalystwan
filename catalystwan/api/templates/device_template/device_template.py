@@ -108,5 +108,10 @@ class DeviceTemplate(BaseModel):
     model_config = ConfigDict(populate_by_name=True, use_enum_values=True)
 
 
+class DeviceTemplateWithTracking(DeviceTemplate):
+    id: str = Field(default="", alias="templateId")
+    devices_attached: int = Field(default=0, alias="devicesAttached")
+
+
 class DeviceSpecificValue(BaseModel):
     property: str

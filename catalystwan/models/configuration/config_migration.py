@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Annotated
 
 from catalystwan.api.template_api import FeatureTemplateInformation
-from catalystwan.api.templates.device_template.device_template import DeviceTemplate
+from catalystwan.api.templates.device_template.device_template import DeviceTemplateWithTracking
 from catalystwan.endpoints.configuration_group import ConfigGroupCreationPayload
 from catalystwan.models.configuration.feature_profile.common import FeatureProfileCreationPayload, ProfileType
 from catalystwan.models.configuration.feature_profile.sdwan.other import AnyOtherParcel
@@ -50,7 +50,7 @@ class UX1Templates(BaseModel):
     feature_templates: List[FeatureTemplateInformation] = Field(
         default=[], serialization_alias="featureTemplates", validation_alias="featureTemplates"
     )
-    device_templates: List[DeviceTemplate] = Field(
+    device_templates: List[DeviceTemplateWithTracking] = Field(
         default=[], serialization_alias="deviceTemplates", validation_alias="deviceTemplates"
     )
 
