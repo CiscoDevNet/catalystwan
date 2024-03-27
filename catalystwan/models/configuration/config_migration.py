@@ -114,6 +114,8 @@ class UX2Config(BaseModel):
     @classmethod
     def insert_parcel_type_from_headers(cls, values: Dict[str, Any]):
         profile_parcels = values.get("profileParcels", [])
+        if not profile_parcels:
+            profile_parcels = values.get("profile_parcels", [])
         for profile_parcel in profile_parcels:
             profile_parcel["parcel"]["type_"] = profile_parcel["header"]["type"]
         return values
