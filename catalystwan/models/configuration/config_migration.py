@@ -6,7 +6,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Annotated
 
-from catalystwan.api.template_api import FeatureTemplateInformation
+from catalystwan.api.template_api import FeatureTemplateInformation, TemplateInformation
 from catalystwan.api.templates.device_template.device_template import DeviceTemplate
 from catalystwan.endpoints.configuration_group import ConfigGroupCreationPayload
 from catalystwan.models.configuration.feature_profile.common import FeatureProfileCreationPayload, ProfileType
@@ -25,6 +25,23 @@ AnyParcel = Annotated[
     Union[AnySystemParcel, AnyPolicyObjectParcel, AnyServiceParcel, AnyOtherParcel, AnyTransportParcel],
     Field(discriminator="type_"),
 ]
+
+
+class DeviceTemplateWithInfo(DeviceTemplate):
+    model_config = ConfigDict(populate_by_name=True)
+    template_id: str = Field(serialization_alias="templateId", validation_alias="templateId")
+    factory_default: bool = Field(serialization_alias="factoryDefault", validation_alias="factoryDefault")
+    devices_attached: int = Field(serialization_alias="devicesAttached", validation_alias="devicesAttached")
+
+    @staticmethod
+    def from_merged(template: DeviceTemplate, info: TemplateInformation) -> "DeviceTemplateWithInfo":
+        info_dict = template.model_dump()
+        return DeviceTemplateWithInfo(
+            template_id=info.id,
+            factory_default=info.factory_default,
+            devices_attached=info.devices_attached,
+            **info_dict
+        )
 
 
 class UX1Policies(BaseModel):
@@ -50,14 +67,13 @@ class UX1Templates(BaseModel):
     feature_templates: List[FeatureTemplateInformation] = Field(
         default=[], serialization_alias="featureTemplates", validation_alias="featureTemplates"
     )
-    device_templates: List[DeviceTemplate] = Field(
+    device_templates: List[DeviceTemplateWithInfo] = Field(
         default=[], serialization_alias="deviceTemplates", validation_alias="deviceTemplates"
     )
 
 
 class UX1Config(BaseModel):
     # All UX1 Configuration items - Mega Model
-    model_config = ConfigDict(populate_by_name=True)
     policies: UX1Policies = UX1Policies()
     templates: UX1Templates = UX1Templates()
 
@@ -114,6 +130,8 @@ class UX2Config(BaseModel):
     @classmethod
     def insert_parcel_type_from_headers(cls, values: Dict[str, Any]):
         profile_parcels = values.get("profileParcels", [])
+        if not profile_parcels:
+            profile_parcels = values.get("profile_parcels", [])
         for profile_parcel in profile_parcels:
             profile_parcel["parcel"]["type_"] = profile_parcel["header"]["type"]
         return values

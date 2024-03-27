@@ -81,7 +81,9 @@ class TemplateInformation(BaseModel):
     devices_attached: int = Field(serialization_alias="devicesAttached", validation_alias="devicesAttached")
     description: str = Field(serialization_alias="templateDescription", validation_alias="templateDescription")
     last_updated_on: dt.datetime = Field(serialization_alias="lastUpdatedOn", validation_alias="lastUpdatedOn")
-    resource_group: Optional[str] = Field(None, serialization_alias="resourceGroup", validation_alias="resourceGroup")
+    resource_group: Optional[str] = Field(
+        default=None, serialization_alias="resourceGroup", validation_alias="resourceGroup"
+    )
 
 
 class FeatureTemplateInformation(TemplateInformation):
@@ -91,7 +93,7 @@ class FeatureTemplateInformation(TemplateInformation):
     device_type: List[str] = Field(serialization_alias="deviceType", validation_alias="deviceType")
     version: str = Field(serialization_alias="templateMinVersion", validation_alias="templateMinVersion")
     template_definiton: Optional[str] = Field(
-        None, serialization_alias="templateDefinition", validation_alias="templateDefinition"
+        default=None, serialization_alias="templateDefinition", validation_alias="templateDefinition"
     )
 
 
@@ -102,8 +104,8 @@ class DeviceTemplateInformation(TemplateInformation):
     template_class: str = Field(serialization_alias="templateClass", validation_alias="templateClass")
     config_type: str = Field(serialization_alias="configType", validation_alias="configType")
     template_attached: int = Field(serialization_alias="templateAttached", validation_alias="templateAttached")
-    draft_mode: Optional[str] = Field(None, serialization_alias="draftMode", validation_alias="draftMode")
-    device_role: Optional[str] = Field(None, serialization_alias="deviceRole", validation_alias="deviceRole")
+    draft_mode: Optional[str] = Field(default=None, serialization_alias="draftMode", validation_alias="draftMode")
+    device_role: Optional[str] = Field(default=None, serialization_alias="deviceRole", validation_alias="deviceRole")
 
 
 class TemplatesAPI:

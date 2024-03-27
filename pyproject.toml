@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "catalystwan"
-version = "0.31.2dev1"
+version = "0.31.2dev2"
 description = "Cisco Catalyst WAN SDK for Python"
 authors = ["kagorski <kagorski@cisco.com>"]
 readme = "README.md"
