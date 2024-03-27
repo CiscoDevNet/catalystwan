@@ -120,7 +120,7 @@ class Default(ParcelAttribute, Generic[T]):
     option_type: OptionType = Field(
         default=OptionType.DEFAULT, serialization_alias="optionType", validation_alias="optionType"
     )
-    value: Any
+    value: Optional[Any] = None
 
 
 def as_global(value: Any, generic_alias: Any = None):

@@ -1,9 +1,9 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
-from typing import List, Set, Tuple, Union
+from typing import Any, Dict, List, Set, Tuple, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Annotated
 
 from catalystwan.api.template_api import FeatureTemplateInformation
