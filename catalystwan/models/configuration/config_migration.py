@@ -110,6 +110,14 @@ class UX2Config(BaseModel):
         default=[], serialization_alias="profileParcels", validation_alias="profileParcels"
     )
 
+    @model_validator(mode="before")
+    @classmethod
+    def insert_parcel_type_from_headers(cls, values: Dict[str, Any]):
+        profile_parcels = values.get("profileParcels", [])
+        for profile_parcel in profile_parcels:
+            profile_parcel["parcel"]["type_"] = profile_parcel["header"]["type"]
+        return values
+
 
 class UX2ConfigRollback(BaseModel):
     config_group_ids: List[UUID] = Field(
