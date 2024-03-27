@@ -14,7 +14,7 @@ class BaseURLListEntry(BaseModel):
 
 class URLParcel(_ParcelBase):
     type_: Literal["security-urllist"] = Field(default="security-urllist", exclude=True)
-    parcel_type: Literal["urlallowed", "urlblocked"]
+    type: Literal["urlallowed", "urlblocked"]
     entries: List[BaseURLListEntry] = Field(default=[], validation_alias=AliasPath("data", "entries"))
 
     def add_url(self, pattern: str):
@@ -23,13 +23,9 @@ class URLParcel(_ParcelBase):
 
 class URLAllowParcel(URLParcel):
     type_: Literal["security-urllist"] = Field(default="security-urllist", exclude=True)
-    parcel_type: Literal["urlallowed"] = Field(
-        default="urlallowed", validation_alias="type", serialization_alias="type"
-    )
+    type: Literal["urlallowed"] = "urlallowed"
 
 
 class URLBlockParcel(URLParcel):
     type_: Literal["security-urllist"] = Field(default="security-urllist", exclude=True)
-    parcel_type: Literal["urlblocked"] = Field(
-        default="urlblocked", validation_alias="type", serialization_alias="type"
-    )
+    type: Literal["urlblocked"] = "urlblocked"

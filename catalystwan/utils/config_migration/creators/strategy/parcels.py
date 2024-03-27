@@ -33,5 +33,7 @@ class SimpleParcelPusher(ParcelPusher):
     def push(self, profile_uuid: UUID, parcel_uuids: List[UUID], mapping: Dict[UUID, TransformedParcel]):
         # Parcels don't have references to other parcels, so we can create them directly
         for parcel_uuid in parcel_uuids:
-            transformed_parcel = mapping[parcel_uuid]
+            transformed_parcel = mapping.get(parcel_uuid)
+            if transformed_parcel is None:
+                continue
             self.api.create_parcel(profile_uuid, transformed_parcel.parcel)  # type: ignore

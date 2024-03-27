@@ -1,9 +1,9 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 
-from typing import List, Set, Tuple, Union
+from typing import Any, Dict, List, Set, Tuple, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Annotated
 
 from catalystwan.api.template_api import FeatureTemplateInformation
@@ -109,6 +109,14 @@ class UX2Config(BaseModel):
     profile_parcels: List[TransformedParcel] = Field(
         default=[], serialization_alias="profileParcels", validation_alias="profileParcels"
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def insert_parcel_type_from_headers(cls, values: Dict[str, Any]):
+        profile_parcels = values.get("profileParcels", [])
+        for profile_parcel in profile_parcels:
+            profile_parcel["parcel"]["type_"] = profile_parcel["header"]["type"]
+        return values
 
 
 class UX2ConfigRollback(BaseModel):
