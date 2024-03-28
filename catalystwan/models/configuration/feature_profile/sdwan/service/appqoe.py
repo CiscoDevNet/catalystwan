@@ -70,7 +70,7 @@ ServiceNodeExternalVpgIp = Literal["192.168.2.1/24"]  # TODO: 1.Is it really con
 
 
 class VirtualApplication(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     instance_id: Global[int] = Field(
         default=Global(value=1), serialization_alias="instanceId", validation_alias="instanceId"
@@ -88,7 +88,7 @@ class VirtualApplication(BaseModel):
 
 
 class Appqoe(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     name: Default[str] = Default(value="/1")
     appnav_controller_group: Global[AppnavControllerGroupName] = Field(
@@ -112,7 +112,7 @@ class Appqoe(BaseModel):
 
 class ServiceContext(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    appqoe: List[Appqoe]
+    appqoe: List[Appqoe] = Field(default_factory=lambda: [Appqoe()])
 
 
 # Frowarder
@@ -123,7 +123,7 @@ class ServiceNodeInformation(BaseModel):
 
 
 class ForwarderController(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     address: Union[Global[str], Global[IPv4Address], Variable]
     vpn: Global[int] = Field(
@@ -132,7 +132,7 @@ class ForwarderController(BaseModel):
 
 
 class ForwarderAppnavControllerGroup(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     group_name: Default[AppnavControllerGroupName] = Field(
         default=Default(value="ACG-APPQOE"), serialization_alias="groupName", validation_alias="groupName"
@@ -143,7 +143,7 @@ class ForwarderAppnavControllerGroup(BaseModel):
 
 
 class ForwarderNodeGroup(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     name: Union[Global[str], Default[ServiceNodeGroupName]]
     internal: Default[bool] = Default[bool](value=False)
@@ -153,7 +153,7 @@ class ForwarderNodeGroup(BaseModel):
 
 
 class ForwarderRole(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     appnav_controller_group: List[ForwarderAppnavControllerGroup] = Field(
         serialization_alias="appnavControllerGroup", validation_alias="appnavControllerGroup"
@@ -161,7 +161,9 @@ class ForwarderRole(BaseModel):
     service_node_group: List[ForwarderNodeGroup] = Field(
         serialization_alias="serviceNodeGroup", validation_alias="serviceNodeGroup"
     )
-    service_context: ServiceContext = Field(serialization_alias="serviceContext", validation_alias="serviceContext")
+    service_context: ServiceContext = Field(
+        default_factory=ServiceContext, serialization_alias="serviceContext", validation_alias="serviceContext"
+    )
 
 
 # Forwarder and Service
@@ -178,7 +180,7 @@ class ForwarderAndServiceNodeController(BaseModel):
 
 
 class ForwarderAndServiceNodeAppnavControllerGroup(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     group_name: Default[AppnavControllerGroupName] = Field(
         default=Default[AppnavControllerGroupName](value="ACG-APPQOE"),
@@ -191,7 +193,7 @@ class ForwarderAndServiceNodeAppnavControllerGroup(BaseModel):
 
 
 class ForwarderAndServiceNodeGroup(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     name: Default[ServiceNodeGroupName] = Default[ServiceNodeGroupName](value="SNG-APPQOE")
     internal: Default[bool] = Default[bool](value=True)
@@ -201,7 +203,7 @@ class ForwarderAndServiceNodeGroup(BaseModel):
 
 
 class ForwarderAndServiceNodeRole(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     appnav_controller_group: List[ForwarderAndServiceNodeAppnavControllerGroup] = Field(
         serialization_alias="appnavControllerGroup", validation_alias="appnavControllerGroup"
@@ -217,7 +219,7 @@ class ForwarderAndServiceNodeRole(BaseModel):
 
 
 class ServiceNodeInformationExternal(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     address: Default[ServiceNodeExternalAddress] = Default[ServiceNodeExternalAddress](value="192.168.2.2")
     vpg_ip: Default[ServiceNodeExternalVpgIp] = Field(
@@ -228,7 +230,7 @@ class ServiceNodeInformationExternal(BaseModel):
 
 
 class ServiceNodeGroup(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     name: Default[ServiceNodeGroupName] = Default[ServiceNodeGroupName](value="SNG-APPQOE")
     external_node: Default[bool] = Field(
@@ -240,7 +242,7 @@ class ServiceNodeGroup(BaseModel):
 
 
 class ServiceNodeRole(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     service_node_group: List[ServiceNodeGroup] = Field(
         default=[ServiceNodeGroup()], serialization_alias="serviceNodeGroup", validation_alias="serviceNodeGroup"
@@ -248,7 +250,8 @@ class ServiceNodeRole(BaseModel):
 
 
 class AppqoeParcel(_ParcelBase):
-    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True)
+    type_: Literal["appqoe"] = Field(default="appqoe", exclude=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True, populate_by_name=True, extra="forbid")
 
     dreopt: Optional[Union[Global[bool], Default[bool]]] = Field(
         default=as_default(False), validation_alias=AliasPath("data", "dreopt")

@@ -1,10 +1,26 @@
 import unittest
-from unittest.mock import patch
-from uuid import UUID
+from ipaddress import IPv4Address
+from unittest.mock import Mock
+from uuid import uuid4
 
 from parameterized import parameterized  # type: ignore
 
-from catalystwan.api.feature_profile_api import SystemFeatureProfileAPI
+from catalystwan.api.configuration_groups.parcel import Global, as_global, as_variable
+from catalystwan.api.feature_profile_api import ServiceFeatureProfileAPI, SystemFeatureProfileAPI
+from catalystwan.endpoints.configuration.feature_profile.sdwan.service import ServiceFeatureProfile
+from catalystwan.endpoints.configuration.feature_profile.sdwan.system import SystemFeatureProfile
+from catalystwan.models.configuration.feature_profile.sdwan.service import (
+    AppqoeParcel,
+    InterfaceEthernetParcel,
+    InterfaceGreParcel,
+    InterfaceIpsecParcel,
+    InterfaceSviParcel,
+    LanVpnDhcpServerParcel,
+    LanVpnParcel,
+    OspfParcel,
+)
+from catalystwan.models.configuration.feature_profile.sdwan.service.lan.gre import BasicGre
+from catalystwan.models.configuration.feature_profile.sdwan.service.lan.ipsec import IpsecAddress, IpsecTunnelMode
 from catalystwan.models.configuration.feature_profile.sdwan.system import (
     AAAParcel,
     BannerParcel,
@@ -19,7 +35,7 @@ from catalystwan.models.configuration.feature_profile.sdwan.system import (
     SNMPParcel,
 )
 
-endpoint_mapping = {
+system_endpoint_mapping = {
     AAAParcel: "aaa",
     BannerParcel: "banner",
     BasicParcel: "basic",
@@ -36,75 +52,136 @@ endpoint_mapping = {
 
 class TestSystemFeatureProfileAPI(unittest.TestCase):
     def setUp(self):
-        self.profile_uuid = UUID("054d1b82-9fa7-43c6-98fb-4355da0d77ff")
-        self.parcel_uuid = UUID("7113505f-8cec-4420-8799-1a209357ba7e")
+        self.profile_uuid = uuid4()
+        self.parcel_uuid = uuid4()
+        self.mock_session = Mock()
+        self.mock_endpoint = Mock(spec=SystemFeatureProfile)
+        self.api = SystemFeatureProfileAPI(self.mock_session)
+        self.api.endpoint = self.mock_endpoint
 
-    @parameterized.expand(endpoint_mapping.items())
-    @patch("catalystwan.session.ManagerSession")
-    @patch("catalystwan.endpoints.configuration.feature_profile.sdwan.system.SystemFeatureProfile")
-    def test_delete_method_with_valid_arguments(self, parcel, expected_path, mock_endpoint, mock_session):
-        # Arrange
-        api = SystemFeatureProfileAPI(mock_session)
-        api.endpoint = mock_endpoint
-
+    @parameterized.expand(system_endpoint_mapping.items())
+    def test_delete_method_with_valid_arguments(self, parcel, expected_path):
         # Act
-        api.delete_parcel(self.profile_uuid, parcel, self.parcel_uuid)
+        self.api.delete_parcel(self.profile_uuid, parcel, self.parcel_uuid)
 
         # Assert
-        mock_endpoint.delete.assert_called_once_with(self.profile_uuid, expected_path, self.parcel_uuid)
+        self.mock_endpoint.delete.assert_called_once_with(self.profile_uuid, expected_path, self.parcel_uuid)
 
-    @parameterized.expand(endpoint_mapping.items())
-    @patch("catalystwan.session.ManagerSession")
-    @patch("catalystwan.endpoints.configuration.feature_profile.sdwan.system.SystemFeatureProfile")
-    def test_get_method_with_valid_arguments(self, parcel, expected_path, mock_endpoint, mock_session):
-        # Arrange
-        api = SystemFeatureProfileAPI(mock_session)
-        api.endpoint = mock_endpoint
-
+    @parameterized.expand(system_endpoint_mapping.items())
+    def test_get_method_with_valid_arguments(self, parcel, expected_path):
         # Act
-        api.get_parcels(self.profile_uuid, parcel, self.parcel_uuid)
+        self.api.get_parcels(self.profile_uuid, parcel, self.parcel_uuid)
 
         # Assert
-        mock_endpoint.get_by_id.assert_called_once_with(self.profile_uuid, expected_path, self.parcel_uuid)
+        self.mock_endpoint.get_by_id.assert_called_once_with(self.profile_uuid, expected_path, self.parcel_uuid)
 
-    @parameterized.expand(endpoint_mapping.items())
-    @patch("catalystwan.session.ManagerSession")
-    @patch("catalystwan.endpoints.configuration.feature_profile.sdwan.system.SystemFeatureProfile")
-    def test_get_all_method_with_valid_arguments(self, parcel, expected_path, mock_endpoint, mock_session):
-        # Arrange
-        api = SystemFeatureProfileAPI(mock_session)
-        api.endpoint = mock_endpoint
-
+    @parameterized.expand(system_endpoint_mapping.items())
+    def test_get_all_method_with_valid_arguments(self, parcel, expected_path):
         # Act
-        api.get_parcels(self.profile_uuid, parcel)
+        self.api.get_parcels(self.profile_uuid, parcel)
 
         # Assert
-        mock_endpoint.get_all.assert_called_once_with(self.profile_uuid, expected_path)
+        self.mock_endpoint.get_all.assert_called_once_with(self.profile_uuid, expected_path)
 
-    @parameterized.expand(endpoint_mapping.items())
-    @patch("catalystwan.session.ManagerSession")
-    @patch("catalystwan.endpoints.configuration.feature_profile.sdwan.system.SystemFeatureProfile")
-    def test_create_method_with_valid_arguments(self, parcel, expected_path, mock_endpoint, mock_session):
-        # Arrange
-        api = SystemFeatureProfileAPI(mock_session)
-        api.endpoint = mock_endpoint
-
+    @parameterized.expand(system_endpoint_mapping.items())
+    def test_create_method_with_valid_arguments(self, parcel, expected_path):
         # Act
-        api.create_parcel(self.profile_uuid, parcel)
+        self.api.create_parcel(self.profile_uuid, parcel)
 
         # Assert
-        mock_endpoint.create.assert_called_once_with(self.profile_uuid, expected_path, parcel)
+        self.mock_endpoint.create.assert_called_once_with(self.profile_uuid, expected_path, parcel)
 
-    @parameterized.expand(endpoint_mapping.items())
-    @patch("catalystwan.session.ManagerSession")
-    @patch("catalystwan.endpoints.configuration.feature_profile.sdwan.system.SystemFeatureProfile")
-    def test_update_method_with_valid_arguments(self, parcel, expected_path, mock_endpoint, mock_session):
-        # Arrange
-        api = SystemFeatureProfileAPI(mock_session)
-        api.endpoint = mock_endpoint
-
+    @parameterized.expand(system_endpoint_mapping.items())
+    def test_update_method_with_valid_arguments(self, parcel, expected_path):
         # Act
-        api.update(self.profile_uuid, parcel, self.parcel_uuid)
+        self.api.update_parcel(self.profile_uuid, parcel, self.parcel_uuid)
 
         # Assert
-        mock_endpoint.update.assert_called_once_with(self.profile_uuid, expected_path, self.parcel_uuid, parcel)
+        self.mock_endpoint.update.assert_called_once_with(self.profile_uuid, expected_path, self.parcel_uuid, parcel)
+
+
+service_endpoint_mapping = {
+    LanVpnDhcpServerParcel: "dhcp-server",
+    AppqoeParcel: "appqoe",
+    LanVpnParcel: "lan/vpn",
+    OspfParcel: "routing/ospf",
+}
+
+service_interface_parcels = [
+    (
+        "gre",
+        InterfaceGreParcel(
+            parcel_name="TestGreParcel",
+            parcel_description="Test Gre Parcel",
+            basic=BasicGre(if_name=as_global("gre1"), tunnel_destination=as_global(IPv4Address("4.4.4.4"))),
+        ),
+    ),
+    (
+        "svi",
+        InterfaceSviParcel(
+            parcel_name="TestSviParcel",
+            parcel_description="Test Svi Parcel",
+            interface_name=as_global("Vlan1"),
+            svi_description=as_global("Test Svi Description"),
+        ),
+    ),
+    (
+        "ethernet",
+        InterfaceEthernetParcel(
+            parcel_name="TestEthernetParcel",
+            parcel_description="Test Ethernet Parcel",
+            interface_name=as_global("HundredGigE"),
+            ethernet_description=as_global("Test Ethernet Description"),
+        ),
+    ),
+    (
+        "ipsec",
+        InterfaceIpsecParcel(
+            parcel_name="TestIpsecParcel",
+            parcel_description="Test Ipsec Parcel",
+            interface_name=as_global("ipsec2"),
+            ipsec_description=as_global("Test Ipsec Description"),
+            pre_shared_secret=as_global("123"),
+            ike_local_id=as_global("123"),
+            ike_remote_id=as_global("123"),
+            application=as_variable("{{ipsec_application}}"),
+            tunnel_mode=Global[IpsecTunnelMode](value="ipv6"),
+            tunnel_destination_v6=as_variable("{{ipsec_tunnelDestinationV6}}"),
+            tunnel_source_v6=Global[str](value="::"),
+            tunnel_source_interface=as_variable("{{ipsec_ipsecSourceInterface}}"),
+            ipv6_address=as_variable("{{test}}"),
+            address=IpsecAddress(address=as_global("10.0.0.1"), mask=as_global("255.255.255.0")),
+            tunnel_destination=IpsecAddress(address=as_global("10.0.0.5"), mask=as_global("255.255.255.0")),
+            mtu_v6=as_variable("{{test}}"),
+        ),
+    ),
+]
+
+
+class TestServiceFeatureProfileAPI(unittest.TestCase):
+    def setUp(self):
+        self.profile_uuid = uuid4()
+        self.vpn_uuid = uuid4()
+        self.parcel_uuid = uuid4()
+        self.mock_session = Mock()
+        self.mock_endpoint = Mock(spec=ServiceFeatureProfile)
+        self.api = ServiceFeatureProfileAPI(self.mock_session)
+        self.api.endpoint = self.mock_endpoint
+
+    @parameterized.expand(service_endpoint_mapping.items())
+    def test_post_method_parcel(self, parcel, parcel_type):
+        # Act
+        self.api.create_parcel(self.profile_uuid, parcel)
+
+        # Assert
+        self.mock_endpoint.create_service_parcel.assert_called_once_with(self.profile_uuid, parcel_type, parcel)
+
+    @parameterized.expand(service_interface_parcels)
+    def test_post_method_interface_parcel(self, parcel_type, parcel):
+        # Act
+        self.api.create_parcel(self.profile_uuid, parcel, self.vpn_uuid)
+
+        # Assert
+        self.mock_endpoint.create_lan_vpn_interface_parcel.assert_called_once_with(
+            self.profile_uuid, self.vpn_uuid, parcel_type, parcel
+        )

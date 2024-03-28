@@ -51,6 +51,14 @@ SUPPORTED_TEMPLATE_TYPES = [
     "ucse",
     "dhcp",
     "cisco_dhcp_server",
+    "cisco_vpn",
+    "cisco_vpn_interface_gre",
+    "vpn-vsmart-interface",
+    "vpn-vedge-interface",
+    "vpn-vmanage-interface",
+    "cisco_vpn_interface",
+    "cisco_vpn_interface_ipsec",
+    "vpn-interface-svi",
 ]
 
 FEATURE_PROFILE_SYSTEM = [
@@ -87,6 +95,17 @@ FEATURE_PROFILE_OTHER = [
     "ucse",
 ]
 
+FEATURE_PROFILE_SERVICE = [
+    "cisco_vpn",
+    "cisco_vpn_interface_gre",
+    "vpn-vsmart-interface",
+    "vpn-vedge-interface",
+    "vpn-vmanage-interface",
+    "cisco_vpn_interface",
+    "cisco_vpn_interface_ipsec",
+    "vpn-interface-svi",
+]
+
 
 def log_progress(task: str, completed: int, total: int) -> None:
     logger.info(f"{task} {completed}/{total}")
@@ -121,6 +140,17 @@ def transform(ux1: UX1Config) -> UX2Config:
                 description="other",
             ),
         )
+        fp_service_uuid = uuid4()
+        transformed_fp_service = TransformedFeatureProfile(
+            header=TransformHeader(
+                type="service",
+                origin=fp_service_uuid,
+            ),
+            feature_profile=FeatureProfileCreationPayload(
+                name=f"{dt.template_name}_service",
+                description="service",
+            ),
+        )
 
         for template in templates:
             # Those feature templates IDs are real UUIDs and are used to map to the feature profiles
@@ -128,12 +158,14 @@ def transform(ux1: UX1Config) -> UX2Config:
                 transformed_fp_system.header.subelements.add(UUID(template.templateId))
             elif template.templateType in FEATURE_PROFILE_OTHER:
                 transformed_fp_other.header.subelements.add(UUID(template.templateId))
+            elif template.templateType in FEATURE_PROFILE_SERVICE:
+                transformed_fp_service.header.subelements.add(UUID(template.templateId))
 
         transformed_cg = TransformedConfigGroup(
             header=TransformHeader(
                 type="config_group",
                 origin=uuid4(),
-                subelements=set([fp_system_uuid, fp_other_uuid]),
+                subelements=set([fp_system_uuid, fp_other_uuid, fp_service_uuid]),
             ),
             config_group=ConfigGroupCreationPayload(
                 name=dt.template_name,
@@ -145,6 +177,7 @@ def transform(ux1: UX1Config) -> UX2Config:
         # Add to UX2
         ux2.feature_profiles.append(transformed_fp_system)
         ux2.feature_profiles.append(transformed_fp_other)
+        ux2.feature_profiles.append(transformed_fp_service)
         ux2.config_groups.append(transformed_cg)
 
     for ft in ux1.templates.feature_templates:
@@ -206,10 +239,10 @@ def collect_ux1_config(session: ManagerSession, progress: Callable[[str, int, in
 
     """Collect Templates"""
     template_api = session.api.templates
-    progress("Collecting Templates Info", 0, 2)
 
+    progress("Collecting Feature Templates", 0, 1)
     ux1.templates.feature_templates = [t for t in template_api.get_feature_templates()]
-    progress("Collecting Feature Templates", 1, 2)
+    progress("Collecting Feature Templates", 1, 1)
 
     device_templates_information = template_api.get_device_templates()
     for i, device_template_information in enumerate(device_templates_information):
