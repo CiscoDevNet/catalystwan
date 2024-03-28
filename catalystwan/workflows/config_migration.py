@@ -18,7 +18,6 @@ from catalystwan.session import ManagerSession
 from catalystwan.utils.config_migration.converters.feature_template import create_parcel_from_template
 from catalystwan.utils.config_migration.converters.policy.policy_lists import convert as convert_policy_list
 from catalystwan.utils.config_migration.creators.config_pusher import UX2ConfigPusher, UX2ConfigRollback
-from catalystwan.utils.config_migration.device_templates import flatten_general_templates
 from catalystwan.utils.config_migration.reverters.config_reverter import UX2ConfigReverter
 
 logger = logging.getLogger(__name__)
@@ -96,7 +95,7 @@ def transform(ux1: UX1Config) -> UX2Config:
     ux2 = UX2Config()
     # Create Feature Profiles and Config Group
     for dt in ux1.templates.device_templates:
-        templates = flatten_general_templates(dt.general_templates)
+        templates = dt.get_flattened_general_templates()
 
         # Create Feature Profiles
         fp_system_uuid = uuid4()
@@ -132,7 +131,7 @@ def transform(ux1: UX1Config) -> UX2Config:
         transformed_cg = TransformedConfigGroup(
             header=TransformHeader(
                 type="config_group",
-                origin=uuid4(),
+                origin=UUID(dt.template_id),
                 subelements=set([fp_system_uuid, fp_other_uuid]),
             ),
             config_group=ConfigGroupCreationPayload(
