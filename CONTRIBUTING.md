@@ -89,6 +89,7 @@ Start reading our code, and you'll get the hang of it.
   Example:
 
   ```python
+  # to keep example brief we define models and endpoints in single file - however it is suggested to use separate files
   from pydantic import BaseModel, Field
   from typing import List
   from catalystwan.endpoints import APIEndpoints, delete, versions, view
@@ -112,17 +113,20 @@ Start reading our code, and you'll get the hang of it.
 
   Please note that when using `@request` decorator method must have no body. Request will be built automatically and return value based on defined type will be provided.
 
-  API endpoints Definitions can be found in: `catalystwan/endpoints` directory.
+  API endpoints definitions can be found in: `catalystwan/endpoints` directory.
 
-  The organization of items **strictly** follows an OpenAPI spec: https://developer.cisco.com/docs/sdwan/#!sd-wan-vmanage-v20-9
+  The organization of items should follow OpenAPI spec: https://developer.cisco.com/docs/sdwan/#!sd-wan-vmanage-v20-9
+
+  For example with given tag `Configuration - Feature Profile (SDWAN)` items should be placed in:
+  - `catalystwan/endpoints/configuration/feature_profile/sdwan/...` for APIEndpoints sub-classes
+  - `catalystwan/models/configuration/feature_profile/sdwan/...` for pydantic models defining payload, return type and possibly query params.
 
   Auto generated python methods names can be found in: https://ghe-msite.cisco.com/sbasan/openapi-generator-vmanage
 
-  If common data-model is being reused by more than one `APIEndpoints` class it should be moved to `catalystwan/model` folder with appropriate module name.
 
   Dedicated pre-commit step will automatically check corectness and add documentation for endpoints with `@request` (or `@get`, `@post`, `@put`, `@delete`) decorator.
 
-  Custom payload types are allowed (eg. for sending various types of files) please check example: [**SoftwarePackageUpdatePayload**](catalystwan/utils/upgrades_helper.py#L68)
+  Custom payload types are allowed (eg. for sending various types of files) please check example: [**SoftwarePackageUploadPayload**](catalystwan/utils/upgrades_helper.py#L77)
 
 1. Check that endpoints you want to utilize in your API already defined in `catalystwan/endpoints`.
 2. If endpoint not present, create new file with endpoint including data-model and methods with `@request`, `@view` and `@versions` decorators when needed.
