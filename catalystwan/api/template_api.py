@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import datetime as dt
 import json
 import logging
 from enum import Enum
-from typing import TYPE_CHECKING, Any, List, Optional, Type, overload
+from typing import TYPE_CHECKING, Any, Optional, Type, overload
 
 from ciscoconfparse import CiscoConfParse  # type: ignore
-from pydantic import BaseModel, ConfigDict, Field
 
 from catalystwan.api.task_status_api import Task
 from catalystwan.api.templates.cli_template import CLITemplate
@@ -42,6 +40,7 @@ from catalystwan.api.templates.models.system_vsmart_model import SystemVsmart
 from catalystwan.dataclasses import Device, DeviceTemplateInfo, FeatureTemplateInfo, FeatureTemplatesTypes, TemplateInfo
 from catalystwan.endpoints.configuration_device_template import FeatureToCLIPayload
 from catalystwan.exceptions import AttachedError, TemplateNotFoundError
+from catalystwan.models.templates import DeviceTemplateInformation, FeatureTemplateInformation
 from catalystwan.response import ManagerResponse
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.device_model import DeviceModel
@@ -69,43 +68,6 @@ class DeviceTemplateFeature(Enum):
     NETWORK_DESIGN = "network-design"
     VMANAGE_DEFAULT = "vmanage-default"
     ALL = "all"
-
-
-class TemplateInformation(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
-
-    last_updated_by: str = Field(serialization_alias="lastUpdatedBy", validation_alias="lastUpdatedBy")
-    id: str = Field(serialization_alias="templateId", validation_alias="templateId")
-    factory_default: bool = Field(serialization_alias="factoryDefault", validation_alias="factoryDefault")
-    name: str = Field(serialization_alias="templateName", validation_alias="templateName")
-    devices_attached: int = Field(serialization_alias="devicesAttached", validation_alias="devicesAttached")
-    description: str = Field(serialization_alias="templateDescription", validation_alias="templateDescription")
-    last_updated_on: dt.datetime = Field(serialization_alias="lastUpdatedOn", validation_alias="lastUpdatedOn")
-    resource_group: Optional[str] = Field(
-        default=None, serialization_alias="resourceGroup", validation_alias="resourceGroup"
-    )
-
-
-class FeatureTemplateInformation(TemplateInformation):
-    model_config = ConfigDict(populate_by_name=True)
-
-    template_type: str = Field(serialization_alias="templateType", validation_alias="templateType")
-    device_type: List[str] = Field(serialization_alias="deviceType", validation_alias="deviceType")
-    version: str = Field(serialization_alias="templateMinVersion", validation_alias="templateMinVersion")
-    template_definiton: Optional[str] = Field(
-        default=None, serialization_alias="templateDefinition", validation_alias="templateDefinition"
-    )
-
-
-class DeviceTemplateInformation(TemplateInformation):
-    model_config = ConfigDict(populate_by_name=True)
-
-    device_type: str = Field(serialization_alias="deviceType", validation_alias="deviceType")
-    template_class: str = Field(serialization_alias="templateClass", validation_alias="templateClass")
-    config_type: str = Field(serialization_alias="configType", validation_alias="configType")
-    template_attached: int = Field(serialization_alias="templateAttached", validation_alias="templateAttached")
-    draft_mode: Optional[str] = Field(default=None, serialization_alias="draftMode", validation_alias="draftMode")
-    device_role: Optional[str] = Field(default=None, serialization_alias="deviceRole", validation_alias="deviceRole")
 
 
 class TemplatesAPI:

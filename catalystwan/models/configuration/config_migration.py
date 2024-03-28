@@ -6,7 +6,6 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Annotated
 
-from catalystwan.api.template_api import FeatureTemplateInformation, TemplateInformation
 from catalystwan.api.templates.device_template.device_template import DeviceTemplate
 from catalystwan.endpoints.configuration_group import ConfigGroupCreationPayload
 from catalystwan.models.configuration.feature_profile.common import FeatureProfileCreationPayload, ProfileType
@@ -20,6 +19,7 @@ from catalystwan.models.policy import AnyPolicyDefinitionInfo, AnyPolicyListInfo
 from catalystwan.models.policy.centralized import CentralizedPolicyInfo
 from catalystwan.models.policy.localized import LocalizedPolicyInfo
 from catalystwan.models.policy.security import AnySecurityPolicyInfo
+from catalystwan.models.templates import FeatureTemplateInformation, TemplateInformation
 
 AnyParcel = Annotated[
     Union[AnySystemParcel, AnyPolicyObjectParcel, AnyServiceParcel, AnyOtherParcel, AnyTransportParcel],
